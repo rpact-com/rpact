@@ -150,22 +150,27 @@ NULL
             "); "
         )
         if (length(selectedPopulations) != gMax) {
-            stopIllegalArgument(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")", parameter = "selectPopulationsFunction",
+            stopIllegalArgument(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")",
+                parameter = "selectPopulationsFunction",
                 value = selectedPopulations, constraint = paste0("logical vector of length ", gMax), relatedParameter = "gMax",
-                relatedValue = gMax, functionName = ".selectPopulations")
+                relatedValue = gMax, functionName = ".selectPopulations"
+            )
         }
         if (!is.logical(selectedPopulations)) {
             stopIllegalArgument(msg, "the output must be a logical vector (is ", .getClassName(selectedPopulations),
-                ")", parameter = "selectPopulationsFunction", value = selectedPopulations, constraint = "logical vector",
+                ")",
+                parameter = "selectPopulationsFunction", value = selectedPopulations, constraint = "logical vector",
                 relatedParameter = "class of selected populations", relatedValue = .getClassName(selectedPopulations),
-                functionName = ".selectPopulations")
+                functionName = ".selectPopulations"
+            )
         }
     }
     return(selectedPopulations)
 }
 
 
-.performClosedCombinationTestForSimulationEnrichment <- function(...,
+.performClosedCombinationTestForSimulationEnrichment <- function(
+        ...,
         stageResults,
         design,
         indices,
@@ -173,7 +178,8 @@ NULL
         successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stopIllegalArgument("Group sequential design cannot be used for enrichment designs with population selection",
-            functionName = ".performClosedCombinationTestForSimulationEnrichment")
+            functionName = ".performClosedCombinationTestForSimulationEnrichment"
+        )
     }
 
     gMax <- nrow(stageResults$testStatistics)
@@ -335,17 +341,24 @@ NULL
     ))
 }
 
-.createSimulationResultsEnrichmentObject <- function(...,
+.createSimulationResultsEnrichmentObject <- function(
+        ...,
         design,
         effectList,
-        kappa = NA_real_, # survival only
-        dropoutRate1 = NA_real_, # survival only
-        dropoutRate2 = NA_real_, # survival only
-        dropoutTime = NA_real_, # survival only
-        eventTime = NA_real_, # survival only
+        kappa = NA_real_,
+        # survival only
+        dropoutRate1 = NA_real_,
+        # survival only
+        dropoutRate2 = NA_real_,
+        # survival only
+        dropoutTime = NA_real_,
+        # survival only
+        eventTime = NA_real_,
+        # survival only
         intersectionTest,
         stratifiedAnalysis = NA,
-        directionUpper = NA, # rates + survival only
+        directionUpper = NA,
+        # rates + survival only
         adaptations,
         typeOfSelection,
         effectMeasure,
@@ -353,25 +366,40 @@ NULL
         epsilonValue,
         rValue,
         threshold,
-        plannedSubjects = NA_real_, # means + rates only
-        plannedEvents = NA_real_, # survival only
-        accrualTime = NA_real_, # survival only
-        accrualIntensity = NA_real_, # survival only
-        maxNumberOfSubjects = NA_real_, # survival only
+        plannedSubjects = NA_real_,
+        # means + rates only
+        plannedEvents = NA_real_,
+        # survival only
+        accrualTime = NA_real_,
+        # survival only
+        accrualIntensity = NA_real_,
+        # survival only
+        maxNumberOfSubjects = NA_real_,
+        # survival only
         allocationRatioPlanned,
-        minNumberOfSubjectsPerStage = NA_real_, # means + rates only
-        maxNumberOfSubjectsPerStage = NA_real_, # means + rates only
-        minNumberOfEventsPerStage = NA_real_, # survival only
-        maxNumberOfEventsPerStage = NA_real_, # survival only
+        minNumberOfSubjectsPerStage = NA_real_,
+        # means + rates only
+        maxNumberOfSubjectsPerStage = NA_real_,
+        # means + rates only
+        minNumberOfEventsPerStage = NA_real_,
+        # survival only
+        maxNumberOfEventsPerStage = NA_real_,
+        # survival only
         conditionalPower,
-        thetaH1 = NA_real_, # means + survival only
-        stDevH1 = NA_real_, # means only
-        piTreatmentH1 = NA_real_, # rates only
-        piControlH1 = NA_real_, # rates only
+        thetaH1 = NA_real_,
+        # means + survival only
+        stDevH1 = NA_real_,
+        # means only
+        piTreatmentH1 = NA_real_,
+        # rates only
+        piControlH1 = NA_real_,
+        # rates only
         maxNumberOfIterations,
         seed,
-        calcSubjectsFunction = NULL, # means + rates only
-        calcEventsFunction = NULL, # survival only
+        calcSubjectsFunction = NULL,
+        # means + rates only
+        calcEventsFunction = NULL,
+        # survival only
         selectPopulationsFunction,
         showStatistics,
         endpoint = c("means", "rates", "survival"),
@@ -386,7 +414,9 @@ NULL
     .assertIsSinglePositiveInteger(rValue, "rValue", naAllowed = TRUE, validateType = FALSE)
 
     allocationRatioPlanned <- .assertIsNumericVector(
-        allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+        allocationRatioPlanned, "allocationRatioPlanned",
+        naAllowed = TRUE
+    )
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned",
@@ -402,14 +432,22 @@ NULL
 
     if (endpoint %in% c("means", "rates")) {
         minNumberOfSubjectsPerStage <- .assertIsNumericVector(
-            minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
+            minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage",
+            naAllowed = TRUE
+        )
         maxNumberOfSubjectsPerStage <- .assertIsNumericVector(
-            maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
+            maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage",
+            naAllowed = TRUE
+        )
     } else if (endpoint == "survival") {
         minNumberOfSubjectsPerStage <- .assertIsNumericVector(
-            minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
+            minNumberOfEventsPerStage, "minNumberOfEventsPerStage",
+            naAllowed = TRUE
+        )
         maxNumberOfSubjectsPerStage <- .assertIsNumericVector(
-            maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage", naAllowed = TRUE)
+            maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage",
+            naAllowed = TRUE
+        )
     }
 
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
@@ -446,7 +484,8 @@ NULL
         if (is.null(effectList$piControls)) {
             stopMissingArgument(sQuote("effectList$piControls"), " must be specified when 'effectList$piTreatments' is used",
                 functionName = ".createSimulationResultsEnrichmentObject", parameter = "effectList$piControls", value = effectList$piControls,
-                relatedParameter = "effectList$piTreatments", relatedValue = effectList$piTreatments)
+                relatedParameter = "effectList$piTreatments", relatedValue = effectList$piTreatments
+            )
         }
 
         effectList$hazardRatios <- t(apply(effectList$piTreatments, 1, function(piTreatments) {
@@ -455,8 +494,10 @@ NULL
     }
     gMax <- .getGMaxFromSubGroups(effectList$subGroups)
     if (gMax > 4) {
-        stopIllegalArgument("'populations' (", gMax, ") must not exceed 4", functionName = ".createSimulationResultsEnrichmentObject",
-            parameter = "populations")
+        stopIllegalArgument("'populations' (", gMax, ") must not exceed 4",
+            functionName = ".createSimulationResultsEnrichmentObject",
+            parameter = "populations"
+        )
     }
 
     .assertIsValidThreshold(threshold, activeArms = gMax)
@@ -466,7 +507,8 @@ NULL
 
     if (intersectionTest == "SpiessensDebois" && gMax > 2) {
         stopIllegalArgument("Spiessen & Debois intersection test cannot generally ", "be used for enrichment designs with more than two populations",
-            functionName = ".createSimulationResultsEnrichmentObject")
+            functionName = ".createSimulationResultsEnrichmentObject"
+        )
     }
 
     typeOfSelection <- .assertIsValidTypeOfSelection(typeOfSelection, rValue, epsilonValue, gMax)
@@ -538,8 +580,10 @@ NULL
         .setValueAndParameterType(simulationResults, "eventTime", eventTime, 12)
 
         if (!is.na(eventTime) && eventTime <= 0) {
-            stopIllegalArgument("'eventTime' (", eventTime, ") must be > 0", functionName = ".createSimulationResultsEnrichmentObject",
-                parameter = "eventTime", value = eventTime)
+            stopIllegalArgument("'eventTime' (", eventTime, ") must be > 0",
+                functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "eventTime", value = eventTime
+            )
         }
 
         .setValueAndParameterType(simulationResults, "kappa", kappa, 1)
@@ -552,22 +596,29 @@ NULL
         .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, 12)
 
         if (!is.na(dropoutTime) && dropoutTime <= 0) {
-            stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0", functionName = ".createSimulationResultsEnrichmentObject",
-                parameter = "dropoutTime", value = dropoutTime)
+            stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0",
+                functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "dropoutTime", value = dropoutTime
+            )
         }
         if (!is.na(dropoutRate1) && (dropoutRate1 < 0 || dropoutRate1 >= 1)) {
-            stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)", functionName = ".createSimulationResultsEnrichmentObject",
-                parameter = "dropoutRate1", value = dropoutRate1)
+            stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
+                functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "dropoutRate1", value = dropoutRate1
+            )
         }
         if (!is.na(dropoutRate2) && (dropoutRate2 < 0 || dropoutRate2 >= 1)) {
-            stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)", functionName = ".createSimulationResultsEnrichmentObject",
-                parameter = "dropoutRate2", value = dropoutRate2)
+            stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
+                functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "dropoutRate2", value = dropoutRate2
+            )
         }
 
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {
             stopIllegalArgument("'plannedEvents' (", .arrayToString(plannedEvents), ") must have length ", kMax,
-                functionName = ".createSimulationResultsEnrichmentObject", parameter = "plannedEvents", value = plannedEvents)
+                functionName = ".createSimulationResultsEnrichmentObject", parameter = "plannedEvents", value = plannedEvents
+            )
         }
         .assertIsInClosedInterval(plannedEvents, "plannedEvents", lower = 1, upper = NULL)
         .assertValuesAreStrictlyIncreasing(plannedEvents, "plannedEvents")
@@ -636,8 +687,10 @@ NULL
                     any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0)
                 ) {
                 stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
-                    .arrayToString(minNumberOfSubjectsPerStage), ")", functionName = ".createSimulationResultsEnrichmentObject",
-                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage)
+                    .arrayToString(minNumberOfSubjectsPerStage), ")",
+                    functionName = ".createSimulationResultsEnrichmentObject",
+                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage
+                )
             }
             .setValueAndParameterType(
                 simulationResults,
@@ -691,9 +744,11 @@ NULL
                     any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0)
                 ) {
                 stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than 'minNumberOfEventsPerStage' (",
-                    .arrayToString(minNumberOfEventsPerStage), ")", functionName = ".createSimulationResultsEnrichmentObject",
+                    .arrayToString(minNumberOfEventsPerStage), ")",
+                    functionName = ".createSimulationResultsEnrichmentObject",
                     parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage, relatedParameter = "minNumberOfEventsPerStage",
-                    relatedValue = minNumberOfEventsPerStage)
+                    relatedValue = minNumberOfEventsPerStage
+                )
             }
             .setValueAndParameterType(
                 simulationResults,
@@ -834,8 +889,10 @@ NULL
         allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
     } else if (length(allocationRatioPlanned) != design$kMax) {
         stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
-            design$kMax, " (kMax)", functionName = ".createSimulationResultsEnrichmentObject", parameter = "allocationRatioPlanned",
-            value = allocationRatioPlanned)
+            design$kMax, " (kMax)",
+            functionName = ".createSimulationResultsEnrichmentObject", parameter = "allocationRatioPlanned",
+            value = allocationRatioPlanned
+        )
     }
 
     if (length(unique(allocationRatioPlanned)) == 1) {
@@ -913,8 +970,10 @@ NULL
         adaptations <- rep(TRUE, kMax - 1)
     }
     if (length(adaptations) != kMax - 1) {
-        stopIllegalArgument("'adaptations' must have length ", (kMax - 1), " (kMax - 1)", functionName = ".createSimulationResultsEnrichmentObject",
-    parameter = "adaptations", value = adaptations)
+        stopIllegalArgument("'adaptations' must have length ", (kMax - 1), " (kMax - 1)",
+            functionName = ".createSimulationResultsEnrichmentObject",
+            parameter = "adaptations", value = adaptations
+        )
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))
 

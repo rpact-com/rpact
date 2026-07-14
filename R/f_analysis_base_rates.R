@@ -59,7 +59,8 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getAnalysisResultsRatesInverseNormal <- function(...,
+.getAnalysisResultsRatesInverseNormal <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -106,7 +107,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsRatesGroupSequential <- function(...,
+.getAnalysisResultsRatesGroupSequential <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -153,7 +155,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsRatesFisher <- function(...,
+.getAnalysisResultsRatesFisher <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -212,7 +215,8 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsRatesAll <- function(...,
+.getAnalysisResultsRatesAll <- function(
+        ...,
         results,
         design,
         dataInput,
@@ -450,7 +454,8 @@ NULL
 #'
 #' @noRd
 #'
-.getStageResultsRates <- function(...,
+.getStageResultsRates <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = NA_real_,
@@ -806,7 +811,8 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getRootThetaRates <- function(...,
+.getRootThetaRates <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -854,7 +860,8 @@ NULL
     return(result)
 }
 
-.getRepeatedConfidenceIntervalsRatesAll <- function(...,
+.getRepeatedConfidenceIntervalsRatesAll <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -994,7 +1001,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesGroupSequential <- function(...,
+.getRepeatedConfidenceIntervalsRatesGroupSequential <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -1028,7 +1036,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesInverseNormal <- function(...,
+.getRepeatedConfidenceIntervalsRatesInverseNormal <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -1062,7 +1071,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesFisher <- function(...,
+.getRepeatedConfidenceIntervalsRatesFisher <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -1096,8 +1106,10 @@ NULL
     # Inverse normal method
     condError <- getConditionalRejectionProbabilities(stageResults = stageResults)[stage]
     if (is.na(condError)) {
-        stopRuntimeIssue("conditional error could not be calculated at stage ", stage, functionName = ".calculateThetaH1",
-            parameter = "stage", value = stage)
+        stopRuntimeIssue("conditional error could not be calculated at stage ", stage,
+            functionName = ".calculateThetaH1",
+            parameter = "stage", value = stage
+        )
     }
 
     if (stageResults$isOneSampleDataset()) {
@@ -1170,7 +1182,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesGroupSequential <- function(...,
+.getConditionalPowerRatesGroupSequential <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         nPlanned,
@@ -1297,7 +1310,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesInverseNormal <- function(...,
+.getConditionalPowerRatesInverseNormal <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         nPlanned,
@@ -1422,7 +1436,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesFisher <- function(...,
+.getConditionalPowerRatesFisher <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         nPlanned,
@@ -1501,7 +1516,8 @@ NULL
     ))
 }
 
-.getConditionalPowerRates <- function(...,
+.getConditionalPowerRates <- function(
+        ...,
         stageResults,
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -1596,7 +1612,8 @@ NULL
     return(results)
 }
 
-.getConditionalPowerPlotRates <- function(...,
+.getConditionalPowerPlotRates <- function(
+        ...,
         stageResults,
         stage,
         nPlanned,
@@ -1771,7 +1788,8 @@ NULL
 }
 
 
-.getFinalConfidenceIntervalRatesValues <- function(design,
+.getFinalConfidenceIntervalRatesValues <- function(
+        design,
         dataInput,
         stageResults,
         directionUpper,
@@ -2034,7 +2052,8 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalRatesGroupSequential <- function(...,
+.getFinalConfidenceIntervalRatesGroupSequential <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -2086,7 +2105,8 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalRatesInverseNormal <- function(...,
+.getFinalConfidenceIntervalRatesInverseNormal <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -2138,7 +2158,8 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalRatesFisher <- function(...,
+.getFinalConfidenceIntervalRatesFisher <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -2184,7 +2205,8 @@ NULL
     ))
 }
 
-.getFinalConfidenceIntervalRates <- function(...,
+.getFinalConfidenceIntervalRates <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = NA_real_,

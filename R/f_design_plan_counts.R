@@ -151,8 +151,10 @@
 
     if (length(accrualTime) != length(accrualIntensity)) {
         stopRuntimeIssue("length of accrualTime (", length(accrualTime), ") and ", "accrualIntensity (", length(accrualIntensity),
-            ") must be identical", functionName = ".generateRecruitmentTimes", parameter = "accrualTime", value = length(accrualTime),
-            relatedParameter = "accrualIntensity", relatedValue = length(accrualIntensity))
+            ") must be identical",
+            functionName = ".generateRecruitmentTimes", parameter = "accrualTime", value = length(accrualTime),
+            relatedParameter = "accrualIntensity", relatedValue = length(accrualIntensity)
+        )
     }
 
     densityIntervals <- accrualTime
@@ -243,7 +245,8 @@
 #'
 #' @noRd
 #'
-.getVarianceEstimate <- function(lambda1,
+.getVarianceEstimate <- function(
+        lambda1,
         lambda2,
         allocation,
         overdispersion,
@@ -271,7 +274,8 @@
     return(varianceEstimate)
 }
 
-.getCalendarTime <- function(n1,
+.getCalendarTime <- function(
+        n1,
         n2,
         information,
         shift,
@@ -332,7 +336,8 @@
     return(NA_real_)
 }
 
-.getMaximumSampleSizeTwoGroups <- function(allocationRatioPlanned,
+.getMaximumSampleSizeTwoGroups <- function(
+        allocationRatioPlanned,
         shift,
         accrualTime,
         followUpTime,
@@ -388,7 +393,8 @@
     )
 }
 
-.getDesignPlanCountData <- function(design,
+.getDesignPlanCountData <- function(
+        design,
         designCharacteristics,
         objectType,
         sided,
@@ -460,7 +466,8 @@
 
     if (design$sided == 2 && thetaH0 != 1) {
         stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
-            functionName = ".getDesignPlanCountData")
+            functionName = ".getDesignPlanCountData"
+        )
     }
 
     if (!is.na(lambda2) && !anyNA(theta)) {

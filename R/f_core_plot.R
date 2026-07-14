@@ -154,8 +154,10 @@ NULL
     }
 
     if (stopIfNotFound) {
-        stopRuntimeIssue("could not find plot caption for ", .getClassName(obj), " and type ", type, functionName = ".getPlotCaption",
-            parameter = "obj", value = obj, relatedParameter = "type", relatedValue = type)
+        stopRuntimeIssue("could not find plot caption for ", .getClassName(obj), " and type ", type,
+            functionName = ".getPlotCaption",
+            parameter = "obj", value = obj, relatedParameter = "type", relatedValue = type
+        )
     }
 
     return(NA_character_)
@@ -168,8 +170,10 @@ NULL
         if (length(type) == 1 && type == "all") {
             availablePlotTypes <- getAvailablePlotTypes(x)
             if (is.null(availablePlotTypes)) {
-                stopRuntimeIssue("function 'getAvailablePlotTypes' not implemented for ", .getClassName(x), functionName = ".getPlotTypeNumber",
-                    parameter = "getAvailablePlotTypes")
+                stopRuntimeIssue("function 'getAvailablePlotTypes' not implemented for ", .getClassName(x),
+                    functionName = ".getPlotTypeNumber",
+                    parameter = "getAvailablePlotTypes"
+                )
             }
             return(availablePlotTypes)
         }
@@ -202,8 +206,10 @@ NULL
         message("Available plot types: ", .arrayToString(tolower(
             getAvailablePlotTypes(x, output = "caption")
         ), encapsulate = TRUE))
-        stopIllegalArgument("'type' (", .arrayToString(type), ") could not be identified", functionName = ".getPlotTypeNumber",
-            parameter = "type", value = type)
+        stopIllegalArgument("'type' (", .arrayToString(type), ") could not be identified",
+            functionName = ".getPlotTypeNumber",
+            parameter = "type", value = type
+        )
     }
 
     return(type)
@@ -294,7 +300,9 @@ NULL
 
 #' @rdname getAvailablePlotTypes
 #' @export
-plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
+plotTypes <- function(
+        obj,
+        output = c("numeric", "caption", "numcap", "capnum"),
         numberInCaptionEnabled = FALSE) {
     return(getAvailablePlotTypes(
         obj = obj, output = output,
@@ -383,7 +391,9 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
 #'
 #' @export
 #'
-getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
+getAvailablePlotTypes <- function(
+        obj,
+        output = c("numeric", "caption", "numcap", "capnum"),
         numberInCaptionEnabled = FALSE) {
     output <- match.arg(output)
     if (is.null(obj)) {
@@ -582,7 +592,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(paste0(objectName, "$", parameterName))
 }
 
-.showPlotSourceInformation <- function(objectName,
+.showPlotSourceInformation <- function(
+        objectName,
         ...,
         xParameterName,
         yParameterNames,
@@ -608,7 +619,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     .assertIsSingleCharacter(xParameterName, "xParameterName")
     if (length(yParameterNames) == 0 || !all(is.character(yParameterNames)) || all(is.na(yParameterNames))) {
         stopIllegalArgument("'yParameterNames' (", .arrayToString(yParameterNames), ") must be a valid character vector",
-            functionName = ".showPlotSourceInformation", parameter = "yParameterNames", value = yParameterNames)
+            functionName = ".showPlotSourceInformation", parameter = "yParameterNames", value = yParameterNames
+        )
     }
     .assertIsSingleCharacter(hint, "hint", naAllowed = TRUE)
     .assertIsSingleNumber(nMax, "nMax", naAllowed = TRUE)
@@ -735,7 +747,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(invisible(FALSE))
 }
 
-.getParameterSetAsDataFrame <- function(...,
+.getParameterSetAsDataFrame <- function(
+        ...,
         parameterSet,
         designMaster,
         addPowerAndAverageSampleNumber = FALSE,
@@ -746,7 +759,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (.isTrialDesignSet(parameterSet) && parameterSet$getSize() > 1 &&
             (is.null(parameterSet$variedParameters) || length(parameterSet$variedParameters) == 0)) {
         stopRuntimeIssue("'variedParameters' must be not empty; ", "use 'DesignSet$addVariedParameters(character)' to add one or more varied parameters",
-            functionName = ".getParameterSetAsDataFrame", parameter = "variedParameters", relatedParameter = "DesignSet$addVariedParameters(character)")
+            functionName = ".getParameterSetAsDataFrame", parameter = "variedParameters", relatedParameter = "DesignSet$addVariedParameters(character)"
+        )
     }
 
     if (inherits(parameterSet, "TrialDesignSet")) {
@@ -790,8 +804,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         for (variedParameter in variedParameters) {
             column <- data[[variedParameter]]
             if (length(column) <= 1) {
-                stopRuntimeIssue("varied parameter '", variedParameter, "' has length ", length(column), functionName = ".getParameterSetAsDataFrame",
-                    parameter = "variedParameter", value = variedParameter, relatedParameter = "column", relatedValue = length(column))
+                stopRuntimeIssue("varied parameter '", variedParameter, "' has length ", length(column),
+                    functionName = ".getParameterSetAsDataFrame",
+                    parameter = "variedParameter", value = variedParameter, relatedParameter = "column", relatedValue = length(column)
+                )
             }
 
             valueBefore <- column[1]
@@ -852,7 +868,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(TRUE)
 }
 
-.plotParameterSet <- function(...,
+.plotParameterSet <- function(
+        ...,
         parameterSet,
         designMaster,
         xParameterName,
@@ -887,8 +904,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         for (parameterName in parameterNames) {
             if (!is.na(parameterName) && !(parameterName %in% fieldNames)) {
                 stopIllegalArgument("'", .getClassName(parameterSet), "' and '", .getClassName(designMaster), "' ", "do not contain a field with name '",
-                    parameterName, "'", functionName = ".plotParameterSet", parameter = "parameterName", value = parameterName,
-                    relatedParameter = "fieldNames", relatedValue = fieldNames)
+                    parameterName, "'",
+                    functionName = ".plotParameterSet", parameter = "parameterName", value = parameterName,
+                    relatedParameter = "fieldNames", relatedValue = fieldNames
+                )
             }
         }
         if (is.null(plotSettings) || !inherits(plotSettings, "PlotSettings")) {
@@ -947,8 +966,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         data <- parameterSet
     } else {
         stopRuntimeIssue("'parameterSet' (", .getClassName(parameterSet), ") must be a data.frame, a 'TrialDesignSet' ",
-            "or an object that inherits from 'ParameterSet'", functionName = ".plotParameterSet", parameter = "parameterSet",
-            value = parameterSet, relatedParameter = "TrialDesignSet")
+            "or an object that inherits from 'ParameterSet'",
+            functionName = ".plotParameterSet", parameter = "parameterSet",
+            value = parameterSet, relatedParameter = "TrialDesignSet"
+        )
     }
 
     if (length(variedParameters) > 0) {
@@ -1028,12 +1049,16 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
         if (!(xParameterName %in% colnames(data))) {
             print(colnames(data))
-            stopRuntimeIssue(sQuote(xParameterName), " is not available in dataset (x-axis)", functionName = ".plotParameterSet",
-                parameter = xParameterName)
+            stopRuntimeIssue(sQuote(xParameterName), " is not available in dataset (x-axis)",
+                functionName = ".plotParameterSet",
+                parameter = xParameterName
+            )
         }
         if (!(yParameterName1 %in% colnames(data))) {
-            stopRuntimeIssue(sQuote(yParameterName1), " is not available in dataset (y-axis)", functionName = ".plotParameterSet",
-                parameter = yParameterName1)
+            stopRuntimeIssue(sQuote(yParameterName1), " is not available in dataset (y-axis)",
+                functionName = ".plotParameterSet",
+                parameter = yParameterName1
+            )
         }
 
         data$xValues <- data[[xParameterName]]
@@ -1050,8 +1075,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$yValues2 <- rep(NA_real_, nrow(data))
         } else {
             if (!(yParameterName2 %in% colnames(data))) {
-                stopRuntimeIssue(sQuote(yParameterName2), " is not available in dataset (y-axis 2)", functionName = ".plotParameterSet",
-                    parameter = yParameterName2)
+                stopRuntimeIssue(sQuote(yParameterName2), " is not available in dataset (y-axis 2)",
+                    functionName = ".plotParameterSet",
+                    parameter = yParameterName2
+                )
             }
             data$yValues2 <- data[[yParameterName2]]
         }
@@ -1059,8 +1086,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$yValues3 <- rep(NA_real_, nrow(data))
         } else {
             if (!(yParameterName3 %in% colnames(data))) {
-                stopRuntimeIssue(sQuote(yParameterName3), " is not available in dataset (y-axis 3)", functionName = ".plotParameterSet",
-                    parameter = yParameterName3)
+                stopRuntimeIssue(sQuote(yParameterName3), " is not available in dataset (y-axis 3)",
+                    functionName = ".plotParameterSet",
+                    parameter = yParameterName3
+                )
             }
             data$yValues3 <- data[[yParameterName3]]
         }
@@ -1277,11 +1306,13 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     m2 <- ifelse(length(.naAndNaNOmit(rightAxisValues)) == 0, 1, max(.naAndNaNOmit(rightAxisValues)))
     if (is.na(m1)) {
         stopRuntimeIssue("y-values, left (", .arrayToString(leftAxisValues), ") are not specified correctly",
-            functionName = ".getScalingFactors", parameter = "leftAxisValues", value = leftAxisValues)
+            functionName = ".getScalingFactors", parameter = "leftAxisValues", value = leftAxisValues
+        )
     }
     if (is.na(m2)) {
         stopRuntimeIssue("y-values, right (", .arrayToString(rightAxisValues), ") are not specified correctly",
-            functionName = ".getScalingFactors", parameter = "rightAxisValues", value = rightAxisValues)
+            functionName = ".getScalingFactors", parameter = "rightAxisValues", value = rightAxisValues
+        )
     }
 
     if (m1 > m2) {
@@ -1297,15 +1328,19 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     if (is.infinite(scalingFactor2)) {
         stopRuntimeIssue("Failed to calculate 'scalingFactor2' (", scalingFactor2, ") for ", .arrayToString(leftAxisValues,
-            maxLength = 15), " and ", .arrayToString(rightAxisValues, maxLength = 15), parameter = "scalingFactor2",
-            value = scalingFactor2, 
-            functionName = ".getScalingFactors")
+            maxLength = 15
+        ), " and ", .arrayToString(rightAxisValues, maxLength = 15),
+        parameter = "scalingFactor2",
+        value = scalingFactor2,
+        functionName = ".getScalingFactors"
+        )
     }
 
     return(list(scalingFactor1 = scalingFactor1, scalingFactor2 = scalingFactor2))
 }
 
-.plotDataFrame <- function(data,
+.plotDataFrame <- function(
+        data,
         ...,
         mainTitle = NA_character_,
         xlab = NA_character_,
@@ -1328,8 +1363,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         discreteXAxis = FALSE,
         directionUpper = NA) {
     if (!is.data.frame(data)) {
-        stopRuntimeIssue("'data' must be a data.frame (is ", .getClassName(data), ")", functionName = ".plotDataFrame",
-            parameter = "data", value = data)
+        stopRuntimeIssue("'data' must be a data.frame (is ", .getClassName(data), ")",
+            functionName = ".plotDataFrame",
+            parameter = "data", value = data
+        )
     }
 
     if (is.null(plotSettings)) {
@@ -1500,7 +1537,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(pointBorder)
 }
 
-.getLegendPosition <- function(plotSettings,
+.getLegendPosition <- function(
+        plotSettings,
         designMaster,
         data,
         yParameterName1,
@@ -1605,8 +1643,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 .getLambdaStepFunction <- function(timeValues, piecewiseSurvivalTime, piecewiseLambda) {
     if (length(piecewiseSurvivalTime) != length(piecewiseLambda)) {
         stopIllegalArgument("length of 'piecewiseSurvivalTime' (", length(piecewiseSurvivalTime), ") must be equal to length of 'piecewiseLambda' (",
-            length(piecewiseLambda), ") - 1", functionName = ".getLambdaStepFunction", parameter = "piecewiseSurvivalTime",
-            value = length(piecewiseSurvivalTime), relatedParameter = "piecewiseLambda", relatedValue = length(piecewiseLambda))
+            length(piecewiseLambda), ") - 1",
+            functionName = ".getLambdaStepFunction", parameter = "piecewiseSurvivalTime",
+            value = length(piecewiseSurvivalTime), relatedParameter = "piecewiseLambda", relatedValue = length(piecewiseLambda)
+        )
     }
 
     piecewiseSurvivalTime <- .getPiecewiseExpStartTimesWithoutLeadingZero(piecewiseSurvivalTime)
@@ -1691,8 +1731,10 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     .assertGgplotIsInstalled()
 
     if (grepl("\\\\|/", filename)) {
-        stopIllegalArgument("'filename' seems to be a path. ", "Please specify 'outputPath' separately", functionName = "saveLastPlot",
-    parameter = "filename", relatedParameter = "outputPath", value = filename)
+        stopIllegalArgument("'filename' seems to be a path. ", "Please specify 'outputPath' separately",
+            functionName = "saveLastPlot",
+            parameter = "filename", relatedParameter = "outputPath", value = filename
+        )
     }
 
     if (!grepl("\\.png$", filename)) {
@@ -1715,8 +1757,10 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     }
 
     if (is.null(x[[".plotSettings"]])) {
-        stopRuntimeIssue("'x' (", .getClassName(x), ") does not contain field .plotSettings", functionName = ".getGridPlotSettings",
-            parameter = "x", value = x)
+        stopRuntimeIssue("'x' (", .getClassName(x), ") does not contain field .plotSettings",
+            functionName = ".getGridPlotSettings",
+            parameter = "x", value = x
+        )
     }
 
     plotSettings <- x$.plotSettings

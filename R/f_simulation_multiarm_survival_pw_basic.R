@@ -142,7 +142,8 @@ NULL
 #'
 #' @noRd
 #'
-.findObservationTime <- function(survivalDataSet,
+.findObservationTime <- function(
+        survivalDataSet,
         requiredStageEvents) {
     numberOfSubjects <- length(survivalDataSet$accrualTime)
     upperBound <- 1
@@ -213,7 +214,8 @@ NULL
     treatments[1:maxNumberOfSubjects]
 }
 
-.updateTreatmentsVector <- function(k,
+.updateTreatmentsVector <- function(
+        k,
         gMax,
         maxNumberOfSubjects,
         numberOfSubjects,
@@ -244,7 +246,8 @@ NULL
 #'
 #' @noRd
 #'
-.getSimulatedStageResultsSurvivalMultiArmPatientWise <- function(...,
+.getSimulatedStageResultsSurvivalMultiArmPatientWise <- function(
+        ...,
         design,
         directionUpper,
         omegaVector,
@@ -542,7 +545,8 @@ NULL
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
-    functionName = ".getSimulatedStageResultsSurvivalMultiArmPatientWise", parameter = "calcEventsFunction", value = calcEventsFunction)
+                        functionName = ".getSimulatedStageResultsSurvivalMultiArmPatientWise", parameter = "calcEventsFunction", value = calcEventsFunction
+                    )
                 }
 
                 if (!is.na(conditionalPower)) {
@@ -593,7 +597,8 @@ NULL
     ))
 }
 
-.performSimulationMultiArmSurvivalLoop <- function(cols,
+.performSimulationMultiArmSurvivalLoop <- function(
+        cols,
         maxNumberOfIterations,
         design,
         directionUpper,

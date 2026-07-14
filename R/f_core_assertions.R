@@ -1061,8 +1061,12 @@ NULL
 }
 
 .assertDesignParameterExists <- function(
-        design, parameterName, defaultValue, ...,
-        relatedParameter = NULL, relatedValue = NULL) {
+        design,
+        parameterName,
+        defaultValue,
+        ...,
+        relatedParameter = NULL,
+        relatedValue = NULL) {
     if (missing(design)) {
         stopMissingArgument("'design' must be defined",
             functionName = ".assertDesignParameterExists",
@@ -1086,14 +1090,13 @@ NULL
 
     value <- design[[parameterName]]
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
-        
         constraint <- NULL
         if (identical(relatedParameter, "typeOfDesign") && !is.null(relatedValue)) {
             constraint <- paste0(
                 "must be specified for '", relatedParameter, "' = '", relatedValue, "'"
             )
         }
-        
+
         stopMissingArgument("parameter '", parameterName, "' must be specified in design",
             functionName = ".assertDesignParameterExists",
             parameter = parameterName,
@@ -1170,8 +1173,8 @@ NULL
     if (is.na(lowerBound) && is.na(upperBound)) {
         stopMissingArgument("'lowerBound' or 'upperBound' must be defined",
             functionName = ".showParameterOutOfValidatedBoundsMessage",
-            parameter = "lowerBound", 
-            relatedParameter = "upperBound", 
+            parameter = "lowerBound",
+            relatedParameter = "upperBound",
             value = lowerBound
         )
     }
@@ -2123,7 +2126,7 @@ NULL
     if (endpoint == "rates" && groups == 1 && is.na(thetaH0)) {
         stopMissingArgument("'thetaH0' must be specified for testing a rate in one sample",
             parameter = "thetaH0", constraint = "must be specified for testing a rate in one sample",
-            functionName = ".assertIsValidThetaH0", 
+            functionName = ".assertIsValidThetaH0",
             value = thetaH0
         )
     }
@@ -3954,13 +3957,14 @@ NULL
     if (numberOfParameters != 2) {
         message <- "exactly two of the parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified"
         do.call(
-            what = if (numberOfParameters > 2) stopConflictingArguments else stopMissingArgument, 
+            what = if (numberOfParameters > 2) stopConflictingArguments else stopMissingArgument,
             args = list(message,
                 functionName = ".assertIsValidEffectCountData",
                 parameter = c("lambda", "lambda1", "lambda2", "theta"),
                 relatedParameter = "numberOfParameters",
                 relatedValue = numberOfParameters
-            ))
+            )
+        )
     }
 
     if (!is.na(lambda2) && all(!is.na(theta))) {

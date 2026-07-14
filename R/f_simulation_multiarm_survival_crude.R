@@ -18,7 +18,8 @@
 NULL
 
 # Correlation matrix according to Deng et al. (2019) accounting for alternative:
-.getCholeskyDecomposition <- function(allocationRatioPlanned,
+.getCholeskyDecomposition <- function(
+        allocationRatioPlanned,
         selectedArms,
         k,
         omegaVector) {
@@ -35,7 +36,8 @@ NULL
     return(choleskyDecomposition)
 }
 
-.getSimulatedStageSurvivalMultiArm <- function(...,
+.getSimulatedStageSurvivalMultiArm <- function(
+        ...,
         design,
         directionUpper,
         omegaVector,
@@ -206,7 +208,8 @@ NULL
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
-    functionName = ".getSimulatedStageSurvivalMultiArm", parameter = "calcEventsFunction", value = calcEventsFunction)
+                        functionName = ".getSimulatedStageSurvivalMultiArm", parameter = "calcEventsFunction", value = calcEventsFunction
+                    )
                 }
 
                 if (!is.na(conditionalPower) || calcEventsFunctionIsUserDefined) {
@@ -326,19 +329,27 @@ NULL
 getSimulationMultiArmSurvivalBasic <- function(
         design = NULL,
         ...,
-        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
+        activeArms = NA_integer_,
+        # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
-        typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+        # C_TYPE_OF_SHAPE_DEFAULT
+        omegaMaxVector = seq(1, 2.6, 0.4),
+        # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
-        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
+        # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         correlationComputation = c("alternative", "null"),
         epsilonValue = NA_real_,
         rValue = NA_real_,
@@ -349,7 +360,8 @@ getSimulationMultiArmSurvivalBasic <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
@@ -664,8 +676,10 @@ getSimulationMultiArmSurvivalBasic <- function(
     }
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations
-    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms",
-        simulationResults$numberOfSelectedArms, "2026-07-13")
+    .addDeprecatedFieldValues(
+        simulationResults, "numberOfActiveArms",
+        simulationResults$numberOfSelectedArms, "2026-07-13"
+    )
 
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
@@ -684,8 +698,10 @@ getSimulationMultiArmSurvivalBasic <- function(
             simulationResults$cumulativeEventsPerStage[, , gMax + 1]
     }
     simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
-    .addDeprecatedFieldValues(simulationResults, "eventsPerStage",
-        simulationResults$cumulativeEventsPerStage, "2024-06-10")
+    .addDeprecatedFieldValues(
+        simulationResults, "eventsPerStage",
+        simulationResults$cumulativeEventsPerStage, "2024-06-10"
+    )
 
     simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
     for (g in 1:gMax) {
@@ -696,8 +712,10 @@ getSimulationMultiArmSurvivalBasic <- function(
 
     simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
     simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage",
-        simulatedSingleEventsPerStage, "2024-06-10")
+    .addDeprecatedFieldValues(
+        simulationResults, "singleNumberOfEventsPerStage",
+        simulatedSingleEventsPerStage, "2024-06-10"
+    )
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 

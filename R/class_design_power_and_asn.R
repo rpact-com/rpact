@@ -115,8 +115,10 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             .assertIsValidSidedParameter(self$.design$sided)
 
             if (self$nMax <= 0) {
-                stopIllegalArgument("'nMax' must be an integer > 0", functionName = ".initPowerAndAverageSampleNumber",
-                    parameter = "nMax")
+                stopIllegalArgument("'nMax' must be an integer > 0",
+                    functionName = ".initPowerAndAverageSampleNumber",
+                    parameter = "nMax"
+                )
             }
 
             self$.setParameterType("nMax", ifelse(self$nMax == C_NA_MAX_DEFAULT,
@@ -321,8 +323,13 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
 #'
 #' @keywords internal
 #'
-as.data.frame.PowerAndAverageSampleNumberResult <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
+as.data.frame.PowerAndAverageSampleNumberResult <- function(
+        x,
+        row.names = NULL,
+        optional = FALSE,
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE,
+        ...) {
     parameterNames <- x$.getVisibleFieldNames()
     parameterNames <- parameterNames[parameterNames != "nMax"]
     dataFrame <- .getAsDataFrame(

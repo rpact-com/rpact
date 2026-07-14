@@ -105,7 +105,8 @@
 #' @keywords internal
 #' @export
 #'
-writeKeyValueFile <- function(keyValueList,
+writeKeyValueFile <- function(
+        keyValueList,
         filePath,
         ...,
         writeHeader = TRUE,
@@ -124,8 +125,10 @@ writeKeyValueFile <- function(keyValueList,
 
     keyNames <- names(keyValueList)
     if (is.null(keyNames) || any(!nzchar(keyNames))) {
-        stopIllegalArgument("'keyValueList' must be a named list()", functionName = "writeKeyValueFile", parameter = "keyValueList",
-    value = keyValueList)
+        stopIllegalArgument("'keyValueList' must be a named list()",
+            functionName = "writeKeyValueFile", parameter = "keyValueList",
+            value = keyValueList
+        )
     }
 
     isInvalidValue <- vapply(
@@ -137,12 +140,15 @@ writeKeyValueFile <- function(keyValueList,
     )
     if (any(isInvalidValue)) {
         stopIllegalArgument("all values must be length-1 atomic (no lists/vectors). Problem keys: ", paste(names(keyValueList)[isInvalidValue],
-            collapse = ", "), functionName = "writeKeyValueFile")
+            collapse = ", "
+        ), functionName = "writeKeyValueFile")
     }
 
     if (file.exists(filePath) && !overwrite) {
-        stopIllegalArgument("file exists and overwrite = FALSE: ", sQuote(filePath), functionName = "writeKeyValueFile",
-            parameter = filePath)
+        stopIllegalArgument("file exists and overwrite = FALSE: ", sQuote(filePath),
+            functionName = "writeKeyValueFile",
+            parameter = filePath
+        )
     }
 
     outputDirectory <- dirname(filePath)
@@ -224,8 +230,10 @@ writeKeyValueFile <- function(keyValueList,
         key <- keyNames[index]
 
         if (isTRUE(safeKeyCheck) && !grepl("^[A-Za-z0-9_.-]+$", key)) {
-            stopRuntimeIssue("invalid key name '", key, "'. Allowed: A-Za-z0-9_.-", functionName = "writeKeyValueFile",
-                parameter = "key", value = key)
+            stopRuntimeIssue("invalid key name '", key, "'. Allowed: A-Za-z0-9_.-",
+                functionName = "writeKeyValueFile",
+                parameter = "key", value = key
+            )
         }
 
         valueString <- convertValueToString(keyValueList[[index]])
@@ -300,7 +308,8 @@ writeKeyValueFile <- function(keyValueList,
 #' @keywords internal
 #' @export
 #'
-readKeyValueFile <- function(filePath,
+readKeyValueFile <- function(
+        filePath,
         ...,
         inferTypes = TRUE,
         duplicateKeys = c("error", "last", "first"),
@@ -406,8 +415,10 @@ readKeyValueFile <- function(filePath,
         }
 
         if (isTRUE(safeKeyCheck) && !grepl("^[A-Za-z0-9_.-]+$", key)) {
-            stopRuntimeIssue("invalid key name in file: ", sQuote(key), ". Allowed: A-Za-z0-9_.-", functionName = "readKeyValueFile",
-                parameter = key)
+            stopRuntimeIssue("invalid key name in file: ", sQuote(key), ". Allowed: A-Za-z0-9_.-",
+                functionName = "readKeyValueFile",
+                parameter = key
+            )
         }
 
         if (key %in% seenKeys) {

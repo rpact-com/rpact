@@ -31,8 +31,7 @@ NULL
         overallRatesTreatment,
         overallRatesControl,
         minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage
-        ) {
+        maxNumberOfSubjectsPerStage) {
     stage <- stage - 1 # to be consistent with non-enrichment situation
     gMax <- nrow(overallRatesTreatment)
 
@@ -80,7 +79,8 @@ NULL
     return(newSubjects)
 }
 
-.getSimulatedStageRatesEnrichment <- function(...,
+.getSimulatedStageRatesEnrichment <- function(
+        ...,
         design,
         subsets,
         prevalences,
@@ -156,7 +156,9 @@ NULL
                 any(round(subjectsPerStage[selsubs, k] / (1 + const)) < 1)
             ) {
             stopIllegalArgument("at least one sample size specification too small to create simulation results, ",
-                "e.g., due to small prevalences of subsets", functionName = ".getSimulatedStageRatesEnrichment")
+                "e.g., due to small prevalences of subsets",
+                functionName = ".getSimulatedStageRatesEnrichment"
+            )
         }
 
         simEventsTreatment[selsubs, k] <- stats::rbinom(
@@ -848,7 +850,8 @@ NULL
                     is.null(newSubjects) || length(newSubjects) != 1 || !is.numeric(newSubjects) || is.na(newSubjects)
                     ) {
                     stopIllegalArgument("'calcSubjectsFunction' returned an illegal or ", "undefined result (", newSubjects, "); ", "the output must be a single numeric value",
-    functionName = ".getSimulatedStageRatesEnrichment", parameter = "calcSubjectsFunction", value = calcSubjectsFunction)
+                        functionName = ".getSimulatedStageRatesEnrichment", parameter = "calcSubjectsFunction", value = calcSubjectsFunction
+                    )
                 }
 
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
@@ -1003,13 +1006,19 @@ getSimulationEnrichmentRates <- function(
         design = NULL,
         ...,
         effectList = NULL,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT,
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
+        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE,
+        # C_STRATIFIED_ANALYSIS_DEFAULT,
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -1020,7 +1029,8 @@ getSimulationEnrichmentRates <- function(
         conditionalPower = NA_real_,
         piTreatmentH1 = NA_real_,
         piControlH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectPopulationsFunction = NULL,

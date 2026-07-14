@@ -249,12 +249,14 @@ NULL
     }
 
     stopRuntimeIssue("function '.getGeneratorFunctionName' is not implemented for class ", .getClassName(obj),
-        functionName = ".getGeneratorFunctionName", parameter = ".getGeneratorFunctionName")
+        functionName = ".getGeneratorFunctionName", parameter = ".getGeneratorFunctionName"
+    )
 }
 
 #' @rdname getObjectRCode
 #' @export
-rcmd <- function(obj,
+rcmd <- function(
+        obj,
         ...,
         leadingArguments = NULL,
         includeDefaultParameters = FALSE,
@@ -283,8 +285,14 @@ rcmd <- function(obj,
     )
 }
 
-.getPreconditionDesignRCode <- function(design, pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
-        stringWrapParagraphWidth, stringWrapPrefix, newArgumentValues,
+.getPreconditionDesignRCode <- function(
+        design,
+        pipeOperator,
+        pipeOperatorPostfix,
+        includeDefaultParameters,
+        stringWrapParagraphWidth,
+        stringWrapPrefix,
+        newArgumentValues,
         leadingArguments) {
     preconditionDesign <- getObjectRCode(
         design,
@@ -313,7 +321,8 @@ rcmd <- function(obj,
     ))
 }
 
-.getObjectRCodeFutilityBounds <- function(obj,
+.getObjectRCodeFutilityBounds <- function(
+        obj,
         ...,
         precondition,
         leadingArguments,
@@ -399,7 +408,8 @@ rcmd <- function(obj,
 #'
 #' @export
 #'
-getObjectRCode <- function(obj,
+getObjectRCode <- function(
+        obj,
         ...,
         leadingArguments = NULL,
         includeDefaultParameters = FALSE,
@@ -502,7 +512,9 @@ getObjectRCode <- function(obj,
 
     if (!is.list(newArgumentValues)) {
         stopIllegalArgument("'newArgumentValues' must be a named list ", "(is ", .getClassName(newArgumentValues),
-            ")", functionName = "getObjectRCode", parameter = "newArgumentValues", value = newArgumentValues)
+            ")",
+            functionName = "getObjectRCode", parameter = "newArgumentValues", value = newArgumentValues
+        )
     }
 
     if (!inherits(obj, "ConditionalPowerResults") &&
@@ -768,7 +780,8 @@ getObjectRCode <- function(obj,
         if (length(illegalArgumentValueNames) > 0) {
             stopIllegalArgument("'", illegalArgumentValueNames, "' is not a valid ", functionName, "() argument",
                 functionName = "getObjectRCode", parameter = "illegalArgumentValueNames", value = illegalArgumentValueNames,
-                relatedParameter = "functionName", relatedValue = functionName)
+                relatedParameter = "functionName", relatedValue = functionName
+            )
         }
 
         defaultParams <- newArgumentValueNames[!(newArgumentValueNames %in% objNames)]
@@ -1087,7 +1100,8 @@ getObjectRCode <- function(obj,
     )
 }
 
-.formatRCode <- function(rCode,
+.formatRCode <- function(
+        rCode,
         precondition,
         stringWrapParagraphWidth,
         postfix,

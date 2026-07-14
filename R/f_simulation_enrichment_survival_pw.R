@@ -106,21 +106,33 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         ...,
         effectList = NULL,
         kappa = 1,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
-        accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
-        accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
+        accrualTime = c(0, 12),
+        # C_ACCRUAL_TIME_DEFAULT
+        accrualIntensity = 0.1,
+        # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),
-        dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
+        dropoutRate1 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutRate2 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutTime = 12,
+        # C_DROP_OUT_TIME_DEFAULT
         maxNumberOfSubjects = NA_real_,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
+        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE,
+        # C_STRATIFIED_ANALYSIS_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -130,7 +142,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
@@ -180,7 +193,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     if (length(allocationRatioPlanned) != 1) {
         stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
             functionName = "getSimulationEnrichmentSurvivalPatientWise", parameter = "allocationRatioPlanned",
-            value = allocationRatioPlanned)
+            value = allocationRatioPlanned
+        )
     }
 
     simulationResults <- .createSimulationResultsEnrichmentObject(
@@ -248,11 +262,15 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     )
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (identical(accrualIntensity, 1L)) {
-            stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'", functionName = "getSimulationEnrichmentSurvivalPatientWise",
-    parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity)
+            stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
+                functionName = "getSimulationEnrichmentSurvivalPatientWise",
+                parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
+            )
         }
-        stopIllegalArgument("'maxNumberOfSubjects' must be defined", functionName = "getSimulationEnrichmentSurvivalPatientWise",
-    parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects)
+        stopIllegalArgument("'maxNumberOfSubjects' must be defined",
+            functionName = "getSimulationEnrichmentSurvivalPatientWise",
+            parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects
+        )
     }
     simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
     simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
@@ -499,21 +517,33 @@ getSimulationEnrichmentSurvival <- function(
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
         effectList = NULL,
         kappa = 1,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
-        accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
-        accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
+        accrualTime = c(0, 12),
+        # C_ACCRUAL_TIME_DEFAULT
+        accrualIntensity = 0.1,
+        # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),
-        dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
+        dropoutRate1 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutRate2 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutTime = 12,
+        # C_DROP_OUT_TIME_DEFAULT
         maxNumberOfSubjects = NA_real_,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
+        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE,
+        # C_STRATIFIED_ANALYSIS_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -523,12 +553,12 @@ getSimulationEnrichmentSurvival <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
-        showStatistics = FALSE
-        ) {
+        showStatistics = FALSE) {
     simulationType <- match.arg(simulationType)
 
     callArgs <- names(as.list(match.call(expand.dots = FALSE)))
@@ -565,10 +595,12 @@ getSimulationEnrichmentSurvival <- function(
     if (identical(simulationType, "testStatisticBased")) {
         if (usesPatientWiseOnlyArgs) {
             stopIllegalArgument("patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"",
-    functionName = "getSimulationEnrichmentSurvival", parameter = "simulationType", value = simulationType)
+                functionName = "getSimulationEnrichmentSurvival", parameter = "simulationType", value = simulationType
+            )
         }
 
-        message("Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed log-rank test statistics instead of patient-wise survival data. ",
+        message(
+            "Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed log-rank test statistics instead of patient-wise survival data. ",
             "To simulate patient-wise survival data, specify 'simulationType' = \"patientWise\" and the corresponding arguments."
         )
 
@@ -639,10 +671,11 @@ getSimulationEnrichmentSurvival <- function(
     }
 
     if (identical(simulationType, "patientWiseBasic")) {
-
-        message("Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise survival data using R code instead of C++ code. ",
+        message(
+            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise survival data using R code instead of C++ code. ",
             "This approach is less efficient and should only be used for testing purposes. ",
-            "To perform a more efficient patient-wise simulation, specify 'simulationType' = \"patientWise\".")
+            "To perform a more efficient patient-wise simulation, specify 'simulationType' = \"patientWise\"."
+        )
 
         return(.getSimulationEnrichmentSurvivalPatientWiseBasic(
             design = design,
@@ -681,6 +714,8 @@ getSimulationEnrichmentSurvival <- function(
         ))
     }
 
-    stopRuntimeIssue("unknown simulation type: ", dQuote(simulationType), functionName = "getSimulationEnrichmentSurvival",
-        parameter = simulationType)
+    stopRuntimeIssue("unknown simulation type: ", dQuote(simulationType),
+        functionName = "getSimulationEnrichmentSurvival",
+        parameter = simulationType
+    )
 }

@@ -59,8 +59,10 @@
 #'
 mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
     if (length(A) != length(B) || length(B) != length(BPD) || length(BPD) != length(INF)) {
-        stopIllegalArgument("input vectors must have the same length (", paste0(sort(unique(c(length(A), length(B),
-            length(BPD), length(INF)))), collapse = " != "), ")", functionName = "mvnprd")
+        stopIllegalArgument("input vectors must have the same length (", paste0(sort(unique(c(
+            length(A), length(B),
+            length(BPD), length(INF)
+        ))), collapse = " != "), ")", functionName = "mvnprd")
     }
 
     result <- .mvnprd(A, B, BPD, EPS, INF, IERC, HINC)
@@ -97,7 +99,11 @@ mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
 #'
 #' @export
 #'
-as251Normal <- function(lower, upper, sigma, ...,
+as251Normal <- function(
+        lower,
+        upper,
+        sigma,
+        ...,
         eps = 1e-06,
         errorControl = c("strict", "halvingIntervals"),
         intervalSimpsonsRule = 0) {
@@ -178,8 +184,10 @@ as251Normal <- function(lower, upper, sigma, ...,
 #'
 mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
     if (length(A) != length(B) || length(B) != length(BPD) || length(BPD) != length(INF) || length(INF) != length(D)) {
-        stopIllegalArgument("input vectors must have the same length (", paste0(sort(unique(c(length(A), length(B),
-            length(BPD), length(INF), length(D)))), collapse = " != "), ")", functionName = "mvstud")
+        stopIllegalArgument("input vectors must have the same length (", paste0(sort(unique(c(
+            length(A), length(B),
+            length(BPD), length(INF), length(D)
+        ))), collapse = " != "), ")", functionName = "mvstud")
     }
 
     result <- .mvstud(NDF, A, B, BPD, D, EPS, INF, IERC, HINC)
@@ -217,7 +225,11 @@ mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0)
 #'
 #' @export
 #'
-as251StudentT <- function(lower, upper, sigma, ...,
+as251StudentT <- function(
+        lower,
+        upper,
+        sigma,
+        ...,
         df,
         eps = 1e-06,
         errorControl = c("strict", "halvingIntervals"),

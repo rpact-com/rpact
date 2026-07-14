@@ -22,9 +22,12 @@ NULL
     return(c(1:kMax) / kMax)
 }
 
-.getDefaultDesign <- function(...,
-        type = c("sampleSize", "power", "simulation",
-            "simulationCounts", "analysis", "characteristics"),
+.getDefaultDesign <- function(
+        ...,
+        type = c(
+            "sampleSize", "power", "simulation",
+            "simulationCounts", "analysis", "characteristics"
+        ),
         ignore = c()) {
     type <- match.arg(type)
 
@@ -78,7 +81,8 @@ NULL
 }
 
 .getDesignArgumentsToIgnoreAtUnknownArgumentCheck <- function(
-        design, powerCalculationEnabled = FALSE) {
+        design,
+        powerCalculationEnabled = FALSE) {
     baseArgsToIgnore <- c("showObservedInformationRatesMessage", "showWarnings")
 
     if (design$kMax > 1) {
@@ -92,8 +96,11 @@ NULL
     return(c(baseArgsToIgnore, "alpha", "beta", "sided", "twoSidedPower"))
 }
 
-.getValidatedFutilityBounds <- function(design, kMaxLowerBound = 1,
-        writeToDesign = TRUE, twoSidedWarningForDefaultValues = TRUE) {
+.getValidatedFutilityBounds <- function(
+        design,
+        kMaxLowerBound = 1,
+        writeToDesign = TRUE,
+        twoSidedWarningForDefaultValues = TRUE) {
     if (.isTrialDesignFixed(design)) {
         return(numeric(0))
     }
@@ -109,8 +116,11 @@ NULL
     ))
 }
 
-.getValidatedAlpha0Vec <- function(design, kMaxLowerBound = 1,
-        writeToDesign = TRUE, twoSidedWarningForDefaultValues = TRUE) {
+.getValidatedAlpha0Vec <- function(
+        design,
+        kMaxLowerBound = 1,
+        writeToDesign = TRUE,
+        twoSidedWarningForDefaultValues = TRUE) {
     .assertIsTrialDesignFisher(design)
     return(.getValidatedFutilityBoundsOrAlpha0Vec(
         design = design,
@@ -122,8 +132,13 @@ NULL
     ))
 }
 
-.getValidatedFutilityBoundsOrAlpha0Vec <- function(design, parameterName, defaultValue,
-        kMaxLowerBound, writeToDesign, twoSidedWarningForDefaultValues = TRUE) {
+.getValidatedFutilityBoundsOrAlpha0Vec <- function(
+        design,
+        parameterName,
+        defaultValue,
+        kMaxLowerBound,
+        writeToDesign,
+        twoSidedWarningForDefaultValues = TRUE) {
     parameterValues <- design[[parameterName]]
 
     if (length(parameterValues) > 1) {
@@ -199,7 +214,8 @@ NULL
         }
 
         if (.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds(
-                design, parameterName, writeToDesign)) {
+                design, parameterName, writeToDesign
+            )) {
             return(rep(defaultValue, design$kMax - 1))
         }
 
@@ -237,7 +253,9 @@ NULL
 
 # Check whether design is a beta spending or Pampallona Tsiatis design
 .isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds <- function(
-        design, parameterName, writeToDesign) {
+        design,
+        parameterName,
+        writeToDesign) {
     if (.isTrialDesignFisher(design)) {
         return(FALSE)
     }
@@ -355,21 +373,32 @@ NULL
 .validateUserAlphaSpending <- function(design) {
     .assertIsTrialDesign(design)
     .assertDesignParameterExists(design, "userAlphaSpending", NA_real_,
-        relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
+        relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign
+    )
 
     if ((design$isUserDefinedParameter("informationRates") ||
             (design$isDefaultParameter("informationRates") && !design$isUserDefinedParameter("kMax"))) &&
             length(design$informationRates) != length(design$userAlphaSpending)) {
-        stopConflictingArguments(sprintf("length of 'userAlphaSpending' (%s) must be equal to length of 'informationRates' (%s)",
-            length(design$userAlphaSpending), length(design$informationRates)), parameter = "userAlphaSpending",
+        stopConflictingArguments(
+            sprintf(
+                "length of 'userAlphaSpending' (%s) must be equal to length of 'informationRates' (%s)",
+                length(design$userAlphaSpending), length(design$informationRates)
+            ),
+            parameter = "userAlphaSpending",
             value = length(design$userAlphaSpending), constraint = "length must equal length of informationRates",
-            relatedParameter = "informationRates", relatedValue = length(design$informationRates), functionName = ".validateUserAlphaSpending")
+            relatedParameter = "informationRates", relatedValue = length(design$informationRates), functionName = ".validateUserAlphaSpending"
+        )
     }
 
     if (length(design$userAlphaSpending) != design$kMax) {
-        stopConflictingArguments(sprintf("length of 'userAlphaSpending' (%s) must be equal to 'kMax' (%s)", length(design$userAlphaSpending),
-            design$kMax), parameter = "userAlphaSpending", value = length(design$userAlphaSpending), constraint = "length must equal kMax",
-            relatedParameter = "kMax", relatedValue = design$kMax, functionName = ".validateUserAlphaSpending")
+        stopConflictingArguments(
+            sprintf(
+                "length of 'userAlphaSpending' (%s) must be equal to 'kMax' (%s)", length(design$userAlphaSpending),
+                design$kMax
+            ),
+            parameter = "userAlphaSpending", value = length(design$userAlphaSpending), constraint = "length must equal kMax",
+            relatedParameter = "kMax", relatedValue = design$kMax, functionName = ".validateUserAlphaSpending"
+        )
     }
 
     .validateUserAlphaSpendingLength(design)
@@ -385,11 +414,18 @@ NULL
 
     if (design$kMax > 1 && (design$userAlphaSpending[1] < 0 || design$userAlphaSpending[design$kMax] > design$alpha ||
             any(design$userAlphaSpending[2:design$kMax] - design$userAlphaSpending[1:(design$kMax - 1)] < 0))) {
-        stopIllegalArgument(sprintf(paste0("'userAlphaSpending' = %s must be a vector that satisfies the following condition: ",
-            "0 <= alpha_1 <= .. <= alpha_%s <= alpha = %s"), .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = TRUE),
-            design$kMax, design$alpha), parameter = "userAlphaSpending", value = design$userAlphaSpending, constraint = "0 <= alpha_1 <= .. <= alpha_kMax <= alpha",
+        stopIllegalArgument(
+            sprintf(
+                paste0(
+                    "'userAlphaSpending' = %s must be a vector that satisfies the following condition: ",
+                    "0 <= alpha_1 <= .. <= alpha_%s <= alpha = %s"
+                ), .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = TRUE),
+                design$kMax, design$alpha
+            ),
+            parameter = "userAlphaSpending", value = design$userAlphaSpending, constraint = "0 <= alpha_1 <= .. <= alpha_kMax <= alpha",
             relatedParameter = c("kMax", "alpha"), relatedValue = list(kMax = design$kMax, alpha = design$alpha),
-            functionName = ".validateUserAlphaSpending")
+            functionName = ".validateUserAlphaSpending"
+        )
     }
 
     if (design$kMax > 2 && (any(design$userAlphaSpending[2:design$kMax] - design$userAlphaSpending[1:(design$kMax - 1)] < design$tolerance))) {
@@ -403,27 +439,42 @@ NULL
 .validateUserBetaSpending <- function(design) {
     .assertIsTrialDesign(design)
     .assertDesignParameterExists(design, "userBetaSpending", NA_real_,
-        relatedParameter = "typeBetaSpending", relatedValue = design$typeBetaSpending)
+        relatedParameter = "typeBetaSpending", relatedValue = design$typeBetaSpending
+    )
 
     if ((design$isUserDefinedParameter("informationRates") ||
             (design$isDefaultParameter("informationRates") && !design$isUserDefinedParameter("kMax"))) &&
             length(design$informationRates) != length(design$userBetaSpending)) {
-        stopConflictingArguments(sprintf("length of 'userBetaSpending' (%s) must be equal to length of 'informationRates' (%s)",
-            length(design$userBetaSpending), length(design$informationRates)), parameter = "userBetaSpending",
+        stopConflictingArguments(
+            sprintf(
+                "length of 'userBetaSpending' (%s) must be equal to length of 'informationRates' (%s)",
+                length(design$userBetaSpending), length(design$informationRates)
+            ),
+            parameter = "userBetaSpending",
             value = length(design$userBetaSpending), constraint = "length must equal length of informationRates",
-            relatedParameter = "informationRates", relatedValue = length(design$informationRates), functionName = ".validateUserBetaSpending")
+            relatedParameter = "informationRates", relatedValue = length(design$informationRates), functionName = ".validateUserBetaSpending"
+        )
     }
 
     if (length(design$userBetaSpending) != design$kMax) {
-        stopConflictingArguments(sprintf("length of 'userBetaSpending' (%s) must be equal to 'kMax' (%s)", length(design$userBetaSpending),
-            design$kMax), parameter = "userBetaSpending", value = length(design$userBetaSpending), constraint = "length must equal kMax",
-            relatedParameter = "kMax", relatedValue = design$kMax, functionName = ".validateUserBetaSpending")
+        stopConflictingArguments(
+            sprintf(
+                "length of 'userBetaSpending' (%s) must be equal to 'kMax' (%s)", length(design$userBetaSpending),
+                design$kMax
+            ),
+            parameter = "userBetaSpending", value = length(design$userBetaSpending), constraint = "length must equal kMax",
+            relatedParameter = "kMax", relatedValue = design$kMax, functionName = ".validateUserBetaSpending"
+        )
     }
 
     if (length(design$userBetaSpending) < 2 || length(design$userBetaSpending) > C_KMAX_UPPER_BOUND) {
-        stopArgumentLengthOutOfBounds(sprintf("length of 'userBetaSpending' (%s) is out of bounds [2; %s]", length(design$userBetaSpending),
-            C_KMAX_UPPER_BOUND), parameter = "userBetaSpending", value = length(design$userBetaSpending), constraint = paste0("length must be in [2; ",
-            C_KMAX_UPPER_BOUND, "]"), lowerBound = 2, upperBound = C_KMAX_UPPER_BOUND, functionName = ".validateUserBetaSpending")
+        stopArgumentLengthOutOfBounds(sprintf(
+            "length of 'userBetaSpending' (%s) is out of bounds [2; %s]", length(design$userBetaSpending),
+            C_KMAX_UPPER_BOUND
+        ), parameter = "userBetaSpending", value = length(design$userBetaSpending), constraint = paste0(
+            "length must be in [2; ",
+            C_KMAX_UPPER_BOUND, "]"
+        ), lowerBound = 2, upperBound = C_KMAX_UPPER_BOUND, functionName = ".validateUserBetaSpending")
     }
 
     if (.isUndefinedArgument(design$beta)) {
@@ -437,11 +488,18 @@ NULL
 
     if (design$kMax > 1 && (design$userBetaSpending[1] < 0 || design$userBetaSpending[design$kMax] > design$beta ||
             any(design$userBetaSpending[2:design$kMax] - design$userBetaSpending[1:(design$kMax - 1)] < 0))) {
-        stopIllegalArgument(sprintf(paste0("'userBetaSpending' = %s must be a vector that satisfies the following condition: ",
-            "0 <= beta_1 <= .. <= beta_%s <= beta = %s"), .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = TRUE),
-            design$kMax, design$beta), parameter = "userBetaSpending", value = design$userBetaSpending, constraint = "0 <= beta_1 <= .. <= beta_kMax <= beta",
+        stopIllegalArgument(
+            sprintf(
+                paste0(
+                    "'userBetaSpending' = %s must be a vector that satisfies the following condition: ",
+                    "0 <= beta_1 <= .. <= beta_%s <= beta = %s"
+                ), .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = TRUE),
+                design$kMax, design$beta
+            ),
+            parameter = "userBetaSpending", value = design$userBetaSpending, constraint = "0 <= beta_1 <= .. <= beta_kMax <= beta",
             relatedParameter = c("kMax", "beta"), relatedValue = list(kMax = design$kMax, beta = design$beta),
-            functionName = ".validateUserBetaSpending")
+            functionName = ".validateUserBetaSpending"
+        )
     }
 
     if (design$kMax > 2 && (any(design$userBetaSpending[2:design$kMax] - design$userBetaSpending[1:(design$kMax - 1)] < design$tolerance))) {
@@ -454,10 +512,15 @@ NULL
 
 .validateUserAlphaSpendingLength <- function(design) {
     if (length(design$userAlphaSpending) < 1 || length(design$userAlphaSpending) > C_KMAX_UPPER_BOUND) {
-        stopArgumentLengthOutOfBounds(sprintf("length of 'userAlphaSpending' (%s) is out of bounds [1; %s]",
-            length(design$userAlphaSpending), C_KMAX_UPPER_BOUND), parameter = "userAlphaSpending", value = length(design$userAlphaSpending),
+        stopArgumentLengthOutOfBounds(
+            sprintf(
+                "length of 'userAlphaSpending' (%s) is out of bounds [1; %s]",
+                length(design$userAlphaSpending), C_KMAX_UPPER_BOUND
+            ),
+            parameter = "userAlphaSpending", value = length(design$userAlphaSpending),
             constraint = paste0("length must be in [1; ", C_KMAX_UPPER_BOUND, "]"), lowerBound = 1, upperBound = C_KMAX_UPPER_BOUND,
-            functionName = ".validateUserAlphaSpendingLength")
+            functionName = ".validateUserAlphaSpendingLength"
+        )
     }
 }
 
@@ -503,8 +566,10 @@ NULL
 .getPiecewiseExponentialDistributionSingleTime <- function(time, piecewiseLambda, piecewiseSurvivalTime = NA_real_, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa <= 0) {
-            stopIllegalArgument("'kappa' (", kappa, ") must be > 0", functionName = ".getPiecewiseExponentialDistributionSingleTime",
-                parameter = "kappa", value = kappa)
+            stopIllegalArgument("'kappa' (", kappa, ") must be > 0",
+                functionName = ".getPiecewiseExponentialDistributionSingleTime",
+                parameter = "kappa", value = kappa
+            )
         }
 
         return(stats::pweibull(time, kappa, scale = 1 / piecewiseLambda, lower.tail = TRUE, log.p = FALSE))
@@ -512,9 +577,11 @@ NULL
 
     if (length(piecewiseSurvivalTime) != length(piecewiseLambda)) {
         stopIllegalArgument("length of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime), ") must be equal to length of 'piecewiseLambda' (",
-            .arrayToString(piecewiseLambda), ")", functionName = ".getPiecewiseExponentialDistributionSingleTime",
+            .arrayToString(piecewiseLambda), ")",
+            functionName = ".getPiecewiseExponentialDistributionSingleTime",
             parameter = "piecewiseSurvivalTime", value = piecewiseSurvivalTime, relatedParameter = "piecewiseLambda",
-            relatedValue = piecewiseLambda)
+            relatedValue = piecewiseLambda
+        )
     }
 
     piecewiseSurvivalTime <- .getPiecewiseExpStartTimesWithoutLeadingZero(piecewiseSurvivalTime)
@@ -562,7 +629,8 @@ NULL
 
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise exponential survival definition",
-            functionName = ".getPiecewiseExponentialSingleQuantile")
+            functionName = ".getPiecewiseExponentialSingleQuantile"
+        )
     }
 
     cdfValues <- .getPiecewiseExponentialDistribution(piecewiseSurvivalTime,
@@ -620,12 +688,17 @@ NULL
     return(result)
 }
 
-.getPiecewiseExponentialSettings <- function(..., piecewiseSurvivalTime = NA_real_,
-        piecewiseLambda = NA_real_, kappa = 1) {
+.getPiecewiseExponentialSettings <- function(
+        ...,
+        piecewiseSurvivalTime = NA_real_,
+        piecewiseLambda = NA_real_,
+        kappa = 1) {
     if (!all(is.na(piecewiseLambda)) && is.list(piecewiseSurvivalTime)) {
         stopConflictingArguments("'piecewiseSurvivalTime' needs to be a numeric vector and not a list ", "because 'piecewiseLambda' (",
-    piecewiseLambda, ") is defined separately", functionName = ".getPiecewiseExponentialSettings", parameter = "piecewiseSurvivalTime",
-    relatedParameter = "piecewiseLambda", relatedValue = piecewiseLambda, value = piecewiseSurvivalTime)
+            piecewiseLambda, ") is defined separately",
+            functionName = ".getPiecewiseExponentialSettings", parameter = "piecewiseSurvivalTime",
+            relatedParameter = "piecewiseLambda", relatedValue = piecewiseLambda, value = piecewiseSurvivalTime
+        )
     }
 
     if (anyNA(piecewiseSurvivalTime)) {
@@ -719,8 +792,12 @@ NULL
 
 #' @rdname utilitiesForPiecewiseExponentialDistribution
 #' @export
-getPiecewiseExponentialDistribution <- function(time, ...,
-        piecewiseSurvivalTime = NA_real_, piecewiseLambda = NA_real_, kappa = 1) {
+getPiecewiseExponentialDistribution <- function(
+        time,
+        ...,
+        piecewiseSurvivalTime = NA_real_,
+        piecewiseLambda = NA_real_,
+        kappa = 1) {
     .warnInCaseOfUnknownArguments(functionName = "getPiecewiseExponentialDistribution", ...)
     time <- .assertIsNumericVector(time, "time")
     if (any(time < 0)) {
@@ -752,8 +829,12 @@ ppwexp <- function(t, ..., s = NA_real_, lambda = NA_real_, kappa = 1) {
 
 #' @rdname utilitiesForPiecewiseExponentialDistribution
 #' @export
-getPiecewiseExponentialQuantile <- function(quantile, ...,
-        piecewiseSurvivalTime = NA_real_, piecewiseLambda = NA_real_, kappa = 1) {
+getPiecewiseExponentialQuantile <- function(
+        quantile,
+        ...,
+        piecewiseSurvivalTime = NA_real_,
+        piecewiseLambda = NA_real_,
+        kappa = 1) {
     .warnInCaseOfUnknownArguments(functionName = "getPiecewiseExponentialQuantile", ...)
     quantile <- .assertIsNumericVector(quantile, "quantile")
     if (any(quantile < 0) || any(quantile > 1)) {
@@ -798,8 +879,12 @@ qpwexp <- function(q, ..., s = NA_real_, lambda = NA_real_, kappa = 1) {
 
 #' @rdname utilitiesForPiecewiseExponentialDistribution
 #' @export
-getPiecewiseExponentialRandomNumbers <- function(n, ...,
-        piecewiseSurvivalTime = NA_real_, piecewiseLambda = NA_real_, kappa = 1) {
+getPiecewiseExponentialRandomNumbers <- function(
+        n,
+        ...,
+        piecewiseSurvivalTime = NA_real_,
+        piecewiseLambda = NA_real_,
+        kappa = 1) {
     .warnInCaseOfUnknownArguments(functionName = "getPiecewiseExponentialRandomNumbers", ...)
     .assertIsSingleInteger(n, "n", validateType = FALSE)
     .assertIsInClosedInterval(n, "n", lower = 1, upper = NULL)
@@ -859,8 +944,10 @@ NULL
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getLambdaByPi <- function(piValue,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
+getLambdaByPi <- function(
+        piValue,
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(piValue, "pi")
     .assertIsValidKappa(kappa)
@@ -885,7 +972,8 @@ getLambdaByMedian <- function(median, kappa = 1) {
     return(log(2)^(1 / kappa) / median)
 }
 
-.assertHasCompatibleLength <- function(paramValue1,
+.assertHasCompatibleLength <- function(
+        paramValue1,
         paramValue2,
         paramName1,
         paramName2) {
@@ -898,15 +986,19 @@ getLambdaByMedian <- function(median, kappa = 1) {
     }
 
     stopIllegalArgument("invalid length of ", sQuote(paramName2), ". ", "Expected length 1 or the same length as ",
-        sQuote(paramName1), " (", length(paramValue1), "), but got length ", length(paramValue2), ".", functionName = ".assertHasCompatibleLength",
-        parameter = paramName2, relatedParameter = paramName1)
+        sQuote(paramName1), " (", length(paramValue1), "), but got length ", length(paramValue2), ".",
+        functionName = ".assertHasCompatibleLength",
+        parameter = paramName2, relatedParameter = paramName1
+    )
 }
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getHazardRatioByPi <- function(pi1,
+getHazardRatioByPi <- function(
+        pi1,
         pi2,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(pi1, "pi1")
     .assertIsValidPi(pi2, "pi2")
@@ -983,8 +1075,10 @@ getPi2ByPi1AndHazardRatio <- function(pi1, hazardRatio, eventTime = 12, kappa = 
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getPiByLambda <- function(lambda,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
+getPiByLambda <- function(
+        lambda,
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     lambda <- .assertIsValidLambda(lambda)
     .assertIsValidKappa(kappa)
@@ -1003,8 +1097,10 @@ getPiByLambda <- function(lambda,
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getPiByMedian <- function(median,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
+getPiByMedian <- function(
+        median,
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     median <- .assertIsNumericVector(median, "median")
     .assertIsValidKappa(kappa)
@@ -1023,8 +1119,10 @@ getMedianByLambda <- function(lambda, kappa = 1) {
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getMedianByPi <- function(piValue,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
+getMedianByPi <- function(
+        piValue,
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(piValue, "piValue")
     .assertIsSingleNumber(eventTime, "eventTime")
@@ -1059,7 +1157,8 @@ getMedianByPi <- function(piValue,
 .getDesignParametersToShow <- function(parameterSet) {
     if (is.null(parameterSet[[".design"]])) {
         stopRuntimeIssue("'parameterSet' (", .getClassName(parameterSet), ") does not contain '.design' field",
-            functionName = ".getDesignParametersToShow", parameter = "parameterSet", value = parameterSet, relatedParameter = ".design")
+            functionName = ".getDesignParametersToShow", parameter = "parameterSet", value = parameterSet, relatedParameter = ".design"
+        )
     }
 
     designParametersToShow <- c(".design$stages")

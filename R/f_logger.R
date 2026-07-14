@@ -144,9 +144,9 @@
 #' @export
 #'
 setLogLevel <- function(logLevel = c(
-            "PROGRESS", "ERROR", "WARN",
-            "INFO", "DEBUG", "TRACE", "DISABLED"
-        )) {
+    "PROGRESS", "ERROR", "WARN",
+    "INFO", "DEBUG", "TRACE", "DISABLED"
+)) {
     logLevel <- match.arg(logLevel)
 
     if (!is.character(logLevel) || !(logLevel %in% c(
@@ -158,9 +158,13 @@ setLogLevel <- function(logLevel = c(
             C_LOG_LEVEL_PROGRESS,
             C_LOG_LEVEL_DISABLED
         ))) {
-        stopIllegalArgument("'logLevel' must be one of ", "c(", paste(paste0("'", c(C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG, C_LOG_LEVEL_INFO,
-    C_LOG_LEVEL_WARN, C_LOG_LEVEL_ERROR, C_LOG_LEVEL_PROGRESS, C_LOG_LEVEL_DISABLED), "'"), collapse = ", "), ")", functionName = "setLogLevel",
-    parameter = "logLevel", value = logLevel)
+        stopIllegalArgument("'logLevel' must be one of ", "c(", paste(paste0("'", c(
+            C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG, C_LOG_LEVEL_INFO,
+            C_LOG_LEVEL_WARN, C_LOG_LEVEL_ERROR, C_LOG_LEVEL_PROGRESS, C_LOG_LEVEL_DISABLED
+        ), "'"), collapse = ", "), ")",
+        functionName = "setLogLevel",
+        parameter = "logLevel", value = logLevel
+        )
     }
 
     Sys.setenv("RPACT_LOG_LEVEL" = logLevel)

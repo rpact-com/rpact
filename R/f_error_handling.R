@@ -115,7 +115,6 @@ stopRuntimeIssue <- function(
         functionName = NULL,
         relatedParameter = NULL,
         relatedValue = NULL,
-        
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
@@ -150,7 +149,6 @@ stopIllegalArgument <- function(
         functionName = NULL,
         relatedParameter = NULL,
         relatedValue = NULL,
-        
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
@@ -179,7 +177,6 @@ stopIllegalDataInput <- function(
         functionName = NULL,
         relatedParameter = NULL,
         relatedValue = NULL,
-        
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
@@ -208,7 +205,6 @@ stopConflictingArguments <- function(
         functionName = NULL,
         relatedParameter = NULL,
         relatedValue = NULL,
-        
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
@@ -239,7 +235,6 @@ stopArgumentOutOfBounds <- function(
         relatedValue = NULL,
         lowerBound = NULL,
         upperBound = NULL,
-        
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
@@ -274,7 +269,6 @@ stopArgumentLengthOutOfBounds <- function(
         upperBound = NULL,
         expectedLength = NULL,
         actualLength = NULL,
-        
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
@@ -310,7 +304,6 @@ stopIndexOutOfBounds <- function(
         lowerBound = NULL,
         upperBound = NULL,
         index = NULL,
-        
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
@@ -342,7 +335,6 @@ stopMissingArgument <- function(
         functionName = NULL,
         relatedParameter = NULL,
         relatedValue = NULL,
-        
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
@@ -373,7 +365,6 @@ stopIncompleteArguments <- function(
         relatedValue = NULL,
         missingParameters = NULL,
         definedParameters = NULL,
-        
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)

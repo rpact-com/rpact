@@ -91,7 +91,6 @@ NULL
         overallEffects,
         minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage) {
-        
     stage <- stage - 1 # to be consistent with non-multiarm situation
     gMax <- nrow(overallEffects)
 
@@ -160,8 +159,7 @@ NULL
         thetaH1,
         overallEffects,
         minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage
-        ) {
+        maxNumberOfEventsPerStage) {
     stage <- stage - 1 # to be consistent with non-multiarm situation
     gMax <- nrow(overallEffects)
 

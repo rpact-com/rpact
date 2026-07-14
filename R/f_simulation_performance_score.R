@@ -51,7 +51,8 @@ getPerformanceScore <- function(simulationResult) {
 
     if (!inherits(simulationResult, "SimulationResultsMeans") && !inherits(simulationResult, "SimulationResultsRates")) {
         stopIllegalArgument("performance score so far implemented only for single comparisons with continuous and binary endpoints",
-            functionName = "getPerformanceScore")
+            functionName = "getPerformanceScore"
+        )
     }
 
     if (design$kMax != 2) {

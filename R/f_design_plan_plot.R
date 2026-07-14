@@ -132,19 +132,22 @@
         if (is.null(designPlan$alternative) || anyNA(designPlan$alternative) ||
                 length(designPlan$alternative) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "alternative")
+                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "alternative"
+            )
         }
     } else if (.isTrialDesignPlanRates(designPlan)) {
         if (is.null(designPlan$pi1) || anyNA(designPlan$pi1) ||
                 length(designPlan$pi1) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "pi1")
+                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "pi1"
+            )
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
         if (is.null(designPlan$hazardRatio) || anyNA(designPlan$hazardRatio) ||
                 length(designPlan$hazardRatio) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "hazardRatio")
+                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "hazardRatio"
+            )
         }
     }
 }
@@ -254,8 +257,7 @@
         showSource = FALSE,
         designPlanName = NA_character_,
         plotSettings = NULL,
-        ...
-        ) {
+        ...) {
     .assertGgplotIsInstalled()
     .assertIsTrialDesignPlan(designPlan)
     .assertIsValidLegendPosition(legendPosition)
@@ -266,8 +268,10 @@
     )
     if (!(type %in% availablePlotTypes)) {
         stopIllegalArgument("'type' (", type, ") is not available; 'type' can ", ifelse(length(availablePlotTypes) ==
-            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"), functionName = ".plotTrialDesignPlan",
-            parameter = "type", value = type)
+            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"),
+        functionName = ".plotTrialDesignPlan",
+        parameter = "type", value = type
+        )
     }
 
     survivalDesignPlanEnabled <- .isTrialDesignPlanSurvival(designPlan)
@@ -721,8 +725,10 @@
                 }
                 yParameterNamesSrc <- yParameterNames
             } else {
-                stopRuntimeIssue("Plot type 5 is not implemented for class ", sQuote(.getClassName(designPlan)), parameter = "type",
-                    value = 5L, relatedParameter = "designPlan", relatedValue = .getClassName(designPlan), functionName = ".plotTrialDesignPlan")
+                stopRuntimeIssue("Plot type 5 is not implemented for class ", sQuote(.getClassName(designPlan)),
+                    parameter = "type",
+                    value = 5L, relatedParameter = "designPlan", relatedValue = .getClassName(designPlan), functionName = ".plotTrialDesignPlan"
+                )
             }
 
             srcCmd <- .showPlotSourceInformation(
@@ -941,14 +947,15 @@
             }
         } else if (.isTrialDesignPlanCountData(designPlan)) {
             if (!designPlan$isGeneratedParameter("expectedNumberOfSubjectsH1")) {
-                stopIllegalArgument("Plot type 9 is only available for count data endpoint ", 
+                stopIllegalArgument("Plot type 9 is only available for count data endpoint ",
                     "if 'expectedNumberOfSubjectsH1' was not calculated",
-                    parameter = "type", 
-                    value = 9L, 
+                    parameter = "type",
+                    value = 9L,
                     constraint = "expectedNumberOfSubjectsH1 must be generated for count data endpoint plots",
-                    relatedParameter = "expectedNumberOfSubjectsH1", 
+                    relatedParameter = "expectedNumberOfSubjectsH1",
                     relatedValue = designPlan$isGeneratedParameter("expectedNumberOfSubjectsH1"),
-                    functionName = ".plotTrialDesignPlan")
+                    functionName = ".plotTrialDesignPlan"
+                )
             }
 
             xParameterName <- "theta"
@@ -1066,12 +1073,16 @@
                 ...
             ))
         } else {
-            stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 14", functionName = ".plotTrialDesignPlan",
-                parameter = "type", value = type)
+            stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 14",
+                functionName = ".plotTrialDesignPlan",
+                parameter = "type", value = type
+            )
         }
     } else {
-        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 9", functionName = ".plotTrialDesignPlan",
-            parameter = "type", value = type)
+        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 9",
+            functionName = ".plotTrialDesignPlan",
+            parameter = "type", value = type
+        )
     }
 
     if (!is.null(srcCmd)) {
@@ -1119,9 +1130,13 @@
 }
 
 .getSurvivalFunctionPlotCommand <- function(
-        functionType = c("pwExpDist", "lambdaStep"), timeValues, lambda,
-        designPlan, type, piecewiseSurvivalEnabled, multiplyByHazardRatio = FALSE
-        ) {
+        functionType = c("pwExpDist", "lambdaStep"),
+        timeValues,
+        lambda,
+        designPlan,
+        type,
+        piecewiseSurvivalEnabled,
+        multiplyByHazardRatio = FALSE) {
     functionType <- match.arg(functionType)
     signPrefix <- ifelse(type == 13, "", "-")
     if (functionType == "pwExpDist") {
@@ -1152,16 +1167,25 @@
 
 # Cumulative Distribution Function / Survival function
 .plotSurvivalFunction <- function(
-        designPlan, ..., designMaster, type = c(13, 14), main = NA_character_,
-        xlab = NA_character_, ylab = NA_character_, palette = "Set1",
-        legendPosition = NA_integer_, showSource = FALSE,
-        designPlanName = NA_character_, plotSettings = NULL
-        ) {
+        designPlan,
+        ...,
+        designMaster,
+        type = c(13, 14),
+        main = NA_character_,
+        xlab = NA_character_,
+        ylab = NA_character_,
+        palette = "Set1",
+        legendPosition = NA_integer_,
+        showSource = FALSE,
+        designPlanName = NA_character_,
+        plotSettings = NULL) {
     startTime <- Sys.time()
     if (is.null(designPlan$piecewiseSurvivalTime) ||
             length(designPlan$piecewiseSurvivalTime) == 0) {
-        stopMissingArgument("'piecewiseSurvivalTime' must be specified", functionName = ".plotSurvivalFunction",
-            parameter = "piecewiseSurvivalTime")
+        stopMissingArgument("'piecewiseSurvivalTime' must be specified",
+            functionName = ".plotSurvivalFunction",
+            parameter = "piecewiseSurvivalTime"
+        )
     }
 
     type <- type[1]
@@ -1579,7 +1603,8 @@
 #'
 plot.TrialDesignPlan <- function(
         x,
-        y, ...,
+        y,
+        ...,
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,
@@ -1590,8 +1615,7 @@ plot.TrialDesignPlan <- function(
         legendPosition = NA_integer_,
         showSource = FALSE,
         grid = 1,
-        plotSettings = NULL
-        ) {
+        plotSettings = NULL) {
     .assertIsValidPlotType(type, naAllowed = TRUE)
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
@@ -1659,8 +1683,7 @@ plot.TrialDesignPlan <- function(
         legendPosition = NA_integer_,
         showSource = FALSE,
         grid = 1,
-        plotSettings = NULL
-        ) {
+        plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
 
     designPlanName <- deparse(fCall$x)
@@ -1670,15 +1693,18 @@ plot.TrialDesignPlan <- function(
     nMax <- list(...)[["nMax"]]
     if (!is.null(nMax)) {
         warning("'nMax' (", nMax, ") will be ignored because it will be taken from design plan",
-            call. = FALSE)
+            call. = FALSE
+        )
     }
 
     if (all(is.na(type))) {
         availablePlotTypes <- getAvailablePlotTypes(x)
         if (length(availablePlotTypes) == 0) {
             stopRuntimeIssue("No plot available for this ", .formatCamelCaseSingleWord(x$.objectType), " ", x$.toString(),
-                " result object", parameter = "x", value = .getClassName(x), 
-                functionName = ".plot.TrialDesignPlan")
+                " result object",
+                parameter = "x", value = .getClassName(x),
+                functionName = ".plot.TrialDesignPlan"
+            )
         }
 
         type <- 1L

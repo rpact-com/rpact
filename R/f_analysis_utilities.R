@@ -177,8 +177,12 @@ NULL
     return(.getSortedSubsets(unique(results)))
 }
 
-.createSubsetsByGMax <- function(gMax, ..., stratifiedInput = TRUE,
-        subsetIdPrefix = "S", restId = ifelse(stratifiedInput, "R", "F"),
+.createSubsetsByGMax <- function(
+        gMax,
+        ...,
+        stratifiedInput = TRUE,
+        subsetIdPrefix = "S",
+        restId = ifelse(stratifiedInput, "R", "F"),
         all = TRUE) {
     .assertIsSingleInteger(gMax, "gMax", validateType = FALSE)
     .assertIsInClosedInterval(gMax, "gMax", lower = 1, upper = 10)
@@ -316,8 +320,10 @@ NULL
         }
     }
     stopConflictingArguments("at least for one treatment arm the values for ", numberOfStages, " stages must be defined ",
-        "because the control arm defines ", numberOfStages, " stages", functionName = ".assertIsValidTreatmentArmArgumentDefined",
-        parameter = "numberOfStages", value = numberOfStages)
+        "because the control arm defines ", numberOfStages, " stages",
+        functionName = ".assertIsValidTreatmentArmArgumentDefined",
+        parameter = "numberOfStages", value = numberOfStages
+    )
 }
 
 .createDataFrame <- function(...) {
@@ -349,40 +355,51 @@ NULL
     for (argName in argNames) {
         argValues <- args[[argName]]
         if (is.null(argValues) || length(argValues) == 0) {
-            stopIllegalArgument("'", argName, "' is not a valid numeric vector", functionName = ".createDataFrame",
-                parameter = argName)
+            stopIllegalArgument("'", argName, "' is not a valid numeric vector",
+                functionName = ".createDataFrame",
+                parameter = argName
+            )
         }
 
         if (is.na(argValues[1])) {
             stopIllegalArgument("'", argName, "' is NA at first stage; a valid numeric value must be specified at stage 1",
-                functionName = ".createDataFrame", parameter = argName)
+                functionName = ".createDataFrame", parameter = argName
+            )
         }
 
         if (length(argValues) != numberOfValues) {
             stopConflictingArguments("all data vectors must have the same length: '", argName, "' (", length(argValues),
-                ") differs from '", argNames[1], "' (", numberOfValues, ")", functionName = ".createDataFrame", parameter = argName,
-                relatedParameter = "argValues", relatedValue = length(argValues))
+                ") differs from '", argNames[1], "' (", numberOfValues, ")",
+                functionName = ".createDataFrame", parameter = argName,
+                relatedParameter = "argValues", relatedValue = length(argValues)
+            )
         }
 
         if (.equalsRegexpIgnoreCase(argName, "^stages?$")) {
             if (length(stats::na.omit(argValues)) != length(argValues)) {
-                stopIllegalArgument("NA's not allowed for '", argName, "'; stages must be defined completely", functionName = ".createDataFrame",
-                    parameter = argName, value = argValues)
+                stopIllegalArgument("NA's not allowed for '", argName, "'; stages must be defined completely",
+                    functionName = ".createDataFrame",
+                    parameter = argName, value = argValues
+                )
             }
 
             definedStages <- sort(intersect(unique(argValues), 1:numberOfValues))
             if (length(definedStages) < numberOfValues) {
                 if (length(definedStages) == 0) {
                     stopIllegalArgument("no valid stages are defined; ", "stages must be defined completely (", .arrayToString(1:numberOfValues),
-                        ")", functionName = ".createDataFrame")
+                        ")",
+                        functionName = ".createDataFrame"
+                    )
                 }
                 if (!enrichmentEnabled) {
                     msg <- ifelse(length(definedStages) == 1,
                         paste0("only stage ", definedStages, " is defined"),
                         paste0("only stages ", .arrayToString(definedStages), " are defined")
                     )
-                    stopIllegalArgument(msg, "; stages must be defined completely", functionName = ".createDataFrame",
-                        parameter = "stages", value = definedStages)
+                    stopIllegalArgument(msg, "; stages must be defined completely",
+                        functionName = ".createDataFrame",
+                        parameter = "stages", value = definedStages
+                    )
                 }
             }
         }
@@ -390,7 +407,8 @@ NULL
         if (!survivalDataEnabled && .isControlGroupArgument(argName, numberOfGroups) &&
                 length(na.omit(argValues)) < numberOfStages) {
             stopIllegalArgument("control group '", argName, "' (", .arrayToString(argValues, digits = 2), ") must be defined for all stages",
-                functionName = ".createDataFrame", parameter = argName, relatedParameter = "argValues", relatedValue = argValues)
+                functionName = ".createDataFrame", parameter = argName, relatedParameter = "argValues", relatedValue = argValues
+            )
         }
 
         naIndices <- which(is.na(argValues))
@@ -398,7 +416,8 @@ NULL
             stageIndex <- naIndices[length(naIndices)]
             if (stageIndex != numberOfValues) {
                 stopIllegalArgument("'", argName, "' contains a NA at stage ", stageIndex, " followed by a value for a higher stage; NA's must be the last values",
-                    functionName = ".createDataFrame", parameter = argName, relatedParameter = "stageIndex", relatedValue = stageIndex)
+                    functionName = ".createDataFrame", parameter = argName, relatedParameter = "stageIndex", relatedValue = stageIndex
+                )
             }
         }
 
@@ -408,7 +427,8 @@ NULL
                 index <- naIndices[i]
                 if (indexBefore - index > 1) {
                     stopIllegalArgument("'", argName, "' contains alternating values and NA's; ", "NA's must be the last values",
-                        functionName = ".createDataFrame", parameter = argName, value = argValues)
+                        functionName = ".createDataFrame", parameter = argName, value = argValues
+                    )
                 }
                 indexBefore <- index
             }
@@ -419,7 +439,8 @@ NULL
                 if (!is.null(naIndicesBefore) && !.equalsRegexpIgnoreCase(argName, "^stages?$")) {
                     if (!.arraysAreEqual(naIndicesBefore, naIndices)) {
                         stopConflictingArguments("inconsistent NA definition; ", "if NA's exist, then they are mandatory for each group at the same stage",
-                            functionName = ".createDataFrame")
+                            functionName = ".createDataFrame"
+                        )
                     }
                 }
                 naIndicesBefore <- naIndices
@@ -430,7 +451,8 @@ NULL
                         !.isControlGroupArgument(argName, numberOfGroups)) {
                     if (!.arraysAreEqual(naIndicesBefore[[as.character(groupNumber)]], naIndices)) {
                         stopConflictingArguments("values of treatment ", groupNumber, " not correctly specified; ", "if NA's exist, then they are mandatory for each parameter at the same stage",
-                            functionName = ".createDataFrame", parameter = "groupNumber", value = groupNumber)
+                            functionName = ".createDataFrame", parameter = "groupNumber", value = groupNumber
+                        )
                     }
                 }
                 if (!.isControlGroupArgument(argName, numberOfGroups)) {
@@ -440,18 +462,24 @@ NULL
         }
 
         if (sum(is.infinite(argValues)) > 0) {
-            stopIllegalArgument("all data values must be finite; ", "'", argName, "' contains infinite values", functionName = ".createDataFrame",
-                parameter = argName)
+            stopIllegalArgument("all data values must be finite; ", "'", argName, "' contains infinite values",
+                functionName = ".createDataFrame",
+                parameter = argName
+            )
         }
 
         if (!any(grepl(paste0("^", sub("\\d*$", "", argName), "$"), C_KEY_WORDS_SUBSETS)) && !is.numeric(argValues)) {
             stopIllegalArgument("all data vectors must be numeric ('", argName, "' is ", .getClassName(argValues),
-                ")", functionName = ".createDataFrame", parameter = argName, relatedParameter = "argValues", relatedValue = argValues)
+                ")",
+                functionName = ".createDataFrame", parameter = argName, relatedParameter = "argValues", relatedValue = argValues
+            )
         }
 
         if (length(argValues) > C_KMAX_UPPER_BOUND * numberOfSubsets) {
-            stopArgumentLengthOutOfBounds("'", argName, "' is out of bounds [1, ", C_KMAX_UPPER_BOUND, "]", functionName = ".createDataFrame",
-                parameter = argName, relatedParameter = "C_KMAX_UPPER_BOUND", relatedValue = C_KMAX_UPPER_BOUND)
+            stopArgumentLengthOutOfBounds("'", argName, "' is out of bounds [1, ", C_KMAX_UPPER_BOUND, "]",
+                functionName = ".createDataFrame",
+                parameter = argName, relatedParameter = "C_KMAX_UPPER_BOUND", relatedValue = C_KMAX_UPPER_BOUND
+            )
         }
     }
 
@@ -465,7 +493,8 @@ NULL
                 if (!is.null(naIndicesBefore) && !.equalsRegexpIgnoreCase(argName, "^stages?$")) {
                     if (!.arraysAreEqual(naIndicesBefore, naIndices)) {
                         stopConflictingArguments("inconsistent NA definition for group ", groupNumber, "; ", "if NA's exist, then they are mandatory for each group at the same stage",
-                            functionName = ".createDataFrame", parameter = "groupNumber", value = groupNumber)
+                            functionName = ".createDataFrame", parameter = "groupNumber", value = groupNumber
+                        )
                     }
                 }
                 naIndicesBefore <- naIndices
@@ -617,11 +646,14 @@ NULL
             unknownArgs[i] <- argNames[argNamesLower == unknownArgs[i]][1]
         }
         if (length(unknownArgs) == 1) {
-            stopIllegalArgument("the argument '", unknownArgs, "' is not a valid dataset argument", functionName = ".assertIsValidDatasetArgument",
-                parameter = "unknownArgs", value = unknownArgs)
+            stopIllegalArgument("the argument '", unknownArgs, "' is not a valid dataset argument",
+                functionName = ".assertIsValidDatasetArgument",
+                parameter = "unknownArgs", value = unknownArgs
+            )
         } else {
             stopIllegalArgument("the arguments ", .arrayToString(unknownArgs, encapsulate = TRUE), " are no valid dataset arguments",
-                functionName = ".assertIsValidDatasetArgument", parameter = "unknownArgs", value = unknownArgs)
+                functionName = ".assertIsValidDatasetArgument", parameter = "unknownArgs", value = unknownArgs
+            )
         }
     }
 
@@ -818,8 +850,10 @@ getWideFormat <- function(dataInput) {
         numberOfStages <- length(unique(as.character(subData$stage)))
         if (numberOfStages == 0) {
             print(dataFrame[, validColNames])
-            stopRuntimeIssue("'dataFrame' seems to contain an invalid column", functionName = ".getNumberOfStages", parameter = "dataFrame",
-    value = dataFrame)
+            stopRuntimeIssue("'dataFrame' seems to contain an invalid column",
+                functionName = ".getNumberOfStages", parameter = "dataFrame",
+                value = dataFrame
+            )
         }
         return(numberOfStages)
     }
@@ -828,8 +862,10 @@ getWideFormat <- function(dataInput) {
 
 .getWideFormat <- function(dataFrame) {
     if (!is.data.frame(dataFrame)) {
-        stopIllegalArgument("'dataFrame' must be a data.frame (is ", .getClassName(dataFrame), ")", functionName = ".getWideFormat",
-            parameter = "dataFrame", value = dataFrame)
+        stopIllegalArgument("'dataFrame' must be a data.frame (is ", .getClassName(dataFrame), ")",
+            functionName = ".getWideFormat",
+            parameter = "dataFrame", value = dataFrame
+        )
     }
 
     paramNames <- names(dataFrame)
@@ -863,8 +899,10 @@ getWideFormat <- function(dataInput) {
 
         subsets <- dataFrame$subset[dataFrame$group == 1]
         if (nrow(df) != length(subsets)) {
-            stopRuntimeIssue("something went wrong: ", nrow(df), " != ", length(subsets), functionName = ".getWideFormat",
-                parameter = "subsets", value = length(subsets))
+            stopRuntimeIssue("something went wrong: ", nrow(df), " != ", length(subsets),
+                functionName = ".getWideFormat",
+                parameter = "subsets", value = length(subsets)
+            )
         }
         df$subset <- subsets
         df <- .moveColumn(df, "subset", "stage")
@@ -931,7 +969,8 @@ getLongFormat <- function(dataInput) {
 .synchronizeIterationsAndSeed <- function(results) {
     if (is.null(results[[".conditionalPowerResults"]])) {
         stopRuntimeIssue(sQuote(.getClassName(results)), " does not contain field ", sQuote(".conditionalPowerResults"),
-            functionName = ".synchronizeIterationsAndSeed", parameter = .getClassName(results), relatedParameter = ".conditionalPowerResults")
+            functionName = ".synchronizeIterationsAndSeed", parameter = .getClassName(results), relatedParameter = ".conditionalPowerResults"
+        )
     }
 
     if (results$.design$kMax == 1) {
@@ -991,8 +1030,10 @@ getLongFormat <- function(dataInput) {
 }
 
 .fireDataInputNotSupportedException <- function(dataInput) {
-    stopIllegalArgument("'dataInput' type ", "'", .getClassName(dataInput), "' is not supported", functionName = ".fireDataInputNotSupportedException",
-        parameter = "dataInput", value = dataInput)
+    stopIllegalArgument("'dataInput' type ", "'", .getClassName(dataInput), "' is not supported",
+        functionName = ".fireDataInputNotSupportedException",
+        parameter = "dataInput", value = dataInput
+    )
 }
 
 .getDatasetEndpoint <- function(dataInput) {

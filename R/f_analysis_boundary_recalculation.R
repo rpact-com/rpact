@@ -14,7 +14,8 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-.getRecalculatedInformationRates <- function(dataInput,
+.getRecalculatedInformationRates <- function(
+        dataInput,
         maxInformation,
         stage = NA_integer_) {
     .assertIsSingleInteger(stage, "stage", naAllowed = TRUE, validateType = FALSE)
@@ -38,8 +39,10 @@
             informationRates[k] <- absoluteInformations[k] / maxInformation
         }
     } else {
-        stopRuntimeIssue("'dataInput' class ", .getClassName(dataInput), " is not supported", functionName = ".getRecalculatedInformationRates",
-            parameter = "dataInput", value = dataInput)
+        stopRuntimeIssue("'dataInput' class ", .getClassName(dataInput), " is not supported",
+            functionName = ".getRecalculatedInformationRates",
+            parameter = "dataInput", value = dataInput
+        )
     }
 
     return(list(
@@ -102,7 +105,8 @@
 #'
 #' @export
 #'
-getObservedInformationRates <- function(dataInput,
+getObservedInformationRates <- function(
+        dataInput,
         ...,
         maxInformation = NULL,
         informationEpsilon = NULL,
@@ -277,7 +281,8 @@ getObservedInformationRates <- function(dataInput,
     ))))
 }
 
-.getDesignWithRecalculatedBoundaries <- function(...,
+.getDesignWithRecalculatedBoundaries <- function(
+        ...,
         design,
         dataInput,
         directionUpper,
@@ -328,7 +333,8 @@ getObservedInformationRates <- function(dataInput,
 
     if (design$typeOfDesign == "asUser") {
         stopIllegalArgument("recalculation of the information rates not possible ", "for user-defined alpha spending designs",
-            functionName = ".getDesignWithRecalculatedBoundaries")
+            functionName = ".getDesignWithRecalculatedBoundaries"
+        )
     }
 
     showObservedInformationRatesMessage <- .getOptionalArgument(

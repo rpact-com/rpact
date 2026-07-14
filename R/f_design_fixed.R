@@ -14,7 +14,7 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-#' 
+#'
 #' @title
 #' Get Fixed Design
 #'
@@ -35,9 +35,9 @@
 #' desired type II error \code{beta} (or equivalently power = 1 - beta).
 #'
 #' @template return_object_trial_design
-#' 
+#'
 #' @family design functions
-#' 
+#'
 #' @examples
 #' # Basic fixed design with default alpha and beta
 #' design <- getDesignFixed()
@@ -48,27 +48,26 @@
 #' design2
 #'
 #' @export
-#' 
+#'
 getDesignFixed <- function(
         alpha = NA_real_,
         beta = NA_real_,
-        sided = 1L, # C_SIDED_DEFAULT
+        sided = 1L,
+        # C_SIDED_DEFAULT
         directionUpper = NA,
-        twoSidedPower = NA
-        ) {
-    
+        twoSidedPower = NA) {
     .assertIsValidAlphaAndBeta(alpha = alpha, beta = beta, naAllowed = TRUE)
     .assertIsValidSidedParameter(sided)
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
     .assertIsSingleLogical(twoSidedPower, "twoSidedPower", naAllowed = TRUE)
-    
+
     if (is.na(alpha)) {
         alpha <- 0.025
     }
     if (is.na(beta)) {
         beta <- 0.2
     }
-        
+
     design <- TrialDesignFixed$new(
         kMax = 1L,
         alpha = alpha,
@@ -81,11 +80,11 @@ getDesignFixed <- function(
     design$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
     design$.setParameterType("futilityBounds", C_PARAM_NOT_APPLICABLE)
     design$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
-    
+
     .setValueAndParameterType(design, "alpha", alpha, 0.025)
     .setValueAndParameterType(design, "beta", beta, 0.2)
     .setValueAndParameterType(design, "sided", sided, 1L)
-    
+
     if (sided == 2L) {
         if (is.na(twoSidedPower)) {
             twoSidedPower <- FALSE
@@ -96,14 +95,14 @@ getDesignFixed <- function(
     } else {
         .setValueAndParameterType(design, "twoSidedPower", twoSidedPower, NA)
         design$.setParameterType("twoSidedPower", C_PARAM_NOT_APPLICABLE)
-        
+
         if (is.na(directionUpper)) {
             design$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
         } else {
             .setValueAndParameterType(design, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
         }
     }
-    
+
     criticalValues <- .getOneMinusQNorm(alpha / sided)
     criticalValues <- .applyDirectionOfAlternative(criticalValues, directionUpper,
         type = "negateIfLower", phase = "design"
@@ -112,7 +111,6 @@ getDesignFixed <- function(
     design$.setParameterType("criticalValues", C_PARAM_GENERATED)
     design$stageLevels <- 1 - stats::pnorm(.getCriticalValues(design))
     design$.setParameterType("stageLevels", C_PARAM_GENERATED)
-    
+
     return(design)
 }
-

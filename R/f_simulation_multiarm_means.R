@@ -17,7 +17,9 @@
 #' @include f_simulation_multiarm.R
 NULL
 
-.getSimulationMeansMultiArmStageSubjects <- function(..., stage,
+.getSimulationMeansMultiArmStageSubjects <- function(
+        ...,
+        stage,
         conditionalPower,
         conditionalCriticalValue,
         plannedSubjects,
@@ -61,11 +63,27 @@ NULL
     return(newSubjects)
 }
 
-.getSimulatedStageMeansMultiArm <- function(...,
-        design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure,
-        adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned,
-        minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower,
-        thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
+.getSimulatedStageMeansMultiArm <- function(
+        ...,
+        design,
+        muVector,
+        stDev,
+        plannedSubjects,
+        typeOfSelection,
+        effectMeasure,
+        adaptations,
+        epsilonValue,
+        rValue,
+        threshold,
+        allocationRatioPlanned,
+        minNumberOfSubjectsPerStage,
+        maxNumberOfSubjectsPerStage,
+        conditionalPower,
+        thetaH1,
+        stDevH1,
+        calcSubjectsFunction,
+        calcSubjectsFunctionIsUserDefined,
+        selectArmsFunction) {
     kMax <- length(plannedSubjects)
     gMax <- length(muVector)
     simMeans <- matrix(NA_real_, nrow = gMax + 1, ncol = kMax)
@@ -202,7 +220,8 @@ NULL
                 if (is.null(newSubjects) || length(newSubjects) != 1 ||
                         !is.numeric(newSubjects) || is.na(newSubjects) || newSubjects < 0) {
                     stopIllegalArgument("'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ", "the output must be a single numeric value >= 0",
-    functionName = ".getSimulatedStageMeansMultiArm", parameter = "calcSubjectsFunction", value = calcSubjectsFunction)
+                        functionName = ".getSimulatedStageMeansMultiArm", parameter = "calcSubjectsFunction", value = calcSubjectsFunction
+                    )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
                     plannedSubjects[(k + 1):kMax] <- sum(subjectsPerStage[gMax + 1, 1:k] *
@@ -314,19 +333,27 @@ NULL
 getSimulationMultiArmMeans <- function(
         design = NULL,
         ...,
-        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
+        activeArms = NA_integer_,
+        # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
-        typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        muMaxVector = seq(0, 1, 0.2), # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+        # C_TYPE_OF_SHAPE_DEFAULT
+        muMaxVector = seq(0, 1, 0.2),
+        # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
-        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        stDev = 1, # C_STDEV_DEFAULT
+        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
+        # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
+        stDev = 1,
+        # C_STDEV_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -337,7 +364,8 @@ getSimulationMultiArmMeans <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectArmsFunction = NULL,
@@ -602,8 +630,10 @@ getSimulationMultiArmMeans <- function(
         simulatedConditionalPower[2:kMax, ] <- simulatedConditionalPower[2:kMax, ] / iterations[2:kMax, ]
     }
     simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations - 1
-    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms",
-        simulationResults$numberOfSelectedArms, "2026-07-13")
+    .addDeprecatedFieldValues(
+        simulationResults, "numberOfActiveArms",
+        simulationResults$numberOfSelectedArms, "2026-07-13"
+    )
 
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations

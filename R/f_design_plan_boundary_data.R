@@ -112,7 +112,7 @@
                 designPlan,
                 boundary = "upper"
             )
-            
+
             if (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     (!is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
                 futilityBoundsEffectScaleLower <- .getFutilityBoundsTreatmentEffectScale(
@@ -458,19 +458,20 @@
 #'
 #' @noRd
 #'
-.getEffectScaleBoundaryCountDataTheta <- function(boundary,
-                                                          informationRate,
-                                                          lambda2,
-                                                          thetaH0,
-                                                          directionUpper,
-                                                          allocationRatio,
-                                                          overdispersion,
-                                                          accrualTime,
-                                                          followUpTime,
-                                                          fixedExposureTime,
-                                                          numberOfSubjects,
-                                                          recruit1,
-                                                          recruit2) {
+.getEffectScaleBoundaryCountDataTheta <- function(
+        boundary,
+        informationRate,
+        lambda2,
+        thetaH0,
+        directionUpper,
+        allocationRatio,
+        overdispersion,
+        accrualTime,
+        followUpTime,
+        fixedExposureTime,
+        numberOfSubjects,
+        recruit1,
+        recruit2) {
     tryCatch(
         {
             if ((2 * directionUpper - 1) * boundary < 0) {
@@ -489,8 +490,10 @@
                         )
 
                         if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                            stopRuntimeIssue("Cannot find theta. ", "The calculated variance estimate is invalid: ", vHat, functionName = ".getEffectScaleBoundaryCountDataTheta",
-                                parameter = "vHat", value = vHat)
+                            stopRuntimeIssue("Cannot find theta. ", "The calculated variance estimate is invalid: ", vHat,
+                                functionName = ".getEffectScaleBoundaryCountDataTheta",
+                                parameter = "vHat", value = vHat
+                            )
                         }
                         (log(x) - log(thetaH0)) / sqrt(vHat) * sqrt(informationRate * numberOfSubjects)
                     },
@@ -520,8 +523,10 @@
                     )
 
                     if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                        stopRuntimeIssue("cannot find theta. ", "The calculated variance estimate is invalid: ", vHat, functionName = ".getEffectScaleBoundaryCountDataTheta",
-                            parameter = "vHat", value = vHat)
+                        stopRuntimeIssue("cannot find theta. ", "The calculated variance estimate is invalid: ", vHat,
+                            functionName = ".getEffectScaleBoundaryCountDataTheta",
+                            parameter = "vHat", value = vHat
+                        )
                     }
 
                     (log(x) - log(thetaH0)) /
@@ -754,7 +759,9 @@
             )
         } else {
             stopIllegalArgument("The specified 'directionUpper' (", directionUpperDefined, ") ", "is not consistent with the calculated 'directionUpper' (",
-                .arrayToString(directionUpperCalculated), "). ", functionName = ".setDirectionUpper", parameter = "directionUpper")
+                .arrayToString(directionUpperCalculated), "). ",
+                functionName = ".setDirectionUpper", parameter = "directionUpper"
+            )
         }
     }
 }

@@ -122,7 +122,8 @@ SimulationResults <- R6::R6Class(
                 consoleOutputEnabled = TRUE
             )
         },
-        .show = function(...,
+        .show = function(
+                ...,
                 showType = 1,
                 digits = NA_integer_,
                 showStatistics = FALSE,
@@ -142,7 +143,8 @@ SimulationResults <- R6::R6Class(
             } else {
                 if (is.null(showStatistics) || length(showStatistics) != 1) {
                     stopIllegalArgument("'showStatistics' (", .arrayToString(showStatistics), ") must be a single logical or character",
-                        functionName = ".show", parameter = "showStatistics", value = showStatistics)
+                        functionName = ".show", parameter = "showStatistics", value = showStatistics
+                    )
                 }
 
                 if (!is.character(showStatistics) || showStatistics != "exclusive") {
@@ -458,7 +460,8 @@ SimulationResults <- R6::R6Class(
             variedParameterName <- sub("Max$", "_max", variedParameterName)
             return(paste0(", ", variedParameterName, " = ", round(parameterValue[1], 4)))
         },
-        .catStatisticsLine = function(...,
+        .catStatisticsLine = function(
+                ...,
                 stage,
                 parameterName,
                 paramCaption,

@@ -23,32 +23,38 @@ NULL
                 anyNA(simulationResults$alternative) ||
                 length(simulationResults$alternative) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", parameter = "alternative")
+                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", parameter = "alternative"
+            )
         }
     } else if (inherits(simulationResults, "SimulationResultsRates")) {
         if (is.null(simulationResults$pi1) ||
                 anyNA(simulationResults$pi1) ||
                 length(simulationResults$pi1) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", parameter = "pi1")
+                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", parameter = "pi1"
+            )
         }
     } else if (inherits(simulationResults, "SimulationResultsSurvival")) {
         if (is.null(simulationResults$hazardRatio) ||
                 anyNA(simulationResults$hazardRatio) ||
                 length(simulationResults$hazardRatio) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined or derived",
-                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", parameter = "hazardRatio")
+                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", parameter = "hazardRatio"
+            )
         }
         if (length(simulationResults$hazardRatio) != length(simulationResults$overallReject)) {
             stopIllegalArgument("plot type ", plotType, " is not available for piecewise survival (only type 13 and 14)",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", parameter = "plotType",
-                value = plotType)
+                value = plotType
+            )
         }
     }
 }
 
-.getSimulationPlotXAxisParameterName <- function(simulationResults,
-        showSource = FALSE, simulationResultsName = NA_character_) {
+.getSimulationPlotXAxisParameterName <- function(
+        simulationResults,
+        showSource = FALSE,
+        simulationResultsName = NA_character_) {
     if (grepl("SimulationResultsEnrichment", .getClassName(simulationResults))) {
         effectDataList <- .getSimulationEnrichmentEffectData(simulationResults)
         if (ncol(effectDataList$effectData) == 1) {
@@ -172,11 +178,21 @@ NULL
     ))
 }
 
-.plotSimulationResults <- function(simulationResults, designMaster, type = 5L, main = NA_character_,
-        xlab = NA_character_, ylab = NA_character_, palette = "Set1",
-        theta = seq(-1, 1, 0.02), plotPointsEnabled = NA,
-        legendPosition = NA_integer_, showSource = FALSE,
-        simulationResultsName = NA_character_, plotSettings = NULL, ...) {
+.plotSimulationResults <- function(
+        simulationResults,
+        designMaster,
+        type = 5L,
+        main = NA_character_,
+        xlab = NA_character_,
+        ylab = NA_character_,
+        palette = "Set1",
+        theta = seq(-1, 1, 0.02),
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_,
+        showSource = FALSE,
+        simulationResultsName = NA_character_,
+        plotSettings = NULL,
+        ...) {
     .assertGgplotIsInstalled()
     .assertIsSimulationResults(simulationResults)
     .assertIsValidLegendPosition(legendPosition)
@@ -214,16 +230,20 @@ NULL
 
     if (type %in% c(1:3) && !multiArmEnabled && !enrichmentEnabled) {
         stopIllegalArgument("'type' (", type, ") is not available for non-multi-arm/non-enrichment simulation results (type must be > 3)",
-            functionName = ".plotSimulationResults", parameter = "type", value = type)
+            functionName = ".plotSimulationResults", parameter = "type", value = type
+        )
     }
 
     if ((!survivalEnabled || multiArmEnabled || enrichmentEnabled) && type %in% c(10:14)) {
         if (multiArmEnabled || enrichmentEnabled) {
             stopIllegalArgument("'type' (", type, ") is only available for non-multi-arm/non-enrichment survival simulation results",
-                functionName = ".plotSimulationResults", parameter = "type", value = type)
+                functionName = ".plotSimulationResults", parameter = "type", value = type
+            )
         } else {
-            stopIllegalArgument("'type' (", type, ") is only available for survival simulation results", functionName = ".plotSimulationResults",
-                parameter = "type", value = type)
+            stopIllegalArgument("'type' (", type, ") is only available for survival simulation results",
+                functionName = ".plotSimulationResults",
+                parameter = "type", value = type
+            )
         }
     }
 
@@ -250,7 +270,8 @@ NULL
             discreteXAxis <- effectDataList$discreteXAxis
             if (length(xValues) <= 1) {
                 stopIllegalArgument("2 ore more situations must be specifed in ", sQuote(paste0("effectList$", effectDataList$effectMatrixName)),
-                    functionName = ".plotSimulationResults", parameter = paste0("effectList$", effectDataList$effectMatrixName))
+                    functionName = ".plotSimulationResults", parameter = paste0("effectList$", effectDataList$effectMatrixName)
+                )
             }
         }
 
@@ -732,8 +753,10 @@ NULL
         )
     } else if (type == 8) {
         if (designMaster$kMax == 1) {
-            stopIllegalArgument("plot type 8 (Early Stopping) is not available for 'kMax' = 1", functionName = ".plotSimulationResults",
-                parameter = "kMax")
+            stopIllegalArgument("plot type 8 (Early Stopping) is not available for 'kMax' = 1",
+                functionName = ".plotSimulationResults",
+                parameter = "kMax"
+            )
         }
 
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
@@ -875,8 +898,10 @@ NULL
             showSource = showSource, plotSettings = plotSettings
         ))
     } else {
-        stopIllegalArgument("'type' (", type, ") is not allowed; must be 5, 6, ..., 14", functionName = ".plotSimulationResults",
-            parameter = "type", value = type)
+        stopIllegalArgument("'type' (", type, ") is not allowed; must be 5, 6, ..., 14",
+            functionName = ".plotSimulationResults",
+            parameter = "type", value = type
+        )
     }
 
     if (!is.null(srcCmd)) {
@@ -953,7 +978,8 @@ NULL
 #'
 #' @export
 #'
-plot.SimulationResults <- function(x,
+plot.SimulationResults <- function(
+        x,
         y,
         ...,
         main = NA_character_,
@@ -1016,7 +1042,8 @@ plot.SimulationResults <- function(x,
     return(do.call(.plot.SimulationResults, args))
 }
 
-.plot.SimulationResults <- function(x,
+.plot.SimulationResults <- function(
+        x,
         y,
         ...,
         main = NA_character_,

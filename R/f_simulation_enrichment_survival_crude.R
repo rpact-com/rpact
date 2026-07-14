@@ -17,7 +17,8 @@
 #' @include f_simulation_enrichment.R
 NULL
 
-.getSimulatedStageSurvivalEnrichment <- function(...,
+.getSimulatedStageSurvivalEnrichment <- function(
+        ...,
         design,
         subsets,
         prevalences,
@@ -40,7 +41,6 @@ NULL
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
         selectPopulationsFunction) {
-
     kMax <- length(plannedEvents)
     pMax <- length(hazardRatios)
     gMax <- log(length(hazardRatios), 2) + 1
@@ -383,7 +383,8 @@ NULL
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
-    functionName = ".getSimulatedStageSurvivalEnrichment", parameter = "calcEventsFunction", value = calcEventsFunction)
+                        functionName = ".getSimulatedStageSurvivalEnrichment", parameter = "calcEventsFunction", value = calcEventsFunction
+                    )
                 }
 
                 if (!is.na(conditionalPower) || calcEventsFunctionIsUserDefined) {
@@ -503,13 +504,19 @@ getSimulationEnrichmentSurvivalBasic <- function(
         design = NULL,
         ...,
         effectList = NULL,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
+        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE,
+        # C_STRATIFIED_ANALYSIS_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -519,7 +526,8 @@ getSimulationEnrichmentSurvivalBasic <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
@@ -812,8 +820,10 @@ getSimulationEnrichmentSurvivalBasic <- function(
 
     simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
     simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage",
-        simulatedSingleEventsPerStage, "2024-06-10")
+    .addDeprecatedFieldValues(
+        simulationResults, "singleNumberOfEventsPerStage",
+        simulatedSingleEventsPerStage, "2024-06-10"
+    )
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 

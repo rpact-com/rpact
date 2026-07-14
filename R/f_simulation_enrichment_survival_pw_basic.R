@@ -35,8 +35,7 @@ updateSubGroupVector <- function(
         subGroupVector,
         subGroups,
         prevSelected,
-        allocationFraction
-        ) {
+        allocationFraction) {
     subGroupVector <- subGroupVector[1:numberOfSubjects[k - 1]]
 
     while (length(subGroupVector) < maxNumberOfSubjects) {
@@ -82,8 +81,7 @@ updateSubGroupVector <- function(
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
-        selectPopulationsFunction
-        ) {
+        selectPopulationsFunction) {
     kMax <- length(plannedEvents)
     pMax <- length(hazardRatios)
     gMax <- log(length(hazardRatios), 2) + 1
@@ -404,7 +402,8 @@ updateSubGroupVector <- function(
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
-    functionName = ".getSimulatedStageResultsSurvivalEnrichmentPatientWise", parameter = "calcEventsFunction", value = calcEventsFunction)
+                        functionName = ".getSimulatedStageResultsSurvivalEnrichmentPatientWise", parameter = "calcEventsFunction", value = calcEventsFunction
+                    )
                 }
 
                 if (!is.na(conditionalPower)) {
@@ -463,40 +462,52 @@ updateSubGroupVector <- function(
 #' @noRd
 #'
 .getSimulationEnrichmentSurvivalPatientWiseBasic <- function(
-    design = NULL,
-    ...,
-    effectList = NULL,
-    kappa = 1,
-    eventTime = 12, # C_EVENT_TIME_DEFAULT
-    accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
-    accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
-    accrualIntensityType = c("auto", "absolute", "relative"),
-    dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
-    dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
-    dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
-    maxNumberOfSubjects = NA_real_,
-    intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-    stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
-    directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
-    adaptations = NA,
-    typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-    effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-    successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
-    epsilonValue = NA_real_,
-    rValue = NA_real_,
-    threshold = -Inf,
-    plannedEvents = NA_real_,
-    allocationRatioPlanned = NA_real_,
-    minNumberOfEventsPerStage = NA_real_,
-    maxNumberOfEventsPerStage = NA_real_,
-    conditionalPower = NA_real_,
-    thetaH1 = NA_real_,
-    maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
-    seed = NA_real_,
-    calcEventsFunction = NULL,
-    selectPopulationsFunction = NULL,
-    showStatistics = FALSE
-) {
+        design = NULL,
+        ...,
+        effectList = NULL,
+        kappa = 1,
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
+        accrualTime = c(0, 12),
+        # C_ACCRUAL_TIME_DEFAULT
+        accrualIntensity = 0.1,
+        # C_ACCRUAL_INTENSITY_DEFAULT
+        accrualIntensityType = c("auto", "absolute", "relative"),
+        dropoutRate1 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutRate2 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutTime = 12,
+        # C_DROP_OUT_TIME_DEFAULT
+        maxNumberOfSubjects = NA_real_,
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
+        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE,
+        # C_STRATIFIED_ANALYSIS_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
+        adaptations = NA,
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
+        epsilonValue = NA_real_,
+        rValue = NA_real_,
+        threshold = -Inf,
+        plannedEvents = NA_real_,
+        allocationRatioPlanned = NA_real_,
+        minNumberOfEventsPerStage = NA_real_,
+        maxNumberOfEventsPerStage = NA_real_,
+        conditionalPower = NA_real_,
+        thetaH1 = NA_real_,
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        seed = NA_real_,
+        calcEventsFunction = NULL,
+        selectPopulationsFunction = NULL,
+        showStatistics = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
@@ -542,7 +553,8 @@ updateSubGroupVector <- function(
     if (length(allocationRatioPlanned) != 1) {
         stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
             functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic", parameter = "allocationRatioPlanned",
-            value = allocationRatioPlanned)
+            value = allocationRatioPlanned
+        )
     }
 
     simulationResults <- .createSimulationResultsEnrichmentObject(
@@ -647,11 +659,15 @@ updateSubGroupVector <- function(
     )
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (identical(accrualIntensity, 1L)) {
-            stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'", functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
-    parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity)
+            stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
+                functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
+                parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
+            )
         }
-        stopIllegalArgument("'maxNumberOfSubjects' must be defined", functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
-    parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects)
+        stopIllegalArgument("'maxNumberOfSubjects' must be defined",
+            functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
+            parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects
+        )
     }
     simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
     simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
@@ -680,8 +696,10 @@ updateSubGroupVector <- function(
     } else if (.isTrialDesignFixed(design) || .isTrialDesignInverseNormal(design)) {
         weights <- .getWeightsInverseNormal(design)
     } else {
-        stopRuntimeIssue("unsuported trial design for simulation enrichment: ", .getClassName(design), functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
-            parameter = "design", value = design)
+        stopRuntimeIssue("unsuported trial design for simulation enrichment: ", .getClassName(design),
+            functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
+            parameter = "design", value = design
+        )
     }
 
     index <- 1
@@ -801,11 +819,11 @@ updateSubGroupVector <- function(
 
                     if (
                         !rejectAtSomeStage &&
-                        any(
-                            closedTest$rejected[, k] &
-                                closedTest$selectedPopulations[1:gMax, k] |
-                                rejectedPopulationsBefore
-                        )
+                            any(
+                                closedTest$rejected[, k] &
+                                    closedTest$selectedPopulations[1:gMax, k] |
+                                    rejectedPopulationsBefore
+                            )
                         ) {
                         simulatedRejectAtLeastOne[i] <- simulatedRejectAtLeastOne[i] + 1
                         rejectAtSomeStage <- TRUE
@@ -816,8 +834,8 @@ updateSubGroupVector <- function(
                         simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
                             matrix(
                                 (closedTest$rejected[, k] &
-                                        closedTest$selectedPopulations[1:gMax, k] |
-                                        rejectedPopulationsBefore),
+                                    closedTest$selectedPopulations[1:gMax, k] |
+                                    rejectedPopulationsBefore),
                                 kMax - k,
                                 gMax,
                                 byrow = TRUE

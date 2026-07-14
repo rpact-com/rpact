@@ -333,8 +333,10 @@ C_CIPHERS <- list(token = "310818669631424001", secret = "9318655074497250732")
     .arrayToString(.getBetaSpendingDesignTypes(), encapsulate = TRUE)
 }
 
-.isBetaSpendingDesignType <- function(typeOfDesign,
-        userDefinedBetaSpendingIncluded = TRUE, noneIncluded = FALSE) {
+.isBetaSpendingDesignType <- function(
+        typeOfDesign,
+        userDefinedBetaSpendingIncluded = TRUE,
+        noneIncluded = FALSE) {
     if (userDefinedBetaSpendingIncluded && typeOfDesign == C_TYPE_OF_DESIGN_BS_USER) {
         return(TRUE)
     }
@@ -806,7 +808,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     pi1H1 = "pi(1) under H1",
     pi2H1 = "pi(2) under H1",
     nPlanned = "Planned sample size",
-    piControl = "Assumed control rate", 
+    piControl = "Assumed control rate",
     piControls = "Assumed control rates",
     piTreatment = "Assumed treatment rate",
     piTreatments = "Assumed treatment rates",
@@ -1203,7 +1205,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     } else {
         paramCaption <- C_PARAMETER_NAMES[[parameterName]]
     }
-    
+
     if (grepl("DelayedInformation", parameterName)) {
         design <- .getTrialDesign(obj)
         if (!is.null(design) && isFALSE(design$directionUpper)) {

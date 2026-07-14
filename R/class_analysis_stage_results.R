@@ -71,7 +71,8 @@ StageResults <- R6::R6Class("StageResults",
         weightsInverseNormal = NULL,
         thetaH0 = NULL,
         direction = NULL,
-        initialize = function(...,
+        initialize = function(
+                ...,
                 stage = NULL,
                 stages = NULL,
                 pValues = NULL,
@@ -310,8 +311,10 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
         overallSampleSizes2 = NULL,
         equalVariances = NULL,
         normalApproximation = NULL,
-        initialize = function(design,
-                dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -496,8 +499,10 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
         varianceOption = NULL,
         normalApproximation = NULL,
         directionUpper = NULL,
-        initialize = function(design,
-                dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -651,7 +656,10 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
         overallSampleSizes1 = NULL,
         overallSampleSizes2 = NULL,
         normalApproximation = NULL,
-        initialize = function(design, dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -824,8 +832,10 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
         intersectionTest = NULL,
         normalApproximation = NULL,
         directionUpper = NULL,
-        initialize = function(design,
-                dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 overallPiTreatments = NULL,
                 overallPiControl = NULL,
                 combInverseNormal = NULL,
@@ -970,7 +980,10 @@ StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
         events = NULL,
         allocationRatios = NULL,
         testStatistics = NULL,
-        initialize = function(design, dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallPValues = NULL,
@@ -1103,7 +1116,10 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
         singleStepAdjustedPValues = NULL,
         intersectionTest = NULL,
         directionUpper = NULL,
-        initialize = function(design, dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -1362,9 +1378,14 @@ names.StageResults <- function(x) {
 #'
 #' @keywords internal
 #'
-as.data.frame.StageResults <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE,
-        includeAllParameters = FALSE, type = 1, ...) {
+as.data.frame.StageResults <- function(
+        x,
+        row.names = NULL,
+        optional = FALSE,
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE,
+        type = 1,
+        ...) {
     if (type == 1) {
         parametersToShow <- x$.getParametersToShow()
 
@@ -1407,8 +1428,10 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         dataInput <- x[[".dataInput"]]
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stopRuntimeIssue("failed to get 'dataInput' from ", .getClassName(x), functionName = ".getTreatmentArmsToShow",
-            parameter = "dataInput")
+        stopRuntimeIssue("failed to get 'dataInput' from ", .getClassName(x),
+            functionName = ".getTreatmentArmsToShow",
+            parameter = "dataInput"
+        )
     }
 
     numberOfTreatments <- dataInput$getNumberOfGroups()
@@ -1427,8 +1450,10 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         treatmentArmsToShow <- validComparisons
     } else if (!all(treatmentArmsToShow %in% validComparisons)) {
         stopIllegalArgument("'treatmentArms' (", .arrayToString(treatmentArmsToShow), ") must be a vector ",
-            "containing one or more values of ", .arrayToString(validComparisons), functionName = ".getTreatmentArmsToShow",
-            parameter = "treatmentArms")
+            "containing one or more values of ", .arrayToString(validComparisons),
+            functionName = ".getTreatmentArmsToShow",
+            parameter = "treatmentArms"
+        )
     }
     treatmentArmsToShow <- sort(unique(treatmentArmsToShow))
     return(treatmentArmsToShow)
@@ -1440,8 +1465,10 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         dataInput <- x[[".dataInput"]]
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stopRuntimeIssue("failed to get 'dataInput' from ", .getClassName(x), functionName = ".getPopulationsToShow",
-            parameter = "dataInput")
+        stopRuntimeIssue("failed to get 'dataInput' from ", .getClassName(x),
+            functionName = ".getPopulationsToShow",
+            parameter = "dataInput"
+        )
     }
 
     numberOfPopulations <- gMax
@@ -1461,7 +1488,9 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         populationsToShow <- validComparisons
     } else if (!all(populationsToShow %in% validComparisons)) {
         stopIllegalArgument("'populations' (", .arrayToString(populationsToShow), ") must be a vector ", "containing one or more values of ",
-            .arrayToString(validComparisons), functionName = ".getPopulationsToShow", parameter = "populations")
+            .arrayToString(validComparisons),
+            functionName = ".getPopulationsToShow", parameter = "populations"
+        )
     }
     populationsToShow <- sort(unique(populationsToShow))
     return(populationsToShow)
@@ -1530,12 +1559,14 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #'
 #' @export
 #'
-plot.StageResults <- function(x,
+plot.StageResults <- function(
+        x,
         y,
         ...,
         type = 1L,
         nPlanned,
-        allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
+        allocationRatioPlanned = 1,
+        # C_ALLOCATION_RATIO_DEFAULT
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,
@@ -1575,12 +1606,14 @@ plot.StageResults <- function(x,
     return(do.call(.plot.StageResults, args))
 }
 
-.plot.StageResults <- function(x,
+.plot.StageResults <- function(
+        x,
         y,
         ...,
         type = 1L,
         nPlanned,
-        allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
+        allocationRatioPlanned = 1,
+        # C_ALLOCATION_RATIO_DEFAULT
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,
@@ -1778,10 +1811,19 @@ plot.StageResults <- function(x,
     ))
 }
 
-.createAnalysisResultsPlotObject <- function(x, ..., data, plotData,
-        main = NA_character_, xlab = NA_character_, ylab = NA_character_,
-        legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
-        numberOfPairedLines = NA_integer_, plotSettings = NULL) {
+.createAnalysisResultsPlotObject <- function(
+        x,
+        ...,
+        data,
+        plotData,
+        main = NA_character_,
+        xlab = NA_character_,
+        ylab = NA_character_,
+        legendTitle = NA_character_,
+        palette = "Set1",
+        legendPosition = NA_integer_,
+        numberOfPairedLines = NA_integer_,
+        plotSettings = NULL) {
     ciModeEnabled <- !is.null(data[["lower"]]) && !is.null(data[["upper"]])
 
     if (!ciModeEnabled) {
