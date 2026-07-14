@@ -470,7 +470,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 showNA = FALSE) {
             if (!is.null(parameterName) && length(parameterName) == 1 &&
                     inherits(parameterSet, "ParameterSet") &&
-                    parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE) {
+                    parameterSet$isNotApplicableParameter(parameterName)) {
                 if (!is.null(values) && .getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE") &&
                         validateParameterType && !.isMarkdownEnabled()) {
                     warning(
@@ -682,7 +682,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                             )) {
                         transposed <- TRUE
                         userDefinedEffectMatrix <-
-                            parameterSet$.getParameterType("effectMatrix") == C_PARAM_USER_DEFINED
+                            parameterSet$isUserDefinedParameter("effectMatrix")
                         if (userDefinedEffectMatrix) {
                             legendEntry[["[j]"]] <- "effect matrix row j (situation to consider)"
                         }
@@ -2232,7 +2232,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         } else {
             userDefinedParam <- "pi1"
             for (param in c("pi1", "lambda1", "median1", "hazardRatio")) {
-                if (designPlan$.getParameterType(param) == C_PARAM_USER_DEFINED &&
+                if (designPlan$isUserDefinedParameter(param) &&
                         length(designPlan[[param]]) == numberOfVariants) {
                     userDefinedParam <- param
                 }
@@ -2278,18 +2278,18 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             treatmentRateText <- paste0("H1: ", paramName, " as specified")
         }
         if (userDefinedParam %in% c("hazardRatio", "pi1") &&
-                (designPlan$.getParameterType("pi2") == C_PARAM_USER_DEFINED ||
-                    designPlan$.getParameterType("pi2") == C_PARAM_DEFAULT_VALUE) &&
+                (designPlan$isUserDefinedParameter("pi2") ||
+                    designPlan$isDefaultParameter("pi2")) &&
                 length(designPlan$pi2) == 1) {
             treatmentRateText <- paste0(treatmentRateText, ", control pi(2) = ", round(designPlan$pi2, 3))
         } else if (userDefinedParam %in% c("hazardRatio", "lambda1") &&
-                (designPlan$.getParameterType("lambda2") == C_PARAM_USER_DEFINED ||
-                    designPlan$.getParameterType("lambda2") == C_PARAM_DEFAULT_VALUE) &&
+                (designPlan$isUserDefinedParameter("lambda2") ||
+                    designPlan$isDefaultParameter("lambda2")) &&
                 length(designPlan$lambda2) == 1) {
             treatmentRateText <- paste0(treatmentRateText, ", control lambda(2) = ", round(designPlan$lambda2, 3))
         } else if (userDefinedParam %in% c("hazardRatio", "median1") &&
-                (designPlan$.getParameterType("median2") == C_PARAM_USER_DEFINED ||
-                    designPlan$isGeneratedParameter("median2")) &&
+                (designPlan$isUserDefinedParameter("median2") ||
+                    designPlan$isGeneratedOrDerivedParameter("median2")) &&
                 length(designPlan$median2) == 1) {
             treatmentRateText <- paste0(treatmentRateText, ", control median(2) = ", round(designPlan$median2, 3))
         } else if (!is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
@@ -2328,21 +2328,21 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 .addAdditionalArgumentsToHeader <- function(header, designPlan, settings) {
     if (settings$countDataEnabled && !is.null(designPlan[["lambda1"]]) &&
             length(designPlan$lambda1) == 1 &&
-            designPlan$.getParameterType("lambda1") == C_PARAM_USER_DEFINED) {
+            designPlan$isUserDefinedParameter("lambda1")) {
         header <- .concatenateSummaryText(header, paste0(
             "lambda(1) = ", designPlan$lambda1
         ))
     }
 
     if (settings$countDataEnabled && !is.null(designPlan[["lambda2"]]) &&
-            designPlan$.getParameterType("lambda2") == C_PARAM_USER_DEFINED) {
+            designPlan$isUserDefinedParameter("lambda2")) {
         header <- .concatenateSummaryText(header, paste0(
             "lambda(2) = ", designPlan$lambda2[1]
         ))
     }
 
     if (settings$countDataEnabled && !is.null(designPlan[["lambda"]]) &&
-            designPlan$.getParameterType("lambda") == C_PARAM_USER_DEFINED) {
+            designPlan$isUserDefinedParameter("lambda")) {
         header <- .concatenateSummaryText(header, paste0(
             "lambda = ", designPlan$lambda
         ))
@@ -2370,7 +2370,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
 
         if (!is.null(designPlan[["maxNumberOfSubjects"]]) &&
-                designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED) {
+                designPlan$isUserDefinedParameter("maxNumberOfSubjects")) {
             header <- .concatenateSummaryText(header, paste0(
                 "maximum number of subjects = ",
                 ceiling(designPlan$maxNumberOfSubjects[1])
@@ -2379,7 +2379,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
         if (settings$survivalEnabled) {
             if (!is.null(designPlan[["maxNumberOfEvents"]]) &&
-                    designPlan$.getParameterType("maxNumberOfEvents") == C_PARAM_USER_DEFINED) {
+                    designPlan$isUserDefinedParameter("maxNumberOfEvents")) {
                 header <- .concatenateSummaryText(header, paste0(
                     "maximum number of events = ",
                     ceiling(designPlan$maxNumberOfEvents[1])
@@ -2408,7 +2408,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
 
         if (!is.null(designPlan[["maxNumberOfSubjects"]]) &&
-                designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED) {
+                designPlan$isUserDefinedParameter("maxNumberOfSubjects")) {
             header <- .concatenateSummaryText(header, paste0(
                 "number of subjects = ",
                 ceiling(designPlan$maxNumberOfSubjects[1])
@@ -2417,7 +2417,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
         if (settings$survivalEnabled) {
             if (!is.null(designPlan[["maxNumberOfEvents"]]) &&
-                    designPlan$.getParameterType("maxNumberOfEvents") == C_PARAM_USER_DEFINED) {
+                    designPlan$isUserDefinedParameter("maxNumberOfEvents")) {
                 header <- .concatenateSummaryText(header, paste0(
                     "number of events = ",
                     designPlan$maxNumberOfEvents[1]
@@ -2541,7 +2541,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
     functionName <- ifelse(settings$survivalEnabled, "calcEventsFunction", "calcSubjectsFunction")
     userDefinedFunction <- !is.null(designPlan[[functionName]]) &&
-        designPlan$.getParameterType(functionName) == C_PARAM_USER_DEFINED
+        designPlan$isUserDefinedParameter(functionName)
 
     if (userDefinedFunction || (!is.null(designPlan[["conditionalPower"]]) &&
             !is.na(designPlan$conditionalPower))) {
@@ -2667,7 +2667,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         header <- .concatenateSummaryText(header, paste0("ED50 = ", designPlan$gED50))
     }
     if (!is.null(designPlan[["doseLevels"]]) &&
-            designPlan$.getParameterType("doseLevels") == C_PARAM_USER_DEFINED &&
+            designPlan$isUserDefinedParameter("doseLevels") &&
             !all(is.na(designPlan$doseLevels))) {
         header <- .concatenateSummaryText(header, paste0(
             "dose levels = ",
@@ -3534,7 +3534,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     if (baseEnabled && countDataEnabled && !is.null(designPlan[["lambda1"]]) &&
-            designPlan$isGeneratedParameter("lambda1")) {
+            designPlan$isGeneratedOrDerivedParameter("lambda1")) {
         summaryFactory$addParameter(designPlan,
             parameterName = "lambda1",
             parameterCaption = "Lambda(1)",
@@ -3543,7 +3543,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     if (baseEnabled && countDataEnabled && !is.null(designPlan[["lambda2"]]) &&
-            designPlan$isGeneratedParameter("lambda2")) {
+            designPlan$isGeneratedOrDerivedParameter("lambda2")) {
         summaryFactory$addParameter(designPlan,
             parameterName = "lambda2",
             parameterCaption = "Lambda(2)",
@@ -4143,7 +4143,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     userDefinedEffectMatrix <- !enrichmentEnabled &&
-        designPlan$.getParameterType("effectMatrix") == C_PARAM_USER_DEFINED
+        designPlan$isUserDefinedParameter("effectMatrix")
 
     if (userDefinedEffectMatrix) {
         return(list(

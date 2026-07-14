@@ -494,7 +494,7 @@ NULL
     }
     .setValueAndParameterType(designPlan, "pi2", pi2, 0.2, notApplicableIfNA = TRUE)
     if (groups == 1) {
-        if (designPlan$.getParameterType("pi2") == C_PARAM_USER_DEFINED) {
+        if (designPlan$isUserDefinedParameter("pi2")) {
             warning(
                 "'pi2' (",
                 pi2,

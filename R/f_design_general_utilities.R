@@ -246,7 +246,7 @@ NULL
         return(FALSE)
     }
 
-    if (design$.getParameterType(parameterName) == C_PARAM_USER_DEFINED) {
+    if (design$isUserDefinedParameter(parameterName)) {
         warning("'", parameterName, "' (", .arrayToString(design[[parameterName]]),
             ") will be ignored because it will be calculated",
             call. = FALSE

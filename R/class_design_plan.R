@@ -897,12 +897,12 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
             }
         },
         recreate = function(..., hazardRatio = NA_real_, pi1 = NA_real_, maxNumberOfSubjects = NA_integer_) {
-            if (anyNA(hazardRatio) && self$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
+            if (anyNA(hazardRatio) && self$isUserDefinedParameter("hazardRatio")) {
                 hazardRatio <- self$hazardRatio
             }
 
             if (anyNA(pi1)) {
-                if (self$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
+                if (self$isUserDefinedParameter("pi1")) {
                     pi1 <- self$pi1
                 } else if (anyNA(hazardRatio)) {
                     if (self$.objectType == "sampleSize") {

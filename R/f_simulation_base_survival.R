@@ -58,14 +58,14 @@ NULL
         return(TRUE)
     }
 
-    if (pwsTimeObject$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED &&
+    if (pwsTimeObject$isUserDefinedParameter("hazardRatio") &&
             !all(is.na(pwsTimeObject$hazardRatio))) {
-        if (pwsTimeObject$.getParameterType("lambda1") == C_PARAM_USER_DEFINED &&
+        if (pwsTimeObject$isUserDefinedParameter("lambda1") &&
                 length(pwsTimeObject$lambda1) == length(pwsTimeObject$hazardRatio) &&
                 !all(is.na(pwsTimeObject$lambda1))) {
             return(TRUE)
         }
-        if (pwsTimeObject$.getParameterType("lambda2") == C_PARAM_USER_DEFINED &&
+        if (pwsTimeObject$isUserDefinedParameter("lambda2") &&
                 length(pwsTimeObject$lambda2) == length(pwsTimeObject$hazardRatio) &&
                 !all(is.na(pwsTimeObject$lambda2))) {
             return(TRUE)

@@ -976,6 +976,7 @@ plot.TrialDesignSet <- function(
         ylab = ylab,
         palette = palette,
         theta = theta,
+        nMax = nMax,
         plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition,
         showSource = showSource,

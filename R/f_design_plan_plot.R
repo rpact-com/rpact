@@ -941,9 +941,13 @@
             }
         } else if (.isTrialDesignPlanCountData(designPlan)) {
             if (!designPlan$isGeneratedParameter("expectedNumberOfSubjectsH1")) {
-                stopIllegalArgument("Plot type 9 is only available for count data endpoint ", "if 'expectedNumberOfSubjectsH1' was not calculated",
-                    parameter = "type", value = 9L, constraint = "expectedNumberOfSubjectsH1 must be generated for count data endpoint plots",
-                    relatedParameter = "expectedNumberOfSubjectsH1", relatedValue = designPlan$isGeneratedParameter("expectedNumberOfSubjectsH1"),
+                stopIllegalArgument("Plot type 9 is only available for count data endpoint ", 
+                    "if 'expectedNumberOfSubjectsH1' was not calculated",
+                    parameter = "type", 
+                    value = 9L, 
+                    constraint = "expectedNumberOfSubjectsH1 must be generated for count data endpoint plots",
+                    relatedParameter = "expectedNumberOfSubjectsH1", 
+                    relatedValue = designPlan$isGeneratedParameter("expectedNumberOfSubjectsH1"),
                     functionName = ".plotTrialDesignPlan")
             }
 

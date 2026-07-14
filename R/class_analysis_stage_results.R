@@ -362,7 +362,7 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -541,7 +541,7 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -698,7 +698,7 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -868,7 +868,7 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -1006,7 +1006,7 @@ StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -1140,7 +1140,7 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }

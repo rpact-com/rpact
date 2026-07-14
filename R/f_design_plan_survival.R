@@ -263,7 +263,7 @@ NULL
 
 .isUserDefinedMaxNumberOfSubjects <- function(designPlan) {
     if (!is.null(designPlan) && length(designPlan$.getParameterType("maxNumberOfSubjects")) > 0) {
-        if (designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED) {
+        if (designPlan$isUserDefinedParameter("maxNumberOfSubjects")) {
             return(TRUE)
         }
     }
@@ -387,8 +387,10 @@ NULL
         }
 
         if (any(designPlan$accrualIntensity < 0)) {
-            stopIllegalArgument("'accrualIntensityRelative' (", .arrayToString(designPlan$accrualIntensity), ") must be >= 0",
-                functionName = ".calculateSampleSizeSurvival", parameter = "accrualIntensityRelative")
+            stopIllegalArgument("'accrualIntensityRelative' (", 
+                .arrayToString(designPlan$accrualIntensity), ") must be >= 0",
+                functionName = ".calculateSampleSizeSurvival", 
+                parameter = "accrualIntensityRelative")
         }
 
         designPlan$accrualIntensityRelative <- designPlan$accrualIntensity
@@ -416,12 +418,12 @@ NULL
 
         if (numberOfDefinedAccrualIntensities > 1) {
             paramName <- NULL
-            if (designPlan$.getParameterType("pi1") == C_PARAM_USER_DEFINED ||
-                    designPlan$.getParameterType("pi1") == C_PARAM_DEFAULT_VALUE ||
-                    designPlan$.getParameterType("pi2") == C_PARAM_USER_DEFINED) {
+            if (designPlan$isUserDefinedParameter("pi1") ||
+                    designPlan$isDefaultParameter("pi1") ||
+                    designPlan$isUserDefinedParameter("pi2")) {
                 paramName <- "pi1"
-            } else if (designPlan$.getParameterType("median1") == C_PARAM_USER_DEFINED ||
-                    designPlan$.getParameterType("median2") == C_PARAM_USER_DEFINED) {
+            } else if (designPlan$isUserDefinedParameter("median1") ||
+                    designPlan$isUserDefinedParameter("median2")) {
                 paramName <- "median1"
             }
             if (!is.null(paramName)) {
@@ -735,7 +737,7 @@ NULL
     )
     designPlan$.setParameterType("kappa", designPlan$.piecewiseSurvivalTime$.getParameterType("kappa"))
 
-    if (designPlan$.piecewiseSurvivalTime$.getParameterType("pi1") == C_PARAM_DEFAULT_VALUE &&
+    if (designPlan$.piecewiseSurvivalTime$isDefaultParameter("pi1") &&
             length(designPlan$.piecewiseSurvivalTime$pi1) > 1 &&
             length(accrualSetup$accrualIntensity) > 1 && all(accrualSetup$accrualIntensity < 1)) {
         designPlan$.piecewiseSurvivalTime$pi1 <- designPlan$.piecewiseSurvivalTime$pi1[1]
@@ -802,7 +804,7 @@ NULL
         )) {
             designPlan$.setParameterType(p, C_PARAM_NOT_APPLICABLE)
         }
-        if (designPlan$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED ||
+        if (designPlan$isUserDefinedParameter("accrualTime") ||
                 !isTRUE(all.equal(accrualTime, C_ACCRUAL_TIME_DEFAULT))) {
             designPlan$.warnInCaseArgumentExists(accrualSetup$accrualTime, "accrualTime")
         }
@@ -1396,7 +1398,7 @@ NULL
     }
 
     designPlan$maxNumberOfSubjects <- designPlan$numberOfSubjects[kMax, ]
-    if (designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_NOT_APPLICABLE ||
+    if (designPlan$isNotApplicableParameter("maxNumberOfSubjects") ||
             length(designPlan$maxNumberOfSubjects) > 1) {
         designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
     }
@@ -1567,7 +1569,7 @@ getEventProbabilities <- function(time,
     )
 
     if (!setting$delayedResponseEnabled && length(setting$lambda1) > 1 &&
-            setting$.getParameterType("lambda1") == C_PARAM_USER_DEFINED) {
+            setting$isUserDefinedParameter("lambda1")) {
         warning("Only the first 'lambda1' (", lambda1[1], ") ",
             "was used to calculate event probabilities",
             call. = FALSE
@@ -1976,20 +1978,20 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         )
         paramName <- NULL
         if (!pwst$piecewiseSurvivalEnabled) {
-            if (pwst$.getParameterType("pi1") == C_PARAM_USER_DEFINED ||
-                    pwst$.getParameterType("pi1") == C_PARAM_DEFAULT_VALUE ||
-                    pwst$.getParameterType("pi2") == C_PARAM_USER_DEFINED) {
+            if (pwst$isUserDefinedParameter("pi1") ||
+                    pwst$isDefaultParameter("pi1") ||
+                    pwst$isUserDefinedParameter("pi2")) {
                 paramName <- "pi1"
-            } else if (pwst$.getParameterType("lambda1") == C_PARAM_USER_DEFINED ||
-                    pwst$.getParameterType("lambda2") == C_PARAM_USER_DEFINED) {
+            } else if (pwst$isUserDefinedParameter("lambda1") ||
+                    pwst$isUserDefinedParameter("lambda2")) {
                 paramName <- "lambda1"
-            } else if (pwst$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
+            } else if (pwst$isUserDefinedParameter("hazardRatio")) {
                 paramName <- "hazardRatio"
-            } else if (pwst$.getParameterType("median1") == C_PARAM_USER_DEFINED ||
-                    pwst$.getParameterType("median2") == C_PARAM_USER_DEFINED) {
+            } else if (pwst$isUserDefinedParameter("median1") ||
+                    pwst$isUserDefinedParameter("median2")) {
                 paramName <- "median1"
             }
-        } else if (pwst$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
+        } else if (pwst$isUserDefinedParameter("hazardRatio")) {
             paramName <- "hazardRatio"
         }
         if (!is.null(paramName)) {

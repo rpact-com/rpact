@@ -1519,7 +1519,7 @@ NULL
 
 .warnInCaseOfTwoSidedPowerIsDisabled <- function(design) {
     if (design$sided == 2 && !is.na(design$twoSidedPower) && !design$twoSidedPower &&
-            design$.getParameterType("twoSidedPower") == C_PARAM_USER_DEFINED) {
+            design$isUserDefinedParameter("twoSidedPower")) {
         warning("design$twoSidedPower = FALSE will be ignored because design$sided = 2", call. = FALSE)
     }
 }

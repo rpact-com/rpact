@@ -76,7 +76,7 @@ NULL
             .setValueAndParameterType(results, "thetaH1", thetaH1, NA_real_)
         } else {
             results$thetaH1 <- thetaH1
-            if (results$.getParameterType("thetaH1") == C_PARAM_TYPE_UNKNOWN) {
+            if (results$isUndefinedParameter("thetaH1")) {
                 results$.setParameterType("thetaH1", C_PARAM_USER_DEFINED)
             }
         }
@@ -88,7 +88,7 @@ NULL
             )
         } else {
             results$thetaH1 <- matrix(thetaH1, ncol = 1)
-            if (results$.getParameterType("thetaH1") == C_PARAM_TYPE_UNKNOWN) {
+            if (results$isUndefinedParameter("thetaH1")) {
                 results$.setParameterType("thetaH1", C_PARAM_USER_DEFINED)
             }
         }
@@ -102,7 +102,7 @@ NULL
         .setValueAndParameterType(results, "assumedStDev", assumedStDev, NA_real_)
     } else {
         results$assumedStDev <- assumedStDev
-        if (results$.getParameterType("assumedStDev") == C_PARAM_TYPE_UNKNOWN) {
+        if (results$isUndefinedParameter("assumedStDev")) {
             results$.setParameterType("assumedStDev", C_PARAM_USER_DEFINED)
         }
     }
@@ -118,7 +118,7 @@ NULL
         )
     } else {
         results$assumedStDevs <- matrix(assumedStDevs, ncol = 1)
-        if (results$.getParameterType("assumedStDevs") == C_PARAM_TYPE_UNKNOWN) {
+        if (results$isUndefinedParameter("assumedStDevs")) {
             results$.setParameterType("assumedStDevs", C_PARAM_USER_DEFINED)
         }
     }
@@ -136,11 +136,11 @@ NULL
         )
     } else {
         results[[piControlName]] <- matrix(piControlValues, ncol = 1)
-        if (results$.getParameterType(piControlName) == C_PARAM_TYPE_UNKNOWN) {
+        if (results$isUndefinedParameter(piControlName)) {
             results$.setParameterType(piControlName, C_PARAM_USER_DEFINED)
         }
     }
-    if (results$.getParameterType("piTreatments") == C_PARAM_TYPE_UNKNOWN) {
+    if (results$isUndefinedParameter("piTreatments")) {
         .setValueAndParameterType(
             results, "piTreatments",
             matrix(piTreatments, ncol = 1),
@@ -148,7 +148,7 @@ NULL
         )
     } else {
         results$piTreatments <- matrix(piTreatments, ncol = 1)
-        if (results$.getParameterType("piTreatments") == C_PARAM_TYPE_UNKNOWN) {
+        if (results$isUndefinedParameter("piTreatments")) {
             results$.setParameterType("piTreatments", C_PARAM_USER_DEFINED)
         }
     }

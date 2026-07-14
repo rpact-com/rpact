@@ -112,6 +112,7 @@
                 designPlan,
                 boundary = "upper"
             )
+            
             if (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     (!is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
                 futilityBoundsEffectScaleLower <- .getFutilityBoundsTreatmentEffectScale(
@@ -394,19 +395,21 @@
         }
     }
 
-    if (design$sided == 1) {
-        futilityBoundsEffectScaleUpper <- .getFutilityBoundsTreatmentEffectScale(designPlan)
-    } else {
-        futilityBoundsEffectScaleUpper <- .getFutilityBoundsTreatmentEffectScale(
-            designPlan,
-            boundary = "upper"
-        )
-        if (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-                (!is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
-            futilityBoundsEffectScaleLower <- .getFutilityBoundsTreatmentEffectScale(
+    if (design$kMax > 1) {
+        if (design$sided == 1) {
+            futilityBoundsEffectScaleUpper <- .getFutilityBoundsTreatmentEffectScale(designPlan)
+        } else {
+            futilityBoundsEffectScaleUpper <- .getFutilityBoundsTreatmentEffectScale(
                 designPlan,
-                boundary = "lower"
+                boundary = "upper"
             )
+            if (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                    (!is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                futilityBoundsEffectScaleLower <- .getFutilityBoundsTreatmentEffectScale(
+                    designPlan,
+                    boundary = "lower"
+                )
+            }
         }
     }
 

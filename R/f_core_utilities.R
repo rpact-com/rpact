@@ -379,7 +379,7 @@ getTestLabel <- function(x) {
         maxCharacters = 160L,
         mode = c("csv", "vector", "and", "or")) {
     .assertIsSingleInteger(digits, "digits", naAllowed = TRUE, validateType = FALSE)
-    .assertIsInClosedInterval(digits, "digits", lower = 0, upper = NULL)
+    .assertIsInClosedInterval(digits, "digits", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsSingleInteger(maxLength, "maxLength", naAllowed = FALSE, validateType = FALSE)
     .assertIsInClosedInterval(maxLength, "maxLength", lower = 1, upper = NULL)
     .assertIsSingleInteger(maxCharacters, "maxCharacters", naAllowed = FALSE, validateType = FALSE)
@@ -1966,7 +1966,8 @@ saveOptions <- function() {
             optionFileContent <- character()
             for (optionName in optionNames) {
                 optionValue <- getOption(optionName)
-                if (!is.null(optionValue)) {
+                if (!is.null(optionValue) && length(optionValue) == 1 && 
+                        (is.character(optionValue) || is.numeric(optionValue) || is.logical(optionValue))) {
                     optionFileContent <- c(optionFileContent, paste0(optionName, ": ", optionValue))
                 }
             }

@@ -273,6 +273,9 @@ ParameterSet <- R6::R6Class("ParameterSet",
         isGeneratedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_GENERATED)
         },
+        isGeneratedOrDerivedParameter = function(parameterName) {
+            return(self$.getParameterType(parameterName) %in% c(C_PARAM_GENERATED, C_PARAM_DERIVED))
+        },
         isDerivedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_DERIVED)
         },
@@ -688,7 +691,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             }
             if (is.function(paramValue) || grepl("Function$", paramName)) {
                 paramValueFormatted <- ifelse(
-                    self$.getParameterType(paramName) == C_PARAM_USER_DEFINED,
+                    self$isUserDefinedParameter(paramName),
                     ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"),
                     "default"
                 )
@@ -784,7 +787,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 if (!is.null(parameterValues) && !is.matrix(parameterValues) &&
                         length(parameterValues) == numberOfVariants &&
                         parameterName %in% C_VARIABLE_DESIGN_PLAN_PARAMETERS &&
-                        self$.getParameterType(parameterName) == C_PARAM_USER_DEFINED) {
+                        self$isUserDefinedParameter(parameterName)) {
                     return(parameterName)
                 }
             }
@@ -795,7 +798,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 if (!is.null(parameterValues) && !is.matrix(parameterValues) &&
                         length(parameterValues) == numberOfVariants &&
                         parameterName %in% C_VARIABLE_DESIGN_PLAN_PARAMETERS &&
-                        self$.getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE) {
+                        self$isDefaultParameter(parameterName)) {
                     return(parameterName)
                 }
             }
@@ -958,13 +961,13 @@ ParameterSet <- R6::R6Class("ParameterSet",
         numberOfStages,
         includeAllParameters,
         mandatoryParameterNames) {
-    if (parameterSet$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN &&
+    if (parameterSet$isUndefinedParameter(parameterName) &&
             parameterName != "futilityStop") {
         return(NULL)
     }
 
     if (!includeAllParameters &&
-            parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE &&
+            parameterSet$isNotApplicableParameter(parameterName) &&
             !(parameterName %in% mandatoryParameterNames)) {
         return(NULL)
     }
@@ -1042,7 +1045,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             ")", functionName = ".getDataFrameColumnValues", parameter = parameterName, value = length(parameterValues))
     } else if (parameterName == "effectMatrix") {
         # return effect matrix row if 'effectMatrix' is user defined
-        if (parameterSet$.getParameterType("effectMatrix") == C_PARAM_USER_DEFINED) {
+        if (parameterSet$isUserDefinedParameter("effectMatrix")) {
             return(1:ncol(parameterValues))
         }
 

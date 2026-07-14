@@ -1243,22 +1243,22 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (parameterName == "accrualTime" && inherits(obj, "TrialDesignPlanCountData") &&
-            obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
+            obj$isUserDefinedParameter("accrualTime")) {
         return(".formatHowItIs")
     }
 
     if (parameterName == "accrualTimeOriginal" && inherits(obj, "TrialDesignPlanCountData") &&
-            obj$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED) {
+            obj$isUserDefinedParameter("accrualTimeOriginal")) {
         return(".formatHowItIs")
     }
 
     if (parameterName == "userAlphaSpending" &&
-            obj$.getParameterType("userAlphaSpending") == C_PARAM_GENERATED) {
+            obj$isGeneratedParameter("userAlphaSpending")) {
         return(".formatProbabilities")
     }
 
     if (parameterName == "userBetaSpending" &&
-            obj$.getParameterType("userBetaSpending") == C_PARAM_GENERATED) {
+            obj$isGeneratedParameter("userBetaSpending")) {
         return(".formatProbabilities")
     }
 

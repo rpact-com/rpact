@@ -101,7 +101,7 @@ NULL
     }
 
     multiArmEnabled <- grepl("MultiArm", .getClassName(simulationResults))
-    userDefinedEffectMatrix <- multiArmEnabled && simulationResults$.getParameterType("effectMatrix") == C_PARAM_USER_DEFINED
+    userDefinedEffectMatrix <- multiArmEnabled && simulationResults$isUserDefinedParameter("effectMatrix")
     if (!is.null(xlab) && !is.na(xlab)) {
         return(xlab)
     }
@@ -193,7 +193,7 @@ NULL
     enrichmentEnabled <- grepl("Enrichment", .getClassName(simulationResults))
     countDataEnabled <- grepl("CountData", .getClassName(simulationResults))
     userDefinedEffectMatrix <- multiArmEnabled &&
-        simulationResults$.getParameterType("effectMatrix") == C_PARAM_USER_DEFINED
+        simulationResults$isUserDefinedParameter("effectMatrix")
 
     gMax <- NA_integer_
     if (multiArmEnabled || enrichmentEnabled) {
