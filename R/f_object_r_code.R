@@ -744,7 +744,7 @@ getObjectRCode <- function(obj,
     if (
         !("accrualTime" %in% objNames) &&
             !is.null(obj[[".accrualTime"]]) &&
-            obj$isGeneratedParameter("accrualTime") &&
+            obj$isGeneratedOrDerivedParameter("accrualTime") &&
             obj$.accrualTime$isUserDefinedParameter("accrualTimeOriginal")
         ) {
         objNames <- c(objNames, "accrualTime")
@@ -824,7 +824,7 @@ getObjectRCode <- function(obj,
                 if (
                     objName == "accrualTime" &&
                         !is.null(obj[[".accrualTime"]]) &&
-                        obj$isGeneratedParameter("accrualTime") &&
+                        obj$isGeneratedOrDerivedParameter("accrualTime") &&
                         obj$.accrualTime$isUserDefinedParameter("accrualTimeOriginal")
                     ) {
                     value <- obj$.accrualTime$accrualTimeOriginal
@@ -981,7 +981,7 @@ getObjectRCode <- function(obj,
         if (inherits(obj, "TrialDesignPlanSurvival") || inherits(obj, "SimulationResultsSurvival")) {
             if (
                 !("accrualTime" %in% objNames) &&
-                    obj$isGeneratedParameter("accrualTime") &&
+                    obj$isGeneratedOrDerivedParameter("accrualTime") &&
                     !all(is.na(obj$accrualTime))
                 ) {
                 # case 2: follow-up time and absolute intensity given
