@@ -390,7 +390,7 @@ getSimulationMultiArmSurvivalBasic <- function(
         design,
         objectType = "power", userFunctionCallEnabled = TRUE
     )
-
+    
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,

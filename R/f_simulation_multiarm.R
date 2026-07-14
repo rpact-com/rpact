@@ -702,7 +702,7 @@ NULL
 
         .setValueAndParameterType(simulationResults, "piTreatmentsH1", piTreatmentsH1, NA_real_)
 
-        .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE) # , noDefaultAvailable = TRUE)
+        .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE)
         .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = FALSE)
         .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
 
@@ -751,11 +751,12 @@ NULL
         if (typeOfShape == "userDefined") {
             omegaMaxVector <- effectMatrix[, gMax]
         }
-        .setValueAndParameterType(simulationResults, "omegaMaxVector", omegaMaxVector, C_RANGE_OF_HAZARD_RATIOS_DEFAULT)
-        if (activeArms == 1) {
-            simulationResults$.setParameterType("omegaMaxVector", C_PARAM_NOT_APPLICABLE)
-        } else if (typeOfShape == "userDefined") {
-            simulationResults$.setParameterType("omegaMaxVector", C_PARAM_DERIVED)
+        if (activeArms == 1 && identical(as.numeric(omegaMaxVector), as.numeric(effectMatrix)) && 
+                !simulationResults$isUserDefinedParameter("effectMatrix")) {
+            simulationResults$.setParameterType("effectMatrix", C_PARAM_NOT_APPLICABLE)
+        }
+        .setValueAndParameterType(simulationResults, "omegaMaxVector", omegaMaxVector, C_RANGE_OF_HAZARD_RATIOS_DEFAULT)        if (simulationResults$isUserDefinedParameter("effectMatrix")) {
+            simulationResults$.setParameterType("omegaMaxVector", ifelse(activeArms == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_DERIVED))
         }
 
         .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)

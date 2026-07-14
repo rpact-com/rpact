@@ -2220,11 +2220,13 @@ kable.ParameterSet <- function(x, ...) {
                 objName <- paste0(objName[1], "...")
             }
             if (grepl("^ *print\\(", objName)) {
-                stopIllegalArgument("kable(", objName, ") ", "does not work correctly. ", "Use ", sub(
-                    "print", "kable",
-                    objName
-                ), " without 'print' ", "instead or ", sub("\\)", ", markdown = TRUE, call. = FALSE)", objName),
-                functionName = "kable.ParameterSet", parameter = "print"
+                stopIllegalArgument(
+                    "kable(", objName, ") ", "does not work correctly. ", 
+                    "Use ", sub("print", "kable", objName), 
+                    " without 'print' instead or ", 
+                    sub("\\)", ", markdown = TRUE, call. = FALSE)", objName),
+                    functionName = "kable.ParameterSet",
+                    parameter = "print"
                 )
             }
         }

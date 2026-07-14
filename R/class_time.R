@@ -438,6 +438,9 @@ getAccrualTime <- function(
 #'
 PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
     inherit = TimeDefinition,
+    private = list(
+        hazardRatioIsUserDefined = FALSE
+    ),
     public = list(
         .pi1Default = NULL,
         .lambdaBased = NULL,
@@ -960,6 +963,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
 
                 if (!anyNA(self$hazardRatio)) {
                     self$.setParameterType("hazardRatio", C_PARAM_USER_DEFINED)
+                    private$hazardRatioIsUserDefined <- TRUE
                 }
 
                 if (!is.na(pwSurvTime)) {
@@ -1159,7 +1163,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             if (is.list(pwSurvTime)) {
                 .assertIsValidHazardRatioVector(self$hazardRatio)
                 self$.initFromList(pwSurvTime)
-                self$.initHazardRatio(1)
+                self$.initHazardRatio(1L)
                 if (!self$piecewiseSurvivalEnabled) {
                     self$.initPi()
                     self$.initMedian()
@@ -1188,7 +1192,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
 
                 self$.initPi()
                 if (hazardRatioCalculationEnabled) {
-                    self$.initHazardRatio(2)
+                    self$.initHazardRatio(2L)
                 }
                 self$.initMedian()
             } else if (!is.numeric(pwSurvTime)) {
@@ -1212,7 +1216,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     self$piecewiseSurvivalTime <- 0
                     self$.setParameterType("piecewiseSurvivalTime", C_PARAM_DEFAULT_VALUE)
                     self$piecewiseSurvivalEnabled <- FALSE
-                    self$.initHazardRatio(3)
+                    self$.initHazardRatio(3L)
                     self$.initPi()
                     self$.initMedian()
                 } else {
@@ -1253,7 +1257,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     }
                     self$.setParameterType("piecewiseSurvivalTime", C_PARAM_USER_DEFINED)
                     self$piecewiseSurvivalEnabled <- TRUE
-                    self$.initHazardRatio(4)
+                    self$.initHazardRatio(4L)
                     self$.initPi()
                 }
             }
@@ -1365,7 +1369,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 }
             }
         },
-        .initHazardRatio = function(number = -1) {
+        .initHazardRatio = function(number = -1L) {
             .logDebug(".initHazardRatio(#%s)", number)
 
             if (!is.null(self$hazardRatio) && length(self$hazardRatio) > 0 && !all(is.na(self$hazardRatio))) {
@@ -1383,11 +1387,13 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                             )
                         )
                     ) {
+                    .logDebug(".init: set hazard ratio to user defined")
                     self$.setParameterType("hazardRatio", C_PARAM_USER_DEFINED)
+                    private$hazardRatioIsUserDefined <- TRUE
                     return(invisible())
                 }
 
-                if (!self$.silent && self$isUserDefinedParameter("hazardRatio")) {
+                if (!self$.silent && (isTRUE(private$hazardRatioIsUserDefined) || number == 3L)) {
                     warning("'hazardRatio' (", .arrayToString(self$hazardRatio),
                         ") will be ignored because it will be calculated",
                         call. = FALSE

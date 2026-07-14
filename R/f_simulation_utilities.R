@@ -601,23 +601,23 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     if (!is.null(effectList[["prevalences"]])) {
         .assertIsInClosedInterval(effectList$prevalences, "effectList$prevalences",
-            lower = 0, upper = 1, call. = FALSE
+            lower = 0, upper = 1
         )
     }
     if (!is.null(effectList[["effects"]])) {
-        .assertIsNumericVector(effectList$effects, "effectList$effects", call. = FALSE)
+        .assertIsValidMatrix(effectList$effects, "effectList$effects")
     }
     for (piParam in c("piControls", "piTreatments")) {
         if (!is.null(effectList[[piParam]])) {
             if (piParam == matrixNameNew && is.matrix(effectList[[piParam]])) {
                 for (i in 1:nrow(effectList[[piParam]])) {
                     .assertIsInOpenInterval(effectList[[piParam]][i, ], paste0("effectList$", piParam),
-                        lower = 0, upper = 1, call. = FALSE
+                        lower = 0, upper = 1
                     )
                 }
             } else {
                 .assertIsInOpenInterval(effectList[[piParam]], paste0("effectList$", piParam),
-                    lower = 0, upper = 1, call. = FALSE
+                    lower = 0, upper = 1
                 )
             }
         }
@@ -625,7 +625,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     for (ratioParam in c("hazardRatios", "stDevs")) {
         if (!is.null(effectList[[ratioParam]])) {
             .assertIsInOpenInterval(effectList[[ratioParam]], paste0("effectList$", ratioParam),
-                lower = 0, upper = NULL, call. = FALSE
+                lower = 0, upper = NULL
             )
         }
     }

@@ -1863,7 +1863,8 @@ Dataset <- R6::R6Class("Dataset",
             if (!survivalCorrectionEnabled) {
                 return(length(levels(data$group)))
             }
-            return(length(levels(data$group)) + ifelse(inherits(self, "DatasetSurvival") || inherits(self, "DatasetSurvival"), 1, 0))
+            return(length(levels(data$group)) + ifelse(inherits(self, "DatasetSurvival") || 
+                inherits(self, "DatasetSurvival"), 1, 0))
         },
         getNumberOfStages = function(naOmitEnabled = TRUE) {
             if (naOmitEnabled) {

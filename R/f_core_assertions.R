@@ -451,7 +451,7 @@ NULL
 #'
 #' @noRd
 #'
-.assertIsInOpenInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
+.assertIsInOpenInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE) {
     if (naAllowed && all(is.na(x))) {
         return(invisible())
     }
@@ -808,7 +808,7 @@ NULL
     return(invisible(as.logical(x)))
 }
 
-.assertIsNoDefault <- function(x, argumentName, noDefaultAvailable, ..., checkNA = FALSE, call. = FALSE) {
+.assertIsNoDefault <- function(x, argumentName, noDefaultAvailable, ..., checkNA = FALSE) {
     if (noDefaultAvailable && (!checkNA || all(is.na(x)))) {
         stopMissingArgument("'", argumentName, "' ",
             "must be specified, there is no default value",
@@ -819,7 +819,7 @@ NULL
     }
 }
 
-.assertIsSingleLogical <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = FALSE) {
+.assertIsSingleLogical <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stopMissingArgument("'", argumentName, "' ",
@@ -1022,7 +1022,7 @@ NULL
     return(invisible(as.character(x)))
 }
 
-.assertIsCharacter <- function(x, argumentName, ..., naAllowed = FALSE, call. = FALSE) {
+.assertIsCharacter <- function(x, argumentName, ..., naAllowed = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         stopMissingArgument("'", argumentName, "' must be a valid character value or vector",
             functionName = ".assertIsCharacter",
@@ -2567,7 +2567,7 @@ NULL
         userFunctionCallEnabled = TRUE) {
     if (sided == 2 && !is.na(directionUpper)) {
         if (userFunctionCallEnabled) {
-            warning("'directionUpper' will be ignored because it ",
+            warning("'directionUpper' (", directionUpper, ") will be ignored because it ",
                 "is not applicable for 'sided' = 2",
                 call. = FALSE
             )
