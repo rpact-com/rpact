@@ -1071,7 +1071,7 @@ NULL
     if (missing(parameterName)) {
         stopMissingArgument("'parameterName' must be defined",
             functionName = ".assertDesignParameterExists",
-            parameter = parameterName
+            parameter = "parameterName"
         )
     }
 
@@ -1157,7 +1157,9 @@ NULL
     if (is.na(lowerBound) && is.na(upperBound)) {
         stopMissingArgument("'lowerBound' or 'upperBound' must be defined",
             functionName = ".showParameterOutOfValidatedBoundsMessage",
-            parameter = "lowerBound", relatedParameter = "upperBound", value = lowerBound
+            parameter = "lowerBound", 
+            relatedParameter = "upperBound", 
+            value = lowerBound
         )
     }
 
@@ -1759,8 +1761,7 @@ NULL
     if (is.null(match.call(expand.dots = FALSE)[["sided"]])) {
         stopMissingArgument("'sided' must be defined",
             functionName = ".assertIsValidSidedParameter",
-            parameter = "sided",
-            value = sided
+            parameter = "sided"
         )
     }
     if (sided != 1 && sided != 2) {
@@ -1776,8 +1777,7 @@ NULL
     if (is.null(match.call(expand.dots = FALSE)[["groups"]])) {
         stopMissingArgument("'groups' must be defined",
             functionName = ".assertIsValidGroupsParameter",
-            parameter = "groups",
-            value = groups
+            parameter = "groups"
         )
     }
     if (groups != 1 && groups != 2) {
@@ -2110,7 +2110,8 @@ NULL
     if (endpoint == "rates" && groups == 1 && is.na(thetaH0)) {
         stopMissingArgument("'thetaH0' must be specified for testing a rate in one sample",
             parameter = "thetaH0", constraint = "must be specified for testing a rate in one sample",
-            functionName = ".assertIsValidThetaH0", value = thetaH0
+            functionName = ".assertIsValidThetaH0", 
+            value = thetaH0
         )
     }
     if (isFALSE(naAllowed)) {
@@ -2856,15 +2857,17 @@ NULL
                 "because 'conditionalPower' or '", calcSubjectsFunctionName,
                 "' is defined",
                 functionName = ".assertIsValidNumberOfSubjectsPerStage",
-                parameter = "conditionalPower",
-                value = conditionalPower
+                parameter = parameterName,
+                relatedParameter = "conditionalPower",
+                relatedValue = conditionalPower
             )
         } else {
             stopMissingArgument("'", parameterName, "' must be defined ",
                 "because 'conditionalPower' is defined",
                 functionName = ".assertIsValidNumberOfSubjectsPerStage",
-                parameter = "conditionalPower",
-                value = conditionalPower
+                parameter = parameterName,
+                relatedParameter = "conditionalPower",
+                relatedValue = conditionalPower
             )
         }
     }
@@ -3787,8 +3790,7 @@ NULL
         stopMissingArgument("either 'design' or 'delayedInformation' must be specified",
             functionName = ".isDelayedInformationEnabled",
             parameter = "design",
-            relatedParameter = "delayedInformation",
-            value = design
+            relatedParameter = "delayedInformation"
         )
     }
 
@@ -3938,17 +3940,14 @@ NULL
     numberOfParameters <- sum(is.na(lambda2), anyNA(lambda1), is.na(lambda), anyNA(theta))
     if (numberOfParameters != 2) {
         message <- "exactly two of the parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified"
-        if (numberOfParameters > 2) {
-            stopConflictingArguments(message,
+        do.call(
+            what = if (numberOfParameters > 2) stopConflictingArguments else stopMissingArgument, 
+            args = list(message,
                 functionName = ".assertIsValidEffectCountData",
-                parameter = c("lambda", "lambda1", "lambda2", "theta")
-            )
-        } else {
-            stopMissingArgument(message,
-                functionName = ".assertIsValidEffectCountData",
-                parameter = c("lambda", "lambda1", "lambda2", "theta")
-            )
-        }
+                parameter = c("lambda", "lambda1", "lambda2", "theta"),
+                relatedParameter = "numberOfParameters",
+                relatedValue = numberOfParameters
+            ))
     }
 
     if (!is.na(lambda2) && all(!is.na(theta))) {
@@ -4256,7 +4255,7 @@ NULL
             .getClassName(type), ")",
             functionName = ".assertIsValidPlotType",
             parameter = "type",
-            value = type
+            value = .getClassName(type)
         )
     }
 
@@ -4293,7 +4292,8 @@ NULL
         sQuote(scaleName), " = ", dQuote(scaleValue),
         functionName = ".showFutilityBoundsMissingArgumentError",
         parameter = argumentName,
-        relatedParameter = scaleName
+        relatedParameter = scaleName,
+        relatedValue = scaleValue
     )
 }
 
