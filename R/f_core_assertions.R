@@ -1060,7 +1060,9 @@ NULL
     return(invisible(as.character(x)))
 }
 
-.assertDesignParameterExists <- function(design, parameterName, defaultValue) {
+.assertDesignParameterExists <- function(
+        design, parameterName, defaultValue, ...,
+        relatedParameter = NULL, relatedValue = NULL) {
     if (missing(design)) {
         stopMissingArgument("'design' must be defined",
             functionName = ".assertDesignParameterExists",
@@ -1084,9 +1086,20 @@ NULL
 
     value <- design[[parameterName]]
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
+        
+        constraint <- NULL
+        if (identical(relatedParameter, "typeOfDesign") && !is.null(relatedValue)) {
+            constraint <- paste0(
+                "must be specified for '", relatedParameter, "' = '", relatedValue, "'"
+            )
+        }
+        
         stopMissingArgument("parameter '", parameterName, "' must be specified in design",
             functionName = ".assertDesignParameterExists",
-            parameter = parameterName
+            parameter = parameterName,
+            relatedParameter = relatedParameter,
+            relatedValue = relatedValue,
+            constraint = constraint
         )
     }
 

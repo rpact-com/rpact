@@ -107,35 +107,42 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     }
 
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT) {
-        .assertDesignParameterExists(design, "deltaWT", NA_real_)
+        .assertDesignParameterExists(design, "deltaWT", NA_real_, 
+            relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
         .assertIsSingleNumber(design$deltaWT, "deltaWT", naAllowed = FALSE)
         .showParameterOutOfValidatedBoundsMessage(design$deltaWT, "deltaWT", lowerBound = -0.5, upperBound = 1)
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_PT) {
-        .assertDesignParameterExists(design, "deltaPT1", NA_real_)
+        .assertDesignParameterExists(design, "deltaPT1", NA_real_, 
+            relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
         .assertIsSingleNumber(design$deltaPT1, "deltaPT1", naAllowed = FALSE)
         .showParameterOutOfValidatedBoundsMessage(design$deltaPT1, "deltaPT1", lowerBound = -0.5, upperBound = 1)
-        .assertDesignParameterExists(design, "deltaPT0", NA_real_)
+        .assertDesignParameterExists(design, "deltaPT0", NA_real_, 
+            relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
         .assertIsSingleNumber(design$deltaPT0, "deltaPT0", naAllowed = FALSE)
         .showParameterOutOfValidatedBoundsMessage(design$deltaPT0, "deltaPT0", lowerBound = -0.5, upperBound = 1)
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
-        .assertDesignParameterExists(design, "optimizationCriterion", C_OPTIMIZATION_CRITERION_DEFAULT)
+        .assertDesignParameterExists(design, "optimizationCriterion", C_OPTIMIZATION_CRITERION_DEFAULT, 
+            relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
         if (!.isOptimizationCriterion(design$optimizationCriterion)) {
             stopIllegalArgument("optimization criterion must be one of the following: ", .printOptimizationCriterion(),
                 functionName = ".validateTypeOfDesign")
         }
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_HP) {
-        .assertDesignParameterExists(design, "constantBoundsHP", C_CONST_BOUND_HP_DEFAULT)
+        .assertDesignParameterExists(design, "constantBoundsHP", C_CONST_BOUND_HP_DEFAULT, 
+            relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
         .assertIsSingleNumber(design$constantBoundsHP, "constantBoundsHP")
         .showParameterOutOfValidatedBoundsMessage(design$constantBoundsHP, "constantBoundsHP", lowerBound = 2)
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_KD) {
-        .assertDesignParameterExists(design, "gammaA", NA_real_)
+        .assertDesignParameterExists(design, "gammaA", NA_real_, 
+            relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
         .assertIsSingleNumber(design$gammaA, "gammaA", naAllowed = FALSE)
         .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA",
             lowerBound = 0.4, upperBound = 8,
             spendingFunctionName = "Kim & DeMets alpha spending"
         )
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_HSD) {
-        .assertDesignParameterExists(design, "gammaA", NA_real_)
+        .assertDesignParameterExists(design, "gammaA", NA_real_, 
+            relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
         .assertIsSingleNumber(design$gammaA, "gammaA", naAllowed = FALSE)
         .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA",
             lowerBound = -10, upperBound = 5,
@@ -167,7 +174,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     }
 
     if (.isAlphaSpendingDesignType(design$typeOfDesign)) {
-        .assertDesignParameterExists(design, "typeBetaSpending", C_TYPE_OF_DESIGN_BS_NONE)
+        .assertDesignParameterExists(design, "typeBetaSpending", C_TYPE_OF_DESIGN_BS_NONE, 
+            relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
 
         if (!.isBetaSpendingDesignType(design$typeBetaSpending, noneIncluded = TRUE)) {
             stopIllegalArgument("type of beta spending must be one of the following: ", .printBetaSpendingDesignTypes(),
@@ -175,7 +183,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         }
 
         if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_KD) {
-            .assertDesignParameterExists(design, "gammaB", NA_real_)
+            .assertDesignParameterExists(design, "gammaB", NA_real_, 
+                relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
             .assertIsSingleNumber(design$gammaB, "gammaB", naAllowed = FALSE)
             .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB",
                 lowerBound = 0.4, upperBound = 8,
@@ -184,7 +193,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         }
 
         if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_HSD) {
-            .assertDesignParameterExists(design, "gammaB", NA_real_)
+            .assertDesignParameterExists(design, "gammaB", NA_real_, 
+                relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
             .assertIsSingleNumber(design$gammaB, "gammaB", naAllowed = FALSE)
             .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB",
                 lowerBound = -10, upperBound = 5,
@@ -257,8 +267,10 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     .assertDesignParameterExists(design, "tolerance", C_DESIGN_TOLERANCE_DEFAULT)
     if (design$tolerance < 1e-10 || design$tolerance > 1e-03) {
-        stopArgumentOutOfBounds("'tolerance' (", design$tolerance, ") out of bounds [1e-10; 1e-03]", functionName = ".validateBaseParameters",
-            parameter = "tolerance", value = design$tolerance)
+        stopArgumentOutOfBounds("'tolerance' (", design$tolerance, ") out of bounds [1e-10; 1e-03]", 
+            functionName = ".validateBaseParameters",
+            parameter = "tolerance", 
+            value = design$tolerance)
     }
 
     return(invisible(design))
@@ -668,7 +680,9 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #' @noRd
 #'
 .getDesignGroupSequentialWangAndTsiatisOptimum <- function(design) {
-    .assertDesignParameterExists(design, "optimizationCriterion", C_OPTIMIZATION_CRITERION_DEFAULT)
+    .assertDesignParameterExists(design, "optimizationCriterion", 
+        C_OPTIMIZATION_CRITERION_DEFAULT,
+        relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
     .assertIsOptimizationCriterion(design$optimizationCriterion)
 
     optimumDesign <- stats::optimize(.getOptimumDesign,

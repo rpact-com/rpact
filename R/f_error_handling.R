@@ -173,7 +173,6 @@ NULL
         class = class,
         call = call
     )
-
     stop(condition)
 }
 

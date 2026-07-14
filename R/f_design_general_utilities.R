@@ -354,7 +354,8 @@ NULL
 
 .validateUserAlphaSpending <- function(design) {
     .assertIsTrialDesign(design)
-    .assertDesignParameterExists(design, "userAlphaSpending", NA_real_)
+    .assertDesignParameterExists(design, "userAlphaSpending", NA_real_,
+        relatedParameter = "typeOfDesign", relatedValue = design$typeOfDesign)
 
     if ((design$isUserDefinedParameter("informationRates") ||
             (design$isDefaultParameter("informationRates") && !design$isUserDefinedParameter("kMax"))) &&
@@ -401,7 +402,8 @@ NULL
 
 .validateUserBetaSpending <- function(design) {
     .assertIsTrialDesign(design)
-    .assertDesignParameterExists(design, "userBetaSpending", NA_real_)
+    .assertDesignParameterExists(design, "userBetaSpending", NA_real_,
+        relatedParameter = "typeBetaSpending", relatedValue = design$typeBetaSpending)
 
     if ((design$isUserDefinedParameter("informationRates") ||
             (design$isDefaultParameter("informationRates") && !design$isUserDefinedParameter("kMax"))) &&
