@@ -17,7 +17,8 @@
 #' @include f_core_utilities.R
 NULL
 
-.getSampleSizeFixedRates <- function(...,
+.getSampleSizeFixedRates <- function(
+        ...,
         alpha = 0.025,
         beta = 0.2,
         sided = 1,
@@ -335,7 +336,8 @@ NULL
 # note that 'directionUpper' and 'maxNumberOfSubjects' are
 # only applicable for 'objectType' = "power"
 #
-.createDesignPlanRates <- function(...,
+.createDesignPlanRates <- function(
+        ...,
         objectType = c("sampleSize", "power"),
         design,
         normalApproximation = TRUE,
@@ -370,18 +372,24 @@ NULL
 
     if (groups == 1) {
         if (!anyNA(pi1) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
-            stopIllegalArgument("any 'pi1' (", .arrayToString(pi1), ") must be != 'thetaH0' (", thetaH0, ")", functionName = ".createDesignPlanRates",
-                parameter = "pi1", value = pi1, relatedParameter = "thetaH0", relatedValue = thetaH0)
+            stopIllegalArgument("any 'pi1' (", .arrayToString(pi1), ") must be != 'thetaH0' (", thetaH0, ")",
+                functionName = ".createDesignPlanRates",
+                parameter = "pi1", value = pi1, relatedParameter = "thetaH0", relatedValue = thetaH0
+            )
         }
 
         if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
-            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)", functionName = ".createDesignPlanRates",
-                parameter = "pi1", value = pi1)
+            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)",
+                functionName = ".createDesignPlanRates",
+                parameter = "pi1", value = pi1
+            )
         }
 
         if (thetaH0 >= 1 || thetaH0 <= 0) {
-            stopArgumentOutOfBounds("'thetaH0' (", thetaH0, ") is out of bounds (0; 1)", functionName = ".createDesignPlanRates",
-                parameter = "thetaH0", value = thetaH0)
+            stopArgumentOutOfBounds("'thetaH0' (", thetaH0, ") is out of bounds (0; 1)",
+                functionName = ".createDesignPlanRates",
+                parameter = "thetaH0", value = thetaH0
+            )
         }
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
@@ -389,8 +397,10 @@ NULL
         }
 
         if (normalApproximation && !conservative && (objectType == "sampleSize")) {
-            stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation", functionName = ".createDesignPlanRates",
-                parameter = "conservative", value = conservative)
+            stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation",
+                functionName = ".createDesignPlanRates",
+                parameter = "conservative", value = conservative
+            )
         }
     } else if (groups == 2) {
         if (
@@ -400,8 +410,10 @@ NULL
                 !riskRatio
             ) {
             stopIllegalArgument("any 'pi1 - pi2' (", .arrayToString(pi1 - pi2), ") ", "must be != 'thetaH0' (", thetaH0,
-                ")", functionName = ".createDesignPlanRates", parameter = "pi1 - pi2", value = pi1 - pi2, relatedParameter = "thetaH0",
-                relatedValue = thetaH0)
+                ")",
+                functionName = ".createDesignPlanRates", parameter = "pi1 - pi2", value = pi1 - pi2, relatedParameter = "thetaH0",
+                relatedValue = thetaH0
+            )
         }
 
         if (
@@ -410,19 +422,23 @@ NULL
                 (objectType == "sampleSize") &&
                 riskRatio
             ) {
-            stopIllegalArgument("any 'pi1 / pi2' (", .arrayToString(pi1/pi2), ") ", "must be != 'thetaH0' (", thetaH0,
-                ")", functionName = ".createDesignPlanRates", parameter = "pi1 / pi2", value = pi1 / pi2,
-                relatedParameter = "thetaH0", relatedValue = thetaH0)
+            stopIllegalArgument("any 'pi1 / pi2' (", .arrayToString(pi1 / pi2), ") ", "must be != 'thetaH0' (", thetaH0,
+                ")",
+                functionName = ".createDesignPlanRates", parameter = "pi1 / pi2", value = pi1 / pi2,
+                relatedParameter = "thetaH0", relatedValue = thetaH0
+            )
         }
 
         if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
             stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") ", "is out of bounds (0; 1)",
-                functionName = ".createDesignPlanRates", parameter = "pi1", value = pi1)
+                functionName = ".createDesignPlanRates", parameter = "pi1", value = pi1
+            )
         }
 
         if (anyNA(pi2) || any(pi2 <= 0) || any(pi2 >= 1)) {
             stopArgumentOutOfBounds("probability 'pi2' (", .arrayToString(pi2), ") ", "is out of bounds (0; 1)",
-                functionName = ".createDesignPlanRates", parameter = "pi2", value = pi2)
+                functionName = ".createDesignPlanRates", parameter = "pi2", value = pi2
+            )
         }
 
         if (
@@ -439,7 +455,8 @@ NULL
 
         if (!conservative) {
             stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation for two groups",
-                functionName = ".createDesignPlanRates", parameter = "conservative", value = conservative)
+                functionName = ".createDesignPlanRates", parameter = "conservative", value = conservative
+            )
         }
 
         if (is.na(allocationRatioPlanned)) {
@@ -447,13 +464,16 @@ NULL
         }
 
         if (allocationRatioPlanned < 0) {
-            stopIllegalArgument("'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0", functionName = ".createDesignPlanRates",
-                parameter = "allocationRatioPlanned", value = allocationRatioPlanned)
+            stopIllegalArgument("'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0",
+                functionName = ".createDesignPlanRates",
+                parameter = "allocationRatioPlanned", value = allocationRatioPlanned
+            )
         }
 
         if (riskRatio && thetaH0 <= 0) {
             stopIllegalArgument("null hypothesis risk ratio is not allowed be negative or zero, ", "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE",
-    functionName = ".createDesignPlanRates", parameter = "thetaH0", relatedParameter = "riskRatio", value = thetaH0)
+                functionName = ".createDesignPlanRates", parameter = "thetaH0", relatedParameter = "riskRatio", value = thetaH0
+            )
         }
     }
 
@@ -581,17 +601,17 @@ NULL
 #'
 #' @export
 #'
-getPowerRates <- function(design = NULL,
+getPowerRates <- function(
+        design = NULL,
         ...,
         groups = 2L,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
-        pi2 = 0.2, # C_PI_2_DEFAULT
+        pi1 = seq(0.2, 0.5, 0.1),
+        pi2 = 0.2,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
-        allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
-        ) {
+        allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "power", ...)
         .warnInCaseOfUnknownArguments(
@@ -778,18 +798,18 @@ getPowerRates <- function(design = NULL,
 #'
 #' @export
 #'
-getSampleSizeRates <- function(design = NULL,
+getSampleSizeRates <- function(
+        design = NULL,
         ...,
         groups = 2L,
         normalApproximation = TRUE,
         conservative = TRUE,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = c(0.4, 0.5, 0.6), # C_PI_1_SAMPLE_SIZE_DEFAULT
-        pi2 = 0.2, # C_PI_2_DEFAULT
+        pi1 = c(0.4, 0.5, 0.6),
+        pi2 = 0.2,
         directionUpper = NA,
-        allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
-        ) {
+        allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "sampleSize", ...)
         .warnInCaseOfUnknownArguments(

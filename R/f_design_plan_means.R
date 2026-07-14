@@ -17,7 +17,8 @@
 #' @include f_core_utilities.R
 NULL
 
-.getSampleSizeFixedMeans <- function(...,
+.getSampleSizeFixedMeans <- function(
+        ...,
         alpha = 0.025,
         beta = 0.2,
         sided = 1,
@@ -40,7 +41,8 @@ NULL
         theta <- alternative[i]
         effect <- theta - thetaH0
         effect <- .applyDirectionOfAlternative(effect, directionUpper,
-            type = "negateIfLower", phase = "planning")
+            type = "negateIfLower", phase = "planning"
+        )
         effectAbsolute <- abs(effect)
 
         if (groups == 1) {
@@ -430,25 +432,32 @@ NULL
     }
 
     directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design, objectType = objectType, userFunctionCallEnabled = TRUE, default = NA
+        design,
+        objectType = objectType, userFunctionCallEnabled = TRUE, default = NA
     )
 
     if (objectType == "sampleSize" && !anyNA(alternative)) {
         if (!is.na(directionUpper)) {
             effect <- alternative - thetaH0
             effect <- .applyDirectionOfAlternative(effect, directionUpper,
-                type = "negateIfLower", phase = "planning")
+                type = "negateIfLower", phase = "planning"
+            )
             if (design$sided == 1 && any(effect <= 0)) {
                 stopIllegalArgument("any 'alternative' (", .arrayToString(alternative), ") must be ", ifelse(isFALSE(directionUpper),
-                    "<", ">"), " 'thetaH0' (", thetaH0, ")", functionName = ".createDesignPlanMeans", parameter = "alternative",
-                    value = alternative, relatedParameter = "thetaH0", relatedValue = thetaH0)
+                    "<", ">"
+                ), " 'thetaH0' (", thetaH0, ")",
+                functionName = ".createDesignPlanMeans", parameter = "alternative",
+                value = alternative, relatedParameter = "thetaH0", relatedValue = thetaH0
+                )
             }
         }
 
         if (any(alternative - thetaH0 == 0)) {
             stopIllegalArgument("any 'alternative' (", .arrayToString(alternative), ") must be != 'thetaH0' (", thetaH0,
-                ")", functionName = ".createDesignPlanMeans", parameter = "alternative", value = alternative, relatedParameter = "thetaH0",
-                relatedValue = thetaH0)
+                ")",
+                functionName = ".createDesignPlanMeans", parameter = "alternative", value = alternative, relatedParameter = "thetaH0",
+                relatedValue = thetaH0
+            )
         }
     }
 
@@ -470,7 +479,9 @@ NULL
         if (design$sided == 2 && ((thetaH0 != 0 && !meanRatio) ||
                 (thetaH0 != 1 && meanRatio))) {
             stopIllegalArgument("two-sided case is implemented only for superiority testing ", "(i.e., thetaH0 = ",
-                ifelse(meanRatio, 1, 0), ")", functionName = ".createDesignPlanMeans")
+                ifelse(meanRatio, 1, 0), ")",
+                functionName = ".createDesignPlanMeans"
+            )
         }
 
         if (is.na(allocationRatioPlanned)) {
@@ -478,8 +489,10 @@ NULL
         }
 
         if (allocationRatioPlanned < 0) {
-            stopIllegalArgument("'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0", functionName = ".createDesignPlanMeans",
-                parameter = "allocationRatioPlanned", value = allocationRatioPlanned)
+            stopIllegalArgument("'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0",
+                functionName = ".createDesignPlanMeans",
+                parameter = "allocationRatioPlanned", value = allocationRatioPlanned
+            )
         }
 
         .setValueAndParameterType(
@@ -489,7 +502,8 @@ NULL
 
         if (meanRatio && thetaH0 <= 0) {
             stopIllegalArgument("null hypothesis mean ratio is not allowed be negative or zero, ", "i.e., 'thetaH0' must be > 0 if 'meanRatio' = TRUE",
-    functionName = ".createDesignPlanMeans", parameter = "thetaH0", relatedParameter = "meanRatio", value = thetaH0)
+                functionName = ".createDesignPlanMeans", parameter = "thetaH0", relatedParameter = "meanRatio", value = thetaH0
+            )
         }
     }
 
@@ -588,11 +602,10 @@ getSampleSizeMeans <- function(
         normalApproximation = FALSE,
         meanRatio = FALSE,
         thetaH0 = ifelse(meanRatio, 1, 0),
-        alternative = seq(0.2, 1, 0.2), # C_ALTERNATIVE_DEFAULT
-        stDev = 1, # C_STDEV_DEFAULT
+        alternative = seq(0.2, 1, 0.2),
+        stDev = 1,
         directionUpper = NA,
-        allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
-        ) {
+        allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "sampleSize", ...)
         .warnInCaseOfUnknownArguments(
@@ -677,12 +690,11 @@ getPowerMeans <- function(
         normalApproximation = FALSE,
         meanRatio = FALSE,
         thetaH0 = ifelse(meanRatio, 1, 0),
-        alternative = seq(0, 1, 0.2), # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
-        stDev = 1, # C_STDEV_DEFAULT
+        alternative = seq(0, 1, 0.2),
+        stDev = 1,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
-        allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
-        ) {
+        allocationRatioPlanned = NA_real_) {
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
 
     if ((length(stDev) == 1) && (groups == 2)) {
