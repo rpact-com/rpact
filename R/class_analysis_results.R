@@ -288,7 +288,9 @@ ConditionalPowerResultsRates <- R6::R6Class("ConditionalPowerResultsRates",
         conditionalPower = NULL,
         pi1 = NULL,
         pi2 = NULL,
-        initialize = function(..., conditionalPower = NULL,
+        initialize = function(
+                ...,
+                conditionalPower = NULL,
                 pi1 = NULL,
                 pi2 = NULL) {
             self$conditionalPower <- conditionalPower
@@ -532,7 +534,9 @@ ClosedCombinationTestResults <- R6::R6Class("ClosedCombinationTestResults",
         secondStagePValues = NULL,
         rejected = NULL,
         rejectedIntersections = NULL,
-        initialize = function(..., .design = NULL,
+        initialize = function(
+                ...,
+                .design = NULL,
                 .enrichment = NULL,
                 intersectionTest = NULL,
                 indices = NULL,
@@ -727,8 +731,10 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
         pi2 = NULL,
         nPlanned = NULL,
         allocationRatioPlanned = NULL,
-        initialize = function(design,
-                dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 .stageResults = NULL,
                 .conditionalPowerResults = NULL,
                 directionUpper = NULL,
@@ -969,7 +975,8 @@ AnalysisResultsBase <- R6::R6Class("AnalysisResultsBase",
         finalConfidenceIntervalUpperBounds = NULL,
         medianUnbiasedEstimates = NULL,
         stdErrorEstimate = NULL,
-        initialize = function(design,
+        initialize = function(
+                design,
                 dataInput,
                 ...,
                 thetaH1 = NULL,
@@ -1051,7 +1058,11 @@ AnalysisResultsMultiHypotheses <- R6::R6Class("AnalysisResultsMultiHypotheses",
         repeatedConfidenceIntervalLowerBounds = NULL,
         repeatedConfidenceIntervalUpperBounds = NULL,
         repeatedPValues = NULL,
-        initialize = function(design, dataInput, ..., .closedTestResults = NULL,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
+                .closedTestResults = NULL,
                 thetaH1 = NULL,
                 assumedStDevs = NULL,
                 piTreatments = NULL,
@@ -1222,7 +1233,11 @@ summary.AnalysisResults <- function(object, ..., type = 1, digits = NA_integer_)
 #'
 #' @keywords internal
 #'
-as.data.frame.AnalysisResults <- function(x, row.names = NULL, optional = FALSE, ...,
+as.data.frame.AnalysisResults <- function(
+        x,
+        row.names = NULL,
+        optional = FALSE,
+        ...,
         niceColumnNamesEnabled = FALSE) {
     parametersToShow <- .getDesignParametersToShow(x)
     if (inherits(x, "AnalysisResultsMultiArm")) {
@@ -1690,8 +1705,10 @@ AnalysisResultsConditionalDunnett <- R6::R6Class("AnalysisResultsConditionalDunn
     public = list()
 )
 
-.getAnalysisResultsPlotArguments <- function(x,
-        nPlanned = NA_real_, allocationRatioPlanned = NA_real_) {
+.getAnalysisResultsPlotArguments <- function(
+        x,
+        nPlanned = NA_real_,
+        allocationRatioPlanned = NA_real_) {
     if (all(is.na(nPlanned))) {
         nPlanned <- stats::na.omit(x$nPlanned)
     }
@@ -1833,7 +1850,10 @@ AnalysisResultsConditionalDunnett <- R6::R6Class("AnalysisResultsConditionalDunn
 #'
 #' @export
 #'
-plot.AnalysisResults <- function(x, y, ...,
+plot.AnalysisResults <- function(
+        x,
+        y,
+        ...,
         type = 1L,
         nPlanned = NA_real_,
         allocationRatioPlanned = NA_real_,
@@ -1888,12 +1908,22 @@ plot.AnalysisResults <- function(x, y, ...,
     }
 }
 
-.plot.AnalysisResults <- function(x, y, ..., type = 1L,
+.plot.AnalysisResults <- function(
+        x,
+        y,
+        ...,
+        type = 1L,
         nPlanned = NA_real_,
         allocationRatioPlanned = NA_real_,
-        main = NA_character_, xlab = NA_character_, ylab = NA_character_,
-        legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
-        showSource = FALSE, grid = 1, plotSettings = NULL) {
+        main = NA_character_,
+        xlab = NA_character_,
+        ylab = NA_character_,
+        legendTitle = NA_character_,
+        palette = "Set1",
+        legendPosition = NA_integer_,
+        showSource = FALSE,
+        grid = 1,
+        plotSettings = NULL) {
     .assertGgplotIsInstalled()
     functionCall <- match.call(expand.dots = TRUE)
 
@@ -1946,7 +1976,8 @@ plot.AnalysisResults <- function(x, y, ...,
     return(.createPlotResultObject(plotList, grid))
 }
 
-.plotAnalysisResultsRCI <- function(...,
+.plotAnalysisResultsRCI <- function(
+        ...,
         x,
         y,
         nPlanned,
@@ -1972,10 +2003,8 @@ plot.AnalysisResults <- function(x, y, ...,
 
     data <- .getConfidenceIntervalData(x, treatmentArmsToShow)
     if (nrow(data) == 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "unable to create plot because no RCIs are available in the specified analysis result",
-            call. = FALSE
+        stopIllegalArgument("unable to create plot because no RCIs are available in the specified analysis result",
+            functionName = ".plotAnalysisResultsRCI"
         )
     }
 
@@ -2119,7 +2148,8 @@ plot.AnalysisResults <- function(x, y, ...,
     return(result)
 }
 
-.plotAnalysisResults <- function(...,
+.plotAnalysisResults <- function(
+        ...,
         x,
         y,
         type,
@@ -2137,9 +2167,9 @@ plot.AnalysisResults <- function(x, y, ...,
         plotSettings = NULL) {
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
     if (!(type %in% c(1, 2))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'type' (", type, ") is not allowed; must be 1 or 2",
-            call. = FALSE
+        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1 or 2",
+            functionName = ".plotAnalysisResults",
+            parameter = "type", value = type
         )
     }
 
@@ -2166,9 +2196,9 @@ plot.AnalysisResults <- function(x, y, ...,
     }
 
     if (!.isConditionalPowerEnabled(x$nPlanned) && !.isConditionalPowerEnabled(nPlanned)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'nPlanned' must be defined to create conditional power plot",
-            call. = FALSE
+        stopMissingArgument("'nPlanned' must be defined to create conditional power plot",
+            functionName = ".plotAnalysisResults",
+            parameter = "nPlanned", value = nPlanned
         )
     }
 

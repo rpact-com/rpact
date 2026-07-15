@@ -7,6 +7,7 @@
 getSampleSizeCounts(
   design = NULL,
   ...,
+  directionUpper = NA,
   lambda1 = NA_real_,
   lambda2 = NA_real_,
   lambda = NA_real_,
@@ -28,6 +29,10 @@ and \code{sided} can be directly entered as argument where necessary.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
+
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is \code{TRUE}
+which means that larger values of the test statistics yield smaller p-values.}
 
 \item{lambda1}{A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
 the active treatment group, there is no default.}

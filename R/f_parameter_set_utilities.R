@@ -84,7 +84,7 @@ NULL
     if (identical(formatFunctionName, ".formatCriticalValues") && .isTrialDesign(parameterSet)) {
         return(.formatCriticalValues(paramValue, design = parameterSet))
     }
-    
+
     return(eval(call(formatFunctionName, paramValue)))
 }
 

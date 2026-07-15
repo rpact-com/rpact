@@ -57,7 +57,8 @@ NULL
     .stopWithWrongDesignMessage(design)
 }
 
-.getAnalysisResultsRatesInverseNormalMultiArm <- function(...,
+.getAnalysisResultsRatesInverseNormalMultiArm <- function(
+        ...,
         design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
@@ -100,7 +101,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsRatesFisherMultiArm <- function(...,
+.getAnalysisResultsRatesFisherMultiArm <- function(
+        ...,
         design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
@@ -112,7 +114,8 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+        iterations = C_ITERATIONS_DEFAULT,
+        seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -145,7 +148,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsRatesConditionalDunnettMultiArm <- function(...,
+.getAnalysisResultsRatesConditionalDunnettMultiArm <- function(
+        ...,
         design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
@@ -192,7 +196,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsRatesMultiArmAll <- function(...,
+.getAnalysisResultsRatesMultiArmAll <- function(
+        ...,
         results,
         design,
         dataInput,
@@ -330,7 +335,8 @@ NULL
     return(results)
 }
 
-.getStageResultsRatesMultiArm <- function(...,
+.getStageResultsRatesMultiArm <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = NA_real_,
@@ -371,9 +377,8 @@ NULL
     .assertIsValidIntersectionTestMultiArm(design, intersectionTest)
 
     if (intersectionTest == "Dunnett" && !normalApproximation) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Dunnett test cannot be used with Fisher's exact test (normalApproximation = FALSE)",
-            call. = FALSE
+        stopIllegalArgument("Dunnett test cannot be used with Fisher's exact test (normalApproximation = FALSE)",
+            functionName = ".getStageResultsRatesMultiArm"
         )
     }
 
@@ -445,10 +450,9 @@ NULL
                 )
             } else {
                 if (thetaH0 != 0) {
-                    stop(
-                        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
-                        call. = FALSE
+                    stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
+                        functionName = ".getStageResultsRatesMultiArm",
+                        parameter = "thetaH0", value = thetaH0
                     )
                 }
 
@@ -511,10 +515,9 @@ NULL
                 )
             } else {
                 if (thetaH0 != 0) {
-                    stop(
-                        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
-                        call. = FALSE
+                    stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
+                        functionName = ".getStageResultsRatesMultiArm",
+                        parameter = "thetaH0", value = thetaH0
                     )
                 }
 
@@ -641,7 +644,8 @@ NULL
 }
 
 
-.getRootThetaRatesMultiArm <- function(...,
+.getRootThetaRatesMultiArm <- function(
+        ...,
         design,
         dataInput,
         treatmentArm,
@@ -678,7 +682,8 @@ NULL
     return(result)
 }
 
-.getRepeatedConfidenceIntervalsRatesMultiArmAll <- function(...,
+.getRepeatedConfidenceIntervalsRatesMultiArmAll <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -889,7 +894,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesMultiArmInverseNormal <- function(...,
+.getRepeatedConfidenceIntervalsRatesMultiArmInverseNormal <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -904,7 +910,10 @@ NULL
     .warnInCaseOfUnknownArguments(
         functionName =
             ".getRepeatedConfidenceIntervalsRatesMultiArmInverseNormal",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"), ...
+        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+            design,
+            powerCalculationEnabled = TRUE
+        ), "stage"), ...
     )
 
     return(.getRepeatedConfidenceIntervalsRatesMultiArmAll(
@@ -925,7 +934,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesMultiArmFisher <- function(...,
+.getRepeatedConfidenceIntervalsRatesMultiArmFisher <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -966,7 +976,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesMultiArmConditionalDunnett <- function(...,
+.getRepeatedConfidenceIntervalsRatesMultiArmConditionalDunnett <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -1017,7 +1028,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesMultiArm <- function(...,
+.getConditionalPowerRatesMultiArm <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         nPlanned,
@@ -1089,25 +1101,43 @@ NULL
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
         lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
     )
-    .setValueAndParameterType(results, "allocationRatioPlanned", allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
-    piControl <- .assertIsValidPiControlForMultiArm(piControl, stageResults, stage, results = results)
-    piTreatments <- .assertIsValidPiTreatmentsForMultiArm(piTreatments, stageResults, stage, results = results)
+    .setValueAndParameterType(
+        results, "allocationRatioPlanned",
+        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
+    )
+    piControl <- .assertIsValidPiControlForMultiArm(
+        piControl, stageResults, stage,
+        results = results
+    )
+    piTreatments <- .assertIsValidPiTreatmentsForMultiArm(
+        piTreatments, stageResults, stage,
+        results = results
+    )
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
 
     if ((length(piTreatments) != 1) && (length(piTreatments) != gMax)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'piTreatments' (%s) ",
-                "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(piTreatments), gMax)
+        stopIllegalArgument(
+            sprintf(
+                paste0("length of 'piTreatments' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                .arrayToString(piTreatments), gMax
+            ),
+            functionName = ".getConditionalPowerRatesMultiArm",
+            parameter = "piTreatments",
+            value = piTreatments,
+            relatedParameter = "gMax",
+            relatedValue = gMax
         )
     }
 
     if (length(piControl) != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0("length of 'piControl' (%s) must be equal to 1"), .arrayToString(piControl))
+        stopIllegalArgument(
+            sprintf(
+                paste0("length of 'piControl' (%s) must be equal to 1"),
+                .arrayToString(piControl)
+            ),
+            functionName = ".getConditionalPowerRatesMultiArm",
+            parameter = "piControl",
+            value = piControl
         )
     }
 
@@ -1152,11 +1182,9 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
         "or TrialDesignConditionalDunnett",
-        call. = FALSE
+        functionName = ".getConditionalPowerRatesMultiArm", parameter = "design"
     )
 }
 
@@ -1165,7 +1193,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesMultiArmInverseNormal <- function(...,
+.getConditionalPowerRatesMultiArmInverseNormal <- function(
+        ...,
         results,
         design,
         stageResults,
@@ -1273,7 +1302,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesMultiArmFisher <- function(...,
+.getConditionalPowerRatesMultiArmFisher <- function(
+        ...,
         results,
         design,
         stageResults,
@@ -1404,7 +1434,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesMultiArmConditionalDunnett <- function(...,
+.getConditionalPowerRatesMultiArmConditionalDunnett <- function(
+        ...,
         results,
         design,
         stageResults,
@@ -1476,7 +1507,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerLikelihoodRatesMultiArm <- function(...,
+.getConditionalPowerLikelihoodRatesMultiArm <- function(
+        ...,
         stageResults,
         stage,
         nPlanned,
@@ -1498,10 +1530,9 @@ NULL
 
     piControl <- .assertIsValidPiControlForMultiArm(piControl, stageResults, stage)
     if (length(piControl) != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'piControl' (", .arrayToString(piControl), ") must be equal to 1",
-            call. = FALSE
+        stopIllegalArgument("length of 'piControl' (", .arrayToString(piControl), ") must be equal to 1",
+            functionName = ".getConditionalPowerLikelihoodRatesMultiArm",
+            parameter = "piControl", value = piControl
         )
     }
 

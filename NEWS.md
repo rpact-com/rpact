@@ -6,10 +6,18 @@
 * `getSimulationMultiArmSurvival()` and `getSimulationEnrichmentSurvival()` now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument `simulationType` can be used to choose between the new C++ implementation (`"patientWise"`), the previous test-statistic-based approach (`"testStatisticBased"`), and a basic R reference implementation (`"patientWiseBasic"`) intended for validation and testing. The default `"auto"` setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.
 * rpact options can now be configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles; see the new vignette [Hidden rpact Features: Options and Environment Variables](https://www.rpact.org/vignettes/utilities/rpact_hidden_features/).
 * Optimized the display of `criticalValues` and `futilityBounds` for designs with `directionUpper = FALSE`. If the direction of the alternative is already specified when creating a design, e.g., with `getDesignGroupSequential(directionUpper = FALSE)`, the boundaries are now shown in the correct direction, typically as negative values. This also applies to futility bounds generated for beta-spending designs.
+* The new function `getFisherInformation()` can be used to calculate the Fisher information at the first planned analysis stage for a design plan for means, rates, or survival endpoints.
 
 ## Improvements, issues, and changes
 
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
+* Several improvements and refactorings, focusing on enhanced error handling, improved naming conventions, and more consistent function signatures
+* Updates to the documentation
+* In `getSimulationSurvival()`, the early stopping probability ("Early stop") is now displayed stage-wise instead of overall
+* In `getSimulationSurvival()`, `numberOfSubjects1` and `numberOfSubjects2` are no longer shown in the print output (though still available in the result object), and `singleEventsPerStage` is now displayed.
+* Improved naming of variables and class fields: in `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()`, the field `numberOfActiveArms` has been replaced by `numberOfSelectedArms`.
+* Refactored error handling in plotting functions to use more specific internal error functions (`stopIllegalArgument`, `stopMissingArgument`) for clearer and more consistent error messages.
+* Standardized and clarified function signatures for R6 class initializers and S3 methods, improving readability and maintainability. This includes consistent formatting and argument ordering across multiple classes 
 
 # rpact 4.4.0
 

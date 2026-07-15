@@ -14,7 +14,7 @@ with suitable arguments to create it.
 \section{Fields}{
 
 \describe{
-\item{\code{nMax}}{The maximum sample size. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{nMax}}{The maximum sample size. Is a single numeric value representing a  whole number.}
 
 \item{\code{theta}}{A vector of standardized effect sizes (theta values). Is a numeric vector.}
 

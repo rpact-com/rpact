@@ -14,7 +14,8 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-.getRecalculatedInformationRates <- function(dataInput,
+.getRecalculatedInformationRates <- function(
+        dataInput,
         maxInformation,
         stage = NA_integer_) {
     .assertIsSingleInteger(stage, "stage", naAllowed = TRUE, validateType = FALSE)
@@ -38,9 +39,9 @@
             informationRates[k] <- absoluteInformations[k] / maxInformation
         }
     } else {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'dataInput' class ",
-            .getClassName(dataInput), " is not supported"
+        stopRuntimeIssue("'dataInput' class ", .getClassName(dataInput), " is not supported",
+            functionName = ".getRecalculatedInformationRates",
+            parameter = "dataInput", value = dataInput
         )
     }
 
@@ -104,7 +105,8 @@
 #'
 #' @export
 #'
-getObservedInformationRates <- function(dataInput,
+getObservedInformationRates <- function(
+        dataInput,
         ...,
         maxInformation = NULL,
         informationEpsilon = NULL,
@@ -279,7 +281,8 @@ getObservedInformationRates <- function(dataInput,
     ))))
 }
 
-.getDesignWithRecalculatedBoundaries <- function(...,
+.getDesignWithRecalculatedBoundaries <- function(
+        ...,
         design,
         dataInput,
         directionUpper,
@@ -329,11 +332,8 @@ getObservedInformationRates <- function(dataInput,
     }
 
     if (design$typeOfDesign == "asUser") {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "recalculation of the information rates not possible ",
-            "for user-defined alpha spending designs",
-            call. = FALSE
+        stopIllegalArgument("recalculation of the information rates not possible ", "for user-defined alpha spending designs",
+            functionName = ".getDesignWithRecalculatedBoundaries"
         )
     }
 
@@ -369,11 +369,7 @@ getObservedInformationRates <- function(dataInput,
 
     stageFromData <- dataInput$getNumberOfStages()
     if (stageFromData == 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "recalculation of the information rates not possible at stage 1",
-            call. = FALSE
-        )
+        stopIllegalArgument("recalculation of the information rates not possible at stage 1", functionName = ".getDesignWithRecalculatedBoundaries")
     }
 
     if (!(getLogLevel() %in% c(C_LOG_LEVEL_DISABLED, C_LOG_LEVEL_PROGRESS))) {

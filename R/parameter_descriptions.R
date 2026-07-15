@@ -153,7 +153,7 @@ NULL
 
 #' Parameter Description: Lambda (1)
 #' @param lambda1 The assumed hazard rate in the treatment group, there is no default.
-#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). 
+#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
 #'   Must be a positive numeric of length 1.
 #' @name param_lambda1
 #' @keywords internal
@@ -161,7 +161,7 @@ NULL
 
 #' Parameter Description: Lambda (2)
 #' @param lambda2 The assumed hazard rate in the reference group, there is no default.
-#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). 
+#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
 #'   Must be a positive numeric of length 1.
 #' @name param_lambda2
 #' @keywords internal
@@ -999,7 +999,7 @@ NULL
 #' @param twoSidedPower For two-sided testing, if \code{twoSidedPower = TRUE} is specified
 #'     the sample size calculation is performed by considering both tails of the distribution.
 #'     Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
-#'     should be directed to one part.#' 
+#'     should be directed to one part.#'
 #' @name param_twoSidedPower
 #' @keywords internal
 NULL
@@ -1010,7 +1010,7 @@ NULL
 #'        matrix according to Deng et al. (Biometrics, 2019) accounting for the
 #'        respective alternative is used;
 #'        if \code{correlationComputation = "null"}, a constant correlation matrix valid
-#'        under the null, i.e., not accounting for the alternative is used, 
+#'        under the null, i.e., not accounting for the alternative is used,
 #'        default is \code{"alternative"}.
 #' @name param_correlationComputation
 #' @keywords internal

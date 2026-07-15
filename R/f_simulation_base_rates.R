@@ -14,7 +14,8 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-.getSimulationRatesStageSubjects <- function(...,
+.getSimulationRatesStageSubjects <- function(
+        ...,
         stage,
         riskRatio,
         thetaH0,
@@ -170,27 +171,32 @@
 #'
 #' @export
 #'
-getSimulationRates <- function(design = NULL, ...,
+getSimulationRates <- function(
+        design = NULL,
+        ...,
         groups = 2L,
         normalApproximation = TRUE,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
+        pi1 = seq(0.2, 0.5, 0.1),
+        # C_PI_1_DEFAULT
         pi2 = NA_real_,
         plannedSubjects = NA_real_,
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         allocationRatioPlanned = NA_real_,
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
         conditionalPower = NA_real_,
         pi1H1 = NA_real_,
         pi2H1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationRates",
             ignore = c(
@@ -230,14 +236,20 @@ getSimulationRates <- function(design = NULL, ...,
             )
         }
     }
-    .assertIsNumericVector(pi1, "pi1", naAllowed = FALSE)
+    pi1 <- .assertIsNumericVector(pi1, "pi1", naAllowed = FALSE)
     .assertIsInOpenInterval(pi1, "pi1",
         lower = 0, upper = 1, naAllowed = FALSE
     )
-    .assertIsNumericVector(pi2, "pi2", naAllowed = TRUE)
+    pi2 <- .assertIsNumericVector(pi2, "pi2", naAllowed = TRUE)
     .assertIsInOpenInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
-    .assertIsNumericVector(minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
-    .assertIsNumericVector(maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
+    minNumberOfSubjectsPerStage <- .assertIsNumericVector(
+        minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage",
+        naAllowed = TRUE
+    )
+    maxNumberOfSubjectsPerStage <- .assertIsNumericVector(
+        maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage",
+        naAllowed = TRUE
+    )
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
     .assertIsInOpenInterval(conditionalPower, "conditionalPower",
         lower = 0, upper = 1, naAllowed = TRUE
@@ -246,7 +258,10 @@ getSimulationRates <- function(design = NULL, ...,
     .assertIsInOpenInterval(pi1H1, "pi1H1", lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsSingleNumber(pi2H1, "pi2H1", naAllowed = TRUE)
     .assertIsInOpenInterval(pi2H1, "pi2H1", lower = 0, upper = 1, naAllowed = TRUE)
-    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    allocationRatioPlanned <- .assertIsNumericVector(
+        allocationRatioPlanned, "allocationRatioPlanned",
+        naAllowed = TRUE
+    )
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
         lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
     )
@@ -256,18 +271,12 @@ getSimulationRates <- function(design = NULL, ...,
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
     if (design$sided == 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "only one-sided case is implemented for the simulation design",
-            call. = FALSE
-        )
+        stopIllegalArgument("only one-sided case is implemented for the simulation design", functionName = "getSimulationRates")
     }
 
     if (!normalApproximation && (groups == 2) && (riskRatio || (thetaH0 != 0))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "in the two-sample case, exact test is implemented only for testing H0: pi1 - pi2 = 0",
-            call. = FALSE
+        stopIllegalArgument("in the two-sample case, exact test is implemented only for testing H0: pi1 - pi2 = 0",
+            functionName = "getSimulationRates"
         )
     }
 
@@ -296,12 +305,10 @@ getSimulationRates <- function(design = NULL, ...,
     if (design$kMax > 1) {
         if (any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0) &&
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'maxNumberOfSubjectsPerStage' (",
-                .arrayToString(maxNumberOfSubjectsPerStage),
-                ") must be not smaller than minNumberOfSubjectsPerStage' (",
+            stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
-                call. = FALSE
+                functionName = "getSimulationRates", parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage
             )
         }
         .setValueAndParameterType(
@@ -389,11 +396,10 @@ getSimulationRates <- function(design = NULL, ...,
         if (length(allocationRatioPlanned) == 1) {
             allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
         } else if (length(allocationRatioPlanned) != design$kMax) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
-                "must have length 1 or ", design$kMax, " (kMax)",
-                call. = FALSE
+            stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+                design$kMax, " (kMax)",
+                functionName = "getSimulationRates", parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned
             )
         }
 

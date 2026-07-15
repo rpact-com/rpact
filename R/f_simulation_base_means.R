@@ -14,7 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-.getSimulationMeansStageSubjects <- function(..., stage,
+.getSimulationMeansStageSubjects <- function(
+        ...,
+        stage,
         meanRatio,
         thetaH0,
         groups,
@@ -153,27 +155,33 @@
 #'
 #' @export
 #'
-getSimulationMeans <- function(design = NULL, ...,
+getSimulationMeans <- function(
+        design = NULL,
+        ...,
         groups = 2L,
         normalApproximation = TRUE,
         meanRatio = FALSE,
         thetaH0 = ifelse(meanRatio, 1, 0),
-        alternative = seq(0, 1, 0.2), # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
-        stDev = 1, # C_STDEV_DEFAULT
+        alternative = seq(0, 1, 0.2),
+        # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
+        stDev = 1,
+        # C_STDEV_DEFAULT
         plannedSubjects = NA_real_,
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         allocationRatioPlanned = NA_real_,
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMeans",
             ignore = c(
@@ -207,22 +215,28 @@ getSimulationMeans <- function(design = NULL, ...,
         )
     }
     .assertIsValidGroupsParameter(groups)
-    .assertIsNumericVector(alternative, "alternative", naAllowed = FALSE)
-    .assertIsNumericVector(minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
-    .assertIsNumericVector(maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
+    alternative <- .assertIsNumericVector(alternative, "alternative", naAllowed = FALSE)
+    minNumberOfSubjectsPerStage <- .assertIsNumericVector(
+        minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage",
+        naAllowed = TRUE
+    )
+    maxNumberOfSubjectsPerStage <- .assertIsNumericVector(
+        maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage",
+        naAllowed = TRUE
+    )
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
     .assertIsInOpenInterval(conditionalPower, "conditionalPower",
         lower = 0, upper = 1, naAllowed = TRUE
     )
     .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE)
-    .assertIsValidStandardDeviation(stDevH1, groups = groups, name = "stDevH1", naAllowed = TRUE)
-    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    stDevH1 <- .assertIsValidStandardDeviation(stDevH1, groups = groups, name = "stDevH1", naAllowed = TRUE)
+    allocationRatioPlanned <- .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
         lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
     )
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
-    .assertIsValidStandardDeviation(stDev, groups = groups)
+    stDev <- .assertIsValidStandardDeviation(stDev, groups = groups)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
     .assertIsSingleLogical(normalApproximation, "normalApproximation", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
@@ -230,11 +244,7 @@ getSimulationMeans <- function(design = NULL, ...,
     simulationResults <- SimulationResultsMeans$new(design, showStatistics = showStatistics)
 
     if (design$sided == 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "only one-sided case is implemented for the simulation design",
-            call. = FALSE
-        )
+        stopIllegalArgument("only one-sided case is implemented for the simulation design", functionName = "getSimulationMeans")
     }
 
     if (groups == 1L) {
@@ -260,11 +270,10 @@ getSimulationMeans <- function(design = NULL, ...,
         if (length(allocationRatioPlanned) == 1) {
             allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
         } else if (length(allocationRatioPlanned) != design$kMax) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
-                "must have length 1 or ", design$kMax, " (kMax)",
-                call. = FALSE
+            stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+                design$kMax, " (kMax)",
+                functionName = "getSimulationMeans", parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned
             )
         }
 
@@ -322,21 +331,15 @@ getSimulationMeans <- function(design = NULL, ...,
     if (design$kMax > 1) {
         if (!normalApproximation) {
             if (!all(is.na(minNumberOfSubjectsPerStage)) && (any(minNumberOfSubjectsPerStage < groups * 2))) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "minNumberOfSubjectsPerStage not correctly specified",
-                    call. = FALSE
-                )
+                stopIllegalArgument("minNumberOfSubjectsPerStage not correctly specified", functionName = "getSimulationMeans")
             }
         }
         if (any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0) &&
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'maxNumberOfSubjectsPerStage' (",
-                .arrayToString(maxNumberOfSubjectsPerStage),
-                ") must be not smaller than minNumberOfSubjectsPerStage' (",
+            stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
-                call. = FALSE
+                functionName = "getSimulationMeans", parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage
             )
         }
         .setValueAndParameterType(
@@ -449,7 +452,10 @@ getSimulationMeans <- function(design = NULL, ...,
     } else if (.isTrialDesignFisher(design)) {
         designNumber <- 3L
     } else {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "design type ", sQuote(.getClassName(design)), " not supported")
+        stopRuntimeIssue("design type ", sQuote(.getClassName(design)), " not supported",
+            functionName = "getSimulationMeans",
+            parameter = .getClassName(design)
+        )
     }
 
     if (.isTrialDesignFisher(design)) {
@@ -508,7 +514,7 @@ getSimulationMeans <- function(design = NULL, ...,
         calcSubjectsFunctionR = calcSubjectsFunctionR,
         calcSubjectsFunctionCpp = calcSubjectsFunctionCpp
     )
-    
+
     sampleSizes <- cppResult$sampleSizes
     sampleSizes[is.na(sampleSizes)] <- 0
 

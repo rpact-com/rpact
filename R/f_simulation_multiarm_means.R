@@ -17,7 +17,9 @@
 #' @include f_simulation_multiarm.R
 NULL
 
-.getSimulationMeansMultiArmStageSubjects <- function(..., stage,
+.getSimulationMeansMultiArmStageSubjects <- function(
+        ...,
+        stage,
         conditionalPower,
         conditionalCriticalValue,
         plannedSubjects,
@@ -61,11 +63,27 @@ NULL
     return(newSubjects)
 }
 
-.getSimulatedStageMeansMultiArm <- function(...,
-        design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure,
-        adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned,
-        minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower,
-        thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
+.getSimulatedStageMeansMultiArm <- function(
+        ...,
+        design,
+        muVector,
+        stDev,
+        plannedSubjects,
+        typeOfSelection,
+        effectMeasure,
+        adaptations,
+        epsilonValue,
+        rValue,
+        threshold,
+        allocationRatioPlanned,
+        minNumberOfSubjectsPerStage,
+        maxNumberOfSubjectsPerStage,
+        conditionalPower,
+        thetaH1,
+        stDevH1,
+        calcSubjectsFunction,
+        calcSubjectsFunctionIsUserDefined,
+        selectArmsFunction) {
     kMax <- length(plannedSubjects)
     gMax <- length(muVector)
     simMeans <- matrix(NA_real_, nrow = gMax + 1, ncol = kMax)
@@ -201,11 +219,8 @@ NULL
 
                 if (is.null(newSubjects) || length(newSubjects) != 1 ||
                         !is.numeric(newSubjects) || is.na(newSubjects) || newSubjects < 0) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
-                        "the output must be a single numeric value >= 0",
-                        call. = FALSE
+                    stopIllegalArgument("'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ", "the output must be a single numeric value >= 0",
+                        functionName = ".getSimulatedStageMeansMultiArm", parameter = "calcSubjectsFunction", value = calcSubjectsFunction
                     )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
@@ -315,20 +330,30 @@ NULL
 #'
 #' @export
 #'
-getSimulationMultiArmMeans <- function(design = NULL, ...,
-        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
+getSimulationMultiArmMeans <- function(
+        design = NULL,
+        ...,
+        activeArms = NA_integer_,
+        # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
-        typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        muMaxVector = seq(0, 1, 0.2), # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+        # C_TYPE_OF_SHAPE_DEFAULT
+        muMaxVector = seq(0, 1, 0.2),
+        # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
-        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        stDev = 1, # C_STDEV_DEFAULT
+        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
+        # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
+        stDev = 1,
+        # C_STDEV_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -339,7 +364,8 @@ getSimulationMultiArmMeans <- function(design = NULL, ...,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectArmsFunction = NULL,
@@ -603,12 +629,27 @@ getSimulationMultiArmMeans <- function(design = NULL, ...,
     if (kMax > 1) {
         simulatedConditionalPower[2:kMax, ] <- simulatedConditionalPower[2:kMax, ] / iterations[2:kMax, ]
     }
-    simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms / iterations - 1
+    simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations - 1
+    .addDeprecatedFieldValues(
+        simulationResults, "numberOfActiveArms",
+        simulationResults$numberOfSelectedArms, "2026-07-13"
+    )
+    simulationResults$.setParameterType(
+        "numberOfSelectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
 
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
+    simulationResults$.setParameterType(
+        "selectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     if (kMax > 1) {
@@ -626,10 +667,7 @@ getSimulationMultiArmMeans <- function(design = NULL, ...,
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "internal error, simulation not possible due to numerical overflow"
-        )
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationMultiArmMeans")
     }
 
     data <- data.frame(

@@ -19,17 +19,17 @@ Use \code{\link[=getSimulationMeans]{getSimulationMeans()}} to create an object 
 \section{Fields}{
 
 \describe{
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.}
 
 \item{\code{alternative}}{The alternative hypothesis value(s) for testing means. Is a numeric vector.}
 
 \item{\code{calcSubjectsFunction}}{An optional function that can be entered to define how sample size is recalculated. By default, recalculation is performed with conditional power with specified \code{minNumberOfSubjectsPerStage} and \code{maxNumberOfSubjectsPerStage}.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a single numeric value between 0 and 1.}
 
 \item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.}
 
-\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
 
 \item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
@@ -43,17 +43,17 @@ Use \code{\link[=getSimulationMeans]{getSimulationMeans()}} to create an object 
 
 \item{\code{groups}}{The group numbers. Is a numeric vector.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a single numeric value representing a  whole number.}
 
-\item{\code{maxNumberOfIterations}}{The number of simulation iterations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{maxNumberOfIterations}}{The number of simulation iterations. Is a single numeric value representing a  whole number.}
 
 \item{\code{maxNumberOfSubjectsPerStage}}{Determines the maximum number of subjects per stage for data-driven sample size recalculation. For two treatment arms, is the number of subjects for both treatment arms. For multi-arm designs, is the minimum number of subjects per selected active arm. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{meanRatio}}{Specifies if the sample size for one-sided testing of H0: \code{mu1/mu2 = thetaH0} has been calculated. Is a logical vector of length 1.}
+\item{\code{meanRatio}}{Specifies if the sample size for one-sided testing of H0: \code{mu1/mu2 = thetaH0} has been calculated. Is a single logical value.}
 
 \item{\code{minNumberOfSubjectsPerStage}}{Determines the minimum number of subjects per stage for data-driven sample size recalculation. For two treatment arms, is the number of subjects for both treatment arms. For multi-arm designs, is the minimum number of subjects per selected active arm. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a logical vector of length 1.}
+\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a single logical value.}
 
 \item{\code{overallReject}}{The overall rejection probability. Is a numeric vector.}
 
@@ -63,13 +63,13 @@ Use \code{\link[=getSimulationMeans]{getSimulationMeans()}} to create an object 
 
 \item{\code{sampleSizes}}{The sample sizes for each group and stage. Is a numeric vector of length number of stages times number of groups containing whole numbers.}
 
-\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
+\item{\code{seed}}{The seed used for random number generation. Is a single numeric value.}
 
-\item{\code{stDev}}{The standard deviation used for sample size and power calculation. Is a numeric vector of length 1.}
+\item{\code{stDev}}{The standard deviation used for sample size and power calculation. Is a single numeric value.}
 
-\item{\code{stDevH1}}{The standard deviation under which the conditional power or sample size recalculation is performed. Is a numeric vector of length 1.}
+\item{\code{stDevH1}}{The standard deviation under which the conditional power or sample size recalculation is performed. Is a single numeric value.}
 
-\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
 
 \item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio. Is a numeric vector.}
 }}

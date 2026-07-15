@@ -35,8 +35,7 @@ updateSubGroupVector <- function(
         subGroupVector,
         subGroups,
         prevSelected,
-        allocationFraction
-        ) {
+        allocationFraction) {
     subGroupVector <- subGroupVector[1:numberOfSubjects[k - 1]]
 
     while (length(subGroupVector) < maxNumberOfSubjects) {
@@ -82,8 +81,7 @@ updateSubGroupVector <- function(
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
-        selectPopulationsFunction
-        ) {
+        selectPopulationsFunction) {
     kMax <- length(plannedEvents)
     pMax <- length(hazardRatios)
     gMax <- log(length(hazardRatios), 2) + 1
@@ -178,7 +176,7 @@ updateSubGroupVector <- function(
                     }
                 }
 
-                # Calculate overall number of events in this 
+                # Calculate overall number of events in this
                 # stage.
                 logRankOverall <- .logRankTestEnrichmentCpp(
                     gMax = 1,
@@ -274,7 +272,7 @@ updateSubGroupVector <- function(
                     }
                 }
 
-                # Calculate overall number of events in this 
+                # Calculate overall number of events in this
                 # stage.
                 logRankOverall <- .logRankTestEnrichmentCpp(
                     gMax = 1,
@@ -403,12 +401,8 @@ updateSubGroupVector <- function(
                 )
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcEventsFunction' returned an illegal or undefined result (",
-                        newEvents,
-                        "); ",
-                        "the output must be a single numeric value"
+                    stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
+                        functionName = ".getSimulatedStageResultsSurvivalEnrichmentPatientWise", parameter = "calcEventsFunction", value = calcEventsFunction
                     )
                 }
 
@@ -464,46 +458,58 @@ updateSubGroupVector <- function(
 
 #'
 #' Get Simulation Enrichment Survival (R Based)
-#' 
-#' @noRd 
+#'
+#' @noRd
 #'
 .getSimulationEnrichmentSurvivalPatientWiseBasic <- function(
-    design = NULL,
-    ...,
-    effectList = NULL,
-    kappa = 1,
-    eventTime = 12, # C_EVENT_TIME_DEFAULT
-    accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
-    accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
-    accrualIntensityType = c("auto", "absolute", "relative"),
-    dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
-    dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
-    dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
-    maxNumberOfSubjects = NA_real_,
-    intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-    stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
-    directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
-    adaptations = NA,
-    typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-    effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-    successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
-    epsilonValue = NA_real_,
-    rValue = NA_real_,
-    threshold = -Inf,
-    plannedEvents = NA_real_,
-    allocationRatioPlanned = NA_real_,
-    minNumberOfEventsPerStage = NA_real_,
-    maxNumberOfEventsPerStage = NA_real_,
-    conditionalPower = NA_real_,
-    thetaH1 = NA_real_,
-    maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
-    seed = NA_real_,
-    calcEventsFunction = NULL,
-    selectPopulationsFunction = NULL,
-    showStatistics = FALSE
-) {
+        design = NULL,
+        ...,
+        effectList = NULL,
+        kappa = 1,
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
+        accrualTime = c(0, 12),
+        # C_ACCRUAL_TIME_DEFAULT
+        accrualIntensity = 0.1,
+        # C_ACCRUAL_INTENSITY_DEFAULT
+        accrualIntensityType = c("auto", "absolute", "relative"),
+        dropoutRate1 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutRate2 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutTime = 12,
+        # C_DROP_OUT_TIME_DEFAULT
+        maxNumberOfSubjects = NA_real_,
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
+        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE,
+        # C_STRATIFIED_ANALYSIS_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
+        adaptations = NA,
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
+        epsilonValue = NA_real_,
+        rValue = NA_real_,
+        threshold = -Inf,
+        plannedEvents = NA_real_,
+        allocationRatioPlanned = NA_real_,
+        minNumberOfEventsPerStage = NA_real_,
+        maxNumberOfEventsPerStage = NA_real_,
+        conditionalPower = NA_real_,
+        thetaH1 = NA_real_,
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        seed = NA_real_,
+        calcEventsFunction = NULL,
+        selectPopulationsFunction = NULL,
+        showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationEnrichmentSurvival",
             ignore = c(
@@ -524,7 +530,7 @@ updateSubGroupVector <- function(
         )
         .warnInCaseOfTwoSidedPowerArgument(...)
     }
-    
+
     .assertIsOneSidedDesign(
         design,
         designType = "enrichment",
@@ -534,26 +540,23 @@ updateSubGroupVector <- function(
         maxNumberOfSubjects,
         naAllowed = TRUE
     )
-    
+
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
-    
+
     directionUpper <- .assertIsValidDirectionUpper(
         directionUpper,
         design,
         objectType = "power",
         userFunctionCallEnabled = TRUE
     )
-    
+
     if (length(allocationRatioPlanned) != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'allocationRatioPlanned' (",
-            .arrayToString(allocationRatioPlanned),
-            ") ",
-            "must have length 1"
+        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
+            functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic", parameter = "allocationRatioPlanned",
+            value = allocationRatioPlanned
         )
     }
-    
+
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design = design,
         effectList = effectList,
@@ -589,7 +592,7 @@ updateSubGroupVector <- function(
         endpoint = "survival",
         simulationType = "patientWiseBasic"
     )
-    
+
     design <- simulationResults$.design
     effectList <- simulationResults$effectList
     successCriterion <- simulationResults$successCriterion
@@ -606,11 +609,11 @@ updateSubGroupVector <- function(
     maxNumberOfEventsPerStage <- simulationResults$maxNumberOfEventsPerStage # survival only
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
-    
+
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
-    
+
     cols <- nrow(effectList$hazardRatios)
-    
+
     simulatedNumberEventsNotAchieved <- matrix(0, nrow = kMax, ncol = cols)
     simulatedAnalysisTime <- matrix(0, nrow = kMax, ncol = cols)
     simulatedNumberOfSubjects <- matrix(0, nrow = kMax, ncol = cols)
@@ -627,9 +630,9 @@ updateSubGroupVector <- function(
     expectedNumberOfSubjects <- rep(0, cols)
     expectedStudyDuration <- rep(0, cols)
     iterations <- matrix(0, nrow = kMax, ncol = cols)
-    
+
     len <- maxNumberOfIterations * kMax * gMax * cols
-    
+
     dataIterationNumber <- rep(NA_real_, len)
     dataStageNumber <- rep(NA_real_, len)
     dataArmNumber <- rep(NA_real_, len)
@@ -647,7 +650,7 @@ updateSubGroupVector <- function(
     dataConditionalPowerAchieved <- rep(NA_real_, len)
     dataEffectEstimate <- rep(NA_real_, len)
     dataPValuesSeparate <- rep(NA_real_, len)
-    
+
     accrualSetup <- getAccrualTime(
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
@@ -656,50 +659,49 @@ updateSubGroupVector <- function(
     )
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (identical(accrualIntensity, 1L)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'"
+            stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
+                functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
+                parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'maxNumberOfSubjects' must be defined"
+        stopIllegalArgument("'maxNumberOfSubjects' must be defined",
+            functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
+            parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects
         )
     }
     simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
     simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
-    
+
     .setValueAndParameterType(simulationResults, "kappa", kappa, 1)
-    
+
     allocationFraction <- .getFraction(allocationRatioPlanned)
     .warnInCaseOfExtremeAllocationRatios(allocationFraction[1], allocationFraction[2])
-    
+
     accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
     recruitmentTimes <- .generateRecruitmentTimes(
         allocationRatioPlanned,
         accrualTime,
         accrualSetup$accrualIntensity
     )$recruit
-    
+
     recruitmentTimes <- recruitmentTimes[1:accrualSetup$maxNumberOfSubjects]
-    
+
     phi <- c(-log(1 - dropoutRate1), -log(1 - dropoutRate2)) / dropoutTime
-    
+
     # to force last value to be last accrualTime
     recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
-    
+
     if (.isTrialDesignFisher(design)) {
         weights <- .getWeightsFisher(design)
     } else if (.isTrialDesignFixed(design) || .isTrialDesignInverseNormal(design)) {
         weights <- .getWeightsInverseNormal(design)
     } else {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "unsuported trial design for simulation enrichment: ",
-            .getClassName(design)
+        stopRuntimeIssue("unsuported trial design for simulation enrichment: ", .getClassName(design),
+            functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
+            parameter = "design", value = design
         )
     }
-    
+
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
@@ -732,7 +734,7 @@ updateSubGroupVector <- function(
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
                 selectPopulationsFunction = selectPopulationsFunction
             )
-            
+
             closedTest <- .performClosedCombinationTestForSimulationEnrichment(
                 stageResults = stageResults,
                 design = design,
@@ -740,10 +742,10 @@ updateSubGroupVector <- function(
                 intersectionTest = intersectionTest,
                 successCriterion = successCriterion
             )
-            
+
             rejectAtSomeStage <- FALSE
             rejectedPopulationsBefore <- rep(FALSE, gMax)
-            
+
             for (k in 1:kMax) {
                 if (stageResults$eventsNotAchieved[k]) {
                     simulatedNumberEventsNotAchieved[k, i] <- simulatedNumberEventsNotAchieved[k, i] + 1
@@ -751,14 +753,14 @@ updateSubGroupVector <- function(
                     simulatedAnalysisTime[k, i] <- simulatedAnalysisTime[k, i] + stageResults$analysisTime[k]
                     simulatedNumberOfSubjects[k, i] <- simulatedNumberOfSubjects[k, i] +
                         stageResults$numberOfSubjects[k]
-                    
+
                     simulatedRejections[k, i, ] <- simulatedRejections[k, i, ] +
                         (closedTest$rejected[, k] &
                             closedTest$selectedPopulations[1:gMax, k] |
                             rejectedPopulationsBefore)
-                    
+
                     simulatedSelections[k, i, ] <- simulatedSelections[k, i, ] + closedTest$selectedPopulations[, k]
-                    
+
                     for (g in 1:gMax) {
                         if (!is.na(stageResults$populationEventsPerStage[g, k])) {
                             simulatedPopulationEventsPerStage[k, i, g] <- simulatedPopulationEventsPerStage[k, i, g] +
@@ -767,11 +769,11 @@ updateSubGroupVector <- function(
                     }
                     simulatedNumberOfPopulations[k, i] <- simulatedNumberOfPopulations[k, i] +
                         sum(closedTest$selectedPopulations[, k])
-                    
+
                     if (!any(is.na(closedTest$successStop))) {
                         simulatedSuccessStopping[k, i] <- simulatedSuccessStopping[k, i] + closedTest$successStop[k]
                     }
-                    
+
                     if ((kMax > 1) && (k < kMax)) {
                         if (!any(is.na(closedTest$futilityStop))) {
                             simulatedFutilityStopping[k, i] <- simulatedFutilityStopping[k, i] +
@@ -782,9 +784,9 @@ updateSubGroupVector <- function(
                                 stageResults$conditionalPowerPerStage[k]
                         }
                     }
-                    
+
                     iterations[k, i] <- iterations[k, i] + 1
-                    
+
                     if (k == 1) {
                         simulatedNumberOfEvents[k, i] <- simulatedNumberOfEvents[k, i] +
                             stageResults$plannedEvents[k]
@@ -792,7 +794,7 @@ updateSubGroupVector <- function(
                         simulatedNumberOfEvents[k, i] <- simulatedNumberOfEvents[k, i] +
                             stageResults$plannedEvents[k]
                     }
-                    
+
                     for (g in 1:gMax) {
                         dataIterationNumber[index] <- j
                         dataStageNumber[index] <- k
@@ -814,40 +816,40 @@ updateSubGroupVector <- function(
                         dataPValuesSeparate[index] <- closedTest$separatePValues[g, k]
                         index <- index + 1
                     }
-                    
+
                     if (
                         !rejectAtSomeStage &&
-                        any(
-                            closedTest$rejected[, k] &
-                                closedTest$selectedPopulations[1:gMax, k] |
-                                rejectedPopulationsBefore
-                        )
+                            any(
+                                closedTest$rejected[, k] &
+                                    closedTest$selectedPopulations[1:gMax, k] |
+                                    rejectedPopulationsBefore
+                            )
                         ) {
                         simulatedRejectAtLeastOne[i] <- simulatedRejectAtLeastOne[i] + 1
                         rejectAtSomeStage <- TRUE
                     }
-                    
+
                     if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
                         # rejected hypotheses remain rejected also in case of early stopping
                         simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
                             matrix(
                                 (closedTest$rejected[, k] &
-                                        closedTest$selectedPopulations[1:gMax, k] |
-                                        rejectedPopulationsBefore),
+                                    closedTest$selectedPopulations[1:gMax, k] |
+                                    rejectedPopulationsBefore),
                                 kMax - k,
                                 gMax,
                                 byrow = TRUE
                             )
                         break
                     }
-                    
+
                     rejectedPopulationsBefore <- closedTest$rejected[, k] &
                         closedTest$selectedPopulations[1:gMax, k] |
                         rejectedPopulationsBefore
                 }
             }
         }
-        
+
         for (g in 1:gMax) {
             simulatedPopulationEventsPerStage[, i, g] <- round(
                 simulatedPopulationEventsPerStage[, i, g] / iterations[, i],
@@ -857,7 +859,7 @@ updateSubGroupVector <- function(
         simulatedNumberOfEvents[, i] <- simulatedNumberOfEvents[, i] / iterations[, i]
         simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / iterations[, i]
         simulatedAnalysisTime[, i] <- simulatedAnalysisTime[, i] / iterations[, i]
-        
+
         if (kMax > 1) {
             simulatedRejections[2:kMax, i, ] <- simulatedRejections[2:kMax, i, ] -
                 simulatedRejections[1:(kMax - 1), i, ]
@@ -878,7 +880,7 @@ updateSubGroupVector <- function(
             expectedStudyDuration[i] <- simulatedAnalysisTime[1, i]
         }
     }
-    
+
     simulatedConditionalPower[1, ] <- NA_real_
     if (kMax > 1) {
         for (k in 2:kMax) {
@@ -887,7 +889,7 @@ updateSubGroupVector <- function(
                     simulatedNumberEventsNotAchieved[k, ])
         }
     }
-    
+
     simulationResults$numberOfPopulations <- simulatedNumberOfPopulations / iterations
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$populationEventsPerStage <- simulatedPopulationEventsPerStage
@@ -897,6 +899,9 @@ updateSubGroupVector <- function(
     simulationResults$selectedPopulations <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedPopulationsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
@@ -909,7 +914,7 @@ updateSubGroupVector <- function(
             simulationResults$successPerStage[1:(kMax - 1), ]
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
-    
+
     ## set parameter types in simulationResults
     if (kMax > 1) {
         simulationResults$.setParameterType("expectedNumberOfSubjects", C_PARAM_GENERATED)
@@ -920,13 +925,13 @@ updateSubGroupVector <- function(
         "selectedPopulations",
         ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
-    
+
     simulationResults$.setParameterType("numberOfSubjects", C_PARAM_GENERATED)
     simulationResults$.setParameterType("analysisTime", C_PARAM_GENERATED)
     if (!all(is.na(simulationResults$conditionalPowerAchieved))) {
         simulationResults$.setParameterType("conditionalPowerAchieved", C_PARAM_GENERATED)
     }
-    
+
     if (any(simulationResults$eventsNotAchieved > 0)) {
         warning(
             "Presumably due to small number of subjects in selected arms, ",
@@ -938,11 +943,11 @@ updateSubGroupVector <- function(
             call. = FALSE
         )
     }
-    
+
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic")
     }
-    
+
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
@@ -961,9 +966,9 @@ updateSubGroupVector <- function(
         successStop = dataSuccessStop,
         futilityPerStage = dataFutilityStop
     )
-    
+
     data <- data[!is.na(data$effectEstimate), ]
     simulationResults$.data <- data
-    
+
     return(simulationResults)
 }

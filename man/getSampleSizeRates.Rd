@@ -14,6 +14,7 @@ getSampleSizeRates(
   thetaH0 = ifelse(riskRatio, 1, 0),
   pi1 = c(0.4, 0.5, 0.6),
   pi2 = 0.2,
+  directionUpper = NA,
   allocationRatioPlanned = NA_real_
 )
 }
@@ -63,6 +64,10 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 
 \item{pi2}{A numeric value that represents the assumed probability in the reference group if two treatment
 groups are considered, default is \code{0.2}.}
+
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is \code{TRUE}
+which means that larger values of the test statistics yield smaller p-values.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered,

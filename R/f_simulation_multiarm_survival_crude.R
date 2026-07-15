@@ -18,7 +18,8 @@
 NULL
 
 # Correlation matrix according to Deng et al. (2019) accounting for alternative:
-.getCholeskyDecomposition <- function(allocationRatioPlanned,
+.getCholeskyDecomposition <- function(
+        allocationRatioPlanned,
         selectedArms,
         k,
         omegaVector) {
@@ -35,7 +36,8 @@ NULL
     return(choleskyDecomposition)
 }
 
-.getSimulatedStageSurvivalMultiArm <- function(...,
+.getSimulatedStageSurvivalMultiArm <- function(
+        ...,
         design,
         directionUpper,
         omegaVector,
@@ -205,11 +207,8 @@ NULL
                 )
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
-                        "the output must be a single numeric value",
-                        call. = FALSE
+                    stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
+                        functionName = ".getSimulatedStageSurvivalMultiArm", parameter = "calcEventsFunction", value = calcEventsFunction
                     )
                 }
 
@@ -327,21 +326,30 @@ NULL
 #'
 #' @keywords internal
 #'
-getSimulationMultiArmSurvivalBasic <- function(design = NULL,
+getSimulationMultiArmSurvivalBasic <- function(
+        design = NULL,
         ...,
-        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
+        activeArms = NA_integer_,
+        # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
-        typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+        # C_TYPE_OF_SHAPE_DEFAULT
+        omegaMaxVector = seq(1, 2.6, 0.4),
+        # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
-        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
+        # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         correlationComputation = c("alternative", "null"),
         epsilonValue = NA_real_,
         rValue = NA_real_,
@@ -352,13 +360,14 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMultiArmSurvival",
             ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design,
@@ -381,7 +390,7 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
         design,
         objectType = "power", userFunctionCallEnabled = TRUE
     )
-
+    
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,
@@ -445,7 +454,7 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
     maxNumberOfEventsPerStage <- simulationResults$maxNumberOfEventsPerStage # survival only
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
-    
+
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
     }
@@ -666,11 +675,26 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
         simulatedConditionalPower[2:kMax, ] <- simulatedConditionalPower[2:kMax, ] / iterations[2:kMax, ]
     }
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
-    simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms / iterations
-
+    simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations
+    .addDeprecatedFieldValues(
+        simulationResults, "numberOfActiveArms",
+        simulationResults$numberOfSelectedArms, "2026-07-13"
+    )
+    simulationResults$.setParameterType(
+        "numberOfSelectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
+    
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
+    simulationResults$.setParameterType(
+        "selectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     if (kMax > 1) {
@@ -685,7 +709,10 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
             simulationResults$cumulativeEventsPerStage[, , gMax + 1]
     }
     simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
-    .addDeprecatedFieldValues(simulationResults, "eventsPerStage", simulationResults$cumulativeEventsPerStage)
+    .addDeprecatedFieldValues(
+        simulationResults, "eventsPerStage",
+        simulationResults$cumulativeEventsPerStage, "2024-06-10"
+    )
 
     simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
     for (g in 1:gMax) {
@@ -696,7 +723,10 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
 
     simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
     simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", simulatedSingleEventsPerStage)
+    .addDeprecatedFieldValues(
+        simulationResults, "singleNumberOfEventsPerStage",
+        simulatedSingleEventsPerStage, "2024-06-10"
+    )
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 
@@ -707,10 +737,7 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "internal error, simulation not possible due to numerical overflow"
-        )
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationMultiArmSurvivalBasic")
     }
 
     data <- data.frame(

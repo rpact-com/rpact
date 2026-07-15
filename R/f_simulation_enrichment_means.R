@@ -29,8 +29,7 @@ NULL
         overallEffects,
         stDevH1,
         minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage
-        ) {
+        maxNumberOfSubjectsPerStage) {
     stage <- stage - 1 # to be consistent with non-enrichment situation
     gMax <- nrow(overallEffects)
 
@@ -78,7 +77,8 @@ NULL
     return(newSubjects)
 }
 
-.getSimulatedStageMeansEnrichment <- function(...,
+.getSimulatedStageMeansEnrichment <- function(
+        ...,
         design,
         subsets,
         prevalences,
@@ -384,13 +384,8 @@ NULL
                         is.na(newSubjects) ||
                         newSubjects < 0
                     ) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcSubjectsFunction' returned an illegal or undefined result (",
-                        newSubjects,
-                        "); ",
-                        "the output must be a single numeric value >= 0",
-                        call. = FALSE
+                    stopIllegalArgument("'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ", "the output must be a single numeric value >= 0",
+                        functionName = ".getSimulatedStageMeansEnrichment", parameter = "calcSubjectsFunction", value = calcSubjectsFunction
                     )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
@@ -499,15 +494,21 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentMeans <- function(design = NULL,
+getSimulationEnrichmentMeans <- function(
+        design = NULL,
         ...,
         effectList = NULL,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT,
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
+        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE,
+        # C_STRATIFIED_ANALYSIS_DEFAULT,
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -518,7 +519,8 @@ getSimulationEnrichmentMeans <- function(design = NULL,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectPopulationsFunction = NULL,
@@ -787,6 +789,9 @@ getSimulationEnrichmentMeans <- function(design = NULL,
     simulationResults$selectedPopulations <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedPopulationsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     if (kMax > 1) {
@@ -804,7 +809,7 @@ getSimulationEnrichmentMeans <- function(design = NULL,
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationEnrichmentMeans")
     }
 
     data <- data.frame(

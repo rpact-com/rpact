@@ -17,7 +17,8 @@
 #' @include f_logger.R
 NULL
 
-.calcMeansVariancesTestStatistics <- function(dataInput,
+.calcMeansVariancesTestStatistics <- function(
+        dataInput,
         subset,
         stage,
         thetaH0,
@@ -184,7 +185,8 @@ NULL
     ))
 }
 
-.getStageResultsMeansEnrichment <- function(...,
+.getStageResultsMeansEnrichment <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = NA_real_,
@@ -222,43 +224,34 @@ NULL
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
 
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
-            call. = FALSE
+        stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
+            functionName = ".getStageResultsMeansEnrichment", parameter = "gMax", value = gMax
         )
     }
     if (varianceOption == "pooledFromFull") {
         if (gMax > 2) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-                ") > 2: varianceOption 'pooledFromFull' can only be used for one subset",
-                call. = FALSE
+            stopIllegalArgument("gMax (", gMax, ") > 2: varianceOption 'pooledFromFull' can only be used for one subset",
+                functionName = ".getStageResultsMeansEnrichment", parameter = "pooledFromFull"
             )
         }
     }
 
     if (intersectionTest == "SpiessensDebois" && varianceOption != "pooledFromFull" && !normalApproximation) {
-        stop("Spiessens & Depois t test can only be performed with pooled ",
-            "residual (stratified) variance from full population,
-			 select 'varianceOption' = \"pooledFromFull\"",
-            call. = FALSE
+        stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ", "residual (stratified) variance from full population,\n\t\t\t select 'varianceOption' = \"pooledFromFull\"",
+            parameter = "varianceOption", value = varianceOption, constraint = "pooledFromFull", functionName = ".getStageResultsMeansEnrichment"
         )
     }
 
     if (intersectionTest == "SpiessensDebois" && !stratifiedAnalysis && !normalApproximation) {
-        stop("Spiessens & Depois t test can only be performed with pooled ",
-            "residual (stratified) variance from full population,
-			select 'stratifiedAnalysis' = TRUE",
-            call. = FALSE
+        stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ", "residual (stratified) variance from full population,\n\t\t\tselect 'stratifiedAnalysis' = TRUE",
+            parameter = "stratifiedAnalysis", value = stratifiedAnalysis, constraint = TRUE, functionName = ".getStageResultsMeansEnrichment"
         )
     }
 
     if (dataInput$isStratified() && (gMax > 4)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 4: Stratified analysis not implemented",
-            call. = FALSE
+        stopIllegalArgument("gMax (", gMax, ") > 4: Stratified analysis not implemented",
+            functionName = ".getStageResultsMeansEnrichment",
+            parameter = "gMax", value = gMax
         )
     }
 
@@ -447,7 +440,8 @@ NULL
     .stopWithWrongDesignMessageEnrichment(design)
 }
 
-.getAnalysisResultsMeansInverseNormalEnrichment <- function(...,
+.getAnalysisResultsMeansInverseNormalEnrichment <- function(
+        ...,
         design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
@@ -456,7 +450,8 @@ NULL
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_ENRICHMENT_DEFAULT,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT,
-        thetaH1 = NA_real_, assumedStDevs = NA_real_,
+        thetaH1 = NA_real_,
+        assumedStDevs = NA_real_,
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
@@ -490,7 +485,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsMeansFisherEnrichment <- function(...,
+.getAnalysisResultsMeansFisherEnrichment <- function(
+        ...,
         design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
@@ -499,7 +495,8 @@ NULL
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_ENRICHMENT_DEFAULT,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT,
-        thetaH1 = NA_real_, assumedStDevs = NA_real_,
+        thetaH1 = NA_real_,
+        assumedStDevs = NA_real_,
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
@@ -543,7 +540,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsMeansEnrichmentAll <- function(...,
+.getAnalysisResultsMeansEnrichmentAll <- function(
+        ...,
         results,
         design,
         dataInput,
@@ -693,7 +691,8 @@ NULL
     return(results)
 }
 
-.getRootThetaMeansEnrichment <- function(...,
+.getRootThetaMeansEnrichment <- function(
+        ...,
         design,
         dataInput,
         population,
@@ -736,7 +735,8 @@ NULL
     return(result)
 }
 
-.getUpperLowerThetaMeansEnrichment <- function(...,
+.getUpperLowerThetaMeansEnrichment <- function(
+        ...,
         design,
         dataInput,
         theta,
@@ -783,24 +783,18 @@ NULL
         firstValue <- stageResults[[firstParameterName]][population, stage]
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                sprintf(
-                    paste0(
-                        "failed to find theta (k = %s, firstValue = %s, ",
-                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
-                    ),
-                    stage, stageResults[[firstParameterName]][population, stage], secondValue,
-                    firstValue, theta
-                )
-            )
+            stopRuntimeIssue(sprintf(
+                paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                stage, stageResults[[firstParameterName]][population, stage], secondValue, firstValue, theta
+            ), functionName = ".getUpperLowerThetaMeansEnrichment")
         }
     }
 
     return(theta)
 }
 
-.getRepeatedConfidenceIntervalsMeansEnrichmentAll <- function(...,
+.getRepeatedConfidenceIntervalsMeansEnrichmentAll <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -1006,7 +1000,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMeansEnrichmentInverseNormal <- function(...,
+.getRepeatedConfidenceIntervalsMeansEnrichmentInverseNormal <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1040,7 +1035,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMeansEnrichmentFisher <- function(...,
+.getRepeatedConfidenceIntervalsMeansEnrichmentFisher <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1094,7 +1090,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansEnrichment <- function(...,
+.getConditionalPowerMeansEnrichment <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         nPlanned,
@@ -1110,7 +1107,8 @@ NULL
     stDevsH1 <- .getOptionalArgument("stDevsH1", ...)
     if (!is.null(stDevsH1) && !is.na(stDevsH1)) {
         if (!is.na(assumedStDevs)) {
-            warning(sQuote("assumedStDevs"), " will be ignored because ",
+            warning(
+                sQuote("assumedStDevs"), " will be ignored because ",
                 sQuote("stDevsH1"), " is defined"
             )
         }
@@ -1159,12 +1157,13 @@ NULL
     .assertIsValidAssumedStDevs(assumedStDevs, gMax)
     thetaH1 <- .assertIsValidThetaH1ForEnrichment(thetaH1, stageResults, stage, results = results)
     if (length(thetaH1) != 1 && length(thetaH1) != gMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'thetaH1' (%s) ",
-                "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(thetaH1), gMax)
+        stopIllegalArgument(
+            sprintf(
+                paste0("length of 'thetaH1' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                .arrayToString(thetaH1), gMax
+            ),
+            functionName = ".getConditionalPowerMeansEnrichment", parameter = "thetaH1",
+            value = thetaH1, relatedParameter = "gMax", relatedValue = gMax
         )
     }
 
@@ -1173,20 +1172,18 @@ NULL
         results$.setParameterType("assumedStDevs", C_PARAM_GENERATED)
     } else {
         if (any(is.na(assumedStDevs[!is.na(stageResults$testStatistics[, stage])]))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any of 'assumedStDevs' not correctly specified",
-                call. = FALSE
+            stopIllegalArgument("any of 'assumedStDevs' not correctly specified",
+                functionName = ".getConditionalPowerMeansEnrichment",
+                parameter = "assumedStDevs", value = assumedStDevs
             )
         }
     }
 
     if (length(thetaH1) > 1) {
         if (any(is.na(thetaH1[!is.na(stageResults$testStatistics[, stage])]))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any of 'thetaH1' not correctly specified",
-                call. = FALSE
+            stopIllegalArgument("any of 'thetaH1' not correctly specified",
+                functionName = ".getConditionalPowerMeansEnrichment", parameter = "thetaH1",
+                value = thetaH1
             )
         }
     }
@@ -1210,10 +1207,8 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        call. = FALSE
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
+        functionName = ".getConditionalPowerMeansEnrichment", parameter = "design"
     )
 }
 
@@ -1222,7 +1217,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansEnrichmentInverseNormal <- function(...,
+.getConditionalPowerMeansEnrichmentInverseNormal <- function(
+        ...,
         results,
         stageResults,
         stage,
@@ -1324,7 +1320,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansEnrichmentFisher <- function(...,
+.getConditionalPowerMeansEnrichmentFisher <- function(
+        ...,
         results,
         stageResults,
         stage,
@@ -1433,7 +1430,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerLikelihoodMeansEnrichment <- function(...,
+.getConditionalPowerLikelihoodMeansEnrichment <- function(
+        ...,
         stageResults,
         stage,
         nPlanned,

@@ -59,24 +59,24 @@ NULL
 #' \dontrun{
 #' # return planned increment when no conditional power is requested
 #' .getSimulationSurvivalMultiArmStageEvents(
-#'   stage = 2,
-#'   directionUpper = TRUE,
-#'   conditionalPower = NA_real_,
-#'   conditionalCriticalValue = rep(NA_real_, 1),
-#'   plannedEvents = c(100, 200),
-#'   allocationRatioPlanned = c(1, 1),
-#'   selectedArms = matrix(TRUE, nrow = 3, ncol = 2),
-#'   estimatedTheta = NA_real_,
-#'   overallEffects = matrix(1, nrow = 3, ncol = 2),
-#'   minNumberOfEventsPerStage = c(0, 50),
-#'   maxNumberOfEventsPerStage = c(0, 200)
+#'     stage = 2,
+#'     directionUpper = TRUE,
+#'     conditionalPower = NA_real_,
+#'     conditionalCriticalValue = rep(NA_real_, 1),
+#'     plannedEvents = c(100, 200),
+#'     allocationRatioPlanned = c(1, 1),
+#'     selectedArms = matrix(TRUE, nrow = 3, ncol = 2),
+#'     estimatedTheta = NA_real_,
+#'     overallEffects = matrix(1, nrow = 3, ncol = 2),
+#'     minNumberOfEventsPerStage = c(0, 50),
+#'     maxNumberOfEventsPerStage = c(0, 200)
 #' )
 #' }
 #'
 #' @keywords internal
-#' 
+#'
 #' @noRd
-#' 
+#'
 .getSimulationSurvivalMultiArmStageEvents <- function(
         ...,
         stage,
@@ -90,11 +90,10 @@ NULL
         estimatedTheta,
         overallEffects,
         minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage
-        ) {
+        maxNumberOfEventsPerStage) {
     stage <- stage - 1 # to be consistent with non-multiarm situation
     gMax <- nrow(overallEffects)
-    
+
     if (!is.na(conditionalPower)) {
         if (any(selectedArms[1:gMax, stage + 1], na.rm = TRUE)) {
             if (is.na(estimatedTheta)) {
@@ -148,48 +147,47 @@ NULL
 }
 
 .getSimulationSurvivalMultiArmStageEventsBasic <- function(
-    ...,
-    stage,
-    directionUpper,
-    conditionalPower,
-    conditionalCriticalValue,
-    plannedEvents,
-    eventsOverStages,
-    allocationRatioPlanned,
-    selectedArms,
-    thetaH1,
-    overallEffects,
-    minNumberOfEventsPerStage,
-    maxNumberOfEventsPerStage
-) {
+        ...,
+        stage,
+        directionUpper,
+        conditionalPower,
+        conditionalCriticalValue,
+        plannedEvents,
+        eventsOverStages,
+        allocationRatioPlanned,
+        selectedArms,
+        thetaH1,
+        overallEffects,
+        minNumberOfEventsPerStage,
+        maxNumberOfEventsPerStage) {
     stage <- stage - 1 # to be consistent with non-multiarm situation
     gMax <- nrow(overallEffects)
-    
+
     if (!is.na(conditionalPower)) {
         if (any(selectedArms[1:gMax, stage + 1], na.rm = TRUE)) {
             if (is.na(thetaH1)) {
                 if (is.na(directionUpper) || isTRUE(directionUpper)) {
                     thetaStandardized <- log(max(
-                            min(
-                                overallEffects[selectedArms[1:gMax, stage + 1], stage],
-                                na.rm = TRUE
-                            ),
-                            1 + 1e-07
-                        ))
+                        min(
+                            overallEffects[selectedArms[1:gMax, stage + 1], stage],
+                            na.rm = TRUE
+                        ),
+                        1 + 1e-07
+                    ))
                 } else {
                     thetaStandardized <- log(min(
-                            max(
-                                overallEffects[selectedArms[1:gMax, stage + 1], stage],
-                                na.rm = TRUE
-                            ),
-                            1 - 1e-07
-                        ))
+                        max(
+                            overallEffects[selectedArms[1:gMax, stage + 1], stage],
+                            na.rm = TRUE
+                        ),
+                        1 - 1e-07
+                    ))
                 }
             } else {
                 thetaStandardized <- log(min(
-                        thetaH1,
-                        1 + ifelse(is.na(directionUpper) || isTRUE(directionUpper), 1e-07, -1e-07)
-                    ))
+                    thetaH1,
+                    1 + ifelse(is.na(directionUpper) || isTRUE(directionUpper), 1e-07, -1e-07)
+                ))
             }
             if (conditionalCriticalValue[stage] > 8) {
                 newEvents <- maxNumberOfEventsPerStage[stage + 1]
@@ -197,11 +195,11 @@ NULL
                 newEvents <- (1 + allocationRatioPlanned[stage])^2 /
                     allocationRatioPlanned[stage] *
                     (max(
-                            0,
-                            conditionalCriticalValue[stage] +
-                                .getQNorm(conditionalPower),
-                            na.rm = TRUE
-                        ))^2 /
+                        0,
+                        conditionalCriticalValue[stage] +
+                            .getQNorm(conditionalPower),
+                        na.rm = TRUE
+                    ))^2 /
                     thetaStandardized^2
                 newEvents <- min(
                     max(minNumberOfEventsPerStage[stage + 1], newEvents),

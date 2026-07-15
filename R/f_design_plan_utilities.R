@@ -37,84 +37,6 @@ NULL
     return(singleEventsPerStage)
 }
 
-.addEffectScaleBoundaryDataToDesignPlan <- function(designPlan) {
-    .assertIsTrialDesignPlan(designPlan)
-
-    design <- designPlan$.design
-    if (.isTrialDesignPlanMeans(designPlan)) {
-        if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
-            designPlan$maxNumberOfSubjects <- designPlan$nFixed
-        }
-
-        boundaries <- .getEffectScaleBoundaryDataMeans(designPlan)
-    } else if (.isTrialDesignPlanRates(designPlan)) {
-        if (designPlan$.isSampleSizeObject()) {
-            # comes from getSampleSize
-            if (designPlan$groups == 1) {
-                designPlan$directionUpper <- (designPlan$pi1 > designPlan$thetaH0)
-            } else {
-                if (designPlan$riskRatio) {
-                    designPlan$directionUpper <- (designPlan$pi1 / designPlan$pi2 > designPlan$thetaH0)
-                } else {
-                    designPlan$directionUpper <- (designPlan$pi1 - designPlan$pi2 > designPlan$thetaH0)
-                }
-            }
-            designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
-        }
-        if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
-            designPlan$maxNumberOfSubjects <- designPlan$nFixed
-        }
-        boundaries <- .getEffectScaleBoundaryDataRates(designPlan)
-    } else if (.isTrialDesignPlanSurvival(designPlan)) {
-        if (designPlan$.isSampleSizeObject()) {
-            # comes from getSampleSize
-            designPlan$directionUpper <- (designPlan$hazardRatio > designPlan$thetaH0)
-            designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
-        }
-
-        if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
-            designPlan$cumulativeEventsPerStage <- matrix(designPlan$eventsFixed, nrow = 1)
-        }
-        boundaries <- .getEffectScaleBoundaryDataSurvival(designPlan)
-    } else if (.isTrialDesignPlanCountData(designPlan)) {
-        boundaries <- .getEffectScaleBoundaryCountData(designPlan)
-    }
-
-    if (designPlan$.design$sided == 1) {
-        designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleUpper
-        designPlan$.setParameterType("criticalValuesEffectScale", C_PARAM_GENERATED)
-    } else {
-        if (all(boundaries$criticalValuesEffectScaleLower < boundaries$criticalValuesEffectScaleUpper, na.rm = TRUE)) {
-            designPlan$criticalValuesEffectScaleLower <- boundaries$criticalValuesEffectScaleLower
-            designPlan$criticalValuesEffectScaleUpper <- boundaries$criticalValuesEffectScaleUpper
-        } else {
-            designPlan$criticalValuesEffectScaleLower <- boundaries$criticalValuesEffectScaleUpper
-            designPlan$criticalValuesEffectScaleUpper <- boundaries$criticalValuesEffectScaleLower
-        }
-        designPlan$.setParameterType("criticalValuesEffectScaleUpper", C_PARAM_GENERATED)
-        designPlan$.setParameterType("criticalValuesEffectScaleLower", C_PARAM_GENERATED)
-    }
-
-    if (.hasApplicableFutilityBounds(design)) {
-        if (design$sided == 1) {
-            designPlan$futilityBoundsEffectScale <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
-            designPlan$.setParameterType("futilityBoundsEffectScale", C_PARAM_GENERATED)
-        } else {
-            if (
-                all(designPlan$futilityBoundsEffectScaleLower < designPlan$futilityBoundsEffectScaleUpper, na.rm = TRUE)
-                ) {
-                designPlan$futilityBoundsEffectScaleLower <- round(boundaries$futilityBoundsEffectScaleLower, 8)
-                designPlan$futilityBoundsEffectScaleUpper <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
-            } else {
-                designPlan$futilityBoundsEffectScaleLower <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
-                designPlan$futilityBoundsEffectScaleUpper <- round(boundaries$futilityBoundsEffectScaleLower, 8)
-            }
-            designPlan$.setParameterType("futilityBoundsEffectScaleLower", C_PARAM_GENERATED)
-            designPlan$.setParameterType("futilityBoundsEffectScaleUpper", C_PARAM_GENERATED)
-        }
-    }
-}
-
 .calculateSampleSizeMeansAndRates <- function(designPlan) {
     if (identical(designPlan$allocationRatioPlanned, 0)) {
         designPlan$optimumAllocationRatio <- TRUE
@@ -132,6 +54,7 @@ NULL
             thetaH0 = designPlan$thetaH0,
             alternative = designPlan$alternative,
             stDev = designPlan$stDev,
+            directionUpper = designPlan$directionUpper,
             groups = designPlan$groups,
             allocationRatioPlanned = designPlan$allocationRatioPlanned
         )
@@ -146,6 +69,7 @@ NULL
             thetaH0 = designPlan$thetaH0,
             pi1 = designPlan$pi1,
             pi2 = designPlan$pi2,
+            directionUpper = designPlan$directionUpper,
             groups = designPlan$groups,
             allocationRatioPlanned = designPlan$allocationRatioPlanned
         )
@@ -266,6 +190,7 @@ NULL
         }
     }
 
+    .setDirectionUpper(designPlan)
     .addEffectScaleBoundaryDataToDesignPlan(designPlan)
 
     return(designPlan)
@@ -360,12 +285,10 @@ NULL
     }
 
     if (piecewiseSurvivalTime[1] != 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "the first value of 'piecewiseSurvivalTime' (",
-            .arrayToString(piecewiseSurvivalTime),
+        stopIllegalArgument("the first value of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime),
             ") must be 0",
-            call. = FALSE
+            functionName = ".getPiecewiseExpStartTimesWithoutLeadingZero", parameter = "piecewiseSurvivalTime",
+            value = piecewiseSurvivalTime
         )
     }
 
@@ -374,12 +297,9 @@ NULL
     }
 
     if (length(piecewiseSurvivalTime) < 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'piecewiseSurvivalTime' (",
-            length(piecewiseSurvivalTime),
-            ") must be > 1",
-            call. = FALSE
+        stopIllegalArgument("length of 'piecewiseSurvivalTime' (", length(piecewiseSurvivalTime), ") must be > 1",
+            functionName = ".getPiecewiseExpStartTimesWithoutLeadingZero", parameter = "piecewiseSurvivalTime",
+            value = length(piecewiseSurvivalTime)
         )
     }
 
@@ -389,15 +309,10 @@ NULL
 .getNumberOfSubjectsInner <- function(..., timeValue, accrualTime, accrualIntensity, maxNumberOfSubjects) {
     .assertIsSingleNumber(timeValue, "timeValue")
     if (length(accrualTime) != length(accrualIntensity)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'accrualTime' (",
-            length(accrualIntensity),
-            ") ",
-            "must be equel to length of 'accrualIntensity' (",
-            length(accrualIntensity),
-            ")",
-            call. = FALSE
+        stopIllegalArgument("length of 'accrualTime' (", length(accrualIntensity), ") ", "must be equel to length of 'accrualIntensity' (",
+            length(accrualIntensity), ")",
+            functionName = ".getNumberOfSubjectsInner", parameter = "accrualTime", relatedParameter = "accrualIntensity",
+            relatedValue = length(accrualIntensity), value = accrualTime
         )
     }
 

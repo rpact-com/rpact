@@ -1,3 +1,3 @@
 #' Field description: delta WT
-#' @field deltaWT Delta for Wang & Tsiatis Delta class. Is a numeric vector of length 1.
+#' @field deltaWT Delta for Wang & Tsiatis Delta class. Is a single numeric value.
 #' @keywords internal

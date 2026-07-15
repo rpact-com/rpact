@@ -15,15 +15,15 @@ with suitable arguments to create the results of a group sequential or a combina
 \describe{
 \item{\code{nPlanned}}{The sample size planned for each of the subsequent stages. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a single numeric value representing a  whole number.}
 
-\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
+\item{\code{seed}}{The seed used for random number generation. Is a single numeric value.}
 
-\item{\code{simulated}}{Describes if the power for Fisher's combination test has been simulated. Only applicable when using Fisher designs. Is a logical vector of length 1.}
+\item{\code{simulated}}{Describes if the power for Fisher's combination test has been simulated. Only applicable when using Fisher designs. Is a single logical value.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a single numeric value between 0 and 1.}
 
 \item{\code{piTreatments}}{The assumed rates in the treatment groups for multi-arm and enrichment designs, i.e., designs with multiple subsets.}
 

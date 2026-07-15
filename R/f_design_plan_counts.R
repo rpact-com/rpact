@@ -146,18 +146,14 @@
 #'
 .generateRecruitmentTimes <- function(allocationRatio, accrualTime, accrualIntensity) {
     .assertIsSingleNumber(allocationRatio, "allocationRatio")
-    .assertIsNumericVector(accrualTime, "accrualTime")
-    .assertIsNumericVector(accrualIntensity, "accrualIntensity")
+    accrualTime <- .assertIsNumericVector(accrualTime, "accrualTime")
+    accrualIntensity <- .assertIsNumericVector(accrualIntensity, "accrualIntensity")
 
     if (length(accrualTime) != length(accrualIntensity)) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "length of accrualTime (",
-            length(accrualTime),
-            ") and ",
-            "accrualIntensity (",
-            length(accrualIntensity),
-            ") must be identical"
+        stopRuntimeIssue("length of accrualTime (", length(accrualTime), ") and ", "accrualIntensity (", length(accrualIntensity),
+            ") must be identical",
+            functionName = ".generateRecruitmentTimes", parameter = "accrualTime", value = length(accrualTime),
+            relatedParameter = "accrualIntensity", relatedValue = length(accrualIntensity)
         )
     }
 
@@ -249,7 +245,8 @@
 #'
 #' @noRd
 #'
-.getVarianceEstimate <- function(lambda1,
+.getVarianceEstimate <- function(
+        lambda1,
         lambda2,
         allocation,
         overdispersion,
@@ -263,10 +260,7 @@
             (1 / fixedExposureTime * (1 / lambda2 + 1 / (lambda1 * allocation)) + overdispersion * (1 + 1 / allocation))
     } else {
         if (is.na(followUpTime)) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "Cannot calculated variance estimate because follow-up time is NA"
-            )
+            stopRuntimeIssue("Cannot calculated variance estimate because follow-up time is NA", functionName = ".getVarianceEstimate")
         }
         timeUnderObservation1 <-
             pmax(accrualTime[length(accrualTime)] + followUpTime - recruit1, 0)
@@ -280,7 +274,8 @@
     return(varianceEstimate)
 }
 
-.getCalendarTime <- function(n1,
+.getCalendarTime <- function(
+        n1,
         n2,
         information,
         shift,
@@ -341,7 +336,8 @@
     return(NA_real_)
 }
 
-.getMaximumSampleSizeTwoGroups <- function(allocationRatioPlanned,
+.getMaximumSampleSizeTwoGroups <- function(
+        allocationRatioPlanned,
         shift,
         accrualTime,
         followUpTime,
@@ -397,7 +393,8 @@
     )
 }
 
-.getDesignPlanCountData <- function(design,
+.getDesignPlanCountData <- function(
+        design,
         designCharacteristics,
         objectType,
         sided,
@@ -412,13 +409,22 @@
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned) {
+        allocationRatioPlanned,
+        directionUpper) {
     designPlan <- TrialDesignPlanCountData$new(
         design = design,
         designCharacteristics = designCharacteristics
     )
     designPlan$.setObjectType(objectType)
     sampleSizeEnabled <- identical(objectType, "sampleSize")
+
+    directionUpper <- .assertIsValidDirectionUpper(
+        directionUpper,
+        design,
+        objectType = "power",
+        userFunctionCallEnabled = TRUE,
+        default = NA
+    )
 
     if (sampleSizeEnabled || design$kMax == 1) {
         designPlan$.setParameterType("overallReject", C_PARAM_NOT_APPLICABLE)
@@ -446,7 +452,7 @@
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
 
-    .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
+    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     .assertIsValidEffectCountData(
         sampleSizeEnabled = sampleSizeEnabled,
         sided = sided,
@@ -459,10 +465,8 @@
     )
 
     if (design$sided == 2 && thetaH0 != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
-            call. = FALSE
+        stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
+            functionName = ".getDesignPlanCountData"
         )
     }
 
@@ -565,6 +569,7 @@
 #' @inheritParams param_accrualTime_counts
 #' @inheritParams param_accrualIntensity_counts
 #' @inheritParams param_followUpTime_counts
+#' @inheritParams param_directionUpper
 #' @inheritParams param_maxNumberOfSubjects
 #' @inheritParams param_overdispersion_counts
 #' @inheritParams param_allocationRatioPlanned_sampleSize
@@ -588,8 +593,10 @@
 #'
 #' @export
 #'
-getSampleSizeCounts <- function(design = NULL,
+getSampleSizeCounts <- function(
+        design = NULL,
         ...,
+        directionUpper = NA,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
         lambda = NA_real_,
@@ -603,7 +610,7 @@ getSampleSizeCounts <- function(design = NULL,
         maxNumberOfSubjects = NA_integer_,
         allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "sampleSize", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = FALSE),
@@ -640,7 +647,8 @@ getSampleSizeCounts <- function(design = NULL,
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned
+        allocationRatioPlanned,
+        directionUpper
     )
     totalCases <- attr(designPlan, "totalCases")
     attr(designPlan, "totalCases") <- NULL
@@ -977,8 +985,7 @@ getSampleSizeCounts <- function(design = NULL,
     designPlan$lambda2 <- lambda2
     designPlan$allocationRatioPlanned <- allocationRatioPlanned
 
-    designPlan$directionUpper <- (lambda1 / lambda2 > thetaH0)
-    designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
+    .setDirectionUpper(designPlan)
 
     designPlan$calendarTime <- calendarTime
     designPlan$.setParameterType(
@@ -1136,7 +1143,8 @@ getSampleSizeCounts <- function(design = NULL,
 #'
 #' @export
 #'
-getPowerCounts <- function(design = NULL,
+getPowerCounts <- function(
+        design = NULL,
         ...,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
@@ -1152,7 +1160,7 @@ getPowerCounts <- function(design = NULL,
         followUpTime = NA_real_,
         allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "power")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "power", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getPowerCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -1173,7 +1181,6 @@ getPowerCounts <- function(design = NULL,
     alpha <- design$alpha
     sided <- design$sided
     designCharacteristics <- getDesignCharacteristics(design)
-#    shift <- designCharacteristics$shift
 
     designPlan <- .getDesignPlanCountData(
         design,
@@ -1191,8 +1198,12 @@ getPowerCounts <- function(design = NULL,
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned
+        allocationRatioPlanned,
+        directionUpper
     )
+    designPlan$directionUpper <- directionUpper
+    directionUpper <- .getDirectionUpper(designPlan)
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
     totalCases <- attr(designPlan, "totalCases")
     attr(designPlan, "totalCases") <- NULL
     allocationRatioPlanned <- designPlan$allocationRatioPlanned
@@ -1202,14 +1213,6 @@ getPowerCounts <- function(design = NULL,
     if (length(accrualTime) > 1) {
         accrualTime <- accrualTime[-1]
     }
-
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE
-    )
-    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
 
     futilityPerStage <- matrix(NA_real_, kMax - 1, totalCases)
     rejectPerStage <- matrix(NA_real_, kMax, totalCases)
@@ -1261,7 +1264,6 @@ getPowerCounts <- function(design = NULL,
             varianceEstimate <- nTotal * (1 / sumLambda1 + 1 / sumLambda2)
         }
         oneSidedFactor <- ifelse(sided == 1, 2 * directionUpper - 1, 1)
-
         powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
             design = design,
             theta = oneSidedFactor * log(lambda1[iCase] / lambda2 / thetaH0) / sqrt(varianceEstimate),
@@ -1273,7 +1275,7 @@ getPowerCounts <- function(design = NULL,
         overallReject[iCase] <- powerAndAverageSampleNumber$overallReject
         earlyStop[iCase] <- sum(powerAndAverageSampleNumber$earlyStop[1:(design$kMax - 1), ], na.rm = TRUE)
     }
-    
+
     designPlan$lambda1 <- lambda1
     designPlan$lambda2 <- lambda2
 

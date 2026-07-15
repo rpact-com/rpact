@@ -17,7 +17,8 @@
 #' @include f_core_utilities.R
 NULL
 
-.getSampleSizeFixedRates <- function(...,
+.getSampleSizeFixedRates <- function(
+        ...,
         alpha = 0.025,
         beta = 0.2,
         sided = 1,
@@ -27,27 +28,32 @@ NULL
         thetaH0 = 0,
         pi1 = seq(0.4, 0.6, 0.1),
         pi2 = 0.2,
+        directionUpper = NA,
         groups = 2,
         allocationRatioPlanned = 1) {
     if (groups == 1) {
         nFixed <- rep(NA_real_, length(pi1))
 
         for (i in seq_len(length(pi1))) {
+            effect <- pi1[i] - thetaH0
             if (normalApproximation) {
                 nFixed[i] <- (.getOneMinusQNorm(alpha / sided) *
                     sqrt(thetaH0 * (1 - thetaH0)) +
                     .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i])))^2 /
-                    (pi1[i] - thetaH0)^2
+                    effect^2
             } else {
-                ifelse(pi1[i] > thetaH0, lower.tail <- FALSE, lower.tail <- TRUE)
+                lowerTail <- isFALSE(directionUpper)
+                if (is.na(directionUpper)) {
+                    lowerTail <- effect < 0
+                }
                 iterations <- 1
                 nup <- 2
                 while (
                     (stats::pbinom(
-                        stats::qbinom(alpha, nup, thetaH0, lower.tail = lower.tail) - as.integer(lower.tail),
+                        stats::qbinom(alpha, nup, thetaH0, lower.tail = lowerTail) - as.integer(lowerTail),
                         nup,
                         pi1[i],
-                        lower.tail = lower.tail
+                        lower.tail = lowerTail
                     ) <
                         1 - beta) &&
                         (iterations <= 50)
@@ -62,11 +68,11 @@ NULL
                         if (conservative) {
                             nFixed[i] <- max(which(
                                 stats::pbinom(
-                                    stats::qbinom(alpha, (1:(2 * nup)), thetaH0, lower.tail = lower.tail) -
-                                        as.integer(lower.tail),
+                                    stats::qbinom(alpha, (1:(2 * nup)), thetaH0, lower.tail = lowerTail) -
+                                        as.integer(lowerTail),
                                     (1:(2 * nup)),
                                     pi1[i],
-                                    lower.tail = lower.tail
+                                    lower.tail = lowerTail
                                 ) <
                                     1 - beta
                             )) +
@@ -74,11 +80,11 @@ NULL
                         } else {
                             nFixed[i] <- min(which(
                                 stats::pbinom(
-                                    stats::qbinom(alpha, (1:nup), thetaH0, lower.tail = lower.tail) -
-                                        as.integer(lower.tail),
+                                    stats::qbinom(alpha, (1:nup), thetaH0, lower.tail = lowerTail) -
+                                        as.integer(lowerTail),
                                     (1:nup),
                                     pi1[i],
-                                    lower.tail = lower.tail
+                                    lower.tail = lowerTail
                                 ) >=
                                     1 - beta
                             ))
@@ -117,6 +123,8 @@ NULL
 
         for (i in seq_len(length(pi1))) {
             if (!riskRatio) {
+                effect <- pi1[i] - pi2 - thetaH0
+
                 # allocationRatioPlanned = 0 provides optimum sample size
                 if (allocationRatioPlanned == 0) {
                     allocationRatioPlannedVec[i] <- stats::optimize(
@@ -131,7 +139,7 @@ NULL
                             n1 <- (.getOneMinusQNorm(alpha / sided) *
                                 sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * x) +
                                 .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * x))^2 /
-                                (pi1[i] - pi2 - thetaH0)^2
+                                effect^2
                             return((1 + x) / x * n1)
                         },
                         interval = c(0, 5),
@@ -148,7 +156,7 @@ NULL
                         sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlannedVec[i]) +
                         .getOneMinusQNorm(beta) *
                             sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlannedVec[i]))^2 /
-                        (pi1[i] - pi2 - thetaH0)^2
+                        effect^2
                 } else {
                     fm <- .getFarringtonManningValues(
                         rate1 = pi1[i],
@@ -161,9 +169,11 @@ NULL
                         sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlanned) +
                         .getOneMinusQNorm(beta) *
                             sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlanned))^2 /
-                        (pi1[i] - pi2 - thetaH0)^2
+                        effect^2
                 }
             } else {
+                effect <- pi1[i] / pi2 - thetaH0
+
                 if (allocationRatioPlanned == 0) {
                     # allocationRatioPlanned = 0 provides optimum sample size
                     allocationRatioPlannedVec[i] <- stats::optimize(
@@ -186,7 +196,7 @@ NULL
                                                 x *
                                                 thetaH0^2
                                     ))^2 /
-                                (pi1[i] - thetaH0 * pi2)^2
+                                (effect * pi2)^2
                             return((1 + x) / x * n1)
                         },
                         interval = c(0, 5),
@@ -205,7 +215,7 @@ NULL
                             sqrt(
                                 pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlannedVec[i] * thetaH0^2
                             ))^2 /
-                        (pi1[i] - thetaH0 * pi2)^2
+                        (effect * pi2)^2
                 } else {
                     fm <- .getFarringtonManningValues(
                         rate1 = pi1[i],
@@ -218,7 +228,7 @@ NULL
                         sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlanned * thetaH0^2) +
                         .getOneMinusQNorm(beta) *
                             sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlanned * thetaH0^2))^2 /
-                        (pi1[i] - thetaH0 * pi2)^2
+                        (effect * pi2)^2
                 }
             }
         }
@@ -332,10 +342,10 @@ NULL
 }
 
 #
-# note that 'directionUpper' and 'maxNumberOfSubjects' are
-# only applicable for 'objectType' = "power"
+# note that 'maxNumberOfSubjects' is only applicable for 'objectType' = "power"
 #
-.createDesignPlanRates <- function(...,
+.createDesignPlanRates <- function(
+        ...,
         objectType = c("sampleSize", "power"),
         design,
         normalApproximation = TRUE,
@@ -364,57 +374,40 @@ NULL
         directionUpper,
         design,
         objectType = objectType,
-        userFunctionCallEnabled = TRUE
+        userFunctionCallEnabled = TRUE,
+        default = NA
     )
 
     if (groups == 1) {
         if (!anyNA(pi1) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'pi1' (",
-                .arrayToString(pi1),
-                ") must be != 'thetaH0' (",
-                thetaH0,
-                ")",
-                call. = FALSE
+            stopIllegalArgument("any 'pi1' (", .arrayToString(pi1), ") must be != 'thetaH0' (", thetaH0, ")",
+                functionName = ".createDesignPlanRates",
+                parameter = "pi1", value = pi1, relatedParameter = "thetaH0", relatedValue = thetaH0
             )
         }
 
         if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "probability 'pi1' (",
-                .arrayToString(pi1),
-                ") is out of bounds (0; 1)",
-                call. = FALSE
+            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)",
+                functionName = ".createDesignPlanRates",
+                parameter = "pi1", value = pi1
             )
         }
 
         if (thetaH0 >= 1 || thetaH0 <= 0) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'thetaH0' (",
-                thetaH0,
-                ") is out of bounds (0; 1)",
-                call. = FALSE
+            stopArgumentOutOfBounds("'thetaH0' (", thetaH0, ") is out of bounds (0; 1)",
+                functionName = ".createDesignPlanRates",
+                parameter = "thetaH0", value = thetaH0
             )
         }
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "exact sample size calculation not available for two-sided testing",
-                call. = FALSE
-            )
+            stopIllegalArgument("exact sample size calculation not available for two-sided testing", functionName = ".createDesignPlanRates")
         }
 
         if (normalApproximation && !conservative && (objectType == "sampleSize")) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'conservative' (",
-                conservative,
-                ") has no effect on sample size calculation",
-                call. = FALSE
+            stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation",
+                functionName = ".createDesignPlanRates",
+                parameter = "conservative", value = conservative
             )
         }
     } else if (groups == 2) {
@@ -424,15 +417,10 @@ NULL
                 (objectType == "sampleSize") &&
                 !riskRatio
             ) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'pi1 - pi2' (",
-                .arrayToString(pi1 - pi2),
-                ") ",
-                "must be != 'thetaH0' (",
-                thetaH0,
+            stopIllegalArgument("any 'pi1 - pi2' (", .arrayToString(pi1 - pi2), ") ", "must be != 'thetaH0' (", thetaH0,
                 ")",
-                call. = FALSE
+                functionName = ".createDesignPlanRates", parameter = "pi1 - pi2", value = pi1 - pi2, relatedParameter = "thetaH0",
+                relatedValue = thetaH0
             )
         }
 
@@ -442,37 +430,22 @@ NULL
                 (objectType == "sampleSize") &&
                 riskRatio
             ) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'pi1 / pi2' (",
-                .arrayToString(pi1 / pi2),
-                ") ",
-                "must be != 'thetaH0' (",
-                thetaH0,
+            stopIllegalArgument("any 'pi1 / pi2' (", .arrayToString(pi1 / pi2), ") ", "must be != 'thetaH0' (", thetaH0,
                 ")",
-                call. = FALSE
+                functionName = ".createDesignPlanRates", parameter = "pi1 / pi2", value = pi1 / pi2,
+                relatedParameter = "thetaH0", relatedValue = thetaH0
             )
         }
 
         if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "probability 'pi1' (",
-                .arrayToString(pi1),
-                ") ",
-                "is out of bounds (0; 1)",
-                call. = FALSE
+            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") ", "is out of bounds (0; 1)",
+                functionName = ".createDesignPlanRates", parameter = "pi1", value = pi1
             )
         }
 
         if (anyNA(pi2) || any(pi2 <= 0) || any(pi2 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "probability 'pi2' (",
-                .arrayToString(pi2),
-                ") ",
-                "is out of bounds (0; 1)",
-                call. = FALSE
+            stopArgumentOutOfBounds("probability 'pi2' (", .arrayToString(pi2), ") ", "is out of bounds (0; 1)",
+                functionName = ".createDesignPlanRates", parameter = "pi2", value = pi2
             )
         }
 
@@ -481,29 +454,16 @@ NULL
                 ((thetaH0 != 0 && !riskRatio) ||
                     (thetaH0 != 1 && riskRatio))
             ) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "two-sided case ",
-                "is implemented only for superiority testing",
-                call. = FALSE
-            )
+            stopIllegalArgument("two-sided case ", "is implemented only for superiority testing", functionName = ".createDesignPlanRates")
         }
 
         if (!normalApproximation) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "only normal approximation case is implemented for two groups",
-                call. = FALSE
-            )
+            stopIllegalArgument("only normal approximation case is implemented for two groups", functionName = ".createDesignPlanRates")
         }
 
         if (!conservative) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'conservative' (",
-                conservative,
-                ") has no effect on sample size calculation for two groups",
-                call. = FALSE
+            stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation for two groups",
+                functionName = ".createDesignPlanRates", parameter = "conservative", value = conservative
             )
         }
 
@@ -512,21 +472,15 @@ NULL
         }
 
         if (allocationRatioPlanned < 0) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'allocationRatioPlanned' (",
-                allocationRatioPlanned,
-                ") must be >= 0",
-                call. = FALSE
+            stopIllegalArgument("'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0",
+                functionName = ".createDesignPlanRates",
+                parameter = "allocationRatioPlanned", value = allocationRatioPlanned
             )
         }
 
         if (riskRatio && thetaH0 <= 0) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "null hypothesis risk ratio is not allowed be negative or zero, ",
-                "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE",
-                call. = FALSE
+            stopIllegalArgument("null hypothesis risk ratio is not allowed be negative or zero, ", "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE",
+                functionName = ".createDesignPlanRates", parameter = "thetaH0", relatedParameter = "riskRatio", value = thetaH0
             )
         }
     }
@@ -546,10 +500,11 @@ NULL
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }
 
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
+
     if (objectType == "power") {
         .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
         .setValueAndParameterType(designPlan, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
-        .setValueAndParameterType(designPlan, "directionUpper", directionUpper, TRUE)
 
         designPlan$.setParameterType("effect", C_PARAM_GENERATED)
     }
@@ -568,7 +523,7 @@ NULL
     }
     .setValueAndParameterType(designPlan, "pi2", pi2, 0.2, notApplicableIfNA = TRUE)
     if (groups == 1) {
-        if (designPlan$.getParameterType("pi2") == C_PARAM_USER_DEFINED) {
+        if (designPlan$isUserDefinedParameter("pi2")) {
             warning(
                 "'pi2' (",
                 pi2,
@@ -655,19 +610,19 @@ NULL
 #'
 #' @export
 #'
-getPowerRates <- function(design = NULL,
+getPowerRates <- function(
+        design = NULL,
         ...,
         groups = 2L,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
-        pi2 = 0.2, # C_PI_2_DEFAULT
+        pi1 = seq(0.2, 0.5, 0.1),
+        pi2 = 0.2,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
-        allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
-        ) {
+        allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "power")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "power", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getPowerRates",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -699,7 +654,7 @@ getPowerRates <- function(design = NULL,
     )
 
     if (!is.na(allocationRatioPlanned) && allocationRatioPlanned <= 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "allocation ratio must be > 0", call. = FALSE)
+        stopIllegalArgument("allocation ratio must be > 0", functionName = "getPowerRates")
     }
 
     allocationRatioPlanned <- designPlan$allocationRatioPlanned
@@ -768,9 +723,9 @@ getPowerRates <- function(design = NULL,
         }
     }
 
-    if (!is.na(designPlan$directionUpper) && !designPlan$directionUpper) {
-        theta <- -theta
-    }
+    theta <- .applyDirectionOfAlternative(theta, designPlan$directionUpper,
+        type = "negateIfLower", phase = "planning"
+    )
 
     powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
         design,
@@ -827,6 +782,7 @@ getPowerRates <- function(design = NULL,
 #' @inheritParams param_thetaH0
 #' @inheritParams param_pi1_rates
 #' @inheritParams param_pi2_rates
+#' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned_sampleSize
 #' @inheritParams param_three_dots
 #'
@@ -851,19 +807,20 @@ getPowerRates <- function(design = NULL,
 #'
 #' @export
 #'
-getSampleSizeRates <- function(design = NULL,
+getSampleSizeRates <- function(
+        design = NULL,
         ...,
         groups = 2L,
         normalApproximation = TRUE,
         conservative = TRUE,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = c(0.4, 0.5, 0.6), # C_PI_1_SAMPLE_SIZE_DEFAULT
-        pi2 = 0.2, # C_PI_2_DEFAULT
-        allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
-        ) {
+        pi1 = c(0.4, 0.5, 0.6),
+        pi2 = 0.2,
+        directionUpper = NA,
+        allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "sampleSize", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeRates",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -889,6 +846,7 @@ getSampleSizeRates <- function(design = NULL,
         pi1 = pi1,
         pi2 = pi2,
         groups = groups,
+        directionUpper = directionUpper,
         allocationRatioPlanned = allocationRatioPlanned,
         ...
     )

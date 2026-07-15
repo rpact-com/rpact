@@ -26,7 +26,10 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsMultiArm <- function(design, dataInput, ...,
+.getAnalysisResultsMultiArm <- function(
+        design,
+        dataInput,
+        ...,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
         directionUpper = NA,
         thetaH0 = NA_real_,
@@ -101,7 +104,8 @@ NULL
 #'
 #' @noRd
 #'
-.getStageResultsMultiArm <- function(design,
+.getStageResultsMultiArm <- function(
+        design,
         dataInput,
         ...,
         directionUpper = NA) {
@@ -150,7 +154,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMultiArm <- function(design,
+.getRepeatedConfidenceIntervalsMultiArm <- function(
+        design,
         dataInput,
         ...) {
     .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
@@ -193,7 +198,10 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMultiArm <- function(..., stageResults, nPlanned,
+.getConditionalPowerMultiArm <- function(
+        ...,
+        stageResults,
+        nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
     .assertIsStageResults(stageResults)
 
@@ -250,7 +258,10 @@ NULL
     return(as.matrix(indices))
 }
 
-.performClosedCombinationTest <- function(..., stageResults, design = stageResults$.design,
+.performClosedCombinationTest <- function(
+        ...,
+        stageResults,
+        design = stageResults$.design,
         intersectionTest = stageResults$intersectionTest) {
     dataInput <- stageResults$.dataInput
     stage <- stageResults$stage
@@ -627,7 +638,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                     }
                     ctr <- .performClosedCombinationTest(
                         stageResults = stageResults,
-                        design = designAlpha, 
+                        design = designAlpha,
                         intersectionTest = intersectionTest
                     )
                     ifelse(ctr$rejected[g, 1], upper <- alpha, lower <- alpha)
@@ -719,7 +730,8 @@ getClosedCombinationTestResults <- function(stageResults) {
 #'
 #' @export
 #'
-getClosedConditionalDunnettTestResults <- function(stageResults,
+getClosedConditionalDunnettTestResults <- function(
+        stageResults,
         ...,
         stage = stageResults$stage) {
     .assertIsStageResultsMultiArm(stageResults)
@@ -753,7 +765,8 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
     ))
 }
 
-.getClosedConditionalDunnettTestResults <- function(...,
+.getClosedConditionalDunnettTestResults <- function(
+        ...,
         stageResults,
         design = stageResults$.design,
         stage = stageResults$stage) {
@@ -907,7 +920,6 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
     ))
 }
 
-
 .getConditionalDunnettTestForCI <- function(..., design, stageResults, treatmentArm) {
     gMax <- stageResults$getGMax()
     informationAtInterim <- design$informationAtInterim
@@ -1000,11 +1012,6 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
         }
     }
 
-    # cat("upper = ", stageResults$directionUpper , ", gMax = ", gMax,
-    #     ", selected = ", selected, ", treatmentArm = ", treatmentArm,
-    #     ", conditionalErrorRate = ", conditionalErrorRate,
-    #     ", secondStagePValues = ", secondStagePValues, "\n")
-
     return(secondStagePValues <= conditionalErrorRate)
 }
 
@@ -1013,7 +1020,8 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
 #'
 #' @noRd
 #'
-.getConditionalRejectionProbabilitiesMultiArm <- function(stageResults,
+.getConditionalRejectionProbabilitiesMultiArm <- function(
+        stageResults,
         ...,
         stage = stageResults$stage,
         iterations = C_ITERATIONS_DEFAULT,
@@ -1040,10 +1048,10 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or TrialDesignDunnett",
-        call. = FALSE
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, ",
+        "TrialDesignFisher, or TrialDesignDunnett",
+        functionName = ".getConditionalRejectionProbabilitiesMultiArm",
+        parameter = "design"
     )
 }
 
@@ -1225,11 +1233,18 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
 #'
 #' @noRd
 #'
-.getConditionalPowerPlotMultiArm <- function(stageResults, ...,
-        nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        thetaRange = NA_real_, assumedStDevs = NA_real_,
-        piTreatmentRange = NA_real_, piControl = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_, showArms = NA_real_) {
+.getConditionalPowerPlotMultiArm <- function(
+        stageResults,
+        ...,
+        nPlanned,
+        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
+        thetaRange = NA_real_,
+        assumedStDevs = NA_real_,
+        piTreatmentRange = NA_real_,
+        piControl = NA_real_,
+        iterations = C_ITERATIONS_DEFAULT,
+        seed = NA_real_,
+        showArms = NA_real_) {
     .stopInCaseOfIllegalStageDefinition2(...)
 
     kMax <- stageResults$.design$kMax
@@ -1238,14 +1253,18 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
         stage <- kMax - 1
     }
     if (stage < 1 || kMax == 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot plot conditional power of a fixed design", call. = FALSE)
+        stopIllegalArgument("cannot plot conditional power of a fixed design",
+            functionName = ".getConditionalPowerPlotMultiArm"
+        )
     }
     if (stage >= kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "the conditional power plot is only available for subsequent stages. ",
+        stopIllegalArgument("the conditional power plot is only available for subsequent stages. ",
             "Please specify a 'stage' (", stage, ") < 'kMax' (", kMax, ")",
-            call. = FALSE
+            functionName = ".getConditionalPowerPlotMultiArm",
+            parameter = "stage",
+            value = stage,
+            relatedParameter = "kMax",
+            relatedValue = kMax
         )
     }
 

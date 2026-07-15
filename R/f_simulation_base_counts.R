@@ -49,7 +49,8 @@
 #'
 #' @noRd
 #'
-.getInformationCountData <- function(lambda1,
+.getInformationCountData <- function(
+        lambda1,
         lambda2,
         overdispersion,
         recruit1,
@@ -110,7 +111,8 @@
 #'
 #' @noRd
 #'
-.getGeneratedEventTimesCountData <- function(recruit1,
+.getGeneratedEventTimesCountData <- function(
+        recruit1,
         recruit2,
         accrualTime,
         followUpTime,
@@ -237,7 +239,8 @@
 #'
 #' @export
 #'
-getSimulationCounts <- function(design = NULL,
+getSimulationCounts <- function(
+        design = NULL,
         ...,
         plannedCalendarTime = NA_real_,
         maxNumberOfSubjects = NA_real_,
@@ -245,7 +248,8 @@ getSimulationCounts <- function(design = NULL,
         lambda2 = NA_real_,
         lambda = NA_real_,
         theta = NA_real_,
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         thetaH0 = 1,
         overdispersion = 0,
         fixedExposureTime = NA_real_,
@@ -253,11 +257,12 @@ getSimulationCounts <- function(design = NULL,
         accrualIntensity = NA_real_,
         followUpTime = NA_real_,
         allocationRatioPlanned = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulationCounts")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulationCounts", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -322,13 +327,18 @@ getSimulationCounts <- function(design = NULL,
         .assertAreValidCalendarTimes(plannedCalendarTime, kMax)
         if (!is.na(followUpTime)) {
             if (abs(plannedCalendarTime[kMax] - max(accrualTime) - followUpTime) > 1e-04) {
-                stop(sprintf(
-                    paste0(
-                        "Last 'plannedCalendarTime' (%s) ",
-                        "must be equal to %s (accrualTime + followUpTime)"
+                stopConflictingArguments(
+                    sprintf(
+                        paste0("Last 'plannedCalendarTime' (%s) ", "must be equal to %s (accrualTime + followUpTime)"),
+                        plannedCalendarTime[kMax], max(accrualTime) + followUpTime
                     ),
-                    plannedCalendarTime[kMax], max(accrualTime) + followUpTime
-                ))
+                    parameter = "plannedCalendarTime", value = plannedCalendarTime[kMax],
+                    constraint = "last plannedCalendarTime must equal max(accrualTime) + followUpTime", relatedParameter = c(
+                        "accrualTime",
+                        "followUpTime"
+                    ), relatedValue = list(accrualTime = accrualTime, followUpTime = followUpTime),
+                    functionName = "getSimulationCounts"
+                )
             }
         }
     } else if (!all(is.na(plannedCalendarTime))) {

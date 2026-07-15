@@ -45,7 +45,8 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getAnalysisResultsMeansInverseNormal <- function(...,
+.getAnalysisResultsMeansInverseNormal <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -92,7 +93,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsMeansGroupSequential <- function(...,
+.getAnalysisResultsMeansGroupSequential <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -125,10 +127,12 @@ NULL
         .assertIsSingleNumber(assumedStDev, "assumedStDev", naAllowed = TRUE)
         if (!is.na(assumedStDev)) {
             if (!identical(assumedStDev, stDevH1)) {
-                stop(
-                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                    "either 'assumedStDev' or 'stDevH1' must be defined",
-                    call. = FALSE
+                stopConflictingArguments("either 'assumedStDev' or 'stDevH1' must be defined",
+                    functionName = ".getAnalysisResultsMeansGroupSequential",
+                    parameter = "assumedStDev",
+                    value = assumedStDev,
+                    relatedParameter = "stDevH1",
+                    relatedValue = stDevH1
                 )
             }
         }
@@ -154,7 +158,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsMeansFisher <- function(...,
+.getAnalysisResultsMeansFisher <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -214,7 +219,8 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsMeansAll <- function(...,
+.getAnalysisResultsMeansAll <- function(
+        ...,
         results,
         design,
         dataInput,
@@ -400,7 +406,8 @@ NULL
     return(results)
 }
 
-.getStageResultsMeans <- function(...,
+.getStageResultsMeans <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = NA_real_,
@@ -717,7 +724,8 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getRootThetaMeans <- function(...,
+.getRootThetaMeans <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -755,7 +763,8 @@ NULL
     return(result)
 }
 
-.getUpperLowerThetaMeans <- function(...,
+.getUpperLowerThetaMeans <- function(
+        ...,
         design,
         dataInput,
         theta,
@@ -803,27 +812,18 @@ NULL
 
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                sprintf(
-                    paste0(
-                        "failed to find theta (k = %s, firstValue = %s, ",
-                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
-                    ),
-                    stage,
-                    stageResults[[firstParameterName]][stage],
-                    secondValue,
-                    firstValue,
-                    theta
-                )
-            )
+            stopRuntimeIssue(sprintf(
+                paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                stage, stageResults[[firstParameterName]][stage], secondValue, firstValue, theta
+            ), functionName = ".getUpperLowerThetaMeans")
         }
     }
 
     return(theta)
 }
 
-.getRepeatedConfidenceIntervalsMeansAll <- function(...,
+.getRepeatedConfidenceIntervalsMeansAll <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -984,7 +984,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMeansGroupSequential <- function(...,
+.getRepeatedConfidenceIntervalsMeansGroupSequential <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1020,7 +1021,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMeansInverseNormal <- function(...,
+.getRepeatedConfidenceIntervalsMeansInverseNormal <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1056,7 +1058,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMeansFisher <- function(...,
+.getRepeatedConfidenceIntervalsMeansFisher <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1092,7 +1095,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansGroupSequential <- function(...,
+.getConditionalPowerMeansGroupSequential <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -1232,7 +1236,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansInverseNormal <- function(...,
+.getConditionalPowerMeansInverseNormal <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -1367,7 +1372,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansFisher <- function(...,
+.getConditionalPowerMeansFisher <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -1470,7 +1476,8 @@ NULL
     ))
 }
 
-.getConditionalPowerMeans <- function(...,
+.getConditionalPowerMeans <- function(
+        ...,
         stageResults,
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -1560,7 +1567,8 @@ NULL
     return(results)
 }
 
-.getConditionalPowerPlotMeans <- function(...,
+.getConditionalPowerPlotMeans <- function(
+        ...,
         stageResults,
         stage,
         nPlanned,
@@ -1688,7 +1696,8 @@ NULL
     ))
 }
 
-.getFinalConfidenceIntervalMeansValues <- function(design,
+.getFinalConfidenceIntervalMeansValues <- function(
+        design,
         dataInput,
         stageResults,
         directionUpper,
@@ -1872,7 +1881,8 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalMeansGroupSequential <- function(...,
+.getFinalConfidenceIntervalMeansGroupSequential <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -1924,7 +1934,8 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalMeansInverseNormal <- function(...,
+.getFinalConfidenceIntervalMeansInverseNormal <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -1969,7 +1980,8 @@ NULL
     ))
 }
 
-.getQFunctionResultBasedOnDataInput <- function(...,
+.getQFunctionResultBasedOnDataInput <- function(
+        ...,
         design,
         dataInput,
         theta,
@@ -2015,7 +2027,8 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalMeansFisher <- function(...,
+.getFinalConfidenceIntervalMeansFisher <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -2219,7 +2232,8 @@ NULL
     }
 }
 
-.getFinalConfidenceIntervalMeans <- function(...,
+.getFinalConfidenceIntervalMeans <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = NA_real_,

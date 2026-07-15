@@ -648,6 +648,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                     std::sqrt(1.0 - informationAtInterim);
             } else {
                 NumericVector criticalValues = design["criticalValues"];
+                criticalValues = Rcpp::abs(criticalValues);
                 if (isDesignFisher) {
                     double product = 1.0;
                     for (int j = 0; j <= k; j++) {

@@ -1,52 +1,52 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.5.0.9310
-Date: 2026-07-06
+Version: 4.5.0.9311
+Date: 2026-07-15
 Authors@R: c(
 	person(
-		given = "Gernot", 
-		family = "Wassmer", 
-		email = "gernot.wassmer@rpact.com", 
-		comment = c(ORCID = "0000-0001-9397-1794"), 
+		given = "Gernot",
+		family = "Wassmer",
+		email = "gernot.wassmer@rpact.com",
+		comment = c(ORCID = "0000-0001-9397-1794"),
 		role = c("aut")
 	),
     person(
-    	given = "Friedrich", 
-    	family = "Pahlke", 
-    	email = "friedrich.pahlke@rpact.com",
-    	comment = c(ORCID = "0000-0003-2105-2582"), 
-    	role = c("aut", "cre")
+	given = "Friedrich",
+	family = "Pahlke",
+	email = "friedrich.pahlke@rpact.com",
+	comment = c(ORCID = "0000-0003-2105-2582"),
+	role = c("aut", "cre")
     ),
     person(
-    	given = "Till", 
-    	family = "Jensen", 
-    	email = "till.jensen@rpact.com",
-    	role = c("ctb")
+	given = "Till",
+	family = "Jensen",
+	email = "till.jensen@rpact.com",
+	role = c("ctb")
 	),
     person(
-    	given = "Daniel", 
-    	family = "Sabanes Bove", 
-    	email = "daniel.sabanes_bove@rpact.com",
-        comment = c(ORCID = "0000-0002-0176-9239"), 
-    	role = c("ctb")
+	given = "Daniel",
+	family = "Sabanes Bove",
+	email = "daniel.sabanes_bove@rpact.com",
+        comment = c(ORCID = "0000-0002-0176-9239"),
+	role = c("ctb")
 	),
     person(
-    	given = "Stephen", 
-    	family = "Schueuerhuis", 
-    	email = "stephen.schueuerhuis@charite.de",
-        comment = c(ORCID = "0009-0006-3124-6056"), 
-    	role = c("ctb")
+	given = "Stephen",
+	family = "Schueuerhuis",
+	email = "stephen.schueuerhuis@charite.de",
+        comment = c(ORCID = "0009-0006-3124-6056"),
+	role = c("ctb")
 	),
     person(
-    	given = "Tobias", 
-    	family = "Muetze", 
-    	email = "tobias.muetze@novartis.com",
-    	comment = c(ORCID = "0000-0002-4111-1941"), 
-    	role = c("ctb")
+	given = "Tobias",
+	family = "Muetze",
+	email = "tobias.muetze@novartis.com",
+	comment = c(ORCID = "0000-0002-4111-1941"),
+	role = c("ctb")
 	),
     person(
-        "RPACT GmbH", 
-        role = c("cph", "fnd"), 
+        "RPACT GmbH",
+        role = c("cph", "fnd"),
         email = "info@rpact.com"
     ))
 Description: Design and analysis of confirmatory adaptive clinical trials with continuous, binary, and survival endpoints according to the methods described in the monograph by Wassmer and Brannath (2025) <doi:10.1007/978-3-031-89669-9>. This includes classical group sequential as well as multi-stage adaptive hypotheses tests that are based on the combination testing principle.
@@ -60,7 +60,7 @@ URL: https://www.rpact.org,
     https://rpact-cloud.share.connect.posit.cloud
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US
-Depends: 
+Depends:
 	R (>= 4.1.0)
 Imports:
 	methods,
@@ -70,11 +70,11 @@ Imports:
 	tools,
 	rlang,
     R6 (>= 2.5.1),
-	knitr (>= 1.19), 
+	knitr (>= 1.19),
 	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
-Suggests: 
-	ggplot2 (>= 3.5.0),	
+Suggests:
+	ggplot2 (>= 3.5.0),
 	testthat (>= 3.0.0),
 	rmarkdown (>= 1.10),
     rappdirs (>= 0.3.3)
@@ -83,7 +83,7 @@ Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 Config/testthat/start-first: *analysis*
-Collate: 
+Collate:
     'RcppExports.R'
     'f_logger.R'
     'class_dictionary.R'
@@ -139,6 +139,7 @@ Collate:
     'f_design_plan_rates.R'
     'f_design_plan_survival.R'
     'f_design_plan_utilities.R'
+    'f_error_handling.R'
     'f_io_utilities.R'
     'f_quality_assurance.R'
     'f_simulation_base_means.R'

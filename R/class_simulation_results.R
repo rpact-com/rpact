@@ -122,7 +122,8 @@ SimulationResults <- R6::R6Class(
                 consoleOutputEnabled = TRUE
             )
         },
-        .show = function(...,
+        .show = function(
+                ...,
                 showType = 1,
                 digits = NA_integer_,
                 showStatistics = FALSE,
@@ -141,12 +142,8 @@ SimulationResults <- R6::R6Class(
                 super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             } else {
                 if (is.null(showStatistics) || length(showStatistics) != 1) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'showStatistics' (",
-                        .arrayToString(showStatistics),
-                        ") must be a single logical or character",
-                        call. = FALSE
+                    stopIllegalArgument("'showStatistics' (", .arrayToString(showStatistics), ") must be a single logical or character",
+                        functionName = ".show", parameter = "showStatistics", value = showStatistics
                     )
                 }
 
@@ -463,7 +460,8 @@ SimulationResults <- R6::R6Class(
             variedParameterName <- sub("Max$", "_max", variedParameterName)
             return(paste0(", ", variedParameterName, " = ", round(parameterValue[1], 4)))
         },
-        .catStatisticsLine = function(...,
+        .catStatisticsLine = function(
+                ...,
                 stage,
                 parameterName,
                 paramCaption,
@@ -625,7 +623,7 @@ SimulationResults <- R6::R6Class(
                 "successPerStage",
                 "selectedArms",
                 "selectedPopulations",
-                "numberOfActiveArms",
+                "numberOfSelectedArms",
                 "numberOfPopulations",
                 "singleEventsPerStage",
                 "singleEventsPerArmAndStage",
@@ -797,7 +795,7 @@ SimulationResultsMeans <- R6::R6Class(
 #' @template field_maxNumberOfSubjectsPerStage
 #' @template field_minNumberOfSubjectsPerStage
 #' @template field_muMaxVector
-#' @template field_numberOfActiveArms
+#' @template field_numberOfSelectedArms
 #' @template field_plannedSubjects
 #' @template field_rejectAtLeastOne
 #' @template field_rejectedArmsPerStage
@@ -845,7 +843,8 @@ SimulationResultsMultiArmMeans <- R6::R6Class(
         gED50 = NULL,
         intersectionTest = NULL,
         muMaxVector = NULL,
-        numberOfActiveArms = NULL,
+        numberOfActiveArms = NULL, # deprecated, use numberOfSelectedArms instead
+        numberOfSelectedArms = NULL,
         rejectAtLeastOne = NULL,
         rejectedArmsPerStage = NULL,
         rValue = NULL,
@@ -864,7 +863,7 @@ SimulationResultsMultiArmMeans <- R6::R6Class(
             for (generatedParam in c(
                 "rejectAtLeastOne",
                 "selectedArms",
-                "numberOfActiveArms",
+                "numberOfSelectedArms",
                 "rejectedArmsPerStage",
                 "successPerStage"
             )) {
@@ -1034,7 +1033,7 @@ SimulationResultsRates <- R6::R6Class(
 #' @template field_iterations
 #' @template field_maxNumberOfIterations
 #' @template field_maxNumberOfSubjects
-#' @template field_numberOfActiveArms
+#' @template field_numberOfSelectedArms
 #' @template field_piControl
 #' @template field_piControlH1
 #' @template field_piH1
@@ -1083,7 +1082,8 @@ SimulationResultsMultiArmRates <- R6::R6Class(
         epsilonValue = NULL,
         gED50 = NULL,
         intersectionTest = NULL,
-        numberOfActiveArms = NULL,
+        numberOfActiveArms = NULL, # deprecated, use numberOfSelectedArms instead
+        numberOfSelectedArms = NULL,
         piControl = NULL,
         piControlH1 = NULL,
         piMaxVector = NULL,
@@ -1106,7 +1106,7 @@ SimulationResultsMultiArmRates <- R6::R6Class(
             for (generatedParam in c(
                 "rejectAtLeastOne",
                 "selectedArms",
-                "numberOfActiveArms",
+                "numberOfSelectedArms",
                 "rejectedArmsPerStage",
                 "successPerStage"
             )) {
@@ -1358,7 +1358,7 @@ SimulationResultsSurvival <- R6::R6Class(
 #' @template field_maxNumberOfIterations
 #' @template field_maxNumberOfSubjects
 #' @template field_minNumberOfEventsPerStage
-#' @template field_numberOfActiveArms
+#' @template field_numberOfSelectedArms
 #' @template field_omegaMaxVector
 #' @template field_plannedEvents
 #' @template field_rejectAtLeastOne
@@ -1395,6 +1395,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
     "SimulationResultsMultiArmSurvival",
     inherit = SimulationResultsBaseSurvival,
     public = list(
+        .accrualTime = NULL,
         accrualIntensity = NULL,
         accrualTime = NULL,
         activeArms = NULL,
@@ -1419,7 +1420,8 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         intersectionTest = NULL,
         kappa = NULL,
         maxNumberOfSubjects = NULL,
-        numberOfActiveArms = NULL,
+        numberOfActiveArms = NULL, # deprecated, use numberOfSelectedArms instead
+        numberOfSelectedArms = NULL,
         numberOfSubjects = NULL,
         omegaMaxVector = NULL,
         piControl = NULL,
@@ -1445,7 +1447,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
                 "eventsNotAchieved",
                 "rejectAtLeastOne",
                 "selectedArms",
-                "numberOfActiveArms",
+                "numberOfSelectedArms",
                 "rejectedArmsPerStage",
                 "studyDuration",
                 "successPerStage"

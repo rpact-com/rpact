@@ -142,7 +142,8 @@ NULL
 #'
 #' @noRd
 #'
-.findObservationTime <- function(survivalDataSet,
+.findObservationTime <- function(
+        survivalDataSet,
         requiredStageEvents) {
     numberOfSubjects <- length(survivalDataSet$accrualTime)
     upperBound <- 1
@@ -213,7 +214,8 @@ NULL
     treatments[1:maxNumberOfSubjects]
 }
 
-.updateTreatmentsVector <- function(k,
+.updateTreatmentsVector <- function(
+        k,
         gMax,
         maxNumberOfSubjects,
         numberOfSubjects,
@@ -244,7 +246,8 @@ NULL
 #'
 #' @noRd
 #'
-.getSimulatedStageResultsSurvivalMultiArmPatientWise <- function(...,
+.getSimulatedStageResultsSurvivalMultiArmPatientWise <- function(
+        ...,
         design,
         directionUpper,
         omegaVector,
@@ -512,11 +515,11 @@ NULL
                 if (is.na(thetaH1)) {
                     estimatedTheta <- min(overallEffects[, k], na.rm = TRUE)
                 }
-                
+
                 if (!directionUpper) {
                     estimatedTheta <- 1 / estimatedTheta
                 }
-                
+
                 conditionalCriticalValuePerStage <- conditionalCriticalValue
                 if (calcEventsFunctionIsUserDefined) {
                     conditionalCriticalValuePerStage <- conditionalCriticalValue[k]
@@ -541,12 +544,8 @@ NULL
                 )
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcEventsFunction' returned an illegal or undefined result (",
-                        newEvents,
-                        "); ",
-                        "the output must be a single numeric value"
+                    stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
+                        functionName = ".getSimulatedStageResultsSurvivalMultiArmPatientWise", parameter = "calcEventsFunction", value = calcEventsFunction
                     )
                 }
 
@@ -598,7 +597,8 @@ NULL
     ))
 }
 
-.performSimulationMultiArmSurvivalLoop <- function(cols,
+.performSimulationMultiArmSurvivalLoop <- function(
+        cols,
         maxNumberOfIterations,
         design,
         directionUpper,

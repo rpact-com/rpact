@@ -73,7 +73,8 @@ TrialDesign <- R6::R6Class("TrialDesign",
         bindingFutility = NULL,
         directionUpper = NULL,
         tolerance = NULL,
-        initialize = function(...,
+        initialize = function(
+                ...,
                 kMax = NA_integer_,
                 alpha = NA_real_,
                 informationRates = NA_real_,
@@ -83,8 +84,7 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 alphaSpent = NA_real_,
                 bindingFutility = NA,
                 directionUpper = NA,
-                tolerance = 1e-06 # C_ANALYSIS_TOLERANCE_DEFAULT
-                ) {
+                tolerance = 1e-06) {
             self$kMax <- kMax
             self$alpha <- alpha
             self$informationRates <- informationRates
@@ -122,9 +122,15 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                self$.showParametersOfOneGroup(self$.getDerivedParameters(), "Derived from user defined parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                )
+                derivedParameters <- self$.getDerivedParameters()
+                if (length(derivedParameters) > 0) {
+                    self$.showParametersOfOneGroup(
+                        derivedParameters,
+                        "Derived from user defined parameters",
+                        orderByParameterName = FALSE,
+                        consoleOutputEnabled = consoleOutputEnabled
+                    )
+                }
                 self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
@@ -346,8 +352,13 @@ print.TrialDesignCharacteristics <- function(x, ..., markdown = NA, showDesign =
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
+as.data.frame.TrialDesignCharacteristics <- function(
+        x,
+        row.names = NULL,
+        optional = FALSE,
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE,
+        ...) {
     if (x$.design$kMax > 1) {
         parameterNamesToBeExcluded <- c("nFixed", "shift")
     } else {
@@ -362,34 +373,34 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
     ))
 }
 
- #' @name TrialDesignFixed
- #'
- #' @title
- #' Fixed Design
- #'
- #' @description
- #' Trial design for fixed (single-stage) trials.
- #'
- #' @template field_kMax
- #' @template field_alpha
- #' @template field_stages
- #' @template field_tolerance
- #' @template field_sided
- #' @template field_twoSidedPower
- #'
- #' @details
- #' This object should not be created directly; use \code{\link[=getDesignFixed]{getDesignFixed()}}
- #' with suitable arguments to create a fixed design.
- #'
- #' @seealso \code{\link[=getDesignFixed]{getDesignFixed()}} for creating a fixed design.
- #'
- #' @include class_core_parameter_set.R
- #' @include class_core_plot_settings.R
- #' @include f_core_constants.R
- #'
- #' @keywords internal
- #'
- #' @importFrom methods new
+#' @name TrialDesignFixed
+#'
+#' @title
+#' Fixed Design
+#'
+#' @description
+#' Trial design for fixed (single-stage) trials.
+#'
+#' @template field_kMax
+#' @template field_alpha
+#' @template field_stages
+#' @template field_tolerance
+#' @template field_sided
+#' @template field_twoSidedPower
+#'
+#' @details
+#' This object should not be created directly; use \code{\link[=getDesignFixed]{getDesignFixed()}}
+#' with suitable arguments to create a fixed design.
+#'
+#' @seealso \code{\link[=getDesignFixed]{getDesignFixed()}} for creating a fixed design.
+#'
+#' @include class_core_parameter_set.R
+#' @include class_core_plot_settings.R
+#' @include f_core_constants.R
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
 TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
     inherit = TrialDesign,
     public = list(
@@ -411,7 +422,7 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
             super$initialize(...) # important: don't move to first line of constructor
             self$informationRates <- 1
             self$futilityBounds <- numeric(0)
-            
+
             self$.initParameterTypes()
             self$.initStages()
             self$.setParameterType("power", C_PARAM_NOT_APPLICABLE)
@@ -510,7 +521,8 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
         simAlpha = NULL,
         iterations = NULL,
         seed = NULL,
-        initialize = function(...,
+        initialize = function(
+                ...,
                 method = NA_character_,
                 alpha0Vec = NA_real_,
                 scale = NA_real_,
@@ -689,7 +701,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
         delayedInformation = NULL,
         decisionCriticalValues = NULL,
         reversalProbabilities = NULL,
-        initialize = function(...,
+        initialize = function(
+                ...,
                 beta = C_BETA_DEFAULT,
                 betaSpent = NA_real_,
                 sided = C_SIDED_DEFAULT,
@@ -1080,7 +1093,8 @@ TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
         informationAtInterim = NULL,
         secondStageConditioning = NULL,
         sided = NULL,
-        initialize = function(...,
+        initialize = function(
+                ...,
                 informationAtInterim = NULL,
                 secondStageConditioning = NULL,
                 directionUpper = NA) {
@@ -1158,7 +1172,8 @@ TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
 #'
 #' @export
 #'
-getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
+getDesignConditionalDunnett <- function(
+        alpha = 0.025,
         informationAtInterim = 0.5,
         ...,
         secondStageConditioning = TRUE,
@@ -1279,22 +1294,22 @@ plot.TrialDesign <- function(
             "showFutilityBounds", "showAlphaSpent", "showBetaSpent"
         ), ...
     )
-    
+
     availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
     if (length(availablePlotTypes) == 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "no plot type available for the specified design")
+        stopIllegalArgument("no plot type available for the specified design", functionName = "plot.TrialDesign")
     }
     if (is.na(type)) {
         type <- availablePlotTypes[1]
     }
     if (!(type %in% availablePlotTypes)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-            ") is not available; 'type' can ", ifelse(length(availablePlotTypes) == 1, "only ", ""),
-            "be ", .arrayToString(availablePlotTypes, mode = "or")
+        stopIllegalArgument("'type' (", type, ") is not available; 'type' can ", ifelse(length(availablePlotTypes) ==
+            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"),
+        functionName = "plot.TrialDesign",
+        parameter = "type", value = type
         )
     }
-    
+
     .showWarningIfPlotArgumentWillBeIgnored(type, ..., obj = x)
 
     args <- list(
@@ -1332,7 +1347,8 @@ plot.TrialDesign <- function(
     return(do.call(.plot.TrialDesign, args))
 }
 
-.plot.TrialDesign <- function(x,
+.plot.TrialDesign <- function(
+        x,
         y,
         ...,
         main = NA_character_,
@@ -1423,7 +1439,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
     plot(x = x$.design, y = y, ...)
 }
 
-.plotTrialDesign <- function(...,
+.plotTrialDesign <- function(
+        ...,
         x,
         y,
         main,
@@ -1442,10 +1459,9 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
 
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
     if (any(.isTrialDesignFisher(x)) && !(type %in% c(1, 3, 4))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4",
-            call. = FALSE
+        stopIllegalArgument("'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4",
+            functionName = ".plotTrialDesign",
+            parameter = "type", value = type
         )
     }
 
@@ -1461,17 +1477,14 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
         variedParameters <- args[["variedParameters"]]
         if (is.null(variedParameters)) {
             if (!.isTrialDesignFixed(x) &&
-                    !.isTrialDesignFixed(y) && 
+                    !.isTrialDesignFixed(y) &&
                     .isTrialDesignInverseNormalOrGroupSequential(x) &&
                     .isTrialDesignInverseNormalOrGroupSequential(y) &&
                     x$typeOfDesign != y$typeOfDesign) {
                 variedParameters <- "typeOfDesign"
             } else {
-                stop(
-                    C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                    "'variedParameters' needs to be specified, ",
-                    "e.g., variedParameters = \"typeOfDesign\"",
-                    call. = FALSE
+                stopMissingArgument("'variedParameters' needs to be specified, ", "e.g., variedParameters = \"typeOfDesign\"",
+                    functionName = ".plotTrialDesign", parameter = "variedParameters"
                 )
             }
         }
@@ -1528,9 +1541,13 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesign <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE,
-        includeAllParameters = FALSE, ...) {
+as.data.frame.TrialDesign <- function(
+        x,
+        row.names = NULL,
+        optional = FALSE,
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE,
+        ...) {
     .assertIsTrialDesign(x)
 
     if (includeAllParameters) {

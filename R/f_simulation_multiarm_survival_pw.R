@@ -165,7 +165,7 @@ getSimulationMultiArmSurvival <- function(
         selectArmsFunction = NULL,
         showStatistics = FALSE) {
     simulationType <- match.arg(simulationType)
-    
+
     callArgs <- names(as.list(match.call(expand.dots = FALSE)))
     hasArg <- function(x) x %in% callArgs
 
@@ -182,8 +182,9 @@ getSimulationMultiArmSurvival <- function(
 
     if (simulationType == "auto") {
         if (usesBasicOnlyArgs && usesPatientWiseOnlyArgs) {
-            stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                "arguments from both 'testStatisticBased' and 'patientWise' simulation types were specified")
+            stopConflictingArguments("arguments from both 'testStatisticBased' and 'patientWise' simulation types were specified",
+                functionName = "getSimulationMultiArmSurvival", parameter = "testStatisticBased", relatedParameter = "patientWise"
+            )
         }
         if (usesBasicOnlyArgs) {
             simulationType <- "testStatisticBased"
@@ -193,17 +194,19 @@ getSimulationMultiArmSurvival <- function(
             simulationType <- "testStatisticBased"
         }
     }
-    
+
     if (simulationType == "testStatisticBased") {
         if (usesPatientWiseOnlyArgs) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"")
+            stopIllegalArgument("patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"",
+                functionName = "getSimulationMultiArmSurvival", parameter = "simulationType", value = simulationType
+            )
         }
-        
-        message("Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed log-rank test statistics instead of patient-wise survival data. ",
+
+        message(
+            "Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed log-rank test statistics instead of patient-wise survival data. ",
             "To simulate patient-wise survival data, specify 'simulationType' = \"patientWise\" and the corresponding arguments."
         )
-        
+
         return(getSimulationMultiArmSurvivalBasic(
             design = design,
             ...,
@@ -240,8 +243,10 @@ getSimulationMultiArmSurvival <- function(
 
     if (simulationType %in% c("patientWise", "patientWiseBasic")) {
         if (usesBasicOnlyArgs) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-                "'correlationComputation' cannot be specified if 'simulationType' = \"patientWise\" or \"patientWiseBasic\"")
+            stopIllegalArgument("'correlationComputation' cannot be specified if 'simulationType' = \"patientWise\" or \"patientWiseBasic\"",
+                functionName = "getSimulationMultiArmSurvival", parameter = "correlationComputation", relatedParameter = "simulationType",
+                value = correlationComputation
+            )
         }
         return(getSimulationMultiArmSurvivalPatientWise(
             design = design,
@@ -378,29 +383,43 @@ getSimulationMultiArmSurvival <- function(
 getSimulationMultiArmSurvivalPatientWise <- function(
         design = NULL,
         ...,
-        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
+        activeArms = NA_integer_,
+        # C_ACTIVE_ARMS_DEFAULT = 3L
         piControl = NA_real_,
         effectMatrix = NULL,
-        typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+        # C_TYPE_OF_SHAPE_DEFAULT
+        omegaMaxVector = seq(1, 2.6, 0.4),
+        # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         kappa = 1,
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
-        accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
-        accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
+        eventTime = 12,
+        # C_EVENT_TIME_DEFAULT
+        accrualTime = c(0, 12),
+        # C_ACCRUAL_TIME_DEFAULT
+        accrualIntensity = 0.1,
+        # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),
-        dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
+        dropoutRate1 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutRate2 = 0,
+        # C_DROP_OUT_RATE_DEFAULT
+        dropoutTime = 12,
+        # C_DROP_OUT_TIME_DEFAULT
         maxNumberOfSubjects = NA_real_,
-        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
+        # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -410,15 +429,15 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
         showStatistics = FALSE,
-        cppEnabled = TRUE
-        ) {
+        cppEnabled = TRUE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMultiArmSurvival",
             ignore = c(
@@ -450,11 +469,13 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     )
 
     if (isFALSE(cppEnabled)) {
-        message("Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise survival data using R code instead of C++ code. ",
+        message(
+            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise survival data using R code instead of C++ code. ",
             "This approach is less efficient and should only be used for testing purposes. ",
-            "To perform a more efficient patient-wise simulation, specify 'simulationType' = \"patientWise\".")
+            "To perform a more efficient patient-wise simulation, specify 'simulationType' = \"patientWise\"."
+        )
     }
-    
+
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
     directionUpper <- .assertIsValidDirectionUpper(
@@ -465,12 +486,9 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     )
 
     if (length(allocationRatioPlanned) != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'allocationRatioPlanned' (",
-            .arrayToString(allocationRatioPlanned),
-            ") ",
-            "must have length 1"
+        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
+            functionName = "getSimulationMultiArmSurvivalPatientWise", parameter = "allocationRatioPlanned",
+            value = allocationRatioPlanned
         )
     }
 
@@ -556,21 +574,26 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     )
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (accrualIntensity < 1L) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'"
+            stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
+                functionName = "getSimulationMultiArmSurvivalPatientWise",
+                parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'maxNumberOfSubjects' must be defined"
+        stopIllegalArgument("'maxNumberOfSubjects' must be defined",
+            functionName = "getSimulationMultiArmSurvivalPatientWise", parameter = "maxNumberOfSubjects",
+            value = maxNumberOfSubjects
         )
     }
+    simulationResults$.accrualTime <- accrualSetup
+
     simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
+    simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
+
     allocationFraction <- .getFraction(allocationRatioPlanned)
     .warnInCaseOfExtremeAllocationRatios(allocationFraction[1], allocationFraction[2])
 
-    simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
+    simulationResults$accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
+    simulationResults$.setParameterType("accrualTime", accrualSetup$.getParameterType("accrualTime"))
 
     accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
     recruitmentTimes <- .generateRecruitmentTimes(
@@ -592,7 +615,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         } else if (.isTrialDesignConditionalDunnett(design)) {
             numeric(0) # not used
         }
-    
+
         .performSimulationMultiArmSurvivalLoopCpp(
             cols = cols,
             maxNumberOfIterations = maxNumberOfIterations,
@@ -691,14 +714,30 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     expectedStudyDuration <- loopResult$expectedStudyDuration
     iterations <- loopResult$iterations
 
-    simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms
+    simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms
+    .addDeprecatedFieldValues(
+        simulationResults, "numberOfActiveArms",
+        simulationResults$numberOfSelectedArms, "2026-07-13"
+    )
+    simulationResults$.setParameterType(
+        "numberOfSelectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
+    
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$analysisTime <- simulatedAnalysisTime
     simulationResults$eventsNotAchieved <- simulatedNumberEventsNotAchieved / maxNumberOfIterations
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
+    simulationResults$.setParameterType(
+        "selectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
@@ -719,14 +758,6 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         simulationResults$.setParameterType("expectedNumberOfEvents", C_PARAM_GENERATED)
         simulationResults$.setParameterType("studyDuration", C_PARAM_GENERATED)
     }
-    simulationResults$.setParameterType(
-        "selectedArms",
-        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
-    )
-    simulationResults$.setParameterType(
-        "numberOfActiveArms",
-        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
-    )
     simulationResults$.setParameterType("numberOfSubjects", C_PARAM_GENERATED)
     simulationResults$.setParameterType("analysisTime", C_PARAM_GENERATED)
     simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
@@ -747,10 +778,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "internal error, simulation not possible due to numerical overflow"
-        )
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationMultiArmSurvivalPatientWise")
     }
 
     simulationResults$.data <- loopResult$data

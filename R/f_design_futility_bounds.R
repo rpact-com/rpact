@@ -27,7 +27,7 @@ NULL
             !all(is.na(information)) && length(information) > 0) {
         indices <- .getValidFutilityBoundVectorIndices(sourceScale, targetScale)
         if (length(information) > 1) {
-            .assertIsNumericVector(information, "information", naAllowed = TRUE, len = 2L)
+            information <- .assertIsNumericVector(information, "information", naAllowed = TRUE, len = 2L)
 
             information1 <- information[1]
             information2 <- information[2]
@@ -256,7 +256,7 @@ summary.FutilityBounds <- function(object, ...) {
 
     for (arg in args) {
         if (is(arg, "FutilityBounds")) {
-            .assertIsNumericVector(as.numeric(arg), "futilityBounds", naAllowed = TRUE)
+            arg <- .assertIsNumericVector(as.numeric(arg), "futilityBounds", naAllowed = TRUE)
             return(arg)
         }
     }
@@ -289,10 +289,11 @@ summary.FutilityBounds <- function(object, ...) {
     if (!all(is.na(futilityBoundsFromArgs))) {
         if (is(futilityBoundsFromArgs, "FutilityBounds") &&
                 !identical(attr(futilityBoundsFromArgs, "targetScale")$value, targetScale)) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'", futilityBoundsName, "' (", .arrayToString(futilityBoundsFromArgs), ") ",
-                "must be on '", targetScale, "' scale or converted to '", targetScale, "' scale",
-                call. = FALSE
+            stopIllegalArgument("'", futilityBoundsName, "' (", .arrayToString(futilityBoundsFromArgs), ") ", "must be on '",
+                targetScale, "' scale or converted to '", targetScale, "' scale",
+                functionName = ".getFutilityBoundsFromArgs",
+                parameter = futilityBoundsName, value = futilityBoundsFromArgs, relatedParameter = futilityBoundsScaleName,
+                relatedValue = targetScale
             )
         }
 
@@ -307,7 +308,7 @@ summary.FutilityBounds <- function(object, ...) {
             )
         }
     } else {
-        .assertIsNumericVector(futilityBounds, futilityBoundsName, naAllowed = TRUE)
+        futilityBounds <- .assertIsNumericVector(futilityBounds, futilityBoundsName, naAllowed = TRUE)
         if (futilityBoundsScale != targetScale) {
             if (!all(is.na(futilityBounds))) {
                 futilityBounds <- getFutilityBounds(
@@ -335,11 +336,10 @@ summary.FutilityBounds <- function(object, ...) {
     }
 
     msg <- paste0(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale),
         " is available only for one-sided two-stage designs; invalid user input: "
     )
-    
+
     invalidInputs <- character()
     if (design$sided != 1) {
         invalidInputs <- c(invalidInputs, paste0("sided = ", design$sided))
@@ -347,7 +347,14 @@ summary.FutilityBounds <- function(object, ...) {
     if (design$kMax != 2) {
         invalidInputs <- c(invalidInputs, paste0("kMax = ", design$kMax))
     }
-    stop(msg, paste(invalidInputs, collapse = ", "), call. = FALSE)
+    stopIllegalArgument(msg, paste(invalidInputs, collapse = ", "),
+        parameter = c("sided", "kMax"), value = list(
+            sided = design$sided,
+            kMax = design$kMax
+        ),
+        constraint = "one-sided two-stage design",
+        functionName = ".assertIsValidDesignForFutilityBoundsConversion"
+    )
 }
 
 .futilityBoundsCalculationRequiresDesign <- function(scale) {
@@ -432,7 +439,8 @@ summary.FutilityBounds <- function(object, ...) {
 #'
 #' @export
 #'
-getFutilityBounds <- function(sourceValue,
+getFutilityBounds <- function(
+        sourceValue,
         ...,
         sourceScale = c(
             "zValue",
@@ -467,7 +475,7 @@ getFutilityBounds <- function(sourceValue,
         ...
     )
 
-    .assertIsNumericVector(sourceValue, "sourceValue", naAllowed = naAllowed)
+    sourceValue <- .assertIsNumericVector(sourceValue, "sourceValue", naAllowed = naAllowed)
     if (is(sourceValue, "FutilityBounds")) {
         sourceValue <- as.numeric(sourceValue)
     }
@@ -651,14 +659,14 @@ getFutilityBounds <- function(sourceValue,
         return(.addFutilityBoundParameterTypes(result, args))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "conversion from '", sourceScale, "' to '", targetScale, "' not implemented",
-        call. = FALSE
+    stopIllegalArgument("conversion from '", sourceScale, "' to '", targetScale, "' not implemented",
+        functionName = "getFutilityBounds",
+        parameter = "sourceScale", value = sourceScale, relatedParameter = "targetScale", relatedValue = targetScale
     )
 }
 
-.getFutilityBoundSourceValueFisher <- function(sourceValue,
+.getFutilityBoundSourceValueFisher <- function(
+        sourceValue,
         criticalValue,
         gsWeights,
         sourceScale,
@@ -718,7 +726,8 @@ getFutilityBounds <- function(sourceValue,
     return(NA_real_)
 }
 
-.getFutilityBoundSourceValuesFisher <- function(sourceValues,
+.getFutilityBoundSourceValuesFisher <- function(
+        sourceValues,
         criticalValue,
         gsWeights,
         sourceScale,
@@ -740,7 +749,8 @@ getFutilityBounds <- function(sourceValue,
     return(sourceValuesCalculated)
 }
 
-.getFutilityBoundGroupSequential <- function(sourceValues,
+.getFutilityBoundGroupSequential <- function(
+        sourceValues,
         criticalValue,
         gsWeights,
         targetScale,
@@ -776,7 +786,8 @@ getFutilityBounds <- function(sourceValue,
     return(result)
 }
 
-.getFutilityBoundFisher <- function(sourceValue,
+.getFutilityBoundFisher <- function(
+        sourceValue,
         criticalValue,
         gsWeights,
         targetScale,
@@ -814,4 +825,261 @@ getFutilityBounds <- function(sourceValue,
     }
 
     return(NA_real_)
+}
+
+#'
+#' @title
+#' Get Fisher Information From a Design Plan
+#'
+#' @description
+#' Calculates the Fisher information at the first planned analysis stage for
+#' a design plan for means, rates, or survival endpoints.
+#'
+#' @param designPlan A trial design plan object as returned by functions such as
+#' \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}},
+#' \code{\link[=getPowerMeans]{getPowerMeans()}},
+#' \code{\link[=getSampleSizeRates]{getSampleSizeRates()}},
+#' \code{\link[=getPowerRates]{getPowerRates()}},
+#' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}, or
+#' \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
+#'
+#' @details
+#' The returned information is the information used at the first stage of the
+#' design plan. For group sequential designs, information at later stages can be
+#' obtained by multiplying this value by the ratio of the corresponding
+#' information rate to the first information rate.
+#'
+#' For means, the information is based on the planned sample size, standard
+#' deviations, allocation ratio, and, if applicable, the mean-ratio null value.
+#' For rates, it is based on the planned sample size and the binomial variance
+#' under the corresponding planning assumptions. For survival endpoints, it is
+#' based on the planned number of events and the allocation ratio.
+#'
+#' @return
+#' A numeric value or numeric vector containing the first-stage Fisher
+#' information. A vector is returned if the design plan contains several
+#' planning alternatives or sample size values. \code{NA_real_} is returned if
+#' the endpoint type is not supported by this helper.
+#'
+#' @examples
+#' \dontrun{
+#' designPlan <- getSampleSizeMeans(alternative = 0.4)
+#' getFisherInformation(designPlan)
+#'
+#' design <- getDesignGroupSequential(kMax = 3)
+#' designPlan <- getPowerMeans(design,
+#'     alternative = c(0.3, 0.4), maxNumberOfSubjects = 100
+#' )
+#' getFisherInformation(designPlan)
+#' }
+#'
+#' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}}
+#'
+#' @export
+getFisherInformation <- function(designPlan) {
+    fisherInformation <- NA_real_
+    if (.isTrialDesignPlanMeans(designPlan)) {
+        if (designPlan$.isSampleSizeObject()) {
+            numberOfSubjects <- designPlan$numberOfSubjects[1, ]
+        } else {
+            numberOfSubjects <- designPlan$maxNumberOfSubjects * designPlan$.design$informationRates[1]
+        }
+        stDev <- designPlan$stDev
+        if (length(stDev) == 1 && designPlan$groups == 2) {
+            stDev <- rep(stDev, 2)
+        }
+        if (designPlan$groups == 1) {
+            fisherInformation <- numberOfSubjects / stDev[1]^2
+        } else {
+            allocationRatio <- designPlan$allocationRatioPlanned[1]
+            if (designPlan$meanRatio) {
+                fisherInformation <- allocationRatio * numberOfSubjects /
+                    ((1 + allocationRatio) *
+                        (stDev[1]^2 + designPlan$thetaH0^2 * allocationRatio * stDev[2]^2))
+            } else {
+                fisherInformation <- allocationRatio * numberOfSubjects /
+                    ((1 + allocationRatio) *
+                        (stDev[1]^2 + allocationRatio * stDev[2]^2))
+            }
+        }
+    } else if (.isTrialDesignPlanRates(designPlan)) {
+        if (designPlan$.isSampleSizeObject()) {
+            n1 <- designPlan$numberOfSubjects[1, ]
+        } else {
+            n1 <- designPlan$maxNumberOfSubjects * designPlan$.design$informationRates[1]
+        }
+        if (designPlan$groups == 1) {
+            pi0 <- designPlan$thetaH0
+            fisherInformation <- n1 / (pi0 * (1 - pi0))
+        } else if (designPlan$groups == 2) {
+            pi1 <- designPlan$pi1
+            pi2 <- designPlan$pi2
+            allocationRatio <- designPlan$allocationRatioPlanned[1]
+            fisherInformation <- allocationRatio / (pi1 * (1 - pi1) + allocationRatio * pi2 * (1 - pi2)) * n1 / (1 + allocationRatio)
+        }
+    } else if (.isTrialDesignPlanSurvival(designPlan)) {
+        if (!is.null(designPlan$cumulativeEventsPerStage) && !all(is.na(designPlan$cumulativeEventsPerStage))) {
+            cumulativeEvents <- designPlan$cumulativeEventsPerStage[1, ]
+        } else if (designPlan$.isSampleSizeObject()) {
+            cumulativeEvents <- designPlan$eventsFixed * designPlan$.design$informationRates[1]
+        } else {
+            cumulativeEvents <- designPlan$maxNumberOfEvents * designPlan$.design$informationRates[1]
+        }
+        allocationRatio <- designPlan$allocationRatioPlanned[1]
+        fisherInformation <- allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents
+    }
+    return(fisherInformation)
+}
+
+.getFutilityBoundsTreatmentEffectScaleRatesTwoGroups <- function(designPlan, boundary, nStages) {
+    design <- designPlan$.design
+    maxNumberOfSubjects <- designPlan$maxNumberOfSubjects
+    allocationRatioPlanned <- designPlan$allocationRatioPlanned
+    nParameters <- length(maxNumberOfSubjects)
+
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, nParameters)
+    }
+
+    result <- matrix(NA_real_, nrow = nStages, ncol = nParameters)
+    if (nStages == 0 || !.hasApplicableFutilityBounds(design)) {
+        return(result)
+    }
+
+    futilityBounds <- .getFutilityBounds(design)
+    if (length(futilityBounds) == 0) {
+        return(result)
+    }
+    futilityBounds[.getInvalidFutilityBoundsIndices(design)] <- NA_real_
+    futilityBounds <- futilityBounds[seq_len(nStages)]
+
+    directionUpper <- .getDirectionUpper(designPlan, nParameters)
+    method <- ifelse(designPlan$riskRatio, "ratio", "diff")
+
+    for (index in seq_len(nParameters)) {
+        n1 <- allocationRatioPlanned[index] *
+            design$informationRates[seq_len(nStages)] *
+            maxNumberOfSubjects[index] /
+            (1 + allocationRatioPlanned[index])
+        n2 <- n1 / allocationRatioPlanned[index]
+
+        for (stage in seq_len(nStages)) {
+            if (is.na(futilityBounds[stage])) {
+                next
+            }
+
+            futilityBound <- futilityBounds[stage]
+            directionUpperBound <- directionUpper[index]
+            if (identical(boundary, "upper")) {
+                directionUpperBound <- TRUE
+            } else if (identical(boundary, "lower")) {
+                futilityBound <- -futilityBound
+                directionUpperBound <- TRUE
+            }
+
+            pi1Bound <- .getEffectScaleBoundaryDataRatesPi(
+                futilityBound,
+                designPlan$pi2,
+                designPlan$thetaH0,
+                n1[stage],
+                n2[stage],
+                allocationRatioPlanned[index],
+                directionUpperBound,
+                method
+            )
+            if (designPlan$riskRatio) {
+                result[stage, index] <- pi1Bound / designPlan$pi2
+            } else {
+                result[stage, index] <- pi1Bound - designPlan$pi2
+            }
+        }
+    }
+
+    if (designPlan$riskRatio) {
+        result[!is.na(result) & result <= 0] <- NA_real_
+    }
+
+    return(result)
+}
+
+.getFutilityBoundsTreatmentEffectScale <- function(designPlan, boundary = c("directed", "upper", "lower")) {
+    .assertIsTrialDesignPlan(designPlan)
+    boundary <- match.arg(boundary)
+
+    design <- designPlan$.design
+    nStages <- max(design$kMax - 1, 0)
+    if (.isTrialDesignPlanRates(designPlan) && designPlan$groups == 2) {
+        return(.getFutilityBoundsTreatmentEffectScaleRatesTwoGroups(designPlan, boundary, nStages))
+    }
+
+    fisherInformation <- getFisherInformation(designPlan)
+    nParameters <- max(length(fisherInformation), 1)
+
+    if (nStages == 0) {
+        return(matrix(numeric(0), nrow = 0, ncol = nParameters))
+    }
+
+    result <- matrix(NA_real_, nrow = nStages, ncol = nParameters)
+    if (!.hasApplicableFutilityBounds(design) || all(is.na(fisherInformation))) {
+        return(result)
+    }
+
+    futilityBounds <- .getFutilityBounds(design)
+    if (length(futilityBounds) == 0) {
+        return(result)
+    }
+    futilityBounds[.getInvalidFutilityBoundsIndices(design)] <- NA_real_
+    futilityBounds <- futilityBounds[seq_len(nStages)]
+
+    informationRates <- design$informationRates[seq_len(nStages)]
+    stageInformation <- (informationRates / design$informationRates[1]) %*% t(fisherInformation)
+    standardizedFutilityBounds <- matrix(futilityBounds, nrow = nStages, ncol = nParameters)
+    if (.isTrialDesignPlanMeans(designPlan) && !designPlan$normalApproximation) {
+        degreesOfFreedom <- pmax(
+            informationRates %*% t(designPlan$maxNumberOfSubjects) - designPlan$groups,
+            1e-04
+        )
+        standardizedFutilityBounds <- matrix(
+            stats::qt(stats::pnorm(futilityBounds), degreesOfFreedom),
+            nrow = nStages,
+            ncol = nParameters
+        )
+        standardizedFutilityBounds[abs(standardizedFutilityBounds) > 50] <- NA_real_
+    }
+    if (identical(boundary, "directed")) {
+        directionUpper <- .getDirectionUpper(designPlan, nParameters)
+        directionSign <- ifelse(directionUpper, 1, -1)
+    } else {
+        directionSign <- rep(ifelse(identical(boundary, "upper"), 1, -1), nParameters)
+    }
+
+    for (stage in seq_len(nStages)) {
+        for (index in seq_len(nParameters)) {
+            if (is.na(standardizedFutilityBounds[stage, index]) || is.na(stageInformation[stage, index])) {
+                next
+            }
+            effectEstimate <- as.numeric(getFutilityBounds(
+                sourceValue = standardizedFutilityBounds[stage, index],
+                sourceScale = "zValue",
+                targetScale = "effectEstimate",
+                information1 = stageInformation[stage, index],
+                naAllowed = TRUE
+            ))
+            if (.isTrialDesignPlanSurvival(designPlan)) {
+                result[stage, index] <- designPlan$thetaH0 * exp(directionSign[index] * effectEstimate)
+            } else {
+                result[stage, index] <- designPlan$thetaH0 + directionSign[index] * effectEstimate
+            }
+        }
+    }
+
+    if (.isTrialDesignPlanRates(designPlan) && designPlan$groups == 1) {
+        result[!is.na(result) & (result < 0 | result > 1)] <- NA_real_
+    }
+    if ((.isTrialDesignPlanMeans(designPlan) && designPlan$meanRatio) ||
+            (.isTrialDesignPlanRates(designPlan) && designPlan$riskRatio)) {
+        result[!is.na(result) & result <= 0] <- NA_real_
+    }
+
+    return(result)
 }

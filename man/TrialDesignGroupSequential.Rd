@@ -14,9 +14,9 @@ with suitable arguments to create a group sequential design.
 \section{Fields}{
 
 \describe{
-\item{\code{kMax}}{The maximum number of stages \code{K}. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{kMax}}{The maximum number of stages \code{K}. Is a single numeric value representing a  whole number.}
 
-\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a single numeric value between 0 and 1.}
 
 \item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
@@ -30,33 +30,33 @@ with suitable arguments to create a group sequential design.
 
 \item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a logical vector of length 1.}
+\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a single logical value.}
 
-\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
+\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a single numeric value.}
 
-\item{\code{typeOfDesign}}{The type of design. Is a character vector of length 1.}
+\item{\code{typeOfDesign}}{The type of design. Is a single character value.}
 
-\item{\code{beta}}{The Type II error rate necessary for providing sample size calculations  (e.g., in \code{getSampleSizeMeans}), beta spending function designs, or optimum designs, default is \code{0.20}. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{beta}}{The Type II error rate necessary for providing sample size calculations  (e.g., in \code{getSampleSizeMeans}), beta spending function designs, or optimum designs, default is \code{0.20}. Is a single numeric value between 0 and 1.}
 
-\item{\code{deltaWT}}{Delta for Wang & Tsiatis Delta class. Is a numeric vector of length 1.}
+\item{\code{deltaWT}}{Delta for Wang & Tsiatis Delta class. Is a single numeric value.}
 
-\item{\code{deltaPT1}}{Delta1 for Pampallona & Tsiatis class rejecting H0 boundaries. Is a numeric vector of length 1.}
+\item{\code{deltaPT1}}{Delta1 for Pampallona & Tsiatis class rejecting H0 boundaries. Is a single numeric value.}
 
-\item{\code{deltaPT0}}{Delta0 for Pampallona & Tsiatis class rejecting H1 (accepting H0) boundaries. Is a numeric vector of length 1.}
+\item{\code{deltaPT0}}{Delta0 for Pampallona & Tsiatis class rejecting H1 (accepting H0) boundaries. Is a single numeric value.}
 
 \item{\code{futilityBounds}}{The futility bounds for each stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{gammaA}}{The parameter for the alpha spending function. Is a numeric vector of length 1.}
+\item{\code{gammaA}}{The parameter for the alpha spending function. Is a single numeric value.}
 
-\item{\code{gammaB}}{The parameter for the beta spending function. Is a numeric vector of length 1.}
+\item{\code{gammaB}}{The parameter for the beta spending function. Is a single numeric value.}
 
 \item{\code{optimizationCriterion}}{The optimization criterion for optimum design within the Wang & Tsiatis class (\code{"ASNH1"}, \code{"ASNIFH1"}, \code{"ASNsum"}), default is \code{"ASNH1"}.}
 
-\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a numeric vector of length 1 containing a whole number.}
+\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a single numeric value representing a  whole number.}
 
 \item{\code{betaSpent}}{The cumulative beta level spent at each stage of the trial. Only applicable for beta-spending designs. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{typeBetaSpending}}{The type of beta spending. Is a character vector of length 1.}
+\item{\code{typeBetaSpending}}{The type of beta spending. Is a single character value.}
 
 \item{\code{userBetaSpending}}{The user defined beta spending. Contains the cumulative beta-spending up to each interim stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
@@ -66,11 +66,11 @@ with suitable arguments to create a group sequential design.
 
 \item{\code{power}}{The one-sided power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{twoSidedPower}}{Specifies if power is defined two-sided at each stage of the trial. Is a logical vector of length 1.}
+\item{\code{twoSidedPower}}{Specifies if power is defined two-sided at each stage of the trial. Is a single logical value.}
 
-\item{\code{constantBoundsHP}}{The constant bounds up to stage kMax - 1 for the Haybittle & Peto design (default is 3). Is a numeric vector of length 1.}
+\item{\code{constantBoundsHP}}{The constant bounds up to stage kMax - 1 for the Haybittle & Peto design (default is 3). Is a single numeric value.}
 
-\item{\code{betaAdjustment}}{If \code{TRUE}, beta spending values are linearly adjusted if an overlapping of decision regions for futility stopping at earlier stages occurs. Only applicable for two-sided beta-spending designs. Is a logical vector of length 1.}
+\item{\code{betaAdjustment}}{If \code{TRUE}, beta spending values are linearly adjusted if an overlapping of decision regions for futility stopping at earlier stages occurs. Only applicable for two-sided beta-spending designs. Is a single logical value.}
 
 \item{\code{delayedInformation}}{Delay of information for delayed response designs. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}
 

@@ -31,8 +31,7 @@ NULL
         overallRatesTreatment,
         overallRatesControl,
         minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage
-        ) {
+        maxNumberOfSubjectsPerStage) {
     stage <- stage - 1 # to be consistent with non-enrichment situation
     gMax <- nrow(overallRatesTreatment)
 
@@ -80,7 +79,8 @@ NULL
     return(newSubjects)
 }
 
-.getSimulatedStageRatesEnrichment <- function(...,
+.getSimulatedStageRatesEnrichment <- function(
+        ...,
         design,
         subsets,
         prevalences,
@@ -155,11 +155,9 @@ NULL
             any(round(subjectsPerStage[selsubs, k] * const / (1 + const)) < 1) ||
                 any(round(subjectsPerStage[selsubs, k] / (1 + const)) < 1)
             ) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "at least one sample size specification too small to create simulation results, ",
+            stopIllegalArgument("at least one sample size specification too small to create simulation results, ",
                 "e.g., due to small prevalences of subsets",
-                call. = FALSE
+                functionName = ".getSimulatedStageRatesEnrichment"
             )
         }
 
@@ -851,14 +849,8 @@ NULL
                 if (
                     is.null(newSubjects) || length(newSubjects) != 1 || !is.numeric(newSubjects) || is.na(newSubjects)
                     ) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcSubjectsFunction' returned an illegal or ",
-                        "undefined result (",
-                        newSubjects,
-                        "); ",
-                        "the output must be a single numeric value",
-                        call. = FALSE
+                    stopIllegalArgument("'calcSubjectsFunction' returned an illegal or ", "undefined result (", newSubjects, "); ", "the output must be a single numeric value",
+                        functionName = ".getSimulatedStageRatesEnrichment", parameter = "calcSubjectsFunction", value = calcSubjectsFunction
                     )
                 }
 
@@ -1010,16 +1002,23 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentRates <- function(design = NULL,
+getSimulationEnrichmentRates <- function(
+        design = NULL,
         ...,
         effectList = NULL,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT,
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
+        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE,
+        # C_STRATIFIED_ANALYSIS_DEFAULT,
+        directionUpper = NA,
+        # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"),
+        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -1030,13 +1029,14 @@ getSimulationEnrichmentRates <- function(design = NULL,
         conditionalPower = NA_real_,
         piTreatmentH1 = NA_real_,
         piControlH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = 1000L,
+        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectPopulationsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationEnrichmentRates",
             ignore = c(
@@ -1313,6 +1313,9 @@ getSimulationEnrichmentRates <- function(design = NULL,
     simulationResults$selectedPopulations <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedPopulationsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     if (kMax > 1) {
@@ -1330,7 +1333,7 @@ getSimulationEnrichmentRates <- function(design = NULL,
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationEnrichmentRates")
     }
 
     data <- data.frame(

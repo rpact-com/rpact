@@ -18,7 +18,7 @@
     if (isFALSE(logEnabled)) {
         return(invisible())
     }
-    
+
     .assertIsSingleCharacter(s, "s")
     if (length(list(...)) > 0) {
         cat(paste0("[", logLevel, "]"), sprintf(s, ...), "\n")
@@ -144,9 +144,9 @@
 #' @export
 #'
 setLogLevel <- function(logLevel = c(
-            "PROGRESS", "ERROR", "WARN",
-            "INFO", "DEBUG", "TRACE", "DISABLED"
-        )) {
+    "PROGRESS", "ERROR", "WARN",
+    "INFO", "DEBUG", "TRACE", "DISABLED"
+)) {
     logLevel <- match.arg(logLevel)
 
     if (!is.character(logLevel) || !(logLevel %in% c(
@@ -158,17 +158,12 @@ setLogLevel <- function(logLevel = c(
             C_LOG_LEVEL_PROGRESS,
             C_LOG_LEVEL_DISABLED
         ))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'logLevel' must be one of ",
-            "c(", paste(paste0("'", c(
-                C_LOG_LEVEL_TRACE,
-                C_LOG_LEVEL_DEBUG,
-                C_LOG_LEVEL_INFO,
-                C_LOG_LEVEL_WARN,
-                C_LOG_LEVEL_ERROR,
-                C_LOG_LEVEL_PROGRESS,
-                C_LOG_LEVEL_DISABLED
-            ), "'"), collapse = ", "), ")"
+        stopIllegalArgument("'logLevel' must be one of ", "c(", paste(paste0("'", c(
+            C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG, C_LOG_LEVEL_INFO,
+            C_LOG_LEVEL_WARN, C_LOG_LEVEL_ERROR, C_LOG_LEVEL_PROGRESS, C_LOG_LEVEL_DISABLED
+        ), "'"), collapse = ", "), ")",
+        functionName = "setLogLevel",
+        parameter = "logLevel", value = logLevel
         )
     }
 

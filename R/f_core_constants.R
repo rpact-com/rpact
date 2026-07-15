@@ -333,8 +333,10 @@ C_CIPHERS <- list(token = "310818669631424001", secret = "9318655074497250732")
     .arrayToString(.getBetaSpendingDesignTypes(), encapsulate = TRUE)
 }
 
-.isBetaSpendingDesignType <- function(typeOfDesign,
-        userDefinedBetaSpendingIncluded = TRUE, noneIncluded = FALSE) {
+.isBetaSpendingDesignType <- function(
+        typeOfDesign,
+        userDefinedBetaSpendingIncluded = TRUE,
+        noneIncluded = FALSE) {
     if (userDefinedBetaSpendingIncluded && typeOfDesign == C_TYPE_OF_DESIGN_BS_USER) {
         return(TRUE)
     }
@@ -679,7 +681,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     conditionalCriticalValue = "Conditional critical value",
     piControlH1 = "pi(control) under H1",
     piMaxVector = "pi_max",
-    omegaMaxVector = "omega_max",
+    omegaMaxVector = "Effect size in highest dose arm",
     muMaxVector = "mu_max",
     activeArms = "Active arms",
     populations = "Populations",
@@ -687,7 +689,8 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     calcSubjectsFunction = "Calculate subjects function",
     calcEventsFunction = "Calculate events function",
     selectArmsFunction = "Select arms function",
-    numberOfActiveArms = "Number of active arms",
+    numberOfSelectedArms = "Number of selected active arms",
+    numberOfActiveArms = "Number of active arms", # deprecated
     selectPopulationsFunction = "Select populations function",
     numberOfPopulations = "Number of populations",
     correlationComputation = "Correlation computation method",
@@ -992,7 +995,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     conditionalCriticalValue = "Conditional critical value",
     piControlH1 = "pi(control) under H1",
     piMaxVector = "pi_max",
-    omegaMaxVector = "omega_max",
+    omegaMaxVector = "Effect size in highest dose arm",
     muMaxVector = "mu_max",
     activeArms = "Active arm",
     populations = "Population",
@@ -1000,7 +1003,8 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     calcSubjectsFunction = "Calc subjects fun",
     calcEventsFunction = "Calc events fun",
     selectArmsFunction = "Select arms fun",
-    numberOfActiveArms = "Number of active arms",
+    numberOfSelectedArms = "Number of selected active arms",
+    numberOfActiveArms = "Number of active arms", # deprecated
     correlationComputation = "Correlation computation",
     subsets = "Subset",
     subset = "Subset",
@@ -1201,7 +1205,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     } else {
         paramCaption <- C_PARAMETER_NAMES[[parameterName]]
     }
-    
+
     if (grepl("DelayedInformation", parameterName)) {
         design <- .getTrialDesign(obj)
         if (!is.null(design) && isFALSE(design$directionUpper)) {
@@ -1241,22 +1245,22 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (parameterName == "accrualTime" && inherits(obj, "TrialDesignPlanCountData") &&
-            obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
+            obj$isUserDefinedParameter("accrualTime")) {
         return(".formatHowItIs")
     }
 
     if (parameterName == "accrualTimeOriginal" && inherits(obj, "TrialDesignPlanCountData") &&
-            obj$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED) {
+            obj$isUserDefinedParameter("accrualTimeOriginal")) {
         return(".formatHowItIs")
     }
 
     if (parameterName == "userAlphaSpending" &&
-            obj$.getParameterType("userAlphaSpending") == C_PARAM_GENERATED) {
+            obj$isGeneratedParameter("userAlphaSpending")) {
         return(".formatProbabilities")
     }
 
     if (parameterName == "userBetaSpending" &&
-            obj$.getParameterType("userBetaSpending") == C_PARAM_GENERATED) {
+            obj$isGeneratedParameter("userBetaSpending")) {
         return(".formatProbabilities")
     }
 
@@ -1452,7 +1456,8 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     omegaMaxVector = ".formatRates",
     muMaxVector = ".formatMeans",
     numberOfEvents = ".formatEvents",
-    numberOfActiveArms = ".formatRates",
+    numberOfSelectedArms = ".formatRates",
+    numberOfActiveArms = ".formatRates", # deprecated
     maxInformation = ".formatHowItIs",
     informationEpsilon = ".formatProbabilities",
     delayedInformation = ".formatRates",

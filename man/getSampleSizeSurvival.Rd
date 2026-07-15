@@ -9,6 +9,7 @@ getSampleSizeSurvival(
   ...,
   typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
   thetaH0 = 1,
+  directionUpper = NA,
   pi1 = NA_real_,
   pi2 = NA_real_,
   lambda1 = NA_real_,
@@ -57,6 +58,10 @@ That is, in case of (one-sided) testing of
 }
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
+
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is \code{TRUE}
+which means that larger values of the test statistics yield smaller p-values.}
 
 \item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
 default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or

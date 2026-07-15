@@ -56,18 +56,18 @@
 #' \dontrun{
 #' # return planned increment when no conditional power is requested
 #' .getSimulationSurvivalEnrichmentStageEvents(
-#'   stage = 2,
-#'   directionUpper = TRUE,
-#'   conditionalPower = NA_real_,
-#'   conditionalCriticalValue = rep(NA_real_, 1),
-#'   plannedEvents = c(100, 200),
-#'   eventsOverStages = c(100, 200),
-#'   allocationRatioPlanned = c(1, 1),
-#'   selectedPopulations = matrix(TRUE, nrow = 3, ncol = 2),
-#'   estimatedTheta = NA_real_,
-#'   overallEffects = matrix(1, nrow = 3, ncol = 2),
-#'   minNumberOfEventsPerStage = c(0, 50),
-#'   maxNumberOfEventsPerStage = c(0, 200)
+#'     stage = 2,
+#'     directionUpper = TRUE,
+#'     conditionalPower = NA_real_,
+#'     conditionalCriticalValue = rep(NA_real_, 1),
+#'     plannedEvents = c(100, 200),
+#'     eventsOverStages = c(100, 200),
+#'     allocationRatioPlanned = c(1, 1),
+#'     selectedPopulations = matrix(TRUE, nrow = 3, ncol = 2),
+#'     estimatedTheta = NA_real_,
+#'     overallEffects = matrix(1, nrow = 3, ncol = 2),
+#'     minNumberOfEventsPerStage = c(0, 50),
+#'     maxNumberOfEventsPerStage = c(0, 200)
 #' )
 #' }
 #'
@@ -87,9 +87,7 @@
         estimatedTheta,
         overallEffects,
         minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage
-        ) {
-            
+        maxNumberOfEventsPerStage) {
     stage <- stage - 1 # to be consistent with non-enrichment situation
     gMax <- nrow(overallEffects)
 
@@ -164,8 +162,7 @@
         thetaH1,
         overallEffects,
         minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage
-        ) {
+        maxNumberOfEventsPerStage) {
     stage <- stage - 1 # to be consistent with non-enrichment situation
     gMax <- nrow(overallEffects)
 

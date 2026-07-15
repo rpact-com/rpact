@@ -29,9 +29,9 @@ with suitable arguments to create the stage results of a dataset of rates.
 
 \item{\code{testActions}}{The test decisions at each stage of the trial. Is a character vector of length \code{kMax}.}
 
-\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
 
-\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a logical vector of length 1.}
+\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a single logical value.}
 
 \item{\code{weightsFisher}}{The weights for Fisher's combination test. Is a numeric vector of length \code{kMax}.}
 
