@@ -536,7 +536,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             } else {
                 self$.silent <- FALSE
             }
-
+            
             self$piecewiseSurvivalEnabled <- FALSE
             self$delayedResponseEnabled <- FALSE
 

@@ -510,7 +510,8 @@ getSimulationSurvival <- function(
         eventTime = eventTime,
         kappa = kappa,
         delayedResponseAllowed = TRUE,
-        .pi1Default = C_PI_1_DEFAULT
+        .pi1Default = C_PI_1_DEFAULT,
+        .silent = TRUE
     )
 
     simulationResults$.piecewiseSurvivalTime <- pwsTimeObject

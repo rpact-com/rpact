@@ -779,10 +779,18 @@ NULL
         pi1Default <- C_PI_1_SAMPLE_SIZE_DEFAULT
     }
     designPlan$.piecewiseSurvivalTime <- getPiecewiseSurvivalTime(
-        piecewiseSurvivalTime = piecewiseSurvivalTime, lambda2 = lambda2, lambda1 = lambda1,
-        median1 = median1, median2 = median2,
-        hazardRatio = hazardRatio, pi1 = pi1, pi2 = pi2, eventTime = eventTime, kappa = kappa,
-        .pi1Default = pi1Default
+        piecewiseSurvivalTime = piecewiseSurvivalTime, 
+        lambda2 = lambda2, 
+        lambda1 = lambda1,
+        median1 = median1, 
+        median2 = median2,
+        hazardRatio = hazardRatio, 
+        pi1 = pi1, 
+        pi2 = pi2, 
+        eventTime = eventTime, 
+        kappa = kappa,
+        .pi1Default = pi1Default,
+        .silent = TRUE
     )
     designPlan$.setParameterType("kappa", designPlan$.piecewiseSurvivalTime$.getParameterType("kappa"))
 
@@ -1649,7 +1657,8 @@ getEventProbabilities <- function(
         hazardRatio = hazardRatio,
         kappa = kappa,
         delayedResponseAllowed = TRUE,
-        .lambdaBased = TRUE
+        .lambdaBased = TRUE,
+        .silent = TRUE
     )
 
     if (!setting$delayedResponseEnabled && length(setting$lambda1) > 1 &&
@@ -1665,7 +1674,8 @@ getEventProbabilities <- function(
             hazardRatio = hazardRatio,
             kappa = kappa,
             delayedResponseAllowed = TRUE,
-            .lambdaBased = TRUE
+            .lambdaBased = TRUE,
+            .silent = TRUE
         )
     }
 
