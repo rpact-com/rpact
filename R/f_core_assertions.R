@@ -762,7 +762,7 @@ NULL
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if (naAllowed && all(is.na(x))) {
-        return(invisible(as.integer(x)))
+        return(invisible(if (is.finite(x)) as.integer(x) else x))
     }
 
     if (!is.numeric(x) || (!naAllowed && anyNA(x)) || (validateType && !is.integer(x)) ||
@@ -775,7 +775,7 @@ NULL
         )
     }
 
-    return(invisible(as.integer(x)))
+    return(invisible(if (is.finite(x)) as.integer(x) else x))
 }
 
 .assertIsLogicalVector <- function(
@@ -967,7 +967,7 @@ NULL
         )
     }
 
-    return(invisible(as.integer(x)))
+    return(invisible(if (is.finite(x)) as.integer(x) else x))
 }
 
 .assertIsSingleCharacter <- function(
@@ -1461,8 +1461,12 @@ NULL
     }
 }
 
-.assertIsValidKMax <- function(kMax, kMaxLowerBound = 1,
-                                       kMaxUpperBound = C_KMAX_UPPER_BOUND, ..., showWarnings = FALSE) {
+.assertIsValidKMax <- function(
+        kMax,
+        kMaxLowerBound = 1,
+        kMaxUpperBound = C_KMAX_UPPER_BOUND,
+        ...,
+        showWarnings = FALSE) {
     .assertIsSingleInteger(kMax, "kMax", validateType = FALSE)
     .assertIsInClosedInterval(kMax, "kMax", lower = kMaxLowerBound, upper = kMaxUpperBound)
     if (showWarnings && kMax > 10) {
@@ -3654,8 +3658,9 @@ NULL
             )
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
-            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 
-                lower = 0, upper = NULL, naAllowed = FALSE)
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix",
+                lower = 0, upper = NULL, naAllowed = FALSE
+            )
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {
