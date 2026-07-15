@@ -499,6 +499,7 @@ NULL
     designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
 
     .addStudyDurationToDesignPlan(designPlan)
+    .setDirectionUpper(designPlan)
 
     return(designPlan)
 }
@@ -517,6 +518,7 @@ NULL
         design = NULL,
         typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
         thetaH0 = 1,
+        directionUpper = NA,
         pi2 = NA_real_,
         pi1 = NA_real_,
         allocationRatioPlanned = NA_real_,
@@ -557,6 +559,7 @@ NULL
         lambda1 = lambda1,
         median1 = median1,
         median2 = median2,
+        directionUpper = directionUpper,
         followUpTime = followUpTime,
         maxNumberOfSubjects = maxNumberOfSubjects,
         dropoutRate1 = dropoutRate1,
@@ -982,7 +985,6 @@ NULL
     designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
 
     if (designPlan$.isSampleSizeObject()) {
-        designPlan$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("maxNumberOfEvents", C_PARAM_NOT_APPLICABLE)
     }
 
@@ -1987,6 +1989,7 @@ getSampleSizeSurvival <- function(
         ...,
         typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
         thetaH0 = 1,
+        directionUpper = NA,
         pi1 = NA_real_,
         pi2 = NA_real_,
         lambda1 = NA_real_,
@@ -2007,8 +2010,8 @@ getSampleSizeSurvival <- function(
         dropoutRate2 = 0,
         dropoutTime = 12) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize", 
-            ignore = c("accountForObservationTimes")) # TODO directionUpper = directionUpper,
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "sampleSize", ..., 
+            ignore = c("accountForObservationTimes"))
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeSurvival",
             ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -2163,6 +2166,7 @@ getSampleSizeSurvival <- function(
                                 design = design,
                                 typeOfComputation = typeOfComputation,
                                 thetaH0 = thetaH0,
+                                directionUpper = directionUpper,
                                 pi2 = pi2,
                                 pi1 = pi1,
                                 allocationRatioPlanned = allocationRatioPlanned,
@@ -2247,7 +2251,10 @@ getSampleSizeSurvival <- function(
                     fut <- .getSampleSizeSurvival(
                         design = design,
                         typeOfComputation = typeOfComputation,
-                        thetaH0 = thetaH0, pi2 = pi2, pi1 = pi1,
+                        thetaH0 = thetaH0, 
+                        directionUpper = directionUpper,
+                        pi2 = pi2, 
+                        pi1 = pi1,
                         allocationRatioPlanned = allocationRatioPlanned,
                         accountForObservationTimes = accountForObservationTimes,
                         eventTime = eventTime, accrualTime = accrualSetup$accrualTime,
@@ -2297,7 +2304,10 @@ getSampleSizeSurvival <- function(
                         fut <- .getSampleSizeSurvival(
                             design = design,
                             typeOfComputation = typeOfComputation,
-                            thetaH0 = thetaH0, pi2 = pi2, pi1 = pi1,
+                            thetaH0 = thetaH0, 
+                            directionUpper = directionUpper,
+                            pi2 = pi2, 
+                            pi1 = pi1,
                             allocationRatioPlanned = allocationRatioPlanned,
                             accountForObservationTimes = accountForObservationTimes,
                             eventTime = eventTime, accrualTime = accrualSetup$accrualTime,
@@ -2324,7 +2334,10 @@ getSampleSizeSurvival <- function(
                             fut <- .getSampleSizeSurvival(
                                 design = design,
                                 typeOfComputation = typeOfComputation,
-                                thetaH0 = thetaH0, pi2 = pi2, pi1 = pi1,
+                                thetaH0 = thetaH0, 
+                                directionUpper = directionUpper,
+                                pi2 = pi2, 
+                                pi1 = pi1,
                                 allocationRatioPlanned = allocationRatioPlanned,
                                 accountForObservationTimes = accountForObservationTimes,
                                 eventTime = eventTime, accrualTime = accrualSetup$accrualTime,
@@ -2367,15 +2380,25 @@ getSampleSizeSurvival <- function(
         sampleSizeSurvival <- .getSampleSizeSurvival(
             design = design,
             typeOfComputation = typeOfComputation,
-            thetaH0 = thetaH0, pi2 = pi2, pi1 = pi1,
+            thetaH0 = thetaH0, 
+            directionUpper = directionUpper,
+            pi2 = pi2, 
+            pi1 = pi1,
             allocationRatioPlanned = allocationRatioPlanned,
             accountForObservationTimes = accountForObservationTimes,
-            eventTime = eventTime, accrualTime = accrualSetup$accrualTime,
-            accrualIntensity = accrualSetup$accrualIntensity, kappa = kappa,
-            piecewiseSurvivalTime = piecewiseSurvivalTime, lambda2 = lambda2, lambda1 = lambda1,
-            median1 = median1, median2 = median2,
-            followUpTime = NA_real_, maxNumberOfSubjects = maxNumberOfSubjectsTarget,
-            dropoutRate1 = dropoutRate1, dropoutRate2 = dropoutRate2,
+            eventTime = eventTime, 
+            accrualTime = accrualSetup$accrualTime,
+            accrualIntensity = accrualSetup$accrualIntensity, 
+            kappa = kappa,
+            piecewiseSurvivalTime = piecewiseSurvivalTime, 
+            lambda2 = lambda2, 
+            lambda1 = lambda1,
+            median1 = median1, 
+            median2 = median2,
+            followUpTime = NA_real_, 
+            maxNumberOfSubjects = maxNumberOfSubjectsTarget,
+            dropoutRate1 = dropoutRate1, 
+            dropoutRate2 = dropoutRate2,
             dropoutTime = dropoutTime,
             hazardRatio = hazardRatio,
             userFunctionCallEnabled = FALSE
@@ -2411,16 +2434,26 @@ getSampleSizeSurvival <- function(
     return(.getSampleSizeSurvival(
         design = design,
         typeOfComputation = typeOfComputation,
-        thetaH0 = thetaH0, pi2 = pi2, pi1 = pi1,
+        thetaH0 = thetaH0, 
+        directionUpper = directionUpper,
+        pi2 = pi2, 
+        pi1 = pi1,
         allocationRatioPlanned = allocationRatioPlanned,
         accountForObservationTimes = accountForObservationTimes,
-        eventTime = eventTime, accrualTime = accrualTime,
-        accrualIntensity = accrualIntensity, accrualIntensityType = accrualIntensityType,
-        kappa = kappa, piecewiseSurvivalTime = piecewiseSurvivalTime,
-        lambda2 = lambda2, lambda1 = lambda1,
-        median1 = median1, median2 = median2,
-        followUpTime = followUpTime, maxNumberOfSubjects = maxNumberOfSubjects,
-        dropoutRate1 = dropoutRate1, dropoutRate2 = dropoutRate2,
+        eventTime = eventTime, 
+        accrualTime = accrualTime,
+        accrualIntensity = accrualIntensity, 
+        accrualIntensityType = accrualIntensityType,
+        kappa = kappa, 
+        piecewiseSurvivalTime = piecewiseSurvivalTime,
+        lambda2 = lambda2, 
+        lambda1 = lambda1,
+        median1 = median1, 
+        median2 = median2,
+        followUpTime = followUpTime, 
+        maxNumberOfSubjects = maxNumberOfSubjects,
+        dropoutRate1 = dropoutRate1, 
+        dropoutRate2 = dropoutRate2,
         dropoutTime = dropoutTime,
         hazardRatio = hazardRatio
     ))
