@@ -638,10 +638,13 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (is.null(paramCaption)) {
                 paramCaption <- paste0("%", paramName, "%")
             }
+            
             if (!is.null(category) && !is.na(category)) {
-                if (.isMultiArmSimulationResults(self) && paramName == "singleEventsPerArmAndStage") {
+                if (.isMultiArmSimulationResults(self) && 
+                        paramName %in% c("singleEventsPerArmAndStage", "selectedArms")) { # TODO also: "rejectedArmsPerStage" ?
                     if (!inherits(self, "SimulationResultsEnrichmentSurvival") &&
-                            !is.na(numberOfCategories) && numberOfCategories == category) {
+                            !is.na(numberOfCategories) && numberOfCategories == category && 
+                            paramName == "singleEventsPerArmAndStage") {
                         category <- "control"
                     }
                     paramCaption <- paste0(paramCaption, " {", category, "}")
