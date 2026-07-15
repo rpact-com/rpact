@@ -104,8 +104,6 @@ design
 #> 
 #> User defined parameters: not available
 #> 
-#> Derived from user defined parameters: not available
-#> 
 #> Default parameters:
 #>   Significance level              : 0.0250 
 #>   Type II error rate              : 0.2000 
@@ -124,8 +122,6 @@ design2
 #> User defined parameters:
 #>   Significance level              : 0.0500 
 #>   Type II error rate              : 0.1000 
-#> 
-#> Derived from user defined parameters: not available
 #> 
 #> Default parameters:
 #>   Test                            : one-sided 

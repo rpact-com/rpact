@@ -13,19 +13,17 @@ with suitable arguments to create a design plan for a dataset of means.
 - `meanRatio`:
 
   Specifies if the sample size for one-sided testing of H0:
-  `mu1/mu2 = thetaH0` has been calculated. Is a logical vector of length
-  1.
+  `mu1/mu2 = thetaH0` has been calculated. Is a single logical value.
 
 - `thetaH0`:
 
-  The difference or assumed effect under H0. Is a numeric vector of
-  length 1.
+  The difference or assumed effect under H0. Is a single numeric value.
 
 - `normalApproximation`:
 
   Describes if a normal approximation was used when calculating
   p-values. Default for means is `FALSE` and `TRUE` for rates and hazard
-  ratio. Is a logical vector of length 1.
+  ratio. Is a single logical value.
 
 - `alternative`:
 
@@ -35,7 +33,7 @@ with suitable arguments to create a design plan for a dataset of means.
 - `stDev`:
 
   The standard deviation used for sample size and power calculation. Is
-  a numeric vector of length 1.
+  a single numeric value.
 
 - `groups`:
 
@@ -45,19 +43,18 @@ with suitable arguments to create a design plan for a dataset of means.
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `optimumAllocationRatio`:
 
   The allocation ratio that is optimum with respect to the overall
-  sample size at given power. Is a logical vector of length 1.
+  sample size at given power. Is a single logical value.
 
 - `directionUpper`:
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.
 
 - `effect`:
 

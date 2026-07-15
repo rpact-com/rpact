@@ -12,13 +12,13 @@ with suitable arguments to create a group sequential design.
 
 - `kMax`:
 
-  The maximum number of stages `K`. Is a numeric vector of length 1
-  containing a whole number.
+  The maximum number of stages `K`. Is a single numeric value
+  representing a whole number.
 
 - `alpha`:
 
-  The significance level alpha, default is 0.025. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The significance level alpha, default is 0.025. Is a single numeric
+  value between 0 and 1.
 
 - `stages`:
 
@@ -58,37 +58,37 @@ with suitable arguments to create a group sequential design.
   If `TRUE`, the calculation of the critical values is affected by the
   futility bounds and the futility threshold is binding in the sense
   that the study must be stopped if the futility condition was reached
-  (default is `FALSE`) Is a logical vector of length 1.
+  (default is `FALSE`) Is a single logical value.
 
 - `tolerance`:
 
-  The numerical tolerance, default is `1e-06`. Is a numeric vector of
-  length 1.
+  The numerical tolerance, default is `1e-06`. Is a single numeric
+  value.
 
 - `typeOfDesign`:
 
-  The type of design. Is a character vector of length 1.
+  The type of design. Is a single character value.
 
 - `beta`:
 
   The Type II error rate necessary for providing sample size
   calculations (e.g., in `getSampleSizeMeans`), beta spending function
-  designs, or optimum designs, default is `0.20`. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  designs, or optimum designs, default is `0.20`. Is a single numeric
+  value between 0 and 1.
 
 - `deltaWT`:
 
-  Delta for Wang & Tsiatis Delta class. Is a numeric vector of length 1.
+  Delta for Wang & Tsiatis Delta class. Is a single numeric value.
 
 - `deltaPT1`:
 
   Delta1 for Pampallona & Tsiatis class rejecting H0 boundaries. Is a
-  numeric vector of length 1.
+  single numeric value.
 
 - `deltaPT0`:
 
   Delta0 for Pampallona & Tsiatis class rejecting H1 (accepting H0)
-  boundaries. Is a numeric vector of length 1.
+  boundaries. Is a single numeric value.
 
 - `futilityBounds`:
 
@@ -97,13 +97,13 @@ with suitable arguments to create a group sequential design.
 
 - `gammaA`:
 
-  The parameter for the alpha spending function. Is a numeric vector of
-  length 1.
+  The parameter for the alpha spending function. Is a single numeric
+  value.
 
 - `gammaB`:
 
-  The parameter for the beta spending function. Is a numeric vector of
-  length 1.
+  The parameter for the beta spending function. Is a single numeric
+  value.
 
 - `optimizationCriterion`:
 
@@ -114,7 +114,7 @@ with suitable arguments to create a group sequential design.
 - `sided`:
 
   Describes if the alternative is one-sided (`1`) or two-sided (`2`). Is
-  a numeric vector of length 1 containing a whole number.
+  a single numeric value representing a whole number.
 
 - `betaSpent`:
 
@@ -124,7 +124,7 @@ with suitable arguments to create a group sequential design.
 
 - `typeBetaSpending`:
 
-  The type of beta spending. Is a character vector of length 1.
+  The type of beta spending. Is a single character value.
 
 - `userBetaSpending`:
 
@@ -150,19 +150,19 @@ with suitable arguments to create a group sequential design.
 - `twoSidedPower`:
 
   Specifies if power is defined two-sided at each stage of the trial. Is
-  a logical vector of length 1.
+  a single logical value.
 
 - `constantBoundsHP`:
 
   The constant bounds up to stage kMax - 1 for the Haybittle & Peto
-  design (default is 3). Is a numeric vector of length 1.
+  design (default is 3). Is a single numeric value.
 
 - `betaAdjustment`:
 
   If `TRUE`, beta spending values are linearly adjusted if an
   overlapping of decision regions for futility stopping at earlier
   stages occurs. Only applicable for two-sided beta-spending designs. Is
-  a logical vector of length 1.
+  a single logical value.
 
 - `delayedInformation`:
 

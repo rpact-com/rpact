@@ -12,13 +12,13 @@ with suitable arguments to create a conditional Dunnett test design.
 
 - `kMax`:
 
-  The maximum number of stages `K`. Is a numeric vector of length 1
-  containing a whole number.
+  The maximum number of stages `K`. Is a single numeric value
+  representing a whole number.
 
 - `alpha`:
 
-  The significance level alpha, default is 0.025. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The significance level alpha, default is 0.025. Is a single numeric
+  value between 0 and 1.
 
 - `stages`:
 
@@ -58,30 +58,29 @@ with suitable arguments to create a conditional Dunnett test design.
   If `TRUE`, the calculation of the critical values is affected by the
   futility bounds and the futility threshold is binding in the sense
   that the study must be stopped if the futility condition was reached
-  (default is `FALSE`) Is a logical vector of length 1.
+  (default is `FALSE`) Is a single logical value.
 
 - `tolerance`:
 
-  The numerical tolerance, default is `1e-06`. Is a numeric vector of
-  length 1.
+  The numerical tolerance, default is `1e-06`. Is a single numeric
+  value.
 
 - `informationAtInterim`:
 
   The information to be expected at interim, default is
-  informationAtInterim = 0.5. Is a numeric vector of length 1 containing
-  a value between 0 and 1.
+  informationAtInterim = 0.5. Is a single numeric value between 0 and 1.
 
 - `secondStageConditioning`:
 
   The way the second stage p-values are calculated within the closed
   system of hypotheses. If `FALSE`, the unconditional adjusted p-values
   are used, otherwise conditional adjusted p-values are calculated. Is a
-  logical vector of length 1.
+  single logical value.
 
 - `sided`:
 
   Describes if the alternative is one-sided (`1`) or two-sided (`2`). Is
-  a numeric vector of length 1 containing a whole number.
+  a single numeric value representing a whole number.
 
 ## See also
 

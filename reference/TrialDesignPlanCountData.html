@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@ with suitable arguments to create a design plan for a dataset of rates.</p>
 
 
 <dl><dt><code>thetaH0</code></dt>
-<dd><p>The difference or assumed effect under H0. Is a numeric vector of length 1.</p></dd>
+<dd><p>The difference or assumed effect under H0. Is a single numeric value.</p></dd>
 
 
 <dt><code>groups</code></dt>
@@ -59,15 +59,15 @@ with suitable arguments to create a design plan for a dataset of rates.</p>
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.</p></dd>
 
 
 <dt><code>optimumAllocationRatio</code></dt>
-<dd><p>The allocation ratio that is optimum with respect to the overall sample size at given power. Is a logical vector of length 1.</p></dd>
+<dd><p>The allocation ratio that is optimum with respect to the overall sample size at given power. Is a single logical value.</p></dd>
 
 
 <dt><code>directionUpper</code></dt>
-<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.</p></dd>
+<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a single logical value.</p></dd>
 
 
 <dt><code>lambda1</code></dt>
@@ -75,7 +75,7 @@ with suitable arguments to create a design plan for a dataset of rates.</p>
 
 
 <dt><code>lambda2</code></dt>
-<dd><p>The assumed hazard rate in the reference group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed hazard rate in the reference group. Is a single numeric value.</p></dd>
 
 
 <dt><code>lambda</code></dt>
@@ -147,7 +147,7 @@ with suitable arguments to create a design plan for a dataset of rates.</p>
 
 
 <dt><code>followUpTime</code></dt>
-<dd><p>The assumed follow-up time for the study. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed follow-up time for the study. Is a single numeric value.</p></dd>
 
 
 <dt><code>calendarTime</code></dt>
@@ -187,7 +187,7 @@ with suitable arguments to create a design plan for a dataset of rates.</p>
 
 
 <dt><code>maxInformation</code></dt>
-<dd><p>The maximum information. Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>The maximum information. Is a single numeric value representing a  whole number.</p></dd>
 
 
 <dt><code>futilityBoundsPValueScale</code></dt>
@@ -205,7 +205,7 @@ with suitable arguments to create a design plan for a dataset of rates.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

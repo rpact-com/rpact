@@ -50,6 +50,8 @@
   : Get Final Confidence Interval
 - [`getFinalPValue()`](https://docs.rpact.org/reference/getFinalPValue.md)
   : Get Final P Value
+- [`getFisherInformation()`](https://docs.rpact.org/reference/getFisherInformation.md)
+  : Get Fisher Information From a Design Plan
 - [`getFutilityBounds()`](https://docs.rpact.org/reference/getFutilityBounds.md)
   : Get Futility Bounds
 - [`getGroupSequentialProbabilities()`](https://docs.rpact.org/reference/getGroupSequentialProbabilities.md)

@@ -21,8 +21,8 @@ survival times.
 
 - `lambda2`:
 
-  The assumed hazard rate in the reference group. Is a numeric vector of
-  length 1.
+  The assumed hazard rate in the reference group. Is a single numeric
+  value.
 
 - `hazardRatio`:
 
@@ -36,8 +36,8 @@ survival times.
 
 - `pi2`:
 
-  The assumed event rate in the control group. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The assumed event rate in the control group. Is a single numeric value
+  between 0 and 1.
 
 - `median1`:
 
@@ -46,23 +46,23 @@ survival times.
 
 - `median2`:
 
-  The assumed median survival time in the reference group. Is a numeric
-  vector of length 1.
+  The assumed median survival time in the reference group. Is a single
+  numeric value.
 
 - `eventTime`:
 
   The assumed time under which the event rates are calculated. Is a
-  numeric vector of length 1.
+  single numeric value.
 
 - `kappa`:
 
-  The shape of the Weibull distribution if `kappa!=1`. Is a numeric
-  vector of length 1.
+  The shape of the Weibull distribution if `kappa!=1`. Is a single
+  numeric value.
 
 - `piecewiseSurvivalEnabled`:
 
   Indicates whether specification of piecewise definition of survival
-  time is selected. Is a logical vector of length 1.
+  time is selected. Is a single logical value.
 
 - `delayedResponseAllowed`:
 

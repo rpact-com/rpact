@@ -15,6 +15,7 @@ getSampleSizeRates(
   thetaH0 = ifelse(riskRatio, 1, 0),
   pi1 = c(0.4, 0.5, 0.6),
   pi2 = 0.2,
+  directionUpper = NA,
   allocationRatioPlanned = NA_real_
 )
 ```
@@ -92,6 +93,12 @@ getSampleSizeRates(
   A numeric value that represents the assumed probability in the
   reference group if two treatment groups are considered, default is
   `0.2`.
+
+- directionUpper:
+
+  Logical. Specifies the direction of the alternative, only applicable
+  for one-sided testing; default is `TRUE` which means that larger
+  values of the test statistics yield smaller p-values.
 
 - allocationRatioPlanned:
 

@@ -49,14 +49,13 @@ suitable arguments to create the stage results of a dataset of rates.
 
 - `thetaH0`:
 
-  The difference or assumed effect under H0. Is a numeric vector of
-  length 1.
+  The difference or assumed effect under H0. Is a single numeric value.
 
 - `normalApproximation`:
 
   Describes if a normal approximation was used when calculating
   p-values. Default for means is `FALSE` and `TRUE` for rates and hazard
-  ratio. Is a logical vector of length 1.
+  ratio. Is a single logical value.
 
 - `weightsFisher`:
 

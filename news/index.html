@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,10 +44,18 @@
 <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> and <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code> now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument <code>simulationType</code> can be used to choose between the new C++ implementation (<code>"patientWise"</code>), the previous test-statistic-based approach (<code>"testStatisticBased"</code>), and a basic R reference implementation (<code>"patientWiseBasic"</code>) intended for validation and testing. The default <code>"auto"</code> setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.</li>
 <li>rpact options can now be configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles; see the new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_hidden_features/" class="external-link">Hidden rpact Features: Options and Environment Variables</a>.</li>
 <li>Optimized the display of <code>criticalValues</code> and <code>futilityBounds</code> for designs with <code>directionUpper = FALSE</code>. If the direction of the alternative is already specified when creating a design, e.g., with <code>getDesignGroupSequential(directionUpper = FALSE)</code>, the boundaries are now shown in the correct direction, typically as negative values. This also applies to futility bounds generated for beta-spending designs.</li>
+<li>The new function <code><a href="../reference/getFisherInformation.html">getFisherInformation()</a></code> can be used to calculate the Fisher information at the first planned analysis stage for a design plan for means, rates, or survival endpoints.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-5-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-5-0"></a></h3>
 <ul><li>Issue <a href="https://github.com/rpact-com/rpact/issues/118" class="external-link">#118</a> fixed</li>
+<li>Several improvements and refactorings, focusing on enhanced error handling, improved naming conventions, and more consistent function signatures</li>
+<li>Updates to the documentation</li>
+<li>In <code><a href="../reference/getSimulationSurvival.html">getSimulationSurvival()</a></code>, the early stopping probability (“Early stop”) is now displayed stage-wise instead of overall</li>
+<li>In <code><a href="../reference/getSimulationSurvival.html">getSimulationSurvival()</a></code>, <code>numberOfSubjects1</code> and <code>numberOfSubjects2</code> are no longer shown in the print output (though still available in the result object), and <code>singleEventsPerStage</code> is now displayed.</li>
+<li>Improved naming of variables and class fields: in <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code>, the field <code>numberOfActiveArms</code> has been replaced by <code>numberOfSelectedArms</code>.</li>
+<li>Refactored error handling in plotting functions to use more specific internal error functions (<code>stopIllegalArgument</code>, <code>stopMissingArgument</code>) for clearer and more consistent error messages.</li>
+<li>Standardized and clarified function signatures for R6 class initializers and S3 methods, improving readability and maintainability. This includes consistent formatting and argument ordering across multiple classes</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -680,7 +688,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

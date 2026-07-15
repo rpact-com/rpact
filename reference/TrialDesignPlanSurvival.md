@@ -13,8 +13,7 @@ survival data.
 
 - `thetaH0`:
 
-  The difference or assumed effect under H0. Is a numeric vector of
-  length 1.
+  The difference or assumed effect under H0. Is a single numeric value.
 
 - `typeOfComputation`:
 
@@ -25,8 +24,7 @@ survival data.
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.
 
 - `pi1`:
 
@@ -35,8 +33,8 @@ survival data.
 
 - `pi2`:
 
-  The assumed event rate in the control group. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The assumed event rate in the control group. Is a single numeric value
+  between 0 and 1.
 
 - `median1`:
 
@@ -45,8 +43,8 @@ survival data.
 
 - `median2`:
 
-  The assumed median survival time in the reference group. Is a numeric
-  vector of length 1.
+  The assumed median survival time in the reference group. Is a single
+  numeric value.
 
 - `lambda1`:
 
@@ -55,8 +53,8 @@ survival data.
 
 - `lambda2`:
 
-  The assumed hazard rate in the reference group. Is a numeric vector of
-  length 1.
+  The assumed hazard rate in the reference group. Is a single numeric
+  value.
 
 - `hazardRatio`:
 
@@ -87,22 +85,22 @@ survival data.
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `optimumAllocationRatio`:
 
   The allocation ratio that is optimum with respect to the overall
-  sample size at given power. Is a logical vector of length 1.
+  sample size at given power. Is a single logical value.
 
 - `accountForObservationTimes`:
 
   If `FALSE`, only the event rates are used for the calculation of the
-  maximum number of subjects. Is a logical vector of length 1.
+  maximum number of subjects. Is a single logical value.
 
 - `eventTime`:
 
   The assumed time under which the event rates are calculated. Is a
-  numeric vector of length 1.
+  single numeric value.
 
 - `accrualTime`:
 
@@ -111,7 +109,7 @@ survival data.
 - `totalAccrualTime`:
 
   The total accrual time, i.e., the maximum of `accrualTime`. Is a
-  positive numeric vector of length 1.
+  single positive numeric value.
 
 - `accrualIntensity`:
 
@@ -124,8 +122,8 @@ survival data.
 
 - `kappa`:
 
-  The shape of the Weibull distribution if `kappa!=1`. Is a numeric
-  vector of length 1.
+  The shape of the Weibull distribution if `kappa!=1`. Is a single
+  numeric value.
 
 - `piecewiseSurvivalTime`:
 
@@ -134,23 +132,22 @@ survival data.
 
 - `followUpTime`:
 
-  The assumed follow-up time for the study. Is a numeric vector of
-  length 1.
+  The assumed follow-up time for the study. Is a single numeric value.
 
 - `dropoutRate1`:
 
-  The assumed drop-out rate in the treatment group. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  The assumed drop-out rate in the treatment group. Is a single numeric
+  value between 0 and 1.
 
 - `dropoutRate2`:
 
-  The assumed drop-out rate in the control group. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The assumed drop-out rate in the control group. Is a single numeric
+  value between 0 and 1.
 
 - `dropoutTime`:
 
   The assumed time for drop-out rates in the control and treatment
-  group. Is a numeric vector of length 1.
+  group. Is a single numeric value.
 
 - `chi`:
 

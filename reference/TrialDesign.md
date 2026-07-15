@@ -19,13 +19,13 @@ Basic class for trial designs.
 
 - `kMax`:
 
-  The maximum number of stages `K`. Is a numeric vector of length 1
-  containing a whole number.
+  The maximum number of stages `K`. Is a single numeric value
+  representing a whole number.
 
 - `alpha`:
 
-  The significance level alpha, default is 0.025. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The significance level alpha, default is 0.025. Is a single numeric
+  value between 0 and 1.
 
 - `stages`:
 
@@ -65,9 +65,9 @@ Basic class for trial designs.
   If `TRUE`, the calculation of the critical values is affected by the
   futility bounds and the futility threshold is binding in the sense
   that the study must be stopped if the futility condition was reached
-  (default is `FALSE`) Is a logical vector of length 1.
+  (default is `FALSE`) Is a single logical value.
 
 - `tolerance`:
 
-  The numerical tolerance, default is `1e-06`. Is a numeric vector of
-  length 1.
+  The numerical tolerance, default is `1e-06`. Is a single numeric
+  value.

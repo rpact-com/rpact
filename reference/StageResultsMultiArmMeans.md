@@ -102,7 +102,7 @@ means.
 - `intersectionTest`:
 
   The multiple test used for intersection hypotheses in closed systems
-  of hypotheses. Is a character vector of length 1.
+  of hypotheses. Is a single character value.
 
 - `varianceOption`:
 
@@ -116,11 +116,10 @@ means.
 
   Describes if a normal approximation was used when calculating
   p-values. Default for means is `FALSE` and `TRUE` for rates and hazard
-  ratio. Is a logical vector of length 1.
+  ratio. Is a single logical value.
 
 - `directionUpper`:
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.

@@ -15,19 +15,17 @@ combination test design.
 
   Describes if a normal approximation was used when calculating
   p-values. Default for means is `FALSE` and `TRUE` for rates and hazard
-  ratio. Is a logical vector of length 1.
+  ratio. Is a single logical value.
 
 - `directionUpper`:
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.
 
 - `thetaH0`:
 
-  The difference or assumed effect under H0. Is a numeric vector of
-  length 1.
+  The difference or assumed effect under H0. Is a single numeric value.
 
 - `pi1`:
 
@@ -38,7 +36,7 @@ combination test design.
 - `pi2`:
 
   The assumed probability in the reference group for two-group designs.
-  Is a numeric vector of length 1 containing a value between 0 and 1.
+  Is a single numeric value between 0 and 1.
 
 - `nPlanned`:
 
@@ -49,7 +47,7 @@ combination test design.
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `thetaH1`:
 
@@ -64,7 +62,7 @@ combination test design.
 - `equalVariances`:
 
   Describes if the variances in two treatment groups are assumed to be
-  the same. Is a logical vector of length 1.
+  the same. Is a single logical value.
 
 - `testActions`:
 
@@ -79,8 +77,8 @@ combination test design.
 
 - `conditionalPower`:
 
-  The conditional power at each stage of the trial. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  The conditional power at each stage of the trial. Is a single numeric
+  value between 0 and 1.
 
 - `repeatedConfidenceIntervalLowerBounds`:
 
@@ -100,7 +98,7 @@ combination test design.
 - `finalStage`:
 
   The stage at which the trial ends, either with acceptance or rejection
-  of the null hypothesis. Is a numeric vector of length 1.
+  of the null hypothesis. Is a single numeric value.
 
 - `finalPValues`:
 
@@ -129,10 +127,9 @@ combination test design.
 
 - `iterations`:
 
-  The number of iterations used for simulations. Is a numeric vector of
-  length 1 containing a whole number.
+  The number of iterations used for simulations. Is a single numeric
+  value representing a whole number.
 
 - `seed`:
 
-  The seed used for random number generation. Is a numeric vector of
-  length 1.
+  The seed used for random number generation. Is a single numeric value.

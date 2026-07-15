@@ -13,12 +13,12 @@ intensity.
 
   If `TRUE`, the end of accrual has to be defined by the user (i.e., the
   length of `accrualTime` is equal to the length of
-  `accrualIntensity -1`). Is a logical vector of length 1.
+  `accrualIntensity -1`). Is a single logical value.
 
 - `followUpTimeMustBeUserDefined`:
 
   Specifies whether follow up time needs to be defined or not. Is a
-  logical vector of length 1.
+  single logical value.
 
 - `maxNumberOfSubjectsIsUserDefined`:
 
@@ -28,12 +28,12 @@ intensity.
 - `maxNumberOfSubjectsCanBeCalculatedDirectly`:
 
   If `TRUE`, the maximum number of subjects can directly be calculated.
-  Is a logical vector of length 1.
+  Is a single logical value.
 
 - `absoluteAccrualIntensityEnabled`:
 
-  If `TRUE`, absolute accrual intensity is enabled. Is a logical vector
-  of length 1.
+  If `TRUE`, absolute accrual intensity is enabled. Is a single logical
+  value.
 
 - `accrualTime`:
 
@@ -55,10 +55,10 @@ intensity.
 
 - `remainingTime`:
 
-  In survival designs, the remaining time for observation. Is a numeric
-  vector of length 1.
+  In survival designs, the remaining time for observation. Is a single
+  numeric value.
 
 - `piecewiseAccrualEnabled`:
 
-  Indicates whether piecewise accrual is selected. Is a logical vector
-  of length 1.
+  Indicates whether piecewise accrual is selected. Is a single logical
+  value.

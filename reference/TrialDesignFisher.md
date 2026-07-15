@@ -12,13 +12,13 @@ with suitable arguments to create a Fisher combination test design.
 
 - `kMax`:
 
-  The maximum number of stages `K`. Is a numeric vector of length 1
-  containing a whole number.
+  The maximum number of stages `K`. Is a single numeric value
+  representing a whole number.
 
 - `alpha`:
 
-  The significance level alpha, default is 0.025. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The significance level alpha, default is 0.025. Is a single numeric
+  value between 0 and 1.
 
 - `stages`:
 
@@ -58,12 +58,12 @@ with suitable arguments to create a Fisher combination test design.
   If `TRUE`, the calculation of the critical values is affected by the
   futility bounds and the futility threshold is binding in the sense
   that the study must be stopped if the futility condition was reached
-  (default is `FALSE`) Is a logical vector of length 1.
+  (default is `FALSE`) Is a single logical value.
 
 - `tolerance`:
 
-  The numerical tolerance, default is `1e-06`. Is a numeric vector of
-  length 1.
+  The numerical tolerance, default is `1e-06`. Is a single numeric
+  value.
 
 - `method`:
 
@@ -88,27 +88,26 @@ with suitable arguments to create a Fisher combination test design.
 
   If `TRUE`, the stopping rule is based on the phenomenon of
   non-stochastic curtailment rather than stochastic reasoning. Is a
-  logical vector of length 1.
+  single logical value.
 
 - `sided`:
 
   Describes if the alternative is one-sided (`1`) or two-sided (`2`). Is
-  a numeric vector of length 1 containing a whole number.
+  a single numeric value representing a whole number.
 
 - `simAlpha`:
 
   The observed alpha error if simulations have been performed. Is a
-  numeric vector of length 1 containing a value between 0 and 1.
+  single numeric value between 0 and 1.
 
 - `iterations`:
 
-  The number of iterations used for simulations. Is a numeric vector of
-  length 1 containing a whole number.
+  The number of iterations used for simulations. Is a single numeric
+  value representing a whole number.
 
 - `seed`:
 
-  The seed used for random number generation. Is a numeric vector of
-  length 1.
+  The seed used for random number generation. Is a single numeric value.
 
 ## See also
 

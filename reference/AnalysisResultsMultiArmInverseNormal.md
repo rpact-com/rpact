@@ -15,19 +15,17 @@ inverse normal design.
 
   Describes if a normal approximation was used when calculating
   p-values. Default for means is `FALSE` and `TRUE` for rates and hazard
-  ratio. Is a logical vector of length 1.
+  ratio. Is a single logical value.
 
 - `directionUpper`:
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.
 
 - `thetaH0`:
 
-  The difference or assumed effect under H0. Is a numeric vector of
-  length 1.
+  The difference or assumed effect under H0. Is a single numeric value.
 
 - `pi1`:
 
@@ -38,7 +36,7 @@ inverse normal design.
 - `pi2`:
 
   The assumed probability in the reference group for two-group designs.
-  Is a numeric vector of length 1 containing a value between 0 and 1.
+  Is a single numeric value between 0 and 1.
 
 - `nPlanned`:
 
@@ -49,7 +47,7 @@ inverse normal design.
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `thetaH1`:
 
@@ -69,7 +67,7 @@ inverse normal design.
 - `intersectionTest`:
 
   The multiple test used for intersection hypotheses in closed systems
-  of hypotheses. Is a character vector of length 1.
+  of hypotheses. Is a single character value.
 
 - `varianceOption`:
 
@@ -87,8 +85,8 @@ inverse normal design.
 
 - `conditionalPower`:
 
-  The conditional power at each stage of the trial. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  The conditional power at each stage of the trial. Is a single numeric
+  value between 0 and 1.
 
 - `repeatedConfidenceIntervalLowerBounds`:
 
@@ -108,5 +106,5 @@ inverse normal design.
 - `piControl`:
 
   The assumed probability in the control arm for simulation and under
-  which the sample size recalculation is performed. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  which the sample size recalculation is performed. Is a single numeric
+  value between 0 and 1.

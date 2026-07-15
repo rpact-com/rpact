@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@
 
 
 <dl><dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.</p></dd>
 
 
 <dt><code>alternative</code></dt>
@@ -65,7 +65,7 @@
 
 
 <dt><code>conditionalPower</code></dt>
-<dd><p>The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The conditional power at each stage of the trial. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>conditionalPowerAchieved</code></dt>
@@ -73,7 +73,7 @@
 
 
 <dt><code>directionUpper</code></dt>
-<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.</p></dd>
+<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a single logical value.</p></dd>
 
 
 <dt><code>earlyStop</code></dt>
@@ -101,11 +101,11 @@
 
 
 <dt><code>iterations</code></dt>
-<dd><p>The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>The number of iterations used for simulations. Is a single numeric value representing a  whole number.</p></dd>
 
 
 <dt><code>maxNumberOfIterations</code></dt>
-<dd><p>The number of simulation iterations. Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>The number of simulation iterations. Is a single numeric value representing a  whole number.</p></dd>
 
 
 <dt><code>maxNumberOfSubjectsPerStage</code></dt>
@@ -113,7 +113,7 @@
 
 
 <dt><code>meanRatio</code></dt>
-<dd><p>Specifies if the sample size for one-sided testing of H0: <code>mu1/mu2 = thetaH0</code> has been calculated. Is a logical vector of length 1.</p></dd>
+<dd><p>Specifies if the sample size for one-sided testing of H0: <code>mu1/mu2 = thetaH0</code> has been calculated. Is a single logical value.</p></dd>
 
 
 <dt><code>minNumberOfSubjectsPerStage</code></dt>
@@ -121,7 +121,7 @@
 
 
 <dt><code>normalApproximation</code></dt>
-<dd><p>Describes if a normal approximation was used when calculating p-values. Default for means is <code>FALSE</code> and <code>TRUE</code> for rates and hazard ratio. Is a logical vector of length 1.</p></dd>
+<dd><p>Describes if a normal approximation was used when calculating p-values. Default for means is <code>FALSE</code> and <code>TRUE</code> for rates and hazard ratio. Is a single logical value.</p></dd>
 
 
 <dt><code>overallReject</code></dt>
@@ -141,19 +141,19 @@
 
 
 <dt><code>seed</code></dt>
-<dd><p>The seed used for random number generation. Is a numeric vector of length 1.</p></dd>
+<dd><p>The seed used for random number generation. Is a single numeric value.</p></dd>
 
 
 <dt><code>stDev</code></dt>
-<dd><p>The standard deviation used for sample size and power calculation. Is a numeric vector of length 1.</p></dd>
+<dd><p>The standard deviation used for sample size and power calculation. Is a single numeric value.</p></dd>
 
 
 <dt><code>stDevH1</code></dt>
-<dd><p>The standard deviation under which the conditional power or sample size recalculation is performed. Is a numeric vector of length 1.</p></dd>
+<dd><p>The standard deviation under which the conditional power or sample size recalculation is performed. Is a single numeric value.</p></dd>
 
 
 <dt><code>thetaH0</code></dt>
-<dd><p>The difference or assumed effect under H0. Is a numeric vector of length 1.</p></dd>
+<dd><p>The difference or assumed effect under H0. Is a single numeric value.</p></dd>
 
 
 <dt><code>thetaH1</code></dt>
@@ -171,7 +171,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

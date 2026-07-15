@@ -31,18 +31,18 @@ to create an object of this type.
 - `allocation1`:
 
   The number of subjects to be assigned to treatment 1 in subsequent
-  order. Is a numeric vector of length 1 containing a whole number.
+  order. Is a single numeric value representing a whole number.
 
 - `allocation2`:
 
   The number of subjects to be assigned to treatment 2 in subsequent
-  order. Is a numeric vector of length 1 containing a whole number.
+  order. Is a single numeric value representing a whole number.
 
 - `allocationRatioPlanned`:
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `calcEventsFunction`:
 
@@ -53,8 +53,8 @@ to create an object of this type.
 
 - `conditionalPower`:
 
-  The conditional power at each stage of the trial. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  The conditional power at each stage of the trial. Is a single numeric
+  value between 0 and 1.
 
 - `conditionalPowerAchieved`:
 
@@ -69,23 +69,22 @@ to create an object of this type.
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.
 
 - `dropoutRate1`:
 
-  The assumed drop-out rate in the treatment group. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  The assumed drop-out rate in the treatment group. Is a single numeric
+  value between 0 and 1.
 
 - `dropoutRate2`:
 
-  The assumed drop-out rate in the control group. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The assumed drop-out rate in the control group. Is a single numeric
+  value between 0 and 1.
 
 - `dropoutTime`:
 
   The assumed time for drop-out rates in the control and treatment
-  group. Is a numeric vector of length 1.
+  group. Is a single numeric value.
 
 - `earlyStop`:
 
@@ -100,7 +99,7 @@ to create an object of this type.
 - `eventTime`:
 
   The assumed time under which the event rates are calculated. Is a
-  numeric vector of length 1.
+  single numeric value.
 
 - `expectedNumberOfEvents`:
 
@@ -128,13 +127,13 @@ to create an object of this type.
 
 - `iterations`:
 
-  The number of iterations used for simulations. Is a numeric vector of
-  length 1 containing a whole number.
+  The number of iterations used for simulations. Is a single numeric
+  value representing a whole number.
 
 - `kappa`:
 
-  The shape of the Weibull distribution if `kappa!=1`. Is a numeric
-  vector of length 1.
+  The shape of the Weibull distribution if `kappa!=1`. Is a single
+  numeric value.
 
 - `lambda1`:
 
@@ -143,8 +142,8 @@ to create an object of this type.
 
 - `lambda2`:
 
-  The assumed hazard rate in the reference group. Is a numeric vector of
-  length 1.
+  The assumed hazard rate in the reference group. Is a single numeric
+  value.
 
 - `maxNumberOfEventsPerStage`:
 
@@ -154,8 +153,8 @@ to create an object of this type.
 
 - `maxNumberOfIterations`:
 
-  The number of simulation iterations. Is a numeric vector of length 1
-  containing a whole number.
+  The number of simulation iterations. Is a single numeric value
+  representing a whole number.
 
 - `maxNumberOfSubjects`:
 
@@ -169,8 +168,8 @@ to create an object of this type.
 
 - `median2`:
 
-  The assumed median survival time in the reference group. Is a numeric
-  vector of length 1.
+  The assumed median survival time in the reference group. Is a single
+  numeric value.
 
 - `minNumberOfEventsPerStage`:
 
@@ -206,8 +205,8 @@ to create an object of this type.
 
 - `pi2`:
 
-  The assumed event rate in the control group. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The assumed event rate in the control group. Is a single numeric value
+  between 0 and 1.
 
 - `piecewiseSurvivalTime`:
 
@@ -230,8 +229,7 @@ to create an object of this type.
 
 - `seed`:
 
-  The seed used for random number generation. Is a numeric vector of
-  length 1.
+  The seed used for random number generation. Is a single numeric value.
 
 - `singleEventsPerStage`:
 
@@ -244,8 +242,7 @@ to create an object of this type.
 
 - `thetaH0`:
 
-  The difference or assumed effect under H0. Is a numeric vector of
-  length 1.
+  The difference or assumed effect under H0. Is a single numeric value.
 
 - `thetaH1`:
 

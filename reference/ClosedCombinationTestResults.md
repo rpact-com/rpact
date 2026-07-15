@@ -14,7 +14,7 @@ closed combination test design.
 - `intersectionTest`:
 
   The multiple test used for intersection hypotheses in closed systems
-  of hypotheses. Is a character vector of length 1.
+  of hypotheses. Is a single character value.
 
 - `indices`:
 

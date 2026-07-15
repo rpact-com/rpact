@@ -17,8 +17,7 @@ enrichment means.
 
 - `thetaH0`:
 
-  The difference or assumed effect under H0. Is a numeric vector of
-  length 1.
+  The difference or assumed effect under H0. Is a single numeric value.
 
 - `direction`:
 
@@ -29,14 +28,13 @@ enrichment means.
 
   Describes if a normal approximation was used when calculating
   p-values. Default for means is `FALSE` and `TRUE` for rates and hazard
-  ratio. Is a logical vector of length 1.
+  ratio. Is a single logical value.
 
 - `directionUpper`:
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.
 
 - `varianceOption`:
 
@@ -49,7 +47,7 @@ enrichment means.
 - `intersectionTest`:
 
   The multiple test used for intersection hypotheses in closed systems
-  of hypotheses. Is a character vector of length 1.
+  of hypotheses. Is a single character value.
 
 - `testStatistics`:
 
@@ -97,7 +95,7 @@ enrichment means.
   For enrichment designs, typically a stratified analysis should be
   chosen. When testing means and rates, a non-stratified analysis can be
   performed on overall data. For survival data, only a stratified
-  analysis is possible. Is a logical vector of length 1.
+  analysis is possible. Is a single logical value.
 
 - `combInverseNormal`:
 

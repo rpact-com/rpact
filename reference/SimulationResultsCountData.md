@@ -23,19 +23,18 @@ to create an object of this type.
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `conditionalPower`:
 
-  The conditional power at each stage of the trial. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  The conditional power at each stage of the trial. Is a single numeric
+  value between 0 and 1.
 
 - `directionUpper`:
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.
 
 - `earlyStop`:
 
@@ -57,13 +56,13 @@ to create an object of this type.
 
 - `iterations`:
 
-  The number of iterations used for simulations. Is a numeric vector of
-  length 1 containing a whole number.
+  The number of iterations used for simulations. Is a single numeric
+  value representing a whole number.
 
 - `maxNumberOfIterations`:
 
-  The number of simulation iterations. Is a numeric vector of length 1
-  containing a whole number.
+  The number of simulation iterations. Is a single numeric value
+  representing a whole number.
 
 - `overallReject`:
 
@@ -82,10 +81,8 @@ to create an object of this type.
 
 - `seed`:
 
-  The seed used for random number generation. Is a numeric vector of
-  length 1.
+  The seed used for random number generation. Is a single numeric value.
 
 - `thetaH0`:
 
-  The difference or assumed effect under H0. Is a numeric vector of
-  length 1.
+  The difference or assumed effect under H0. Is a single numeric value.

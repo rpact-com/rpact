@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,11 +51,11 @@ with suitable arguments to create a conditional Dunnett test design.</p>
 
 
 <dl><dt><code>kMax</code></dt>
-<dd><p>The maximum number of stages <code>K</code>. Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>The maximum number of stages <code>K</code>. Is a single numeric value representing a  whole number.</p></dd>
 
 
 <dt><code>alpha</code></dt>
-<dd><p>The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The significance level alpha, default is 0.025. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>stages</code></dt>
@@ -83,23 +83,23 @@ with suitable arguments to create a conditional Dunnett test design.</p>
 
 
 <dt><code>bindingFutility</code></dt>
-<dd><p>If <code>TRUE</code>, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is <code>FALSE</code>) Is a logical vector of length 1.</p></dd>
+<dd><p>If <code>TRUE</code>, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is <code>FALSE</code>) Is a single logical value.</p></dd>
 
 
 <dt><code>tolerance</code></dt>
-<dd><p>The numerical tolerance, default is <code>1e-06</code>. Is a numeric vector of length 1.</p></dd>
+<dd><p>The numerical tolerance, default is <code>1e-06</code>. Is a single numeric value.</p></dd>
 
 
 <dt><code>informationAtInterim</code></dt>
-<dd><p>The information to be expected at interim, default is informationAtInterim = 0.5. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The information to be expected at interim, default is informationAtInterim = 0.5. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>secondStageConditioning</code></dt>
-<dd><p>The way the second stage p-values are calculated within the closed system of hypotheses. If <code>FALSE</code>, the unconditional adjusted p-values are used, otherwise conditional adjusted p-values are calculated. Is a logical vector of length 1.</p></dd>
+<dd><p>The way the second stage p-values are calculated within the closed system of hypotheses. If <code>FALSE</code>, the unconditional adjusted p-values are used, otherwise conditional adjusted p-values are calculated. Is a single logical value.</p></dd>
 
 
 <dt><code>sided</code></dt>
-<dd><p>Describes if the alternative is one-sided (<code>1</code>) or two-sided (<code>2</code>). Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>Describes if the alternative is one-sided (<code>1</code>) or two-sided (<code>2</code>). Is a single numeric value representing a  whole number.</p></dd>
 
 
 </dl></div>
@@ -117,7 +117,7 @@ with suitable arguments to create a conditional Dunnett test design.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,7 @@
 <span>  thetaH0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">meanRatio</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>  alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">1</span>, <span class="fl">0.2</span><span class="op">)</span>,</span>
 <span>  stDev <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  directionUpper <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  allocationRatioPlanned <span class="op">=</span> <span class="cn">NA_real_</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -112,6 +113,12 @@ For two-armed trials, it is allowed to specify the standard deviations separatel
 i.e., as vector with two elements.
 If <code>meanRatio = TRUE</code> is specified, <code>stDev</code> defines
 the coefficient of variation <code>sigma / mu2</code>.</p></dd>
+
+
+<dt id="arg-directionupper">directionUpper<a class="anchor" aria-label="anchor" href="#arg-directionupper"></a></dt>
+<dd><p>Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is <code>TRUE</code>
+which means that larger values of the test statistics yield smaller p-values.</p></dd>
 
 
 <dt id="arg-allocationratioplanned">allocationRatioPlanned<a class="anchor" aria-label="anchor" href="#arg-allocationratioplanned"></a></dt>
@@ -197,7 +204,7 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

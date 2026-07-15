@@ -17,14 +17,14 @@ use `getDesignCharacteristics` with suitable arguments to create it.
 
 - `shift`:
 
-  The shift value for group sequential test characteristics. Is a
-  numeric vector of length 1.
+  The shift value for group sequential test characteristics. Is a single
+  numeric value.
 
 - `inflationFactor`:
 
   The relative increase of maximum sample size in a group sequential
-  design as compared to the fixed sample size case. Is a positive
-  numeric vector of length 1.
+  design as compared to the fixed sample size case. Is a single positive
+  numeric value.
 
 - `stages`:
 
@@ -54,18 +54,16 @@ use `getDesignCharacteristics` with suitable arguments to create it.
 
 - `averageSampleNumber1`:
 
-  The expected sample size under H1. Is a positive numeric vector of
-  length 1.
+  The expected sample size under H1. Is a single positive numeric value.
 
 - `averageSampleNumber01`:
 
-  The expected sample size for a value between H0 and H1. Is a positive
-  numeric vector of length 1.
+  The expected sample size for a value between H0 and H1. Is a single
+  positive numeric value.
 
 - `averageSampleNumber0`:
 
-  The expected sample size under H0. Is a positive numeric vector of
-  length 1.
+  The expected sample size under H0. Is a single positive numeric value.
 
 ## See also
 

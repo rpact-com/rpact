@@ -11,6 +11,7 @@ getSampleSizeSurvival(
   ...,
   typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
   thetaH0 = 1,
+  directionUpper = NA,
   pi1 = NA_real_,
   pi2 = NA_real_,
   lambda1 = NA_real_,
@@ -77,6 +78,12 @@ getSampleSizeSurvival(
 
   For testing a rate in one sample, a value `thetaH0` in (0, 1) has to
   be specified for defining the null hypothesis H0: `pi = thetaH0`.
+
+- directionUpper:
+
+  Logical. Specifies the direction of the alternative, only applicable
+  for one-sided testing; default is `TRUE` which means that larger
+  values of the test statistics yield smaller p-values.
 
 - pi1:
 

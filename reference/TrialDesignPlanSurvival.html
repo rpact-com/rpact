@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dl><dt><code>thetaH0</code></dt>
-<dd><p>The difference or assumed effect under H0. Is a numeric vector of length 1.</p></dd>
+<dd><p>The difference or assumed effect under H0. Is a single numeric value.</p></dd>
 
 
 <dt><code>typeOfComputation</code></dt>
@@ -59,7 +59,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>directionUpper</code></dt>
-<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.</p></dd>
+<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a single logical value.</p></dd>
 
 
 <dt><code>pi1</code></dt>
@@ -67,7 +67,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>pi2</code></dt>
-<dd><p>The assumed event rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The assumed event rate in the control group. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>median1</code></dt>
@@ -75,7 +75,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>median2</code></dt>
-<dd><p>The assumed median survival time in the reference group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed median survival time in the reference group. Is a single numeric value.</p></dd>
 
 
 <dt><code>lambda1</code></dt>
@@ -83,7 +83,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>lambda2</code></dt>
-<dd><p>The assumed hazard rate in the reference group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed hazard rate in the reference group. Is a single numeric value.</p></dd>
 
 
 <dt><code>hazardRatio</code></dt>
@@ -107,19 +107,19 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.</p></dd>
 
 
 <dt><code>optimumAllocationRatio</code></dt>
-<dd><p>The allocation ratio that is optimum with respect to the overall sample size at given power. Is a logical vector of length 1.</p></dd>
+<dd><p>The allocation ratio that is optimum with respect to the overall sample size at given power. Is a single logical value.</p></dd>
 
 
 <dt><code>accountForObservationTimes</code></dt>
-<dd><p>If <code>FALSE</code>, only the event rates are used for the calculation of the maximum number of subjects. Is a logical vector of length 1.</p></dd>
+<dd><p>If <code>FALSE</code>, only the event rates are used for the calculation of the maximum number of subjects. Is a single logical value.</p></dd>
 
 
 <dt><code>eventTime</code></dt>
-<dd><p>The assumed time under which the event rates are calculated. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed time under which the event rates are calculated. Is a single numeric value.</p></dd>
 
 
 <dt><code>accrualTime</code></dt>
@@ -127,7 +127,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>totalAccrualTime</code></dt>
-<dd><p>The total accrual time, i.e., the maximum of <code>accrualTime</code>. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The total accrual time, i.e., the maximum of <code>accrualTime</code>. Is a single positive numeric value.</p></dd>
 
 
 <dt><code>accrualIntensity</code></dt>
@@ -139,7 +139,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>kappa</code></dt>
-<dd><p>The shape of the Weibull distribution if <code>kappa!=1</code>. Is a numeric vector of length 1.</p></dd>
+<dd><p>The shape of the Weibull distribution if <code>kappa!=1</code>. Is a single numeric value.</p></dd>
 
 
 <dt><code>piecewiseSurvivalTime</code></dt>
@@ -147,19 +147,19 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>followUpTime</code></dt>
-<dd><p>The assumed follow-up time for the study. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed follow-up time for the study. Is a single numeric value.</p></dd>
 
 
 <dt><code>dropoutRate1</code></dt>
-<dd><p>The assumed drop-out rate in the treatment group. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The assumed drop-out rate in the treatment group. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>dropoutRate2</code></dt>
-<dd><p>The assumed drop-out rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The assumed drop-out rate in the control group. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>dropoutTime</code></dt>
-<dd><p>The assumed time for drop-out rates in the control and treatment group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.</p></dd>
 
 
 <dt><code>chi</code></dt>
@@ -313,7 +313,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

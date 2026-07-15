@@ -31,10 +31,9 @@ A class for simulation results.
 
 - `seed`:
 
-  The seed used for random number generation. Is a numeric vector of
-  length 1.
+  The seed used for random number generation. Is a single numeric value.
 
 - `iterations`:
 
-  The number of iterations used for simulations. Is a numeric vector of
-  length 1 containing a whole number.
+  The number of iterations used for simulations. Is a single numeric
+  value representing a whole number.

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,15 +51,15 @@ with suitable arguments to create the enrichment analysis results of an inverse 
 
 
 <dl><dt><code>normalApproximation</code></dt>
-<dd><p>Describes if a normal approximation was used when calculating p-values. Default for means is <code>FALSE</code> and <code>TRUE</code> for rates and hazard ratio. Is a logical vector of length 1.</p></dd>
+<dd><p>Describes if a normal approximation was used when calculating p-values. Default for means is <code>FALSE</code> and <code>TRUE</code> for rates and hazard ratio. Is a single logical value.</p></dd>
 
 
 <dt><code>directionUpper</code></dt>
-<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.</p></dd>
+<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a single logical value.</p></dd>
 
 
 <dt><code>thetaH0</code></dt>
-<dd><p>The difference or assumed effect under H0. Is a numeric vector of length 1.</p></dd>
+<dd><p>The difference or assumed effect under H0. Is a single numeric value.</p></dd>
 
 
 <dt><code>pi1</code></dt>
@@ -67,7 +67,7 @@ with suitable arguments to create the enrichment analysis results of an inverse 
 
 
 <dt><code>pi2</code></dt>
-<dd><p>The assumed probability in the reference group for two-group designs. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The assumed probability in the reference group for two-group designs. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>nPlanned</code></dt>
@@ -75,7 +75,7 @@ with suitable arguments to create the enrichment analysis results of an inverse 
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.</p></dd>
 
 
 <dt><code>thetaH1</code></dt>
@@ -91,7 +91,7 @@ with suitable arguments to create the enrichment analysis results of an inverse 
 
 
 <dt><code>intersectionTest</code></dt>
-<dd><p>The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a character vector of length 1.</p></dd>
+<dd><p>The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a single character value.</p></dd>
 
 
 <dt><code>varianceOption</code></dt>
@@ -103,7 +103,7 @@ with suitable arguments to create the enrichment analysis results of an inverse 
 
 
 <dt><code>conditionalPower</code></dt>
-<dd><p>The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The conditional power at each stage of the trial. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>repeatedConfidenceIntervalLowerBounds</code></dt>
@@ -123,7 +123,7 @@ with suitable arguments to create the enrichment analysis results of an inverse 
 
 
 <dt><code>stratifiedAnalysis</code></dt>
-<dd><p>For enrichment designs, typically a stratified analysis should be chosen. When testing means and rates, a non-stratified analysis can be performed on overall data. For survival data, only a stratified analysis is possible. Is a logical vector of length 1.</p></dd>
+<dd><p>For enrichment designs, typically a stratified analysis should be chosen. When testing means and rates, a non-stratified analysis can be performed on overall data. For survival data, only a stratified analysis is possible. Is a single logical value.</p></dd>
 
 
 </dl></div>
@@ -137,7 +137,7 @@ with suitable arguments to create the enrichment analysis results of an inverse 
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

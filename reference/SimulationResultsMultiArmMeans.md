@@ -13,7 +13,7 @@ to create an object of this type.
 - `activeArms`:
 
   The number of active treatment arms to be compared with control. Is a
-  numeric vector of length 1 containing a whole number.
+  single numeric value representing a whole number.
 
 - `adaptations`:
 
@@ -24,7 +24,7 @@ to create an object of this type.
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `calcSubjectsFunction`:
 
@@ -35,8 +35,8 @@ to create an object of this type.
 
 - `conditionalPower`:
 
-  The conditional power at each stage of the trial. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  The conditional power at each stage of the trial. Is a single numeric
+  value between 0 and 1.
 
 - `conditionalPowerAchieved`:
 
@@ -57,12 +57,12 @@ to create an object of this type.
 
   Criterion for treatment arm/population selection, either based on test
   statistic (`"testStatistic"`) or effect estimate (`"effectEstimate"`).
-  Is a character vector of length 1.
+  Is a single character value.
 
 - `epsilonValue`:
 
-  Needs to be specified if `typeOfSelection = "epsilon"`. Is a numeric
-  vector of length 1.
+  Needs to be specified if `typeOfSelection = "epsilon"`. Is a single
+  numeric value.
 
 - `expectedNumberOfSubjects`:
 
@@ -81,23 +81,23 @@ to create an object of this type.
 - `gED50`:
 
   The ED50 of the sigmoid Emax model. Only necessary if
-  `typeOfShape = "sigmoidEmax"` has been specified. Is a numeric vector
-  of length 1.
+  `typeOfShape = "sigmoidEmax"` has been specified. Is a single numeric
+  value.
 
 - `intersectionTest`:
 
   The multiple test used for intersection hypotheses in closed systems
-  of hypotheses. Is a character vector of length 1.
+  of hypotheses. Is a single character value.
 
 - `iterations`:
 
-  The number of iterations used for simulations. Is a numeric vector of
-  length 1 containing a whole number.
+  The number of iterations used for simulations. Is a single numeric
+  value representing a whole number.
 
 - `maxNumberOfIterations`:
 
-  The number of simulation iterations. Is a numeric vector of length 1
-  containing a whole number.
+  The number of simulation iterations. Is a single numeric value
+  representing a whole number.
 
 - `maxNumberOfSubjectsPerStage`:
 
@@ -121,9 +121,9 @@ to create an object of this type.
   response for `"linear"` and `"sigmoidEmax"` model. Is a numeric
   vector.
 
-- `numberOfActiveArms`:
+- `numberOfSelectedArms`:
 
-  The number of active arms in a multi-armed design. Is a numeric
+  The number of selected arms in a multi-armed design. Is a numeric
   matrix.
 
 - `plannedSubjects`:
@@ -145,8 +145,8 @@ to create an object of this type.
 
 - `rValue`:
 
-  Needs to be specified if `typeOfSelection = "rBest"`. Is a numeric
-  vector of length 1.
+  Needs to be specified if `typeOfSelection = "rBest"`. Is a single
+  numeric value.
 
 - `sampleSizes`:
 
@@ -156,8 +156,7 @@ to create an object of this type.
 
 - `seed`:
 
-  The seed used for random number generation. Is a numeric vector of
-  length 1.
+  The seed used for random number generation. Is a single numeric value.
 
 - `selectArmsFunction`:
 
@@ -171,17 +170,17 @@ to create an object of this type.
 - `slope`:
 
   The slope of the sigmoid Emax model, if `typeOfShape = "sigmoidEmax"`
-  Is a numeric vector of length 1.
+  Is a single numeric value.
 
 - `stDev`:
 
   The standard deviation used for sample size and power calculation. Is
-  a numeric vector of length 1.
+  a single numeric value.
 
 - `stDevH1`:
 
   The standard deviation under which the conditional power or sample
-  size recalculation is performed. Is a numeric vector of length 1.
+  size recalculation is performed. Is a single numeric value.
 
 - `successCriterion`:
 
@@ -189,7 +188,7 @@ to create an object of this type.
   stops the trial if the efficacy criterion has been fulfilled for all
   selected treatment arms/populations, `"atLeastOne"` stops if at least
   one of the selected treatment arms/populations is shown to be superior
-  to control at interim. Is a character vector of length 1.
+  to control at interim. Is a single character value.
 
 - `successPerStage`:
 
@@ -211,9 +210,9 @@ to create an object of this type.
 - `typeOfSelection`:
 
   The way the treatment arms or populations are selected at interim. Is
-  a character vector of length 1.
+  a single character value.
 
 - `typeOfShape`:
 
   The shape of the dose-response relationship over the treatment groups.
-  Is a character vector of length 1.
+  Is a single character value.

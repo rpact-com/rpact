@@ -12,7 +12,7 @@ with suitable arguments to create it.
 
 - `nMax`:
 
-  The maximum sample size. Is a numeric vector of length 1 containing a
+  The maximum sample size. Is a single numeric value representing a
   whole number.
 
 - `theta`:

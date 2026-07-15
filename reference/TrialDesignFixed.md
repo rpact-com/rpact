@@ -12,13 +12,13 @@ with suitable arguments to create a fixed design.
 
 - `kMax`:
 
-  The maximum number of stages `K`. Is a numeric vector of length 1
-  containing a whole number.
+  The maximum number of stages `K`. Is a single numeric value
+  representing a whole number.
 
 - `alpha`:
 
-  The significance level alpha, default is 0.025. Is a numeric vector of
-  length 1 containing a value between 0 and 1.
+  The significance level alpha, default is 0.025. Is a single numeric
+  value between 0 and 1.
 
 - `stages`:
 
@@ -27,18 +27,18 @@ with suitable arguments to create a fixed design.
 
 - `tolerance`:
 
-  The numerical tolerance, default is `1e-06`. Is a numeric vector of
-  length 1.
+  The numerical tolerance, default is `1e-06`. Is a single numeric
+  value.
 
 - `sided`:
 
   Describes if the alternative is one-sided (`1`) or two-sided (`2`). Is
-  a numeric vector of length 1 containing a whole number.
+  a single numeric value representing a whole number.
 
 - `twoSidedPower`:
 
   Specifies if power is defined two-sided at each stage of the trial. Is
-  a logical vector of length 1.
+  a single logical value.
 
 ## See also
 

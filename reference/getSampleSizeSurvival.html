@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@
 <span>  <span class="va">...</span>,</span>
 <span>  typeOfComputation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Schoenfeld"</span>, <span class="st">"Freedman"</span>, <span class="st">"HsiehFreedman"</span><span class="op">)</span>,</span>
 <span>  thetaH0 <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  directionUpper <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  pi1 <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  pi2 <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  lambda1 <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
@@ -103,6 +104,12 @@ That is, in case of (one-sided) testing of</p><ul><li><p><em>means</em>: a value
 <li><p><em>count data</em>: a bound for testing H0: <code>lambda1 / lambda2 = thetaH0 != 1</code> can be specified.</p></li>
 </ul><p>For testing a rate in one sample, a value <code>thetaH0</code> in (0, 1) has to be specified for
 defining the null hypothesis H0: <code>pi = thetaH0</code>.</p></dd>
+
+
+<dt id="arg-directionupper">directionUpper<a class="anchor" aria-label="anchor" href="#arg-directionupper"></a></dt>
+<dd><p>Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is <code>TRUE</code>
+which means that larger values of the test statistics yield smaller p-values.</p></dd>
 
 
 <dt id="arg-pi-">pi1<a class="anchor" aria-label="anchor" href="#arg-pi-"></a></dt>
@@ -412,7 +419,7 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

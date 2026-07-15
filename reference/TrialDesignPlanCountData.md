@@ -12,8 +12,7 @@ with suitable arguments to create a design plan for a dataset of rates.
 
 - `thetaH0`:
 
-  The difference or assumed effect under H0. Is a numeric vector of
-  length 1.
+  The difference or assumed effect under H0. Is a single numeric value.
 
 - `groups`:
 
@@ -23,19 +22,18 @@ with suitable arguments to create a design plan for a dataset of rates.
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `optimumAllocationRatio`:
 
   The allocation ratio that is optimum with respect to the overall
-  sample size at given power. Is a logical vector of length 1.
+  sample size at given power. Is a single logical value.
 
 - `directionUpper`:
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.
 
 - `lambda1`:
 
@@ -44,8 +42,8 @@ with suitable arguments to create a design plan for a dataset of rates.
 
 - `lambda2`:
 
-  The assumed hazard rate in the reference group. Is a numeric vector of
-  length 1.
+  The assumed hazard rate in the reference group. Is a single numeric
+  value.
 
 - `lambda`:
 
@@ -133,8 +131,7 @@ with suitable arguments to create a design plan for a dataset of rates.
 
 - `followUpTime`:
 
-  The assumed follow-up time for the study. Is a numeric vector of
-  length 1.
+  The assumed follow-up time for the study. Is a single numeric value.
 
 - `calendarTime`:
 
@@ -175,7 +172,7 @@ with suitable arguments to create a design plan for a dataset of rates.
 
 - `maxInformation`:
 
-  The maximum information. Is a numeric vector of length 1 containing a
+  The maximum information. Is a single numeric value representing a
   whole number.
 
 - `futilityBoundsPValueScale`:

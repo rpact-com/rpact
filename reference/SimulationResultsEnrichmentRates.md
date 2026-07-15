@@ -19,7 +19,7 @@ to create an object of this type.
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `calcSubjectsFunction`:
 
@@ -30,8 +30,8 @@ to create an object of this type.
 
 - `conditionalPower`:
 
-  The conditional power at each stage of the trial. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  The conditional power at each stage of the trial. Is a single numeric
+  value between 0 and 1.
 
 - `conditionalPowerAchieved`:
 
@@ -42,8 +42,7 @@ to create an object of this type.
 
   Specifies the direction of the alternative, only applicable for
   one-sided testing. Default is `TRUE` which means that larger values of
-  the test statistics yield smaller p-values. Is a logical vector of
-  length 1.
+  the test statistics yield smaller p-values. Is a single logical value.
 
 - `earlyStop`:
 
@@ -59,12 +58,12 @@ to create an object of this type.
 
   Criterion for treatment arm/population selection, either based on test
   statistic (`"testStatistic"`) or effect estimate (`"effectEstimate"`).
-  Is a character vector of length 1.
+  Is a single character value.
 
 - `epsilonValue`:
 
-  Needs to be specified if `typeOfSelection = "epsilon"`. Is a numeric
-  vector of length 1.
+  Needs to be specified if `typeOfSelection = "epsilon"`. Is a single
+  numeric value.
 
 - `expectedNumberOfSubjects`:
 
@@ -83,17 +82,17 @@ to create an object of this type.
 - `intersectionTest`:
 
   The multiple test used for intersection hypotheses in closed systems
-  of hypotheses. Is a character vector of length 1.
+  of hypotheses. Is a single character value.
 
 - `iterations`:
 
-  The number of iterations used for simulations. Is a numeric vector of
-  length 1 containing a whole number.
+  The number of iterations used for simulations. Is a single numeric
+  value representing a whole number.
 
 - `maxNumberOfIterations`:
 
-  The number of simulation iterations. Is a numeric vector of length 1
-  containing a whole number.
+  The number of simulation iterations. Is a single numeric value
+  representing a whole number.
 
 - `maxNumberOfSubjectsPerStage`:
 
@@ -119,8 +118,8 @@ to create an object of this type.
 - `piControlH1`:
 
   The assumed probability in the reference group, for which the
-  conditional power was calculated. Is a numeric vector of length 1
-  containing a value between 0 and 1.
+  conditional power was calculated. Is a single numeric value between 0
+  and 1.
 
 - `piTreatmentH1`:
 
@@ -138,8 +137,8 @@ to create an object of this type.
 
 - `populations`:
 
-  The number of populations in an enrichment design. Is a numeric vector
-  of length 1 containing a whole number.
+  The number of populations in an enrichment design. Is a single numeric
+  value representing a whole number.
 
 - `rejectAtLeastOne`:
 
@@ -152,8 +151,8 @@ to create an object of this type.
 
 - `rValue`:
 
-  Needs to be specified if `typeOfSelection = "rBest"`. Is a numeric
-  vector of length 1.
+  Needs to be specified if `typeOfSelection = "rBest"`. Is a single
+  numeric value.
 
 - `sampleSizes`:
 
@@ -163,8 +162,7 @@ to create an object of this type.
 
 - `seed`:
 
-  The seed used for random number generation. Is a numeric vector of
-  length 1.
+  The seed used for random number generation. Is a single numeric value.
 
 - `selectedPopulations`:
 
@@ -180,7 +178,7 @@ to create an object of this type.
   For enrichment designs, typically a stratified analysis should be
   chosen. When testing means and rates, a non-stratified analysis can be
   performed on overall data. For survival data, only a stratified
-  analysis is possible. Is a logical vector of length 1.
+  analysis is possible. Is a single logical value.
 
 - `successCriterion`:
 
@@ -188,7 +186,7 @@ to create an object of this type.
   stops the trial if the efficacy criterion has been fulfilled for all
   selected treatment arms/populations, `"atLeastOne"` stops if at least
   one of the selected treatment arms/populations is shown to be superior
-  to control at interim. Is a character vector of length 1.
+  to control at interim. Is a single character value.
 
 - `successPerStage`:
 
@@ -205,4 +203,4 @@ to create an object of this type.
 - `typeOfSelection`:
 
   The way the treatment arms or populations are selected at interim. Is
-  a character vector of length 1.
+  a single character value.

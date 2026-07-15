@@ -9,6 +9,7 @@ binomial distributed event numbers in two samples at given effect.
 getSampleSizeCounts(
   design = NULL,
   ...,
+  directionUpper = NA,
   lambda1 = NA_real_,
   lambda2 = NA_real_,
   lambda = NA_real_,
@@ -37,6 +38,12 @@ getSampleSizeCounts(
 
   Ensures that all arguments (starting from the "...") are to be named
   and that a warning will be displayed if unknown arguments are passed.
+
+- directionUpper:
+
+  Logical. Specifies the direction of the alternative, only applicable
+  for one-sided testing; default is `TRUE` which means that larger
+  values of the test statistics yield smaller p-values.
 
 - lambda1:
 

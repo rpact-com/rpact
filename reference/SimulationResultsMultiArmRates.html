@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@ to create an object of this type.</p>
 
 
 <dl><dt><code>activeArms</code></dt>
-<dd><p>The number of active treatment arms to be compared with control. Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>The number of active treatment arms to be compared with control. Is a single numeric value representing a  whole number.</p></dd>
 
 
 <dt><code>adaptations</code></dt>
@@ -59,7 +59,7 @@ to create an object of this type.</p>
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.</p></dd>
 
 
 <dt><code>calcSubjectsFunction</code></dt>
@@ -67,7 +67,7 @@ to create an object of this type.</p>
 
 
 <dt><code>conditionalPower</code></dt>
-<dd><p>The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The conditional power at each stage of the trial. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>conditionalPowerAchieved</code></dt>
@@ -75,7 +75,7 @@ to create an object of this type.</p>
 
 
 <dt><code>directionUpper</code></dt>
-<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.</p></dd>
+<dd><p>Specifies the direction of the alternative, only applicable for one-sided testing. Default is <code>TRUE</code> which means that larger values of the test statistics yield smaller p-values. Is a single logical value.</p></dd>
 
 
 <dt><code>earlyStop</code></dt>
@@ -87,11 +87,11 @@ to create an object of this type.</p>
 
 
 <dt><code>effectMeasure</code></dt>
-<dd><p>Criterion for treatment arm/population selection, either based on test statistic (<code>"testStatistic"</code>) or effect estimate (<code>"effectEstimate"</code>). Is a character vector of length 1.</p></dd>
+<dd><p>Criterion for treatment arm/population selection, either based on test statistic (<code>"testStatistic"</code>) or effect estimate (<code>"effectEstimate"</code>). Is a single character value.</p></dd>
 
 
 <dt><code>epsilonValue</code></dt>
-<dd><p>Needs to be specified if <code>typeOfSelection = "epsilon"</code>. Is a numeric vector of length 1.</p></dd>
+<dd><p>Needs to be specified if <code>typeOfSelection = "epsilon"</code>. Is a single numeric value.</p></dd>
 
 
 <dt><code>expectedNumberOfSubjects</code></dt>
@@ -107,39 +107,39 @@ to create an object of this type.</p>
 
 
 <dt><code>gED50</code></dt>
-<dd><p>The ED50 of the sigmoid Emax model. Only necessary if <code>typeOfShape = "sigmoidEmax"</code> has been specified. Is a numeric vector of length 1.</p></dd>
+<dd><p>The ED50 of the sigmoid Emax model. Only necessary if <code>typeOfShape = "sigmoidEmax"</code> has been specified. Is a single numeric value.</p></dd>
 
 
 <dt><code>intersectionTest</code></dt>
-<dd><p>The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a character vector of length 1.</p></dd>
+<dd><p>The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a single character value.</p></dd>
 
 
 <dt><code>iterations</code></dt>
-<dd><p>The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>The number of iterations used for simulations. Is a single numeric value representing a  whole number.</p></dd>
 
 
 <dt><code>maxNumberOfIterations</code></dt>
-<dd><p>The number of simulation iterations. Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>The number of simulation iterations. Is a single numeric value representing a  whole number.</p></dd>
 
 
 <dt><code>maxNumberOfSubjects</code></dt>
 <dd><p>The maximum number of subjects for power calculations. Is a numeric vector.</p></dd>
 
 
-<dt><code>numberOfActiveArms</code></dt>
-<dd><p>The number of active arms in a multi-armed design. Is a numeric matrix.</p></dd>
+<dt><code>numberOfSelectedArms</code></dt>
+<dd><p>The number of selected arms in a multi-armed design. Is a numeric matrix.</p></dd>
 
 
 <dt><code>piControl</code></dt>
-<dd><p>The assumed probability in the control arm for simulation and under which the sample size recalculation is performed. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The assumed probability in the control arm for simulation and under which the sample size recalculation is performed. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>piControlH1</code></dt>
-<dd><p>The assumed probability in the reference group, for which the conditional power was calculated. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The assumed probability in the reference group, for which the conditional power was calculated. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>piH1</code></dt>
-<dd><p>The assumed probability in the active treatment arm(s) under which the sample size recalculation is performed. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The assumed probability in the active treatment arm(s) under which the sample size recalculation is performed. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>piMaxVector</code></dt>
@@ -159,7 +159,7 @@ to create an object of this type.</p>
 
 
 <dt><code>rValue</code></dt>
-<dd><p>Needs to be specified if <code>typeOfSelection = "rBest"</code>. Is a numeric vector of length 1.</p></dd>
+<dd><p>Needs to be specified if <code>typeOfSelection = "rBest"</code>. Is a single numeric value.</p></dd>
 
 
 <dt><code>sampleSizes</code></dt>
@@ -167,7 +167,7 @@ to create an object of this type.</p>
 
 
 <dt><code>seed</code></dt>
-<dd><p>The seed used for random number generation. Is a numeric vector of length 1.</p></dd>
+<dd><p>The seed used for random number generation. Is a single numeric value.</p></dd>
 
 
 <dt><code>selectArmsFunction</code></dt>
@@ -179,11 +179,11 @@ to create an object of this type.</p>
 
 
 <dt><code>slope</code></dt>
-<dd><p>The slope of the sigmoid Emax model, if <code>typeOfShape = "sigmoidEmax"</code> Is a numeric vector of length 1.</p></dd>
+<dd><p>The slope of the sigmoid Emax model, if <code>typeOfShape = "sigmoidEmax"</code> Is a single numeric value.</p></dd>
 
 
 <dt><code>successCriterion</code></dt>
-<dd><p>Defines when the study is stopped for efficacy at interim. <code>"all"</code> stops the trial if the efficacy criterion has been fulfilled for all selected treatment arms/populations, <code>"atLeastOne"</code> stops if at least one of the selected treatment arms/populations is shown to be superior to control at interim. Is a character vector of length 1.</p></dd>
+<dd><p>Defines when the study is stopped for efficacy at interim. <code>"all"</code> stops the trial if the efficacy criterion has been fulfilled for all selected treatment arms/populations, <code>"atLeastOne"</code> stops if at least one of the selected treatment arms/populations is shown to be superior to control at interim. Is a single character value.</p></dd>
 
 
 <dt><code>successPerStage</code></dt>
@@ -195,11 +195,11 @@ to create an object of this type.</p>
 
 
 <dt><code>typeOfSelection</code></dt>
-<dd><p>The way the treatment arms or populations are selected at interim. Is a character vector of length 1.</p></dd>
+<dd><p>The way the treatment arms or populations are selected at interim. Is a single character value.</p></dd>
 
 
 <dt><code>typeOfShape</code></dt>
-<dd><p>The shape of the dose-response relationship over the treatment groups. Is a character vector of length 1.</p></dd>
+<dd><p>The shape of the dose-response relationship over the treatment groups. Is a single character value.</p></dd>
 
 
 </dl></div>
@@ -213,7 +213,7 @@ to create an object of this type.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

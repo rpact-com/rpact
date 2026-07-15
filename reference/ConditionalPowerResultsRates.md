@@ -20,28 +20,27 @@ combination test design.
 
   The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
   designs, it is the allocation ratio relating the active arm(s) to the
-  control. Is a positive numeric vector of length 1.
+  control. Is a single positive numeric value.
 
 - `iterations`:
 
-  The number of iterations used for simulations. Is a numeric vector of
-  length 1 containing a whole number.
+  The number of iterations used for simulations. Is a single numeric
+  value representing a whole number.
 
 - `seed`:
 
-  The seed used for random number generation. Is a numeric vector of
-  length 1.
+  The seed used for random number generation. Is a single numeric value.
 
 - `simulated`:
 
   Describes if the power for Fisher's combination test has been
-  simulated. Only applicable when using Fisher designs. Is a logical
-  vector of length 1.
+  simulated. Only applicable when using Fisher designs. Is a single
+  logical value.
 
 - `conditionalPower`:
 
-  The conditional power at each stage of the trial. Is a numeric vector
-  of length 1 containing a value between 0 and 1.
+  The conditional power at each stage of the trial. Is a single numeric
+  value between 0 and 1.
 
 - `pi1`:
 
@@ -52,4 +51,4 @@ combination test design.
 - `pi2`:
 
   The assumed probability in the reference group for two-group designs.
-  Is a numeric vector of length 1 containing a value between 0 and 1.
+  Is a single numeric value between 0 and 1.

@@ -35,10 +35,42 @@
   `getDesignGroupSequential(directionUpper = FALSE)`, the boundaries are
   now shown in the correct direction, typically as negative values. This
   also applies to futility bounds generated for beta-spending designs.
+- The new function
+  [`getFisherInformation()`](https://docs.rpact.org/reference/getFisherInformation.md)
+  can be used to calculate the Fisher information at the first planned
+  analysis stage for a design plan for means, rates, or survival
+  endpoints.
 
 ### Improvements, issues, and changes
 
 - Issue [\#118](https://github.com/rpact-com/rpact/issues/118) fixed
+- Several improvements and refactorings, focusing on enhanced error
+  handling, improved naming conventions, and more consistent function
+  signatures
+- Updates to the documentation
+- In
+  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md),
+  the early stopping probability (“Early stop”) is now displayed
+  stage-wise instead of overall
+- In
+  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md),
+  `numberOfSubjects1` and `numberOfSubjects2` are no longer shown in the
+  print output (though still available in the result object), and
+  `singleEventsPerStage` is now displayed.
+- Improved naming of variables and class fields: in
+  [`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md),
+  [`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md),
+  and
+  [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md),
+  the field `numberOfActiveArms` has been replaced by
+  `numberOfSelectedArms`.
+- Refactored error handling in plotting functions to use more specific
+  internal error functions (`stopIllegalArgument`,
+  `stopMissingArgument`) for clearer and more consistent error messages.
+- Standardized and clarified function signatures for R6 class
+  initializers and S3 methods, improving readability and
+  maintainability. This includes consistent formatting and argument
+  ordering across multiple classes
 
 ## rpact 4.4.0
 

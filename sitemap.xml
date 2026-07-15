@@ -121,6 +121,7 @@
 <url><loc>https://docs.rpact.org/reference/getEventProbabilities.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getFinalConfidenceInterval.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getFinalPValue.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/getFisherInformation.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getFutilityBounds.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getGroupSequentialProbabilities.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getLambdaStepFunction.html</loc></url>

@@ -14,6 +14,7 @@ getSampleSizeMeans(
   thetaH0 = ifelse(meanRatio, 1, 0),
   alternative = seq(0.2, 1, 0.2),
   stDev = 1,
+  directionUpper = NA,
   allocationRatioPlanned = NA_real_
 )
 ```
@@ -84,6 +85,12 @@ getSampleSizeMeans(
   allowed to specify the standard deviations separately, i.e., as vector
   with two elements. If `meanRatio = TRUE` is specified, `stDev` defines
   the coefficient of variation `sigma / mu2`.
+
+- directionUpper:
+
+  Logical. Specifies the direction of the alternative, only applicable
+  for one-sided testing; default is `TRUE` which means that larger
+  values of the test statistics yield smaller p-values.
 
 - allocationRatioPlanned:
 

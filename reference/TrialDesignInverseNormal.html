@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9311</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,11 +51,11 @@ with suitable arguments to create a inverse normal design.</p>
 
 
 <dl><dt><code>kMax</code></dt>
-<dd><p>The maximum number of stages <code>K</code>. Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>The maximum number of stages <code>K</code>. Is a single numeric value representing a  whole number.</p></dd>
 
 
 <dt><code>alpha</code></dt>
-<dd><p>The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The significance level alpha, default is 0.025. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>stages</code></dt>
@@ -83,31 +83,31 @@ with suitable arguments to create a inverse normal design.</p>
 
 
 <dt><code>bindingFutility</code></dt>
-<dd><p>If <code>TRUE</code>, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is <code>FALSE</code>) Is a logical vector of length 1.</p></dd>
+<dd><p>If <code>TRUE</code>, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is <code>FALSE</code>) Is a single logical value.</p></dd>
 
 
 <dt><code>tolerance</code></dt>
-<dd><p>The numerical tolerance, default is <code>1e-06</code>. Is a numeric vector of length 1.</p></dd>
+<dd><p>The numerical tolerance, default is <code>1e-06</code>. Is a single numeric value.</p></dd>
 
 
 <dt><code>typeOfDesign</code></dt>
-<dd><p>The type of design. Is a character vector of length 1.</p></dd>
+<dd><p>The type of design. Is a single character value.</p></dd>
 
 
 <dt><code>beta</code></dt>
-<dd><p>The Type II error rate necessary for providing sample size calculations  (e.g., in <code>getSampleSizeMeans</code>), beta spending function designs, or optimum designs, default is <code>0.20</code>. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
+<dd><p>The Type II error rate necessary for providing sample size calculations  (e.g., in <code>getSampleSizeMeans</code>), beta spending function designs, or optimum designs, default is <code>0.20</code>. Is a single numeric value between 0 and 1.</p></dd>
 
 
 <dt><code>deltaWT</code></dt>
-<dd><p>Delta for Wang &amp; Tsiatis Delta class. Is a numeric vector of length 1.</p></dd>
+<dd><p>Delta for Wang &amp; Tsiatis Delta class. Is a single numeric value.</p></dd>
 
 
 <dt><code>deltaPT1</code></dt>
-<dd><p>Delta1 for Pampallona &amp; Tsiatis class rejecting H0 boundaries. Is a numeric vector of length 1.</p></dd>
+<dd><p>Delta1 for Pampallona &amp; Tsiatis class rejecting H0 boundaries. Is a single numeric value.</p></dd>
 
 
 <dt><code>deltaPT0</code></dt>
-<dd><p>Delta0 for Pampallona &amp; Tsiatis class rejecting H1 (accepting H0) boundaries. Is a numeric vector of length 1.</p></dd>
+<dd><p>Delta0 for Pampallona &amp; Tsiatis class rejecting H1 (accepting H0) boundaries. Is a single numeric value.</p></dd>
 
 
 <dt><code>futilityBounds</code></dt>
@@ -115,11 +115,11 @@ with suitable arguments to create a inverse normal design.</p>
 
 
 <dt><code>gammaA</code></dt>
-<dd><p>The parameter for the alpha spending function. Is a numeric vector of length 1.</p></dd>
+<dd><p>The parameter for the alpha spending function. Is a single numeric value.</p></dd>
 
 
 <dt><code>gammaB</code></dt>
-<dd><p>The parameter for the beta spending function. Is a numeric vector of length 1.</p></dd>
+<dd><p>The parameter for the beta spending function. Is a single numeric value.</p></dd>
 
 
 <dt><code>optimizationCriterion</code></dt>
@@ -127,7 +127,7 @@ with suitable arguments to create a inverse normal design.</p>
 
 
 <dt><code>sided</code></dt>
-<dd><p>Describes if the alternative is one-sided (<code>1</code>) or two-sided (<code>2</code>). Is a numeric vector of length 1 containing a whole number.</p></dd>
+<dd><p>Describes if the alternative is one-sided (<code>1</code>) or two-sided (<code>2</code>). Is a single numeric value representing a  whole number.</p></dd>
 
 
 <dt><code>betaSpent</code></dt>
@@ -135,7 +135,7 @@ with suitable arguments to create a inverse normal design.</p>
 
 
 <dt><code>typeBetaSpending</code></dt>
-<dd><p>The type of beta spending. Is a character vector of length 1.</p></dd>
+<dd><p>The type of beta spending. Is a single character value.</p></dd>
 
 
 <dt><code>userBetaSpending</code></dt>
@@ -155,15 +155,15 @@ with suitable arguments to create a inverse normal design.</p>
 
 
 <dt><code>twoSidedPower</code></dt>
-<dd><p>Specifies if power is defined two-sided at each stage of the trial. Is a logical vector of length 1.</p></dd>
+<dd><p>Specifies if power is defined two-sided at each stage of the trial. Is a single logical value.</p></dd>
 
 
 <dt><code>constantBoundsHP</code></dt>
-<dd><p>The constant bounds up to stage kMax - 1 for the Haybittle &amp; Peto design (default is 3). Is a numeric vector of length 1.</p></dd>
+<dd><p>The constant bounds up to stage kMax - 1 for the Haybittle &amp; Peto design (default is 3). Is a single numeric value.</p></dd>
 
 
 <dt><code>betaAdjustment</code></dt>
-<dd><p>If <code>TRUE</code>, beta spending values are linearly adjusted if an overlapping of decision regions for futility stopping at earlier stages occurs. Only applicable for two-sided beta-spending designs. Is a logical vector of length 1.</p></dd>
+<dd><p>If <code>TRUE</code>, beta spending values are linearly adjusted if an overlapping of decision regions for futility stopping at earlier stages occurs. Only applicable for two-sided beta-spending designs. Is a single logical value.</p></dd>
 
 
 <dt><code>delayedInformation</code></dt>
@@ -193,7 +193,7 @@ with suitable arguments to create a inverse normal design.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>
