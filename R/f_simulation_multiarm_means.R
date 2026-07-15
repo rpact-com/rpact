@@ -634,11 +634,22 @@ getSimulationMultiArmMeans <- function(
         simulationResults, "numberOfActiveArms",
         simulationResults$numberOfSelectedArms, "2026-07-13"
     )
+    simulationResults$.setParameterType(
+        "numberOfSelectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
 
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
+    simulationResults$.setParameterType(
+        "selectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     if (kMax > 1) {
