@@ -1929,6 +1929,7 @@ getNumberOfSubjects <- function(
 #' @inheritParams param_typeOfComputation
 #' @inheritParams param_allocationRatioPlanned_sampleSize
 #' @inheritParams param_thetaH0
+#' @inheritParams param_directionUpper
 #' @inheritParams param_lambda1
 #' @inheritParams param_lambda2
 #' @inheritParams param_pi1_survival
