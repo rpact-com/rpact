@@ -755,8 +755,10 @@ NULL
                 !simulationResults$isUserDefinedParameter("effectMatrix")) {
             simulationResults$.setParameterType("effectMatrix", C_PARAM_NOT_APPLICABLE)
         }
-        .setValueAndParameterType(simulationResults, "omegaMaxVector", omegaMaxVector, C_RANGE_OF_HAZARD_RATIOS_DEFAULT)        if (simulationResults$isUserDefinedParameter("effectMatrix")) {
-            simulationResults$.setParameterType("omegaMaxVector", ifelse(activeArms == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_DERIVED))
+        .setValueAndParameterType(simulationResults, "omegaMaxVector", 
+            omegaMaxVector, C_RANGE_OF_HAZARD_RATIOS_DEFAULT)        if (simulationResults$isUserDefinedParameter("effectMatrix")) {
+            simulationResults$.setParameterType("omegaMaxVector", 
+                ifelse(activeArms == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_DERIVED))
         }
 
         .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)

@@ -3488,12 +3488,16 @@ NULL
         ...,
         expectedNumberOfColumns = NA_integer_,
         naAllowed = FALSE,
-        returnSingleValueAsMatrix = FALSE) {
+        returnSingleValueAsMatrix = FALSE,
+        relatedParameter = NULL,
+        relatedValue = NULL) {
     if (missing(x) || is.null(x) || length(x) == 0) {
-        stopMissingArgument("'", argumentName, "' must be a valid matrix",
+        stopMissingArgument("'", argumentName, "' must be specified",
             functionName = ".assertIsValidMatrix",
             parameter = argumentName,
-            value = if (!missing(x)) x else NULL
+            value = if (!missing(x)) x else NULL,
+            relatedParameter = relatedParameter,
+            relatedValue = relatedValue
         )
     }
 
@@ -3638,7 +3642,8 @@ NULL
 
     if (typeOfShape == "userDefined") {
         effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
-            expectedNumberOfColumns = gMax, naAllowed = FALSE, returnSingleValueAsMatrix = TRUE
+            expectedNumberOfColumns = gMax, naAllowed = FALSE, returnSingleValueAsMatrix = TRUE,
+            relatedParameter = "typeOfShape", relatedValue = typeOfShape
         )
         .assertIsNumericVector(valueMaxVector, valueMaxVectorName, naAllowed = TRUE)
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
