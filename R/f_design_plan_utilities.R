@@ -69,7 +69,7 @@ NULL
             thetaH0 = designPlan$thetaH0,
             pi1 = designPlan$pi1,
             pi2 = designPlan$pi2,
-            # TODO directionUpper = designPlan$directionUpper,
+            directionUpper = designPlan$directionUpper,
             groups = designPlan$groups,
             allocationRatioPlanned = designPlan$allocationRatioPlanned
         )
@@ -190,6 +190,7 @@ NULL
         }
     }
 
+    .setDirectionUpper(designPlan)
     .addEffectScaleBoundaryDataToDesignPlan(designPlan)
 
     return(designPlan)

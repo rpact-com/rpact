@@ -1720,7 +1720,11 @@ getParameterName <- function(obj, parameterCaption) {
 #' @keywords internal
 #' @noRd
 #'
-.addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues, deprecationDate = NULL) {
+.addDeprecatedFieldValues <- function(
+        parameterSet,
+        fieldName,
+        fieldValues,
+        deprecationDate = NULL) {
     if (!fieldName %in% names(parameterSet)) {
         stopRuntimeIssue("'", .getClassName(parameterSet), "' does not ",
             "contain a field with name '", fieldName, "'",
@@ -1774,7 +1778,10 @@ getParameterName <- function(obj, parameterCaption) {
                 }
             },
             error = function(e) {
-                message("Failed to reset pipe operator queue attribute ", sQuote(attrName), ": ", e$message)
+                message(
+                    "Failed to reset pipe operator queue attribute ",
+                    sQuote(attrName), ": ", e$message
+                )
             }
         )
     }
@@ -1850,9 +1857,11 @@ getParameterName <- function(obj, parameterCaption) {
 
     futilityBoundsFormatted <- futilityBounds
     if (!is.null(design) && isFALSE(design$directionUpper)) {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- Inf
+        futilityBoundsFormatted[!is.na(futilityBounds) &
+            futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- Inf
     } else {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- -Inf
+        futilityBoundsFormatted[!is.na(futilityBounds) &
+            futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- -Inf
     }
     return(futilityBoundsFormatted)
 }
@@ -1864,9 +1873,11 @@ getParameterName <- function(obj, parameterCaption) {
 
     futilityBoundsFormatted <- futilityBounds
     if (isFALSE(design$directionUpper)) {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- C_FUTILITY_BOUNDS_MAX_VALUE
+        futilityBoundsFormatted[!is.na(futilityBounds) &
+            futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- C_FUTILITY_BOUNDS_MAX_VALUE
     } else {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- C_FUTILITY_BOUNDS_MIN_VALUE
+        futilityBoundsFormatted[!is.na(futilityBounds) &
+            futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- C_FUTILITY_BOUNDS_MIN_VALUE
     }
     return(futilityBoundsFormatted)
 }
@@ -1897,10 +1908,13 @@ getParameterName <- function(obj, parameterCaption) {
     }
 
     if (length(directionUpper) > 1 && length(value) != length(directionUpper)) {
-        stopIllegalArgument("'value' (", .arrayToString(value), ") and ", "'directionUpper' (", .arrayToString(directionUpper),
-            ") must have the same length",
-            functionName = ".applyDirectionOfAlternative", parameter = "value",
-            value = value, relatedParameter = "directionUpper", relatedValue = directionUpper
+        stopIllegalArgument("'value' (", .arrayToString(value), ") and ",
+            "'directionUpper' (", .arrayToString(directionUpper), ") must have the same length",
+            functionName = ".applyDirectionOfAlternative",
+            parameter = "value",
+            value = value,
+            relatedParameter = "directionUpper",
+            relatedValue = directionUpper
         )
     }
 
@@ -1918,7 +1932,9 @@ getParameterName <- function(obj, parameterCaption) {
             values,
             .applyDirectionOfAlternativeSingle(
                 value = value[i],
-                directionUpper = ifelse(length(directionUpper) == 1, directionUpper, directionUpper[i]),
+                directionUpper = ifelse(length(directionUpper) == 1,
+                    directionUpper, directionUpper[i]
+                ),
                 type = type
             )
         )

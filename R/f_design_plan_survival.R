@@ -2007,7 +2007,8 @@ getSampleSizeSurvival <- function(
         dropoutRate2 = 0,
         dropoutTime = 12) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize", ignore = c("accountForObservationTimes")) # TODO directionUpper = directionUpper,
+        design <- .getDefaultDesign(..., type = "sampleSize", 
+            ignore = c("accountForObservationTimes")) # TODO directionUpper = directionUpper,
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeSurvival",
             ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -2252,9 +2253,15 @@ getSampleSizeSurvival <- function(
                         eventTime = eventTime, accrualTime = accrualSetup$accrualTime,
                         accrualIntensity = accrualSetup$accrualIntensity, kappa = kappa,
                         piecewiseSurvivalTime = piecewiseSurvivalTime,
-                        lambda2 = lambda2, lambda1 = lambda1, median1 = median1, median2 = median2,
-                        followUpTime = NA_real_, maxNumberOfSubjects = maxNumberOfSubjectsUpper,
-                        dropoutRate1 = dropoutRate1, dropoutRate2 = dropoutRate2, dropoutTime = dropoutTime,
+                        lambda2 = lambda2, 
+                        lambda1 = lambda1, 
+                        median1 = median1, 
+                        median2 = median2,
+                        followUpTime = NA_real_, 
+                        maxNumberOfSubjects = maxNumberOfSubjectsUpper,
+                        dropoutRate1 = dropoutRate1, 
+                        dropoutRate2 = dropoutRate2, 
+                        dropoutTime = dropoutTime,
                         hazardRatio = hazardRatio
                     )$followUpTime
                     maxSearchIterations <- maxSearchIterations - 1
@@ -2505,7 +2512,7 @@ getPowerSurvival <- function(
         dropoutRate2 = 0,
         dropoutTime = 12) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "power") # TODO directionUpper = directionUpper,
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "power", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getPowerSurvival",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), ...
@@ -2562,9 +2569,9 @@ getPowerSurvival <- function(
             (designPlan$hazardRatio - 1) / (designPlan$hazardRatio + 1)
     }
 
-    if (!is.na(designPlan$directionUpper) && !designPlan$directionUpper) {
-        theta <- -theta
-    }
+    theta <- .applyDirectionOfAlternative(theta, designPlan$directionUpper,
+        type = "negateIfLower", phase = "planning"
+    )
 
     powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
         design = design, theta = theta, nMax = maxNumberOfEvents

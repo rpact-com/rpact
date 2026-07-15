@@ -122,9 +122,15 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                self$.showParametersOfOneGroup(self$.getDerivedParameters(), "Derived from user defined parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                )
+                derivedParameters <- self$.getDerivedParameters()
+                if (length(derivedParameters) > 0) {
+                    self$.showParametersOfOneGroup(
+                        derivedParameters,
+                        "Derived from user defined parameters",
+                        orderByParameterName = FALSE,
+                        consoleOutputEnabled = consoleOutputEnabled
+                    )
+                }
                 self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )

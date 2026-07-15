@@ -727,6 +727,12 @@
         } else {
             directionUpperCalculated <- (designPlan$lambda1 / designPlan$lambda2 > designPlan$thetaH0)
         }
+    } else {
+        stopRuntimeIssue("Cannot determine the direction of the test. ",
+            "The trial design plan type ", sQuote(.getClassName(designPlan)), 
+            " is not supported for this operation.",
+            functionName = ".getDirectionUpperCalculated"
+        )
     }
     return(directionUpperCalculated)
 }
@@ -745,11 +751,11 @@
     directionUpperDefined <- .getDirectionUpper(designPlan, setDefault = FALSE)
     if (is.null(directionUpperDefined) || all(is.na(directionUpperDefined))) {
         designPlan$directionUpper <- directionUpperCalculated
-        designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
+        designPlan$.setParameterType("directionUpper", C_PARAM_DERIVED)
     } else if (any(directionUpperDefined != directionUpperCalculated, na.rm = TRUE)) {
         if (length(unique(na.omit(directionUpperCalculated))) > 1) {
             designPlan$directionUpper <- directionUpperCalculated
-            designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
+            designPlan$.setParameterType("directionUpper", C_PARAM_DERIVED)
             warning(
                 "The specified 'directionUpper' (", directionUpperDefined, ") ",
                 "is not consistent with the calculated 'directionUpper' (",

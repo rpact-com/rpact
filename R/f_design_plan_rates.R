@@ -28,27 +28,32 @@ NULL
         thetaH0 = 0,
         pi1 = seq(0.4, 0.6, 0.1),
         pi2 = 0.2,
+        directionUpper = NA,
         groups = 2,
         allocationRatioPlanned = 1) {
     if (groups == 1) {
         nFixed <- rep(NA_real_, length(pi1))
 
         for (i in seq_len(length(pi1))) {
+            effect <- pi1[i] - thetaH0
             if (normalApproximation) {
                 nFixed[i] <- (.getOneMinusQNorm(alpha / sided) *
                     sqrt(thetaH0 * (1 - thetaH0)) +
                     .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i])))^2 /
-                    (pi1[i] - thetaH0)^2
+                    effect^2
             } else {
-                ifelse(pi1[i] > thetaH0, lower.tail <- FALSE, lower.tail <- TRUE)
+                lowerTail <- isFALSE(directionUpper)
+                if (is.na(directionUpper)) {
+                    lowerTail <- effect < 0
+                }
                 iterations <- 1
                 nup <- 2
                 while (
                     (stats::pbinom(
-                        stats::qbinom(alpha, nup, thetaH0, lower.tail = lower.tail) - as.integer(lower.tail),
+                        stats::qbinom(alpha, nup, thetaH0, lower.tail = lowerTail) - as.integer(lowerTail),
                         nup,
                         pi1[i],
-                        lower.tail = lower.tail
+                        lower.tail = lowerTail
                     ) <
                         1 - beta) &&
                         (iterations <= 50)
@@ -63,11 +68,11 @@ NULL
                         if (conservative) {
                             nFixed[i] <- max(which(
                                 stats::pbinom(
-                                    stats::qbinom(alpha, (1:(2 * nup)), thetaH0, lower.tail = lower.tail) -
-                                        as.integer(lower.tail),
+                                    stats::qbinom(alpha, (1:(2 * nup)), thetaH0, lower.tail = lowerTail) -
+                                        as.integer(lowerTail),
                                     (1:(2 * nup)),
                                     pi1[i],
-                                    lower.tail = lower.tail
+                                    lower.tail = lowerTail
                                 ) <
                                     1 - beta
                             )) +
@@ -75,11 +80,11 @@ NULL
                         } else {
                             nFixed[i] <- min(which(
                                 stats::pbinom(
-                                    stats::qbinom(alpha, (1:nup), thetaH0, lower.tail = lower.tail) -
-                                        as.integer(lower.tail),
+                                    stats::qbinom(alpha, (1:nup), thetaH0, lower.tail = lowerTail) -
+                                        as.integer(lowerTail),
                                     (1:nup),
                                     pi1[i],
-                                    lower.tail = lower.tail
+                                    lower.tail = lowerTail
                                 ) >=
                                     1 - beta
                             ))
@@ -118,6 +123,8 @@ NULL
 
         for (i in seq_len(length(pi1))) {
             if (!riskRatio) {
+                effect <- pi1[i] - pi2 - thetaH0
+
                 # allocationRatioPlanned = 0 provides optimum sample size
                 if (allocationRatioPlanned == 0) {
                     allocationRatioPlannedVec[i] <- stats::optimize(
@@ -132,7 +139,7 @@ NULL
                             n1 <- (.getOneMinusQNorm(alpha / sided) *
                                 sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * x) +
                                 .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * x))^2 /
-                                (pi1[i] - pi2 - thetaH0)^2
+                                effect^2
                             return((1 + x) / x * n1)
                         },
                         interval = c(0, 5),
@@ -149,7 +156,7 @@ NULL
                         sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlannedVec[i]) +
                         .getOneMinusQNorm(beta) *
                             sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlannedVec[i]))^2 /
-                        (pi1[i] - pi2 - thetaH0)^2
+                        effect^2
                 } else {
                     fm <- .getFarringtonManningValues(
                         rate1 = pi1[i],
@@ -162,9 +169,11 @@ NULL
                         sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlanned) +
                         .getOneMinusQNorm(beta) *
                             sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlanned))^2 /
-                        (pi1[i] - pi2 - thetaH0)^2
+                        effect^2
                 }
             } else {
+                effect <- pi1[i] / pi2 - thetaH0
+
                 if (allocationRatioPlanned == 0) {
                     # allocationRatioPlanned = 0 provides optimum sample size
                     allocationRatioPlannedVec[i] <- stats::optimize(
@@ -187,7 +196,7 @@ NULL
                                                 x *
                                                 thetaH0^2
                                     ))^2 /
-                                (pi1[i] - thetaH0 * pi2)^2
+                                (effect * pi2)^2
                             return((1 + x) / x * n1)
                         },
                         interval = c(0, 5),
@@ -206,7 +215,7 @@ NULL
                             sqrt(
                                 pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlannedVec[i] * thetaH0^2
                             ))^2 /
-                        (pi1[i] - thetaH0 * pi2)^2
+                        (effect * pi2)^2
                 } else {
                     fm <- .getFarringtonManningValues(
                         rate1 = pi1[i],
@@ -219,7 +228,7 @@ NULL
                         sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlanned * thetaH0^2) +
                         .getOneMinusQNorm(beta) *
                             sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlanned * thetaH0^2))^2 /
-                        (pi1[i] - thetaH0 * pi2)^2
+                        (effect * pi2)^2
                 }
             }
         }
@@ -333,8 +342,7 @@ NULL
 }
 
 #
-# note that 'directionUpper' and 'maxNumberOfSubjects' are
-# only applicable for 'objectType' = "power"
+# note that 'maxNumberOfSubjects' is only applicable for 'objectType' = "power"
 #
 .createDesignPlanRates <- function(
         ...,
@@ -492,10 +500,11 @@ NULL
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }
 
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
+
     if (objectType == "power") {
         .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
         .setValueAndParameterType(designPlan, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
-        .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
 
         designPlan$.setParameterType("effect", C_PARAM_GENERATED)
     }
@@ -714,9 +723,9 @@ getPowerRates <- function(
         }
     }
 
-    if (!is.na(designPlan$directionUpper) && !designPlan$directionUpper) {
-        theta <- -theta
-    }
+    theta <- .applyDirectionOfAlternative(theta, designPlan$directionUpper,
+        type = "negateIfLower", phase = "planning"
+    )
 
     powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
         design,
