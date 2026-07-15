@@ -762,7 +762,7 @@ NULL
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if (naAllowed && all(is.na(x))) {
-        return(invisible(if (is.finite(x)) as.integer(x) else x))
+        return(invisible(if (all(is.finite(x))) as.integer(x) else x))
     }
 
     if (!is.numeric(x) || (!naAllowed && anyNA(x)) || (validateType && !is.integer(x)) ||
@@ -775,7 +775,7 @@ NULL
         )
     }
 
-    return(invisible(if (is.finite(x)) as.integer(x) else x))
+    return(invisible(if (all(is.finite(x))) as.integer(x) else x))
 }
 
 .assertIsLogicalVector <- function(
@@ -967,7 +967,7 @@ NULL
         )
     }
 
-    return(invisible(if (is.finite(x)) as.integer(x) else x))
+    return(invisible(if (all(is.finite(x))) as.integer(x) else x))
 }
 
 .assertIsSingleCharacter <- function(
