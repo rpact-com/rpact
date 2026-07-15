@@ -511,20 +511,6 @@ NULL
         .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
     }
 
-    typeOfShape <- .assertIsValidTypeOfShape(typeOfShape)
-
-    if (!is.null(effectMatrix)) {
-        if (typeOfShape != "userDefined") {
-            stopIllegalArgument("Change 'typeOfShape' (", typeOfShape, ") to 'userDefined'",
-                functionName = ".createSimulationResultsMultiArmObject",
-                parameter = "typeOfShape",
-                value = typeOfShape,
-                relatedParameter = "effectMatrix",
-                relatedValue = "not NULL"
-            )
-        }
-    }
-
     if (is.na(activeArms)) {
         if (!is.null(effectMatrix)) {
             effectMatrix <- .assertIsValidMatrix(
@@ -557,6 +543,17 @@ NULL
         stopIllegalArgument("'activeArms' (", activeArms, ") max not exceed 8",
             functionName = ".createSimulationResultsMultiArmObject",
             parameter = "activeArms", value = activeArms
+        )
+    }
+    
+    typeOfShape <- .assertIsValidTypeOfShape(typeOfShape)
+    if (!is.null(effectMatrix) && typeOfShape != "userDefined") {
+        stopIllegalArgument("Change 'typeOfShape' (", typeOfShape, ") to 'userDefined'",
+            functionName = ".createSimulationResultsMultiArmObject",
+            parameter = "typeOfShape",
+            value = typeOfShape,
+            relatedParameter = "effectMatrix",
+            relatedValue = "not NULL"
         )
     }
 
@@ -667,6 +664,7 @@ NULL
     if (endpoint == "means") {
         effectMatrix <- .assertIsValidEffectMatrixMeans(
             simulationResults = simulationResults,
+            activeArms = activeArms,
             typeOfShape = typeOfShape,
             effectMatrix = effectMatrix,
             muMaxVector = muMaxVector,
@@ -720,6 +718,7 @@ NULL
 
         effectMatrix <- .assertIsValidEffectMatrixRates(
             simulationResults = simulationResults,
+            activeArms = activeArms,
             typeOfShape = typeOfShape,
             effectMatrix = effectMatrix,
             piMaxVector = piMaxVector,
@@ -740,6 +739,7 @@ NULL
     } else if (endpoint == "survival") {
         effectMatrix <- .assertIsValidEffectMatrixSurvival(
             simulationResults = simulationResults,
+            activeArms = activeArms,
             typeOfShape = typeOfShape,
             effectMatrix = effectMatrix,
             omegaMaxVector = omegaMaxVector,
@@ -1198,9 +1198,6 @@ NULL
     )
     .setValueAndParameterType(simulationResults, "typeOfSelection", typeOfSelection, C_TYPE_OF_SELECTION_DEFAULT)
     .setValueAndParameterType(simulationResults, "typeOfShape", typeOfShape, C_TYPE_OF_SHAPE_DEFAULT)
-    if (activeArms == 1) {
-        simulationResults$.setParameterType("typeOfShape", C_PARAM_NOT_APPLICABLE)
-    }
     .setValueAndParameterType(simulationResults, "successCriterion", successCriterion, C_SUCCESS_CRITERION_DEFAULT)
     .setValueAndParameterType(simulationResults, "effectMeasure", effectMeasure, C_EFFECT_MEASURE_DEFAULT)
 

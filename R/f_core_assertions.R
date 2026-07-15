@@ -3623,6 +3623,7 @@ NULL
 .assertIsValidEffectMatrix <- function(
         ...,
         simulationResults,
+        activeArms,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
         effectMatrix,
         valueMaxVector,
@@ -3653,7 +3654,8 @@ NULL
             )
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
-            .assertIsInOpenInterval(effectMatrix, "effectMatrix", lower = 0, upper = NULL, naAllowed = FALSE)
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 
+                lower = 0, upper = NULL, naAllowed = FALSE)
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {
@@ -3714,6 +3716,7 @@ NULL
 .assertIsValidEffectMatrixMeans <- function(
         ...,
         simulationResults,
+        activeArms,
         typeOfShape,
         effectMatrix,
         muMaxVector,
@@ -3723,6 +3726,7 @@ NULL
         doseLevels) {
     return(.assertIsValidEffectMatrix(
         simulationResults = simulationResults,
+        activeArms = activeArms,
         typeOfShape = typeOfShape,
         effectMatrix = effectMatrix,
         valueMaxVector = muMaxVector,
@@ -3737,6 +3741,7 @@ NULL
 .assertIsValidEffectMatrixRates <- function(
         ...,
         simulationResults,
+        activeArms,
         typeOfShape,
         effectMatrix,
         piMaxVector,
@@ -3747,6 +3752,7 @@ NULL
         doseLevels) {
     return(.assertIsValidEffectMatrix(
         simulationResults = simulationResults,
+        activeArms = activeArms,
         typeOfShape = typeOfShape,
         effectMatrix = effectMatrix,
         valueMaxVector = piMaxVector,
@@ -3762,6 +3768,7 @@ NULL
 .assertIsValidEffectMatrixSurvival <- function(
         ...,
         simulationResults,
+        activeArms,
         typeOfShape,
         effectMatrix,
         omegaMaxVector,
@@ -3771,6 +3778,7 @@ NULL
         doseLevels) {
     return(.assertIsValidEffectMatrix(
         simulationResults = simulationResults,
+        activeArms = activeArms,
         typeOfShape = typeOfShape,
         effectMatrix = effectMatrix,
         valueMaxVector = omegaMaxVector,

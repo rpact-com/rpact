@@ -689,7 +689,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     calcSubjectsFunction = "Calculate subjects function",
     calcEventsFunction = "Calculate events function",
     selectArmsFunction = "Select arms function",
-    numberOfSelectedArms = "Number of selected arms",
+    numberOfSelectedArms = "Number of selected active arms",
     numberOfActiveArms = "Number of active arms", # deprecated
     selectPopulationsFunction = "Select populations function",
     numberOfPopulations = "Number of populations",
@@ -1003,7 +1003,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     calcSubjectsFunction = "Calc subjects fun",
     calcEventsFunction = "Calc events fun",
     selectArmsFunction = "Select arms fun",
-    numberOfSelectedArms = "Number of selected arms",
+    numberOfSelectedArms = "Number of selected active arms",
     numberOfActiveArms = "Number of active arms", # deprecated
     correlationComputation = "Correlation computation",
     subsets = "Subset",
