@@ -17,11 +17,11 @@ to create an object of this type.
 
 \item{\code{accrualTime}}{The assumed accrual time intervals for the study. Is a numeric vector.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a single numeric value between 0 and 1.}
 
-\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
 
 \item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
@@ -31,9 +31,9 @@ to create an object of this type.
 
 \item{\code{groups}}{The group numbers. Is a numeric vector.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a single numeric value representing a  whole number.}
 
-\item{\code{maxNumberOfIterations}}{The number of simulation iterations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{maxNumberOfIterations}}{The number of simulation iterations. Is a single numeric value representing a  whole number.}
 
 \item{\code{overallReject}}{The overall rejection probability. Is a numeric vector.}
 
@@ -41,9 +41,9 @@ to create an object of this type.
 
 \item{\code{sampleSizes}}{The sample sizes for each group and stage. Is a numeric vector of length number of stages times number of groups containing whole numbers.}
 
-\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
+\item{\code{seed}}{The seed used for random number generation. Is a single numeric value.}
 
-\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
 }}
 
 \keyword{internal}

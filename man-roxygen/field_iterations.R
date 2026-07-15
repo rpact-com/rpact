@@ -1,3 +1,3 @@
 #' Field description: iterations
-#' @field iterations The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.
+#' @field iterations The number of iterations used for simulations. Is a single numeric value representing a  whole number.
 #' @keywords internal

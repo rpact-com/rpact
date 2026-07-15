@@ -1,3 +1,3 @@
 #' Field description: k max
-#' @field kMax The maximum number of stages \code{K}. Is a numeric vector of length 1 containing a whole number.
+#' @field kMax The maximum number of stages \code{K}. Is a single numeric value representing a  whole number.
 #' @keywords internal

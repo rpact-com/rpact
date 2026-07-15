@@ -9,6 +9,7 @@ getSampleSizeSurvival(
   ...,
   typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
   thetaH0 = 1,
+  directionUpper = NA,
   pi1 = NA_real_,
   pi2 = NA_real_,
   lambda1 = NA_real_,

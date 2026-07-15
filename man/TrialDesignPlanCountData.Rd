@@ -13,19 +13,19 @@ with suitable arguments to create a design plan for a dataset of rates.
 \section{Fields}{
 
 \describe{
-\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
 
 \item{\code{groups}}{The group numbers. Is a numeric vector.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.}
 
-\item{\code{optimumAllocationRatio}}{The allocation ratio that is optimum with respect to the overall sample size at given power. Is a logical vector of length 1.}
+\item{\code{optimumAllocationRatio}}{The allocation ratio that is optimum with respect to the overall sample size at given power. Is a single logical value.}
 
-\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
 
 \item{\code{lambda1}}{The assumed hazard rate in the treatment group. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a numeric vector of length 1.}
+\item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a single numeric value.}
 
 \item{\code{lambda}}{A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in the pooled treatment groups Is a numeric vector.}
 
@@ -61,7 +61,7 @@ with suitable arguments to create a design plan for a dataset of rates.
 
 \item{\code{accrualIntensity}}{The absolute accrual intensities. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{followUpTime}}{The assumed follow-up time for the study. Is a numeric vector of length 1.}
+\item{\code{followUpTime}}{The assumed follow-up time for the study. Is a single numeric value.}
 
 \item{\code{calendarTime}}{The calendar time Is a numeric vector.}
 
@@ -81,7 +81,7 @@ with suitable arguments to create a design plan for a dataset of rates.
 
 \item{\code{expectedInformationH1}}{The expected information under H1 Is a numeric vector.}
 
-\item{\code{maxInformation}}{The maximum information. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{maxInformation}}{The maximum information. Is a single numeric value representing a  whole number.}
 
 \item{\code{futilityBoundsPValueScale}}{The futility bounds for each stage of the trial on the p-value scale. Is a numeric matrix.}
 }}

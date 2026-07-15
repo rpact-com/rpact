@@ -47,11 +47,11 @@ with suitable arguments to create the stage results of a dataset of multi arm ra
 
 \item{\code{singleStepAdjustedPValues}}{The adjusted p-value for testing multiple hypotheses per stage of the trial.}
 
-\item{\code{intersectionTest}}{The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a character vector of length 1.}
+\item{\code{intersectionTest}}{The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a single character value.}
 
-\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a logical vector of length 1.}
+\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a single logical value.}
 
-\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
 }}
 
 \keyword{internal}

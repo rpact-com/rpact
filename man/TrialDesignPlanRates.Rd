@@ -13,25 +13,25 @@ with suitable arguments to create a design plan for a dataset of rates.
 \section{Fields}{
 
 \describe{
-\item{\code{riskRatio}}{Specifies if the sample size for one-sided testing of H0: \code{pi1 / pi2 = thetaH0} has been calculated. Is a logical vector of length 1.}
+\item{\code{riskRatio}}{Specifies if the sample size for one-sided testing of H0: \code{pi1 / pi2 = thetaH0} has been calculated. Is a single logical value.}
 
-\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
 
-\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a logical vector of length 1.}
+\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a single logical value.}
 
-\item{\code{conservative}}{Conservative sample size calculation enabled or not Is a logical vector of length 1.}
+\item{\code{conservative}}{Conservative sample size calculation enabled or not Is a single logical value.}
 
 \item{\code{pi1}}{The assumed probability or probabilities in the active treatment group in two-group designs, or the alternative probability for a one-group design.}
 
-\item{\code{pi2}}{The assumed probability in the reference group for two-group designs. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{pi2}}{The assumed probability in the reference group for two-group designs. Is a single numeric value between 0 and 1.}
 
 \item{\code{groups}}{The group numbers. Is a numeric vector.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.}
 
-\item{\code{optimumAllocationRatio}}{The allocation ratio that is optimum with respect to the overall sample size at given power. Is a logical vector of length 1.}
+\item{\code{optimumAllocationRatio}}{The allocation ratio that is optimum with respect to the overall sample size at given power. Is a single logical value.}
 
-\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
 
 \item{\code{effect}}{The effect for randomly creating normally distributed responses. Is a numeric vector of length \code{kMax}.}
 
