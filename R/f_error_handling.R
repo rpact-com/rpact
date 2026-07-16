@@ -21,7 +21,11 @@ NULL
     return(paste0(unlist(list(...)), collapse = ""))
 }
 
-.getErrorCall <- function(call = NULL) {
+.getErrorCall <- function(call = NULL, asCharacter = TRUE) {
+    if (isTRUE(asCharacter)) {
+        return(sys.calls()[[1]])
+    }
+    
     if (!is.null(call)) {
         return(call)
     }
