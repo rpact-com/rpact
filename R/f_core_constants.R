@@ -668,7 +668,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     epsilonValue = "Epsilon value",
     rValue = "r value",
     threshold = "Threshold",
-    rejectAtLeastOne = "Reject at least one",
+    rejectAtLeastOne = "Overall reject at least one",
     selectedArms = "Selected arms",
     rejectedArmsPerStage = "Rejected arms per stage",
     selectedPopulations = "Selected populations",
@@ -984,7 +984,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     epsilonValue = "Epsilon value",
     rValue = "r value",
     threshold = "Threshold",
-    rejectAtLeastOne = "Reject at least one",
+    rejectAtLeastOne = "Overall reject at least one",
     selectedArms = "Selected arm",
     rejectedArmsPerStage = "Rejected arm per stage",
     successPerStage = "Success per stage",
@@ -1214,6 +1214,17 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
             } else {
                 paramCaption <- sub("Upper bounds of continuation", "Lower bounds of continuation", paramCaption)
             }
+        }
+    }
+    
+    if (parameterName %in% c("rejectAtLeastOne", "rejectedArmsPerStage") &&
+            inherits(obj, "SimulationResultsMultiArmSurvival") &&
+            !is.null(obj$activeArms) && obj$activeArms == 1) {
+        if (identical(parameterName, "rejectAtLeastOne")) {
+            paramCaption <- "Overall reject"
+        }
+        else if (identical(parameterName, "rejectedArmsPerStage")) {
+            paramCaption <- "Reject per stage"
         }
     }
 
