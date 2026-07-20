@@ -176,7 +176,8 @@ NULL
 
     if (grepl("testthat(/|\\\\)?$", testFileTargetDirectory)) {
         stopIllegalArgument("'testFileTargetDirectory' (", testFileTargetDirectory, ") must not end with 'testthat'",
-            functionName = ".downloadUnitTests", parameter = "testFileTargetDirectory", value = testFileTargetDirectory,
+            functionName = ".downloadUnitTests", 
+		parameter ="testFileTargetDirectory", value = testFileTargetDirectory,
             relatedParameter = "testthat"
         )
     }
@@ -328,7 +329,8 @@ NULL
             testFiles <- gsub(".*>", "", testFiles)
             testFiles <- gsub(" *$", "", testFiles)
             if (length(testFiles) == 0) {
-                stopIllegalArgument("online source does not contain any unit test files", functionName = ".downloadUnitTestsViaHttp")
+                stopIllegalArgument("online source does not contain any unit test files", 
+		functionName = ".downloadUnitTestsViaHttp")
             }
 
             startTime <- Sys.time()
@@ -362,18 +364,22 @@ NULL
         warning = function(w) {
             if (grepl("404 Not Found", w$message)) {
                 stopRuntimeIssue("failed to download unit test files (http): file ", sQuote(currentFile), " not found",
-                    functionName = ".downloadUnitTestsViaHttp", parameter = currentFile
+                    functionName = ".downloadUnitTestsViaHttp", 
+		parameter =currentFile
                 )
             }
         },
         error = function(e) {
             if (grepl(C_EXCEPTION_TYPE_RUNTIME_ISSUE, e$message)) {
-                stopRuntimeIssue(e$message, functionName = ".downloadUnitTestsViaHttp")
+                stopRuntimeIssue(e$message, 
+		functionName = ".downloadUnitTestsViaHttp")
             }
             .logDebug(e$message)
             stopRuntimeIssue("failed to download unit test files (http): ", "illegal 'token' / 'secret' or rpact version ",
                 version, " unknown",
-                functionName = ".downloadUnitTestsViaHttp", parameter = "token", relatedParameter = "secret"
+                functionName = ".downloadUnitTestsViaHttp", 
+		parameter ="token", 
+		relatedParameter ="secret"
             )
         },
         finally = {
@@ -437,7 +443,8 @@ NULL
             testFiles <- gsub("\\.R<.*", ".R", lines)
             testFiles <- gsub(".*>", "", testFiles)
             if (length(testFiles) == 0) {
-                stopIllegalArgument("online source does not contain any unit test files", functionName = ".downloadUnitTestsViaFtp")
+                stopIllegalArgument("online source does not contain any unit test files", 
+		functionName = ".downloadUnitTestsViaFtp")
             }
 
             startTime <- Sys.time()
@@ -474,7 +481,9 @@ NULL
             .logDebug(e$message)
             stopRuntimeIssue("failed to download unit test files (ftp): ", "illegal 'token' / 'secret' or rpact version ",
                 version, " unknown",
-                functionName = ".downloadUnitTestsViaFtp", parameter = "token", relatedParameter = "secret"
+                functionName = ".downloadUnitTestsViaFtp", 
+		parameter ="token", 
+		relatedParameter ="secret"
             )
         },
         finally = {
@@ -895,15 +904,18 @@ setupPackageTests <- function(token, secret) {
     .assertIsSingleCharacter(secret, "secret")
     installPath <- find.package("rpact")
     if (!dir.exists(installPath)) {
-        stopRuntimeIssue("the rpact package directory was not found", functionName = "setupPackageTests")
+        stopRuntimeIssue("the rpact package directory was not found", 
+		functionName = "setupPackageTests")
     }
 
     if (!dir.exists(file.path(installPath, "tests"))) {
-        stopRuntimeIssue("the rpact package directory does not contain a test directory", functionName = "setupPackageTests")
+        stopRuntimeIssue("the rpact package directory does not contain a test directory", 
+		functionName = "setupPackageTests")
     }
 
     if (!dir.exists(file.path(installPath, "tests", "testthat"))) {
-        stopRuntimeIssue("the rpact package directory does not contain a testthat directory", functionName = "setupPackageTests")
+        stopRuntimeIssue("the rpact package directory does not contain a testthat directory", 
+		functionName = "setupPackageTests")
     }
 
     tmpDir <- tempdir()
@@ -916,7 +928,8 @@ setupPackageTests <- function(token, secret) {
     if (!dir.exists(tmpTestsDir)) {
         stopRuntimeIssue("The test package directory was not created",
             parameter = "tmpTestsDir", value = tmpTestsDir,
-            constraint = "existing test package directory", functionName = "setupPackageTests"
+            constraint = "existing test package directory", 
+		functionName = "setupPackageTests"
         )
     }
 
@@ -1185,19 +1198,20 @@ testPackage <- function(
 
     if (grepl("/|:|\\\\", reportFileBaseName)) {
         stopIllegalArgument("'reportFileBaseName' (", dQuote(reportFileBaseName), ") ", "must not contain path separators or drive specifiers",
-            functionName = "testPackage", parameter = "reportFileBaseName", value = reportFileBaseName
+            functionName = "testPackage", 
+		parameter ="reportFileBaseName", value = reportFileBaseName
         )
     }
 
     if (!dir.exists(outDir)) {
-        stopIllegalArgument("test output directory '", outDir, "' does not exist",
+        stopIllegalArgument("test output directory ", .vQuote(outDir), " does not exist",
             functionName = "testPackage",
             parameter = "outDir", value = outDir
         )
     }
 
     if (outDir != "." && !grepl("^([a-zA-Z]{1,1}:)?(/|\\\\)", outDir, ignore.case = TRUE)) {
-        stopIllegalArgument("test output directory '", outDir, "' must be an absolute path",
+        stopIllegalArgument("test output directory ", .vQuote(outDir), " must be an absolute path",
             functionName = "testPackage",
             parameter = "outDir", value = outDir
         )
@@ -1208,7 +1222,7 @@ testPackage <- function(
     }
 
     if (!is.na(testFileDirectory) && !dir.exists(testFileDirectory)) {
-        stopIllegalArgument("test file directory '", testFileDirectory, "' does not exist",
+        stopIllegalArgument("test file directory ", .vQuote(testFileDirectory), " does not exist",
             functionName = "testPackage",
             parameter = "testFileDirectory", value = testFileDirectory
         )
@@ -1345,13 +1359,13 @@ testPackage <- function(
             "library(rpact)\n\n",
             'test_check("rpact", ',
             "reporter = MarkdownReporter$new(",
-            'outputFile = file.path("', testFileTargetDirectory, '", "', markdownReportFileName, '"), ',
+            'outputFile = file.path(', .dQuote(testFileTargetDirectory), ', ', .dQuote(markdownReportFileName), '), ',
             'outputSize = "', reportType, '", ',
             "openHtmlReport = ", openHtmlReport, ", ",
             "keepSourceFiles = ", keepSourceFiles, ", ",
             "testInstalledBasicPackages = ", testInstalledBasicPackages, ", ",
-            'author = "', author, '", ',
-            'scope = "', scope, '", ',
+            'author = ', .dQuote(author), ', ',
+            'scope = ', .dQuote(scope), ', ',
             'metaDataFile = "', metaDataFile, '"',
             ")",
             ")\n\n"
@@ -1480,7 +1494,7 @@ testPackage <- function(
             cat(resultMessage, "\n")
             .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
         } else {
-            cat("No test results found in directory '", resultDir, "'\n", sep = "")
+            cat("No test results found in directory ", .vQuote(resultDir), "\n", sep = "")
             statusMessage <- "Installation qualification was not successful (no test results found)"
         }
     }
@@ -1613,12 +1627,12 @@ print.InstallationQualificationResult <- function(x, ...) {
 .showResultsWereWrittenToDirectoryMessage <- function(resultDir, reportFileName, resultOuputFile) {
     cat("Test results were written to directory \n")
     if (!is.null(reportFileName)) {
-        cat("'", resultDir, "' (see file", ifelse(length(reportFileName) == 1, "", "s"), " ",
+        cat(.vQuote(resultDir), " (see file", ifelse(length(reportFileName) == 1, "", "s"), " ",
             .arrayToString(sQuote(reportFileName), mode = "and"), ")\n",
             sep = ""
         )
     } else {
-        cat("'", resultDir, "' (see file ", sQuote(resultOuputFile), ")\n", sep = "")
+        cat(.vQuote(resultDir), " (see file ", sQuote(resultOuputFile), ")\n", sep = "")
     }
 }
 

@@ -120,7 +120,8 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 
     .assertIsTrialDesignSet(object)
     if (object$isEmpty()) {
-        stopIllegalArgument("cannot create summary because the design set is empty", functionName = "summary.TrialDesignSet")
+        stopIllegalArgument("cannot create summary because the design set is empty", 
+		functionName = "summary.TrialDesignSet")
     }
 
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
@@ -301,7 +302,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
         },
         getDesignMaster = function() {
             if (length(self$designs) == 0) {
-                stopRuntimeIssue("no design master defined", functionName = "getDesignMaster")
+                stopRuntimeIssue("no design master defined", 
+		functionName = "getDesignMaster")
             }
 
             return(self$designs[[1]])
@@ -309,14 +311,16 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
         .validateDesignsArgument = function(designsToAdd, args) {
             if (!is.list(designsToAdd)) {
                 stopIllegalArgument("'designsToAdd' must be a list",
-                    functionName = ".validateDesignsArgument", parameter = "designsToAdd",
+                    functionName = ".validateDesignsArgument", 
+		parameter ="designsToAdd",
                     value = designsToAdd
                 )
             }
 
             if (length(designsToAdd) == 0) {
                 stopIllegalArgument("'designsToAdd' must be not empty",
-                    functionName = ".validateDesignsArgument", parameter = "designsToAdd",
+                    functionName = ".validateDesignsArgument", 
+		parameter ="designsToAdd",
                     value = designsToAdd
                 )
             }
@@ -328,7 +332,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                 } else {
                     parentDesign <- d[[".design"]]
                     if (is.null(parentDesign)) {
-                        stopIllegalArgument("'designsToAdd' must be a list of trial designs (found '", .getClassName(d), "')",
+                        stopIllegalArgument("'designsToAdd' must be a list of trial designs (found ", .getClassName(d, quote = TRUE), ")",
                             functionName = ".validateDesignsArgument",
                             parameter = "designsToAdd", value = designsToAdd
                         )
@@ -361,7 +365,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
         addVariedParameters = function(varPar) {
             if (is.null(varPar) || !is.character(varPar)) {
                 stopIllegalArgument("'varPar' must be a valid character vector",
-                    functionName = "addVariedParameters", parameter = "varPar",
+                    functionName = "addVariedParameters", 
+		parameter ="varPar",
                     value = varPar
                 )
             }
@@ -380,7 +385,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             optionalArgumentsDefined <- (length(args) > 0)
             if (is.null(design) && !optionalArgumentsDefined) {
                 stopIllegalArgument("please specify a 'design' to add and/or a design parameter, ", "e.g., deltaWT = c(0.1, 0.3, 0.4)",
-                    functionName = ".validateOptionalArguments", parameter = "design"
+                    functionName = ".validateOptionalArguments", 
+		parameter ="design"
                 )
             }
 
@@ -478,7 +484,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             for (design in self$designs) {
                 if (sided != design$sided) {
                     stopConflictingArguments("designs have different directions of alternative (design master is ", ifelse(sided ==
-                        1, "one", "two"), " sided)", functionName = "assertHaveEqualSidedValues")
+                        1, "one", "two"), " sided)", 
+		functionName = "assertHaveEqualSidedValues")
                 }
             }
         },
@@ -497,7 +504,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
             if (length(argumentNames) > 2) {
                 stopIllegalArgument("too many arguments (", .arrayToString(argumentNames, encapsulate = TRUE), "): up to 2 design parameters are allowed",
-                    functionName = ".createDesignVariants", parameter = "argumentNames", value = argumentNames
+                    functionName = ".createDesignVariants", 
+		parameter ="argumentNames", value = argumentNames
                 )
             }
 
@@ -831,7 +839,8 @@ as.data.frame.TrialDesignSet <- function(
         ...) {
     .assertIsTrialDesignSet(x)
     if (x$isEmpty()) {
-        stopIllegalArgument("cannot create data.frame because the design set is empty", functionName = "as.data.frame.TrialDesignSet")
+        stopIllegalArgument("cannot create data.frame because the design set is empty", 
+		functionName = "as.data.frame.TrialDesignSet")
     }
 
     fCall <- match.call(expand.dots = FALSE)
@@ -849,8 +858,8 @@ as.data.frame.TrialDesignSet <- function(
     for (design in x$designs) {
         if (fisherDesignEnabled != .isTrialDesignFisher(design)) {
             stopConflictingArguments("all trial designs must be from the same type ",
-                "('", .getClassName(x$designs[[1]]),
-                "' != '", .getClassName(design), ")'",
+                "(", .getClassName(x$designs[[1]], quote = TRUE), " != ", 
+                .getClassName(design, quote = TRUE), ")",
                 functionName = "as.data.frame.TrialDesignSet",
                 parameter = "design",
                 value = design,
@@ -1002,7 +1011,8 @@ plot.TrialDesignSet <- function(
 
     availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
     if (length(availablePlotTypes) == 0) {
-        stopIllegalArgument("no plot type available for the specified design", functionName = "plot.TrialDesignSet")
+        stopIllegalArgument("no plot type available for the specified design", 
+		functionName = "plot.TrialDesignSet")
     }
     if (is.na(type)) {
         type <- availablePlotTypes[1]
@@ -1168,7 +1178,8 @@ plot.TrialDesignSet <- function(
             }
         }
     } else if (type == 2) {
-        stopIllegalArgument("designs with undefined endpoint do not support plot type 2", functionName = ".plotTrialDesignSet")
+        stopIllegalArgument("designs with undefined endpoint do not support plot type 2", 
+		functionName = ".plotTrialDesignSet")
     } else if (type == 3) {
         main <- .getMainTitle(main, title = "Stage Levels", nMax = nMax)
         xParameterName <- "informationRates"

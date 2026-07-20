@@ -766,7 +766,8 @@
         } else {
             stopIllegalArgument("The specified 'directionUpper' (", directionUpperDefined, ") ", "is not consistent with the calculated 'directionUpper' (",
                 .arrayToString(directionUpperCalculated), "). ",
-                functionName = ".setDirectionUpper", parameter = "directionUpper"
+                functionName = ".setDirectionUpper", 
+		parameter ="directionUpper"
             )
         }
     }

@@ -614,7 +614,8 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                         getPiByMedian(self$median1, eventTime = self$eventTime, kappa = self$kappa),
                         5
                     ), ", but is ", round(self$pi1, 5),
-                    functionName = ".validateCalculatedArguments", parameter = "pi1",
+                    functionName = ".validateCalculatedArguments", 
+		parameter ="pi1",
                     value = self$pi1
                     )
                 }
@@ -626,7 +627,8 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     ), self$lambda2, tolerance = 1e-05))) {
                     stopRuntimeIssue("'lambda2' must be ", round(getLambdaByMedian(self$median2, kappa = self$kappa), 5),
                         ", ", "but is ", round(self$lambda2, 5),
-                        functionName = ".validateCalculatedArguments", parameter = "lambda2",
+                        functionName = ".validateCalculatedArguments", 
+		parameter ="lambda2",
                         value = self$lambda2
                     )
                 }
@@ -639,7 +641,8 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                         getPiByMedian(self$median2, eventTime = self$eventTime, kappa = self$kappa),
                         5
                     ), ", but is ", round(self$pi2, 5),
-                    functionName = ".validateCalculatedArguments", parameter = "pi2",
+                    functionName = ".validateCalculatedArguments", 
+		parameter ="pi2",
                     value = self$pi2
                     )
                 }
@@ -658,7 +661,8 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 if (self$.getParameterType("pi1") != C_PARAM_NOT_APPLICABLE) {
                     stopRuntimeIssue("parameter type of 'pi1' (", self$.getParameterType("pi1"),
                         ") must be C_PARAM_NOT_APPLICABLE",
-                        functionName = ".validateCalculatedArguments", parameter = "pi1"
+                        functionName = ".validateCalculatedArguments", 
+		parameter ="pi1"
                     )
                 }
                 if (!anyNA(self$pi1)) {
@@ -703,8 +707,8 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
         },
         .stopInCaseOfConflictingArguments = function(arg1, argName1, arg2, argName2) {
             if (length(arg1) > 0 && !all(is.na(arg1)) && length(arg2) > 0 && !all(is.na(arg2))) {
-                stopConflictingArguments("it is not allowed to specify '", argName1, "' (", .arrayToString(arg1), ")",
-                    " and '", argName2, "' (", .arrayToString(arg2), ") concurrently",
+                stopConflictingArguments("it is not allowed to specify ", .pQuote(argName1), " (", .arrayToString(arg1), ")",
+                    " and ", .pQuote(argName2), " (", .arrayToString(arg2), ") concurrently",
                     functionName = ".stopInCaseOfConflictingArguments",
                     parameter = "argName1",
                     value = argName1,
@@ -1268,7 +1272,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                         paramName <- paste0(param, group)
                         if (self$isUserDefinedParameter(paramName)) {
                             warning(
-                                "'", paramName, "' (", .arrayToString(self[[paramName]]), ") ",
+                                .pQuote(paramName), " (", .arrayToString(self[[paramName]]), ") ",
                                 "was converted to 'lambda", group, "' ",
                                 "and is not available in output because piecewise ",
                                 "exponential survival time is enabled"
@@ -2115,7 +2119,9 @@ AccrualTime <- R6::R6Class("AccrualTime",
         },
         .initFromList = function(accrualTimeList) {
             if (!is.list(accrualTimeList)) {
-                stopIllegalArgument("'accrualTime' must be a list", functionName = ".initFromList", parameter = "accrualTime")
+                stopIllegalArgument("'accrualTime' must be a list", 
+		functionName = ".initFromList", 
+		parameter ="accrualTime")
             }
 
             if (length(accrualTimeList) == 0) {
@@ -2251,7 +2257,8 @@ AccrualTime <- R6::R6Class("AccrualTime",
             if (length(accrualTimeArg) == 0 || anyNA(accrualTimeArg) ||
                     !all(is.numeric(accrualTimeArg))) {
                 stopRuntimeIssue("'accrualTimeArg' must a be valid numeric vector",
-                    functionName = ".isNoPiecewiseAccrualTime", parameter = "accrualTimeArg",
+                    functionName = ".isNoPiecewiseAccrualTime", 
+		parameter ="accrualTimeArg",
                     value = accrualTimeArg
                 )
             }
@@ -2336,7 +2343,8 @@ AccrualTime <- R6::R6Class("AccrualTime",
 
                 if (self$accrualTime[1] != 0) {
                     stopIllegalArgument("the first value of 'accrualTime' (", .arrayToString(self$accrualTime), ") must be 0",
-                        functionName = ".init", parameter = "accrualTime", value = self$accrualTime
+                        functionName = ".init", 
+		parameter ="accrualTime", value = self$accrualTime
                     )
                 }
 
@@ -2422,7 +2430,8 @@ AccrualTime <- R6::R6Class("AccrualTime",
                                     stopConflictingArguments("'maxNumberOfSubjects' (", self$maxNumberOfSubjects,
                                         ") disagrees with ", "the defined accrual time and intensity: ",
                                         self$.getFormula(), " = ", sampleSize,
-                                        functionName = ".init", parameter = "maxNumberOfSubjects",
+                                        functionName = ".init", 
+		parameter ="maxNumberOfSubjects",
                                         value = self$maxNumberOfSubjects
                                     )
                                 } else {

@@ -83,7 +83,7 @@ NULL
     return(condition)
 }
 
-.stopRpactError <- function(
+.stopWithError <- function(
         message,
         ...,
         exceptionType,
@@ -122,7 +122,7 @@ stopRuntimeIssue <- function(
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
-    .stopRpactError(
+    .stopWithError(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -156,7 +156,7 @@ stopIllegalArgument <- function(
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
-    .stopRpactError(
+    .stopWithError(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -184,7 +184,7 @@ stopIllegalDataInput <- function(
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
-    .stopRpactError(
+    .stopWithError(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -212,7 +212,7 @@ stopConflictingArguments <- function(
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
-    .stopRpactError(
+    .stopWithError(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -242,7 +242,7 @@ stopArgumentOutOfBounds <- function(
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
-    .stopRpactError(
+    .stopWithError(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -276,7 +276,7 @@ stopArgumentLengthOutOfBounds <- function(
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
-    .stopRpactError(
+    .stopWithError(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -311,7 +311,7 @@ stopIndexOutOfBounds <- function(
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
-    .stopRpactError(
+    .stopWithError(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -342,7 +342,7 @@ stopMissingArgument <- function(
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
-    .stopRpactError(
+    .stopWithError(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -372,7 +372,7 @@ stopIncompleteArguments <- function(
         call = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
-    .stopRpactError(
+    .stopWithError(
         message,
         functionName = functionName,
         parameter = parameter,

@@ -850,7 +850,8 @@ NULL
                     is.null(newSubjects) || length(newSubjects) != 1 || !is.numeric(newSubjects) || is.na(newSubjects)
                     ) {
                     stopIllegalArgument("'calcSubjectsFunction' returned an illegal or ", "undefined result (", newSubjects, "); ", "the output must be a single numeric value",
-                        functionName = ".getSimulatedStageRatesEnrichment", parameter = "calcSubjectsFunction", value = calcSubjectsFunction
+                        functionName = ".getSimulatedStageRatesEnrichment", 
+		parameter ="calcSubjectsFunction", value = calcSubjectsFunction
                     )
                 }
 
@@ -1333,7 +1334,8 @@ getSimulationEnrichmentRates <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationEnrichmentRates")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", 
+		functionName = "getSimulationEnrichmentRates")
     }
 
     data <- data.frame(

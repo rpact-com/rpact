@@ -225,26 +225,30 @@ NULL
 
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
-            functionName = ".getStageResultsMeansEnrichment", parameter = "gMax", value = gMax
+            functionName = ".getStageResultsMeansEnrichment", 
+		parameter ="gMax", value = gMax
         )
     }
     if (varianceOption == "pooledFromFull") {
         if (gMax > 2) {
             stopIllegalArgument("gMax (", gMax, ") > 2: varianceOption 'pooledFromFull' can only be used for one subset",
-                functionName = ".getStageResultsMeansEnrichment", parameter = "pooledFromFull"
+                functionName = ".getStageResultsMeansEnrichment", 
+		parameter ="pooledFromFull"
             )
         }
     }
 
     if (intersectionTest == "SpiessensDebois" && varianceOption != "pooledFromFull" && !normalApproximation) {
         stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ", "residual (stratified) variance from full population,\n\t\t\t select 'varianceOption' = \"pooledFromFull\"",
-            parameter = "varianceOption", value = varianceOption, constraint = "pooledFromFull", functionName = ".getStageResultsMeansEnrichment"
+            parameter = "varianceOption", value = varianceOption, constraint = "pooledFromFull", 
+		functionName = ".getStageResultsMeansEnrichment"
         )
     }
 
     if (intersectionTest == "SpiessensDebois" && !stratifiedAnalysis && !normalApproximation) {
         stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ", "residual (stratified) variance from full population,\n\t\t\tselect 'stratifiedAnalysis' = TRUE",
-            parameter = "stratifiedAnalysis", value = stratifiedAnalysis, constraint = TRUE, functionName = ".getStageResultsMeansEnrichment"
+            parameter = "stratifiedAnalysis", value = stratifiedAnalysis, constraint = TRUE, 
+		functionName = ".getStageResultsMeansEnrichment"
         )
     }
 
@@ -786,7 +790,8 @@ NULL
             stopRuntimeIssue(sprintf(
                 paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
                 stage, stageResults[[firstParameterName]][population, stage], secondValue, firstValue, theta
-            ), functionName = ".getUpperLowerThetaMeansEnrichment")
+            ), 
+		functionName = ".getUpperLowerThetaMeansEnrichment")
         }
     }
 
@@ -1162,8 +1167,11 @@ NULL
                 paste0("length of 'thetaH1' (%s) ", "must be equal to 'gMax' (%s) or 1"),
                 .arrayToString(thetaH1), gMax
             ),
-            functionName = ".getConditionalPowerMeansEnrichment", parameter = "thetaH1",
-            value = thetaH1, relatedParameter = "gMax", relatedValue = gMax
+            functionName = ".getConditionalPowerMeansEnrichment", 
+		parameter ="thetaH1",
+            value = thetaH1, 
+		relatedParameter ="gMax", 
+		relatedValue = gMax
         )
     }
 
@@ -1182,7 +1190,8 @@ NULL
     if (length(thetaH1) > 1) {
         if (any(is.na(thetaH1[!is.na(stageResults$testStatistics[, stage])]))) {
             stopIllegalArgument("any of 'thetaH1' not correctly specified",
-                functionName = ".getConditionalPowerMeansEnrichment", parameter = "thetaH1",
+                functionName = ".getConditionalPowerMeansEnrichment", 
+		parameter ="thetaH1",
                 value = thetaH1
             )
         }
@@ -1208,7 +1217,8 @@ NULL
     }
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        functionName = ".getConditionalPowerMeansEnrichment", parameter = "design"
+        functionName = ".getConditionalPowerMeansEnrichment", 
+		parameter ="design"
     )
 }
 

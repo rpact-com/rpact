@@ -255,7 +255,8 @@ NULL
 
                 if (is.null(newSubjects) || length(newSubjects) != 1 || !is.numeric(newSubjects) || is.na(newSubjects)) {
                     stopIllegalArgument("'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ", "the output must be a single numeric value",
-                        functionName = ".getSimulatedStageRatesMultiArm", parameter = "calcSubjectsFunction", value = calcSubjectsFunction
+                        functionName = ".getSimulatedStageRatesMultiArm", 
+		parameter ="calcSubjectsFunction", value = calcSubjectsFunction
                     )
                 }
 
@@ -755,7 +756,8 @@ getSimulationMultiArmRates <- function(
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationMultiArmRates")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", 
+		functionName = "getSimulationMultiArmRates")
     }
 
     data <- data.frame(

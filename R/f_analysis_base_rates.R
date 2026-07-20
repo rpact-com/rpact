@@ -478,7 +478,9 @@ NULL
 
     if (dataInput$getNumberOfGroups() == 1) {
         if (is.na(thetaH0)) {
-            stopMissingArgument("'thetaH0' must be defined", functionName = ".getStageResultsRates", parameter = "thetaH0", value = thetaH0)
+            stopMissingArgument("'thetaH0' must be defined", 
+		functionName = ".getStageResultsRates", 
+		parameter ="thetaH0", value = thetaH0)
         }
 
         if (normalApproximation) {
@@ -586,7 +588,8 @@ NULL
                 )
             } else {
                 if (thetaH0 != 0) {
-                    stopConflictingArguments("thetaH0 must be equal 0 for performing Fisher's exact test", functionName = ".getStageResultsRates")
+                    stopConflictingArguments("thetaH0 must be equal 0 for performing Fisher's exact test", 
+		functionName = ".getStageResultsRates")
                 }
 
                 overallPValues[k] <- stats::phyper(

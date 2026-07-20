@@ -1297,7 +1297,8 @@ plot.TrialDesign <- function(
 
     availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
     if (length(availablePlotTypes) == 0) {
-        stopIllegalArgument("no plot type available for the specified design", functionName = "plot.TrialDesign")
+        stopIllegalArgument("no plot type available for the specified design", 
+		functionName = "plot.TrialDesign")
     }
     if (is.na(type)) {
         type <- availablePlotTypes[1]
@@ -1484,7 +1485,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
                 variedParameters <- "typeOfDesign"
             } else {
                 stopMissingArgument("'variedParameters' needs to be specified, ", "e.g., variedParameters = \"typeOfDesign\"",
-                    functionName = ".plotTrialDesign", parameter = "variedParameters"
+                    functionName = ".plotTrialDesign", 
+		parameter ="variedParameters"
                 )
             }
         }

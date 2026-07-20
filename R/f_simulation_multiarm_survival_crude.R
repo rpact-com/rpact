@@ -208,7 +208,8 @@ NULL
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
-                        functionName = ".getSimulatedStageSurvivalMultiArm", parameter = "calcEventsFunction", value = calcEventsFunction
+                        functionName = ".getSimulatedStageSurvivalMultiArm", 
+		parameter ="calcEventsFunction", value = calcEventsFunction
                     )
                 }
 
@@ -737,7 +738,8 @@ getSimulationMultiArmSurvivalBasic <- function(
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationMultiArmSurvivalBasic")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", 
+		functionName = "getSimulationMultiArmSurvivalBasic")
     }
 
     data <- data.frame(

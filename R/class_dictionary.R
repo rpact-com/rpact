@@ -130,14 +130,16 @@ initDictionary <- function(x, keyValuePairList) {
     .assertIsDictionary(x)
     if (is.null(keyValuePairList) || length(keyValuePairList) == 0 || !is.list(keyValuePairList)) {
         stopIllegalArgument("'keyValuePairList' must be a valid list",
-            functionName = "initDictionary", parameter = "keyValuePairList",
+            functionName = "initDictionary", 
+		parameter ="keyValuePairList",
             value = keyValuePairList
         )
     }
 
     if (any(names(keyValuePairList) == "")) {
         stopIllegalArgument("'keyValuePairList' must be a named list",
-            functionName = "initDictionary", parameter = "keyValuePairList",
+            functionName = "initDictionary", 
+		parameter ="keyValuePairList",
             value = keyValuePairList
         )
     }

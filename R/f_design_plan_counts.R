@@ -152,8 +152,10 @@
     if (length(accrualTime) != length(accrualIntensity)) {
         stopRuntimeIssue("length of accrualTime (", length(accrualTime), ") and ", "accrualIntensity (", length(accrualIntensity),
             ") must be identical",
-            functionName = ".generateRecruitmentTimes", parameter = "accrualTime", value = length(accrualTime),
-            relatedParameter = "accrualIntensity", relatedValue = length(accrualIntensity)
+            functionName = ".generateRecruitmentTimes", 
+		parameter ="accrualTime", value = length(accrualTime),
+            relatedParameter = "accrualIntensity", 
+		relatedValue = length(accrualIntensity)
         )
     }
 
@@ -260,7 +262,8 @@
             (1 / fixedExposureTime * (1 / lambda2 + 1 / (lambda1 * allocation)) + overdispersion * (1 + 1 / allocation))
     } else {
         if (is.na(followUpTime)) {
-            stopRuntimeIssue("Cannot calculated variance estimate because follow-up time is NA", functionName = ".getVarianceEstimate")
+            stopRuntimeIssue("Cannot calculated variance estimate because follow-up time is NA", 
+		functionName = ".getVarianceEstimate")
         }
         timeUnderObservation1 <-
             pmax(accrualTime[length(accrualTime)] + followUpTime - recruit1, 0)

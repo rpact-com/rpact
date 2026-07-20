@@ -269,7 +269,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             } else if (.isTrialDesignPlanSurvival(self)) {
                 result <- "survival data"
             } else {
-                result <- paste0("unknown data class '", .getClassName(self), "'")
+                result <- paste0("unknown data class ", .getClassName(self, quote = TRUE))
             }
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(result), result))
         }

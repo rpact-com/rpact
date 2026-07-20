@@ -333,10 +333,12 @@ getSimulationCounts <- function(
                         plannedCalendarTime[kMax], max(accrualTime) + followUpTime
                     ),
                     parameter = "plannedCalendarTime", value = plannedCalendarTime[kMax],
-                    constraint = "last plannedCalendarTime must equal max(accrualTime) + followUpTime", relatedParameter = c(
+                    constraint = "last plannedCalendarTime must equal max(accrualTime) + followUpTime", 
+		relatedParameter =c(
                         "accrualTime",
                         "followUpTime"
-                    ), relatedValue = list(accrualTime = accrualTime, followUpTime = followUpTime),
+                    ), 
+		relatedValue = list(accrualTime = accrualTime, followUpTime = followUpTime),
                     functionName = "getSimulationCounts"
                 )
             }

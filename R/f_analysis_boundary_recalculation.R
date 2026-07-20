@@ -369,7 +369,8 @@ getObservedInformationRates <- function(
 
     stageFromData <- dataInput$getNumberOfStages()
     if (stageFromData == 1) {
-        stopIllegalArgument("recalculation of the information rates not possible at stage 1", functionName = ".getDesignWithRecalculatedBoundaries")
+        stopIllegalArgument("recalculation of the information rates not possible at stage 1", 
+		functionName = ".getDesignWithRecalculatedBoundaries")
     }
 
     if (!(getLogLevel() %in% c(C_LOG_LEVEL_DISABLED, C_LOG_LEVEL_PROGRESS))) {

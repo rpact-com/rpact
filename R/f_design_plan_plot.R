@@ -132,21 +132,24 @@
         if (is.null(designPlan$alternative) || anyNA(designPlan$alternative) ||
                 length(designPlan$alternative) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "alternative"
+                functionName = ".assertIsValidVariedParameterVectorForPlotting", 
+		parameter ="alternative"
             )
         }
     } else if (.isTrialDesignPlanRates(designPlan)) {
         if (is.null(designPlan$pi1) || anyNA(designPlan$pi1) ||
                 length(designPlan$pi1) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "pi1"
+                functionName = ".assertIsValidVariedParameterVectorForPlotting", 
+		parameter ="pi1"
             )
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
         if (is.null(designPlan$hazardRatio) || anyNA(designPlan$hazardRatio) ||
                 length(designPlan$hazardRatio) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "hazardRatio"
+                functionName = ".assertIsValidVariedParameterVectorForPlotting", 
+		parameter ="hazardRatio"
             )
         }
     }
@@ -727,7 +730,10 @@
             } else {
                 stopRuntimeIssue("Plot type 5 is not implemented for class ", sQuote(.getClassName(designPlan)),
                     parameter = "type",
-                    value = 5L, relatedParameter = "designPlan", relatedValue = .getClassName(designPlan), functionName = ".plotTrialDesignPlan"
+                    value = 5L, 
+		relatedParameter ="designPlan", 
+		relatedValue = .getClassName(designPlan), 
+		functionName = ".plotTrialDesignPlan"
                 )
             }
 
@@ -1190,21 +1196,29 @@
 
     type <- type[1]
     if (!(type %in% c(13, 14))) {
-        stopIllegalArgument("'type' must be 13 or 14", functionName = ".plotSurvivalFunction", parameter = "type", value = type)
+        stopIllegalArgument("'type' must be 13 or 14", 
+		functionName = ".plotSurvivalFunction", 
+		parameter ="type", value = type)
     }
 
     lambda1 <- designPlan[["lambda1"]]
     lambda2 <- designPlan[["lambda2"]]
     if (is.null(lambda2) || length(lambda2) == 0) {
-        stopMissingArgument("'lambda2' must be specified", functionName = ".plotSurvivalFunction", parameter = "lambda2")
+        stopMissingArgument("'lambda2' must be specified", 
+		functionName = ".plotSurvivalFunction", 
+		parameter ="lambda2")
     }
 
     if (is.null(designPlan$kappa) || length(designPlan$kappa) == 0) {
-        stopMissingArgument("'kappa' must be specified", functionName = ".plotSurvivalFunction", parameter = "kappa")
+        stopMissingArgument("'kappa' must be specified", 
+		functionName = ".plotSurvivalFunction", 
+		parameter ="kappa")
     }
 
     if (is.null(designPlan$hazardRatio) || length(designPlan$hazardRatio) == 0) {
-        stopMissingArgument("'hazardRatio' must be specified", functionName = ".plotSurvivalFunction", parameter = "hazardRatio")
+        stopMissingArgument("'hazardRatio' must be specified", 
+		functionName = ".plotSurvivalFunction", 
+		parameter ="hazardRatio")
     }
 
     piecewiseSurvivalEnabled <- designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled

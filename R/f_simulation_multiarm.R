@@ -88,14 +88,18 @@ NULL
         if (length(selectedArms) != gMax) {
             stopIllegalArgument(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")",
                 parameter = "selectArmsFunction",
-                value = selectedArms, constraint = paste0("logical vector of length ", gMax), relatedParameter = "gMax",
-                relatedValue = gMax, functionName = ".selectTreatmentArms"
+                value = selectedArms, constraint = paste0("logical vector of length ", gMax), 
+		relatedParameter ="gMax",
+                relatedValue = gMax, 
+		functionName = ".selectTreatmentArms"
             )
         }
         if (!is.logical(selectedArms)) {
             stopIllegalArgument(msg, "the output must be a logical vector (is ", .getClassName(selectedArms), ")",
-                parameter = "selectArmsFunction", value = selectedArms, constraint = "logical vector", relatedParameter = "class of selected arms",
-                relatedValue = .getClassName(selectedArms), functionName = ".selectTreatmentArms"
+                parameter = "selectArmsFunction", value = selectedArms, constraint = "logical vector", 
+		relatedParameter ="class of selected arms",
+                relatedValue = .getClassName(selectedArms), 
+		functionName = ".selectTreatmentArms"
             )
         }
     }
@@ -280,7 +284,8 @@ NULL
 
 .getCriticalValuesDunnettForSimulation <- function(alpha, indices, allocationRatioPlanned) {
     if (allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
-        stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages", functionName = ".getCriticalValuesDunnettForSimulation")
+        stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages", 
+		functionName = ".getCriticalValuesDunnettForSimulation")
     }
 
     gMax <- ncol(indices)
@@ -531,7 +536,8 @@ NULL
         if (!is.null(effectMatrix) && activeArms != ncol(effectMatrix)) {
             stopIllegalArgument("Number of columns of effect matrix (", ncol(effectMatrix), ") is not equal to specified 'activeArms' (",
                 activeArms, ")",
-                functionName = ".createSimulationResultsMultiArmObject", parameter = "activeArms",
+                functionName = ".createSimulationResultsMultiArmObject", 
+		parameter ="activeArms",
                 value = activeArms
             )
         }
@@ -804,7 +810,8 @@ NULL
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {
             stopIllegalArgument("'plannedEvents' (", .arrayToString(plannedEvents), ") must have length ", kMax,
-                functionName = ".createSimulationResultsMultiArmObject", parameter = "plannedEvents", value = plannedEvents
+                functionName = ".createSimulationResultsMultiArmObject", 
+		parameter ="plannedEvents", value = plannedEvents
             )
         }
         .assertIsInClosedInterval(plannedEvents, "plannedEvents", lower = 1, upper = NULL)
@@ -945,7 +952,8 @@ NULL
                 stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than 'minNumberOfEventsPerStage' (",
                     .arrayToString(minNumberOfEventsPerStage), ")",
                     functionName = ".createSimulationResultsMultiArmObject",
-                    parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage, relatedParameter = "minNumberOfEventsPerStage",
+                    parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage, 
+		relatedParameter ="minNumberOfEventsPerStage",
                     relatedValue = minNumberOfEventsPerStage
                 )
             }
@@ -1094,7 +1102,8 @@ NULL
     } else if (length(allocationRatioPlanned) != design$kMax) {
         stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
             design$kMax, " (kMax)",
-            functionName = ".createSimulationResultsMultiArmObject", parameter = "allocationRatioPlanned",
+            functionName = ".createSimulationResultsMultiArmObject", 
+		parameter ="allocationRatioPlanned",
             value = allocationRatioPlanned
         )
     }
