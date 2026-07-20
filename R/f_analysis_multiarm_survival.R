@@ -1014,7 +1014,8 @@ NULL
     if ((length(thetaH1) != 1) && (length(thetaH1) != gMax)) {
         stopIllegalArgument(
             sprintf(
-                paste0("length of 'thetaH1' (%s) must be ", "equal to 'gMax' (%s) or 1"),
+                paste0("length of 'thetaH1' (%s) must be ", 
+                "equal to 'gMax' (%s) or 1"),
                 .arrayToString(thetaH1), gMax
             ),
             functionName = ".getConditionalPowerSurvivalMultiArm",

@@ -233,7 +233,9 @@ NULL
     }
 
     if (type %in% c(1:3) && !multiArmEnabled && !enrichmentEnabled) {
-        stopIllegalArgument("'type' (", type, ") is not available for non-multi-arm/non-enrichment simulation results (type must be > 3)",
+        stopIllegalArgument(
+            "'type' (", type, ") is not available for non-multi-arm/non-enrichment ",
+            "simulation results (type must be > 3)",
             functionName = ".plotSimulationResults",
             parameter = "type", value = type
         )
@@ -241,12 +243,15 @@ NULL
 
     if ((!survivalEnabled || multiArmEnabled || enrichmentEnabled) && type %in% c(10:14)) {
         if (multiArmEnabled || enrichmentEnabled) {
-            stopIllegalArgument("'type' (", type, ") is only available for non-multi-arm/non-enrichment survival simulation results",
+            stopIllegalArgument(
+                "'type' (", type, ") is only available for ",
+                "non-multi-arm/non-enrichment survival simulation results",
                 functionName = ".plotSimulationResults",
                 parameter = "type", value = type
             )
         } else {
-            stopIllegalArgument("'type' (", type, ") is only available for survival simulation results",
+            stopIllegalArgument(
+                "'type' (", type, ") is only available for survival simulation results",
                 functionName = ".plotSimulationResults",
                 parameter = "type", value = type
             )
@@ -275,7 +280,9 @@ NULL
             xValues <- effectDataList$xValues
             discreteXAxis <- effectDataList$discreteXAxis
             if (length(xValues) <= 1) {
-                stopIllegalArgument("2 ore more situations must be specifed in ", sQuote(paste0("effectList$", effectDataList$effectMatrixName)),
+                stopIllegalArgument(
+                    "2 ore more situations must be specifed in ",
+                    sQuote(paste0("effectList$", effectDataList$effectMatrixName)),
                     functionName = ".plotSimulationResults",
                     parameter = paste0("effectList$", effectDataList$effectMatrixName)
                 )

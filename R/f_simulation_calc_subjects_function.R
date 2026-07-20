@@ -207,7 +207,8 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
     x1 <- regexpr(pattern, cmd)
     if (x1 == -1) {
         stopIllegalArgument(
-            ifelse(language == "cpp", "the function definition must match 'double myFunctionName(myArgs) { myCode; }'",
+            ifelse(language == "cpp",
+                "the function definition must match 'double myFunctionName(myArgs) { myCode; }'",
                 "the function definition must match 'myFunctionName <- (myArgs) { myCode }'"
             ),
             functionName = ".regexprCalcSubjectsFunction",
@@ -243,14 +244,16 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
     args <- args[args != "..."]
     if (!all(args %in% validArgs)) {
         invalidArgs <- args[!(args %in% validArgs)]
-        stopIllegalArgument("the argument", ifelse(length(invalidArgs) == 1, "", "s"), " ", .arrayToString(invalidArgs,
-            encapsulate = TRUE
-        ), " ", ifelse(length(invalidArgs) == 1, "is", "are"), " invalid (the ", length(validArgs),
-        " valid arguments can be found in the reference manual)",
-        functionName = ".getCalcSubjectsFunctionRCode",
-        parameter = "invalidArgs", value = invalidArgs,
-        relatedParameter = "validArgs",
-        relatedValue = length(validArgs)
+        stopIllegalArgument(
+            "the argument", ifelse(length(invalidArgs) == 1, "", "s"), " ",
+            .arrayToString(invalidArgs, encapsulate = TRUE), " ",
+            ifelse(length(invalidArgs) == 1, "is", "are"), " invalid (the ", length(validArgs),
+            " valid arguments can be found in the reference manual)",
+            functionName = ".getCalcSubjectsFunctionRCode",
+            parameter = "invalidArgs",
+            value = invalidArgs,
+            relatedParameter = "validArgs",
+            relatedValue = length(validArgs)
         )
     }
 
@@ -271,7 +274,8 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
 
     cppCodeBody <- paste0(cppCodeBody, collapse = "\n")
     if (!grepl("#include <Rcpp.h>", cppCodeBody)) {
-        stopRuntimeIssue("'cppCodeBody' must contain '#include <Rcpp.h>'",
+        stopRuntimeIssue(
+            "'cppCodeBody' must contain '#include <Rcpp.h>'",
             functionName = ".getCalcSubjectsFunctionCppCode",
             parameter = "cppCodeBody",
             relatedParameter = "#include <Rcpp.h>"
@@ -341,7 +345,9 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
         cppCodeBodyType <- C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL
     }
     if (is.na(cppCodeBodyType)) {
-        stopRuntimeIssue(".getCalcSubjectsFunction() is not implemented for object ", class(simulationResults)[1],
+        stopRuntimeIssue(
+            ".getCalcSubjectsFunction() is not implemented for object ",
+            class(simulationResults)[1],
             functionName = ".getCalcSubjectsFunction"
         )
     }
@@ -395,7 +401,8 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
     }
 
     if (!is.character(calcFunction)) {
-        stopIllegalArgument(.pQuote(functionFieldName), " must be a function or a character ", "string specifying a function written in R/C++/Rcpp",
+        stopIllegalArgument(.pQuote(functionFieldName), " must be a function or a character ",
+            "string specifying a function written in R/C++/Rcpp",
             functionName = ".getCalcSubjectsFunction",
             parameter = functionFieldName
         )
@@ -406,11 +413,15 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
             {
                 if (.isPackageInstalled("pkgbuild") &&
                         !isTRUE(eval(parse(text = "pkgbuild::has_build_tools(debug = FALSE)")))) {
-                    stopRuntimeIssue("no C++ compiler found", ifelse(.Platform$OS.type == "windows", " (install RTools to solve the issue)",
-                        ""
-                    ),
-                    parameter = "calcFunction", value = calcFunction, constraint = "available C++ compiler",
-                    functionName = ".getCalcSubjectsFunction"
+                    stopRuntimeIssue(
+                        "no C++ compiler found", ifelse(.Platform$OS.type == "windows",
+                            " (install RTools to solve the issue)",
+                            ""
+                        ),
+                        parameter = "calcFunction",
+                        value = calcFunction,
+                        constraint = "available C++ compiler",
+                        functionName = ".getCalcSubjectsFunction"
                     )
                 }
 
@@ -430,7 +441,9 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
                     )
                 }
                 if (functionName != expectedFunctionName) {
-                    stopRuntimeIssue("C++ compilation returned an unexpected ", "function name (", sQuote(functionName),
+                    stopRuntimeIssue(
+                        "C++ compilation returned an unexpected ",
+                        "function name (", sQuote(functionName),
                         " instead of ", sQuote(expectedFunctionName), ")",
                         functionName = ".getCalcSubjectsFunction",
                         parameter = functionName,
@@ -469,9 +482,11 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
                     ),
                     verbose = FALSE, showOutput = TRUE
                 )
-                stopRuntimeIssue("Failed to compile ", .pQuote(functionFieldName), ": ", e$message,
+                stopRuntimeIssue(
+                    "Failed to compile ", .pQuote(functionFieldName), ": ", e$message,
                     parameter = functionFieldName,
-                    value = calcFunction, constraint = "valid compilable C++ code",
+                    value = calcFunction,
+                    constraint = "valid compilable C++ code",
                     functionName = ".getCalcSubjectsFunction"
                 )
             }
@@ -489,9 +504,11 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
             ))
         },
         error = function(e) {
-            stopRuntimeIssue("Failed to evaluate and parse ", .pQuote(functionFieldName), ": ", e$message,
+            stopRuntimeIssue(
+                "Failed to evaluate and parse ", .pQuote(functionFieldName), ": ", e$message,
                 parameter = functionFieldName,
-                value = calcFunction, constraint = "valid R function code",
+                value = calcFunction,
+                constraint = "valid R function code",
                 functionName = ".getCalcSubjectsFunction"
             )
         }

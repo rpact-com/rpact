@@ -307,7 +307,9 @@ getSimulationRates <- function(
     if (design$kMax > 1) {
         if (any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0) &&
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage))) {
-            stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+            stopIllegalArgument(
+                "'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), 
+                ") must be not smaller than minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
                 functionName = "getSimulationRates",
                 parameter = "maxNumberOfSubjectsPerStage",
@@ -399,7 +401,9 @@ getSimulationRates <- function(
         if (length(allocationRatioPlanned) == 1) {
             allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
         } else if (length(allocationRatioPlanned) != design$kMax) {
-            stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+            stopIllegalArgument(
+                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", 
+                "must have length 1 or ",
                 design$kMax, " (kMax)",
                 functionName = "getSimulationRates",
                 parameter = "allocationRatioPlanned",

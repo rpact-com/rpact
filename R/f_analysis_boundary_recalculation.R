@@ -332,7 +332,8 @@ getObservedInformationRates <- function(
     }
 
     if (design$typeOfDesign == "asUser") {
-        stopIllegalArgument("recalculation of the information rates not possible ", "for user-defined alpha spending designs",
+        stopIllegalArgument("recalculation of the information rates not possible ", 
+            "for user-defined alpha spending designs",
             functionName = ".getDesignWithRecalculatedBoundaries"
         )
     }

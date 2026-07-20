@@ -535,8 +535,9 @@ NULL
         }
     } else {
         if (!is.null(effectMatrix) && activeArms != ncol(effectMatrix)) {
-            stopIllegalArgument("Number of columns of effect matrix (", ncol(effectMatrix), ") is not equal to specified 'activeArms' (",
-                activeArms, ")",
+            stopIllegalArgument(
+                "Number of columns of effect matrix (", ncol(effectMatrix),
+                ") is not equal to specified 'activeArms' (", activeArms, ")",
                 functionName = ".createSimulationResultsMultiArmObject",
                 parameter = "activeArms",
                 value = activeArms
@@ -898,7 +899,9 @@ NULL
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage)) &&
                     any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0)
                 ) {
-                stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+                stopIllegalArgument(
+                    "'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage),
+                    ") must be not smaller than minNumberOfSubjectsPerStage' (",
                     .arrayToString(minNumberOfSubjectsPerStage), ")",
                     functionName = ".createSimulationResultsMultiArmObject",
                     parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage
@@ -955,7 +958,9 @@ NULL
                 !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage)) &&
                     any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0)
                 ) {
-                stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than 'minNumberOfEventsPerStage' (",
+                stopIllegalArgument(
+                    "'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage),
+                    ") must be not smaller than 'minNumberOfEventsPerStage' (",
                     .arrayToString(minNumberOfEventsPerStage), ")",
                     functionName = ".createSimulationResultsMultiArmObject",
                     parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage,
@@ -1106,7 +1111,9 @@ NULL
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
     } else if (length(allocationRatioPlanned) != design$kMax) {
-        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+        stopIllegalArgument(
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1 or ",
             design$kMax, " (kMax)",
             functionName = ".createSimulationResultsMultiArmObject",
             parameter = "allocationRatioPlanned",

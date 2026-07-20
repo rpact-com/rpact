@@ -150,10 +150,11 @@
     accrualIntensity <- .assertIsNumericVector(accrualIntensity, "accrualIntensity")
 
     if (length(accrualTime) != length(accrualIntensity)) {
-        stopRuntimeIssue("length of accrualTime (", length(accrualTime), ") and ", "accrualIntensity (", length(accrualIntensity),
-            ") must be identical",
+        stopRuntimeIssue("length of accrualTime (", length(accrualTime), ") and ", 
+            "accrualIntensity (", length(accrualIntensity), ") must be identical",
             functionName = ".generateRecruitmentTimes",
-            parameter = "accrualTime", value = length(accrualTime),
+            parameter = "accrualTime", 
+            value = length(accrualTime),
             relatedParameter = "accrualIntensity",
             relatedValue = length(accrualIntensity)
         )

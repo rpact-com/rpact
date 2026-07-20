@@ -421,8 +421,8 @@ NULL
                 (objectType == "sampleSize") &&
                 !riskRatio
             ) {
-            stopIllegalArgument("any 'pi1 - pi2' (", .arrayToString(pi1 - pi2), ") ", "must be != 'thetaH0' (", thetaH0,
-                ")",
+            stopIllegalArgument("any 'pi1 - pi2' (", .arrayToString(pi1 - pi2), ") ",
+                "must be != 'thetaH0' (", thetaH0, ")",
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1 - pi2", value = pi1 - pi2,
                 relatedParameter = "thetaH0",
@@ -436,8 +436,8 @@ NULL
                 (objectType == "sampleSize") &&
                 riskRatio
             ) {
-            stopIllegalArgument("any 'pi1 / pi2' (", .arrayToString(pi1 / pi2), ") ", "must be != 'thetaH0' (", thetaH0,
-                ")",
+            stopIllegalArgument("any 'pi1 / pi2' (", .arrayToString(pi1 / pi2), ") ",
+                "must be != 'thetaH0' (", thetaH0, ")",
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1 / pi2", value = pi1 / pi2,
                 relatedParameter = "thetaH0",
@@ -446,14 +446,16 @@ NULL
         }
 
         if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
-            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") ", "is out of bounds (0; 1)",
+            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") ",
+                "is out of bounds (0; 1)",
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1", value = pi1
             )
         }
 
         if (anyNA(pi2) || any(pi2 <= 0) || any(pi2 >= 1)) {
-            stopArgumentOutOfBounds("probability 'pi2' (", .arrayToString(pi2), ") ", "is out of bounds (0; 1)",
+            stopArgumentOutOfBounds("probability 'pi2' (", .arrayToString(pi2), ") ",
+                "is out of bounds (0; 1)",
                 functionName = ".createDesignPlanRates",
                 parameter = "pi2", value = pi2
             )
@@ -464,7 +466,8 @@ NULL
                 ((thetaH0 != 0 && !riskRatio) ||
                     (thetaH0 != 1 && riskRatio))
             ) {
-            stopIllegalArgument("two-sided case ", "is implemented only for superiority testing",
+            stopIllegalArgument("two-sided case ",
+                "is implemented only for superiority testing",
                 functionName = ".createDesignPlanRates"
             )
         }
@@ -476,7 +479,8 @@ NULL
         }
 
         if (!conservative) {
-            stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation for two groups",
+            stopIllegalArgument("'conservative' (", conservative, ") ",
+                "has no effect on sample size calculation for two groups",
                 functionName = ".createDesignPlanRates",
                 parameter = "conservative", value = conservative
             )
@@ -494,7 +498,8 @@ NULL
         }
 
         if (riskRatio && thetaH0 <= 0) {
-            stopIllegalArgument("null hypothesis risk ratio is not allowed be negative or zero, ", "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE",
+            stopIllegalArgument("null hypothesis risk ratio is not allowed be negative ",
+                "or zero, ", "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE",
                 functionName = ".createDesignPlanRates",
                 parameter = "thetaH0",
                 relatedParameter = "riskRatio", value = thetaH0

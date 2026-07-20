@@ -485,7 +485,9 @@ NULL
     effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
     if (endpoint == "survival" && is.null(effectList$hazardRatios) && !is.null(effectList$piTreatments)) {
         if (is.null(effectList$piControls)) {
-            stopMissingArgument(sQuote("effectList$piControls"), " must be specified when 'effectList$piTreatments' is used",
+            stopMissingArgument(
+                sQuote("effectList$piControls"),
+                " must be specified when 'effectList$piTreatments' is used",
                 functionName = ".createSimulationResultsEnrichmentObject",
                 parameter = "effectList$piControls", value = effectList$piControls,
                 relatedParameter = "effectList$piTreatments",
@@ -511,7 +513,9 @@ NULL
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
 
     if (intersectionTest == "SpiessensDebois" && gMax > 2) {
-        stopIllegalArgument("Spiessen & Debois intersection test cannot generally ", "be used for enrichment designs with more than two populations",
+        stopIllegalArgument(
+            "Spiessen & Debois intersection test cannot generally ",
+            "be used for enrichment designs with more than two populations",
             functionName = ".createSimulationResultsEnrichmentObject"
         )
     }
@@ -694,7 +698,8 @@ NULL
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage)) &&
                     any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0)
                 ) {
-                stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+                stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage),
+                    ") must be not smaller than minNumberOfSubjectsPerStage' (",
                     .arrayToString(minNumberOfSubjectsPerStage), ")",
                     functionName = ".createSimulationResultsEnrichmentObject",
                     parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage
@@ -751,7 +756,8 @@ NULL
                 !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage)) &&
                     any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0)
                 ) {
-                stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than 'minNumberOfEventsPerStage' (",
+                stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage),
+                    ") must be not smaller than 'minNumberOfEventsPerStage' (",
                     .arrayToString(minNumberOfEventsPerStage), ")",
                     functionName = ".createSimulationResultsEnrichmentObject",
                     parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage,
@@ -897,7 +903,9 @@ NULL
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
     } else if (length(allocationRatioPlanned) != design$kMax) {
-        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+        stopIllegalArgument(
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1 or ",
             design$kMax, " (kMax)",
             functionName = ".createSimulationResultsEnrichmentObject",
             parameter = "allocationRatioPlanned",
@@ -980,7 +988,8 @@ NULL
         adaptations <- rep(TRUE, kMax - 1)
     }
     if (length(adaptations) != kMax - 1) {
-        stopIllegalArgument("'adaptations' must have length ", (kMax - 1), " (kMax - 1)",
+        stopIllegalArgument(
+            "'adaptations' must have length ", (kMax - 1), " (kMax - 1)",
             functionName = ".createSimulationResultsEnrichmentObject",
             parameter = "adaptations", value = adaptations
         )

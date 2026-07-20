@@ -401,9 +401,12 @@ updateSubGroupVector <- function(
                 )
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
-                    stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
+                    stopIllegalArgument(
+                        "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
+                        "the output must be a single numeric value",
                         functionName = ".getSimulatedStageResultsSurvivalEnrichmentPatientWise",
-                        parameter = "calcEventsFunction", value = calcEventsFunction
+                        parameter = "calcEventsFunction",
+                        value = calcEventsFunction
                     )
                 }
 
@@ -552,7 +555,9 @@ updateSubGroupVector <- function(
     )
 
     if (length(allocationRatioPlanned) != 1) {
-        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
+        stopIllegalArgument(
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1",
             functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
             parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
@@ -948,7 +953,8 @@ updateSubGroupVector <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
+        stopRuntimeIssue(
+            "internal error, simulation not possible due to numerical overflow",
             functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic"
         )
     }

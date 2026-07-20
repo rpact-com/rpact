@@ -512,8 +512,8 @@ getObjectRCode <- function(
     .assertIsParameterSetClass(obj, "ParameterSet")
 
     if (!is.list(newArgumentValues)) {
-        stopIllegalArgument("'newArgumentValues' must be a named list ", "(is ", .getClassName(newArgumentValues),
-            ")",
+        stopIllegalArgument("'newArgumentValues' must be a named list ",
+            "(is ", .getClassName(newArgumentValues), ")",
             functionName = "getObjectRCode",
             parameter = "newArgumentValues", value = newArgumentValues
         )

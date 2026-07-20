@@ -48,7 +48,8 @@ NULL
 .getEventProbabilityFunction <- function(..., time, piecewiseLambda, piecewiseSurvivalTime, phi, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa != 1 && phi > 0) {
-            stopIllegalArgument("Weibull distribution cannot ", "be used together with specified dropout rate (use simulation instead)",
+            stopIllegalArgument("Weibull distribution cannot ",
+                "be used together with specified dropout rate (use simulation instead)",
                 functionName = ".getEventProbabilityFunction"
             )
         }
@@ -58,7 +59,9 @@ NULL
     }
 
     if (length(piecewiseSurvivalTime) != length(piecewiseLambda)) {
-        stopIllegalArgument("length of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime), ") must be equal to length of 'piecewiseLambda' (",
+        stopIllegalArgument(
+            "length of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime),
+            ") must be equal to length of 'piecewiseLambda' (",
             .arrayToString(piecewiseLambda), ")",
             functionName = ".getEventProbabilityFunction",
             parameter = "piecewiseSurvivalTime",
@@ -471,9 +474,10 @@ NULL
             if (!is.null(paramName)) {
                 paramValue <- designPlan[[paramName]]
                 if (!is.null(paramValue) && length(paramValue) > 1) {
-                    stopIllegalArgument("the definition of relative accrual intensities ", "(all 'accrualIntensity' values < 1) ",
-                        "is only available for a single value ", "(", paramName, " = ", .arrayToString(paramValue, vectorLookAndFeelEnabled = TRUE),
-                        ")",
+                    stopIllegalArgument("the definition of relative accrual intensities ",
+                        "(all 'accrualIntensity' values < 1) ",
+                        "is only available for a single value ", "(", paramName, " = ",
+                        .arrayToString(paramValue, vectorLookAndFeelEnabled = TRUE), ")",
                         functionName = ".calculateSampleSizeSurvival",
                         parameter = "accrualIntensity"
                     )
@@ -1143,7 +1147,10 @@ NULL
                 if (length(hazardRatio) > 1) {
                     stopIllegalArgument(
                         sprintf(
-                            paste0("'maxNumberOfSubjects' (%s) is smaller than the number ", "of events (%.3f) at index %s (hazard ratio = %.3f)"),
+                            paste0(
+                                "'maxNumberOfSubjects' (%s) is smaller than the number ",
+                                "of events (%.3f) at index %s (hazard ratio = %.3f)"
+                            ),
                             maxNumberOfSubjects, designPlan$eventsFixed[i], i, hazardRatio[i]
                         ),
                         functionName = ".getSampleSizeFixedSurvival",
@@ -1152,7 +1159,10 @@ NULL
                 } else {
                     stopIllegalArgument(
                         sprintf(
-                            paste0("'maxNumberOfSubjects' (%s) is smaller than the number ", "of events (%.3f)"),
+                            paste0(
+                                "'maxNumberOfSubjects' (%s) is smaller than the number ",
+                                "of events (%.3f)"
+                            ),
                             maxNumberOfSubjects, designPlan$eventsFixed[i]
                         ),
                         functionName = ".getSampleSizeFixedSurvival",
@@ -1174,7 +1184,9 @@ NULL
                 up <- 2 * up
                 iterate <- iterate + 1
                 if (iterate > 50) {
-                    stopIllegalArgument("the number of subjects is too small to reach maximum number of events ", "(presumably due to drop-out rates), search algorithm failed",
+                    stopIllegalArgument(
+                        "the number of subjects is too small to reach maximum number of events ",
+                        "(presumably due to drop-out rates), search algorithm failed",
                         functionName = ".getSampleSizeFixedSurvival"
                     )
                 }
@@ -1303,7 +1315,10 @@ NULL
                 if (designPlan$cumulativeEventsPerStage[kMax, i] > designPlan$maxNumberOfSubjects[i]) {
                     stopIllegalArgument(
                         sprintf(
-                            paste0("the number of subjects (%s) is smaller than the number ", "of events (%s) at stage %s"),
+                            paste0(
+                                "the number of subjects (%s) is smaller than the number ",
+                                "of events (%s) at stage %s"
+                            ),
                             designPlan$maxNumberOfSubjects[i], designPlan$cumulativeEventsPerStage[kMax, i], i
                         ),
                         functionName = ".getSampleSizeSequentialSurvival"
@@ -1326,7 +1341,9 @@ NULL
                     up <- 2 * up
                     iterate <- iterate + 1
                     if (iterate > 50) {
-                        stopIllegalArgument("the number of subjects is too small to reach maximum number of events ", "(presumably due to drop-out rates)",
+                        stopIllegalArgument(
+                            "the number of subjects is too small to reach maximum number of events ",
+                            "(presumably due to drop-out rates)",
                             functionName = ".getSampleSizeSequentialSurvival"
                         )
                     }
@@ -2416,7 +2433,9 @@ getSampleSizeSurvival <- function(
         )
 
         if (is.na(maxNumberOfSubjectsTarget)) {
-            stopRuntimeIssue("failed to calculate 'maxNumberOfSubjects' by given 'followUpTime' ", "(lower = ", maxNumberOfSubjectsLower,
+            stopRuntimeIssue(
+                "failed to calculate 'maxNumberOfSubjects' by given 'followUpTime' ",
+                "(lower = ", maxNumberOfSubjectsLower,
                 ", upper = ", maxNumberOfSubjectsUpper, ")",
                 functionName = "getSampleSizeSurvival",
                 parameter = "maxNumberOfSubjects",
@@ -2704,7 +2723,8 @@ getPowerSurvival <- function(
             up <- 2 * up
             iterate <- iterate + 1
             if (iterate > 50) {
-                stopIllegalArgument("'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ") ", "is too small to reach maximum number of events ",
+                stopIllegalArgument("'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ") ",
+                    "is too small to reach maximum number of events ",
                     "(presumably due to drop-out rates)",
                     functionName = "getPowerSurvival",
                     parameter = "maxNumberOfSubjects",

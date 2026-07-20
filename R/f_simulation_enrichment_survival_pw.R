@@ -191,7 +191,9 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     )
 
     if (length(allocationRatioPlanned) != 1) {
-        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
+        stopIllegalArgument(
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1",
             functionName = "getSimulationEnrichmentSurvivalPatientWise",
             parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
@@ -608,8 +610,10 @@ getSimulationEnrichmentSurvival <- function(
         }
 
         message(
-            "Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed log-rank test statistics instead of patient-wise survival data. ",
-            "To simulate patient-wise survival data, specify 'simulationType' = \"patientWise\" and the corresponding arguments."
+            "Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed ",
+            "log-rank test statistics instead of patient-wise survival data. ",
+            "To simulate patient-wise survival data, specify 'simulationType' = \"patientWise\" ",
+            "and the corresponding arguments."
         )
 
         return(getSimulationEnrichmentSurvivalBasic(
@@ -680,9 +684,11 @@ getSimulationEnrichmentSurvival <- function(
 
     if (identical(simulationType, "patientWiseBasic")) {
         message(
-            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise survival data using R code instead of C++ code. ",
+            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise ",
+            "survival data using R code instead of C++ code. ",
             "This approach is less efficient and should only be used for testing purposes. ",
-            "To perform a more efficient patient-wise simulation, specify 'simulationType' = \"patientWise\"."
+            "To perform a more efficient patient-wise simulation, ",
+            "specify 'simulationType' = \"patientWise\"."
         )
 
         return(.getSimulationEnrichmentSurvivalPatientWiseBasic(

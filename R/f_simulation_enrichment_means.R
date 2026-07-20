@@ -384,9 +384,12 @@ NULL
                         is.na(newSubjects) ||
                         newSubjects < 0
                     ) {
-                    stopIllegalArgument("'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ", "the output must be a single numeric value >= 0",
+                    stopIllegalArgument(
+                        "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
+                        "the output must be a single numeric value >= 0",
                         functionName = ".getSimulatedStageMeansEnrichment",
-                        parameter = "calcSubjectsFunction", value = calcSubjectsFunction
+                        parameter = "calcSubjectsFunction",
+                        value = calcSubjectsFunction
                     )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
@@ -810,7 +813,8 @@ getSimulationEnrichmentMeans <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
+        stopRuntimeIssue(
+            "internal error, simulation not possible due to numerical overflow",
             functionName = "getSimulationEnrichmentMeans"
         )
     }

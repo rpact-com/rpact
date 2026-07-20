@@ -45,7 +45,9 @@ NULL
 
     if (pwsTimeObject$kappa != 1) {
         if (length(pwsTimeObject$lambda1) != 1) {
-            stopIllegalArgument("if 'kappa' != 1 then 'lambda1' (", .arrayToString(pwsTimeObject$lambda1), ") must be a single numeric value",
+            stopIllegalArgument(
+                "if 'kappa' != 1 then 'lambda1' (", .arrayToString(pwsTimeObject$lambda1),
+                ") must be a single numeric value",
                 functionName = ".isLambdaBasedSimulationEnabled",
                 parameter = "kappa",
                 relatedParameter = "lambda1",
@@ -53,7 +55,9 @@ NULL
             )
         }
         if (length(pwsTimeObject$lambda2) != 1) {
-            stopIllegalArgument("if 'kappa' != 1 then 'lambda2' (", .arrayToString(pwsTimeObject$lambda2), ") must be a single numeric value",
+            stopIllegalArgument(
+                "if 'kappa' != 1 then 'lambda2' (", .arrayToString(pwsTimeObject$lambda2),
+                ") must be a single numeric value",
                 functionName = ".isLambdaBasedSimulationEnabled",
                 parameter = "kappa",
                 relatedParameter = "lambda2",
@@ -378,10 +382,12 @@ getSimulationSurvival <- function(
     }
     if (!all(is.na(lambda2)) && !all(is.na(lambda1)) &&
             length(lambda2) != length(lambda1) && length(lambda2) > 1) {
-        stopIllegalArgument("length of 'lambda2' (", length(lambda2), ") must be equal to length of 'lambda1' (",
-            length(lambda1), ")",
+        stopIllegalArgument(
+            "length of 'lambda2' (", length(lambda2), ") must be equal to ",
+            "length of 'lambda1' (", length(lambda1), ")",
             functionName = "getSimulationSurvival",
-            parameter = "lambda2", value = length(lambda2),
+            parameter = "lambda2",
+            value = length(lambda2),
             relatedParameter = "lambda1",
             relatedValue = length(lambda1)
         )
@@ -394,12 +400,14 @@ getSimulationSurvival <- function(
         lambda1 <- NA_real_
     }
     if (!all(is.na(lambda2)) && is.list(piecewiseSurvivalTime)) {
-        stopIllegalArgument("'piecewiseSurvivalTime' needs to be a numeric vector and not a list ", "because 'lambda2' (", .arrayToString(lambda2),
-            ") is defined separately",
+        stopIllegalArgument(
+            "'piecewiseSurvivalTime' needs to be a numeric vector and not a list ",
+            "because 'lambda2' (", .arrayToString(lambda2), ") is defined separately",
             functionName = "getSimulationSurvival",
             parameter = "piecewiseSurvivalTime",
             relatedParameter = "lambda2",
-            relatedValue = lambda2, value = piecewiseSurvivalTime
+            relatedValue = lambda2,
+            value = piecewiseSurvivalTime
         )
     }
     thetaH1 <- .ignoreParameterIfNotUsed(
@@ -435,7 +443,9 @@ getSimulationSurvival <- function(
         if (design$kMax > 1) {
             if (any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0) &&
                     !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage))) {
-                stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than minNumberOfEventsPerStage' (",
+                stopIllegalArgument(
+                    "'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage),
+                    ") must be not smaller than minNumberOfEventsPerStage' (",
                     .arrayToString(minNumberOfEventsPerStage), ")",
                     functionName = "getSimulationSurvival",
                     parameter = "maxNumberOfEventsPerStage",

@@ -219,7 +219,8 @@ NULL
     }
 
     if (intersectionTest == "SpiessensDebois" && !normalApproximation) {
-        stopIllegalArgument("Spiessens & Debois test cannot be used with Fisher's ", "exact test (normalApproximation = FALSE)",
+        stopIllegalArgument("Spiessens & Debois test cannot be used with Fisher's ",
+            "exact test (normalApproximation = FALSE)",
             functionName = ".getStageResultsRatesEnrichment"
         )
     }
@@ -1022,7 +1023,10 @@ NULL
     if ((length(piTreatments) != 1) && (length(piTreatments) != gMax)) {
         stopIllegalArgument(
             sprintf(
-                paste0("length of 'piTreatments' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                paste0(
+                    "length of 'piTreatments' (%s) ",
+                    "must be equal to 'gMax' (%s) or 1"
+                ),
                 .arrayToString(piTreatments), gMax
             ),
             functionName = ".getConditionalPowerRatesEnrichment",
@@ -1036,7 +1040,10 @@ NULL
     if ((length(piControls) != 1) && (length(piControls) != gMax)) {
         stopIllegalArgument(
             sprintf(
-                paste0("length of 'piControls' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                paste0(
+                    "length of 'piControls' (%s) ",
+                    "must be equal to 'gMax' (%s) or 1"
+                ),
                 .arrayToString(piControls), gMax
             ),
             functionName = ".getConditionalPowerRatesEnrichment",

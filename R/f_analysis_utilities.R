@@ -155,7 +155,10 @@ NULL
 }
 
 .getSortedSubsets <- function(subsets) {
-    return(subsets[with(data.frame(subsets = subsets, index = as.integer(sub("\\D", "", subsets))), order(index))])
+    return(subsets[with(data.frame(
+        subsets = subsets,
+        index = as.integer(sub("\\D", "", subsets))
+    ), order(index))])
 }
 
 .getAllAvailableSubsets <- function(numbers, ..., sort = TRUE, digits = NA_integer_) {
@@ -1067,7 +1070,8 @@ getLongFormat <- function(dataInput) {
 }
 
 .fireDataInputNotSupportedException <- function(dataInput) {
-    stopIllegalArgument("'dataInput' type ", "", .getClassName(dataInput, quote = TRUE), " is not supported",
+    stopIllegalArgument("'dataInput' type ",
+        .getClassName(dataInput, quote = TRUE), " is not supported",
         functionName = ".fireDataInputNotSupportedException",
         parameter = "dataInput", value = dataInput
     )

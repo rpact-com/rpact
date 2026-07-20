@@ -1387,12 +1387,14 @@ getDesignInverseNormal <- function(
     argNames <- argNames[argNames != "..."]
     missingArgNames <- argNames[!(argNames %in% names(defaultValues))]
     if (length(missingArgNames) > 0) {
-        stopRuntimeIssue(".getDesignGroupSequentialDefaultValues() does return the arguments ", .arrayToString(missingArgNames,
-            encapsulate = TRUE
-        ),
-        functionName = ".assertAllArgumentsHaveDefaultValues",
-        parameter = "missingArgNames",
-        value = missingArgNames
+        stopRuntimeIssue(
+            ".getDesignGroupSequentialDefaultValues() does return the arguments ",
+            .arrayToString(missingArgNames,
+                encapsulate = TRUE
+            ),
+            functionName = ".assertAllArgumentsHaveDefaultValues",
+            parameter = "missingArgNames",
+            value = missingArgNames
         )
     }
 }
@@ -1460,8 +1462,10 @@ getDesignInverseNormal <- function(
         tolerance = 1e-08) {
     validTypesOfDesign <- c("asOF", "asP", "asKD", "asHSD")
     if (!(typeOfDesign %in% validTypesOfDesign)) {
-        stopConflictingArguments("'typeOfDesign' (", dQuote(typeOfDesign), ") must be one of the following ",
-            "when 'efficacyStops' or 'futilityStops' are specified: ", .arrayToString(validTypesOfDesign, encapsulate = TRUE),
+        stopConflictingArguments(
+            "'typeOfDesign' (", dQuote(typeOfDesign), ") must be one of the following ",
+            "when 'efficacyStops' or 'futilityStops' are specified: ",
+            .arrayToString(validTypesOfDesign, encapsulate = TRUE),
             functionName = ".getDesignWithInterimStops",
             parameter = "typeOfDesign",
             relatedParameter = "efficacyStops",
@@ -1469,7 +1473,8 @@ getDesignInverseNormal <- function(
         )
     }
     if (identical(typeBetaSpending, C_TYPE_OF_DESIGN_BS_USER)) {
-        stopConflictingArguments("'typeBetaSpending' cannot be ", dQuote(C_TYPE_OF_DESIGN_BS_USER), " ", "when 'efficacyStops' or 'futilityStops' are specified",
+        stopConflictingArguments("'typeBetaSpending' cannot be ", dQuote(C_TYPE_OF_DESIGN_BS_USER),
+            " when 'efficacyStops' or 'futilityStops' are specified",
             functionName = ".getDesignWithInterimStops",
             parameter = "typeBetaSpending",
             relatedParameter = C_TYPE_OF_DESIGN_BS_USER,
@@ -1852,7 +1857,9 @@ getDesignInverseNormal <- function(
             design$.setParameterType("futilityBounds", C_PARAM_NOT_APPLICABLE)
         } else if (userFunctionCallEnabled &&
                 any(.getFutilityBounds(design) > .getCriticalValues(design, 1:(design$kMax - 1)) - 0.01, na.rm = TRUE)) {
-            stopIllegalArgument("'futilityBounds' (", .arrayToString(design$futilityBounds), ") ", "too extreme for this situation",
+            stopIllegalArgument(
+                "'futilityBounds' (", .arrayToString(design$futilityBounds), ") ",
+                "too extreme for this situation",
                 functionName = ".getDesignGroupSequential",
                 parameter = "futilityBounds", value = design$futilityBounds
             )
@@ -1913,7 +1920,8 @@ getDesignInverseNormal <- function(
     # proceed with delayed response design
     .assertIsInClosedInterval(delayedInformation, "delayedInformation", lower = 0, upper = NULL)
     if (design$sided != 1) {
-        stopIllegalArgument("decision critical values for delayed response design ", "are only available for one-sided designs",
+        stopIllegalArgument("decision critical values for delayed response design ",
+            "are only available for one-sided designs",
             functionName = ".getDesignGroupSequential"
         )
     }
@@ -1927,7 +1935,8 @@ getDesignInverseNormal <- function(
     reversalProbabilities <- numeric(kMax - 1)
 
     if (all(contRegionLower <= C_FUTILITY_BOUNDS_DEFAULT + 1e-06)) {
-        stopIllegalArgument("decision critical values for delayed response design are ", "only available for designs with valid futility bounds",
+        stopIllegalArgument("decision critical values for delayed response design are ",
+            "only available for designs with valid futility bounds",
             functionName = ".getDesignGroupSequential"
         )
     }
@@ -1936,7 +1945,8 @@ getDesignInverseNormal <- function(
         delayedInformation <- rep(delayedInformation, kMax - 1)
     }
     if (length(delayedInformation) != kMax - 1) {
-        stopIllegalArgument("'delayedInformation' (", .arrayToString(delayedInformation), ") must have length ",
+        stopIllegalArgument(
+            "'delayedInformation' (", .arrayToString(delayedInformation), ") must have length ",
             (kMax - 1), " (kMax - 1)",
             functionName = ".getDesignGroupSequential",
             parameter = "delayedInformation",
@@ -1947,7 +1957,8 @@ getDesignInverseNormal <- function(
     indices <- which(delayedInformation > 0 & delayedInformation < 1e-03)
     n <- length(indices)
     if (n > 0) {
-        warning("The", ifelse(n == 1, "", paste0(" ", n)), " delayed information value", ifelse(n == 1, "", "s"), " ",
+        warning("The", ifelse(n == 1, "", paste0(" ", n)),
+            " delayed information value", ifelse(n == 1, "", "s"), " ",
             .arrayToString(delayedInformation[indices], mode = "and"),
             " will be replaced by 1e-03 to achieve reasonable results",
             call. = FALSE
@@ -1960,11 +1971,15 @@ getDesignInverseNormal <- function(
     if (!anyNA(eps) && any(eps >= 1)) {
         stages <- which(eps >= 1)
         stagesInfo <- ifelse(length(stages) == 1, paste0(" ", stages), paste0("s ", .arrayToString(stages, mode = "and")))
-        stopIllegalArgument("'delayedInformation[stage] + informationRates[stage]' for ", "stage", stagesInfo,
-            " too large (>= 1). Recruitment stop analysis information + pipeline data ", "information cannot exceed overall trial information. Instead, the ",
-            "recruitment stop analysis would be skipped, directly proceeding to the ", "final analysis",
+        stopIllegalArgument(
+            "'delayedInformation[stage] + informationRates[stage]' for ",
+            "stage", stagesInfo, " too large (>= 1). Recruitment stop analysis information + pipeline data ",
+            "information cannot exceed overall trial information. Instead, the ",
+            "recruitment stop analysis would be skipped, directly proceeding to the ",
+            "final analysis",
             functionName = ".getDesignGroupSequential",
-            parameter = "delayedInformation", value = delayedInformation,
+            parameter = "delayedInformation",
+            value = delayedInformation,
             relatedParameter = "informationRates",
             relatedValue = informationRates
         )
@@ -2091,7 +2106,9 @@ getDesignInverseNormal <- function(
     }
 
     if (is.na(design$alphaSpent[design$kMax]) || abs(design$alphaSpent[design$kMax] - design$alpha) > 1e-05) {
-        stopRuntimeIssue("critical values cannot be calculated ", "(alpha: ", design$alpha, "; alpha spent at maximum stage: ",
+        stopRuntimeIssue(
+            "critical values cannot be calculated ",
+            "(alpha: ", design$alpha, "; alpha spent at maximum stage: ",
             design$alphaSpent[design$kMax], ")",
             functionName = ".assertIsValidAlphaSpent"
         )
@@ -2114,8 +2131,9 @@ getDesignInverseNormal <- function(
     }
 
     if (is.na(design$betaSpent[design$kMax]) || abs(design$betaSpent[design$kMax] - design$beta) > 1e-05) {
-        stopRuntimeIssue("critical values cannot be calculated ", "(beta spent at maximum stage: ", design$betaSpent[design$kMax],
-            ")",
+        stopRuntimeIssue(
+            "critical values cannot be calculated ",
+            "(beta spent at maximum stage: ", design$betaSpent[design$kMax], ")",
             functionName = ".assertIsValidBetaSpent"
         )
     }
@@ -2369,7 +2387,8 @@ getDesignGroupSequential <- function(
 #'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
 #'   \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
 #'   \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
-#'   \item \code{\link[=as.data.frame.TrialDesignCharacteristics]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.data.frame.TrialDesignCharacteristics]{as.data.frame()}}
+#'         to coerce the object to a \code{\link[base]{data.frame}},
 #'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
@@ -2863,10 +2882,13 @@ getSimulatedRejectionsDelayedResponse <- function(design, ..., delta = 0, iterat
     .assertIsSingleNumber(delta, "delta")
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     if (!design$.isDelayedResponseDesign()) {
-        stopIllegalArgument("'design' must be a delayed ", "response design with specified 'delayedInformation'",
+        stopIllegalArgument(
+            "'design' must be a delayed ",
+            "response design with specified 'delayedInformation'",
             functionName = "getSimulatedRejectionsDelayedResponse",
             parameter = "design",
-            relatedParameter = "delayedInformation", value = design
+            relatedParameter = "delayedInformation",
+            value = design
         )
     }
     startTime <- Sys.time()
