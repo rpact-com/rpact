@@ -12,6 +12,7 @@ dataEnrichmentRatesStratified
 }
 \description{
 A dataset containing the sample sizes and events of two groups.
-Use \code{getDataset(dataEnrichmentRatesStratified)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+Use \code{getDataset(dataEnrichmentRatesStratified)} to create a dataset object that
+can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 }
 \keyword{internal}

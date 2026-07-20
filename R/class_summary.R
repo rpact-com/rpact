@@ -31,14 +31,16 @@ SummaryItem <- R6::R6Class("SummaryItem",
             if (!is.null(self$legendEntry) && length(self$legendEntry) > 0) {
                 if (is.null(names(self$legendEntry))) {
                     stopIllegalArgument(sQuote("legendEntry"), " must be a named list",
-                        functionName = "initialize", parameter = "legendEntry",
+                        functionName = "initialize",
+                        parameter = "legendEntry",
                         value = legendEntry
                     )
                 }
                 for (l in self$legendEntry) {
                     if (length(l) == 0) {
                         stopIllegalArgument(sQuote("legendEntry"), " must be not empty",
-                            functionName = "initialize", parameter = "legendEntry",
+                            functionName = "initialize",
+                            parameter = "legendEntry",
                             value = legendEntry
                         )
                     }
@@ -419,7 +421,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     self$addSummaryItem(SummaryItem$new(title = title, values = values, legendEntry = legendEntry))
                 },
                 error = function(e) {
-                    stopRuntimeIssue("failed to add summary item '", title, "' = ", .arrayToString(values),
+                    stopRuntimeIssue("failed to add summary item ", .pQuote(title), " = ", .arrayToString(values),
                         " (class: ", .getClassName(values), "): ", e$message,
                         functionName = "addItem",
                         parameter = "title",
@@ -433,7 +435,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         addSummaryItem = function(summaryItem) {
             if (!inherits(summaryItem, "SummaryItem")) {
                 stopIllegalArgument("'summaryItem' must be an instance of class ",
-                    "'SummaryItem' (was '", .getClassName(summaryItem), "')",
+                    "'SummaryItem' (was ", .getClassName(summaryItem, quote = TRUE), ")",
                     functionName = "addSummaryItem",
                     parameter = "summaryItem",
                     value = summaryItem,
@@ -507,7 +509,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 values <- parameterSet[[parameterName1]]
                 if (is.null(values)) {
                     stopRuntimeIssue(.getClassName(parameterSet), " does not ",
-                        "contain a field '", parameterName1, "'",
+                        "contain a field ", .pQuote(parameterName1), "",
                         functionName = "addParameter",
                         parameter = "parameterSet",
                         value = parameterSet,
@@ -525,7 +527,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 parameterName <- parameterName[1]
                 if (is.null(values2)) {
                     stopRuntimeIssue(.getClassName(parameterSet), " does not ",
-                        "contain a field '", parameterName2, "'",
+                        "contain a field ", .pQuote(parameterName2), "",
                         functionName = "addParameter",
                         parameter = "parameterSet",
                         value = parameterSet,
@@ -576,7 +578,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             if (is.list(parameterSet) && is.matrix(values)) {
                 parameterSet <- parameterSet[["parameterSet"]]
                 if (is.null(parameterSet)) {
-                    stopRuntimeIssue("'parameterSet' must be added to list", functionName = "addParameter", parameter = "parameterSet", value = parameterSet)
+                    stopRuntimeIssue("'parameterSet' must be added to list",
+                        functionName = "addParameter",
+                        parameter = "parameterSet", value = parameterSet
+                    )
                 }
             }
 
@@ -685,8 +690,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             } else {
                 if (!inherits(parameterSet, "ParameterSet")) {
                     stopIllegalArgument("for varied values 'parameterSet' must be an instance of ",
-                        "class 'ParameterSet' (was '",
-                        .getClassName(parameterSet), "')",
+                        "class 'ParameterSet' (was ", .getClassName(parameterSet, quote = TRUE), ")",
                         functionName = "addParameter",
                         parameter = "parameterSet",
                         value = parameterSet
@@ -753,7 +757,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                             numberOfVariants <- length(variedParameterValues)
                         } else {
                             stopRuntimeIssue("varied parameter identification ", "is not implemented for ", .getClassName(parameterSet),
-                                functionName = "addParameter", parameter = "parameterSet", value = parameterSet
+                                functionName = "addParameter",
+                                parameter = "parameterSet", value = parameterSet
                             )
                         }
                         variedParameterCaption <- tolower(variedParameterCaption)
@@ -1170,7 +1175,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 }
             },
             error = function(e) {
-                stopRuntimeIssue("failed to show parameter '", parameterName, "': ", e$message,
+                stopRuntimeIssue("failed to show parameter ", .pQuote(parameterName), ": ", e$message,
                     functionName = ".getSummaryValuesFormatted",
                     parameter = parameterName
                 )
@@ -1356,8 +1361,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             !inherits(object, "SimulationResults")) {
         stopIllegalArgument("'object' must be an instance of class ",
             "'AnalysisResults', 'TrialDesignPlan' ",
-            "or 'SimulationResults' (is '",
-            .getClassName(object), "')",
+            "or 'SimulationResults' (is ", .getClassName(object, quote = TRUE), ")",
             functionName = ".createSummaryHypothesisText",
             parameter = "object",
             value = .getClassName(object)
@@ -2608,7 +2612,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (userDefinedFunction) {
             header <- .concatenateSummaryText(
                 header,
-                paste0("sample size reassessment: user defined '", functionName, "'")
+                paste0("sample size reassessment: user defined ", .pQuote(functionName))
             )
             if ((!is.null(designPlan[["conditionalPower"]]) && !is.na(designPlan$conditionalPower))) {
                 header <- .concatenateSummaryText(
@@ -2862,7 +2866,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     if (!inherits(object, "AnalysisResults")) {
         stopIllegalArgument("'object' must be a valid analysis result object (is class ", .getClassName(object),
             ")",
-            functionName = ".createSummaryAnalysisResults", parameter = "object", value = object
+            functionName = ".createSummaryAnalysisResults",
+            parameter = "object", value = object
         )
     }
 
@@ -3455,7 +3460,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     } else {
         stopIllegalArgument("'object' must be a valid design, design plan, ", "or simulation result object (is class ",
             .getClassName(object), ")",
-            functionName = ".createSummaryDesignPlan", parameter = "object", value = object
+            functionName = ".createSummaryDesignPlan",
+            parameter = "object", value = object
         )
     }
 

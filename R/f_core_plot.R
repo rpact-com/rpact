@@ -156,7 +156,9 @@ NULL
     if (stopIfNotFound) {
         stopRuntimeIssue("could not find plot caption for ", .getClassName(obj), " and type ", type,
             functionName = ".getPlotCaption",
-            parameter = "obj", value = obj, relatedParameter = "type", relatedValue = type
+            parameter = "obj", value = obj,
+            relatedParameter = "type",
+            relatedValue = type
         )
     }
 
@@ -274,7 +276,7 @@ NULL
                 return(eval(parse(text = plotCmd)))
             },
             error = function(e) {
-                warning("Failed to create grid plot using command '", plotCmd, "': ", e$message)
+                warning("Failed to create grid plot using command ", .sQuote(plotCmd), ": ", e$message)
             }
         )
     }
@@ -619,7 +621,8 @@ getAvailablePlotTypes <- function(
     .assertIsSingleCharacter(xParameterName, "xParameterName")
     if (length(yParameterNames) == 0 || !all(is.character(yParameterNames)) || all(is.na(yParameterNames))) {
         stopIllegalArgument("'yParameterNames' (", .arrayToString(yParameterNames), ") must be a valid character vector",
-            functionName = ".showPlotSourceInformation", parameter = "yParameterNames", value = yParameterNames
+            functionName = ".showPlotSourceInformation",
+            parameter = "yParameterNames", value = yParameterNames
         )
     }
     .assertIsSingleCharacter(hint, "hint", naAllowed = TRUE)
@@ -736,10 +739,12 @@ getAvailablePlotTypes <- function(
         error = function(e) {
             msg <- paste0(
                 "failed to evaluate plot command \"", plotCmd, "\" ",
-                "('", as.character(e$call), "'): ", e$message
+                "(", .sQuote(as.character(e$call)), "): ", e$message
             )
             if (!silent) {
-                stopRuntimeIssue(msg[1], functionName = ".testPlotCommand")
+                stopRuntimeIssue(msg[1],
+                    functionName = ".testPlotCommand"
+                )
             }
             cat(.firstCharacterToUpperCase(msg), "\n")
         }
@@ -759,7 +764,9 @@ getAvailablePlotTypes <- function(
     if (.isTrialDesignSet(parameterSet) && parameterSet$getSize() > 1 &&
             (is.null(parameterSet$variedParameters) || length(parameterSet$variedParameters) == 0)) {
         stopRuntimeIssue("'variedParameters' must be not empty; ", "use 'DesignSet$addVariedParameters(character)' to add one or more varied parameters",
-            functionName = ".getParameterSetAsDataFrame", parameter = "variedParameters", relatedParameter = "DesignSet$addVariedParameters(character)"
+            functionName = ".getParameterSetAsDataFrame",
+            parameter = "variedParameters",
+            relatedParameter = "DesignSet$addVariedParameters(character)"
         )
     }
 
@@ -804,9 +811,11 @@ getAvailablePlotTypes <- function(
         for (variedParameter in variedParameters) {
             column <- data[[variedParameter]]
             if (length(column) <= 1) {
-                stopRuntimeIssue("varied parameter '", variedParameter, "' has length ", length(column),
+                stopRuntimeIssue("varied parameter ", .pQuote(variedParameter), " has length ", length(column),
                     functionName = ".getParameterSetAsDataFrame",
-                    parameter = "variedParameter", value = variedParameter, relatedParameter = "column", relatedValue = length(column)
+                    parameter = "variedParameter", value = variedParameter,
+                    relatedParameter = "column",
+                    relatedValue = length(column)
                 )
             }
 
@@ -903,10 +912,13 @@ getAvailablePlotTypes <- function(
         }
         for (parameterName in parameterNames) {
             if (!is.na(parameterName) && !(parameterName %in% fieldNames)) {
-                stopIllegalArgument("'", .getClassName(parameterSet), "' and '", .getClassName(designMaster), "' ", "do not contain a field with name '",
-                    parameterName, "'",
-                    functionName = ".plotParameterSet", parameter = "parameterName", value = parameterName,
-                    relatedParameter = "fieldNames", relatedValue = fieldNames
+                stopIllegalArgument("", .getClassName(parameterSet, quote = TRUE), " and ",
+                    .getClassName(designMaster, quote = TRUE), " ",
+                    "do not contain a field with name ", .pQuote(parameterName),
+                    functionName = ".plotParameterSet",
+                    parameter = "parameterName", value = parameterName,
+                    relatedParameter = "fieldNames",
+                    relatedValue = fieldNames
                 )
             }
         }
@@ -967,8 +979,10 @@ getAvailablePlotTypes <- function(
     } else {
         stopRuntimeIssue("'parameterSet' (", .getClassName(parameterSet), ") must be a data.frame, a 'TrialDesignSet' ",
             "or an object that inherits from 'ParameterSet'",
-            functionName = ".plotParameterSet", parameter = "parameterSet",
-            value = parameterSet, relatedParameter = "TrialDesignSet"
+            functionName = ".plotParameterSet",
+            parameter = "parameterSet",
+            value = parameterSet,
+            relatedParameter = "TrialDesignSet"
         )
     }
 
@@ -1306,12 +1320,14 @@ getAvailablePlotTypes <- function(
     m2 <- ifelse(length(.naAndNaNOmit(rightAxisValues)) == 0, 1, max(.naAndNaNOmit(rightAxisValues)))
     if (is.na(m1)) {
         stopRuntimeIssue("y-values, left (", .arrayToString(leftAxisValues), ") are not specified correctly",
-            functionName = ".getScalingFactors", parameter = "leftAxisValues", value = leftAxisValues
+            functionName = ".getScalingFactors",
+            parameter = "leftAxisValues", value = leftAxisValues
         )
     }
     if (is.na(m2)) {
         stopRuntimeIssue("y-values, right (", .arrayToString(rightAxisValues), ") are not specified correctly",
-            functionName = ".getScalingFactors", parameter = "rightAxisValues", value = rightAxisValues
+            functionName = ".getScalingFactors",
+            parameter = "rightAxisValues", value = rightAxisValues
         )
     }
 
@@ -1644,8 +1660,11 @@ getAvailablePlotTypes <- function(
     if (length(piecewiseSurvivalTime) != length(piecewiseLambda)) {
         stopIllegalArgument("length of 'piecewiseSurvivalTime' (", length(piecewiseSurvivalTime), ") must be equal to length of 'piecewiseLambda' (",
             length(piecewiseLambda), ") - 1",
-            functionName = ".getLambdaStepFunction", parameter = "piecewiseSurvivalTime",
-            value = length(piecewiseSurvivalTime), relatedParameter = "piecewiseLambda", relatedValue = length(piecewiseLambda)
+            functionName = ".getLambdaStepFunction",
+            parameter = "piecewiseSurvivalTime",
+            value = length(piecewiseSurvivalTime),
+            relatedParameter = "piecewiseLambda",
+            relatedValue = length(piecewiseLambda)
         )
     }
 
@@ -1733,7 +1752,8 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     if (grepl("\\\\|/", filename)) {
         stopIllegalArgument("'filename' seems to be a path. ", "Please specify 'outputPath' separately",
             functionName = "saveLastPlot",
-            parameter = "filename", relatedParameter = "outputPath", value = filename
+            parameter = "filename",
+            relatedParameter = "outputPath", value = filename
         )
     }
 
@@ -1748,7 +1768,7 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         scale = 1.2, width = 16, height = 15, units = "cm", dpi = 600, limitsize = TRUE
     )
 
-    cat("Last plot was saved to '", path, "'\n")
+    cat("Last plot was saved to ", .pQuote(path), "\n")
 }
 
 .getGridPlotSettings <- function(x, typeNumbers, grid) {

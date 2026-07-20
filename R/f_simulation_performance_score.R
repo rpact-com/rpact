@@ -56,7 +56,9 @@ getPerformanceScore <- function(simulationResult) {
     }
 
     if (design$kMax != 2) {
-        stopIllegalArgument("performance score so far implemented only for two-stage designs", functionName = "getPerformanceScore")
+        stopIllegalArgument("performance score so far implemented only for two-stage designs",
+            functionName = "getPerformanceScore"
+        )
     }
 
     # initialize necessary sample size values
@@ -97,7 +99,9 @@ getPerformanceScore <- function(simulationResult) {
         referenceValue <- simulationResult$pi2
         args$pi2 <- referenceValue
     } else {
-        stopIllegalArgument("performance score is not available for class ", class(simulationResult)[1], functionName = "getPerformanceScore")
+        stopIllegalArgument("performance score is not available for class ", class(simulationResult)[1],
+            functionName = "getPerformanceScore"
+        )
     }
     alternativeValues <- simulationResult[[alternativeParamName]]
 

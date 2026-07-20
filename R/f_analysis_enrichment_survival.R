@@ -157,12 +157,15 @@ NULL
 
     if (gMax > 2 && intersectionTest == "SpiessensDebois") {
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
-            functionName = ".getStageResultsSurvivalEnrichment", parameter = "gMax", value = gMax
+            functionName = ".getStageResultsSurvivalEnrichment",
+            parameter = "gMax", value = gMax
         )
     }
 
     if (!stratifiedAnalysis) {
-        stopIllegalArgument("only stratified analysis can be performed for enrichment survival designs", functionName = ".getStageResultsSurvivalEnrichment")
+        stopIllegalArgument("only stratified analysis can be performed for enrichment survival designs",
+            functionName = ".getStageResultsSurvivalEnrichment"
+        )
     }
 
     if (dataInput$isStratified() && gMax > 4) {
@@ -614,7 +617,10 @@ NULL
         if (maxSearchIterations < 0) {
             stopRuntimeIssue(
                 sprintf(
-                    paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                    paste0(
+                        "failed to find theta (k = %s, firstValue = %s, ",
+                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
+                    ),
                     stage, stageResults[[firstParameterName]][treatmentArm, stage], secondValue, firstValue, theta
                 ),
                 functionName = ".getUpperLowerThetaSurvivalEnrichment"
@@ -957,7 +963,10 @@ NULL
     if ((length(thetaH1) != 1) && (length(thetaH1) != gMax)) {
         stopIllegalArgument(
             sprintf(
-                paste0("length of 'thetaH1' (%s) must be ", "equal to 'gMax' (%s) or 1"),
+                paste0(
+                    "length of 'thetaH1' (%s) must be ",
+                    "equal to 'gMax' (%s) or 1"
+                ),
                 .arrayToString(thetaH1), gMax
             ),
             functionName = ".getConditionalPowerSurvivalEnrichment",
@@ -994,7 +1003,8 @@ NULL
     }
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        functionName = ".getConditionalPowerSurvivalEnrichment", parameter = "design"
+        functionName = ".getConditionalPowerSurvivalEnrichment",
+        parameter = "design"
     )
 }
 

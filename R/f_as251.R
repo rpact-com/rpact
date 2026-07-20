@@ -62,7 +62,9 @@ mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
         stopIllegalArgument("input vectors must have the same length (", paste0(sort(unique(c(
             length(A), length(B),
             length(BPD), length(INF)
-        ))), collapse = " != "), ")", functionName = "mvnprd")
+        ))), collapse = " != "), ")",
+        functionName = "mvnprd"
+        )
     }
 
     result <- .mvnprd(A, B, BPD, EPS, INF, IERC, HINC)
@@ -187,7 +189,9 @@ mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0)
         stopIllegalArgument("input vectors must have the same length (", paste0(sort(unique(c(
             length(A), length(B),
             length(BPD), length(INF), length(D)
-        ))), collapse = " != "), ")", functionName = "mvstud")
+        ))), collapse = " != "), ")",
+        functionName = "mvstud"
+        )
     }
 
     result <- .mvstud(NDF, A, B, BPD, D, EPS, INF, IERC, HINC)

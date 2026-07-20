@@ -1118,7 +1118,8 @@ NULL
     if ((length(piTreatments) != 1) && (length(piTreatments) != gMax)) {
         stopIllegalArgument(
             sprintf(
-                paste0("length of 'piTreatments' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                paste0("length of 'piTreatments' (%s) ", 
+                "must be equal to 'gMax' (%s) or 1"),
                 .arrayToString(piTreatments), gMax
             ),
             functionName = ".getConditionalPowerRatesMultiArm",
@@ -1184,7 +1185,8 @@ NULL
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
         "or TrialDesignConditionalDunnett",
-        functionName = ".getConditionalPowerRatesMultiArm", parameter = "design"
+        functionName = ".getConditionalPowerRatesMultiArm",
+        parameter = "design"
     )
 }
 

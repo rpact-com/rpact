@@ -213,22 +213,28 @@ NULL
 
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
-            functionName = ".getStageResultsRatesEnrichment", parameter = "gMax", value = gMax
+            functionName = ".getStageResultsRatesEnrichment",
+            parameter = "gMax", value = gMax
         )
     }
 
     if (intersectionTest == "SpiessensDebois" && !normalApproximation) {
-        stopIllegalArgument("Spiessens & Debois test cannot be used with Fisher's ", "exact test (normalApproximation = FALSE)",
+        stopIllegalArgument("Spiessens & Debois test cannot be used with Fisher's ",
+            "exact test (normalApproximation = FALSE)",
             functionName = ".getStageResultsRatesEnrichment"
         )
     }
 
     if (stratifiedAnalysis && !normalApproximation) {
-        stopConflictingArguments("stratified version is not available for Fisher's exact test", functionName = ".getStageResultsRatesEnrichment")
+        stopConflictingArguments("stratified version is not available for Fisher's exact test",
+            functionName = ".getStageResultsRatesEnrichment"
+        )
     }
 
     if (stratifiedAnalysis && !dataInput$isStratified()) {
-        stopIllegalArgument("stratified analysis is only possible for stratified data input", functionName = ".getStageResultsRatesEnrichment")
+        stopIllegalArgument("stratified analysis is only possible for stratified data input",
+            functionName = ".getStageResultsRatesEnrichment"
+        )
     }
 
     if (dataInput$isStratified() && (gMax > 4)) {
@@ -1017,10 +1023,14 @@ NULL
     if ((length(piTreatments) != 1) && (length(piTreatments) != gMax)) {
         stopIllegalArgument(
             sprintf(
-                paste0("length of 'piTreatments' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                paste0(
+                    "length of 'piTreatments' (%s) ",
+                    "must be equal to 'gMax' (%s) or 1"
+                ),
                 .arrayToString(piTreatments), gMax
             ),
-            functionName = ".getConditionalPowerRatesEnrichment", parameter = "piTreatments",
+            functionName = ".getConditionalPowerRatesEnrichment",
+            parameter = "piTreatments",
             value = piTreatments,
             relatedParameter = "gMax",
             relatedValue = gMax
@@ -1030,10 +1040,14 @@ NULL
     if ((length(piControls) != 1) && (length(piControls) != gMax)) {
         stopIllegalArgument(
             sprintf(
-                paste0("length of 'piControls' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                paste0(
+                    "length of 'piControls' (%s) ",
+                    "must be equal to 'gMax' (%s) or 1"
+                ),
                 .arrayToString(piControls), gMax
             ),
-            functionName = ".getConditionalPowerRatesEnrichment", parameter = "piControls",
+            functionName = ".getConditionalPowerRatesEnrichment",
+            parameter = "piControls",
             value = piControls,
             relatedParameter = "gMax",
             relatedValue = gMax
@@ -1070,7 +1084,8 @@ NULL
     }
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        functionName = ".getConditionalPowerRatesEnrichment", parameter = "design"
+        functionName = ".getConditionalPowerRatesEnrichment",
+        parameter = "design"
     )
 }
 

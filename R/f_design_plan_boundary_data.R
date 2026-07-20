@@ -490,7 +490,8 @@
                         )
 
                         if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                            stopRuntimeIssue("Cannot find theta. ", "The calculated variance estimate is invalid: ", vHat,
+                            stopRuntimeIssue("Cannot find theta. ", 
+                                "The calculated variance estimate is invalid: ", vHat,
                                 functionName = ".getEffectScaleBoundaryCountDataTheta",
                                 parameter = "vHat", value = vHat
                             )
@@ -523,7 +524,8 @@
                     )
 
                     if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                        stopRuntimeIssue("cannot find theta. ", "The calculated variance estimate is invalid: ", vHat,
+                        stopRuntimeIssue("cannot find theta. ", 
+                            "The calculated variance estimate is invalid: ", vHat,
                             functionName = ".getEffectScaleBoundaryCountDataTheta",
                             parameter = "vHat", value = vHat
                         )
@@ -729,7 +731,7 @@
         }
     } else {
         stopRuntimeIssue("Cannot determine the direction of the test. ",
-            "The trial design plan type ", sQuote(.getClassName(designPlan)), 
+            "The trial design plan type ", sQuote(.getClassName(designPlan)),
             " is not supported for this operation.",
             functionName = ".getDirectionUpperCalculated"
         )
@@ -764,9 +766,11 @@
                 call. = FALSE
             )
         } else {
-            stopIllegalArgument("The specified 'directionUpper' (", directionUpperDefined, ") ", "is not consistent with the calculated 'directionUpper' (",
+            stopIllegalArgument("The specified 'directionUpper' (", directionUpperDefined, ") ", 
+                "is not consistent with the calculated 'directionUpper' (",
                 .arrayToString(directionUpperCalculated), "). ",
-                functionName = ".setDirectionUpper", parameter = "directionUpper"
+                functionName = ".setDirectionUpper",
+                parameter = "directionUpper"
             )
         }
     }

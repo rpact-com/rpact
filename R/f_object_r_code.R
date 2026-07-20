@@ -249,7 +249,8 @@ NULL
     }
 
     stopRuntimeIssue("function '.getGeneratorFunctionName' is not implemented for class ", .getClassName(obj),
-        functionName = ".getGeneratorFunctionName", parameter = ".getGeneratorFunctionName"
+        functionName = ".getGeneratorFunctionName",
+        parameter = ".getGeneratorFunctionName"
     )
 }
 
@@ -511,9 +512,10 @@ getObjectRCode <- function(
     .assertIsParameterSetClass(obj, "ParameterSet")
 
     if (!is.list(newArgumentValues)) {
-        stopIllegalArgument("'newArgumentValues' must be a named list ", "(is ", .getClassName(newArgumentValues),
-            ")",
-            functionName = "getObjectRCode", parameter = "newArgumentValues", value = newArgumentValues
+        stopIllegalArgument("'newArgumentValues' must be a named list ",
+            "(is ", .getClassName(newArgumentValues), ")",
+            functionName = "getObjectRCode",
+            parameter = "newArgumentValues", value = newArgumentValues
         )
     }
 
@@ -778,9 +780,11 @@ getObjectRCode <- function(
         newArgumentValueNames <- names(newArgumentValues)
         illegalArgumentValueNames <- newArgumentValueNames[which(!(newArgumentValueNames %in% names(obj)))]
         if (length(illegalArgumentValueNames) > 0) {
-            stopIllegalArgument("'", illegalArgumentValueNames, "' is not a valid ", functionName, "() argument",
-                functionName = "getObjectRCode", parameter = "illegalArgumentValueNames", value = illegalArgumentValueNames,
-                relatedParameter = "functionName", relatedValue = functionName
+            stopIllegalArgument(.pQuote(illegalArgumentValueNames), " is not a valid ", functionName, "() argument",
+                functionName = "getObjectRCode",
+                parameter = "illegalArgumentValueNames", value = illegalArgumentValueNames,
+                relatedParameter = "functionName",
+                relatedValue = functionName
             )
         }
 

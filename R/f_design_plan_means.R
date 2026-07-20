@@ -445,12 +445,12 @@ NULL
             )
             if (design$sided == 1 && any(effect <= 0)) {
                 stopIllegalArgument(
-                    "any 'alternative' (", .arrayToString(alternative), ") must be ", 
+                    "any 'alternative' (", .arrayToString(alternative), ") must be ",
                     ifelse(isFALSE(directionUpper), "<", ">"), " 'thetaH0' (", thetaH0, ")",
-                    functionName = ".createDesignPlanMeans", 
+                    functionName = ".createDesignPlanMeans",
                     parameter = "alternative",
-                    value = alternative, 
-                    relatedParameter = "thetaH0", 
+                    value = alternative,
+                    relatedParameter = "thetaH0",
                     relatedValue = thetaH0
                 )
             }
@@ -459,9 +459,9 @@ NULL
         if (any(alternative - thetaH0 == 0)) {
             stopIllegalArgument("any 'alternative' (", .arrayToString(alternative), ") ",
                 "must be != 'thetaH0' (", thetaH0, ")",
-                functionName = ".createDesignPlanMeans", 
-                parameter = "alternative", 
-                value = alternative, 
+                functionName = ".createDesignPlanMeans",
+                parameter = "alternative",
+                value = alternative,
                 relatedParameter = "thetaH0",
                 relatedValue = thetaH0
             )
@@ -485,7 +485,7 @@ NULL
     if (groups == 2) {
         if (design$sided == 2 && ((thetaH0 != 0 && !meanRatio) ||
                 (thetaH0 != 1 && meanRatio))) {
-            stopIllegalArgument("two-sided case is implemented only for superiority testing ", 
+            stopIllegalArgument("two-sided case is implemented only for superiority testing ",
                 "(i.e., thetaH0 = ", ifelse(meanRatio, 1, 0), ")",
                 functionName = ".createDesignPlanMeans"
             )
@@ -508,11 +508,11 @@ NULL
         )
 
         if (meanRatio && thetaH0 <= 0) {
-            stopIllegalArgument("null hypothesis mean ratio is not allowed be negative or zero, ", 
+            stopIllegalArgument("null hypothesis mean ratio is not allowed be negative or zero, ",
                 "i.e., 'thetaH0' must be > 0 if 'meanRatio' = TRUE",
-                functionName = ".createDesignPlanMeans", 
-                parameter = "thetaH0", 
-                relatedParameter = "meanRatio", 
+                functionName = ".createDesignPlanMeans",
+                parameter = "thetaH0",
+                relatedParameter = "meanRatio",
                 value = thetaH0
             )
         }
@@ -536,8 +536,10 @@ NULL
         )
     }
     .setValueAndParameterType(designPlan, "stDev", stDev, C_STDEV_DEFAULT)
-    .setValueAndParameterType(designPlan, "directionUpper", 
-        directionUpper, C_DIRECTION_UPPER_DEFAULT)
+    .setValueAndParameterType(
+        designPlan, "directionUpper",
+        directionUpper, C_DIRECTION_UPPER_DEFAULT
+    )
     if (objectType == "power") {
         .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
         .setValueAndParameterType(

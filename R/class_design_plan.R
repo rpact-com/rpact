@@ -269,7 +269,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             } else if (.isTrialDesignPlanSurvival(self)) {
                 result <- "survival data"
             } else {
-                result <- paste0("unknown data class '", .getClassName(self), "'")
+                result <- paste0("unknown data class ", .getClassName(self, quote = TRUE))
             }
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(result), result))
         }
@@ -538,7 +538,8 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
 #' @template field_futilityBoundsPValueScale
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
+#' This object cannot be created directly; 
+#' use \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
 #' with suitable arguments to create a design plan for a dataset of rates.
 #'
 #' @include class_core_parameter_set.R
@@ -736,7 +737,8 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
 #' @template field_futilityBoundsPValueScale
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
+#' This object cannot be created directly; 
+#' use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 #' with suitable arguments to create a design plan for a dataset of survival data.
 #'
 #' @include class_core_parameter_set.R
@@ -958,7 +960,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                 dropoutRate2 = self$dropoutRate2,
                 dropoutTime = self$dropoutTime
             )
-            
+
             if (self$.design$sided == 1 && self$isUserDefinedParameter("directionUpper")) {
                 directionUpperTemp <- self$directionUpper
                 if (length(directionUpperTemp) == 1) {

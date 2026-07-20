@@ -221,7 +221,9 @@ getDesignFisher <- function(
     }
 
     if (sided != 1) {
-        stopIllegalArgument("Fisher's combination test only available for one-sided testing", functionName = ".getDesignFisher")
+        stopIllegalArgument("Fisher's combination test only available for one-sided testing",
+            functionName = ".getDesignFisher"
+        )
     }
 
     if (is.na(bindingFutility)) {
@@ -294,8 +296,8 @@ getDesignFisher <- function(
     } else {
         design$.setParameterType("userAlphaSpending", C_PARAM_NOT_APPLICABLE)
         if (.isDefinedArgument(design$userAlphaSpending)) {
-            warning("'userAlphaSpending' will be ignored because 'method' is not '",
-                C_FISHER_METHOD_USER_DEFINED_ALPHA, "'",
+            warning("'userAlphaSpending' will be ignored because 'method' is not ",
+                .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
                 call. = FALSE
             )
         }
@@ -319,9 +321,11 @@ getDesignFisher <- function(
     .assertIsSingleInteger(design$kMax, "kMax")
     .assertIsValidKMax(design$kMax, kMaxUpperBound = C_KMAX_UPPER_BOUND_FISHER)
     if (design$method == C_FISHER_METHOD_NO_INTERACTION && design$kMax < 3) {
-        stopIllegalArgument("method '", C_FISHER_METHOD_NO_INTERACTION, "' is only allowed for kMax > 2 (kMax is ",
+        stopIllegalArgument("method ", .vQuote(C_FISHER_METHOD_NO_INTERACTION),
+            " is only allowed for kMax > 2 (kMax is ",
             design$kMax, ")",
-            functionName = ".getDesignFisher", parameter = "C_FISHER_METHOD_NO_INTERACTION",
+            functionName = ".getDesignFisher",
+            parameter = "C_FISHER_METHOD_NO_INTERACTION",
             value = C_FISHER_METHOD_NO_INTERACTION
         )
     }
@@ -346,7 +350,9 @@ getDesignFisher <- function(
         stopIllegalArgument("for specified 'method' (\"", C_FISHER_METHOD_NO_INTERACTION, "\") the 'alpha0Vec' must be unequal to ",
             .arrayToString(alpha0Vec, vectorLookAndFeelEnabled = TRUE), " and 'bindingFutility' must be TRUE",
             functionName = ".getDesignFisher",
-            parameter = "method", relatedParameter = "alpha0Vec", relatedValue = alpha0Vec, value = method
+            parameter = "method",
+            relatedParameter = "alpha0Vec",
+            relatedValue = alpha0Vec, value = method
         )
     }
 
@@ -419,12 +425,16 @@ getDesignFisher <- function(
 
     if (userFunctionCallEnabled) {
         if (design$method == C_FISHER_METHOD_NO_INTERACTION && abs(size - design$alpha) > 1e-03) {
-            stopRuntimeIssue("numerical overflow in computation routine", functionName = ".getDesignFisher")
+            stopRuntimeIssue("numerical overflow in computation routine",
+                functionName = ".getDesignFisher"
+            )
         }
 
         if (design$method == C_FISHER_METHOD_EQUAL_ALPHA && !all(is.na(design$stageLevels)) &&
                 abs(mean(na.omit(design$stageLevels)) - design$stageLevels[1]) > 1e-03) {
-            stopRuntimeIssue("numerical overflow in computation routine", functionName = ".getDesignFisher")
+            stopRuntimeIssue("numerical overflow in computation routine",
+                functionName = ".getDesignFisher"
+            )
         }
 
         if (design$kMax > 1) {
@@ -435,7 +445,9 @@ getDesignFisher <- function(
                     .arrayToString(design$criticalValues, vectorLookAndFeelEnabled = TRUE), ", ",
                     "i.e., differences are ", .arrayToString(diff, vectorLookAndFeelEnabled = TRUE)
                 )
-                stopRuntimeIssue("no calculation possible", functionName = ".getDesignFisher")
+                stopRuntimeIssue("no calculation possible",
+                    functionName = ".getDesignFisher"
+                )
             }
 
             if (!all(is.na(design$stageLevels)) && any(na.omit(design$stageLevels[1:(design$kMax - 1)]) > design$alpha)) {
@@ -450,8 +462,10 @@ getDesignFisher <- function(
             if (any(abs(design$alphaSpent - design$userAlphaSpending) > 1e-05)) {
                 stopIllegalArgument("'alpha' (", design$alpha, ") or 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending),
                     ") not correctly specified",
-                    functionName = ".getDesignFisher", parameter = "alpha", value = design$alpha,
-                    relatedParameter = "userAlphaSpending", relatedValue = design$userAlphaSpending
+                    functionName = ".getDesignFisher",
+                    parameter = "alpha", value = design$alpha,
+                    relatedParameter = "userAlphaSpending",
+                    relatedValue = design$userAlphaSpending
                 )
             }
         }

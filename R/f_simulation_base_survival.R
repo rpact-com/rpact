@@ -45,14 +45,22 @@ NULL
 
     if (pwsTimeObject$kappa != 1) {
         if (length(pwsTimeObject$lambda1) != 1) {
-            stopIllegalArgument("if 'kappa' != 1 then 'lambda1' (", .arrayToString(pwsTimeObject$lambda1), ") must be a single numeric value",
-                functionName = ".isLambdaBasedSimulationEnabled", parameter = "kappa", relatedParameter = "lambda1",
+            stopIllegalArgument(
+                "if 'kappa' != 1 then 'lambda1' (", .arrayToString(pwsTimeObject$lambda1),
+                ") must be a single numeric value",
+                functionName = ".isLambdaBasedSimulationEnabled",
+                parameter = "kappa",
+                relatedParameter = "lambda1",
                 relatedValue = pwsTimeObject$lambda1
             )
         }
         if (length(pwsTimeObject$lambda2) != 1) {
-            stopIllegalArgument("if 'kappa' != 1 then 'lambda2' (", .arrayToString(pwsTimeObject$lambda2), ") must be a single numeric value",
-                functionName = ".isLambdaBasedSimulationEnabled", parameter = "kappa", relatedParameter = "lambda2",
+            stopIllegalArgument(
+                "if 'kappa' != 1 then 'lambda2' (", .arrayToString(pwsTimeObject$lambda2),
+                ") must be a single numeric value",
+                functionName = ".isLambdaBasedSimulationEnabled",
+                parameter = "kappa",
+                relatedParameter = "lambda2",
                 relatedValue = pwsTimeObject$lambda2
             )
         }
@@ -368,14 +376,20 @@ getSimulationSurvival <- function(
         )
     }
     if (design$sided == 2) {
-        stopIllegalArgument("Only one-sided case is implemented for the survival simulation design", functionName = "getSimulationSurvival")
+        stopIllegalArgument("Only one-sided case is implemented for the survival simulation design",
+            functionName = "getSimulationSurvival"
+        )
     }
     if (!all(is.na(lambda2)) && !all(is.na(lambda1)) &&
             length(lambda2) != length(lambda1) && length(lambda2) > 1) {
-        stopIllegalArgument("length of 'lambda2' (", length(lambda2), ") must be equal to length of 'lambda1' (",
-            length(lambda1), ")",
-            functionName = "getSimulationSurvival", parameter = "lambda2", value = length(lambda2),
-            relatedParameter = "lambda1", relatedValue = length(lambda1)
+        stopIllegalArgument(
+            "length of 'lambda2' (", length(lambda2), ") must be equal to ",
+            "length of 'lambda1' (", length(lambda1), ")",
+            functionName = "getSimulationSurvival",
+            parameter = "lambda2",
+            value = length(lambda2),
+            relatedParameter = "lambda1",
+            relatedValue = length(lambda1)
         )
     }
     if (all(is.na(lambda2)) && !all(is.na(lambda1))) {
@@ -386,10 +400,14 @@ getSimulationSurvival <- function(
         lambda1 <- NA_real_
     }
     if (!all(is.na(lambda2)) && is.list(piecewiseSurvivalTime)) {
-        stopIllegalArgument("'piecewiseSurvivalTime' needs to be a numeric vector and not a list ", "because 'lambda2' (", .arrayToString(lambda2),
-            ") is defined separately",
-            functionName = "getSimulationSurvival", parameter = "piecewiseSurvivalTime", relatedParameter = "lambda2",
-            relatedValue = lambda2, value = piecewiseSurvivalTime
+        stopIllegalArgument(
+            "'piecewiseSurvivalTime' needs to be a numeric vector and not a list ",
+            "because 'lambda2' (", .arrayToString(lambda2), ") is defined separately",
+            functionName = "getSimulationSurvival",
+            parameter = "piecewiseSurvivalTime",
+            relatedParameter = "lambda2",
+            relatedValue = lambda2,
+            value = piecewiseSurvivalTime
         )
     }
     thetaH1 <- .ignoreParameterIfNotUsed(
@@ -425,9 +443,12 @@ getSimulationSurvival <- function(
         if (design$kMax > 1) {
             if (any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0) &&
                     !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage))) {
-                stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than minNumberOfEventsPerStage' (",
+                stopIllegalArgument(
+                    "'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage),
+                    ") must be not smaller than minNumberOfEventsPerStage' (",
                     .arrayToString(minNumberOfEventsPerStage), ")",
-                    functionName = "getSimulationSurvival", parameter = "maxNumberOfEventsPerStage",
+                    functionName = "getSimulationSurvival",
+                    parameter = "maxNumberOfEventsPerStage",
                     value = maxNumberOfEventsPerStage
                 )
             }
@@ -463,11 +484,13 @@ getSimulationSurvival <- function(
         if (identical(accrualIntensity, 1L)) {
             stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
                 functionName = "getSimulationSurvival",
-                parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
+                parameter = "accrualIntensity",
+                relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
         stopIllegalArgument("'maxNumberOfSubjects' must be defined",
-            functionName = "getSimulationSurvival", parameter = "maxNumberOfSubjects",
+            functionName = "getSimulationSurvival",
+            parameter = "maxNumberOfSubjects",
             value = maxNumberOfSubjects
         )
     }
@@ -769,7 +792,9 @@ getSimulationSurvival <- function(
 
     overview <- resultData$overview
     if (length(overview) == 0 || nrow(overview) == 0) {
-        stopRuntimeIssue("no simulation results calculated", functionName = "getSimulationSurvival")
+        stopRuntimeIssue("no simulation results calculated",
+            functionName = "getSimulationSurvival"
+        )
     }
 
     n <- nrow(overview)

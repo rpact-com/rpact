@@ -7,7 +7,8 @@
 Trial design plan for rates.
 }
 \details{
-This object cannot be created directly; use \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
+This object cannot be created directly;
+use \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
 with suitable arguments to create a design plan for a dataset of rates.
 }
 \section{Fields}{

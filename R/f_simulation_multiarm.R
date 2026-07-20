@@ -88,14 +88,18 @@ NULL
         if (length(selectedArms) != gMax) {
             stopIllegalArgument(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")",
                 parameter = "selectArmsFunction",
-                value = selectedArms, constraint = paste0("logical vector of length ", gMax), relatedParameter = "gMax",
-                relatedValue = gMax, functionName = ".selectTreatmentArms"
+                value = selectedArms, constraint = paste0("logical vector of length ", gMax),
+                relatedParameter = "gMax",
+                relatedValue = gMax,
+                functionName = ".selectTreatmentArms"
             )
         }
         if (!is.logical(selectedArms)) {
             stopIllegalArgument(msg, "the output must be a logical vector (is ", .getClassName(selectedArms), ")",
-                parameter = "selectArmsFunction", value = selectedArms, constraint = "logical vector", relatedParameter = "class of selected arms",
-                relatedValue = .getClassName(selectedArms), functionName = ".selectTreatmentArms"
+                parameter = "selectArmsFunction", value = selectedArms, constraint = "logical vector",
+                relatedParameter = "class of selected arms",
+                relatedValue = .getClassName(selectedArms),
+                functionName = ".selectTreatmentArms"
             )
         }
     }
@@ -280,7 +284,9 @@ NULL
 
 .getCriticalValuesDunnettForSimulation <- function(alpha, indices, allocationRatioPlanned) {
     if (allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
-        stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages", functionName = ".getCriticalValuesDunnettForSimulation")
+        stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages",
+            functionName = ".getCriticalValuesDunnettForSimulation"
+        )
     }
 
     gMax <- ncol(indices)
@@ -529,9 +535,11 @@ NULL
         }
     } else {
         if (!is.null(effectMatrix) && activeArms != ncol(effectMatrix)) {
-            stopIllegalArgument("Number of columns of effect matrix (", ncol(effectMatrix), ") is not equal to specified 'activeArms' (",
-                activeArms, ")",
-                functionName = ".createSimulationResultsMultiArmObject", parameter = "activeArms",
+            stopIllegalArgument(
+                "Number of columns of effect matrix (", ncol(effectMatrix),
+                ") is not equal to specified 'activeArms' (", activeArms, ")",
+                functionName = ".createSimulationResultsMultiArmObject",
+                parameter = "activeArms",
                 value = activeArms
             )
         }
@@ -545,7 +553,7 @@ NULL
             parameter = "activeArms", value = activeArms
         )
     }
-    
+
     typeOfShape <- .assertIsValidTypeOfShape(typeOfShape)
     if (!is.null(effectMatrix) && typeOfShape != "userDefined") {
         stopIllegalArgument("Change 'typeOfShape' (", typeOfShape, ") to 'userDefined'",
@@ -751,14 +759,19 @@ NULL
         if (typeOfShape == "userDefined") {
             omegaMaxVector <- effectMatrix[, gMax]
         }
-        if (activeArms == 1 && identical(as.numeric(omegaMaxVector), as.numeric(effectMatrix)) && 
+        if (activeArms == 1 && identical(as.numeric(omegaMaxVector), as.numeric(effectMatrix)) &&
                 !simulationResults$isUserDefinedParameter("effectMatrix")) {
             simulationResults$.setParameterType("effectMatrix", C_PARAM_NOT_APPLICABLE)
         }
-        .setValueAndParameterType(simulationResults, "omegaMaxVector", 
-            omegaMaxVector, C_RANGE_OF_HAZARD_RATIOS_DEFAULT)        if (simulationResults$isUserDefinedParameter("effectMatrix")) {
-            simulationResults$.setParameterType("omegaMaxVector", 
-                ifelse(activeArms == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_DERIVED))
+        .setValueAndParameterType(
+            simulationResults, "omegaMaxVector",
+            omegaMaxVector, C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+        )
+        if (simulationResults$isUserDefinedParameter("effectMatrix")) {
+            simulationResults$.setParameterType(
+                "omegaMaxVector",
+                ifelse(activeArms == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_DERIVED)
+            )
         }
 
         .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)
@@ -804,7 +817,8 @@ NULL
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {
             stopIllegalArgument("'plannedEvents' (", .arrayToString(plannedEvents), ") must have length ", kMax,
-                functionName = ".createSimulationResultsMultiArmObject", parameter = "plannedEvents", value = plannedEvents
+                functionName = ".createSimulationResultsMultiArmObject",
+                parameter = "plannedEvents", value = plannedEvents
             )
         }
         .assertIsInClosedInterval(plannedEvents, "plannedEvents", lower = 1, upper = NULL)
@@ -885,7 +899,9 @@ NULL
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage)) &&
                     any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0)
                 ) {
-                stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+                stopIllegalArgument(
+                    "'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage),
+                    ") must be not smaller than minNumberOfSubjectsPerStage' (",
                     .arrayToString(minNumberOfSubjectsPerStage), ")",
                     functionName = ".createSimulationResultsMultiArmObject",
                     parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage
@@ -942,10 +958,13 @@ NULL
                 !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage)) &&
                     any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0)
                 ) {
-                stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than 'minNumberOfEventsPerStage' (",
+                stopIllegalArgument(
+                    "'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage),
+                    ") must be not smaller than 'minNumberOfEventsPerStage' (",
                     .arrayToString(minNumberOfEventsPerStage), ")",
                     functionName = ".createSimulationResultsMultiArmObject",
-                    parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage, relatedParameter = "minNumberOfEventsPerStage",
+                    parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage,
+                    relatedParameter = "minNumberOfEventsPerStage",
                     relatedValue = minNumberOfEventsPerStage
                 )
             }
@@ -1092,9 +1111,12 @@ NULL
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
     } else if (length(allocationRatioPlanned) != design$kMax) {
-        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+        stopIllegalArgument(
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1 or ",
             design$kMax, " (kMax)",
-            functionName = ".createSimulationResultsMultiArmObject", parameter = "allocationRatioPlanned",
+            functionName = ".createSimulationResultsMultiArmObject",
+            parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
         )
     }

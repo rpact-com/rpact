@@ -7,7 +7,8 @@
 Trial design plan for survival data.
 }
 \details{
-This object cannot be created directly; use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
+This object cannot be created directly;
+use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 with suitable arguments to create a design plan for a dataset of survival data.
 }
 \section{Fields}{

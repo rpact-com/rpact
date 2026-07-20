@@ -18,7 +18,8 @@
 #' One-Arm Dataset of Means
 #'
 #' A dataset containing the sample sizes, means, and standard deviations of one group.
-#' Use \code{getDataset(dataMeans)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataMeans)} to create a dataset object that can 
+#' be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -29,7 +30,8 @@
 #' One-Arm Dataset of Rates
 #'
 #' A dataset containing the sample sizes and events of one group.
-#' Use \code{getDataset(dataRates)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataRates)} to create a dataset object that can 
+#' be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -40,7 +42,8 @@
 #' One-Arm Dataset of Survival Data
 #'
 #' A dataset containing the log-rank statistics, events, and allocation ratios of one group.
-#' Use \code{getDataset(dataSurvival)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataSurvival)} to create a dataset object that can b
+#' e processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -53,7 +56,8 @@
 #' Multi-Arm Dataset of Means
 #'
 #' A dataset containing the sample sizes, means, and standard deviations of four groups.
-#' Use \code{getDataset(dataMultiArmMeans)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataMultiArmMeans)} to create a dataset object that can 
+#' be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -64,7 +68,8 @@
 #' Multi-Arm Dataset of Rates
 #'
 #' A dataset containing the sample sizes and events of three groups.
-#' Use \code{getDataset(dataMultiArmRates)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataMultiArmRates)} to create a dataset object that can 
+#' be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -75,7 +80,8 @@
 #' Multi-Arm Dataset of Survival Data
 #'
 #' A dataset containing the log-rank statistics, events, and allocation ratios of three groups.
-#' Use \code{getDataset(dataMultiArmSurvival)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataMultiArmSurvival)} to create a dataset object that can 
+#' be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -88,7 +94,8 @@
 #' Enrichment Dataset of Means
 #'
 #' A dataset containing the sample sizes, means, and standard deviations of two groups.
-#' Use \code{getDataset(dataEnrichmentMeans)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataEnrichmentMeans)} to create a dataset object that can 
+#' be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -99,7 +106,8 @@
 #' Enrichment Dataset of Rates
 #'
 #' A dataset containing the sample sizes and events of two groups.
-#' Use \code{getDataset(dataEnrichmentRates)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataEnrichmentRates)} to create a dataset object that can 
+#' be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -110,7 +118,8 @@
 #' Enrichment Dataset of Survival Data
 #'
 #' A dataset containing the log-rank statistics, events, and allocation ratios of two groups.
-#' Use \code{getDataset(dataEnrichmentSurvival)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataEnrichmentSurvival)} to create a dataset object that can 
+#' be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -123,7 +132,8 @@
 #' Stratified Enrichment Dataset of Means
 #'
 #' A dataset containing the sample sizes, means, and standard deviations of two groups.
-#' Use \code{getDataset(dataEnrichmentMeansStratified)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataEnrichmentMeansStratified)} to create a dataset object that can 
+#' be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -134,7 +144,8 @@
 #' Stratified Enrichment Dataset of Rates
 #'
 #' A dataset containing the sample sizes and events of two groups.
-#' Use \code{getDataset(dataEnrichmentRatesStratified)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataEnrichmentRatesStratified)} to create a dataset object that 
+#' can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'
@@ -145,7 +156,8 @@
 #' Stratified Enrichment Dataset of Survival Data
 #'
 #' A dataset containing the log-rank statistics, events, and allocation ratios of two groups.
-#' Use \code{getDataset(dataEnrichmentSurvivalStratified)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' Use \code{getDataset(dataEnrichmentSurvivalStratified)} to create a dataset object that 
+#' can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @format A \code{\link[base]{data.frame}} object.
 #'

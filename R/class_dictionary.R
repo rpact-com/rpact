@@ -130,14 +130,16 @@ initDictionary <- function(x, keyValuePairList) {
     .assertIsDictionary(x)
     if (is.null(keyValuePairList) || length(keyValuePairList) == 0 || !is.list(keyValuePairList)) {
         stopIllegalArgument("'keyValuePairList' must be a valid list",
-            functionName = "initDictionary", parameter = "keyValuePairList",
+            functionName = "initDictionary",
+            parameter = "keyValuePairList",
             value = keyValuePairList
         )
     }
 
     if (any(names(keyValuePairList) == "")) {
         stopIllegalArgument("'keyValuePairList' must be a named list",
-            functionName = "initDictionary", parameter = "keyValuePairList",
+            functionName = "initDictionary",
+            parameter = "keyValuePairList",
             value = keyValuePairList
         )
     }
@@ -151,7 +153,8 @@ initDictionary <- function(x, keyValuePairList) {
 addValueToDictionary <- function(x, key, value) {
     .assertIsDictionary(x)
     if (base::exists(key, envir = x)) {
-        stopIllegalArgument("dictionary ", base::sQuote(base::attr(x, "name")), " already contains key ", base::sQuote(key),
+        stopIllegalArgument("dictionary ", base::sQuote(base::attr(x, "name")), 
+            " already contains key ", base::sQuote(key),
             functionName = "addValueToDictionary"
         )
     }
@@ -166,7 +169,8 @@ setValueToDictionary <- function(x, key, value) {
 getValueFromDictionary <- function(x, key) {
     .assertIsDictionary(x)
     if (!base::exists(key, envir = x)) {
-        stopIllegalArgument("dictionary ", base::sQuote(base::attr(x, "name")), " does not contain key ", base::sQuote(key),
+        stopIllegalArgument("dictionary ", base::sQuote(base::attr(x, "name")), 
+            " does not contain key ", base::sQuote(key),
             functionName = "getValueFromDictionary"
         )
     }

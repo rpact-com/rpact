@@ -207,8 +207,11 @@ NULL
                 )
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
-                    stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
-                        functionName = ".getSimulatedStageSurvivalMultiArm", parameter = "calcEventsFunction", value = calcEventsFunction
+                    stopIllegalArgument(
+                        "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
+                        "the output must be a single numeric value",
+                        functionName = ".getSimulatedStageSurvivalMultiArm",
+                        parameter = "calcEventsFunction", value = calcEventsFunction
                     )
                 }
 
@@ -390,7 +393,7 @@ getSimulationMultiArmSurvivalBasic <- function(
         design,
         objectType = "power", userFunctionCallEnabled = TRUE
     )
-    
+
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,
@@ -684,7 +687,7 @@ getSimulationMultiArmSurvivalBasic <- function(
         "numberOfSelectedArms",
         ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
-    
+
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
     simulationResults$.setParameterType(
         "selectedArms",
@@ -737,7 +740,10 @@ getSimulationMultiArmSurvivalBasic <- function(
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationMultiArmSurvivalBasic")
+        stopRuntimeIssue(
+            "internal error, simulation not possible due to numerical overflow",
+            functionName = "getSimulationMultiArmSurvivalBasic"
+        )
     }
 
     data <- data.frame(

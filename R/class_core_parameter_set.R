@@ -268,7 +268,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                     C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE,
                     C_PARAM_GENERATED, C_PARAM_DERIVED, C_PARAM_NOT_APPLICABLE
                 ))) {
-                stopIllegalArgument("'parameterType' ('", parameterType, "') is invalid",
+                stopIllegalArgument("'parameterType' (", .pQuote(parameterType), ") is invalid",
                     functionName = ".setParameterType",
                     parameter = "parameterType", value = parameterType
                 )
@@ -400,7 +400,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 self$.showAllParameters(consoleOutputEnabled = consoleOutputEnabled)
                 self$.showParameterTypeDescription(consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                stopRuntimeIssue("method '.show()' is not implemented in class '", .getClassName(self), "'",
+                stopRuntimeIssue("method '.show()' is not implemented in class ",
+                    .getClassName(self, quote = TRUE),
                     functionName = ".show",
                     parameter = ".show()"
                 )
@@ -488,7 +489,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 },
                 error = function(e) {
                     if (consoleOutputEnabled) {
-                        warning("Failed to show parameter '", parameterName, "': ", e$message)
+                        warning("Failed to show parameter ", .pQuote(parameterName), ": ", e$message)
                     }
                 }
             )
@@ -569,7 +570,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 },
                 error = function(e) {
                     if (consoleOutputEnabled) {
-                        warning("Failed to show single parameter '", parameterName, "' (", param$type, "): ", e$message)
+                        warning("Failed to show single parameter ", .pQuote(parameterName), " (", param$type, "): ", e$message)
                     }
                 }
             )
@@ -603,7 +604,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 },
                 error = function(e) {
                     if (consoleOutputEnabled) {
-                        warning("Failed to extract parameter name and value from ", sQuote(parameterName), ": ", e$message)
+                        warning("Failed to extract parameter name and value from ", 
+                            sQuote(parameterName), ": ", e$message)
                     }
                     return(list(parameterName = parameterName, paramValue = ""))
                 }
@@ -638,12 +640,12 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (is.null(paramCaption)) {
                 paramCaption <- paste0("%", paramName, "%")
             }
-            
+
             if (!is.null(category) && !is.na(category)) {
-                if (.isMultiArmSimulationResults(self) && 
+                if (.isMultiArmSimulationResults(self) &&
                         paramName %in% c("singleEventsPerArmAndStage", "selectedArms")) {
                     if (!inherits(self, "SimulationResultsEnrichmentSurvival") &&
-                            !is.na(numberOfCategories) && numberOfCategories == category && 
+                            !is.na(numberOfCategories) && numberOfCategories == category &&
                             paramName == "singleEventsPerArmAndStage") {
                         category <- "control"
                     }
@@ -686,9 +688,11 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         } else if (inherits(self, "ClosedCombinationTestResults")) {
                             populations <- self$.getHypothesisPopulationVariants()[matrixRow]
                         } else {
-                            stopRuntimeIssue("only ClosedCombinationTestResults ", "supports function .getHypothesisPopulationVariants() (object is ",
+                            stopRuntimeIssue("only ClosedCombinationTestResults ", 
+                                "supports function .getHypothesisPopulationVariants() (object is ",
                                 .getClassName(self), ")",
-                                functionName = ".showParameterFormatted", parameter = "self", value = self
+                                functionName = ".showParameterFormatted",
+                                parameter = "self", value = self
                             )
                         }
                         paramCaption <- paste0(paramCaption, " ", populations)
@@ -928,7 +932,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
 
             if (!is.character(listEntryNames)) {
                 stopRuntimeIssue("'listEntryNames' must be a character vector",
-                    functionName = ".getSubListByNames", parameter = "listEntryNames",
+                    functionName = ".getSubListByNames",
+                    parameter = "listEntryNames",
                     value = listEntryNames
                 )
             }
@@ -1081,9 +1086,11 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(paste(parameterValues, collapse = ", "))
         }
 
-        stopRuntimeIssue("parameter '", parameterName, "' has an invalid ", "dimension (length is ", length(parameterValues),
-            ")",
-            functionName = ".getDataFrameColumnValues", parameter = parameterName, value = length(parameterValues)
+        stopRuntimeIssue("parameter ", .pQuote(parameterName), " has an invalid ", 
+            "dimension (length is ", length(parameterValues), ")",
+            functionName = ".getDataFrameColumnValues",
+            parameter = parameterName, 
+            value = length(parameterValues)
         )
     } else if (parameterName == "effectMatrix") {
         # return effect matrix row if 'effectMatrix' is user defined
@@ -1149,7 +1156,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         return(rep(parameterValues[, 1], numberOfVariants))
     }
 
-    stopRuntimeIssue("parameter '", parameterName, "' has an invalid ",
+    stopRuntimeIssue("parameter ", .pQuote(parameterName), " has an invalid ",
         "dimension (", nrow(parameterValues),
         " x ", ncol(parameterValues), "); ",
         "expected was (", numberOfStages, " x ", numberOfVariants, ")",
@@ -1595,8 +1602,10 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
     }
 
     if (inherits(x, "AnalysisResults")) {
-        dfDesign <- as.data.frame(x$.design, niceColumnNamesEnabled = niceColumnNamesEnabled)
-        dfStageResults <- as.data.frame(x$.stageResults, niceColumnNamesEnabled = niceColumnNamesEnabled)
+        dfDesign <- as.data.frame(x$.design, 
+            niceColumnNamesEnabled = niceColumnNamesEnabled)
+        dfStageResults <- as.data.frame(x$.stageResults, 
+            niceColumnNamesEnabled = niceColumnNamesEnabled)
         dfStageResults <- dfStageResults[!is.na(dfStageResults[
             ,
             grep("(test statistic)|(testStatistics)", colnames(dfStageResults))
@@ -1651,7 +1660,8 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 #' @inheritParams param_digits
 #' @param output The output parts, default is \code{"all"}.
 #' @param printObject Show also the print output after the summary, default is \code{FALSE}.
-#' @param sep The separator line between the summary and the optional print output, default is \code{"\n\n-----\n\n"}.
+#' @param sep The separator line between the summary and the 
+#'        optional print output, default is \code{"\n\n-----\n\n"}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -1841,9 +1851,11 @@ fetch <- function(x, ..., output) UseMethod("fetch")
 #'  - a positive integer, giving the position counting from the left
 #'  - a negative integer, giving the position counting from the right.
 #' The default returns the last parameter.
-#' This argument is taken by expression and supports quasi-quotation (you can unquote column names and column locations).
+#' This argument is taken by expression and supports quasi-quotation 
+#' (you can unquote column names and column locations).
 #' @param output A character defining the output type as follows:
-#'  - "named" (default) returns the named value if the value is a single value, the value inside a named list otherwise
+#'  - "named" (default) returns the named value if the value is 
+#'    a single value, the value inside a named list otherwise
 #'  - "value" returns only the value itself
 #'  - "list" returns the value inside a named list
 #'
@@ -2043,7 +2055,8 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
     .assertIsInClosedInterval(var, "var", lower = -length(varNames), upper = length(varNames))
     if (var == 0) {
         stopIllegalArgument("'var' (", var, ") must != 0",
-            functionName = ".getParameterSetValue", parameter = "var",
+            functionName = ".getParameterSetValue",
+            parameter = "var",
             value = var
         )
     }
@@ -2113,8 +2126,10 @@ plot.ParameterSet <- function(
         plotSettings = NULL) {
     .assertGgplotIsInstalled()
 
-    stopRuntimeIssue("sorry, function 'plot' is not yet implemented for class '", .getClassName(x), "'",
-        functionName = "plot.ParameterSet", parameter = "plot"
+    stopRuntimeIssue("sorry, function 'plot' is not yet implemented for class ",
+        .getClassName(x, quote = TRUE),
+        functionName = "plot.ParameterSet",
+        parameter = "plot"
     )
 }
 
@@ -2224,9 +2239,9 @@ kable.ParameterSet <- function(x, ...) {
             }
             if (grepl("^ *print\\(", objName)) {
                 stopIllegalArgument(
-                    "kable(", objName, ") ", "does not work correctly. ", 
-                    "Use ", sub("print", "kable", objName), 
-                    " without 'print' instead or ", 
+                    "kable(", objName, ") ", "does not work correctly. ",
+                    "Use ", sub("print", "kable", objName),
+                    " without 'print' instead or ",
                     sub("\\)", ", markdown = TRUE, call. = FALSE)", objName),
                     functionName = "kable.ParameterSet",
                     parameter = "print"

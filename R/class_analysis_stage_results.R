@@ -1487,9 +1487,11 @@ as.data.frame.StageResults <- function(
             all(is.na(populationsToShow)) || !is.numeric(populationsToShow)) {
         populationsToShow <- validComparisons
     } else if (!all(populationsToShow %in% validComparisons)) {
-        stopIllegalArgument("'populations' (", .arrayToString(populationsToShow), ") must be a vector ", "containing one or more values of ",
+        stopIllegalArgument("'populations' (", .arrayToString(populationsToShow), ") must be a vector ", 
+            "containing one or more values of ",
             .arrayToString(validComparisons),
-            functionName = ".getPopulationsToShow", parameter = "populations"
+            functionName = ".getPopulationsToShow",
+            parameter = "populations"
         )
     }
     populationsToShow <- sort(unique(populationsToShow))
@@ -1633,7 +1635,9 @@ plot.StageResults <- function(
     .stopInCaseOfIllegalStageDefinition2(...)
 
     if (x$.design$kMax == 1) {
-        stopIllegalArgument("cannot plot stage results of a fixed design", functionName = ".plot.StageResults")
+        stopIllegalArgument("cannot plot stage results of a fixed design",
+            functionName = ".plot.StageResults"
+        )
     }
 
     if (!is.logical(showSource) || isTRUE(showSource)) {

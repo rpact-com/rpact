@@ -287,7 +287,8 @@ NULL
     if (piecewiseSurvivalTime[1] != 0) {
         stopIllegalArgument("the first value of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime),
             ") must be 0",
-            functionName = ".getPiecewiseExpStartTimesWithoutLeadingZero", parameter = "piecewiseSurvivalTime",
+            functionName = ".getPiecewiseExpStartTimesWithoutLeadingZero",
+            parameter = "piecewiseSurvivalTime",
             value = piecewiseSurvivalTime
         )
     }
@@ -297,8 +298,10 @@ NULL
     }
 
     if (length(piecewiseSurvivalTime) < 2) {
-        stopIllegalArgument("length of 'piecewiseSurvivalTime' (", length(piecewiseSurvivalTime), ") must be > 1",
-            functionName = ".getPiecewiseExpStartTimesWithoutLeadingZero", parameter = "piecewiseSurvivalTime",
+        stopIllegalArgument(
+            "length of 'piecewiseSurvivalTime' (", length(piecewiseSurvivalTime), ") must be > 1",
+            functionName = ".getPiecewiseExpStartTimesWithoutLeadingZero",
+            parameter = "piecewiseSurvivalTime",
             value = length(piecewiseSurvivalTime)
         )
     }
@@ -309,9 +312,12 @@ NULL
 .getNumberOfSubjectsInner <- function(..., timeValue, accrualTime, accrualIntensity, maxNumberOfSubjects) {
     .assertIsSingleNumber(timeValue, "timeValue")
     if (length(accrualTime) != length(accrualIntensity)) {
-        stopIllegalArgument("length of 'accrualTime' (", length(accrualIntensity), ") ", "must be equel to length of 'accrualIntensity' (",
+        stopIllegalArgument("length of 'accrualTime' (", length(accrualIntensity), ") ",
+            "must be equel to length of 'accrualIntensity' (",
             length(accrualIntensity), ")",
-            functionName = ".getNumberOfSubjectsInner", parameter = "accrualTime", relatedParameter = "accrualIntensity",
+            functionName = ".getNumberOfSubjectsInner",
+            parameter = "accrualTime",
+            relatedParameter = "accrualIntensity",
             relatedValue = length(accrualIntensity), value = accrualTime
         )
     }

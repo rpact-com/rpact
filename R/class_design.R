@@ -1297,16 +1297,21 @@ plot.TrialDesign <- function(
 
     availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
     if (length(availablePlotTypes) == 0) {
-        stopIllegalArgument("no plot type available for the specified design", functionName = "plot.TrialDesign")
+        stopIllegalArgument("no plot type available for the specified design",
+            functionName = "plot.TrialDesign"
+        )
     }
     if (is.na(type)) {
         type <- availablePlotTypes[1]
     }
     if (!(type %in% availablePlotTypes)) {
-        stopIllegalArgument("'type' (", type, ") is not available; 'type' can ", ifelse(length(availablePlotTypes) ==
-            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"),
-        functionName = "plot.TrialDesign",
-        parameter = "type", value = type
+        stopIllegalArgument(
+            "'type' (", type, ") is not available; 'type' can ",
+            ifelse(length(availablePlotTypes) == 1, "only ", ""), "be ",
+            .arrayToString(availablePlotTypes, mode = "or"),
+            functionName = "plot.TrialDesign",
+            parameter = "type",
+            value = type
         )
     }
 
@@ -1459,9 +1464,11 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
 
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
     if (any(.isTrialDesignFisher(x)) && !(type %in% c(1, 3, 4))) {
-        stopIllegalArgument("'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4",
+        stopIllegalArgument(
+            "'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4",
             functionName = ".plotTrialDesign",
-            parameter = "type", value = type
+            parameter = "type",
+            value = type
         )
     }
 
@@ -1483,8 +1490,11 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
                     x$typeOfDesign != y$typeOfDesign) {
                 variedParameters <- "typeOfDesign"
             } else {
-                stopMissingArgument("'variedParameters' needs to be specified, ", "e.g., variedParameters = \"typeOfDesign\"",
-                    functionName = ".plotTrialDesign", parameter = "variedParameters"
+                stopMissingArgument(
+                    "'variedParameters' needs to be specified, ",
+                    "e.g., variedParameters = \"typeOfDesign\"",
+                    functionName = ".plotTrialDesign",
+                    parameter = "variedParameters"
                 )
             }
         }

@@ -502,16 +502,16 @@ getClosedCombinationTestResults <- function(stageResults) {
 
     if (.isTrialDesignInverseNormal(design)) {
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
-            warning("Repeated p-values not available for 'typeOfDesign' = '",
-                C_TYPE_OF_DESIGN_AS_USER, "'",
+            warning("Repeated p-values not available for 'typeOfDesign' = ",
+                .vQuote(C_TYPE_OF_DESIGN_AS_USER),
                 call. = FALSE
             )
             return(repeatedPValues)
         }
 
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
-            warning("Repeated p-values not available for 'typeOfDesign' = '",
-                C_TYPE_OF_DESIGN_WT_OPTIMUM, "'",
+            warning("Repeated p-values not available for 'typeOfDesign' = ",
+                .vQuote(C_TYPE_OF_DESIGN_WT_OPTIMUM),
                 call. = FALSE
             )
             return(repeatedPValues)
@@ -519,8 +519,8 @@ getClosedCombinationTestResults <- function(stageResults) {
     }
 
     if (.isTrialDesignFisher(design) && design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
-        warning("Repeated p-values not available for 'method' = '",
-            C_FISHER_METHOD_USER_DEFINED_ALPHA, "'",
+        warning("Repeated p-values not available for 'method' = ",
+            .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
             call. = FALSE
         )
         return(repeatedPValues)

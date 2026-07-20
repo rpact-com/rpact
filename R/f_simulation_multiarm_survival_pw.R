@@ -182,8 +182,12 @@ getSimulationMultiArmSurvival <- function(
 
     if (simulationType == "auto") {
         if (usesBasicOnlyArgs && usesPatientWiseOnlyArgs) {
-            stopConflictingArguments("arguments from both 'testStatisticBased' and 'patientWise' simulation types were specified",
-                functionName = "getSimulationMultiArmSurvival", parameter = "testStatisticBased", relatedParameter = "patientWise"
+            stopConflictingArguments(
+                "arguments from both 'testStatisticBased' and 'patientWise' ",
+                "simulation types were specified",
+                functionName = "getSimulationMultiArmSurvival",
+                parameter = "testStatisticBased",
+                relatedParameter = "patientWise"
             )
         }
         if (usesBasicOnlyArgs) {
@@ -197,14 +201,19 @@ getSimulationMultiArmSurvival <- function(
 
     if (simulationType == "testStatisticBased") {
         if (usesPatientWiseOnlyArgs) {
-            stopIllegalArgument("patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"",
-                functionName = "getSimulationMultiArmSurvival", parameter = "simulationType", value = simulationType
+            stopIllegalArgument(
+                "patient-wise simulation arguments cannot be specified ",
+                "if 'simulationType' = \"testStatisticBased\"",
+                functionName = "getSimulationMultiArmSurvival",
+                parameter = "simulationType", value = simulationType
             )
         }
 
         message(
-            "Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed log-rank test statistics instead of patient-wise survival data. ",
-            "To simulate patient-wise survival data, specify 'simulationType' = \"patientWise\" and the corresponding arguments."
+            "Note: 'simulationType' = \"testStatisticBased\" simulates normally ",
+            "distributed log-rank test statistics instead of patient-wise survival data. ",
+            "To simulate patient-wise survival data, specify ",
+            "'simulationType' = \"patientWise\" and the corresponding arguments."
         )
 
         return(getSimulationMultiArmSurvivalBasic(
@@ -244,7 +253,9 @@ getSimulationMultiArmSurvival <- function(
     if (simulationType %in% c("patientWise", "patientWiseBasic")) {
         if (usesBasicOnlyArgs) {
             stopIllegalArgument("'correlationComputation' cannot be specified if 'simulationType' = \"patientWise\" or \"patientWiseBasic\"",
-                functionName = "getSimulationMultiArmSurvival", parameter = "correlationComputation", relatedParameter = "simulationType",
+                functionName = "getSimulationMultiArmSurvival",
+                parameter = "correlationComputation",
+                relatedParameter = "simulationType",
                 value = correlationComputation
             )
         }
@@ -470,9 +481,11 @@ getSimulationMultiArmSurvivalPatientWise <- function(
 
     if (isFALSE(cppEnabled)) {
         message(
-            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise survival data using R code instead of C++ code. ",
+            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise ",
+            "survival data using R code instead of C++ code. ",
             "This approach is less efficient and should only be used for testing purposes. ",
-            "To perform a more efficient patient-wise simulation, specify 'simulationType' = \"patientWise\"."
+            "To perform a more efficient patient-wise simulation, ",
+            "specify 'simulationType' = \"patientWise\"."
         )
     }
 
@@ -486,8 +499,11 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     )
 
     if (length(allocationRatioPlanned) != 1) {
-        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
-            functionName = "getSimulationMultiArmSurvivalPatientWise", parameter = "allocationRatioPlanned",
+        stopIllegalArgument(
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1",
+            functionName = "getSimulationMultiArmSurvivalPatientWise",
+            parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
         )
     }
@@ -576,18 +592,23 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         if (accrualIntensity < 1L) {
             stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
                 functionName = "getSimulationMultiArmSurvivalPatientWise",
-                parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
+                parameter = "accrualIntensity",
+                relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
         stopIllegalArgument("'maxNumberOfSubjects' must be defined",
-            functionName = "getSimulationMultiArmSurvivalPatientWise", parameter = "maxNumberOfSubjects",
+            functionName = "getSimulationMultiArmSurvivalPatientWise",
+            parameter = "maxNumberOfSubjects",
             value = maxNumberOfSubjects
         )
     }
     simulationResults$.accrualTime <- accrualSetup
 
     simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
-    simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
+    simulationResults$.setParameterType(
+        "maxNumberOfSubjects",
+        accrualSetup$.getParameterType("maxNumberOfSubjects")
+    )
 
     allocationFraction <- .getFraction(allocationRatioPlanned)
     .warnInCaseOfExtremeAllocationRatios(allocationFraction[1], allocationFraction[2])
@@ -723,7 +744,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         "numberOfSelectedArms",
         ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
-    
+
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$analysisTime <- simulatedAnalysisTime
     simulationResults$eventsNotAchieved <- simulatedNumberEventsNotAchieved / maxNumberOfIterations
@@ -778,7 +799,9 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationMultiArmSurvivalPatientWise")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
+            functionName = "getSimulationMultiArmSurvivalPatientWise"
+        )
     }
 
     simulationResults$.data <- loopResult$data

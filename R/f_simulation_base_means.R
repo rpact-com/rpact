@@ -244,7 +244,9 @@ getSimulationMeans <- function(
     simulationResults <- SimulationResultsMeans$new(design, showStatistics = showStatistics)
 
     if (design$sided == 2) {
-        stopIllegalArgument("only one-sided case is implemented for the simulation design", functionName = "getSimulationMeans")
+        stopIllegalArgument("only one-sided case is implemented for the simulation design",
+            functionName = "getSimulationMeans"
+        )
     }
 
     if (groups == 1L) {
@@ -270,9 +272,12 @@ getSimulationMeans <- function(
         if (length(allocationRatioPlanned) == 1) {
             allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
         } else if (length(allocationRatioPlanned) != design$kMax) {
-            stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+            stopIllegalArgument(
+                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+                "must have length 1 or ",
                 design$kMax, " (kMax)",
-                functionName = "getSimulationMeans", parameter = "allocationRatioPlanned",
+                functionName = "getSimulationMeans",
+                parameter = "allocationRatioPlanned",
                 value = allocationRatioPlanned
             )
         }
@@ -331,14 +336,19 @@ getSimulationMeans <- function(
     if (design$kMax > 1) {
         if (!normalApproximation) {
             if (!all(is.na(minNumberOfSubjectsPerStage)) && (any(minNumberOfSubjectsPerStage < groups * 2))) {
-                stopIllegalArgument("minNumberOfSubjectsPerStage not correctly specified", functionName = "getSimulationMeans")
+                stopIllegalArgument("minNumberOfSubjectsPerStage not correctly specified",
+                    functionName = "getSimulationMeans"
+                )
             }
         }
         if (any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0) &&
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage))) {
-            stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+            stopIllegalArgument(
+                "'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), 
+                ") must be not smaller than minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
-                functionName = "getSimulationMeans", parameter = "maxNumberOfSubjectsPerStage",
+                functionName = "getSimulationMeans",
+                parameter = "maxNumberOfSubjectsPerStage",
                 value = maxNumberOfSubjectsPerStage
             )
         }

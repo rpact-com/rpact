@@ -191,8 +191,11 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     )
 
     if (length(allocationRatioPlanned) != 1) {
-        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
-            functionName = "getSimulationEnrichmentSurvivalPatientWise", parameter = "allocationRatioPlanned",
+        stopIllegalArgument(
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1",
+            functionName = "getSimulationEnrichmentSurvivalPatientWise",
+            parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
         )
     }
@@ -264,7 +267,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         if (identical(accrualIntensity, 1L)) {
             stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
                 functionName = "getSimulationEnrichmentSurvivalPatientWise",
-                parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
+                parameter = "accrualIntensity",
+                relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
         stopIllegalArgument("'maxNumberOfSubjects' must be defined",
@@ -417,7 +421,9 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationEnrichmentSurvivalPatientWise")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
+            functionName = "getSimulationEnrichmentSurvivalPatientWise"
+        )
     }
 
     simulationResults$.data <- loopResult$data
@@ -598,13 +604,16 @@ getSimulationEnrichmentSurvival <- function(
     if (identical(simulationType, "testStatisticBased")) {
         if (usesPatientWiseOnlyArgs) {
             stopIllegalArgument("patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"",
-                functionName = "getSimulationEnrichmentSurvival", parameter = "simulationType", value = simulationType
+                functionName = "getSimulationEnrichmentSurvival",
+                parameter = "simulationType", value = simulationType
             )
         }
 
         message(
-            "Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed log-rank test statistics instead of patient-wise survival data. ",
-            "To simulate patient-wise survival data, specify 'simulationType' = \"patientWise\" and the corresponding arguments."
+            "Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed ",
+            "log-rank test statistics instead of patient-wise survival data. ",
+            "To simulate patient-wise survival data, specify 'simulationType' = \"patientWise\" ",
+            "and the corresponding arguments."
         )
 
         return(getSimulationEnrichmentSurvivalBasic(
@@ -675,9 +684,11 @@ getSimulationEnrichmentSurvival <- function(
 
     if (identical(simulationType, "patientWiseBasic")) {
         message(
-            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise survival data using R code instead of C++ code. ",
+            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise ",
+            "survival data using R code instead of C++ code. ",
             "This approach is less efficient and should only be used for testing purposes. ",
-            "To perform a more efficient patient-wise simulation, specify 'simulationType' = \"patientWise\"."
+            "To perform a more efficient patient-wise simulation, ",
+            "specify 'simulationType' = \"patientWise\"."
         )
 
         return(.getSimulationEnrichmentSurvivalPatientWiseBasic(

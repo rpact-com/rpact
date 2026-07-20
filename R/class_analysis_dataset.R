@@ -171,8 +171,9 @@ readDataset <- function(
         comment.char = "",
         fileEncoding = "UTF-8") {
     if (!file.exists(file)) {
-        stopIllegalArgument("the file '", file, "' does not exist",
-            functionName = "readDataset", parameter = "file",
+        stopIllegalArgument("the file ", .vQuote(file), " does not exist",
+            functionName = "readDataset",
+            parameter = "file",
             value = file
         )
     }
@@ -323,8 +324,9 @@ readDatasets <- function(
         comment.char = "",
         fileEncoding = "UTF-8") {
     if (!file.exists(file)) {
-        stopIllegalArgument("the file '", file, "' does not exist",
-            functionName = "readDatasets", parameter = "file",
+        stopIllegalArgument("the file ", .vQuote(file), " does not exist",
+            functionName = "readDatasets",
+            parameter = "file",
             value = file
         )
     }
@@ -335,7 +337,10 @@ readDatasets <- function(
     )
 
     if (is.null(data[["datasetId"]])) {
-        stopIllegalArgument("data file must contain the column 'datasetId'", functionName = "readDatasets", parameter = "datasetId")
+        stopIllegalArgument("data file must contain the column 'datasetId'",
+            functionName = "readDatasets",
+            parameter = "datasetId"
+        )
     }
 
     datasets <- list()
@@ -435,11 +440,19 @@ writeDatasets <- function(
         qmethod = "double",
         fileEncoding = "UTF-8") {
     if (!is.list(datasets)) {
-        stopIllegalArgument("'datasets' must be a list of datasets", functionName = "writeDatasets", parameter = "datasets", value = datasets)
+        stopIllegalArgument("'datasets' must be a list of datasets",
+            functionName = "writeDatasets",
+            parameter = "datasets",
+            value = datasets
+        )
     }
 
     if (length(datasets) == 0) {
-        stopIllegalArgument("'datasets' is empty", functionName = "writeDatasets", parameter = "datasets", value = datasets)
+        stopIllegalArgument("'datasets' is empty",
+            functionName = "writeDatasets",
+            parameter = "datasets",
+            value = datasets
+        )
     }
 
     datasetType <- NA_character_
@@ -450,7 +463,9 @@ writeDatasets <- function(
         if (is.na(datasetType)) {
             datasetType <- .getClassName(dataset)
         } else if (.getClassName(dataset) != datasetType) {
-            stopIllegalArgument("all datasets must have the same type", functionName = "writeDatasets")
+            stopIllegalArgument("all datasets must have the same type",
+                functionName = "writeDatasets"
+            )
         }
 
         data <- as.data.frame(dataset, niceColumnNamesEnabled = FALSE)
@@ -471,7 +486,9 @@ writeDatasets <- function(
     }
 
     if (is.null(dataFrames)) {
-        stopRuntimeIssue("failed to bind datasets", functionName = "writeDatasets")
+        stopRuntimeIssue("failed to bind datasets",
+            functionName = "writeDatasets"
+        )
     }
 
     utils::write.table(
@@ -485,7 +502,9 @@ writeDatasets <- function(
 .getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
     args <- list(...)
     if (length(args) == 0) {
-        stopMissingArgument("data.frame, data vectors, or datasets expected", functionName = ".getDataset")
+        stopMissingArgument("data.frame, data vectors, or datasets expected",
+            functionName = ".getDataset"
+        )
     }
 
     if (.optionalArgsContainsDatasets(...)) {
@@ -538,11 +557,15 @@ writeDatasets <- function(
         }
 
         if (length(paramNames) != numberOfParameters) {
-            stopIllegalArgument("all parameters must be named", functionName = ".getDataset")
+            stopIllegalArgument("all parameters must be named",
+                functionName = ".getDataset"
+            )
         }
 
         if (length(paramNames) != length(unique(paramNames))) {
-            stopIllegalArgument("the parameter names must be unique", functionName = ".getDataset")
+            stopIllegalArgument("the parameter names must be unique",
+                functionName = ".getDataset"
+            )
         }
 
         dataFrame <- .createDataFrame(...)
@@ -586,7 +609,9 @@ writeDatasets <- function(
         ))
     }
 
-    stopIllegalArgument("failed to identify dataset type", functionName = ".getDataset")
+    stopIllegalArgument("failed to identify dataset type",
+        functionName = ".getDataset"
+    )
 }
 
 #' @title
@@ -724,7 +749,10 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 argInfo <- paste0(sQuote(argName), " ")
             }
             argInfo <- paste0(argInfo, "(", .arrayToString(arg), ")")
-            warning("Argument ", argInfo, " will be ignored because only 'emmGrid' objects will be respected")
+            warning(
+                "Argument ", argInfo, " will be ignored ",
+                "because only 'emmGrid' objects will be respected"
+            )
         }
     }
 
@@ -745,12 +773,14 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #' @param dfValue Numeric. Degrees of freedom for the t-distribution. Default is \code{NA_real_}.
 #' @param alpha Numeric. Significance level for the t-distribution. Default is \code{0.05}.
 #' @param lmEnabled Logical. If \code{TRUE}, linear model-based calculations are enabled. Default is \code{TRUE}.
-#' @param stDevCalcMode Character. Specifies the calculation mode for standard deviation. Options are \code{"auto"} or \code{"t"}.
+#' @param stDevCalcMode Character. Specifies the calculation
+#'        mode for standard deviation. Options are \code{"auto"} or \code{"t"}.
 #'
 #' @details
 #' The function performs the following tasks:
 #' \itemize{
-#'   \item If \code{stDevCalcMode} is set to \code{"t"} and \code{dfValue} is valid, it uses the t-distribution to calculate the standard deviation.
+#'   \item If \code{stDevCalcMode} is set to \code{"t"} and \code{dfValue} is
+#'         valid, it uses the t-distribution to calculate the standard deviation.
 #'   \item Otherwise, it defaults to using the normal distribution for the calculation.
 #' }
 #'
@@ -818,7 +848,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                         "%s must contain %s objects created by emmeans(x), ",
                         "where x is a linear model result (one object per stage; class is %s at stage %s)"
                     ),
-                    sQuote("emmeansResults"), sQuote("emmGrid"), .getClassName(emmeansResultPerStage), stage
+                    sQuote("emmeansResults"), sQuote("emmGrid"),
+                    .getClassName(emmeansResultPerStage), stage
                 ),
                 parameter = "emmeansResults",
                 value = emmeansResultPerStage,
@@ -865,14 +896,16 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 )
             } else {
                 warning("Using ", modelFunction, " emmeans result objects as ",
-                    "arguments of getDataset() is experminental in this rpact version and not fully validated",
+                    "arguments of getDataset() is experminental in this rpact ",
+                    "version and not fully validated",
                     call. = FALSE
                 )
             }
         },
         error = function(e) {
             warning("Using emmeans result objects as ",
-                "arguments of getDataset() is experminental in this rpact version and not fully validated",
+                "arguments of getDataset() is experminental in this rpact ",
+                "version and not fully validated",
                 call. = FALSE
             )
         }
@@ -890,15 +923,18 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         emmeansResultsList <- as.list(emmeansResult)
 
         if (is.null(emmeansResultsSummary[["emmean"]])) {
-            stopRuntimeIssue("the objects in summary(emmeansResults) must contain the field 'emmean'",
+            stopRuntimeIssue("the objects in summary(emmeansResults) ",
+                "must contain the field 'emmean'",
                 functionName = ".getDatasetMeansFromModelsByStage",
                 parameter = "emmean"
             )
         }
         for (expectedField in c("sigma", "extras")) {
             if (is.null(emmeansResultsList[[expectedField]])) {
-                stopRuntimeIssue("the objects in as.list(emmeansResults) must contain the field ", sQuote(expectedField),
-                    functionName = ".getDatasetMeansFromModelsByStage", parameter = expectedField
+                stopRuntimeIssue("the objects in as.list(emmeansResults) ",
+                    "must contain the field ", sQuote(expectedField),
+                    functionName = ".getDatasetMeansFromModelsByStage",
+                    parameter = expectedField
                 )
             }
         }
@@ -944,7 +980,10 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         sampleSizes = sampleSizes
     )
     data <- data[order(data$stages, data$groups), ]
-    dataWide <- stats::reshape(data = data, direction = "wide", idvar = "stages", timevar = "groups")
+    dataWide <- stats::reshape(
+        data = data, direction = "wide",
+        idvar = "stages", timevar = "groups"
+    )
     colnames(dataWide) <- gsub("\\.", "", colnames(dataWide))
     return(getDataset(dataWide))
 }
@@ -966,16 +1005,21 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 .getSubsetsFromArgs <- function(...) {
     args <- list(...)
     if (length(args) == 0) {
-        stopMissingArgument("one or more subset datasets expected", functionName = ".getSubsetsFromArgs")
+        stopMissingArgument("one or more subset datasets expected",
+            functionName = ".getSubsetsFromArgs"
+        )
     }
 
     subsetNames <- names(args)
     if (is.null(subsetNames)) {
-        stopIllegalArgument("all subsets must be named", functionName = ".getSubsetsFromArgs")
+        stopIllegalArgument("all subsets must be named",
+            functionName = ".getSubsetsFromArgs"
+        )
     }
 
     if (!("R" %in% subsetNames) && !("F" %in% subsetNames)) {
-        stopMissingArgument("\"R\" (stratified analysis)\" or \"F\" (non-stratified analysis) must be defined as subset",
+        stopMissingArgument("\"R\" (stratified analysis)\" or \"F\" ",
+            "(non-stratified analysis) must be defined as subset",
             functionName = ".getSubsetsFromArgs"
         )
     }
@@ -983,10 +1027,12 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     subsetNumbers <- gsub("\\D", "", subsetNames)
     subsetNumbers <- subsetNumbers[subsetNumbers != ""] #  & nchar(subsetNumbers) == 1
     if (length(subsetNumbers) == 0) {
-        stopIllegalArgument("all subset names (", .arrayToString(subsetNames), ") must be \"S[n]\", \"R\", or \"F\", ",
+        stopIllegalArgument("all subset names (", .arrayToString(subsetNames), ") ",
+            "must be \"S[n]\", \"R\", or \"F\", ",
             "where [n] is a number with increasing digits (starting with 1)",
             functionName = ".getSubsetsFromArgs",
-            parameter = "subsetNames", value = subsetNames
+            parameter = "subsetNames",
+            value = subsetNames
         )
     }
 
@@ -1000,13 +1046,16 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     for (i in seq_len(length(subsetNames))) {
         subsetName <- subsetNames[i]
         if (subsetName == "" && !inherits(args[[i]], "TrialDesign")) {
-            stopIllegalArgument("all subsets must be named", functionName = ".getSubsetsFromArgs")
+            stopIllegalArgument("all subsets must be named",
+                functionName = ".getSubsetsFromArgs"
+            )
         }
 
         if (subsetName != "" && !(subsetName %in% validSubsetNames)) {
             suffix <- ifelse(stratifiedInput, " (stratified analysis)", " (non-stratified analysis)")
             if (length(validSubsetNames) < 10) {
-                stopIllegalArgument("invalid subset name (", subsetName, "); ", "valid names are ", .arrayToString(validSubsetNames),
+                stopIllegalArgument("invalid subset name (", subsetName, "); ",
+                    "valid names are ", .arrayToString(validSubsetNames),
                     suffix,
                     functionName = ".getSubsetsFromArgs",
                     parameter = "subsetName",
@@ -1040,7 +1089,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
             emptySubsetNames <- c(emptySubsetNames, subsetName)
         } else {
             if (!.isDataset(subset)) {
-                stopIllegalArgument("subset ", subsetName, " is not a dataset (is ", .getClassName(subset), ")",
+                stopIllegalArgument("subset ", subsetName, " is not a dataset ",
+                    "(is ", .getClassName(subset), ")",
                     functionName = ".getSubsetsFromArgs",
                     parameter = "subsetName",
                     value = subsetName,
@@ -1110,9 +1160,14 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     for (param in params) {
         paramValue <- dataFrameStage1[[param]]
         if (any(is.null(paramValue) || any(is.infinite(paramValue)))) {
-            stopIllegalArgument(gettextf("all %s values (%s) at first stage must be valid", sQuote(param), .arrayToString(paramValue,
-                maxLength = 10
-            )), functionName = ".validateEnrichmentDataFrameAtFirstStage", parameter = param)
+            stopIllegalArgument(
+                gettextf(
+                    "all %s values (%s) at first stage must be valid",
+                    sQuote(param), .arrayToString(paramValue, maxLength = 10)
+                ),
+                functionName = ".validateEnrichmentDataFrameAtFirstStage",
+                parameter = param
+            )
         }
         if (anyNA(paramValue)) {
             subsets <- unique(dataFrame$subset)
@@ -1122,7 +1177,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 if (!all(is.na(subsetParamValues)) && anyNA(subsetParamValues[subData$stage == 1])) {
                     stopIllegalArgument(
                         gettextf(
-                            "all %s values (%s) at first stage must be valid (NA is not allowed)", sQuote(param),
+                            "all %s values (%s) at first stage must be valid (NA is not allowed)",
+                            sQuote(param),
                             .arrayToString(paramValue, maxLength = 10)
                         ),
                         functionName = ".validateEnrichmentDataFrameAtFirstStage",
@@ -1145,10 +1201,13 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     for (i in 1:nrow(dataFrame)) {
         row <- dataFrame[i, paramNames]
         if (anyNA(row) && !all(is.na(row))) {
-            stopConflictingArguments(gettextf(
-                paste0("inconsistent deselection in group %s at stage %s (", "%s: all or none must be NA)"),
-                dataFrame$group[i], dataFrame$stage[i], .arrayToString(paramNames, maxCharacters = 40)
-            ), functionName = ".validateEnrichmentDataFrameDeselection")
+            stopConflictingArguments(
+                gettextf(
+                    paste0("inconsistent deselection in group %s at stage %s (", "%s: all or none must be NA)"),
+                    dataFrame$group[i], dataFrame$stage[i], .arrayToString(paramNames, maxCharacters = 40)
+                ),
+                functionName = ".validateEnrichmentDataFrameDeselection"
+            )
         }
     }
 
@@ -1159,10 +1218,13 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
             subData <- dataFrame[dataFrame$subset == s & dataFrame$stage == stage, paramNames]
 
             if (deselectedStage > 0 && !all(is.na(subData))) {
-                stopConflictingArguments(gettextf(paste0(
-                    "%s was deselected at stage %s ", "and therefore must be also deselected in the following stages, ",
-                    "but is no longer deselected in stage %s"
-                ), s, deselectedStage, stage), functionName = ".validateEnrichmentDataFrameDeselection")
+                stopConflictingArguments(
+                    gettextf(paste0(
+                        "%s was deselected at stage %s ", "and therefore must be also deselected in the following stages, ",
+                        "but is no longer deselected in stage %s"
+                    ), s, deselectedStage, stage),
+                    functionName = ".validateEnrichmentDataFrameDeselection"
+                )
             }
 
             if (anyNA(subData)) {
@@ -1174,10 +1236,14 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 
 .validateEnrichmentDataFrameMeans <- function(dataFrame) {
     if (any(na.omit(dataFrame$stDev) <= 0) || any(na.omit(dataFrame$overallStDev) <= 0)) {
-        stopIllegalArgument("all standard deviations must be > 0", functionName = ".validateEnrichmentDataFrameMeans")
+        stopIllegalArgument("all standard deviations must be > 0",
+            functionName = ".validateEnrichmentDataFrameMeans"
+        )
     }
     if (any(na.omit(dataFrame$sampleSize) <= 0) || any(na.omit(dataFrame$overallSampleSize) <= 0)) {
-        stopIllegalArgument("all sample sizes must be > 0", functionName = ".validateEnrichmentDataFrameMeans")
+        stopIllegalArgument("all sample sizes must be > 0",
+            functionName = ".validateEnrichmentDataFrameMeans"
+        )
     }
 
     .validateEnrichmentDataFrameAtFirstStage(dataFrame,
@@ -1228,7 +1294,9 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 
 .validateEnrichmentDataFrameSurvival <- function(dataFrame) {
     if (any(na.omit(dataFrame$event) < 0) || any(na.omit(dataFrame$overallEvent) < 0)) {
-        stopIllegalArgument("all events must be >= 0", functionName = ".validateEnrichmentDataFrameSurvival")
+        stopIllegalArgument("all events must be >= 0",
+            functionName = ".validateEnrichmentDataFrameSurvival"
+        )
     }
 
     .validateEnrichmentDataFrameAtFirstStage(dataFrame,
@@ -1266,7 +1334,9 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 
 .validateEnrichmentDataFrameRates <- function(dataFrame) {
     if (any(na.omit(dataFrame$sampleSize) <= 0) || any(na.omit(dataFrame$overallSampleSize) <= 0)) {
-        stopIllegalArgument("all sample sizes must be > 0", functionName = ".validateEnrichmentDataFrameRates")
+        stopIllegalArgument("all sample sizes must be > 0",
+            functionName = ".validateEnrichmentDataFrameRates"
+        )
     }
 
     .validateEnrichmentDataFrameAtFirstStage(dataFrame,
@@ -1282,11 +1352,13 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         for (s in subsets) {
             for (stage in unique(dataFrame$stage)) {
                 for (group in unique(dataFrame$group)) {
-                    subData <- dataFrame[dataFrame$subset == s & dataFrame$stage == stage & dataFrame$group == group, ]
+                    subData <- dataFrame[dataFrame$subset == s &
+                        dataFrame$stage == stage & dataFrame$group == group, ]
 
                     sampleSizeFull <- na.omit(fullData$sampleSize[fullData$stage == stage & fullData$group == group])
                     sampleSizeSubset <- na.omit(subData$sampleSize)
-                    if (length(sampleSizeFull) > 0 && length(sampleSizeSubset) > 0 && any(sampleSizeFull < sampleSizeSubset)) {
+                    if (length(sampleSizeFull) > 0 && length(sampleSizeSubset) > 0 &&
+                            any(sampleSizeFull < sampleSizeSubset)) {
                         stopConflictingArguments(
                             gettextf(
                                 "'sampleSize' F (%s) must be >= 'sampleSize' %s (%s) in group %s at stage %s",
@@ -1311,7 +1383,11 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         subsetStages <- as.integer(sort(unique(na.omit(as.character(dataFrame$stage[dataFrame$subset == s])))))
         kMax <- max(subsetStages)
         if (!isTRUE(all.equal(1:kMax, subsetStages))) {
-            stopIllegalArgument(gettextf("subset %s has incomplete stages (%s)", s, .arrayToString(subsetStages)),
+            stopIllegalArgument(
+                gettextf(
+                    "subset %s has incomplete stages (%s)",
+                    s, .arrayToString(subsetStages)
+                ),
                 functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages"
             )
         }
@@ -1321,8 +1397,9 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 
     kMax <- unique(unlist(kMaxList))
     if (length(kMax) > 1) {
-        stopConflictingArguments("all subsets must have the identical number of stages defined (kMax: ", .listToString(kMaxList),
-            ")",
+        stopConflictingArguments(
+            "all subsets must have the identical number of ",
+            "stages defined (kMax: ", .listToString(kMaxList), ")",
             functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages"
         )
     }
@@ -1338,7 +1415,9 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         .validateEnrichmentDataFrameSurvival(dataFrame)
     } else {
         print(paramNames)
-        stopRuntimeIssue("could not identify the endpoint of the specified dataset", functionName = ".validateEnrichmentDataFrame")
+        stopRuntimeIssue("could not identify the endpoint of the specified dataset",
+            functionName = ".validateEnrichmentDataFrame"
+        )
     }
 
     subsets <- unique(dataFrame$subset)
@@ -1361,13 +1440,18 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                             paramValueSubset <- subData[[paramName]]
                             if (length(paramValueRest) > 0 && length(paramValueSubset) > 0 &&
                                     anyNA(paramValueSubset) && !all(is.na(paramValueRest))) {
-                                stopConflictingArguments(gettextf(
-                                    paste0(
-                                        "if %s is deselected (NA) then R also must be deselected (NA) but, e.g., ",
-                                        "%s R is %s in group %s at stage %s"
-                                    ), s, sQuote(paramName), .arrayToString(paramValueRest, vectorLookAndFeelEnabled = TRUE),
-                                    group, stage
-                                ), functionName = ".validateEnrichmentDataFrame", parameter = paramName)
+                                stopConflictingArguments(
+                                    gettextf(
+                                        paste0(
+                                            "if %s is deselected (NA) then R also must be deselected (NA) but, e.g., ",
+                                            "%s R is %s in group %s at stage %s"
+                                        ), s, sQuote(paramName),
+                                        .arrayToString(paramValueRest, vectorLookAndFeelEnabled = TRUE),
+                                        group, stage
+                                    ),
+                                    functionName = ".validateEnrichmentDataFrame",
+                                    parameter = paramName
+                                )
                             }
                         }
                     }
@@ -1442,7 +1526,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 
     stopIllegalArgument("'exampleType' (", exampleType, ") is not allowed",
         functionName = ".getDatasetExample",
-        parameter = "exampleType", value = exampleType
+        parameter = "exampleType",
+        value = exampleType
     )
 }
 
@@ -1494,7 +1579,12 @@ Dataset <- R6::R6Class("Dataset",
         stages = NULL,
         groups = NULL,
         subsets = NULL,
-        initialize = function(dataFrame, ..., floatingPointNumbersEnabled = FALSE, enrichmentEnabled = FALSE, .design = NULL) {
+        initialize = function(
+                dataFrame,
+                ...,
+                floatingPointNumbersEnabled = FALSE,
+                enrichmentEnabled = FALSE,
+                .design = NULL) {
             super$initialize(...)
 
             self$.floatingPointNumbersEnabled <- floatingPointNumbersEnabled
@@ -1555,8 +1645,8 @@ Dataset <- R6::R6Class("Dataset",
         },
         .initByDataFrame = function(dataFrame) {
             if (!is.data.frame(dataFrame)) {
-                stopIllegalArgument("'dataFrame' must be a data.frame (is an instance of class ",
-                    .getClassName(dataFrame), ")",
+                stopIllegalArgument("'dataFrame' must be a data.frame ",
+                    "(is an instance of class ", .getClassName(dataFrame), ")",
                     functionName = ".initByDataFrame",
                     parameter = "dataFrame",
                     value = dataFrame
@@ -1608,7 +1698,7 @@ Dataset <- R6::R6Class("Dataset",
             for (var in names(self)) {
                 values <- self[[var]]
                 if (any(is.nan(values)) || any(is.infinite(values))) {
-                    stopRuntimeIssue("'", var, "' (", .arrayToString(values), ") ",
+                    stopRuntimeIssue(.pQuote(var), " (", .arrayToString(values), ") ",
                         "contains illegal values, i.e., something went wrong",
                         functionName = ".validateDataset",
                         parameter = "var",
@@ -1630,7 +1720,7 @@ Dataset <- R6::R6Class("Dataset",
                 stopConflictingArguments("there ",
                     ifelse(l1 == 1, paste("is", l1, "stage"), paste("are", l1, "stages")),
                     " defined", " (", .arrayToString(unique(self$stages)), ") and ",
-                    "'", name, "' has length ", l2,
+                    .pQuote(name), " has length ", l2,
                     functionName = ".validateValues",
                     parameter = "name",
                     value = name,
@@ -1747,7 +1837,8 @@ Dataset <- R6::R6Class("Dataset",
                 return(defaultValues)
             }
 
-            stopMissingArgument("parameter '", paste0(parameterNameVariants[1], suffix), "' is missing or not correctly specified",
+            stopMissingArgument("parameter ", .pQuote(paste0(parameterNameVariants[1], suffix)), " ",
+                "is missing or not correctly specified",
                 functionName = ".getValuesByParameterName"
             )
         },
@@ -1762,9 +1853,11 @@ Dataset <- R6::R6Class("Dataset",
             values <- self$.data[[paramName]]
             valueLevels <- self$.getValueLevels(values)
             if (!all(paramValues %in% valueLevels)) {
-                stopIllegalArgument("'", paramName, "' (", .arrayToString(paramValues), ") out of range [", .arrayToString(valueLevels),
-                    "]",
-                    functionName = ".getValues", parameter = paramName, value = paramValues
+                stopIllegalArgument(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
+                    "out of range [", .arrayToString(valueLevels), "]",
+                    functionName = ".getValues",
+                    parameter = paramName,
+                    value = paramValues
                 )
             }
             return(values)
@@ -1781,16 +1874,21 @@ Dataset <- R6::R6Class("Dataset",
         .assertIsValidSubset = function(subset) {
             for (s in subset) {
                 if (!(s %in% levels(self$.data$subset))) {
-                    stopIllegalArgument("'subset' (", s, ") is not a defined value [", .arrayToString(levels(self$.data$subset)),
-                        "]",
-                        functionName = ".assertIsValidSubset", parameter = "subset", value = self$.data$subset
+                    stopIllegalArgument("'subset' (", s, ") is not a defined value ",
+                        "[", .arrayToString(levels(self$.data$subset)), "]",
+                        functionName = ".assertIsValidSubset",
+                        parameter = "subset",
+                        value = self$.data$subset
                     )
                 }
             }
         },
         .getIndices = function(..., stage, group, subset = NA_character_) {
             if (is.null(self$.data)) {
-                stopRuntimeIssue("'.data' must be defined", functionName = ".getIndices", parameter = ".data")
+                stopRuntimeIssue("'.data' must be defined",
+                    functionName = ".getIndices",
+                    parameter = ".data"
+                )
             }
 
             if (!is.null(stage) && !anyNA(stage) && all(stage < 0)) {
@@ -1830,7 +1928,10 @@ Dataset <- R6::R6Class("Dataset",
 
             nToCheck <- stats::na.omit(x)
             if (any(nToCheck != as.integer(nToCheck))) {
-                warning(parameterName, " specified as floating-point numbers were truncated", call. = FALSE)
+                warning(parameterName, " specified as floating-point ",
+                    "numbers were truncated",
+                    call. = FALSE
+                )
             }
 
             x[!is.na(x)] <- as.integer(x[!is.na(x)])
@@ -1863,7 +1964,7 @@ Dataset <- R6::R6Class("Dataset",
             if (!survivalCorrectionEnabled) {
                 return(length(levels(data$group)))
             }
-            return(length(levels(data$group)) + ifelse(inherits(self, "DatasetSurvival") || 
+            return(length(levels(data$group)) + ifelse(inherits(self, "DatasetSurvival") ||
                 inherits(self, "DatasetSurvival"), 1, 0))
         },
         getNumberOfStages = function(naOmitEnabled = TRUE) {
@@ -1880,7 +1981,9 @@ Dataset <- R6::R6Class("Dataset",
                 numberOfStages <- length(unique(as.character(subData$stage)))
                 if (numberOfStages == 0) {
                     print(self$.data[, validColNames])
-                    stopRuntimeIssue(".data seems to contain an invalid column", functionName = "getNumberOfStages")
+                    stopRuntimeIssue(".data seems to contain an invalid column",
+                        functionName = "getNumberOfStages"
+                    )
                 }
                 return(numberOfStages)
             }
@@ -2040,8 +2143,10 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
                 ), parameterName = "Sample sizes")
                 self$.validateValues(self$sampleSizes, "n")
                 if (any(stats::na.omit(self$sampleSizes) <= 0)) {
-                    stopIllegalArgument("all sample sizes must be > 0, but 'n' = ", .arrayToString(self$sampleSizes, vectorLookAndFeelEnabled = TRUE),
-                        functionName = ".initByDataFrame", parameter = "n"
+                    stopIllegalArgument("all sample sizes must be > 0, but 'n' = ",
+                        .arrayToString(self$sampleSizes, vectorLookAndFeelEnabled = TRUE),
+                        functionName = ".initByDataFrame",
+                        parameter = "n"
                     )
                 }
 
@@ -2151,7 +2256,9 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
                     self$groups <- c(self$groups, rep(as.integer(group), length(overallSampleSizesTemp)))
                 }
             } else {
-                stopMissingArgument("sample sizes are missing or not correctly specified", functionName = ".initByDataFrame")
+                stopMissingArgument("sample sizes are missing or not correctly specified",
+                    functionName = ".initByDataFrame"
+                )
             }
 
             if (self$.inputType == "stagewise") {
@@ -2189,10 +2296,14 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
             }
 
             if (sum(stats::na.omit(self$sampleSizes) < 0) > 0) {
-                stopIllegalArgument("all sample sizes must be >= 0", functionName = ".initByDataFrame")
+                stopIllegalArgument("all sample sizes must be >= 0",
+                    functionName = ".initByDataFrame"
+                )
             }
             if (sum(stats::na.omit(self$stDevs) < 0) > 0) {
-                stopIllegalArgument("all standard deviations must be >= 0", functionName = ".initByDataFrame")
+                stopIllegalArgument("all standard deviations must be >= 0",
+                    functionName = ".initByDataFrame"
+                )
             }
         },
         .recreateDataFrame = function() {
@@ -2418,7 +2529,8 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
     if (!is.null(fixedCovariates)) {
         if (!is.list(fixedCovariates)) {
             stopIllegalArgument(sQuote("fixedCovariates"), " must be a named list",
-                functionName = ".getRandomDataMeans", parameter = "fixedCovariates",
+                functionName = ".getRandomDataMeans",
+                parameter = "fixedCovariates",
                 value = fixedCovariates
             )
         }
@@ -2426,7 +2538,8 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
     if (!is.null(covariateEffects)) {
         if (!is.list(covariateEffects)) {
             stopIllegalArgument(sQuote("covariateEffects"), " must be a named list",
-                functionName = ".getRandomDataMeans", parameter = "covariateEffects",
+                functionName = ".getRandomDataMeans",
+                parameter = "covariateEffects",
                 value = covariateEffects
             )
         }
@@ -2560,7 +2673,8 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
         fixedCovariateNames <- names(fixedCovariates)
         if (is.null(fixedCovariateNames) || any(nchar(trimws(fixedCovariateNames)) == 0)) {
             stopIllegalArgument(sQuote("fixedCovariates"), " must be a named list",
-                functionName = ".getRandomDataMeans", parameter = "fixedCovariates",
+                functionName = ".getRandomDataMeans",
+                parameter = "fixedCovariates",
                 value = fixedCovariates
             )
         }
@@ -2581,10 +2695,13 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
                 if (length(unique(values)) < length(values)) {
                     stopIllegalArgument(sQuote(paste0("fixedCovariates$", fixedCovariateName)), " (", .arrayToString(values,
                         maxLength = 20
-                    ), ") must be a unique vector", functionName = ".getRandomDataMeans", parameter = paste0(
+                    ), ") must be a unique vector",
+                    functionName = ".getRandomDataMeans",
+                    parameter = paste0(
                         "fixedCovariates$",
                         fixedCovariateName
-                    ))
+                    )
+                    )
                 }
 
                 fixedCovariateSample <- sample(values, length(subjects), replace = TRUE)
@@ -2727,7 +2844,9 @@ plot.Dataset <- function(
         showSource = FALSE,
         plotSettings = NULL) {
     if (x$.enrichmentEnabled) {
-        stopRuntimeIssue("plot of enrichment data is not yet implemented", functionName = ".plot.Dataset")
+        stopRuntimeIssue("plot of enrichment data is not yet implemented",
+            functionName = ".plot.Dataset"
+        )
     }
 
     .assertGgplotIsInstalled()
@@ -2744,7 +2863,9 @@ plot.Dataset <- function(
         }
     } else if (x$isDatasetSurvival()) {
         # Open work: implement dataset plot of survival data
-        stopRuntimeIssue("plot of survival data is not yet implemented", functionName = ".plot.Dataset")
+        stopRuntimeIssue("plot of survival data is not yet implemented",
+            functionName = ".plot.Dataset"
+        )
     }
 
     if (!is.logical(showSource) || isTRUE(showSource)) {
@@ -2978,9 +3099,13 @@ DatasetRates <- R6::R6Class("DatasetRates",
                 )
                 self$.validateValues(self$sampleSizes, "n")
                 if (any(stats::na.omit(self$sampleSizes) <= 0)) {
-                    stopIllegalArgument("all sample sizes must be > 0, but 'n' = ", self$.arrayToString(self$sampleSizes,
-                        vectorLookAndFeelEnabled = TRUE
-                    ), functionName = ".initByDataFrame", parameter = "n")
+                    stopIllegalArgument("all sample sizes must be > 0, but 'n' = ",
+                        self$.arrayToString(self$sampleSizes,
+                            vectorLookAndFeelEnabled = TRUE
+                        ),
+                        functionName = ".initByDataFrame",
+                        parameter = "n"
+                    )
                 }
 
                 self$events <- self$.getValidatedFloatingPointNumbers(
@@ -2989,8 +3114,10 @@ DatasetRates <- R6::R6Class("DatasetRates",
                 )
                 self$.validateValues(self$events, "events")
                 if (any(stats::na.omit(self$events) < 0)) {
-                    stopIllegalArgument("all events must be >= 0, but 'events' = ", self$.arrayToString(self$events, vectorLookAndFeelEnabled = TRUE),
-                        functionName = ".initByDataFrame", parameter = "events", value = self$events
+                    stopIllegalArgument("all events must be >= 0, but 'events' = ",
+                        self$.arrayToString(self$events, vectorLookAndFeelEnabled = TRUE),
+                        functionName = ".initByDataFrame",
+                        parameter = "events", value = self$events
                     )
                 }
 
@@ -3022,14 +3149,20 @@ DatasetRates <- R6::R6Class("DatasetRates",
                     parameterName = "Cumulative sample sizes"
                 )
                 self$.validateValues(self$overallSampleSizes, "overallSampleSizes")
-                .assertValuesAreStrictlyIncreasing(self$overallSampleSizes, "overallSampleSizes", endingNasAllowed = TRUE)
+                .assertValuesAreStrictlyIncreasing(self$overallSampleSizes,
+                    "overallSampleSizes",
+                    endingNasAllowed = TRUE
+                )
 
                 self$overallEvents <- self$.getValidatedFloatingPointNumbers(
                     self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_OVERALL_EVENTS),
                     parameterName = "Cumulative events"
                 )
                 self$.validateValues(self$overallEvents, "overallEvents")
-                .assertValuesAreMonotoneIncreasing(self$overallEvents, "overallEvents", endingNasAllowed = TRUE)
+                .assertValuesAreMonotoneIncreasing(self$overallEvents,
+                    "overallEvents",
+                    endingNasAllowed = TRUE
+                )
 
                 kMax <- length(self$overallSampleSizes)
                 stageNumber <- length(stats::na.omit(self$overallSampleSizes))
@@ -3071,9 +3204,13 @@ DatasetRates <- R6::R6Class("DatasetRates",
                     )
                     self$.validateValues(sampleSizesTemp, paste0("n", group))
                     if (any(stats::na.omit(sampleSizesTemp) <= 0)) {
-                        stopIllegalArgument("all sample sizes must be > 0, but 'n", group, "' = ", self$.arrayToString(sampleSizesTemp,
-                            vectorLookAndFeelEnabled = TRUE
-                        ), functionName = ".initByDataFrame", parameter = "group", value = group)
+                        stopIllegalArgument(
+                            "all sample sizes must be > 0, but ",
+                            .pQuote(paste0("n", group)), " = ",
+                            self$.arrayToString(sampleSizesTemp, vectorLookAndFeelEnabled = TRUE),
+                            functionName = ".initByDataFrame",
+                            parameter = "group", value = group
+                        )
                     }
                     self$sampleSizes <- c(self$sampleSizes, sampleSizesTemp)
 
@@ -3083,9 +3220,13 @@ DatasetRates <- R6::R6Class("DatasetRates",
                     )
                     self$.validateValues(eventsTemp, paste0("events", group))
                     if (any(stats::na.omit(eventsTemp) < 0)) {
-                        stopIllegalArgument("all events must be >= 0, but 'events", group, "' = ", self$.arrayToString(eventsTemp,
-                            vectorLookAndFeelEnabled = TRUE
-                        ), functionName = ".initByDataFrame", parameter = "group", value = group)
+                        stopIllegalArgument(
+                            "all events must be >= 0, but ",
+                            .pQuote(paste0("events", group)), " = ",
+                            self$.arrayToString(eventsTemp, vectorLookAndFeelEnabled = TRUE),
+                            functionName = ".initByDataFrame",
+                            parameter = "group", value = group
+                        )
                     }
                     self$events <- c(self$events, eventsTemp)
 
@@ -3102,7 +3243,9 @@ DatasetRates <- R6::R6Class("DatasetRates",
                     self$overallEvents <- c(self$overallEvents, overallData$overallEvents)
                 }
                 if (sum(stats::na.omit(self$sampleSizes) < 0) > 0) {
-                    stopIllegalArgument("all sample sizes must be >= 0", functionName = ".initByDataFrame")
+                    stopIllegalArgument("all sample sizes must be >= 0",
+                        functionName = ".initByDataFrame"
+                    )
                 }
 
                 self$.setParameterType("sampleSizes", C_PARAM_USER_DEFINED)
@@ -3170,7 +3313,9 @@ DatasetRates <- R6::R6Class("DatasetRates",
                     self$events <- c(self$events, stageWiseData$events)
 
                     if (sum(stats::na.omit(self$sampleSizes) < 0) > 0) {
-                        stopIllegalArgument("all sample sizes must be >= 0", functionName = ".initByDataFrame")
+                        stopIllegalArgument("all sample sizes must be >= 0",
+                            functionName = ".initByDataFrame"
+                        )
                     }
                 }
 
@@ -3180,11 +3325,15 @@ DatasetRates <- R6::R6Class("DatasetRates",
                 self$.setParameterType("overallSampleSizes", C_PARAM_USER_DEFINED)
                 self$.setParameterType("overallEvents", C_PARAM_USER_DEFINED)
             } else {
-                stopMissingArgument("sample sizes are missing or not correctly specified", functionName = ".initByDataFrame")
+                stopMissingArgument("sample sizes are missing or not correctly specified",
+                    functionName = ".initByDataFrame"
+                )
             }
 
             if (sum(stats::na.omit(self$events) < 0) > 0) {
-                stopIllegalArgument("all events must be >= 0", functionName = ".initByDataFrame")
+                stopIllegalArgument("all events must be >= 0",
+                    functionName = ".initByDataFrame"
+                )
             }
 
             self$.recreateDataFrame()
@@ -3312,7 +3461,10 @@ DatasetRates <- R6::R6Class("DatasetRates",
                 )
             }
             if (is.null(dataInput[["events"]])) {
-                stopMissingArgument("data input must contain variable 'events'", functionName = ".getOverallData", parameter = "events")
+                stopMissingArgument("data input must contain variable 'events'",
+                    functionName = ".getOverallData",
+                    parameter = "events"
+                )
             }
 
             dataInput$overallSampleSizes <- c(
@@ -3475,7 +3627,9 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
 
                     self$allocationRatios <- self$.getValuesByParameterName(
                         dataFrame, C_KEY_WORDS_ALLOCATION_RATIOS,
-                        defaultValues = self$.getAllocationRatioDefaultValues(self$stages, self$events, self$expectedEvents)
+                        defaultValues = self$.getAllocationRatioDefaultValues(
+                            self$stages, self$events, self$expectedEvents
+                        )
                     )
                     self$.validateValues(self$allocationRatios, "allocationRatios")
                 } else if (self$.paramExists(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS) ||
@@ -3491,7 +3645,9 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                     self$overallAllocationRatios <- self$.getValuesByParameterName(
                         dataFrame,
                         parameterNameVariants = C_KEY_WORDS_OVERALL_ALLOCATION_RATIOS,
-                        defaultValues = self$.getAllocationRatioDefaultValues(self$stages, self$overallEvents, self$overallExpectedEvents)
+                        defaultValues = self$.getAllocationRatioDefaultValues(
+                            self$stages, self$overallEvents, self$overallExpectedEvents
+                        )
                     )
                     self$.validateValues(self$overallAllocationRatios, "overallAllocationRatios")
                 }
@@ -3532,7 +3688,9 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                 ), parameterName = "Events")
                 self$.validateValues(self$events, "events")
                 if (any(stats::na.omit(self$events) < 0)) {
-                    stopIllegalArgument("all events must be >= 0", functionName = ".initByDataFrame")
+                    stopIllegalArgument("all events must be >= 0",
+                        functionName = ".initByDataFrame"
+                    )
                 }
 
                 self$logRanks <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_LOG_RANKS)
@@ -3614,9 +3772,12 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                         suffix = group
                     ), parameterName = "Events")
                     if (any(stats::na.omit(eventsTemp) < 0)) {
-                        stopIllegalArgument("all events must be >= 0, but 'events", group, "' = ", self$.arrayToString(eventsTemp,
-                            vectorLookAndFeelEnabled = TRUE
-                        ), functionName = ".initByDataFrame", parameter = "group", value = group)
+                        stopIllegalArgument("all events must be >= 0, but ",
+                            .pQuote(paste0("events", group)), " = ",
+                            self$.arrayToString(eventsTemp, vectorLookAndFeelEnabled = TRUE),
+                            functionName = ".initByDataFrame",
+                            parameter = "group", value = group
+                        )
                     }
                     self$events <- c(self$events, eventsTemp)
 
@@ -3641,8 +3802,10 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                     self$groups <- c(self$groups, rep(as.integer(group), length(eventsTemp)))
                 }
             } else {
-                stopRuntimeIssue("unable to identify case for ", .getClassName(self), " and columns ", self$.arrayToString(colnames(dataFrame)),
-                    functionName = ".initByDataFrame", parameter = "self", value = self
+                stopRuntimeIssue("unable to identify case for ", .getClassName(self),
+                    " and columns ", self$.arrayToString(colnames(dataFrame)),
+                    functionName = ".initByDataFrame",
+                    parameter = "self", value = self
                 )
             }
 
@@ -3876,7 +4039,8 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                         overallEvents[1:(kMax - 1)] / overallEvents[2:kMax]
             ) / (events[2:kMax] / overallEvents[2:kMax])
             if (any(stats::na.omit(result) <= 0)) {
-                stopIllegalArgument("overall allocation ratios not correctly specified: ", "one or more calculated stage-wise allocation ratios <= 0",
+                stopIllegalArgument("overall allocation ratios not correctly specified: ",
+                    "one or more calculated stage-wise allocation ratios <= 0",
                     functionName = ".getStageWiseAllocationRatios"
                 )
             }
@@ -3960,13 +4124,15 @@ DatasetEnrichmentSurvival <- R6::R6Class("DatasetEnrichmentSurvival",
                 if (!self$.paramExists(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS)) {
                     stopMissingArgument("'overallExpectedEvents' or 'cumExpectedEvents' is missing",
                         functionName = ".initByDataFrame",
-                        parameter = "overallExpectedEvents", relatedParameter = "cumExpectedEvents"
+                        parameter = "overallExpectedEvents",
+                        relatedParameter = "cumExpectedEvents"
                     )
                 }
                 if (!self$.paramExists(dataFrame, C_KEY_WORDS_OVERALL_VARIANCE_EVENTS)) {
                     stopMissingArgument("'overallVarianceEvents' or 'cumVarianceEvents' is missing",
                         functionName = ".initByDataFrame",
-                        parameter = "overallVarianceEvents", relatedParameter = "cumVarianceEvents"
+                        parameter = "overallVarianceEvents",
+                        relatedParameter = "cumVarianceEvents"
                     )
                 }
 
@@ -3978,25 +4144,37 @@ DatasetEnrichmentSurvival <- R6::R6Class("DatasetEnrichmentSurvival",
                 )
                 self$.validateValues(self$overallEvents, "overallEvents")
 
-                self$overallExpectedEvents <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS)
+                self$overallExpectedEvents <- self$.getValuesByParameterName(
+                    dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS
+                )
                 self$.validateValues(self$overallExpectedEvents, "overallExpectedEvents")
 
-                self$overallVarianceEvents <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_OVERALL_VARIANCE_EVENTS)
+                self$overallVarianceEvents <- self$.getValuesByParameterName(
+                    dataFrame, C_KEY_WORDS_OVERALL_VARIANCE_EVENTS
+                )
                 self$.validateValues(self$overallVarianceEvents, "overallVarianceEvents")
 
                 self$overallAllocationRatios <- self$.getValuesByParameterName(
                     dataFrame,
                     parameterNameVariants = C_KEY_WORDS_OVERALL_ALLOCATION_RATIOS,
-                    defaultValues = self$.getAllocationRatioDefaultValues(self$stages, self$overallEvents, self$overallExpectedEvents)
+                    defaultValues = self$.getAllocationRatioDefaultValues(
+                        self$stages, self$overallEvents, self$overallExpectedEvents
+                    )
                 )
                 self$.validateValues(self$overallAllocationRatios, "overallAllocationRatios")
             } else if (self$.paramExists(dataFrame, C_KEY_WORDS_EXPECTED_EVENTS) ||
                     self$.paramExists(dataFrame, C_KEY_WORDS_VARIANCE_EVENTS)) {
                 if (!self$.paramExists(dataFrame, C_KEY_WORDS_EXPECTED_EVENTS)) {
-                    stopMissingArgument("'expectedEvents' is missing", functionName = ".initByDataFrame", parameter = "expectedEvents")
+                    stopMissingArgument("'expectedEvents' is missing",
+                        functionName = ".initByDataFrame",
+                        parameter = "expectedEvents"
+                    )
                 }
                 if (!self$.paramExists(dataFrame, C_KEY_WORDS_VARIANCE_EVENTS)) {
-                    stopMissingArgument("'varianceEvents' is missing", functionName = ".initByDataFrame", parameter = "varianceEvents")
+                    stopMissingArgument("'varianceEvents' is missing",
+                        functionName = ".initByDataFrame",
+                        parameter = "varianceEvents"
+                    )
                 }
 
                 self$.inputType <- "stagewise"
@@ -4016,7 +4194,9 @@ DatasetEnrichmentSurvival <- R6::R6Class("DatasetEnrichmentSurvival",
                 self$allocationRatios <- self$.getValuesByParameterName(
                     dataFrame,
                     parameterNameVariants = C_KEY_WORDS_ALLOCATION_RATIOS,
-                    defaultValues = self$.getAllocationRatioDefaultValues(self$stages, self$events, self$expectedEvents)
+                    defaultValues = self$.getAllocationRatioDefaultValues(
+                        self$stages, self$events, self$expectedEvents
+                    )
                 )
                 self$.validateValues(self$allocationRatios, "allocationRatios")
             }
@@ -4070,23 +4250,53 @@ DatasetEnrichmentSurvival <- R6::R6Class("DatasetEnrichmentSurvival",
             self$overallVarianceEvents <- self$.data$overallVarianceEvent
             self$expectedEvents <- self$.data$expectedEvent
         },
-        getOverallExpectedEvent = function(stage, group = 1, subset = NA_character_) {
+        getOverallExpectedEvent = function(
+                stage,
+                group = 1,
+                subset = NA_character_) {
             return(self$.data$overallExpectedEvent[self$.getIndices(stage = stage, group = group, subset = subset)])
         },
-        getOverallExpectedEvents = function(..., stage = NA_integer_, group = NA_integer_, subset = NA_character_) {
-            return(self$.data$overallExpectedEvent[self$.getIndices(stage = self$.getValidatedStage(stage), group = group, subset = subset)])
+        getOverallExpectedEvents = function(
+                ...,
+                stage = NA_integer_,
+                group = NA_integer_,
+                subset = NA_character_) {
+            return(self$.data$overallExpectedEvent[self$.getIndices(
+                stage = self$.getValidatedStage(stage), group = group, subset = subset
+            )])
         },
-        getOverallExpectedEventsUpTo = function(to, group = 1, subset = NA_character_) {
-            return(self$.data$overallExpectedEvent[self$.getIndices(stage = c(1:to), group = group, subset = subset)])
+        getOverallExpectedEventsUpTo = function(
+                to,
+                group = 1,
+                subset = NA_character_) {
+            return(self$.data$overallExpectedEvent[self$.getIndices(
+                stage = c(1:to), group = group, subset = subset
+            )])
         },
-        getOverallVarianceEvent = function(stage, group = 1, subset = NA_character_) {
-            return(self$.data$overallVarianceEvent[self$.getIndices(stage = stage, group = group, subset = subset)])
+        getOverallVarianceEvent = function(
+                stage,
+                group = 1,
+                subset = NA_character_) {
+            return(self$.data$overallVarianceEvent[self$.getIndices(
+                stage = stage, group = group, subset = subset
+            )])
         },
-        getOverallVarianceEvents = function(..., stage = NA_integer_, group = NA_integer_, subset = NA_character_) {
-            return(self$.data$overallVarianceEvent[self$.getIndices(stage = self$.getValidatedStage(stage), group = group, subset = subset)])
+        getOverallVarianceEvents = function(
+                ...,
+                stage = NA_integer_,
+                group = NA_integer_,
+                subset = NA_character_) {
+            return(self$.data$overallVarianceEvent[self$.getIndices(
+                stage = self$.getValidatedStage(stage), group = group, subset = subset
+            )])
         },
-        getOverallVarianceEventsUpTo = function(to, group = 1, subset = NA_character_) {
-            return(self$.data$overallVarianceEvent[self$.getIndices(stage = c(1:to), group = group, subset = subset)])
+        getOverallVarianceEventsUpTo = function(
+                to,
+                group = 1,
+                subset = NA_character_) {
+            return(self$.data$overallVarianceEvent[self$.getIndices(
+                stage = c(1:to), group = group, subset = subset
+            )])
         }
     )
 )
@@ -4209,7 +4419,10 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         paste0(groups, collapse = ifelse(object$isDatasetSurvival(), " with ", " and "))
     )
     if (object$.enrichmentEnabled) {
-        header <- paste0(header, ". The data will be analyzed ", ifelse(object$isStratified(), "", "non-"), "stratified")
+        header <- paste0(
+            header, ". The data will be analyzed ",
+            ifelse(object$isStratified(), "", "non-"), "stratified"
+        )
     }
     if (kMax > 1) {
         header <- paste0(
@@ -4274,7 +4487,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallSampleSizes",
-                parameterCaption = "Cumulative sample size", roundDigits = digitsSampleSize
+                parameterCaption = "Cumulative sample size",
+                roundDigits = digitsSampleSize
             )
         }
     }
@@ -4288,7 +4502,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallMeans",
-                parameterCaption = "Cumulative mean", roundDigits = digitsGeneral
+                parameterCaption = "Cumulative mean",
+                roundDigits = digitsGeneral
             )
         }
         summaryFactory$addParameter(object,
@@ -4299,7 +4514,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallStDevs",
-                parameterCaption = "Cumulative standard deviation", roundDigits = digitsGeneral
+                parameterCaption = "Cumulative standard deviation",
+                roundDigits = digitsGeneral
             )
         }
     } else if (object$isDatasetRates()) {
@@ -4311,7 +4527,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallEvents",
-                parameterCaption = "Cumulative number of events", roundDigits = digitsSampleSize
+                parameterCaption = "Cumulative number of events",
+                roundDigits = digitsSampleSize
             )
         }
     } else if (object$isDatasetSurvival()) {
@@ -4323,7 +4540,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallEvents",
-                parameterCaption = "Cumulative number of events", roundDigits = digitsSampleSize
+                parameterCaption = "Cumulative number of events",
+                roundDigits = digitsSampleSize
             )
         }
         summaryFactory$addParameter(object,
@@ -4334,7 +4552,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallLogRanks",
-                parameterCaption = "Cumulative log rank statistic", roundDigits = digitsGeneral
+                parameterCaption = "Cumulative log rank statistic",
+                roundDigits = digitsGeneral
             )
         }
         if (!anyNA(object$allocationRatios) && any(object$allocationRatios != 1)) {
@@ -4346,7 +4565,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
             if (kMax > 1) {
                 summaryFactory$addParameter(object,
                     parameterName = "overallAllocationRatios",
-                    parameterCaption = "Cumulative allocation ratio", roundDigits = digitsGeneral
+                    parameterCaption = "Cumulative allocation ratio",
+                    roundDigits = digitsGeneral
                 )
             }
         }
@@ -4371,7 +4591,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         encapsulate <- grepl("^subset", paramName)
         if (!encapsulate || isTRUE(x$.enrichmentEnabled)) {
             values <- m[[paramName]]
-            if (!encapsulate && is.numeric(values) && !is.null(digits) && length(digits) == 1 && !is.na(digits)) {
+            if (!encapsulate && is.numeric(values) &&
+                    !is.null(digits) && length(digits) == 1 && !is.na(digits)) {
                 values <- round(values, digits = digits)
             }
             lines <- c(lines, paste0(paramName, " = ", .arrayToString(values,
@@ -4427,7 +4648,11 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
 #'
 #' @keywords internal
 #'
-print.Dataset <- function(x, ..., markdown = NA, output = c("list", "long", "wide", "r", "rComplete")) {
+print.Dataset <- function(
+        x,
+        ...,
+        markdown = NA,
+        output = c("list", "long", "wide", "r", "rComplete")) {
     fCall <- match.call(expand.dots = FALSE)
     sysCalls <- sys.calls()
 

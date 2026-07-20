@@ -271,7 +271,9 @@ getSimulationRates <- function(
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
     if (design$sided == 2) {
-        stopIllegalArgument("only one-sided case is implemented for the simulation design", functionName = "getSimulationRates")
+        stopIllegalArgument("only one-sided case is implemented for the simulation design",
+            functionName = "getSimulationRates"
+        )
     }
 
     if (!normalApproximation && (groups == 2) && (riskRatio || (thetaH0 != 0))) {
@@ -305,9 +307,12 @@ getSimulationRates <- function(
     if (design$kMax > 1) {
         if (any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0) &&
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage))) {
-            stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+            stopIllegalArgument(
+                "'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), 
+                ") must be not smaller than minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
-                functionName = "getSimulationRates", parameter = "maxNumberOfSubjectsPerStage",
+                functionName = "getSimulationRates",
+                parameter = "maxNumberOfSubjectsPerStage",
                 value = maxNumberOfSubjectsPerStage
             )
         }
@@ -396,9 +401,12 @@ getSimulationRates <- function(
         if (length(allocationRatioPlanned) == 1) {
             allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
         } else if (length(allocationRatioPlanned) != design$kMax) {
-            stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+            stopIllegalArgument(
+                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", 
+                "must have length 1 or ",
                 design$kMax, " (kMax)",
-                functionName = "getSimulationRates", parameter = "allocationRatioPlanned",
+                functionName = "getSimulationRates",
+                parameter = "allocationRatioPlanned",
                 value = allocationRatioPlanned
             )
         }
