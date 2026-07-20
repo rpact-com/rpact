@@ -2,7 +2,7 @@
 
 A dataset containing the log-rank statistics, events, and allocation
 ratios of one group. Use `getDataset(dataSurvival)` to create a dataset
-object that can be processed by
+object that can b e processed by
 [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md).
 
 ## Usage

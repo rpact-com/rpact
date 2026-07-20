@@ -1,7 +1,8 @@
-# Get Fisher Information From a Design Plan
+# Get Fisher Information From a Design Plan or Simulation Results
 
 Calculates the Fisher information at the first planned analysis stage
-for a design plan for means, rates, or survival endpoints.
+for a design plan or simulation results object for means, rates, or
+survival endpoints.
 
 ## Usage
 
@@ -13,28 +14,33 @@ getFisherInformation(designPlan)
 
 - designPlan:
 
-  A trial design plan object as returned by functions such as
+  A trial design plan or simulation results object as returned by
+  functions such as
   [`getSampleSizeMeans()`](https://docs.rpact.org/reference/getSampleSizeMeans.md),
   [`getPowerMeans()`](https://docs.rpact.org/reference/getPowerMeans.md),
   [`getSampleSizeRates()`](https://docs.rpact.org/reference/getSampleSizeRates.md),
   [`getPowerRates()`](https://docs.rpact.org/reference/getPowerRates.md),
   [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md),
+  [`getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.md),
+  [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md),
+  [`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md),
   or
-  [`getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.md).
+  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md).
 
 ## Value
 
 A numeric value or numeric vector containing the first-stage Fisher
-information. A vector is returned if the design plan contains several
+information. A vector is returned if the object contains several
 planning alternatives or sample size values. `NA_real_` is returned if
 the endpoint type is not supported by this helper.
 
 ## Details
 
 The returned information is the information used at the first stage of
-the design plan. For group sequential designs, information at later
-stages can be obtained by multiplying this value by the ratio of the
-corresponding information rate to the first information rate.
+the design plan or simulation setup. For group sequential designs,
+information at later stages can be obtained by multiplying this value by
+the ratio of the corresponding information rate to the first information
+rate.
 
 For means, the information is based on the planned sample size, standard
 deviations, allocation ratio, and, if applicable, the mean-ratio null
@@ -59,5 +65,11 @@ designPlan <- getPowerMeans(design,
     alternative = c(0.3, 0.4), maxNumberOfSubjects = 100
 )
 getFisherInformation(designPlan)
+
+simulationResults <- getSimulationMeans(design,
+    plannedSubjects = c(20, 40, 60), alternative = 0.4,
+    maxNumberOfIterations = 10
+)
+getFisherInformation(simulationResults)
 } # }
 ```
