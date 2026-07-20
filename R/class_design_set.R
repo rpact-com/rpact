@@ -386,7 +386,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             design <- .getOptionalArgument(optionalArgumentName = "design", ...)
             optionalArgumentsDefined <- (length(args) > 0)
             if (is.null(design) && !optionalArgumentsDefined) {
-                stopIllegalArgument("please specify a 'design' to add and/or a design parameter, ", "e.g., deltaWT = c(0.1, 0.3, 0.4)",
+                stopIllegalArgument("please specify a 'design' to add and/or a design parameter, ",
+                    "e.g., deltaWT = c(0.1, 0.3, 0.4)",
                     functionName = ".validateOptionalArguments",
                     parameter = "design"
                 )
@@ -399,7 +400,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             }
 
             if (is.null(design) && optionalArgumentsDefined && length(self$designs) == 0) {
-                stopIncompleteArguments("at least one design (master) must be defined in this ", "design set to respect any design parameters",
+                stopIncompleteArguments("at least one design (master) must be defined in this ",
+                    "design set to respect any design parameters",
                     functionName = ".validateOptionalArguments"
                 )
             }
@@ -485,9 +487,10 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             sided <- self$getDesignMaster()$sided
             for (design in self$designs) {
                 if (sided != design$sided) {
-                    stopConflictingArguments("designs have different directions of alternative (design master is ", ifelse(sided ==
-                        1, "one", "two"), " sided)",
-                    functionName = "assertHaveEqualSidedValues"
+                    stopConflictingArguments(
+                        "designs have different directions of alternative (design master is ",
+                        ifelse(sided == 1, "one", "two"), " sided)",
+                        functionName = "assertHaveEqualSidedValues"
                     )
                 }
             }
@@ -506,9 +509,12 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             }
 
             if (length(argumentNames) > 2) {
-                stopIllegalArgument("too many arguments (", .arrayToString(argumentNames, encapsulate = TRUE), "): up to 2 design parameters are allowed",
+                stopIllegalArgument("too many arguments (",
+                    .arrayToString(argumentNames, encapsulate = TRUE), "): ",
+                    "up to 2 design parameters are allowed",
                     functionName = ".createDesignVariants",
-                    parameter = "argumentNames", value = argumentNames
+                    parameter = "argumentNames",
+                    value = argumentNames
                 )
             }
 
@@ -1023,10 +1029,12 @@ plot.TrialDesignSet <- function(
         type <- availablePlotTypes[1]
     }
     if (!(type %in% availablePlotTypes)) {
-        stopIllegalArgument("'type' (", type, ") is not available; 'type' can ", ifelse(length(availablePlotTypes) ==
-            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"),
-        functionName = "plot.TrialDesignSet",
-        parameter = "type", value = type
+        stopIllegalArgument(
+            "'type' (", type, ") is not available; 'type' can ",
+            ifelse(length(availablePlotTypes) == 1, "only ", ""), "be ",
+            .arrayToString(availablePlotTypes, mode = "or"),
+            functionName = "plot.TrialDesignSet",
+            parameter = "type", value = type
         )
     }
 
@@ -1173,8 +1181,10 @@ plot.TrialDesignSet <- function(
         main <- .getMainTitle(main, title = "Boundaries", nMax = nMax)
         xParameterName <- "informationRates"
         yParameterNames <- "criticalValues"
-        if (designMaster$sided == 1 || (designMaster$kMax > 1 && .isTrialDesignInverseNormalOrGroupSequential(designMaster) &&
-                (identical(designMaster$typeOfDesign, C_TYPE_OF_DESIGN_PT) || grepl("^bs", designMaster$typeBetaSpending)))) {
+        if (designMaster$sided == 1 || (designMaster$kMax > 1 &&
+                .isTrialDesignInverseNormalOrGroupSequential(designMaster) &&
+                (identical(designMaster$typeOfDesign, C_TYPE_OF_DESIGN_PT) ||
+                    grepl("^bs", designMaster$typeBetaSpending)))) {
             if (.isTrialDesignWithValidFutilityBounds(designMaster)) {
                 yParameterNames <- c("futilityBounds", yParameterNames)
             }
@@ -1274,7 +1284,8 @@ plot.TrialDesignSet <- function(
 }
 
 .addDecisionCriticalValuesToPlot <- function(p, designMaster, type, nMax = NA_integer_) {
-    if (type != 1 || .isTrialDesignFixed(designMaster) || !.isTrialDesignInverseNormalOrGroupSequential(designMaster)) {
+    if (type != 1 || .isTrialDesignFixed(designMaster) ||
+            !.isTrialDesignInverseNormalOrGroupSequential(designMaster)) {
         return(p)
     }
 
@@ -1291,7 +1302,9 @@ plot.TrialDesignSet <- function(
         data$delayedInformationRates <- data$delayedInformationRates * nMax
         tryCatch(
             {
-                data$delayedInformationRates <- as.numeric(.formatSampleSizes(data$delayedInformationRates))
+                data$delayedInformationRates <- as.numeric(
+                    .formatSampleSizes(data$delayedInformationRates)
+                )
             },
             error = function(e) {
                 warning("Failed to format delayed information rates on x-axis: ", e$message)
@@ -1331,6 +1344,8 @@ plot.TrialDesignSet <- function(
         )
     }
 
-    try(suppressWarnings(suppressMessages(p <- p + ggplot2::scale_color_manual(values = c("#4daf4a", "#377eb8", "#e41a1c")))))
+    try(suppressWarnings(suppressMessages(p <- p + ggplot2::scale_color_manual(
+        values = c("#4daf4a", "#377eb8", "#e41a1c")
+    ))))
     return(p)
 }

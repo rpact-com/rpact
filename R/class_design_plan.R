@@ -538,7 +538,8 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
 #' @template field_futilityBoundsPValueScale
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
+#' This object cannot be created directly; 
+#' use \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
 #' with suitable arguments to create a design plan for a dataset of rates.
 #'
 #' @include class_core_parameter_set.R
@@ -736,7 +737,8 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
 #' @template field_futilityBoundsPValueScale
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
+#' This object cannot be created directly; 
+#' use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 #' with suitable arguments to create a design plan for a dataset of survival data.
 #'
 #' @include class_core_parameter_set.R

@@ -3099,11 +3099,12 @@ DatasetRates <- R6::R6Class("DatasetRates",
                 )
                 self$.validateValues(self$sampleSizes, "n")
                 if (any(stats::na.omit(self$sampleSizes) <= 0)) {
-                    stopIllegalArgument("all sample sizes must be > 0, but 'n' = ", self$.arrayToString(self$sampleSizes,
-                        vectorLookAndFeelEnabled = TRUE
-                    ),
-                    functionName = ".initByDataFrame",
-                    parameter = "n"
+                    stopIllegalArgument("all sample sizes must be > 0, but 'n' = ",
+                        self$.arrayToString(self$sampleSizes,
+                            vectorLookAndFeelEnabled = TRUE
+                        ),
+                        functionName = ".initByDataFrame",
+                        parameter = "n"
                     )
                 }
 
@@ -3113,7 +3114,8 @@ DatasetRates <- R6::R6Class("DatasetRates",
                 )
                 self$.validateValues(self$events, "events")
                 if (any(stats::na.omit(self$events) < 0)) {
-                    stopIllegalArgument("all events must be >= 0, but 'events' = ", self$.arrayToString(self$events, vectorLookAndFeelEnabled = TRUE),
+                    stopIllegalArgument("all events must be >= 0, but 'events' = ",
+                        self$.arrayToString(self$events, vectorLookAndFeelEnabled = TRUE),
                         functionName = ".initByDataFrame",
                         parameter = "events", value = self$events
                     )
@@ -3147,14 +3149,20 @@ DatasetRates <- R6::R6Class("DatasetRates",
                     parameterName = "Cumulative sample sizes"
                 )
                 self$.validateValues(self$overallSampleSizes, "overallSampleSizes")
-                .assertValuesAreStrictlyIncreasing(self$overallSampleSizes, "overallSampleSizes", endingNasAllowed = TRUE)
+                .assertValuesAreStrictlyIncreasing(self$overallSampleSizes,
+                    "overallSampleSizes",
+                    endingNasAllowed = TRUE
+                )
 
                 self$overallEvents <- self$.getValidatedFloatingPointNumbers(
                     self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_OVERALL_EVENTS),
                     parameterName = "Cumulative events"
                 )
                 self$.validateValues(self$overallEvents, "overallEvents")
-                .assertValuesAreMonotoneIncreasing(self$overallEvents, "overallEvents", endingNasAllowed = TRUE)
+                .assertValuesAreMonotoneIncreasing(self$overallEvents,
+                    "overallEvents",
+                    endingNasAllowed = TRUE
+                )
 
                 kMax <- length(self$overallSampleSizes)
                 stageNumber <- length(stats::na.omit(self$overallSampleSizes))
@@ -3196,11 +3204,12 @@ DatasetRates <- R6::R6Class("DatasetRates",
                     )
                     self$.validateValues(sampleSizesTemp, paste0("n", group))
                     if (any(stats::na.omit(sampleSizesTemp) <= 0)) {
-                        stopIllegalArgument("all sample sizes must be > 0, but 'n", group, "' = ", self$.arrayToString(sampleSizesTemp,
-                            vectorLookAndFeelEnabled = TRUE
-                        ),
-                        functionName = ".initByDataFrame",
-                        parameter = "group", value = group
+                        stopIllegalArgument(
+                            "all sample sizes must be > 0, but ",
+                            .pQuote(paste0("n", group)), " = ",
+                            self$.arrayToString(sampleSizesTemp, vectorLookAndFeelEnabled = TRUE),
+                            functionName = ".initByDataFrame",
+                            parameter = "group", value = group
                         )
                     }
                     self$sampleSizes <- c(self$sampleSizes, sampleSizesTemp)
@@ -3211,11 +3220,12 @@ DatasetRates <- R6::R6Class("DatasetRates",
                     )
                     self$.validateValues(eventsTemp, paste0("events", group))
                     if (any(stats::na.omit(eventsTemp) < 0)) {
-                        stopIllegalArgument("all events must be >= 0, but 'events", group, "' = ", self$.arrayToString(eventsTemp,
-                            vectorLookAndFeelEnabled = TRUE
-                        ),
-                        functionName = ".initByDataFrame",
-                        parameter = "group", value = group
+                        stopIllegalArgument(
+                            "all events must be >= 0, but ",
+                            .pQuote(paste0("events", group)), " = ",
+                            self$.arrayToString(eventsTemp, vectorLookAndFeelEnabled = TRUE),
+                            functionName = ".initByDataFrame",
+                            parameter = "group", value = group
                         )
                     }
                     self$events <- c(self$events, eventsTemp)
@@ -3617,7 +3627,9 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
 
                     self$allocationRatios <- self$.getValuesByParameterName(
                         dataFrame, C_KEY_WORDS_ALLOCATION_RATIOS,
-                        defaultValues = self$.getAllocationRatioDefaultValues(self$stages, self$events, self$expectedEvents)
+                        defaultValues = self$.getAllocationRatioDefaultValues(
+                            self$stages, self$events, self$expectedEvents
+                        )
                     )
                     self$.validateValues(self$allocationRatios, "allocationRatios")
                 } else if (self$.paramExists(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS) ||
@@ -3633,7 +3645,9 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                     self$overallAllocationRatios <- self$.getValuesByParameterName(
                         dataFrame,
                         parameterNameVariants = C_KEY_WORDS_OVERALL_ALLOCATION_RATIOS,
-                        defaultValues = self$.getAllocationRatioDefaultValues(self$stages, self$overallEvents, self$overallExpectedEvents)
+                        defaultValues = self$.getAllocationRatioDefaultValues(
+                            self$stages, self$overallEvents, self$overallExpectedEvents
+                        )
                     )
                     self$.validateValues(self$overallAllocationRatios, "overallAllocationRatios")
                 }
@@ -3758,11 +3772,11 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                         suffix = group
                     ), parameterName = "Events")
                     if (any(stats::na.omit(eventsTemp) < 0)) {
-                        stopIllegalArgument("all events must be >= 0, but 'events", group, "' = ", self$.arrayToString(eventsTemp,
-                            vectorLookAndFeelEnabled = TRUE
-                        ),
-                        functionName = ".initByDataFrame",
-                        parameter = "group", value = group
+                        stopIllegalArgument("all events must be >= 0, but ",
+                            .pQuote(paste0("events", group)), " = ",
+                            self$.arrayToString(eventsTemp, vectorLookAndFeelEnabled = TRUE),
+                            functionName = ".initByDataFrame",
+                            parameter = "group", value = group
                         )
                     }
                     self$events <- c(self$events, eventsTemp)
@@ -3788,7 +3802,8 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                     self$groups <- c(self$groups, rep(as.integer(group), length(eventsTemp)))
                 }
             } else {
-                stopRuntimeIssue("unable to identify case for ", .getClassName(self), " and columns ", self$.arrayToString(colnames(dataFrame)),
+                stopRuntimeIssue("unable to identify case for ", .getClassName(self),
+                    " and columns ", self$.arrayToString(colnames(dataFrame)),
                     functionName = ".initByDataFrame",
                     parameter = "self", value = self
                 )
@@ -4024,7 +4039,8 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                         overallEvents[1:(kMax - 1)] / overallEvents[2:kMax]
             ) / (events[2:kMax] / overallEvents[2:kMax])
             if (any(stats::na.omit(result) <= 0)) {
-                stopIllegalArgument("overall allocation ratios not correctly specified: ", "one or more calculated stage-wise allocation ratios <= 0",
+                stopIllegalArgument("overall allocation ratios not correctly specified: ",
+                    "one or more calculated stage-wise allocation ratios <= 0",
                     functionName = ".getStageWiseAllocationRatios"
                 )
             }
@@ -4128,16 +4144,22 @@ DatasetEnrichmentSurvival <- R6::R6Class("DatasetEnrichmentSurvival",
                 )
                 self$.validateValues(self$overallEvents, "overallEvents")
 
-                self$overallExpectedEvents <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS)
+                self$overallExpectedEvents <- self$.getValuesByParameterName(
+                    dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS
+                )
                 self$.validateValues(self$overallExpectedEvents, "overallExpectedEvents")
 
-                self$overallVarianceEvents <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_OVERALL_VARIANCE_EVENTS)
+                self$overallVarianceEvents <- self$.getValuesByParameterName(
+                    dataFrame, C_KEY_WORDS_OVERALL_VARIANCE_EVENTS
+                )
                 self$.validateValues(self$overallVarianceEvents, "overallVarianceEvents")
 
                 self$overallAllocationRatios <- self$.getValuesByParameterName(
                     dataFrame,
                     parameterNameVariants = C_KEY_WORDS_OVERALL_ALLOCATION_RATIOS,
-                    defaultValues = self$.getAllocationRatioDefaultValues(self$stages, self$overallEvents, self$overallExpectedEvents)
+                    defaultValues = self$.getAllocationRatioDefaultValues(
+                        self$stages, self$overallEvents, self$overallExpectedEvents
+                    )
                 )
                 self$.validateValues(self$overallAllocationRatios, "overallAllocationRatios")
             } else if (self$.paramExists(dataFrame, C_KEY_WORDS_EXPECTED_EVENTS) ||
@@ -4172,7 +4194,9 @@ DatasetEnrichmentSurvival <- R6::R6Class("DatasetEnrichmentSurvival",
                 self$allocationRatios <- self$.getValuesByParameterName(
                     dataFrame,
                     parameterNameVariants = C_KEY_WORDS_ALLOCATION_RATIOS,
-                    defaultValues = self$.getAllocationRatioDefaultValues(self$stages, self$events, self$expectedEvents)
+                    defaultValues = self$.getAllocationRatioDefaultValues(
+                        self$stages, self$events, self$expectedEvents
+                    )
                 )
                 self$.validateValues(self$allocationRatios, "allocationRatios")
             }
@@ -4226,23 +4250,53 @@ DatasetEnrichmentSurvival <- R6::R6Class("DatasetEnrichmentSurvival",
             self$overallVarianceEvents <- self$.data$overallVarianceEvent
             self$expectedEvents <- self$.data$expectedEvent
         },
-        getOverallExpectedEvent = function(stage, group = 1, subset = NA_character_) {
+        getOverallExpectedEvent = function(
+                stage,
+                group = 1,
+                subset = NA_character_) {
             return(self$.data$overallExpectedEvent[self$.getIndices(stage = stage, group = group, subset = subset)])
         },
-        getOverallExpectedEvents = function(..., stage = NA_integer_, group = NA_integer_, subset = NA_character_) {
-            return(self$.data$overallExpectedEvent[self$.getIndices(stage = self$.getValidatedStage(stage), group = group, subset = subset)])
+        getOverallExpectedEvents = function(
+                ...,
+                stage = NA_integer_,
+                group = NA_integer_,
+                subset = NA_character_) {
+            return(self$.data$overallExpectedEvent[self$.getIndices(
+                stage = self$.getValidatedStage(stage), group = group, subset = subset
+            )])
         },
-        getOverallExpectedEventsUpTo = function(to, group = 1, subset = NA_character_) {
-            return(self$.data$overallExpectedEvent[self$.getIndices(stage = c(1:to), group = group, subset = subset)])
+        getOverallExpectedEventsUpTo = function(
+                to,
+                group = 1,
+                subset = NA_character_) {
+            return(self$.data$overallExpectedEvent[self$.getIndices(
+                stage = c(1:to), group = group, subset = subset
+            )])
         },
-        getOverallVarianceEvent = function(stage, group = 1, subset = NA_character_) {
-            return(self$.data$overallVarianceEvent[self$.getIndices(stage = stage, group = group, subset = subset)])
+        getOverallVarianceEvent = function(
+                stage,
+                group = 1,
+                subset = NA_character_) {
+            return(self$.data$overallVarianceEvent[self$.getIndices(
+                stage = stage, group = group, subset = subset
+            )])
         },
-        getOverallVarianceEvents = function(..., stage = NA_integer_, group = NA_integer_, subset = NA_character_) {
-            return(self$.data$overallVarianceEvent[self$.getIndices(stage = self$.getValidatedStage(stage), group = group, subset = subset)])
+        getOverallVarianceEvents = function(
+                ...,
+                stage = NA_integer_,
+                group = NA_integer_,
+                subset = NA_character_) {
+            return(self$.data$overallVarianceEvent[self$.getIndices(
+                stage = self$.getValidatedStage(stage), group = group, subset = subset
+            )])
         },
-        getOverallVarianceEventsUpTo = function(to, group = 1, subset = NA_character_) {
-            return(self$.data$overallVarianceEvent[self$.getIndices(stage = c(1:to), group = group, subset = subset)])
+        getOverallVarianceEventsUpTo = function(
+                to,
+                group = 1,
+                subset = NA_character_) {
+            return(self$.data$overallVarianceEvent[self$.getIndices(
+                stage = c(1:to), group = group, subset = subset
+            )])
         }
     )
 )
@@ -4365,7 +4419,10 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         paste0(groups, collapse = ifelse(object$isDatasetSurvival(), " with ", " and "))
     )
     if (object$.enrichmentEnabled) {
-        header <- paste0(header, ". The data will be analyzed ", ifelse(object$isStratified(), "", "non-"), "stratified")
+        header <- paste0(
+            header, ". The data will be analyzed ",
+            ifelse(object$isStratified(), "", "non-"), "stratified"
+        )
     }
     if (kMax > 1) {
         header <- paste0(
@@ -4430,7 +4487,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallSampleSizes",
-                parameterCaption = "Cumulative sample size", roundDigits = digitsSampleSize
+                parameterCaption = "Cumulative sample size",
+                roundDigits = digitsSampleSize
             )
         }
     }
@@ -4444,7 +4502,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallMeans",
-                parameterCaption = "Cumulative mean", roundDigits = digitsGeneral
+                parameterCaption = "Cumulative mean",
+                roundDigits = digitsGeneral
             )
         }
         summaryFactory$addParameter(object,
@@ -4455,7 +4514,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallStDevs",
-                parameterCaption = "Cumulative standard deviation", roundDigits = digitsGeneral
+                parameterCaption = "Cumulative standard deviation",
+                roundDigits = digitsGeneral
             )
         }
     } else if (object$isDatasetRates()) {
@@ -4467,7 +4527,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallEvents",
-                parameterCaption = "Cumulative number of events", roundDigits = digitsSampleSize
+                parameterCaption = "Cumulative number of events",
+                roundDigits = digitsSampleSize
             )
         }
     } else if (object$isDatasetSurvival()) {
@@ -4479,7 +4540,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallEvents",
-                parameterCaption = "Cumulative number of events", roundDigits = digitsSampleSize
+                parameterCaption = "Cumulative number of events",
+                roundDigits = digitsSampleSize
             )
         }
         summaryFactory$addParameter(object,
@@ -4490,7 +4552,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         if (kMax > 1) {
             summaryFactory$addParameter(object,
                 parameterName = "overallLogRanks",
-                parameterCaption = "Cumulative log rank statistic", roundDigits = digitsGeneral
+                parameterCaption = "Cumulative log rank statistic",
+                roundDigits = digitsGeneral
             )
         }
         if (!anyNA(object$allocationRatios) && any(object$allocationRatios != 1)) {
@@ -4502,7 +4565,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
             if (kMax > 1) {
                 summaryFactory$addParameter(object,
                     parameterName = "overallAllocationRatios",
-                    parameterCaption = "Cumulative allocation ratio", roundDigits = digitsGeneral
+                    parameterCaption = "Cumulative allocation ratio",
+                    roundDigits = digitsGeneral
                 )
             }
         }
@@ -4527,7 +4591,8 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         encapsulate <- grepl("^subset", paramName)
         if (!encapsulate || isTRUE(x$.enrichmentEnabled)) {
             values <- m[[paramName]]
-            if (!encapsulate && is.numeric(values) && !is.null(digits) && length(digits) == 1 && !is.na(digits)) {
+            if (!encapsulate && is.numeric(values) &&
+                    !is.null(digits) && length(digits) == 1 && !is.na(digits)) {
                 values <- round(values, digits = digits)
             }
             lines <- c(lines, paste0(paramName, " = ", .arrayToString(values,
@@ -4583,7 +4648,11 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
 #'
 #' @keywords internal
 #'
-print.Dataset <- function(x, ..., markdown = NA, output = c("list", "long", "wide", "r", "rComplete")) {
+print.Dataset <- function(
+        x,
+        ...,
+        markdown = NA,
+        output = c("list", "long", "wide", "r", "rComplete")) {
     fCall <- match.call(expand.dots = FALSE)
     sysCalls <- sys.calls()
 

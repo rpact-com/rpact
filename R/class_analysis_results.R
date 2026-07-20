@@ -52,7 +52,16 @@ ConditionalPowerResults <- R6::R6Class("ConditionalPowerResults",
         iterations = NULL,
         seed = NULL,
         simulated = NULL,
-        initialize = function(..., .design = NULL, .stageResults = NULL, .plotData = NULL, nPlanned = NULL, allocationRatioPlanned = NULL, iterations = NULL, seed = NULL, simulated = NULL) {
+        initialize = function(
+                ...,
+                .design = NULL,
+                .stageResults = NULL,
+                .plotData = NULL,
+                nPlanned = NULL,
+                allocationRatioPlanned = NULL,
+                iterations = NULL,
+                seed = NULL,
+                simulated = NULL) {
             self$.design <- .design
             self$.stageResults <- .stageResults
             self$.plotData <- .plotData
@@ -155,7 +164,11 @@ ConditionalPowerResultsMeans <- R6::R6Class("ConditionalPowerResultsMeans",
         conditionalPower = NULL,
         thetaH1 = NULL,
         assumedStDev = NULL,
-        initialize = function(..., conditionalPower = NULL, thetaH1 = NULL, assumedStDev = NULL) {
+        initialize = function(
+                ...,
+                conditionalPower = NULL,
+                thetaH1 = NULL,
+                assumedStDev = NULL) {
             self$conditionalPower <- conditionalPower
             self$thetaH1 <- thetaH1
             self$assumedStDev <- assumedStDev
@@ -191,14 +204,17 @@ ConditionalPowerResultsMultiHypotheses <- R6::R6Class("ConditionalPowerResultsMu
             if (self$.readyForInitialization()) {
                 gMax <- self$getGMax()
                 kMax <- self$.design$kMax
-                if (is.null(self$conditionalPower) || (nrow(self$conditionalPower) == 0 && ncol(self$conditionalPower) == 0)) {
+                if (is.null(self$conditionalPower) ||
+                        (nrow(self$conditionalPower) == 0 && ncol(self$conditionalPower) == 0)) {
                     self$conditionalPower <- matrix(rep(NA_real_, gMax * kMax), nrow = gMax, ncol = kMax)
                 }
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
             s <- "Conditional power results"
-            s <- paste0(s, " ", ifelse(grepl("Enrichment", .getClassName(self$.stageResults)), "enrichment", "multi-arm"))
+            s <- paste0(s, " ", ifelse(grepl("Enrichment", .getClassName(self$.stageResults)),
+                "enrichment", "multi-arm"
+            ))
             if (grepl("Means", .getClassName(self))) {
                 s <- paste0(s, " means")
             } else if (grepl("Rates", .getClassName(self))) {
@@ -1265,7 +1281,8 @@ as.data.frame.AnalysisResults <- function(
 #' @description
 #' Function to get the names of an \code{\link{AnalysisResults}} object.
 #'
-#' @param x An \code{\link{AnalysisResults}} object created by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' @param x An \code{\link{AnalysisResults}} object created
+#'        by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @details
 #' Returns the names of an analysis results that can be accessed by the user.
@@ -1337,7 +1354,12 @@ AnalysisResultsGroupSequential <- R6::R6Class("AnalysisResultsGroupSequential",
     public = list(
         maxInformation = NULL,
         informationEpsilon = NULL,
-        initialize = function(design, dataInput, ..., maxInformation = NULL, informationEpsilon = NULL) {
+        initialize = function(
+                design,
+                dataInput,
+                ...,
+                maxInformation = NULL,
+                informationEpsilon = NULL) {
             self$maxInformation <- maxInformation
             self$informationEpsilon <- informationEpsilon
 
@@ -1721,7 +1743,9 @@ AnalysisResultsConditionalDunnett <- R6::R6Class("AnalysisResultsConditionalDunn
         allocationRatioPlanned <- NA_real_
     }
 
-    if ((.isConditionalPowerEnabled(x$nPlanned) || .isConditionalPowerEnabled(nPlanned)) && is.na(allocationRatioPlanned)) {
+    if ((.isConditionalPowerEnabled(x$nPlanned) ||
+            .isConditionalPowerEnabled(nPlanned)) &&
+            is.na(allocationRatioPlanned)) {
         allocationRatioPlanned <- 1
     }
 
@@ -1752,9 +1776,14 @@ AnalysisResultsConditionalDunnett <- R6::R6Class("AnalysisResultsConditionalDunn
     return(data)
 }
 
-.getConfidenceIntervalDataPerBound <- function(x, ciName = c("lower", "upper"), treatmentArmsToShow = NULL) {
+.getConfidenceIntervalDataPerBound <- function(
+        x,
+        ciName = c("lower", "upper"),
+        treatmentArmsToShow = NULL) {
     ciName <- match.arg(ciName)
-    paramName <- ifelse(ciName == "lower", "repeatedConfidenceIntervalLowerBounds", "repeatedConfidenceIntervalUpperBounds")
+    paramName <- ifelse(ciName == "lower",
+        "repeatedConfidenceIntervalLowerBounds", "repeatedConfidenceIntervalUpperBounds"
+    )
     data <- x[[paramName]]
 
     if (is.matrix(data) && !is.null(treatmentArmsToShow) &&
@@ -2065,7 +2094,12 @@ plot.AnalysisResults <- function(
     return(eval.parent(functionCall[[paramName]]))
 }
 
-.addAnalysisPlotArgumentsToFunctionCall <- function(x, functionCall, ..., result = NULL, args = list()) {
+.addAnalysisPlotArgumentsToFunctionCall <- function(
+        x,
+        functionCall,
+        ...,
+        result = NULL,
+        args = list()) {
     if (is.null(result)) {
         result <- functionCall
     }
@@ -2204,7 +2238,10 @@ plot.AnalysisResults <- function(
 
     .warnInCaseOfUnknownArguments(
         functionName = "plot",
-        ignore = c("thetaRange", "assumedStDev", "assumedStDevs", "treatmentArms", "populations", "pi2", "piTreatmentRange"),
+        ignore = c(
+            "thetaRange", "assumedStDev", "assumedStDevs",
+            "treatmentArms", "populations", "pi2", "piTreatmentRange"
+        ),
         ...
     )
 

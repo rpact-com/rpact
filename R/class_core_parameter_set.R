@@ -604,7 +604,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 },
                 error = function(e) {
                     if (consoleOutputEnabled) {
-                        warning("Failed to extract parameter name and value from ", sQuote(parameterName), ": ", e$message)
+                        warning("Failed to extract parameter name and value from ", 
+                            sQuote(parameterName), ": ", e$message)
                     }
                     return(list(parameterName = parameterName, paramValue = ""))
                 }
@@ -687,7 +688,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         } else if (inherits(self, "ClosedCombinationTestResults")) {
                             populations <- self$.getHypothesisPopulationVariants()[matrixRow]
                         } else {
-                            stopRuntimeIssue("only ClosedCombinationTestResults ", "supports function .getHypothesisPopulationVariants() (object is ",
+                            stopRuntimeIssue("only ClosedCombinationTestResults ", 
+                                "supports function .getHypothesisPopulationVariants() (object is ",
                                 .getClassName(self), ")",
                                 functionName = ".showParameterFormatted",
                                 parameter = "self", value = self
@@ -1084,10 +1086,11 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(paste(parameterValues, collapse = ", "))
         }
 
-        stopRuntimeIssue("parameter ", .pQuote(parameterName), " has an invalid ", "dimension (length is ", length(parameterValues),
-            ")",
+        stopRuntimeIssue("parameter ", .pQuote(parameterName), " has an invalid ", 
+            "dimension (length is ", length(parameterValues), ")",
             functionName = ".getDataFrameColumnValues",
-            parameter = parameterName, value = length(parameterValues)
+            parameter = parameterName, 
+            value = length(parameterValues)
         )
     } else if (parameterName == "effectMatrix") {
         # return effect matrix row if 'effectMatrix' is user defined
@@ -1599,8 +1602,10 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
     }
 
     if (inherits(x, "AnalysisResults")) {
-        dfDesign <- as.data.frame(x$.design, niceColumnNamesEnabled = niceColumnNamesEnabled)
-        dfStageResults <- as.data.frame(x$.stageResults, niceColumnNamesEnabled = niceColumnNamesEnabled)
+        dfDesign <- as.data.frame(x$.design, 
+            niceColumnNamesEnabled = niceColumnNamesEnabled)
+        dfStageResults <- as.data.frame(x$.stageResults, 
+            niceColumnNamesEnabled = niceColumnNamesEnabled)
         dfStageResults <- dfStageResults[!is.na(dfStageResults[
             ,
             grep("(test statistic)|(testStatistics)", colnames(dfStageResults))
@@ -1655,7 +1660,8 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 #' @inheritParams param_digits
 #' @param output The output parts, default is \code{"all"}.
 #' @param printObject Show also the print output after the summary, default is \code{FALSE}.
-#' @param sep The separator line between the summary and the optional print output, default is \code{"\n\n-----\n\n"}.
+#' @param sep The separator line between the summary and the 
+#'        optional print output, default is \code{"\n\n-----\n\n"}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -1845,9 +1851,11 @@ fetch <- function(x, ..., output) UseMethod("fetch")
 #'  - a positive integer, giving the position counting from the left
 #'  - a negative integer, giving the position counting from the right.
 #' The default returns the last parameter.
-#' This argument is taken by expression and supports quasi-quotation (you can unquote column names and column locations).
+#' This argument is taken by expression and supports quasi-quotation 
+#' (you can unquote column names and column locations).
 #' @param output A character defining the output type as follows:
-#'  - "named" (default) returns the named value if the value is a single value, the value inside a named list otherwise
+#'  - "named" (default) returns the named value if the value is 
+#'    a single value, the value inside a named list otherwise
 #'  - "value" returns only the value itself
 #'  - "list" returns the value inside a named list
 #'
