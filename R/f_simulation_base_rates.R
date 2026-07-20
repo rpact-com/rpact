@@ -436,9 +436,8 @@ getSimulationRates <- function(
         }
     }
     simulationResults$effect <- effect
-    simulationResults$.setParameterType(
-        "effect",
-        ifelse(groups == 1 && thetaH0 == 0, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    simulationResults$.setParameterType("effect",
+        ifelse(groups == 1 && thetaH0 == 0, C_PARAM_NOT_APPLICABLE, C_PARAM_DERIVED)
     )
 
     .setValueAndParameterType(simulationResults, "normalApproximation", normalApproximation, TRUE)

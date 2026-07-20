@@ -528,7 +528,7 @@ NULL
         .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
         .setValueAndParameterType(designPlan, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
 
-        designPlan$.setParameterType("effect", C_PARAM_GENERATED)
+        designPlan$.setParameterType("effect", C_PARAM_DERIVED)
     }
 
     .setValueAndParameterType(designPlan, "normalApproximation", normalApproximation, TRUE)

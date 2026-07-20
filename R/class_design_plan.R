@@ -272,6 +272,47 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
                 result <- paste0("unknown data class ", .getClassName(self, quote = TRUE))
             }
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(result), result))
+        },
+        
+        # Defines the order of the parameter output
+        .getParametersToShow = function() {
+            return(c(
+                "typeOfComputation", 
+                "maxNumberOfSubjects", 
+                "maxNumberOfSubjects1", 
+                "maxNumberOfSubjects2", 
+                "maxNumberOfEvents", 
+                "alternative", 
+                "stDev", 
+                "normalApproximation", 
+                "conservative", 
+                "meanRatio", 
+                "groups", 
+                "thetaH0", 
+                "lambda1", 
+                "lambda2", 
+                "pi1", 
+                "pi2", 
+                "median1", 
+                "median2", 
+                "hazardRatio", 
+                "effect", 
+                "directionUpper", 
+                "allocationRatioPlanned", 
+                "optimumAllocationRatio", 
+                "accountForObservationTimes", 
+                "eventTime", 
+                "accrualTime", 
+                "totalAccrualTime", 
+                "accrualIntensity", 
+                "accrualIntensityRelative", 
+                "kappa", 
+                "piecewiseSurvivalTime", 
+                "followUpTime", 
+                "dropoutRate1", 
+                "dropoutRate2", 
+                "dropoutTime"
+            ))
         }
     )
 )

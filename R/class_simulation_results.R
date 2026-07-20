@@ -605,9 +605,50 @@ SimulationResults <- R6::R6Class(
             }
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         },
+
+        # Defines the order of the parameter output
         .getParametersToShow = function() {
             parametersToShow <- self$.getVisibleFieldNames()
             y <- c(
+                "typeOfComputation", 
+                "maxNumberOfSubjects", 
+                "maxNumberOfSubjects1", 
+                "maxNumberOfSubjects2", 
+                "maxNumberOfEvents", 
+                "alternative", 
+                "stDev", 
+                "normalApproximation", 
+                "conservative", 
+                "meanRatio", 
+                "groups", 
+                "thetaH0", 
+                "lambda1", 
+                "lambda2", 
+                "pi1", 
+                "pi2", 
+                "median1", 
+                "median2", 
+                "hazardRatio", 
+                "effect", 
+                "directionUpper", 
+                "allocationRatioPlanned", 
+                "optimumAllocationRatio", 
+                "accountForObservationTimes", 
+                "eventTime", 
+                "accrualTime", 
+                "totalAccrualTime", 
+                "accrualIntensity", 
+                "accrualIntensityRelative", 
+                "kappa", 
+                "piecewiseSurvivalTime", 
+                "followUpTime", 
+                "dropoutRate1", 
+                "dropoutRate2", 
+                "dropoutTime"
+            )
+            y <- c(
+                y,
+                "seed",
                 "iterations",
                 "overallReject", # base
                 "rejectAtLeastOne",
