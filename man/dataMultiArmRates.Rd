@@ -12,6 +12,7 @@ dataMultiArmRates
 }
 \description{
 A dataset containing the sample sizes and events of three groups.
-Use \code{getDataset(dataMultiArmRates)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+Use \code{getDataset(dataMultiArmRates)} to create a dataset object that can
+be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 }
 \keyword{internal}
