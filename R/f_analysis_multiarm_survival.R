@@ -1064,8 +1064,8 @@ NULL
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
         "or TrialDesignConditionalDunnett",
-        functionName = ".getConditionalPowerSurvivalMultiArm", 
-		parameter ="design"
+        functionName = ".getConditionalPowerSurvivalMultiArm",
+        parameter = "design"
     )
 }
 

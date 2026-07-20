@@ -383,8 +383,8 @@ NULL
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
-                        functionName = ".getSimulatedStageSurvivalEnrichment", 
-		parameter ="calcEventsFunction", value = calcEventsFunction
+                        functionName = ".getSimulatedStageSurvivalEnrichment",
+                        parameter = "calcEventsFunction", value = calcEventsFunction
                     )
                 }
 
@@ -838,8 +838,9 @@ getSimulationEnrichmentSurvivalBasic <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", 
-		functionName = "getSimulationEnrichmentSurvivalBasic")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
+            functionName = "getSimulationEnrichmentSurvivalBasic"
+        )
     }
 
     data <- data.frame(

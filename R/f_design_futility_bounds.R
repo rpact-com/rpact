@@ -35,8 +35,8 @@ NULL
                 if (isTRUE(showWarnings)) {
                     warning(
                         "'information[1]' (", information1, ") will be ignored ",
-                        "because it is not required for the conversion from ", 
-                        .vQuote(sourceScale), " to ", .vQuote(targetScale), 
+                        "because it is not required for the conversion from ",
+                        .vQuote(sourceScale), " to ", .vQuote(targetScale),
                         call. = FALSE
                     )
                 }
@@ -46,8 +46,8 @@ NULL
                 if (isTRUE(showWarnings)) {
                     warning(
                         "'information[2]' (", information2, ") will be ignored ",
-                        "because it is not required for the conversion from ", 
-                        .vQuote(sourceScale), " to ", .vQuote(targetScale), 
+                        "because it is not required for the conversion from ",
+                        .vQuote(sourceScale), " to ", .vQuote(targetScale),
                         call. = FALSE
                     )
                 }
@@ -289,11 +289,11 @@ summary.FutilityBounds <- function(object, ...) {
     if (!all(is.na(futilityBoundsFromArgs))) {
         if (is(futilityBoundsFromArgs, "FutilityBounds") &&
                 !identical(attr(futilityBoundsFromArgs, "targetScale")$value, targetScale)) {
-            stopIllegalArgument(.pQuote(futilityBoundsName), " (", .arrayToString(futilityBoundsFromArgs), ") ", 
+            stopIllegalArgument(.pQuote(futilityBoundsName), " (", .arrayToString(futilityBoundsFromArgs), ") ",
                 "must be on ", .vQuote(targetScale), " scale or converted to ", .vQuote(targetScale), " scale",
                 functionName = ".getFutilityBoundsFromArgs",
-                parameter = futilityBoundsName, value = futilityBoundsFromArgs, 
-		relatedParameter =futilityBoundsScaleName,
+                parameter = futilityBoundsName, value = futilityBoundsFromArgs,
+                relatedParameter = futilityBoundsScaleName,
                 relatedValue = targetScale
             )
         }
@@ -660,12 +660,12 @@ getFutilityBounds <- function(
         return(.addFutilityBoundParameterTypes(result, args))
     }
 
-    stopIllegalArgument("conversion from ", .vQuote(sourceScale), " to ", 
+    stopIllegalArgument("conversion from ", .vQuote(sourceScale), " to ",
         .vQuote(targetScale), " not implemented",
         functionName = "getFutilityBounds",
-        parameter = "sourceScale", value = sourceScale, 
-		relatedParameter ="targetScale", 
-		relatedValue = targetScale
+        parameter = "sourceScale", value = sourceScale,
+        relatedParameter = "targetScale",
+        relatedValue = targetScale
     )
 }
 
@@ -720,12 +720,16 @@ getFutilityBounds <- function(
             }
         },
         warning = function(w) {
-            warning("Failed to calculate ", sQuote(sourceScale), " source value from ", 
-                sourceValue, ": ", w$message, call. = FALSE)
+            warning("Failed to calculate ", sQuote(sourceScale), " source value from ",
+                sourceValue, ": ", w$message,
+                call. = FALSE
+            )
         },
         error = function(e) {
-            warning("Failed to calculate ", sQuote(sourceScale), " source value from ", 
-                sourceValue, ": ", e$message, call. = FALSE)
+            warning("Failed to calculate ", sQuote(sourceScale), " source value from ",
+                sourceValue, ": ", e$message,
+                call. = FALSE
+            )
         }
     )
 

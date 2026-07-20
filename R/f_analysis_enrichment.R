@@ -266,8 +266,8 @@ NULL
     }
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        functionName = ".getConditionalRejectionProbabilitiesEnrichment", 
-		parameter ="design"
+        functionName = ".getConditionalRejectionProbabilitiesEnrichment",
+        parameter = "design"
     )
 }
 

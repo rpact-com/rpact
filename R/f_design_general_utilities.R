@@ -373,8 +373,8 @@ NULL
 .validateUserAlphaSpending <- function(design) {
     .assertIsTrialDesign(design)
     .assertDesignParameterExists(design, "userAlphaSpending", NA_real_,
-        relatedParameter = "typeOfDesign", 
-		relatedValue = design$typeOfDesign
+        relatedParameter = "typeOfDesign",
+        relatedValue = design$typeOfDesign
     )
 
     if ((design$isUserDefinedParameter("informationRates") ||
@@ -387,9 +387,9 @@ NULL
             ),
             parameter = "userAlphaSpending",
             value = length(design$userAlphaSpending), constraint = "length must equal length of informationRates",
-            relatedParameter = "informationRates", 
-		relatedValue = length(design$informationRates), 
-		functionName = ".validateUserAlphaSpending"
+            relatedParameter = "informationRates",
+            relatedValue = length(design$informationRates),
+            functionName = ".validateUserAlphaSpending"
         )
     }
 
@@ -400,9 +400,9 @@ NULL
                 design$kMax
             ),
             parameter = "userAlphaSpending", value = length(design$userAlphaSpending), constraint = "length must equal kMax",
-            relatedParameter = "kMax", 
-		relatedValue = design$kMax, 
-		functionName = ".validateUserAlphaSpending"
+            relatedParameter = "kMax",
+            relatedValue = design$kMax,
+            functionName = ".validateUserAlphaSpending"
         )
     }
 
@@ -428,8 +428,8 @@ NULL
                 design$kMax, design$alpha
             ),
             parameter = "userAlphaSpending", value = design$userAlphaSpending, constraint = "0 <= alpha_1 <= .. <= alpha_kMax <= alpha",
-            relatedParameter = c("kMax", "alpha"), 
-		relatedValue = list(kMax = design$kMax, alpha = design$alpha),
+            relatedParameter = c("kMax", "alpha"),
+            relatedValue = list(kMax = design$kMax, alpha = design$alpha),
             functionName = ".validateUserAlphaSpending"
         )
     }
@@ -445,8 +445,8 @@ NULL
 .validateUserBetaSpending <- function(design) {
     .assertIsTrialDesign(design)
     .assertDesignParameterExists(design, "userBetaSpending", NA_real_,
-        relatedParameter = "typeBetaSpending", 
-		relatedValue = design$typeBetaSpending
+        relatedParameter = "typeBetaSpending",
+        relatedValue = design$typeBetaSpending
     )
 
     if ((design$isUserDefinedParameter("informationRates") ||
@@ -459,9 +459,9 @@ NULL
             ),
             parameter = "userBetaSpending",
             value = length(design$userBetaSpending), constraint = "length must equal length of informationRates",
-            relatedParameter = "informationRates", 
-		relatedValue = length(design$informationRates), 
-		functionName = ".validateUserBetaSpending"
+            relatedParameter = "informationRates",
+            relatedValue = length(design$informationRates),
+            functionName = ".validateUserBetaSpending"
         )
     }
 
@@ -472,22 +472,24 @@ NULL
                 design$kMax
             ),
             parameter = "userBetaSpending", value = length(design$userBetaSpending), constraint = "length must equal kMax",
-            relatedParameter = "kMax", 
-		relatedValue = design$kMax, 
-		functionName = ".validateUserBetaSpending"
+            relatedParameter = "kMax",
+            relatedValue = design$kMax,
+            functionName = ".validateUserBetaSpending"
         )
     }
 
     if (length(design$userBetaSpending) < 2 || length(design$userBetaSpending) > C_KMAX_UPPER_BOUND) {
-        stopArgumentLengthOutOfBounds(sprintf(
-            "length of 'userBetaSpending' (%s) is out of bounds [2; %s]", length(design$userBetaSpending),
-            C_KMAX_UPPER_BOUND
-        ), 
-		parameter ="userBetaSpending", value = length(design$userBetaSpending), constraint = paste0(
-            "length must be in [2; ",
-            C_KMAX_UPPER_BOUND, "]"
-        ), lowerBound = 2, upperBound = C_KMAX_UPPER_BOUND, 
-		functionName = ".validateUserBetaSpending")
+        stopArgumentLengthOutOfBounds(
+            sprintf(
+                "length of 'userBetaSpending' (%s) is out of bounds [2; %s]", length(design$userBetaSpending),
+                C_KMAX_UPPER_BOUND
+            ),
+            parameter = "userBetaSpending", value = length(design$userBetaSpending), constraint = paste0(
+                "length must be in [2; ",
+                C_KMAX_UPPER_BOUND, "]"
+            ), lowerBound = 2, upperBound = C_KMAX_UPPER_BOUND,
+            functionName = ".validateUserBetaSpending"
+        )
     }
 
     if (.isUndefinedArgument(design$beta)) {
@@ -510,8 +512,8 @@ NULL
                 design$kMax, design$beta
             ),
             parameter = "userBetaSpending", value = design$userBetaSpending, constraint = "0 <= beta_1 <= .. <= beta_kMax <= beta",
-            relatedParameter = c("kMax", "beta"), 
-		relatedValue = list(kMax = design$kMax, beta = design$beta),
+            relatedParameter = c("kMax", "beta"),
+            relatedValue = list(kMax = design$kMax, beta = design$beta),
             functionName = ".validateUserBetaSpending"
         )
     }
@@ -593,8 +595,8 @@ NULL
         stopIllegalArgument("length of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime), ") must be equal to length of 'piecewiseLambda' (",
             .arrayToString(piecewiseLambda), ")",
             functionName = ".getPiecewiseExponentialDistributionSingleTime",
-            parameter = "piecewiseSurvivalTime", value = piecewiseSurvivalTime, 
-		relatedParameter ="piecewiseLambda",
+            parameter = "piecewiseSurvivalTime", value = piecewiseSurvivalTime,
+            relatedParameter = "piecewiseLambda",
             relatedValue = piecewiseLambda
         )
     }
@@ -602,8 +604,9 @@ NULL
     piecewiseSurvivalTime <- .getPiecewiseExpStartTimesWithoutLeadingZero(piecewiseSurvivalTime)
 
     if (kappa != 1) {
-        stopIllegalArgument("Weibull distribution cannot be used for piecewise survival definition", 
-		functionName = ".getPiecewiseExponentialDistributionSingleTime")
+        stopIllegalArgument("Weibull distribution cannot be used for piecewise survival definition",
+            functionName = ".getPiecewiseExponentialDistributionSingleTime"
+        )
     }
 
     len <- length(piecewiseSurvivalTime)
@@ -636,8 +639,9 @@ NULL
 .getPiecewiseExponentialSingleQuantile <- function(quantile, piecewiseLambda, piecewiseSurvivalTime, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa <= 0) {
-            stopIllegalArgument("kappa needs to a positive number", 
-		functionName = ".getPiecewiseExponentialSingleQuantile")
+            stopIllegalArgument("kappa needs to a positive number",
+                functionName = ".getPiecewiseExponentialSingleQuantile"
+            )
         }
 
         # kappa is required here because quantiles depend on the Weibull shape parameter
@@ -713,10 +717,10 @@ NULL
     if (!all(is.na(piecewiseLambda)) && is.list(piecewiseSurvivalTime)) {
         stopConflictingArguments("'piecewiseSurvivalTime' needs to be a numeric vector and not a list ", "because 'piecewiseLambda' (",
             piecewiseLambda, ") is defined separately",
-            functionName = ".getPiecewiseExponentialSettings", 
-		parameter ="piecewiseSurvivalTime",
-            relatedParameter = "piecewiseLambda", 
-		relatedValue = piecewiseLambda, value = piecewiseSurvivalTime
+            functionName = ".getPiecewiseExponentialSettings",
+            parameter = "piecewiseSurvivalTime",
+            relatedParameter = "piecewiseLambda",
+            relatedValue = piecewiseLambda, value = piecewiseSurvivalTime
         )
     }
 
@@ -820,8 +824,9 @@ getPiecewiseExponentialDistribution <- function(
     .warnInCaseOfUnknownArguments(functionName = "getPiecewiseExponentialDistribution", ...)
     time <- .assertIsNumericVector(time, "time")
     if (any(time < 0)) {
-        stopIllegalArgument("time needs to be a non-negative number", 
-		functionName = "getPiecewiseExponentialDistribution")
+        stopIllegalArgument("time needs to be a non-negative number",
+            functionName = "getPiecewiseExponentialDistribution"
+        )
     }
 
     settings <- .getPiecewiseExponentialSettings(
@@ -858,8 +863,9 @@ getPiecewiseExponentialQuantile <- function(
     .warnInCaseOfUnknownArguments(functionName = "getPiecewiseExponentialQuantile", ...)
     quantile <- .assertIsNumericVector(quantile, "quantile")
     if (any(quantile < 0) || any(quantile > 1)) {
-        stopIllegalArgument("quantile needs to be within [0; 1]", 
-		functionName = "getPiecewiseExponentialQuantile")
+        stopIllegalArgument("quantile needs to be within [0; 1]",
+            functionName = "getPiecewiseExponentialQuantile"
+        )
     }
 
     settings <- .getPiecewiseExponentialSettings(
@@ -976,9 +982,10 @@ getLambdaByPi <- function(
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
     for (value in piValue) {
         if (!is.na(value) && value > 1 - 1e-16 && value < 1 + 1e-16) {
-            stopIllegalArgument("'pi' must be != 1", 
-		functionName = "getLambdaByPi", 
-		parameter ="pi")
+            stopIllegalArgument("'pi' must be != 1",
+                functionName = "getLambdaByPi",
+                parameter = "pi"
+            )
         }
     }
 
@@ -1011,8 +1018,8 @@ getLambdaByMedian <- function(median, kappa = 1) {
     stopIllegalArgument("invalid length of ", sQuote(paramName2), ". ", "Expected length 1 or the same length as ",
         sQuote(paramName1), " (", length(paramValue1), "), but got length ", length(paramValue2), ".",
         functionName = ".assertHasCompatibleLength",
-        parameter = paramName2, 
-		relatedParameter =paramName1
+        parameter = paramName2,
+        relatedParameter = paramName1
     )
 }
 
@@ -1181,9 +1188,9 @@ getMedianByPi <- function(
 .getDesignParametersToShow <- function(parameterSet) {
     if (is.null(parameterSet[[".design"]])) {
         stopRuntimeIssue("'parameterSet' (", .getClassName(parameterSet), ") does not contain '.design' field",
-            functionName = ".getDesignParametersToShow", 
-		parameter ="parameterSet", value = parameterSet, 
-		relatedParameter =".design"
+            functionName = ".getDesignParametersToShow",
+            parameter = "parameterSet", value = parameterSet,
+            relatedParameter = ".design"
         )
     }
 

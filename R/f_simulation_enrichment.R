@@ -152,18 +152,18 @@ NULL
         if (length(selectedPopulations) != gMax) {
             stopIllegalArgument(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")",
                 parameter = "selectPopulationsFunction",
-                value = selectedPopulations, constraint = paste0("logical vector of length ", gMax), 
-		relatedParameter ="gMax",
-                relatedValue = gMax, 
-		functionName = ".selectPopulations"
+                value = selectedPopulations, constraint = paste0("logical vector of length ", gMax),
+                relatedParameter = "gMax",
+                relatedValue = gMax,
+                functionName = ".selectPopulations"
             )
         }
         if (!is.logical(selectedPopulations)) {
             stopIllegalArgument(msg, "the output must be a logical vector (is ", .getClassName(selectedPopulations),
                 ")",
                 parameter = "selectPopulationsFunction", value = selectedPopulations, constraint = "logical vector",
-                relatedParameter = "class of selected populations", 
-		relatedValue = .getClassName(selectedPopulations),
+                relatedParameter = "class of selected populations",
+                relatedValue = .getClassName(selectedPopulations),
                 functionName = ".selectPopulations"
             )
         }
@@ -486,10 +486,10 @@ NULL
     if (endpoint == "survival" && is.null(effectList$hazardRatios) && !is.null(effectList$piTreatments)) {
         if (is.null(effectList$piControls)) {
             stopMissingArgument(sQuote("effectList$piControls"), " must be specified when 'effectList$piTreatments' is used",
-                functionName = ".createSimulationResultsEnrichmentObject", 
-		parameter ="effectList$piControls", value = effectList$piControls,
-                relatedParameter = "effectList$piTreatments", 
-		relatedValue = effectList$piTreatments
+                functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "effectList$piControls", value = effectList$piControls,
+                relatedParameter = "effectList$piTreatments",
+                relatedValue = effectList$piTreatments
             )
         }
 
@@ -547,8 +547,9 @@ NULL
     }
 
     if (!stratifiedAnalysis && endpoint %in% c("means")) {
-        stopIllegalArgument("For testing means, only stratified analysis is supported", 
-		functionName = ".createSimulationResultsEnrichmentObject")
+        stopIllegalArgument("For testing means, only stratified analysis is supported",
+            functionName = ".createSimulationResultsEnrichmentObject"
+        )
     }
 
     kMax <- design$kMax
@@ -623,8 +624,8 @@ NULL
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {
             stopIllegalArgument("'plannedEvents' (", .arrayToString(plannedEvents), ") must have length ", kMax,
-                functionName = ".createSimulationResultsEnrichmentObject", 
-		parameter ="plannedEvents", value = plannedEvents
+                functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "plannedEvents", value = plannedEvents
             )
         }
         .assertIsInClosedInterval(plannedEvents, "plannedEvents", lower = 1, upper = NULL)
@@ -753,8 +754,8 @@ NULL
                 stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than 'minNumberOfEventsPerStage' (",
                     .arrayToString(minNumberOfEventsPerStage), ")",
                     functionName = ".createSimulationResultsEnrichmentObject",
-                    parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage, 
-		relatedParameter ="minNumberOfEventsPerStage",
+                    parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage,
+                    relatedParameter = "minNumberOfEventsPerStage",
                     relatedValue = minNumberOfEventsPerStage
                 )
             }
@@ -898,8 +899,8 @@ NULL
     } else if (length(allocationRatioPlanned) != design$kMax) {
         stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
             design$kMax, " (kMax)",
-            functionName = ".createSimulationResultsEnrichmentObject", 
-		parameter ="allocationRatioPlanned",
+            functionName = ".createSimulationResultsEnrichmentObject",
+            parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
         )
     }

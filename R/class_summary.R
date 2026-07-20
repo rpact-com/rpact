@@ -31,16 +31,16 @@ SummaryItem <- R6::R6Class("SummaryItem",
             if (!is.null(self$legendEntry) && length(self$legendEntry) > 0) {
                 if (is.null(names(self$legendEntry))) {
                     stopIllegalArgument(sQuote("legendEntry"), " must be a named list",
-                        functionName = "initialize", 
-		parameter ="legendEntry",
+                        functionName = "initialize",
+                        parameter = "legendEntry",
                         value = legendEntry
                     )
                 }
                 for (l in self$legendEntry) {
                     if (length(l) == 0) {
                         stopIllegalArgument(sQuote("legendEntry"), " must be not empty",
-                            functionName = "initialize", 
-		parameter ="legendEntry",
+                            functionName = "initialize",
+                            parameter = "legendEntry",
                             value = legendEntry
                         )
                     }
@@ -578,9 +578,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             if (is.list(parameterSet) && is.matrix(values)) {
                 parameterSet <- parameterSet[["parameterSet"]]
                 if (is.null(parameterSet)) {
-                    stopRuntimeIssue("'parameterSet' must be added to list", 
-		functionName = "addParameter", 
-		parameter ="parameterSet", value = parameterSet)
+                    stopRuntimeIssue("'parameterSet' must be added to list",
+                        functionName = "addParameter",
+                        parameter = "parameterSet", value = parameterSet
+                    )
                 }
             }
 
@@ -756,8 +757,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                             numberOfVariants <- length(variedParameterValues)
                         } else {
                             stopRuntimeIssue("varied parameter identification ", "is not implemented for ", .getClassName(parameterSet),
-                                functionName = "addParameter", 
-		parameter ="parameterSet", value = parameterSet
+                                functionName = "addParameter",
+                                parameter = "parameterSet", value = parameterSet
                             )
                         }
                         variedParameterCaption <- tolower(variedParameterCaption)
@@ -2865,8 +2866,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     if (!inherits(object, "AnalysisResults")) {
         stopIllegalArgument("'object' must be a valid analysis result object (is class ", .getClassName(object),
             ")",
-            functionName = ".createSummaryAnalysisResults", 
-		parameter ="object", value = object
+            functionName = ".createSummaryAnalysisResults",
+            parameter = "object", value = object
         )
     }
 
@@ -3459,8 +3460,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     } else {
         stopIllegalArgument("'object' must be a valid design, design plan, ", "or simulation result object (is class ",
             .getClassName(object), ")",
-            functionName = ".createSummaryDesignPlan", 
-		parameter ="object", value = object
+            functionName = ".createSummaryDesignPlan",
+            parameter = "object", value = object
         )
     }
 

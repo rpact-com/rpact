@@ -1216,14 +1216,13 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
             }
         }
     }
-    
+
     if (parameterName %in% c("rejectAtLeastOne", "rejectedArmsPerStage") &&
             inherits(obj, "SimulationResultsMultiArmSurvival") &&
             !is.null(obj$activeArms) && obj$activeArms == 1) {
         if (identical(parameterName, "rejectAtLeastOne")) {
             paramCaption <- "Overall reject"
-        }
-        else if (identical(parameterName, "rejectedArmsPerStage")) {
+        } else if (identical(parameterName, "rejectedArmsPerStage")) {
             paramCaption <- "Reject per stage"
         }
     }

@@ -499,8 +499,9 @@ getStageResults <- function(
 getTestActions <- function(stageResults, ...) {
     .warnInCaseOfUnknownArguments(functionName = "getTestActions", ...)
 
-    stageResults <- .getStageResultsObject(stageResults, 
-		functionName = "getTestActions", ...)
+    stageResults <- .getStageResultsObject(stageResults,
+        functionName = "getTestActions", ...
+    )
     .assertIsStageResultsNonMultiHypotheses(stageResults)
     design <- stageResults$.design
     criticalValues <- .getCriticalValues(design)
@@ -864,8 +865,10 @@ getConditionalPower <- function(
         ...,
         nPlanned,
         allocationRatioPlanned = 1) {
-    stageResults <- .getStageResultsObject(stageResults = stageResults, 
-		functionName = "getConditionalPower", ...)
+    stageResults <- .getStageResultsObject(
+        stageResults = stageResults,
+        functionName = "getConditionalPower", ...
+    )
     .assertIsValidAllocationRatioPlanned(allocationRatioPlanned, stageResults$.dataInput$getNumberOfGroups())
 
     conditionalPower <- NULL
@@ -1042,8 +1045,9 @@ getConditionalPower <- function(
 getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
     .assertIsValidTolerance(tolerance)
     .assertIsValidTolerance(tolerance)
-    stageResults <- .getStageResultsObject(stageResults, 
-		functionName = "getRepeatedPValues", ...)
+    stageResults <- .getStageResultsObject(stageResults,
+        functionName = "getRepeatedPValues", ...
+    )
 
     if (.isEnrichmentStageResults(stageResults)) {
         return(.getRepeatedPValuesEnrichment(stageResults = stageResults, tolerance = tolerance, ...))
@@ -1093,7 +1097,7 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
 
     if (.isTrialDesignFisher(design)) {
         if (design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
-            warning("Repeated p-values not available for 'method' = ", 
+            warning("Repeated p-values not available for 'method' = ",
                 .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
                 call. = FALSE
             )
@@ -1479,8 +1483,9 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
 #' @export
 #'
 getFinalPValue <- function(stageResults, ...) {
-    stageResults <- .getStageResultsObject(stageResults, 
-		functionName = "getFinalPValue", ...)
+    stageResults <- .getStageResultsObject(stageResults,
+        functionName = "getFinalPValue", ...
+    )
 
     .assertIsStageResultsNonMultiHypotheses(stageResults)
 

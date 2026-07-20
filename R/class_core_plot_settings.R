@@ -701,8 +701,8 @@ PlotSettings <- R6::R6Class("PlotSettings",
             }
             if (!(length(margin) %in% c(1, 4))) {
                 stopRuntimeIssue("'margin' (", .arrayToString(margin), ") must be a numeric vector with length 1 or 4",
-                    functionName = "setMarginAroundPlot", 
-		parameter ="margin", value = margin
+                    functionName = "setMarginAroundPlot",
+                    parameter = "margin", value = margin
                 )
             }
             p <- p + ggplot2::theme(plot.margin = ggplot2::unit(margin, "cm"))

@@ -143,8 +143,8 @@ SimulationResults <- R6::R6Class(
             } else {
                 if (is.null(showStatistics) || length(showStatistics) != 1) {
                     stopIllegalArgument("'showStatistics' (", .arrayToString(showStatistics), ") must be a single logical or character",
-                        functionName = ".show", 
-		parameter ="showStatistics", value = showStatistics
+                        functionName = ".show",
+                        parameter = "showStatistics", value = showStatistics
                     )
                 }
 

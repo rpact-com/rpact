@@ -25,7 +25,7 @@ NULL
     if (isTRUE(asCharacter)) {
         return(sys.calls()[[1]])
     }
-    
+
     if (!is.null(call)) {
         return(call)
     }

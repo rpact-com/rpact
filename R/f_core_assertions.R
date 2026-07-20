@@ -399,8 +399,10 @@ NULL
     }
 
     functionName <- paste(deparse(sys.call()), collapse = "")
-    .assertIsNumericVector(x, xName, naAllowed = naAllowed, 
-		functionName = functionName, call. = call.)
+    .assertIsNumericVector(x, xName,
+        naAllowed = naAllowed,
+        functionName = functionName, call. = call.
+    )
 
     if (is.null(upper) || is.na(upper)) {
         if (any(x < lower, na.rm = TRUE)) {
@@ -418,8 +420,8 @@ NULL
             parameter = xName, value = x, constraint = paste0(
                 sQuote(xName), " >= ", lower, " and ",
                 sQuote(xName), " <= ", upper
-            ), 
-		functionName = functionName, lowerBound = lower, upperBound = upper
+            ),
+            functionName = functionName, lowerBound = lower, upperBound = upper
         )
     }
 }
@@ -1531,8 +1533,8 @@ NULL
             value = informationRates, constraint = sprintf(
                 "must be strictly increasing: 0 < x_1 < .. < x_%s <= 1",
                 kMax
-            ), 
-		functionName = ".assertAreValidInformationRates"
+            ),
+            functionName = ".assertAreValidInformationRates"
         )
     }
 
@@ -1721,9 +1723,9 @@ NULL
     if (length(futilityBounds) != kMax - 1) {
         stopConflictingArguments("length of 'futilityBounds' (", length(futilityBounds), ") must be equal to 'kMax' (",
             kMax, ") - 1",
-            parameter = "futilityBounds", value = futilityBounds, 
-		relatedParameter ="kMax", 
-		relatedValue = kMax,
+            parameter = "futilityBounds", value = futilityBounds,
+            relatedParameter = "kMax",
+            relatedValue = kMax,
             functionName = ".assertAreValidFutilityBounds"
         )
     }
@@ -1738,8 +1740,8 @@ NULL
 .assertIsValidCipher <- function(key, value) {
     if (!(key %in% names(C_CIPHERS)) || (getCipheredValue(value) != C_CIPHERS[[key]])) {
         stopIllegalArgument("'token' and/or 'secret' unkown",
-            functionName = ".assertIsValidCipher", 
-		parameter ="token",
+            functionName = ".assertIsValidCipher",
+            parameter = "token",
             relatedParameter = "secret"
         )
     }
@@ -1905,8 +1907,8 @@ NULL
                 paste0("'nPlanned' (%s) is invalid: ", "length must be equal to %s (kMax - stage = %s - %s)"),
                 .arrayToString(nPlanned), kMax - stage, kMax, stage
             ),
-            functionName = ".assertIsValidNPlanned", 
-		parameter ="nPlanned",
+            functionName = ".assertIsValidNPlanned",
+            parameter = "nPlanned",
             value = nPlanned
         )
     }
@@ -2029,13 +2031,13 @@ NULL
 .warnInCaseOfUnusedArgument <- function(arg, argName, defaultValue, functionName) {
     if (!identical(arg, defaultValue)) {
         warning("Unused argument in ", functionName, "(...): ", .pQuote(argName), " = ", .arrayToString(
-                arg,
-                vectorLookAndFeelEnabled = (length(arg) > 1),
-                maxLength = 10,
-                encapsulate = !is.null(arg) && any(is.character(arg))
-            ),
-            " will be ignored",
-            call. = FALSE
+            arg,
+            vectorLookAndFeelEnabled = (length(arg) > 1),
+            maxLength = 10,
+            encapsulate = !is.null(arg) && any(is.character(arg))
+        ),
+        " will be ignored",
+        call. = FALSE
         )
     }
 }
@@ -2754,9 +2756,9 @@ NULL
                     "an argument with name ", .pQuote(argNameExpected),
                     parameter = funArgName, value = fun, constraint = paste0(
                         "must contain an argument with name ", .pQuote(argNameExpected)
-                    ), 
-		functionName = ".assertIsValidFunction", 
-		relatedParameter ="functionName",
+                    ),
+                    functionName = ".assertIsValidFunction",
+                    relatedParameter = "functionName",
                     relatedValue = functionName
                 )
             }
@@ -2789,7 +2791,7 @@ NULL
     }
 
     if (showUnusedArgumentsMessage && length(unusedArgs) > 0) {
-        message("Note that the following arguments can optionally be used in ", 
+        message("Note that the following arguments can optionally be used in ",
             .pQuote(funArgName), " (", functionName, "): \n",
             .arrayToString(unusedArgs),
             call. = FALSE
@@ -2859,7 +2861,7 @@ NULL
         if (length(parameterValues) != 1 || !is.na(parameterValues)) {
             if (calcSubjectsFunctionEnabled) {
                 warning(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
-                    "will be ignored because neither 'conditionalPower' nor ", 
+                    "will be ignored because neither 'conditionalPower' nor ",
                     .pQuote(calcSubjectsFunctionName), " is defined",
                     call. = FALSE
                 )
@@ -3309,7 +3311,7 @@ NULL
         )
     }
     if (.isTrialDesignConditionalDunnett(design) && varianceOption != C_VARIANCE_OPTION_DUNNETT) {
-        stopIllegalArgument("variance option (", .pQuote(varianceOption), ") must be ", 
+        stopIllegalArgument("variance option (", .pQuote(varianceOption), ") must be ",
             .pQuote(C_VARIANCE_OPTION_DUNNETT), " because conditional Dunnett test was specified as design",
             functionName = ".assertIsValidVarianceOptionMultiArmed",
             parameter = "varianceOption",
@@ -3569,8 +3571,8 @@ NULL
     .assertIsValidMatrix(decisionMatrix, "decisionMatrix", naAllowed = FALSE)
     if (!(nrow(decisionMatrix) %in% c(2, 4))) {
         stopIllegalArgument("'decisionMatrix' must have two or four rows",
-            functionName = ".assertIsValidDecisionMatrix", 
-		parameter ="decisionMatrix",
+            functionName = ".assertIsValidDecisionMatrix",
+            parameter = "decisionMatrix",
             value = decisionMatrix
         )
     }
@@ -3650,8 +3652,8 @@ NULL
     if (typeOfShape == "userDefined") {
         effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
             expectedNumberOfColumns = gMax, naAllowed = FALSE, returnSingleValueAsMatrix = TRUE,
-            relatedParameter = "typeOfShape", 
-		relatedValue = typeOfShape
+            relatedParameter = "typeOfShape",
+            relatedValue = typeOfShape
         )
         .assertIsNumericVector(valueMaxVector, valueMaxVectorName, naAllowed = TRUE)
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
@@ -3675,13 +3677,13 @@ NULL
         if (!is.null(doseLevels) && !anyNA(doseLevels)) {
             warning("'doseLevels' (", .arrayToString(doseLevels), ") ",
                 "will be ignored because 'typeOfShape' ",
-                "is defined as ", .pQuote(typeOfShape), 
+                "is defined as ", .pQuote(typeOfShape),
                 call. = FALSE
             )
         }
     } else if (!is.null(effectMatrix)) {
         warning("'effectMatrix' will be ignored because 'typeOfShape' ",
-            "is defined as ", .pQuote(typeOfShape), 
+            "is defined as ", .pQuote(typeOfShape),
             call. = FALSE
         )
     }
@@ -3942,8 +3944,8 @@ NULL
     if (sided != 1 && sided != 2) {
         stopIllegalArgument("'sided' (", sided, ") must be defined as 1 or 2",
             parameter = "sided", value = sided,
-            constraint = "must be defined as 1 or 2", 
-		functionName = ".assertIsValidEffectCountData"
+            constraint = "must be defined as 1 or 2",
+            functionName = ".assertIsValidEffectCountData"
         )
     }
     .assertIsSingleNumber(lambda, "lambda", naAllowed = TRUE)
@@ -4317,7 +4319,7 @@ NULL
 
     warning(
         sQuote(argumentName), valueStr, " will be ignored ",
-        "because it is not required for the conversion from ", 
+        "because it is not required for the conversion from ",
         .pQuote(sourceScale), " to ", .pQuote(targetScale),
         call. = FALSE
     )

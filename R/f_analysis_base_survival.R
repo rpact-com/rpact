@@ -568,11 +568,13 @@ NULL
 
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stopRuntimeIssue(sprintf(
-                paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
-                stage, stageResults[[firstParameterName]][stage], secondValue, firstValue, theta
-            ), 
-		functionName = ".getUpperLowerThetaSurvival")
+            stopRuntimeIssue(
+                sprintf(
+                    paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                    stage, stageResults[[firstParameterName]][stage], secondValue, firstValue, theta
+                ),
+                functionName = ".getUpperLowerThetaSurvival"
+            )
         }
     }
 

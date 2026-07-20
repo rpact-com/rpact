@@ -23,8 +23,8 @@ NULL
                 anyNA(simulationResults$alternative) ||
                 length(simulationResults$alternative) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", 
-		parameter ="alternative"
+                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
+                parameter = "alternative"
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsRates")) {
@@ -32,8 +32,8 @@ NULL
                 anyNA(simulationResults$pi1) ||
                 length(simulationResults$pi1) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
-                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", 
-		parameter ="pi1"
+                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
+                parameter = "pi1"
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsSurvival")) {
@@ -41,14 +41,14 @@ NULL
                 anyNA(simulationResults$hazardRatio) ||
                 length(simulationResults$hazardRatio) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined or derived",
-                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", 
-		parameter ="hazardRatio"
+                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
+                parameter = "hazardRatio"
             )
         }
         if (length(simulationResults$hazardRatio) != length(simulationResults$overallReject)) {
             stopIllegalArgument("plot type ", plotType, " is not available for piecewise survival (only type 13 and 14)",
-                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting", 
-		parameter ="plotType",
+                functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
+                parameter = "plotType",
                 value = plotType
             )
         }
@@ -234,16 +234,16 @@ NULL
 
     if (type %in% c(1:3) && !multiArmEnabled && !enrichmentEnabled) {
         stopIllegalArgument("'type' (", type, ") is not available for non-multi-arm/non-enrichment simulation results (type must be > 3)",
-            functionName = ".plotSimulationResults", 
-		parameter ="type", value = type
+            functionName = ".plotSimulationResults",
+            parameter = "type", value = type
         )
     }
 
     if ((!survivalEnabled || multiArmEnabled || enrichmentEnabled) && type %in% c(10:14)) {
         if (multiArmEnabled || enrichmentEnabled) {
             stopIllegalArgument("'type' (", type, ") is only available for non-multi-arm/non-enrichment survival simulation results",
-                functionName = ".plotSimulationResults", 
-		parameter ="type", value = type
+                functionName = ".plotSimulationResults",
+                parameter = "type", value = type
             )
         } else {
             stopIllegalArgument("'type' (", type, ") is only available for survival simulation results",
@@ -276,8 +276,8 @@ NULL
             discreteXAxis <- effectDataList$discreteXAxis
             if (length(xValues) <= 1) {
                 stopIllegalArgument("2 ore more situations must be specifed in ", sQuote(paste0("effectList$", effectDataList$effectMatrixName)),
-                    functionName = ".plotSimulationResults", 
-		parameter =paste0("effectList$", effectDataList$effectMatrixName)
+                    functionName = ".plotSimulationResults",
+                    parameter = paste0("effectList$", effectDataList$effectMatrixName)
                 )
             }
         }
@@ -1004,8 +1004,9 @@ plot.SimulationResults <- function(
     if (all(is.na(type))) {
         type <- na.omit(getAvailablePlotTypes(x))
         if (length(type) == 0) {
-            stopIllegalArgument("not plot type available", 
-		functionName = "plot.SimulationResults")
+            stopIllegalArgument("not plot type available",
+                functionName = "plot.SimulationResults"
+            )
         }
 
         type <- type[1]

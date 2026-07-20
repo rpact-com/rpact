@@ -120,16 +120,17 @@ writeKeyValueFile <- function(
     .assertIsSingleLogical(safeKeyCheck, "safeKeyCheck")
 
     if (!is.list(keyValueList)) {
-        stopIllegalArgument("'keyValueList' must be a list()", 
-		functionName = "writeKeyValueFile", 
-		parameter ="keyValueList", value = keyValueList)
+        stopIllegalArgument("'keyValueList' must be a list()",
+            functionName = "writeKeyValueFile",
+            parameter = "keyValueList", value = keyValueList
+        )
     }
 
     keyNames <- names(keyValueList)
     if (is.null(keyNames) || any(!nzchar(keyNames))) {
         stopIllegalArgument("'keyValueList' must be a named list()",
-            functionName = "writeKeyValueFile", 
-		parameter ="keyValueList",
+            functionName = "writeKeyValueFile",
+            parameter = "keyValueList",
             value = keyValueList
         )
     }
@@ -144,8 +145,9 @@ writeKeyValueFile <- function(
     if (any(isInvalidValue)) {
         stopIllegalArgument("all values must be length-1 atomic (no lists/vectors). Problem keys: ", paste(names(keyValueList)[isInvalidValue],
             collapse = ", "
-        ), 
-		functionName = "writeKeyValueFile")
+        ),
+        functionName = "writeKeyValueFile"
+        )
     }
 
     if (file.exists(filePath) && !overwrite) {
@@ -183,8 +185,9 @@ writeKeyValueFile <- function(
 
     convertValueToString <- function(value) {
         if (length(value) != 1L) {
-            stopRuntimeIssue("value must be length 1", 
-		functionName = "convertValueToString")
+            stopRuntimeIssue("value must be length 1",
+                functionName = "convertValueToString"
+            )
         }
 
         if (is.na(value)) {
@@ -325,9 +328,10 @@ readKeyValueFile <- function(
     duplicateKeys <- match.arg(duplicateKeys)
 
     if (!file.exists(filePath)) {
-        stopIllegalArgument("file not found: ", sQuote(filePath), 
-		functionName = "readKeyValueFile", 
-		parameter =filePath)
+        stopIllegalArgument("file not found: ", sQuote(filePath),
+            functionName = "readKeyValueFile",
+            parameter = filePath
+        )
     }
 
     con <- file(filePath, open = "r", encoding = "UTF-8")
@@ -430,9 +434,10 @@ readKeyValueFile <- function(
 
         if (key %in% seenKeys) {
             if (duplicateKeys == "error") {
-                stopRuntimeIssue("duplicate key in file: ", sQuote(key), 
-		functionName = "readKeyValueFile", 
-		parameter =key)
+                stopRuntimeIssue("duplicate key in file: ", sQuote(key),
+                    functionName = "readKeyValueFile",
+                    parameter = key
+                )
             }
             if (duplicateKeys == "first") {
                 next

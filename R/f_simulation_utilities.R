@@ -45,9 +45,10 @@ NULL
 .setSeed <- function(seed = NA_real_) {
     if (!is.null(seed) && !is.na(seed)) {
         if (is.na(as.integer(seed))) {
-            stopIllegalArgument("'seed' must be a valid integer", 
-		functionName = ".setSeed", 
-		parameter ="seed", value = seed)
+            stopIllegalArgument("'seed' must be a valid integer",
+                functionName = ".setSeed",
+                parameter = "seed", value = seed
+            )
         }
 
         set.seed(seed = seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
@@ -103,8 +104,8 @@ NULL
 
     if (!is.data.frame(data)) {
         stopIllegalArgument("'data' (", .getClassName(data), ") must be a data.frame or a simulation result object",
-            functionName = ".getSimulationParametersFromRawData", 
-		parameter ="data", value = data
+            functionName = ".getSimulationParametersFromRawData",
+            parameter = "data", value = data
         )
     }
 
@@ -182,8 +183,8 @@ NULL
     if (is.null(arg) || length(arg) == 0 || all(is.na(arg))) {
         stopIllegalArgument("'effectList' must contain ", sQuote(argName),
             functionName = ".assertArgumentFitsWithSubGroups",
-            parameter = "effectList", 
-		relatedParameter =argName
+            parameter = "effectList",
+            relatedParameter = argName
         )
     }
 
@@ -195,9 +196,9 @@ NULL
             argName <- paste0(argName, " (", .arrayToString(arg), ")")
         }
         stopIllegalArgument(argName, " must have ", length(subGroups), " columns given by the number of sub-groups",
-            functionName = ".assertArgumentFitsWithSubGroups", 
-		parameter =argName, 
-		relatedParameter ="subGroups",
+            functionName = ".assertArgumentFitsWithSubGroups",
+            parameter = argName,
+            relatedParameter = "subGroups",
             relatedValue = length(subGroups)
         )
     }
@@ -222,8 +223,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     if (is.null(effectList) || length(effectList) == 0 || !is.list(effectList)) {
         stopIllegalArgument(sQuote("effectList"), " must be a non-empty list",
-            functionName = ".getEffectData", 
-		parameter ="effectList",
+            functionName = ".getEffectData",
+            parameter = "effectList",
             value = effectList
         )
     }
@@ -231,8 +232,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     effectListNames <- names(effectList)
     if (is.null(effectListNames) || any(nchar(trimws(effectListNames)) == 0)) {
         stopIllegalArgument(sQuote("effectList"), " must be named. Current names are ", .arrayToString(effectListNames, encapsulate = TRUE),
-            functionName = ".getEffectData", 
-		parameter ="effectList", value = effectList
+            functionName = ".getEffectData",
+            parameter = "effectList", value = effectList
         )
     }
 
@@ -246,8 +247,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     if (!("subGroups" %in% effectListNames)) {
         stopIllegalArgument(sQuote("effectList"), " must contain ", sQuote("subGroups"),
-            functionName = ".getEffectData", 
-		parameter ="effectList",
+            functionName = ".getEffectData",
+            parameter = "effectList",
             relatedParameter = "subGroups", value = effectList
         )
     }
@@ -255,8 +256,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     subGroups <- effectList[["subGroups"]]
     if (is.null(subGroups) || length(subGroups) == 0 || (!is.character(subGroups) && !is.factor(subGroups))) {
         stopIllegalArgument(sQuote("effectList$subGroups"), " must be a non-empty character vector or factor",
-            functionName = ".getEffectData", 
-		parameter ="effectList$subGroups", value = effectList$subGroups
+            functionName = ".getEffectData",
+            parameter = "effectList$subGroups", value = effectList$subGroups
         )
     }
     if (is.factor(subGroups)) {
@@ -279,8 +280,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
                 2, "", "s"), " ", .arrayToString(subGroups[subGroups != "F"], encapsulate = TRUE, mode = "and"),
             " makes no sense and is not allowed (use remaining population 'R' instead of 'F')",
             functionName = ".getEffectData",
-            parameter = "F", 
-		relatedParameter ="R"
+            parameter = "F",
+            relatedParameter = "R"
             )
         }
         expectedSubGroups <- .createSubsetsByGMax(gMax, stratifiedInput = TRUE, all = FALSE)
@@ -292,8 +293,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     missingSubGroups <- expectedSubGroups[!(expectedSubGroups %in% subGroups)]
     if (length(missingSubGroups) > 0) {
         stopIllegalArgument(sQuote("effectList$subGroups"), " must contain ", .arrayToString(dQuote(missingSubGroups)),
-            functionName = ".getEffectData", 
-		parameter ="effectList$subGroups", value = effectList$subGroups,
+            functionName = ".getEffectData",
+            parameter = "effectList$subGroups", value = effectList$subGroups,
             relatedParameter = missingSubGroups
         )
     }
@@ -303,8 +304,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         stopIllegalArgument(sQuote("effectList$subGroups"), " must not contain ", .arrayToString(dQuote(unknownSubGroups)),
             " (valid sub-group names: ", .arrayToString(dQuote(expectedSubGroups)), ")",
             functionName = ".getEffectData",
-            parameter = "effectList$subGroups", value = effectList$subGroups, 
-		relatedParameter =unknownSubGroups
+            parameter = "effectList$subGroups", value = effectList$subGroups,
+            relatedParameter = unknownSubGroups
         )
     }
 
@@ -330,8 +331,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     if (is.na(matrixName)) {
         stopIllegalArgument(sQuote("effectList"), " must contain ", .arrayToString(matrixNames, mode = "or", encapsulate = TRUE),
-            functionName = ".getEffectData", 
-		parameter ="effectList", value = effectList
+            functionName = ".getEffectData",
+            parameter = "effectList", value = effectList
         )
     }
 
@@ -357,8 +358,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     if (nrow(matrixValues) == 0) {
         stopIllegalArgument(sQuote(paste0("effectList$", matrixName)), " must have one or more rows ", "reflecting the different situations to consider",
-            functionName = ".getEffectData", 
-		parameter =paste0("effectList$", matrixName)
+            functionName = ".getEffectData",
+            parameter = paste0("effectList$", matrixName)
         )
     }
     .assertArgumentFitsWithSubGroups(matrixValues, matrixName, subGroups)
@@ -475,8 +476,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (!grepl("SimulationResultsEnrichment", .getClassName(obj))) {
         stopIllegalArgument(sQuote("obj"), " must be a SimulationResultsEnrichment object (is ", .getClassName(obj),
             ")",
-            functionName = ".getSimulationEnrichmentEffectMatrixName", 
-		parameter ="obj", value = obj
+            functionName = ".getSimulationEnrichmentEffectMatrixName",
+            parameter = "obj", value = obj
         )
     }
 
@@ -512,8 +513,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (length(xValues) <= 1) {
         if (validatePlotCapability) {
             stopIllegalArgument("2 ore more situations must be specifed in ", sQuote(paste0("effectList$", effectMatrixName)),
-                functionName = ".getSimulationEnrichmentEffectData", 
-		parameter =paste0("effectList$", effectMatrixName)
+                functionName = ".getSimulationEnrichmentEffectData",
+                parameter = paste0("effectList$", effectMatrixName)
             )
         }
         valid <- FALSE
@@ -557,8 +558,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         stopIllegalArgument(sQuote(parameterName), " must contain ", ifelse(!is.na(expectedMatrixName), sQuote(expectedMatrixName),
             .arrayToString(matrixNames, mode = "or", encapsulate = TRUE)
         ),
-        functionName = ".getEffectList", 
-		parameter =parameterName,
+        functionName = ".getEffectList",
+        parameter = parameterName,
         relatedParameter = expectedMatrixName
         )
     }
@@ -578,8 +579,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             if (!("stDev" %in% effectDataNames)) {
                 stopIllegalArgument(sQuote(parameterName), " must contain ", sQuote("stDev"),
                     functionName = ".getEffectList",
-                    parameter = parameterName, 
-		relatedParameter ="stDev"
+                    parameter = parameterName,
+                    relatedParameter = "stDev"
                 )
             }
             effectList$stDevs <- c(effectList$stDevs, subData$stDev[1])
@@ -587,8 +588,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             if (!("piControl" %in% effectDataNames)) {
                 stopIllegalArgument(sQuote(parameterName), " must contain ", sQuote("piControl"),
                     functionName = ".getEffectList",
-                    parameter = parameterName, 
-		relatedParameter ="piControl"
+                    parameter = parameterName,
+                    relatedParameter = "piControl"
                 )
             }
             effectList$piControls <- c(effectList$piControls, subData$piControl[1])
@@ -657,15 +658,15 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (is.null(endpoint) || !(endpoint %in% c("means", "rates", "survival"))) {
         stopRuntimeIssue("'endpoint' (", endpoint, ") must be one of 'means', 'rates', or 'survival'",
             functionName = ".getValidatedEffectList",
-            parameter = "endpoint", value = endpoint, 
-		relatedParameter ="means"
+            parameter = "endpoint", value = endpoint,
+            relatedParameter = "means"
         )
     }
 
     if (is.null(effectList) || length(effectList) == 0 || (!is.list(effectList) && !is.data.frame(effectList))) {
         stopIllegalArgument("'effectList' must be a valid list or data.frame",
-            functionName = ".getValidatedEffectList", 
-		parameter ="effectList",
+            functionName = ".getValidatedEffectList",
+            parameter = "effectList",
             value = effectList
         )
     }
@@ -681,8 +682,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 .getVariedParameterSimulationMultiArm <- function(designPlan) {
     if (!grepl("SimulationResultsMultiArm", .getClassName(designPlan))) {
         stopIllegalArgument("'designPlan' (", .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'",
-            functionName = ".getVariedParameterSimulationMultiArm", 
-		parameter ="designPlan", value = designPlan,
+            functionName = ".getVariedParameterSimulationMultiArm",
+            parameter = "designPlan", value = designPlan,
             relatedParameter = "SimulationResultsMultiArm"
         )
     }
@@ -696,8 +697,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     }
 
     stopIllegalArgument("'designPlan' (", .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'",
-        functionName = ".getVariedParameterSimulationMultiArm", 
-		parameter ="designPlan", value = designPlan,
+        functionName = ".getVariedParameterSimulationMultiArm",
+        parameter = "designPlan", value = designPlan,
         relatedParameter = "SimulationResultsMultiArm"
     )
 }
@@ -771,8 +772,8 @@ getData <- function(x) {
     if (!inherits(x, "SimulationResults")) { #  or 'Dataset'
         stopIllegalArgument("'x' must be a 'SimulationResults' object; for example, use getSimulationMeans() to create one",
             functionName = "getData",
-            parameter = "x", 
-		relatedParameter ="SimulationResults", value = x
+            parameter = "x",
+            relatedParameter = "SimulationResults", value = x
         )
     }
 
@@ -789,8 +790,8 @@ getData.SimulationResults <- function(x) {
     if (!is.na(pi1)) {
         if (is.null(rawData[["pi1"]])) {
             stopRuntimeIssue("'rawData' does not contains a 'pi1' column",
-                functionName = ".getAggregatedDataByIterationNumber", 
-		parameter ="rawData",
+                functionName = ".getAggregatedDataByIterationNumber",
+                parameter = "rawData",
                 relatedParameter = "pi1", value = rawData
             )
         }
@@ -922,8 +923,8 @@ getRawData <- function(x, aggregate = FALSE) {
     if (!inherits(x, "SimulationResultsSurvival")) {
         stopIllegalArgument("'x' must be a 'SimulationResultsSurvival' object; use getSimulationSurvival() to create one",
             functionName = "getRawData",
-            parameter = "x", 
-		relatedParameter ="SimulationResultsSurvival", value = x
+            parameter = "x",
+            relatedParameter = "SimulationResultsSurvival", value = x
         )
     }
 
@@ -931,8 +932,8 @@ getRawData <- function(x, aggregate = FALSE) {
     if (is.null(rawData) || ncol(rawData) == 0 || nrow(rawData) == 0) {
         stopIllegalArgument("simulation results contain no raw data; ", "choose a 'maxNumberOfRawDatasetsPerStage' > 0, e.g., ",
             "getSimulationSurvival(..., maxNumberOfRawDatasetsPerStage = 1)",
-            functionName = "getRawData", 
-		parameter ="maxNumberOfRawDatasetsPerStage"
+            functionName = "getRawData",
+            parameter = "maxNumberOfRawDatasetsPerStage"
         )
     }
 
@@ -1021,13 +1022,13 @@ getRawData <- function(x, aggregate = FALSE) {
         simulationResults$.setParameterType("effectMatrix", C_PARAM_DERIVED)
         if (!is.null(gED50) && !is.na(gED50)) {
             warning("'gED50' (", gED50, ") will be ignored because 'typeOfShape' ",
-                "is defined as ", .vQuote(typeOfShape), 
+                "is defined as ", .vQuote(typeOfShape),
                 call. = FALSE
             )
         }
         if (!is.null(slope) && !is.na(slope) && slope != 1) {
             warning("'slope' (", slope, ") will be ignored because 'typeOfShape' ",
-                "is defined as ", .vQuote(typeOfShape), 
+                "is defined as ", .vQuote(typeOfShape),
                 call. = FALSE
             )
         }

@@ -402,8 +402,8 @@ updateSubGroupVector <- function(
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
-                        functionName = ".getSimulatedStageResultsSurvivalEnrichmentPatientWise", 
-		parameter ="calcEventsFunction", value = calcEventsFunction
+                        functionName = ".getSimulatedStageResultsSurvivalEnrichmentPatientWise",
+                        parameter = "calcEventsFunction", value = calcEventsFunction
                     )
                 }
 
@@ -553,8 +553,8 @@ updateSubGroupVector <- function(
 
     if (length(allocationRatioPlanned) != 1) {
         stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
-            functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic", 
-		parameter ="allocationRatioPlanned",
+            functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
+            parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
         )
     }
@@ -663,8 +663,8 @@ updateSubGroupVector <- function(
         if (identical(accrualIntensity, 1L)) {
             stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
                 functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic",
-                parameter = "accrualIntensity", 
-		relatedParameter ="maxNumberOfSubjects", value = accrualIntensity
+                parameter = "accrualIntensity",
+                relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
         stopIllegalArgument("'maxNumberOfSubjects' must be defined",
@@ -948,8 +948,9 @@ updateSubGroupVector <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", 
-		functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
+            functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic"
+        )
     }
 
     data <- data.frame(

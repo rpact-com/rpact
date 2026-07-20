@@ -958,7 +958,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                 dropoutRate2 = self$dropoutRate2,
                 dropoutTime = self$dropoutTime
             )
-            
+
             if (self$.design$sided == 1 && self$isUserDefinedParameter("directionUpper")) {
                 directionUpperTemp <- self$directionUpper
                 if (length(directionUpperTemp) == 1) {

@@ -400,8 +400,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 self$.showAllParameters(consoleOutputEnabled = consoleOutputEnabled)
                 self$.showParameterTypeDescription(consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                stopRuntimeIssue("method '.show()' is not implemented in class ", 
-                    .getClassName(self, quote = TRUE), 
+                stopRuntimeIssue("method '.show()' is not implemented in class ",
+                    .getClassName(self, quote = TRUE),
                     functionName = ".show",
                     parameter = ".show()"
                 )
@@ -639,12 +639,12 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (is.null(paramCaption)) {
                 paramCaption <- paste0("%", paramName, "%")
             }
-            
+
             if (!is.null(category) && !is.na(category)) {
-                if (.isMultiArmSimulationResults(self) && 
+                if (.isMultiArmSimulationResults(self) &&
                         paramName %in% c("singleEventsPerArmAndStage", "selectedArms")) {
                     if (!inherits(self, "SimulationResultsEnrichmentSurvival") &&
-                            !is.na(numberOfCategories) && numberOfCategories == category && 
+                            !is.na(numberOfCategories) && numberOfCategories == category &&
                             paramName == "singleEventsPerArmAndStage") {
                         category <- "control"
                     }
@@ -689,8 +689,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         } else {
                             stopRuntimeIssue("only ClosedCombinationTestResults ", "supports function .getHypothesisPopulationVariants() (object is ",
                                 .getClassName(self), ")",
-                                functionName = ".showParameterFormatted", 
-		parameter ="self", value = self
+                                functionName = ".showParameterFormatted",
+                                parameter = "self", value = self
                             )
                         }
                         paramCaption <- paste0(paramCaption, " ", populations)
@@ -930,8 +930,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
 
             if (!is.character(listEntryNames)) {
                 stopRuntimeIssue("'listEntryNames' must be a character vector",
-                    functionName = ".getSubListByNames", 
-		parameter ="listEntryNames",
+                    functionName = ".getSubListByNames",
+                    parameter = "listEntryNames",
                     value = listEntryNames
                 )
             }
@@ -1086,8 +1086,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
 
         stopRuntimeIssue("parameter ", .pQuote(parameterName), " has an invalid ", "dimension (length is ", length(parameterValues),
             ")",
-            functionName = ".getDataFrameColumnValues", 
-		parameter =parameterName, value = length(parameterValues)
+            functionName = ".getDataFrameColumnValues",
+            parameter = parameterName, value = length(parameterValues)
         )
     } else if (parameterName == "effectMatrix") {
         # return effect matrix row if 'effectMatrix' is user defined
@@ -2047,8 +2047,8 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
     .assertIsInClosedInterval(var, "var", lower = -length(varNames), upper = length(varNames))
     if (var == 0) {
         stopIllegalArgument("'var' (", var, ") must != 0",
-            functionName = ".getParameterSetValue", 
-		parameter ="var",
+            functionName = ".getParameterSetValue",
+            parameter = "var",
             value = var
         )
     }
@@ -2118,10 +2118,10 @@ plot.ParameterSet <- function(
         plotSettings = NULL) {
     .assertGgplotIsInstalled()
 
-    stopRuntimeIssue("sorry, function 'plot' is not yet implemented for class ", 
-        .getClassName(x, quote = TRUE), 
-        functionName = "plot.ParameterSet", 
-		parameter ="plot"
+    stopRuntimeIssue("sorry, function 'plot' is not yet implemented for class ",
+        .getClassName(x, quote = TRUE),
+        functionName = "plot.ParameterSet",
+        parameter = "plot"
     )
 }
 
@@ -2231,9 +2231,9 @@ kable.ParameterSet <- function(x, ...) {
             }
             if (grepl("^ *print\\(", objName)) {
                 stopIllegalArgument(
-                    "kable(", objName, ") ", "does not work correctly. ", 
-                    "Use ", sub("print", "kable", objName), 
-                    " without 'print' instead or ", 
+                    "kable(", objName, ") ", "does not work correctly. ",
+                    "Use ", sub("print", "kable", objName),
+                    " without 'print' instead or ",
                     sub("\\)", ", markdown = TRUE, call. = FALSE)", objName),
                     functionName = "kable.ParameterSet",
                     parameter = "print"
