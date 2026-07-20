@@ -856,3 +856,4 @@ getCipheredValue <- function(x) {
 .tcrossprodCpp <- function(x) {
     .Call(`_rpact_tcrossprod`, x)
 }
+

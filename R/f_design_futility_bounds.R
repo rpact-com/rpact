@@ -839,23 +839,26 @@ getFutilityBounds <- function(
 
 #'
 #' @title
-#' Get Fisher Information From a Design Plan
+#' Get Fisher Information From a Design Plan or Simulation Results
 #'
 #' @description
 #' Calculates the Fisher information at the first planned analysis stage for
-#' a design plan for means, rates, or survival endpoints.
+#' a design plan or simulation results object for means, rates, or survival endpoints.
 #'
-#' @param designPlan A trial design plan object as returned by functions such as
+#' @param designPlan A trial design plan or simulation results object as returned by functions such as
 #' \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}},
 #' \code{\link[=getPowerMeans]{getPowerMeans()}},
 #' \code{\link[=getSampleSizeRates]{getSampleSizeRates()}},
 #' \code{\link[=getPowerRates]{getPowerRates()}},
-#' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}, or
-#' \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
+#' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}},
+#' \code{\link[=getPowerSurvival]{getPowerSurvival()}},
+#' \code{\link[=getSimulationMeans]{getSimulationMeans()}},
+#' \code{\link[=getSimulationRates]{getSimulationRates()}}, or
+#' \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
 #'
 #' @details
 #' The returned information is the information used at the first stage of the
-#' design plan. For group sequential designs, information at later stages can be
+#' design plan or simulation setup. For group sequential designs, information at later stages can be
 #' obtained by multiplying this value by the ratio of the corresponding
 #' information rate to the first information rate.
 #'
@@ -867,7 +870,7 @@ getFutilityBounds <- function(
 #'
 #' @return
 #' A numeric value or numeric vector containing the first-stage Fisher
-#' information. A vector is returned if the design plan contains several
+#' information. A vector is returned if the object contains several
 #' planning alternatives or sample size values. \code{NA_real_} is returned if
 #' the endpoint type is not supported by this helper.
 #'
@@ -881,6 +884,12 @@ getFutilityBounds <- function(
 #'     alternative = c(0.3, 0.4), maxNumberOfSubjects = 100
 #' )
 #' getFisherInformation(designPlan)
+#'
+#' simulationResults <- getSimulationMeans(design,
+#'     plannedSubjects = c(20, 40, 60), alternative = 0.4,
+#'     maxNumberOfIterations = 10
+#' )
+#' getFisherInformation(simulationResults)
 #' }
 #'
 #' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}}
@@ -935,6 +944,41 @@ getFisherInformation <- function(designPlan) {
         } else {
             cumulativeEvents <- designPlan$maxNumberOfEvents * designPlan$.design$informationRates[1]
         }
+        allocationRatio <- designPlan$allocationRatioPlanned[1]
+        fisherInformation <- allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents
+    } else if (is(designPlan, "SimulationResultsMeans")) {
+        numberOfSubjects <- designPlan$plannedSubjects[1]
+        stDev <- designPlan$stDev
+        if (length(stDev) == 1 && designPlan$groups == 2) {
+            stDev <- rep(stDev, 2)
+        }
+        if (designPlan$groups == 1) {
+            fisherInformation <- numberOfSubjects / stDev[1]^2
+        } else {
+            allocationRatio <- designPlan$allocationRatioPlanned[1]
+            if (designPlan$meanRatio) {
+                fisherInformation <- allocationRatio * numberOfSubjects /
+                    ((1 + allocationRatio) *
+                        (stDev[1]^2 + designPlan$thetaH0^2 * allocationRatio * stDev[2]^2))
+            } else {
+                fisherInformation <- allocationRatio * numberOfSubjects /
+                    ((1 + allocationRatio) *
+                        (stDev[1]^2 + allocationRatio * stDev[2]^2))
+            }
+        }
+    } else if (is(designPlan, "SimulationResultsRates")) {
+        n1 <- designPlan$plannedSubjects[1]
+        if (designPlan$groups == 1) {
+            pi0 <- designPlan$thetaH0
+            fisherInformation <- n1 / (pi0 * (1 - pi0))
+        } else if (designPlan$groups == 2) {
+            pi1 <- designPlan$pi1
+            pi2 <- designPlan$pi2
+            allocationRatio <- designPlan$allocationRatioPlanned[1]
+            fisherInformation <- allocationRatio / (pi1 * (1 - pi1) + allocationRatio * pi2 * (1 - pi2)) * n1 / (1 + allocationRatio)
+        }
+    } else if (is(designPlan, "SimulationResultsSurvival")) {
+        cumulativeEvents <- designPlan$plannedEvents[1]
         allocationRatio <- designPlan$allocationRatioPlanned[1]
         fisherInformation <- allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents
     }
