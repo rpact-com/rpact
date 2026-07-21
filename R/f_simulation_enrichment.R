@@ -1015,6 +1015,10 @@ NULL
             epsilonValue, NA_real_, notApplicableIfNA = TRUE)
         .setValueAndParameterType(simulationResults, "rValue", 
             rValue, NA_real_, notApplicableIfNA = TRUE)
+    } else { 
+        simulationResults$.setParameterType("threshold", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("epsilonValue", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("rValue", C_PARAM_NOT_APPLICABLE)
     }
     .setValueAndParameterType(
         simulationResults,

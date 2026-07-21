@@ -981,6 +981,12 @@ getFisherInformation <- function(designPlan) {
         cumulativeEvents <- designPlan$plannedEvents[1]
         allocationRatio <- designPlan$allocationRatioPlanned[1]
         fisherInformation <- allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents
+    } else if (is(designPlan, "SimulationResultsMultiArmMeans")) {
+        # TODO implement for the function getSimulationMultiArmMeans(), i.e. for the class SimulationResultsMultiArmMeans
+    } else if (is(designPlan, "SimulationResultsMultiArmRates")) {
+        # TODO implement for the function getSimulationMultiArmRates(), i.e. for the class SimulationResultsMultiArmRates
+    } else if (is(designPlan, "SimulationResultsMultiArmSurvival")) {
+        # TODO implement for the function getSimulationMultiArmSurvival(), i.e. for the class SimulationResultsMultiArmSurvival
     }
     return(fisherInformation)
 }
