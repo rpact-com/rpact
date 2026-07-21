@@ -1392,7 +1392,7 @@ NULL
                 designPlan$followUpTime[i] <- totalTime -
                     designPlan$accrualTime[length(designPlan$accrualTime)]
 
-                numberOfSubjects[, i] <- .getNumberOfSubjects(
+                numberOfSubjects[, i] <- .getNumberOfSubjectsSurvival(
                     time = analysisTime[, i],
                     accrualTime = designPlan$accrualTime,
                     accrualIntensity = designPlan$accrualIntensity,
@@ -1452,7 +1452,7 @@ NULL
                 analysisTime[kMax, i] <- designPlan$accrualTime[length(designPlan$accrualTime)] +
                     designPlan$followUpTime
 
-                numberOfSubjects[, i] <- .getNumberOfSubjects(
+                numberOfSubjects[, i] <- .getNumberOfSubjectsSurvival(
                     time = analysisTime[, i],
                     accrualTime = designPlan$accrualTime, accrualIntensity = designPlan$accrualIntensity,
                     maxNumberOfSubjects = numberOfSubjects[kMax, i]
@@ -1531,10 +1531,10 @@ NULL
         designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
     }
 
-    designPlan$maxNumberOfSubjects1 <- .getNumberOfSubjects1(
+    designPlan$maxNumberOfSubjects1 <- .getNumberOfSubjectsSurvival1(
         designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
     )
-    designPlan$maxNumberOfSubjects2 <- .getNumberOfSubjects2(
+    designPlan$maxNumberOfSubjects2 <- .getNumberOfSubjectsSurvival2(
         designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
     )
     designPlan$.setParameterType("maxNumberOfSubjects1", C_PARAM_GENERATED)
@@ -1575,7 +1575,43 @@ NULL
     return(designPlan)
 }
 
-.getNumberOfSubjects <- function(..., time, accrualTime, accrualIntensity, maxNumberOfSubjects) {
+.getNumberOfSubjectsSurvivalSurvivalSingleTimeValue <- function(
+        ..., timeValue, accrualTime, accrualIntensity, maxNumberOfSubjects) {
+    .assertIsSingleNumber(timeValue, "timeValue")
+    if (length(accrualTime) != length(accrualIntensity)) {
+        stopIllegalArgument("length of 'accrualTime' (", length(accrualIntensity), ") ",
+            "must be equel to length of 'accrualIntensity' (",
+            length(accrualIntensity), ")",
+            functionName = ".getNumberOfSubjectsSurvivalSurvivalSingleTimeValue",
+            parameter = "accrualTime",
+            relatedParameter = "accrualIntensity",
+            relatedValue = length(accrualIntensity), value = accrualTime
+        )
+    }
+
+    densityIntervals <- accrualTime
+    if (length(accrualTime) > 1) {
+        densityIntervals[2:length(accrualTime)] <- accrualTime[2:length(accrualTime)] -
+            accrualTime[1:(length(accrualTime) - 1)]
+    }
+    densityVector <- accrualIntensity / sum(densityIntervals * accrualIntensity)
+    for (l in seq_len(length(densityVector))) {
+        if (timeValue <= accrualTime[l]) {
+            if (l == 1) {
+                return(timeValue * densityVector[l] * maxNumberOfSubjects)
+            } else {
+                return(
+                    (sum(densityVector[1:(l - 1)] * densityIntervals[1:(l - 1)]) +
+                            (timeValue - accrualTime[l - 1]) * densityVector[l]) *
+                        maxNumberOfSubjects
+                )
+            }
+        }
+    }
+    return(maxNumberOfSubjects)
+}
+
+.getNumberOfSubjectsSurvival <- function(..., time, accrualTime, accrualIntensity, maxNumberOfSubjects) {
     subjectNumbers <- c()
     for (timeValue in time) {
         if (is.na(timeValue)) {
@@ -1584,9 +1620,11 @@ NULL
 
         subjectNumbers <- c(
             subjectNumbers,
-            .getNumberOfSubjectsInner(
-                timeValue = timeValue, accrualTime = accrualTime,
-                accrualIntensity = accrualIntensity, maxNumberOfSubjects = maxNumberOfSubjects
+            .getNumberOfSubjectsSurvivalSurvivalSingleTimeValue(
+                timeValue = timeValue, 
+                accrualTime = accrualTime,
+                accrualIntensity = accrualIntensity, 
+                maxNumberOfSubjects = maxNumberOfSubjects
             )
         )
     }
@@ -1950,7 +1988,7 @@ getNumberOfSubjects <- function(
         )
     }
 
-    numberOfSubjects <- .getNumberOfSubjects(
+    numberOfSubjects <- .getNumberOfSubjectsSurvival(
         time = time, accrualTime = accrualTime,
         accrualIntensity = accrualIntensity, maxNumberOfSubjects = maxNumberOfSubjects
     )
@@ -2759,7 +2797,7 @@ getPowerSurvival <- function(
             }
         }
         if (kMax > 1) {
-            designPlan$numberOfSubjects[, i] <- .getNumberOfSubjects(
+            designPlan$numberOfSubjects[, i] <- .getNumberOfSubjectsSurvival(
                 time = designPlan$analysisTime[, i],
                 accrualTime = designPlan$accrualTime,
                 accrualIntensity = designPlan$accrualIntensity,
@@ -2782,7 +2820,7 @@ getPowerSurvival <- function(
     }
 
     if (kMax == 1) {
-        designPlan$expectedNumberOfSubjects <- .getNumberOfSubjects(
+        designPlan$expectedNumberOfSubjects <- .getNumberOfSubjectsSurvival(
             time = designPlan$analysisTime[1, ],
             accrualTime = designPlan$accrualTime,
             accrualIntensity = designPlan$accrualIntensity,
