@@ -919,8 +919,8 @@ getFutilityBounds <- function(
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmRates")) {
         n1 <- nTotal # active arm
-        n2 <- trunc(nTotal / allocationRatio) # common control arm
-        pi1 <- designPlan$effectMatrix # TODO also support omegaMaxVector
+        n2 <- trunc(nTotal / allocationRatio) # common control arm TODO is truncation correct here?
+        pi1 <- designPlan$effectMatrix
         pi2 <- designPlan$piControl
         return(.getFisherInformationRatesTwoSample(pi1, pi2, n1, n2))
     }
@@ -933,6 +933,26 @@ getFutilityBounds <- function(
 .getFisherInformationSurvival <- function(designPlan, stage = 1L) {
     cumulativeEvents <- .getNumberOfSubjects(designPlan, stage)
     allocationRatio <- designPlan$allocationRatioPlanned[stage]
+
+    # multi-arm case
+    if (is(designPlan, "SimulationResultsMultiArmSurvival")) {
+        omega <- designPlan$effectMatrix
+
+        cumulativeEventsPerComparison <- cumulativeEvents *
+            sweep(
+                1 + allocationRatio * omega,
+                2,
+                1 + allocationRatio * colSums(omega),
+                FUN = "/"
+            )
+        
+        return(
+            allocationRatio / (1 + allocationRatio)^2 *
+                cumulativeEventsPerComparison
+        )
+    }
+
+    # two group case
     return(allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents)
 }
 
