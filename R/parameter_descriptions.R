@@ -1,5 +1,5 @@
 ## |
-## |  *Parameters Descriptions*
+## |  *Parameter Descriptions*
 ## |
 ## |  This file is part of the R package rpact:
 ## |  Confirmatory Adaptive Clinical Trial Design and Analysis

@@ -996,6 +996,7 @@ getFutilityBounds <- function(
 #'
 #' @export
 getFisherInformation <- function(designPlan) {
+    .assertIsTrialDesignPlanOrSimulationResults(designPlan)
     className <- .getClassName(designPlan)
     if (grepl("Means", className)) {
         return(.getFisherInformationMeans(designPlan))

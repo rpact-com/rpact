@@ -1579,8 +1579,8 @@ NULL
         ..., timeValue, accrualTime, accrualIntensity, maxNumberOfSubjects) {
     .assertIsSingleNumber(timeValue, "timeValue")
     if (length(accrualTime) != length(accrualIntensity)) {
-        stopIllegalArgument("length of 'accrualTime' (", length(accrualIntensity), ") ",
-            "must be equel to length of 'accrualIntensity' (",
+        stopIllegalArgument("length of 'accrualTime' (", length(accrualTime), ") ",
+            "must be equal to length of 'accrualIntensity' (",
             length(accrualIntensity), ")",
             functionName = ".getNumberOfSubjectsSurvivalSurvivalSingleTimeValue",
             parameter = "accrualTime",

@@ -119,6 +119,7 @@ NULL
     }
 
     for (k in 1:kMax) {
+        # TODO @Gernot: is it right to truncate the number of subjects per stage? Shouldn't it be rounded instead?
         if (k == 1) {
             subjectsPerStage[gMax + 1, k] <- trunc(plannedSubjects[k] / allocationRatioPlanned[k])
         } else {

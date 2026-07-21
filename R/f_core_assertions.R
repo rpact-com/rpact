@@ -4538,3 +4538,17 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         )
     }
 }
+
+
+.assertIsTrialDesignPlanOrSimulationResults <- function(designPlan) {
+    if (!is(designPlan, "TrialDesignPlan") && !is(designPlan, "SimulationResults")) {
+        stopIllegalArgument(
+            .sQuote("designPlan"), " must be a trial design plan or ",
+            "simulation results object, but is of class ", .getClassName(designPlan),
+            functionName = ".assertIsTrialDesignPlanOrSimulationResults",
+            parameter = "designPlan", 
+            value = .getClassName(designPlan)
+        )
+    }
+}
+

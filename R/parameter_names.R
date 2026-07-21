@@ -482,7 +482,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
         return("Coefficient of variation")
     }
 
-    if (identical(parameterName, "criticalValuesPValueScale") && inherits(obj, "TrailDesign") &&
+    if (identical(parameterName, "criticalValuesPValueScale") && inherits(obj, "TrialDesign") &&
             .getClassName(obj) != "TrialDesign" && obj$sided == 2) {
         return(paste0("Local two-sided significance level", ifelse(tableOutputEnabled, "", "s")))
     }
