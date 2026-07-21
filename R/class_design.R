@@ -454,16 +454,7 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
 
         # Defines the order of the parameter output
         .getParametersToShow = function() {
-            return(c(
-                "stages",
-                "alpha",
-                "beta",
-                "twoSidedPower",
-                "directionUpper",
-                "sided",
-                "criticalValues",
-                "stageLevels"
-            ))
+            return(C_PARAMETER_ORDER_DESIGN_FIXED)
         }
     )
 )
@@ -595,27 +586,7 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
 
         # Defines the order of the parameter output
         .getParametersToShow = function() {
-            return(c(
-                "method",
-                "kMax",
-                "stages",
-                "informationRates",
-                "alpha",
-                "alpha0Vec",
-                "bindingFutility",
-                "directionUpper",
-                "sided",
-                "tolerance",
-                "iterations",
-                "seed",
-                "alphaSpent",
-                "userAlphaSpending",
-                "criticalValues",
-                "stageLevels",
-                "scale",
-                "simAlpha",
-                "nonStochasticCurtailment"
-            ))
+            return(C_PARAMETER_ORDER_DESIGN_FISHER)
         }
     )
 )
@@ -940,41 +911,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
 
         # Defines the order of the parameter output
         .getParametersToShow = function() {
-            return(c(
-                "typeOfDesign",
-                "kMax",
-                "stages",
-                "informationRates",
-                "alpha",
-                "beta",
-                "power",
-                "twoSidedPower",
-                "deltaWT",
-                "deltaPT1",
-                "deltaPT0",
-                "futilityBounds",
-                "bindingFutility",
-                "directionUpper",
-                "constantBoundsHP",
-                "gammaA",
-                "gammaB",
-                "optimizationCriterion",
-                "sided",
-                "betaAdjustment",
-                "delayedInformation",
-                "tolerance",
-                "alphaSpent",
-                "userAlphaSpending",
-                "betaSpent",
-                "typeBetaSpending",
-                "userBetaSpending",
-                "efficacyStops",
-                "futilityStops",
-                "criticalValues",
-                "stageLevels",
-                "decisionCriticalValues",
-                "reversalProbabilities"
-            ))
+            return(C_PARAMETER_ORDER_DESIGN_GS_AND_IN)
         }
     )
 )
