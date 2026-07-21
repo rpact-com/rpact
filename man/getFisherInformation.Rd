@@ -15,14 +15,15 @@ getFisherInformation(designPlan)
 \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}},
 \code{\link[=getPowerSurvival]{getPowerSurvival()}},
 \code{\link[=getSimulationMeans]{getSimulationMeans()}},
-\code{\link[=getSimulationRates]{getSimulationRates()}}, or
-\code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.}
+\code{\link[=getSimulationRates]{getSimulationRates()}},
+\code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, or the
+corresponding multi-arm simulation functions.}
 }
 \value{
-A numeric value or numeric vector containing the first-stage Fisher
-information. A vector is returned if the object contains several
-planning alternatives or sample size values. \code{NA_real_} is returned if
-the endpoint type is not supported by this helper.
+A numeric value, vector, or matrix containing the first-stage Fisher
+information. A vector or matrix can be returned if the object contains
+several planning alternatives, arms, or sample size values. \code{NA_real_}
+is returned if the endpoint type is not supported by this helper.
 }
 \description{
 Calculates the Fisher information at the first planned analysis stage for
