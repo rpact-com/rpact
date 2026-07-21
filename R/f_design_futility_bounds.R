@@ -859,28 +859,36 @@ getFutilityBounds <- function(
             is(designPlan, "SimulationResultsRates") || 
             is(designPlan, "SimulationResultsMultiArmRates")) {
         numberOfSubjects <- designPlan$plannedSubjects[stage]
-        #numberOfSubjectsControl <- trunc(numberOfSubjects / designPlan$allocationRatioPlanned[stage])
     } else if (is(designPlan, "SimulationResultsSurvival") || is(designPlan, "SimulationResultsMultiArmSurvival")) {
         numberOfSubjects <- designPlan$plannedEvents[stage]
-
     }
     return(numberOfSubjects)
 }
 
+.getNumberOfSubjectsTwoSample <- function(nTotal, allocationRatio) {
+    n1 <- allocationRatio * nTotal / (1 + allocationRatio) # treatment arm
+    n2 <- nTotal / (1 + allocationRatio) # control arm
+    return(c(n1, n2))
+}
+
+.getFisherInformationMeansTwoSample <- function(stDev, n1, n2, thetaMult = 1) {
+    return(1 / (stDev[1]^2 / n1 + thetaMult * stDev[2]^2 / n2))
+}
+
 .getFisherInformationMeans <- function(designPlan, stage = 1L) {
-    numberOfSubjects <- .getNumberOfSubjects(designPlan, stage)
+    nTotal <- .getNumberOfSubjects(designPlan, stage)
     stDev <- designPlan$stDev
     
     # one group case
     if ((.isTrialDesignPlanMeans(designPlan) || is(designPlan, "SimulationResultsMeans")) && designPlan$groups == 1) {
-        return(numberOfSubjects / stDev[1]^2)
+        return(nTotal / stDev[1]^2)
     } 
     
     allocationRatio <- designPlan$allocationRatioPlanned[stage]
     
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmMeans")) {
-        return(numberOfSubjects / (designPlan$stDev[1]^2 * (1 + allocationRatio)))        
+        return(nTotal / (designPlan$stDev[1]^2 * (1 + allocationRatio)))        
     }
     
     # two group case
@@ -888,13 +896,9 @@ getFutilityBounds <- function(
         stDev <- rep(stDev, 2)
     }
     
+    n <- .getNumberOfSubjectsTwoSample(nTotal, allocationRatio)
     thetaMult <- ifelse(isTRUE(designPlan$meanRatio), designPlan$thetaH0^2, 1)
-    return(
-        allocationRatio * numberOfSubjects /
-            (
-                (1 + allocationRatio) * (stDev[1]^2 + thetaMult * allocationRatio * stDev[2]^2)
-            )
-    )
+    return(.getFisherInformationMeansTwoSample(stDev, n[1], n[2], thetaMult))
 }
 
 .getFisherInformationRatesTwoSample <- function(pi1, pi2, n1, n2) {
@@ -922,11 +926,8 @@ getFutilityBounds <- function(
     }
     
     # two group case
-    n1 <- allocationRatio * nTotal / (1 + allocationRatio) # treatment arm
-    n2 <- nTotal / (1 + allocationRatio) # control arm
-    pi1 <- designPlan$pi1
-    pi2 <- designPlan$pi2
-    return(.getFisherInformationRatesTwoSample(pi1, pi2, n1, n2))
+    n <- .getNumberOfSubjectsTwoSample(nTotal, allocationRatio)
+    return(.getFisherInformationRatesTwoSample(designPlan$pi1, designPlan$pi2, n[1], n[2]))
 }
 
 .getFisherInformationSurvival <- function(designPlan, stage = 1L) {
