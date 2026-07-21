@@ -856,7 +856,7 @@ getFutilityBounds <- function(
     } else if (
             is(designPlan, "SimulationResultsMeans") || 
             is(designPlan, "SimulationResultsMultiArmMeans") || 
-            is(designPlan, "SimulationResultsMeans") || 
+            is(designPlan, "SimulationResultsRates") || 
             is(designPlan, "SimulationResultsMultiArmRates")) {
         numberOfSubjects <- designPlan$plannedSubjects[stage]
         #numberOfSubjectsControl <- trunc(numberOfSubjects / designPlan$allocationRatioPlanned[stage])
@@ -897,42 +897,36 @@ getFutilityBounds <- function(
     )
 }
 
+.getFisherInformationRatesTwoSample <- function(pi1, pi2, n1, n2) {
+    return(1 / (pi1 * (1 - pi1) / n1 + pi2 * (1 - pi2) / n2))
+}
+
 .getFisherInformationRates <- function(designPlan, stage = 1L) {
-    numberOfSubjects <- .getNumberOfSubjects(designPlan, stage)
+    nTotal <- .getNumberOfSubjects(designPlan, stage)
   
     # one group case
     if ((.isTrialDesignPlanRates(designPlan) || is(designPlan, "SimulationResultsRates")) && designPlan$groups == 1) {
         pi0 <- designPlan$thetaH0
-        return(numberOfSubjects / (pi0 * (1 - pi0)))
+        return(nTotal / (pi0 * (1 - pi0)))
     }
     
     allocationRatio <- designPlan$allocationRatioPlanned[stage]
     
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmRates")) {
-        numberOfSubjectsControl <- trunc(numberOfSubjects / allocationRatio)
+        n1 <- nTotal # active arm
+        n2 <- trunc(nTotal / allocationRatio) # common control arm
         pi1 <- designPlan$effectMatrix # TODO also support omegaMaxVector
         pi2 <- designPlan$piControl
-        return(
-            1 / (
-                    pi1 * (1 - pi1) / numberOfSubjects +
-                    pi2 * (1 - pi2) / numberOfSubjectsControl
-                )
-        )
+        return(.getFisherInformationRatesTwoSample(pi1, pi2, n1, n2))
     }
     
     # two group case
+    n1 <- allocationRatio * nTotal / (1 + allocationRatio) # treatment arm
+    n2 <- nTotal / (1 + allocationRatio) # control arm
     pi1 <- designPlan$pi1
     pi2 <- designPlan$pi2
-    return(
-        allocationRatio / 
-            (
-                pi1 * (1 - pi1) + 
-                allocationRatio * pi2 * (1 - pi2)
-            ) * 
-        numberOfSubjects / 
-            (1 + allocationRatio)
-    )
+    return(.getFisherInformationRatesTwoSample(pi1, pi2, n1, n2))
 }
 
 .getFisherInformationSurvival <- function(designPlan, stage = 1L) {
