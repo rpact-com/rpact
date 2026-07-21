@@ -352,13 +352,20 @@ ParameterSet <- R6::R6Class("ParameterSet",
             } else {
                 parameterNames <- names(self$.parameterTypes[which(self$.parameterTypes %in% parameterType)])
             }
+            
+            if (length(parameterNames) == 0) {
+                return(character())
+            }
 
             parametersToShow <- self$.getParametersToShow()
             if (is.null(parametersToShow) || length(parametersToShow) == 0) {
                 return(parameterNames)
             }
-
-            return(parametersToShow[parametersToShow %in% parameterNames])
+            
+            parametersToShow <- parametersToShow[parametersToShow %in% parameterNames]
+            parameterNames <- parameterNames[!(parameterNames %in% parametersToShow)]
+            parameterNames <- c(parametersToShow, parameterNames)
+            return(parameterNames)
         },
         .showParameterType = function(parameterName) {
             if (!self$.showParameterTypeEnabled) {
