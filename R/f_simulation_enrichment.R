@@ -1011,8 +1011,10 @@ NULL
 
     if (typeOfSelection != "userDefined") {
         .setValueAndParameterType(simulationResults, "threshold", threshold, -Inf)
-        .setValueAndParameterType(simulationResults, "epsilonValue", epsilonValue, NA_real_)
-        .setValueAndParameterType(simulationResults, "rValue", rValue, NA_real_)
+        .setValueAndParameterType(simulationResults, "epsilonValue", 
+            epsilonValue, NA_real_, notApplicableIfNA = TRUE)
+        .setValueAndParameterType(simulationResults, "rValue", 
+            rValue, NA_real_, notApplicableIfNA = TRUE)
     }
     .setValueAndParameterType(
         simulationResults,

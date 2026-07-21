@@ -14,6 +14,7 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
+# Defines the order of the parameter output
 C_PARAMETER_ORDER_DESIGN_FIXED <- c(
     "stages",
     "alpha",
