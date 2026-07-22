@@ -4,7 +4,7 @@
 \alias{getFisherInformation}
 \title{Get Fisher Information From a Design Plan or Simulation Results}
 \usage{
-getFisherInformation(designPlan)
+getFisherInformation(designPlan, stage = NA_integer_)
 }
 \arguments{
 \item{designPlan}{A trial design plan or simulation results object as returned by functions such as
@@ -18,6 +18,9 @@ getFisherInformation(designPlan)
 \code{\link[=getSimulationRates]{getSimulationRates()}},
 \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, or the
 corresponding multi-arm simulation functions.}
+
+\item{stage}{Integer. The analysis stage for which the Fisher information is
+requested. If \code{NA} (default), the first stage is used.}
 }
 \value{
 A numeric value, vector, or matrix containing the first-stage Fisher

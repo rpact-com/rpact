@@ -837,30 +837,40 @@ getFutilityBounds <- function(
     return(NA_real_)
 }
 
-.getNumberOfSubjects <- function(designPlan, stage = 1L) {
+.getNumberOfSubjects <- function(designPlan, stage = NA_integer_) {
     numberOfSubjects <- NA_real_
+    matrixInput <- FALSE
     if (.isTrialDesignPlanMeans(designPlan) || .isTrialDesignPlanRates(designPlan)) {
         if (designPlan$.isSampleSizeObject()) {
-            numberOfSubjects <- designPlan$numberOfSubjects[stage, ]
+            numberOfSubjects <- designPlan$numberOfSubjects
+            matrixInput <- TRUE
         } else {
-            numberOfSubjects <- designPlan$maxNumberOfSubjects * designPlan$.design$informationRates[stage]
+            numberOfSubjects <- designPlan$maxNumberOfSubjects * designPlan$.design$informationRates
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
         if (!is.null(designPlan$cumulativeEventsPerStage) && !all(is.na(designPlan$cumulativeEventsPerStage))) {
-            numberOfSubjects <- designPlan$cumulativeEventsPerStage[stage, ]
+            numberOfSubjects <- designPlan$cumulativeEventsPerStage
+            matrixInput <- TRUE
         } else if (designPlan$.isSampleSizeObject()) {
-            numberOfSubjects <- designPlan$eventsFixed * designPlan$.design$informationRates[stage]
+            numberOfSubjects <- designPlan$eventsFixed * designPlan$.design$informationRates
         } else {
-            numberOfSubjects <- designPlan$maxNumberOfEvents * designPlan$.design$informationRates[stage]
+            numberOfSubjects <- designPlan$maxNumberOfEvents * designPlan$.design$informationRates
         }
     } else if (
             is(designPlan, "SimulationResultsMeans") || 
             is(designPlan, "SimulationResultsMultiArmMeans") || 
             is(designPlan, "SimulationResultsRates") || 
             is(designPlan, "SimulationResultsMultiArmRates")) {
-        numberOfSubjects <- designPlan$plannedSubjects[stage]
+        numberOfSubjects <- designPlan$plannedSubjects
     } else if (is(designPlan, "SimulationResultsSurvival") || is(designPlan, "SimulationResultsMultiArmSurvival")) {
-        numberOfSubjects <- designPlan$plannedEvents[stage]
+        numberOfSubjects <- designPlan$plannedEvents
+    }
+    if (!is.na(stage)) {
+        if (matrixInput && is.matrix(numberOfSubjects)) {
+            numberOfSubjects <- numberOfSubjects[stage, ]
+        } else {
+            numberOfSubjects <- numberOfSubjects[stage]
+        }
     }
     return(numberOfSubjects)
 }
@@ -868,14 +878,14 @@ getFutilityBounds <- function(
 .getNumberOfSubjectsTwoSample <- function(nTotal, allocationRatio) {
     n1 <- allocationRatio * nTotal / (1 + allocationRatio) # treatment arm
     n2 <- nTotal / (1 + allocationRatio) # control arm
-    return(c(n1, n2))
+    return(list(n1 = n1, n2 = n2))
 }
 
 .getFisherInformationMeansTwoSample <- function(stDev, n1, n2, thetaMult = 1) {
     return(1 / (stDev[1]^2 / n1 + thetaMult * stDev[2]^2 / n2))
 }
 
-.getFisherInformationMeans <- function(designPlan, stage = 1L) {
+.getFisherInformationMeans <- function(designPlan, stage = NA_integer_) {
     nTotal <- .getNumberOfSubjects(designPlan, stage)
     stDev <- designPlan$stDev
     
@@ -884,8 +894,7 @@ getFutilityBounds <- function(
         return(nTotal / stDev[1]^2)
     } 
     
-    allocationRatio <- designPlan$allocationRatioPlanned[stage]
-    
+    allocationRatio <- .getAllocationRatioByStage(designPlan, stage)    
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmMeans")) {
         return(nTotal / (designPlan$stDev[1]^2 * (1 + allocationRatio)))        
@@ -898,14 +907,14 @@ getFutilityBounds <- function(
     
     n <- .getNumberOfSubjectsTwoSample(nTotal, allocationRatio)
     thetaMult <- ifelse(isTRUE(designPlan$meanRatio), designPlan$thetaH0^2, 1)
-    return(.getFisherInformationMeansTwoSample(stDev, n[1], n[2], thetaMult))
+    return(.getFisherInformationMeansTwoSample(stDev, n$n1, n$n2, thetaMult))
 }
 
 .getFisherInformationRatesTwoSample <- function(pi1, pi2, n1, n2) {
     return(1 / (pi1 * (1 - pi1) / n1 + pi2 * (1 - pi2) / n2))
 }
 
-.getFisherInformationRates <- function(designPlan, stage = 1L) {
+.getFisherInformationRates <- function(designPlan, stage = NA_integer_) {
     nTotal <- .getNumberOfSubjects(designPlan, stage)
   
     # one group case
@@ -914,7 +923,7 @@ getFutilityBounds <- function(
         return(nTotal / (pi0 * (1 - pi0)))
     }
     
-    allocationRatio <- designPlan$allocationRatioPlanned[stage]
+    allocationRatio <- .getAllocationRatioByStage(designPlan, stage)
     
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmRates")) {
@@ -927,12 +936,21 @@ getFutilityBounds <- function(
     
     # two group case
     n <- .getNumberOfSubjectsTwoSample(nTotal, allocationRatio)
-    return(.getFisherInformationRatesTwoSample(designPlan$pi1, designPlan$pi2, n[1], n[2]))
+    return(.getFisherInformationRatesTwoSample(designPlan$pi1, designPlan$pi2, n$n1, n$n2))
 }
 
-.getFisherInformationSurvival <- function(designPlan, stage = 1L) {
+.getAllocationRatioByStage <- function(designPlan, stage = NA_integer_) {
+    allocationRatioPlanned <- designPlan$allocationRatioPlanned
+    if (is.na(stage) || length(allocationRatioPlanned) == 1) {
+        return(allocationRatioPlanned)
+    } 
+    
+    return(allocationRatioPlanned[stage])        
+}
+
+.getFisherInformationSurvival <- function(designPlan, stage = NA_integer_) {
     cumulativeEvents <- .getNumberOfSubjects(designPlan, stage)
-    allocationRatio <- designPlan$allocationRatioPlanned[stage]
+    allocationRatio <- .getAllocationRatioByStage(designPlan, stage)
 
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmSurvival")) {
@@ -975,6 +993,8 @@ getFutilityBounds <- function(
 #' \code{\link[=getSimulationRates]{getSimulationRates()}},
 #' \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, or the
 #' corresponding multi-arm simulation functions.
+#' @param stage Integer. The analysis stage for which the Fisher information is
+#'        requested. If \code{NA} (default), the first stage is used.
 #'
 #' @details
 #' The returned information is the information used at the first stage of the
@@ -1015,15 +1035,18 @@ getFutilityBounds <- function(
 #' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}}
 #'
 #' @export
-getFisherInformation <- function(designPlan) {
+getFisherInformation <- function(designPlan, stage = NA_integer_) {
     .assertIsTrialDesignPlanOrSimulationResults(designPlan)
     className <- .getClassName(designPlan)
+    if (is.na(stage)) {
+        stage <- 1L 
+    }
     if (grepl("Means", className)) {
-        return(.getFisherInformationMeans(designPlan))
+        return(.getFisherInformationMeans(designPlan, stage = stage))
     } else if (grepl("Rates", className)) {
-        return(.getFisherInformationRates(designPlan))
+        return(.getFisherInformationRates(designPlan, stage = stage))
     } else if (grepl("Survival", className)) {
-        return(.getFisherInformationSurvival(designPlan))
+        return(.getFisherInformationSurvival(designPlan, stage = stage))
     }
    
     return(NA_real_)

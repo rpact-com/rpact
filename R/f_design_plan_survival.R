@@ -1531,10 +1531,10 @@ NULL
         designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
     }
 
-    designPlan$maxNumberOfSubjects1 <- .getNumberOfSubjectsSurvival1(
+    designPlan$maxNumberOfSubjects1 <- .getNumberOfSubjects1(
         designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
     )
-    designPlan$maxNumberOfSubjects2 <- .getNumberOfSubjectsSurvival2(
+    designPlan$maxNumberOfSubjects2 <- .getNumberOfSubjects2(
         designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
     )
     designPlan$.setParameterType("maxNumberOfSubjects1", C_PARAM_GENERATED)
