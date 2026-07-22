@@ -1592,7 +1592,7 @@ getParameterName <- function(obj, parameterCaption) {
 
 .moveValue <- function(values, value, insertPositionValue) {
     if (is.null(insertPositionValue) || length(insertPositionValue) != 1 || is.na(insertPositionValue)) {
-        stopIllegalArgument("'insertPositionValue' (", class(insertPositionValue), ") ",
+        stopIllegalArgument("'insertPositionValue' (", .getClassName(insertPositionValue), ") ",
             "must be a valid single value",
             functionName = ".moveValue",
             parameter = "insertPositionValue",
@@ -1600,7 +1600,7 @@ getParameterName <- function(obj, parameterCaption) {
         )
     }
     if (is.null(value) || length(value) != 1 || is.na(value)) {
-        stopIllegalArgument("'value' (", class(value), ") must be a valid single value",
+        stopIllegalArgument("'value' (", .getClassName(value), ") must be a valid single value",
             functionName = ".moveValue",
             parameter = "value",
             value = value

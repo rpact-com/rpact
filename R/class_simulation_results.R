@@ -608,44 +608,7 @@ SimulationResults <- R6::R6Class(
 
         # Defines the order of the parameter output
         .getParametersToShow = function() {
-            parametersToShow <- self$.getVisibleFieldNames()
-            y <- C_PARAMETER_ORDER_DESIGN_PLAN
-            y <- c(
-                y,
-                "seed",
-                "iterations",
-                "overallReject", # base
-                "rejectAtLeastOne",
-                "rejectPerStage",
-                "rejectedArmsPerStage",
-                "rejectedPopulationsPerStage"
-            )
-            if (self$.design$kMax > 1) {
-                y <- c(y, "futilityStop")
-            }
-            y <- c(
-                y,
-                "futilityPerStage",
-                "earlyStop", # base
-                "successPerStage",
-                "selectedArms",
-                "selectedPopulations",
-                "numberOfSelectedArms",
-                "numberOfPopulations",
-                "singleEventsPerStage",
-                "singleEventsPerArmAndStage",
-                "singleEventsPerSubsetAndStage",
-                "cumulativeEventsPerStage",
-                "expectedNumberOfSubjects",
-                "expectedNumberOfEvents",
-                "numberOfSubjects",
-                "numberOfSubjects1",
-                "numberOfSubjects2",
-                "sampleSizes",
-                "conditionalPowerAchieved" # base
-            )
-            parametersToShow <- c(parametersToShow[!(parametersToShow %in% y)], y[y %in% parametersToShow])
-            return(parametersToShow)
+            return(C_PARAMETER_ORDER_DESIGN_PLAN)
         },
         .isSampleSizeObject = function() {
             return(FALSE)

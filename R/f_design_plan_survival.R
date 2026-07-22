@@ -1229,7 +1229,7 @@ NULL
 
     if (userDefinedMaxNumberOfSubjects) {
         designPlan$followUpTime <- timeVector - accrualTime[length(accrualTime)]
-        designPlan$.setParameterType("followUpTime", C_PARAM_GENERATED)
+        designPlan$.setParameterType("followUpTime", C_PARAM_DERIVED)
     }
 
     designPlan$nFixed2 <- designPlan$nFixed / (1 + allocationRatioPlanned)
@@ -2521,7 +2521,7 @@ getSampleSizeSurvival <- function(
 
             if (sampleSizeSurvival$followUpTime < followUpTime - 1e-02 ||
                     sampleSizeSurvival$followUpTime > followUpTime + 1e-02) {
-                sampleSizeSurvival$.setParameterType("followUpTime", C_PARAM_GENERATED)
+                sampleSizeSurvival$.setParameterType("followUpTime", C_PARAM_DERIVED)
                 warning("User defined 'followUpTime' (", followUpTime, ") ignored because ",
                     "follow-up time is ", round(sampleSizeSurvival$followUpTime, 4),
                     call. = FALSE

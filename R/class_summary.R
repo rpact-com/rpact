@@ -725,7 +725,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                             )) {
                         transposed <- TRUE
                         userDefinedEffectMatrix <-
-                            parameterSet$isUserDefinedParameter("effectMatrix")
+                            parameterSet$isUserDefinedOrDerivedParameter("effectMatrix")
                         if (userDefinedEffectMatrix) {
                             legendEntry[["[j]"]] <- "effect matrix row j (situation to consider)"
                         }
@@ -3631,6 +3631,16 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     if (simulationEnabled && (multiArmEnabled || enrichmentEnabled)) {
+#        if (multiArmEnabled) {
+#            .addSimulationMultiArmArrayParameter(designPlan,
+#                parameterName = "effectMatrix",
+#                parameterCaption = "Effect matrix",
+#                summaryFactory,
+#                roundDigits = digitSettings$digitsProbabilities,
+#                smoothedZeroFormat = TRUE
+#            )
+#        }
+        
         summaryFactory$addParameter(designPlan,
             parameterName = "rejectAtLeastOne",
             parameterCaption = "Reject at least one",
@@ -4223,7 +4233,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     userDefinedEffectMatrix <- !enrichmentEnabled &&
-        designPlan$isUserDefinedParameter("effectMatrix")
+        designPlan$isUserDefinedOrDerivedParameter("effectMatrix")
 
     if (userDefinedEffectMatrix) {
         return(list(
@@ -4292,7 +4302,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         smoothedZeroFormat = FALSE) {
     arrayData <- designPlan[[parameterName]]
     if (is.null(arrayData)) {
-        stopRuntimeIssue(class(designPlan)[1], " does not contain the field ", sQuote(parameterName),
+        stopRuntimeIssue(.getClassName(designPlan), " does not contain the field ", sQuote(parameterName),
             functionName = ".addSimulationArrayToSummary",
             parameter = parameterName
         )
@@ -4300,9 +4310,20 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
     numberOfVariedParams <- 1
     numberOfGroups <- 1
-    if (dim(arrayData)[1] > 1) {
-        numberOfVariedParams <- dim(arrayData)[2]
-        numberOfGroups <- dim(arrayData)[3]
+    arrayDataDim <- dim(arrayData)
+    if (length(arrayDataDim) > 1 && arrayDataDim[1] > 1) {
+        numberOfVariedParams <- arrayDataDim[2]
+        if (length(arrayDataDim) > 2) {
+            numberOfGroups <- arrayDataDim[3]
+        }
+    }
+    
+    if (is.na(numberOfGroups)) {
+        stopRuntimeIssue("Unable to identify 'numberOfGroups' from ", 
+            sQuote(parameterName), "in ", .getClassName(designPlan),
+            functionName = ".addSimulationArrayToSummary",
+            parameter = parameterName
+        )
     }
 
     for (variedParamNumber in 1:numberOfVariedParams) {
@@ -4319,9 +4340,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
 
         for (groupNumber in 1:numberOfGroups) {
-            if (numberOfVariedParams == 1 && numberOfGroups == 1 && length(dim(arrayData)) == 2) {
-                dataPerGroupAndStage <- arrayData
-            } else {
+            dataPerGroupAndStage <- arrayData
+            if (length(arrayDataDim) > 2 && (numberOfVariedParams == 1 || numberOfGroups == 1)) {
                 dataPerGroupAndStage <- arrayData[, variedParamNumber, groupNumber]
             }
             if (numberOfGroups > 1) {
@@ -4332,7 +4352,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             }
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterName,
-                values = dataPerGroupAndStage, parameterCaption = groupCaption,
+                values = dataPerGroupAndStage, 
+                parameterCaption = groupCaption,
                 roundDigits = digitsSampleSize,
                 smoothedZeroFormat = smoothedZeroFormat,
                 enforceFirstCase = TRUE
@@ -4399,13 +4420,20 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         numberOfGroups <- ncol(data)
         for (groupNumber in 1:numberOfGroups) {
             dataPerGroupAndStage <- data[, groupNumber]
+            
+            if (parameterName == "effectMatrix") {
+                paramCaption <- paste0(parameterCaption, " [", groupNumber, "]")
+            } else {
+                paramCaption <- ifelse(groupNumber == numberOfGroups,
+                    paste0(parameterCaption, ", control"),
+                    paste0(parameterCaption, ", treatment ", groupNumber)
+                )
+            }
+            
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterName,
                 values = dataPerGroupAndStage,
-                parameterCaption = ifelse(groupNumber == numberOfGroups,
-                    paste0(parameterCaption, ", control"),
-                    paste0(parameterCaption, ", treatment ", groupNumber)
-                ),
+                parameterCaption = paramCaption,
                 roundDigits = roundDigits,
                 smoothedZeroFormat = smoothedZeroFormat
             )

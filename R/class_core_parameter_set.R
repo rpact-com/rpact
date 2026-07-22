@@ -299,6 +299,9 @@ ParameterSet <- R6::R6Class("ParameterSet",
         isNotApplicableParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE)
         },
+        isUserDefinedOrDerivedParameter = function(parameterName) {
+            return(self$isUserDefinedParameter(parameterName) || self$isDerivedParameter(parameterName))
+        },
         .getInputParameters = function() {
             params <- self$.getParametersOfOneGroup(c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))
             return(params)

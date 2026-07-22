@@ -4539,7 +4539,6 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     }
 }
 
-
 .assertIsTrialDesignPlanOrSimulationResults <- function(designPlan) {
     if (!is(designPlan, "TrialDesignPlan") && !is(designPlan, "SimulationResults")) {
         stopIllegalArgument(
@@ -4551,4 +4550,14 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         )
     }
 }
+
+.assertIsUniqueVector <- function(x, name) {
+    if (length(x) != length(unique(x))) {
+        dupEntries <- x[duplicated(x)]
+        dupCounts <- as.data.frame(table(dupEntries), stringsAsFactors = FALSE)
+        dupText <- paste(paste0(dupCounts$dupEntries, " (", dupCounts$Freq, ")"), collapse = ", ")
+        stopRuntimeIssue(.sQuote(name), " contains duplicate entries: ", dupText, ".")
+    }
+} 
+
 

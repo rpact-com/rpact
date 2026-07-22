@@ -26,6 +26,8 @@ C_PARAMETER_ORDER_DESIGN_FIXED <- c(
     "stageLevels"
 )
 
+.assertIsUniqueVector(C_PARAMETER_ORDER_DESIGN_FIXED, "C_PARAMETER_ORDER_DESIGN_FIXED")
+
 C_PARAMETER_ORDER_DESIGN_FISHER <- c(
     "method",
     "kMax",
@@ -47,6 +49,8 @@ C_PARAMETER_ORDER_DESIGN_FISHER <- c(
     "simAlpha",
     "nonStochasticCurtailment"
 )
+
+.assertIsUniqueVector(C_PARAMETER_ORDER_DESIGN_FISHER, "C_PARAMETER_ORDER_DESIGN_FISHER")
 
 C_PARAMETER_ORDER_DESIGN_GS_AND_IN <- c(
     "typeOfDesign",
@@ -84,12 +88,16 @@ C_PARAMETER_ORDER_DESIGN_GS_AND_IN <- c(
     "reversalProbabilities"
 )
 
+.assertIsUniqueVector(C_PARAMETER_ORDER_DESIGN_GS_AND_IN, "C_PARAMETER_ORDER_DESIGN_GS_AND_IN")
+
 C_PARAMETER_ORDER_DESIGN_PLAN <- c(
     "typeOfComputation", 
     "maxNumberOfSubjects", 
     "maxNumberOfSubjects1", 
     "maxNumberOfSubjects2", 
     "maxNumberOfEvents", 
+    "plannedEvents",
+    "plannedSubjects",
     "alternative", 
     "stDev", 
     "normalApproximation", 
@@ -97,16 +105,18 @@ C_PARAMETER_ORDER_DESIGN_PLAN <- c(
     "meanRatio", 
     "groups", 
     "thetaH0", 
-    "lambda1", 
-    "lambda2", 
     "pi1", 
     "pi2", 
+    "lambda1", 
+    "lambda2", 
     "median1", 
     "median2", 
     "hazardRatio", 
     "effect", 
     "directionUpper", 
     "allocationRatioPlanned", 
+    "allocation1", 
+    "allocation2", 
     "optimumAllocationRatio", 
     "accountForObservationTimes", 
     "eventTime", 
@@ -119,5 +129,60 @@ C_PARAMETER_ORDER_DESIGN_PLAN <- c(
     "followUpTime", 
     "dropoutRate1", 
     "dropoutRate2", 
-    "dropoutTime"
+    "dropoutTime",
+    "seed",
+    
+    "singleEventsPerStage", 
+    "singleEventsPerArmAndStage", 
+    "singleEventsPerSubsetAndStage", 
+    "eventsPerStage", 
+    "populationEventsPerStage", 
+    "cumulativeEventsPerStage", 
+    "overallEventsPerStage", 
+    "expectedNumberOfEventsPerStage", 
+    "expectedNumberOfEvents", 
+    "expectedEventsH0", 
+    "expectedEventsH01", 
+    "expectedEventsH1", 
+    "eventsNotAchieved", 
+    "numberOfSubjects", 
+    "numberOfSubjects1", 
+    "numberOfSubjects2", 
+    "expectedNumberOfSubjects", 
+    "sampleSizes",
+    "rejectAtLeastOne",
+    "rejectPerStage", 
+    "rejectedArmsPerStage",
+    "rejectedPopulationsPerStage",
+    "overallReject", 
+    "conditionalPowerAchieved", 
+    "earlyStop", 
+    "analysisTime",
+    "studyDuration",
+    "maxStudyDuration",
+    "futilityPerStage",
+    "futilityStop",
+    "successPerStage",
+    "selectedArms",
+    "selectedPopulations",
+    "numberOfSelectedArms",
+    "numberOfPopulations",
+    "criticalValuesEffectScale",
+    "criticalValuesEffectScaleDelayedInformation",
+    "criticalValuesEffectScaleLower",
+    "criticalValuesEffectScaleUpper",
+    "criticalValuesPValueScale",
+    "futilityBoundsEffectScale",
+    "futilityBoundsEffectScaleDelayedInformation",
+    "futilityBoundsEffectScaleLower",
+    "futilityBoundsEffectScaleUpper",
+    "futilityBoundsPValueScale",
+    "futilityBoundsPValueScaleDelayedInformation",
+    "iterations"
 )
+
+.assertIsUniqueVector(C_PARAMETER_ORDER_DESIGN_PLAN, "C_PARAMETER_ORDER_DESIGN_PLAN")
+
+
+ 
+
