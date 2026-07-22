@@ -434,7 +434,8 @@ getSimulationMultiArmSurvivalBasic <- function(
         "dropoutTime",
         "eventTime",
         "kappa",
-        "piControl"
+        "piControl",
+        "maxNumberOfSubjects"
     )
     ) {
         simulationResults$.setParameterType(notApplicableParam, C_PARAM_NOT_APPLICABLE)

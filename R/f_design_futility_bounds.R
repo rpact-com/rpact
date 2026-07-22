@@ -837,6 +837,143 @@ getFutilityBounds <- function(
     return(NA_real_)
 }
 
+.getNumberOfSubjects <- function(designPlan, stage = NA_integer_) {
+    numberOfSubjects <- NA_real_
+    matrixInput <- FALSE
+    if (.isTrialDesignPlanMeans(designPlan) || .isTrialDesignPlanRates(designPlan)) {
+        if (designPlan$.isSampleSizeObject()) {
+            numberOfSubjects <- designPlan$numberOfSubjects
+            matrixInput <- TRUE
+        } else {
+            numberOfSubjects <- designPlan$maxNumberOfSubjects * designPlan$.design$informationRates
+        }
+    } else if (.isTrialDesignPlanSurvival(designPlan)) {
+        if (!is.null(designPlan$cumulativeEventsPerStage) && !all(is.na(designPlan$cumulativeEventsPerStage))) {
+            numberOfSubjects <- designPlan$cumulativeEventsPerStage
+            matrixInput <- TRUE
+        } else if (designPlan$.isSampleSizeObject()) {
+            numberOfSubjects <- designPlan$eventsFixed * designPlan$.design$informationRates
+        } else {
+            numberOfSubjects <- designPlan$maxNumberOfEvents * designPlan$.design$informationRates
+        }
+    } else if (
+            is(designPlan, "SimulationResultsMeans") || 
+            is(designPlan, "SimulationResultsMultiArmMeans") || 
+            is(designPlan, "SimulationResultsRates") || 
+            is(designPlan, "SimulationResultsMultiArmRates")) {
+        numberOfSubjects <- designPlan$plannedSubjects
+    } else if (is(designPlan, "SimulationResultsSurvival") || is(designPlan, "SimulationResultsMultiArmSurvival")) {
+        numberOfSubjects <- designPlan$plannedEvents
+    }
+    if (!is.na(stage)) {
+        if (matrixInput && is.matrix(numberOfSubjects)) {
+            numberOfSubjects <- numberOfSubjects[stage, ]
+        } else {
+            numberOfSubjects <- numberOfSubjects[stage]
+        }
+    }
+    return(numberOfSubjects)
+}
+
+.getNumberOfSubjectsTwoSample <- function(nTotal, allocationRatio) {
+    n1 <- allocationRatio * nTotal / (1 + allocationRatio) # treatment arm
+    n2 <- nTotal / (1 + allocationRatio) # control arm
+    return(list(n1 = n1, n2 = n2))
+}
+
+.getFisherInformationMeansTwoSample <- function(stDev, n1, n2, thetaMult = 1) {
+    return(1 / (stDev[1]^2 / n1 + thetaMult * stDev[2]^2 / n2))
+}
+
+.getFisherInformationMeans <- function(designPlan, stage = NA_integer_) {
+    nTotal <- .getNumberOfSubjects(designPlan, stage)
+    stDev <- designPlan$stDev
+    
+    # one group case
+    if ((.isTrialDesignPlanMeans(designPlan) || is(designPlan, "SimulationResultsMeans")) && designPlan$groups == 1) {
+        return(nTotal / stDev[1]^2)
+    } 
+    
+    allocationRatio <- .getAllocationRatioByStage(designPlan, stage)    
+    # multi-arm case
+    if (is(designPlan, "SimulationResultsMultiArmMeans")) {
+        return(nTotal / (designPlan$stDev[1]^2 * (1 + allocationRatio)))        
+    }
+    
+    # two group case
+    if (length(stDev) == 1 && designPlan$groups == 2) {
+        stDev <- rep(stDev, 2)
+    }
+    
+    n <- .getNumberOfSubjectsTwoSample(nTotal, allocationRatio)
+    thetaMult <- ifelse(isTRUE(designPlan$meanRatio), designPlan$thetaH0^2, 1)
+    return(.getFisherInformationMeansTwoSample(stDev, n$n1, n$n2, thetaMult))
+}
+
+.getFisherInformationRatesTwoSample <- function(pi1, pi2, n1, n2) {
+    return(1 / (pi1 * (1 - pi1) / n1 + pi2 * (1 - pi2) / n2))
+}
+
+.getFisherInformationRates <- function(designPlan, stage = NA_integer_) {
+    nTotal <- .getNumberOfSubjects(designPlan, stage)
+  
+    # one group case
+    if ((.isTrialDesignPlanRates(designPlan) || is(designPlan, "SimulationResultsRates")) && designPlan$groups == 1) {
+        pi0 <- designPlan$thetaH0
+        return(nTotal / (pi0 * (1 - pi0)))
+    }
+    
+    allocationRatio <- .getAllocationRatioByStage(designPlan, stage)
+    
+    # multi-arm case
+    if (is(designPlan, "SimulationResultsMultiArmRates")) {
+        n1 <- nTotal # active arm
+        n2 <- trunc(nTotal / allocationRatio) # common control arm TODO is truncation correct here?
+        pi1 <- designPlan$effectMatrix
+        pi2 <- designPlan$piControl
+        return(.getFisherInformationRatesTwoSample(pi1, pi2, n1, n2))
+    }
+    
+    # two group case
+    n <- .getNumberOfSubjectsTwoSample(nTotal, allocationRatio)
+    return(.getFisherInformationRatesTwoSample(designPlan$pi1, designPlan$pi2, n$n1, n$n2))
+}
+
+.getAllocationRatioByStage <- function(designPlan, stage = NA_integer_) {
+    allocationRatioPlanned <- designPlan$allocationRatioPlanned
+    if (is.na(stage) || length(allocationRatioPlanned) == 1) {
+        return(allocationRatioPlanned)
+    } 
+    
+    return(allocationRatioPlanned[stage])        
+}
+
+.getFisherInformationSurvival <- function(designPlan, stage = NA_integer_) {
+    cumulativeEvents <- .getNumberOfSubjects(designPlan, stage)
+    allocationRatio <- .getAllocationRatioByStage(designPlan, stage)
+
+    # multi-arm case
+    if (is(designPlan, "SimulationResultsMultiArmSurvival")) {
+        omega <- designPlan$effectMatrix
+
+        cumulativeEventsPerComparison <- cumulativeEvents *
+            sweep(
+                1 + allocationRatio * omega,
+                2,
+                1 + allocationRatio * colSums(omega),
+                FUN = "/"
+            )
+        
+        return(
+            allocationRatio / (1 + allocationRatio)^2 *
+                cumulativeEventsPerComparison
+        )
+    }
+
+    # two group case
+    return(allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents)
+}
+
 #'
 #' @title
 #' Get Fisher Information From a Design Plan or Simulation Results
@@ -853,8 +990,11 @@ getFutilityBounds <- function(
 #' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}},
 #' \code{\link[=getPowerSurvival]{getPowerSurvival()}},
 #' \code{\link[=getSimulationMeans]{getSimulationMeans()}},
-#' \code{\link[=getSimulationRates]{getSimulationRates()}}, or
-#' \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
+#' \code{\link[=getSimulationRates]{getSimulationRates()}},
+#' \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, or the
+#' corresponding multi-arm simulation functions.
+#' @param stage Integer. The analysis stage for which the Fisher information is
+#'        requested. If \code{NA} (default), the first stage is used.
 #'
 #' @details
 #' The returned information is the information used at the first stage of the
@@ -869,10 +1009,10 @@ getFutilityBounds <- function(
 #' based on the planned number of events and the allocation ratio.
 #'
 #' @return
-#' A numeric value or numeric vector containing the first-stage Fisher
-#' information. A vector is returned if the object contains several
-#' planning alternatives or sample size values. \code{NA_real_} is returned if
-#' the endpoint type is not supported by this helper.
+#' A numeric value, vector, or matrix containing the first-stage Fisher
+#' information. A vector or matrix can be returned if the object contains
+#' several planning alternatives, arms, or sample size values. \code{NA_real_}
+#' is returned if the endpoint type is not supported by this helper.
 #'
 #' @examples
 #' \dontrun{
@@ -895,94 +1035,21 @@ getFutilityBounds <- function(
 #' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}}
 #'
 #' @export
-getFisherInformation <- function(designPlan) {
-    fisherInformation <- NA_real_
-    if (.isTrialDesignPlanMeans(designPlan)) {
-        if (designPlan$.isSampleSizeObject()) {
-            numberOfSubjects <- designPlan$numberOfSubjects[1, ]
-        } else {
-            numberOfSubjects <- designPlan$maxNumberOfSubjects * designPlan$.design$informationRates[1]
-        }
-        stDev <- designPlan$stDev
-        if (length(stDev) == 1 && designPlan$groups == 2) {
-            stDev <- rep(stDev, 2)
-        }
-        if (designPlan$groups == 1) {
-            fisherInformation <- numberOfSubjects / stDev[1]^2
-        } else {
-            allocationRatio <- designPlan$allocationRatioPlanned[1]
-            if (designPlan$meanRatio) {
-                fisherInformation <- allocationRatio * numberOfSubjects /
-                    ((1 + allocationRatio) *
-                        (stDev[1]^2 + designPlan$thetaH0^2 * allocationRatio * stDev[2]^2))
-            } else {
-                fisherInformation <- allocationRatio * numberOfSubjects /
-                    ((1 + allocationRatio) *
-                        (stDev[1]^2 + allocationRatio * stDev[2]^2))
-            }
-        }
-    } else if (.isTrialDesignPlanRates(designPlan)) {
-        if (designPlan$.isSampleSizeObject()) {
-            n1 <- designPlan$numberOfSubjects[1, ]
-        } else {
-            n1 <- designPlan$maxNumberOfSubjects * designPlan$.design$informationRates[1]
-        }
-        if (designPlan$groups == 1) {
-            pi0 <- designPlan$thetaH0
-            fisherInformation <- n1 / (pi0 * (1 - pi0))
-        } else if (designPlan$groups == 2) {
-            pi1 <- designPlan$pi1
-            pi2 <- designPlan$pi2
-            allocationRatio <- designPlan$allocationRatioPlanned[1]
-            fisherInformation <- allocationRatio / (pi1 * (1 - pi1) + allocationRatio * pi2 * (1 - pi2)) * n1 / (1 + allocationRatio)
-        }
-    } else if (.isTrialDesignPlanSurvival(designPlan)) {
-        if (!is.null(designPlan$cumulativeEventsPerStage) && !all(is.na(designPlan$cumulativeEventsPerStage))) {
-            cumulativeEvents <- designPlan$cumulativeEventsPerStage[1, ]
-        } else if (designPlan$.isSampleSizeObject()) {
-            cumulativeEvents <- designPlan$eventsFixed * designPlan$.design$informationRates[1]
-        } else {
-            cumulativeEvents <- designPlan$maxNumberOfEvents * designPlan$.design$informationRates[1]
-        }
-        allocationRatio <- designPlan$allocationRatioPlanned[1]
-        fisherInformation <- allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents
-    } else if (is(designPlan, "SimulationResultsMeans")) {
-        numberOfSubjects <- designPlan$plannedSubjects[1]
-        stDev <- designPlan$stDev
-        if (length(stDev) == 1 && designPlan$groups == 2) {
-            stDev <- rep(stDev, 2)
-        }
-        if (designPlan$groups == 1) {
-            fisherInformation <- numberOfSubjects / stDev[1]^2
-        } else {
-            allocationRatio <- designPlan$allocationRatioPlanned[1]
-            if (designPlan$meanRatio) {
-                fisherInformation <- allocationRatio * numberOfSubjects /
-                    ((1 + allocationRatio) *
-                        (stDev[1]^2 + designPlan$thetaH0^2 * allocationRatio * stDev[2]^2))
-            } else {
-                fisherInformation <- allocationRatio * numberOfSubjects /
-                    ((1 + allocationRatio) *
-                        (stDev[1]^2 + allocationRatio * stDev[2]^2))
-            }
-        }
-    } else if (is(designPlan, "SimulationResultsRates")) {
-        n1 <- designPlan$plannedSubjects[1]
-        if (designPlan$groups == 1) {
-            pi0 <- designPlan$thetaH0
-            fisherInformation <- n1 / (pi0 * (1 - pi0))
-        } else if (designPlan$groups == 2) {
-            pi1 <- designPlan$pi1
-            pi2 <- designPlan$pi2
-            allocationRatio <- designPlan$allocationRatioPlanned[1]
-            fisherInformation <- allocationRatio / (pi1 * (1 - pi1) + allocationRatio * pi2 * (1 - pi2)) * n1 / (1 + allocationRatio)
-        }
-    } else if (is(designPlan, "SimulationResultsSurvival")) {
-        cumulativeEvents <- designPlan$plannedEvents[1]
-        allocationRatio <- designPlan$allocationRatioPlanned[1]
-        fisherInformation <- allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents
+getFisherInformation <- function(designPlan, stage = NA_integer_) {
+    .assertIsTrialDesignPlanOrSimulationResults(designPlan)
+    className <- .getClassName(designPlan)
+    if (is.na(stage)) {
+        stage <- 1L 
     }
-    return(fisherInformation)
+    if (grepl("Means", className)) {
+        return(.getFisherInformationMeans(designPlan, stage = stage))
+    } else if (grepl("Rates", className)) {
+        return(.getFisherInformationRates(designPlan, stage = stage))
+    } else if (grepl("Survival", className)) {
+        return(.getFisherInformationSurvival(designPlan, stage = stage))
+    }
+   
+    return(NA_real_)
 }
 
 .getFutilityBoundsTreatmentEffectScaleRatesTwoGroups <- function(designPlan, boundary, nStages) {

@@ -309,41 +309,6 @@ NULL
     return(piecewiseSurvivalTime[2:length(piecewiseSurvivalTime)])
 }
 
-.getNumberOfSubjectsInner <- function(..., timeValue, accrualTime, accrualIntensity, maxNumberOfSubjects) {
-    .assertIsSingleNumber(timeValue, "timeValue")
-    if (length(accrualTime) != length(accrualIntensity)) {
-        stopIllegalArgument("length of 'accrualTime' (", length(accrualIntensity), ") ",
-            "must be equel to length of 'accrualIntensity' (",
-            length(accrualIntensity), ")",
-            functionName = ".getNumberOfSubjectsInner",
-            parameter = "accrualTime",
-            relatedParameter = "accrualIntensity",
-            relatedValue = length(accrualIntensity), value = accrualTime
-        )
-    }
-
-    densityIntervals <- accrualTime
-    if (length(accrualTime) > 1) {
-        densityIntervals[2:length(accrualTime)] <- accrualTime[2:length(accrualTime)] -
-            accrualTime[1:(length(accrualTime) - 1)]
-    }
-    densityVector <- accrualIntensity / sum(densityIntervals * accrualIntensity)
-    for (l in seq_len(length(densityVector))) {
-        if (timeValue <= accrualTime[l]) {
-            if (l == 1) {
-                return(timeValue * densityVector[l] * maxNumberOfSubjects)
-            } else {
-                return(
-                    (sum(densityVector[1:(l - 1)] * densityIntervals[1:(l - 1)]) +
-                        (timeValue - accrualTime[l - 1]) * densityVector[l]) *
-                        maxNumberOfSubjects
-                )
-            }
-        }
-    }
-    return(maxNumberOfSubjects)
-}
-
 .addNumberOfSubjectsToPowerResult <- function(designPlan) {
     design <- designPlan$.design
 

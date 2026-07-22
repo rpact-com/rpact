@@ -122,18 +122,18 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
+                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
                 derivedParameters <- self$.getDerivedParameters()
                 if (length(derivedParameters) > 0) {
                     self$.showParametersOfOneGroup(
                         derivedParameters,
-                        "Derived from user defined parameters",
+                        "Derived parameters",
                         orderByParameterName = FALSE,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
                 }
-                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                )
                 self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Output",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
@@ -161,8 +161,8 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 if (self$kMax == C_KMAX_DEFAULT) {
                     self$.setParameterType("stages", C_PARAM_DEFAULT_VALUE)
                 } else {
-                    type <- self$.getParameterType("kMax")
-                    self$.setParameterType("stages", ifelse(type != C_PARAM_TYPE_UNKNOWN, type, C_PARAM_USER_DEFINED))
+                    self$.setParameterType("stages", ifelse(self$isDefinedParameter("kMax"), 
+                        self$.getParameterType("kMax"), C_PARAM_USER_DEFINED))
                 }
             } else {
                 self$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
@@ -454,16 +454,7 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
 
         # Defines the order of the parameter output
         .getParametersToShow = function() {
-            return(c(
-                "stages",
-                "alpha",
-                "beta",
-                "twoSidedPower",
-                "directionUpper",
-                "sided",
-                "criticalValues",
-                "stageLevels"
-            ))
+            return(C_PARAMETER_ORDER_DESIGN_FIXED)
         }
     )
 )
@@ -595,27 +586,7 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
 
         # Defines the order of the parameter output
         .getParametersToShow = function() {
-            return(c(
-                "method",
-                "kMax",
-                "stages",
-                "informationRates",
-                "alpha",
-                "alpha0Vec",
-                "bindingFutility",
-                "directionUpper",
-                "sided",
-                "tolerance",
-                "iterations",
-                "seed",
-                "alphaSpent",
-                "userAlphaSpending",
-                "criticalValues",
-                "stageLevels",
-                "scale",
-                "simAlpha",
-                "nonStochasticCurtailment"
-            ))
+            return(C_PARAMETER_ORDER_DESIGN_FISHER)
         }
     )
 )
@@ -900,7 +871,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             }
             if ((typeOfDesign == C_TYPE_OF_DESIGN_PT && !identical(bindingFutility, self$bindingFutility)) ||
                     (!identical(bindingFutility, self$bindingFutility) &&
-                        self$.getParameterType("futilityBounds") != C_PARAM_NOT_APPLICABLE &&
+                        self$isApplicableParameter("futilityBounds") &&
                         (sided == 1 || !grepl("^as.*", typeOfDesign) || typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) &&
                         (any(na.omit(futilityBounds) > -6) || any(na.omit(self$futilityBounds) > -6))
                     )) {
@@ -940,41 +911,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
 
         # Defines the order of the parameter output
         .getParametersToShow = function() {
-            return(c(
-                "typeOfDesign",
-                "kMax",
-                "stages",
-                "informationRates",
-                "alpha",
-                "beta",
-                "power",
-                "twoSidedPower",
-                "deltaWT",
-                "deltaPT1",
-                "deltaPT0",
-                "futilityBounds",
-                "bindingFutility",
-                "directionUpper",
-                "constantBoundsHP",
-                "gammaA",
-                "gammaB",
-                "optimizationCriterion",
-                "sided",
-                "betaAdjustment",
-                "delayedInformation",
-                "tolerance",
-                "alphaSpent",
-                "userAlphaSpending",
-                "betaSpent",
-                "typeBetaSpending",
-                "userBetaSpending",
-                "efficacyStops",
-                "futilityStops",
-                "criticalValues",
-                "stageLevels",
-                "decisionCriticalValues",
-                "reversalProbabilities"
-            ))
+            return(C_PARAMETER_ORDER_DESIGN_GS_AND_IN)
         }
     )
 )

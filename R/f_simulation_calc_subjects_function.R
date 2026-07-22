@@ -347,7 +347,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
     if (is.na(cppCodeBodyType)) {
         stopRuntimeIssue(
             ".getCalcSubjectsFunction() is not implemented for object ",
-            class(simulationResults)[1],
+            .getClassName(simulationResults),
             functionName = ".getCalcSubjectsFunction"
         )
     }

@@ -4,7 +4,7 @@
 \alias{getFisherInformation}
 \title{Get Fisher Information From a Design Plan or Simulation Results}
 \usage{
-getFisherInformation(designPlan)
+getFisherInformation(designPlan, stage = NA_integer_)
 }
 \arguments{
 \item{designPlan}{A trial design plan or simulation results object as returned by functions such as
@@ -15,14 +15,18 @@ getFisherInformation(designPlan)
 \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}},
 \code{\link[=getPowerSurvival]{getPowerSurvival()}},
 \code{\link[=getSimulationMeans]{getSimulationMeans()}},
-\code{\link[=getSimulationRates]{getSimulationRates()}}, or
-\code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.}
+\code{\link[=getSimulationRates]{getSimulationRates()}},
+\code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, or the
+corresponding multi-arm simulation functions.}
+
+\item{stage}{Integer. The analysis stage for which the Fisher information is
+requested. If \code{NA} (default), the first stage is used.}
 }
 \value{
-A numeric value or numeric vector containing the first-stage Fisher
-information. A vector is returned if the object contains several
-planning alternatives or sample size values. \code{NA_real_} is returned if
-the endpoint type is not supported by this helper.
+A numeric value, vector, or matrix containing the first-stage Fisher
+information. A vector or matrix can be returned if the object contains
+several planning alternatives, arms, or sample size values. \code{NA_real_}
+is returned if the endpoint type is not supported by this helper.
 }
 \description{
 Calculates the Fisher information at the first planned analysis stage for

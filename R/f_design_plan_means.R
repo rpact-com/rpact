@@ -546,7 +546,7 @@ NULL
             designPlan, "maxNumberOfSubjects",
             maxNumberOfSubjects, NA_real_
         )
-        designPlan$.setParameterType("effect", C_PARAM_GENERATED)
+        designPlan$.setParameterType("effect", C_PARAM_DERIVED)
     }
     .setValueAndParameterType(designPlan, "groups", groups, 2)
     if (groups == 1) {

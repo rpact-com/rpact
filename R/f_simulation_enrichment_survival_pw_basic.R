@@ -678,7 +678,8 @@ updateSubGroupVector <- function(
         )
     }
     simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
-    simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
+    simulationResults$.setParameterType("maxNumberOfSubjects", 
+        accrualSetup$.getParameterType("maxNumberOfSubjects"))
 
     .setValueAndParameterType(simulationResults, "kappa", kappa, 1)
 

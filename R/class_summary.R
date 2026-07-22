@@ -725,7 +725,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                             )) {
                         transposed <- TRUE
                         userDefinedEffectMatrix <-
-                            parameterSet$isUserDefinedParameter("effectMatrix")
+                            parameterSet$isUserDefinedOrDerivedParameter("effectMatrix")
                         if (userDefinedEffectMatrix) {
                             legendEntry[["[j]"]] <- "effect matrix row j (situation to consider)"
                         }
@@ -792,7 +792,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                         }
 
                         if (inherits(parameterSet, "ClosedCombinationTestResults") &&
-                                parameterSet$.getParameterType("adjustedStageWisePValues") != "g" &&
+                                parameterSet$isNotGeneratedParameter("adjustedStageWisePValues") &&
                                 parameterName == "separatePValues") {
                             transposed <- TRUE
                         }
@@ -1775,8 +1775,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     paramValue1 <- analysisResults[[paramName1]]
-    case1 <- analysisResults$.getParameterType(paramName1) != C_PARAM_NOT_APPLICABLE &&
-        !all(is.na(paramValue1))
+    case1 <- analysisResults$isApplicableParameter(paramName1) && !all(is.na(paramValue1))
     if (!is.na(paramCaption1) && analysisResults$isGeneratedParameter(paramName1)) {
         paramCaption1 <- sub("assumed ", "overall ", paramCaption1)
     }
@@ -1784,7 +1783,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     case2 <- FALSE
     if (!is.na(paramName2)) {
         paramValue2 <- analysisResults[[paramName2]]
-        case2 <- analysisResults$.getParameterType(paramName2) != C_PARAM_NOT_APPLICABLE &&
+        case2 <- analysisResults$isApplicableParameter(paramName2) &&
             !all(is.na(paramValue2))
         if (!is.na(paramCaption2) && analysisResults$isGeneratedParameter(paramName2)) {
             paramCaption2 <- sub("assumed ", "overall ", paramCaption2)
@@ -2386,6 +2385,23 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         )
     }
     header <- paste0(header, ".")
+    
+    if ("effectMatrix" %in% names(designPlan) && !is.null(designPlan$effectMatrix)) {
+        effectMatrix <- designPlan$effectMatrix
+        activeArms <- nrow(effectMatrix)
+        if (activeArms == 1) {
+            rownames(effectMatrix) <- NULL
+        }
+        effectMatrixLines <- capture.output(print(effectMatrix))
+        if (activeArms == 1) {
+            effectMatrixLines <- substring(effectMatrixLines, 6)
+        }
+        
+        header <- paste0(header, "\n\n", 
+            "User defined effect shape:", 
+            "\n", paste(effectMatrixLines, collapse = "\n"))
+    }
+    
     return(header)
 }
 
@@ -3131,7 +3147,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 parameterCaption = "Planned sample size",
                 roundDigits = -1
             )
-        } else if (analysisResults$.getParameterType("nPlanned") != C_PARAM_NOT_APPLICABLE) {
+        } else if (analysisResults$isApplicableParameter("nPlanned")) {
             summaryFactory$addParameter(analysisResults,
                 parameterName = "nPlanned",
                 parameterCaption = "Planned sample size",
@@ -3149,7 +3165,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 smoothedZeroFormat = TRUE
             )
         } else if (!multiHypothesesEnabled &&
-                analysisResults$.getParameterType("nPlanned") != C_PARAM_NOT_APPLICABLE) {
+                analysisResults$isApplicableParameter("nPlanned")) {
             parameterName <- "conditionalPower"
             if (!is.null(analysisResults[["conditionalPowerSimulated"]]) &&
                     length(analysisResults[["conditionalPowerSimulated"]]) > 0) {
@@ -3856,7 +3872,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     if (simulationEnabled && (multiArmEnabled || enrichmentEnabled)) {
-        if (multiArmEnabled && outputSize %in% c("medium", "large")) {
+        if (multiArmEnabled && outputSize %in% c("medium", "large") && design$kMax > 1) {
             .addSimulationMultiArmArrayParameter(
                 designPlan = designPlan,
                 parameterName = "selectedArms",
@@ -3878,10 +3894,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
 
-        if (multiArmEnabled && outputSize %in% c("medium", "large")) {
+        if (multiArmEnabled && outputSize %in% c("medium", "large") && design$kMax > 1) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "numberOfSelectedArms",
-                parameterCaption = "Number of selected arms",
+                parameterCaption = "Number of selected active arms",
                 roundDigits = digitSettings$digitsGeneral,
                 transpose = TRUE
             )
@@ -3896,7 +3912,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
 
-        if (outputSize == "large") {
+        if (outputSize == "large" && design$kMax > 1) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "conditionalPowerAchieved",
                 parameterCaption = "Conditional power (achieved)",
@@ -4223,7 +4239,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     userDefinedEffectMatrix <- !enrichmentEnabled &&
-        designPlan$isUserDefinedParameter("effectMatrix")
+        designPlan$isUserDefinedOrDerivedParameter("effectMatrix")
 
     if (userDefinedEffectMatrix) {
         return(list(
@@ -4292,7 +4308,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         smoothedZeroFormat = FALSE) {
     arrayData <- designPlan[[parameterName]]
     if (is.null(arrayData)) {
-        stopRuntimeIssue(class(designPlan)[1], " does not contain the field ", sQuote(parameterName),
+        stopRuntimeIssue(.getClassName(designPlan), " does not contain the field ", sQuote(parameterName),
             functionName = ".addSimulationArrayToSummary",
             parameter = parameterName
         )
@@ -4300,9 +4316,20 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
     numberOfVariedParams <- 1
     numberOfGroups <- 1
-    if (dim(arrayData)[1] > 1) {
-        numberOfVariedParams <- dim(arrayData)[2]
-        numberOfGroups <- dim(arrayData)[3]
+    arrayDataDim <- dim(arrayData)
+    if (length(arrayDataDim) > 1 && arrayDataDim[1] > 1) {
+        numberOfVariedParams <- arrayDataDim[2]
+        if (length(arrayDataDim) > 2) {
+            numberOfGroups <- arrayDataDim[3]
+        }
+    }
+    
+    if (is.na(numberOfGroups)) {
+        stopRuntimeIssue("Unable to identify 'numberOfGroups' from ", 
+            sQuote(parameterName), "in ", .getClassName(designPlan),
+            functionName = ".addSimulationArrayToSummary",
+            parameter = parameterName
+        )
     }
 
     for (variedParamNumber in 1:numberOfVariedParams) {
@@ -4319,9 +4346,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
 
         for (groupNumber in 1:numberOfGroups) {
-            if (numberOfVariedParams == 1 && numberOfGroups == 1 && length(dim(arrayData)) == 2) {
-                dataPerGroupAndStage <- arrayData
-            } else {
+            dataPerGroupAndStage <- arrayData
+            if (length(arrayDataDim) > 2 && (numberOfVariedParams == 1 || numberOfGroups == 1)) {
                 dataPerGroupAndStage <- arrayData[, variedParamNumber, groupNumber]
             }
             if (numberOfGroups > 1) {
@@ -4332,7 +4358,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             }
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterName,
-                values = dataPerGroupAndStage, parameterCaption = groupCaption,
+                values = dataPerGroupAndStage, 
+                parameterCaption = groupCaption,
                 roundDigits = digitsSampleSize,
                 smoothedZeroFormat = smoothedZeroFormat,
                 enforceFirstCase = TRUE
@@ -4353,6 +4380,15 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         totalNumberOfGroups <- dim(designPlan[[ifelse(grepl("Survival", .getClassName(designPlan)),
             "cumulativeEventsPerStage", "sampleSizes"
         )]])[3]
+        if (is.null(totalNumberOfGroups) || is.na(totalNumberOfGroups)) {
+            totalNumberOfGroups <- designPlan$activeArms 
+        }
+        if (is.null(totalNumberOfGroups) || is.na(totalNumberOfGroups)) {
+            warning("Unable to identify 'totalNumberOfGroups' from ", 
+                .pQuote(parameterName), "in ", .getClassName(designPlan),
+                call = FALSE
+            )
+        }
 
         numberOfGroups <- dim(arrayData)[3]
         if (parameterName == "selectedArms" &&
@@ -4397,15 +4433,17 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     } else {
         data <- designPlan[[parameterName]]
         numberOfGroups <- ncol(data)
+        
         for (groupNumber in 1:numberOfGroups) {
             dataPerGroupAndStage <- data[, groupNumber]
+            paramCaption <- ifelse(groupNumber == numberOfGroups,
+                paste0(parameterCaption, ", control"),
+                paste0(parameterCaption, ", treatment ", groupNumber)
+            )
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterName,
                 values = dataPerGroupAndStage,
-                parameterCaption = ifelse(groupNumber == numberOfGroups,
-                    paste0(parameterCaption, ", control"),
-                    paste0(parameterCaption, ", treatment ", groupNumber)
-                ),
+                parameterCaption = paramCaption,
                 roundDigits = roundDigits,
                 smoothedZeroFormat = smoothedZeroFormat
             )

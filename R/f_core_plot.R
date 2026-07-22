@@ -319,7 +319,7 @@ plotTypes <- function(
 
     for (param in c("alternative", "pi1", "hazardRatio", "muMaxVector", "piMaxVector", "omegaMaxVector")) {
         if (!is.null(resultObject[[param]]) &&
-                resultObject$.getParameterType(param) != C_PARAM_NOT_APPLICABLE &&
+                resultObject$isApplicableParameter(param) &&
                 (anyNA(resultObject[[param]]) ||
                     length(resultObject[[param]]) <= 1)) {
             return(FALSE)
@@ -327,8 +327,8 @@ plotTypes <- function(
     }
 
     if (!is.null(resultObject[["hazardRatio"]]) && !is.null(resultObject[["overallReject"]]) &&
-            resultObject$.getParameterType("hazardRatio") != C_PARAM_NOT_APPLICABLE &&
-            resultObject$.getParameterType("overallReject") != C_PARAM_NOT_APPLICABLE &&
+            resultObject$isApplicableParameter("hazardRatio") &&
+            resultObject$isApplicableParameter("overallReject") &&
             length(resultObject$hazardRatio) > 0 &&
             length(resultObject$hazardRatio) != length(resultObject$overallReject)) {
         return(FALSE)

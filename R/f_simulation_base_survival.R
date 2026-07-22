@@ -510,7 +510,8 @@ getSimulationSurvival <- function(
     )
 
     simulationResults$accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
-    simulationResults$.setParameterType("accrualTime", accrualSetup$.getParameterType("accrualTime"))
+    simulationResults$.setParameterType("accrualTime", 
+        accrualSetup$.getParameterType("accrualTime"))
 
     simulationResults$accrualIntensity <- accrualSetup$accrualIntensity
     simulationResults$.setParameterType(
@@ -674,7 +675,8 @@ getSimulationSurvival <- function(
         simulationResults, "allocationRatioPlanned",
         allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
     )
-    .setValueAndParameterType(simulationResults, "conditionalPower", conditionalPower, NA_real_)
+    .setValueAndParameterType(simulationResults, "conditionalPower", 
+        conditionalPower, NA_real_, notApplicableIfNA = TRUE)
     if (!is.na(thetaH0) && !is.na(thetaH1) && thetaH0 != 1) {
         thetaH1 <- thetaH1 / thetaH0
         .setValueAndParameterType(simulationResults, "thetaH1", thetaH1, NA_real_)
@@ -803,8 +805,7 @@ getSimulationSurvival <- function(
         overview
     )
 
-    if (pwsTimeObject$.isPiBased() &&
-            pwsTimeObject$.getParameterType("hazardRatio") != C_PARAM_USER_DEFINED) {
+    if (pwsTimeObject$.isPiBased() && !pwsTimeObject$isUserDefinedParameter("hazardRatio")) {
         simulationResults$hazardRatio <- matrix(overview$hazardRatio, nrow = design$kMax)[1, ]
     }
     simulationResults$iterations <- matrix(as.integer(overview$iterations), nrow = design$kMax)

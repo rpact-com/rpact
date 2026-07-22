@@ -159,6 +159,19 @@ getDesignFisher <- function(
     ))
 }
 
+.getFisherMethods <- function() {
+    return(c(
+        C_FISHER_METHOD_FULL_ALPHA,
+        C_FISHER_METHOD_EQUAL_ALPHA,
+        C_FISHER_METHOD_NO_INTERACTION,
+        C_FISHER_METHOD_USER_DEFINED_ALPHA
+    ))
+}
+
+.isFisherMethod <- function(method) {
+    return(method %in% .getFisherMethods())
+}
+
 .getDesignFisherDefaultValues <- function(designFun = NULL) {
     defaultValues <- list(
         kMax = NA_integer_,
@@ -272,7 +285,8 @@ getDesignFisher <- function(
     .assertDesignParameterExists(design, "method", C_FISHER_METHOD_DEFAULT)
     .assertIsSingleCharacter(design$method, "method")
     if (!.isFisherMethod(design$method)) {
-        stopIllegalArgument("'method' must be one of the following: ", .printFisherMethods(),
+        stopIllegalArgument("'method' must be one of the following: ", 
+            .arrayToString(.getFisherMethods(), encapsulate = TRUE),
             functionName = ".getDesignFisher",
             parameter = "method", value = method
         )

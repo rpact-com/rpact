@@ -395,42 +395,28 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         design = NULL,
         ...,
         activeArms = NA_integer_,
-        # C_ACTIVE_ARMS_DEFAULT = 3L
         piControl = NA_real_,
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
-        # C_TYPE_OF_SHAPE_DEFAULT
         omegaMaxVector = seq(1, 2.6, 0.4),
-        # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         kappa = 1,
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
         eventTime = 12,
-        # C_EVENT_TIME_DEFAULT
         accrualTime = c(0, 12),
-        # C_ACCRUAL_TIME_DEFAULT
         accrualIntensity = 0.1,
-        # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),
         dropoutRate1 = 0,
-        # C_DROP_OUT_RATE_DEFAULT
         dropoutRate2 = 0,
-        # C_DROP_OUT_RATE_DEFAULT
         dropoutTime = 12,
-        # C_DROP_OUT_TIME_DEFAULT
         maxNumberOfSubjects = NA_real_,
         intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
-        # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
         directionUpper = NA,
-        # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
         typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
-        # C_TYPE_OF_SELECTION_DEFAULT
         effectMeasure = c("effectEstimate", "testStatistic"),
-        # C_EFFECT_MEASURE_DEFAULT
         successCriterion = c("all", "atLeastOne"),
-        # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -441,7 +427,6 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         maxNumberOfIterations = 1000L,
-        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
@@ -742,7 +727,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     )
     simulationResults$.setParameterType(
         "numberOfSelectedArms",
-        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
 
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
@@ -752,7 +737,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
     simulationResults$.setParameterType(
         "selectedArms",
-        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations

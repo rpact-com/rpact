@@ -100,8 +100,7 @@ NULL
             }
 
             if (is.function(paramValue)) {
-                valueStr <- ifelse(obj$.getParameterType(parameterName) ==
-                    C_PARAM_USER_DEFINED, "user defined", "default")
+                valueStr <- ifelse(obj$isUserDefinedParameter(parameterName), "user defined", "default")
                 return(list(
                     paramName = parameterName,
                     paramValue = valueStr,

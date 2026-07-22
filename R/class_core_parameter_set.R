@@ -281,11 +281,17 @@ ParameterSet <- R6::R6Class("ParameterSet",
         isUserDefinedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_USER_DEFINED)
         },
+        isNotUserDefinedParameter = function(parameterName) {
+            return(!self$isUserDefinedParameter(parameterName))
+        },
         isDefaultParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE)
         },
         isGeneratedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_GENERATED)
+        },
+        isNotGeneratedParameter = function(parameterName) {
+            return(!self$isGeneratedParameter(parameterName))
         },
         isGeneratedOrDerivedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) %in% c(C_PARAM_GENERATED, C_PARAM_DERIVED))
@@ -296,8 +302,17 @@ ParameterSet <- R6::R6Class("ParameterSet",
         isUndefinedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN)
         },
+        isDefinedParameter = function(parameterName) {
+            return(!self$isUndefinedParameter(parameterName))
+        },
         isNotApplicableParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE)
+        },
+        isApplicableParameter = function(parameterName) {
+            return(!self$isNotApplicableParameter(parameterName))
+        },
+        isUserDefinedOrDerivedParameter = function(parameterName) {
+            return(self$isUserDefinedParameter(parameterName) || self$isDerivedParameter(parameterName))
         },
         .getInputParameters = function() {
             params <- self$.getParametersOfOneGroup(c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))
@@ -352,13 +367,20 @@ ParameterSet <- R6::R6Class("ParameterSet",
             } else {
                 parameterNames <- names(self$.parameterTypes[which(self$.parameterTypes %in% parameterType)])
             }
+            
+            if (length(parameterNames) == 0) {
+                return(character())
+            }
 
             parametersToShow <- self$.getParametersToShow()
             if (is.null(parametersToShow) || length(parametersToShow) == 0) {
                 return(parameterNames)
             }
-
-            return(parametersToShow[parametersToShow %in% parameterNames])
+            
+            parametersToShow <- parametersToShow[parametersToShow %in% parameterNames]
+            parameterNames <- parameterNames[!(parameterNames %in% parametersToShow)]
+            parameterNames <- c(parametersToShow, parameterNames)
+            return(parameterNames)
         },
         .showParameterType = function(parameterName) {
             if (!self$.showParameterTypeEnabled) {
@@ -720,10 +742,14 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 paramValueFormatted <- .listToString(paramValueFormatted)
             }
             if (is.function(paramValue) || grepl("Function$", paramName)) {
+                
+                defaultValue <- ifelse(identical(paramName, "calcEventsFunction"), 
+                    "Conditional power based", "default")
+                
                 paramValueFormatted <- ifelse(
                     self$isUserDefinedParameter(paramName),
                     ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"),
-                    "default"
+                    defaultValue
                 )
             }
             prefix <- ifelse(showParameterType, self$.showParameterType(paramName), "")

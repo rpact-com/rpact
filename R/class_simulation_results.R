@@ -180,21 +180,21 @@ SimulationResults <- R6::R6Class(
                         orderByParameterName = FALSE,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
-                    derivedParameters <- self$.getDerivedParameters()
-                    if (length(derivedParameters) > 0) {
-                        self$.showParametersOfOneGroup(
-                            derivedParameters,
-                            "Derived from user defined parameters",
-                            orderByParameterName = FALSE,
-                            consoleOutputEnabled = consoleOutputEnabled
-                        )
-                    }
                     self$.showParametersOfOneGroup(
                         self$.getDefaultParameters(),
                         "Default parameters",
                         orderByParameterName = FALSE,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
+                    derivedParameters <- self$.getDerivedParameters()
+                    if (length(derivedParameters) > 0) {
+                        self$.showParametersOfOneGroup(
+                            derivedParameters,
+                            "Derived parameters",
+                            orderByParameterName = FALSE,
+                            consoleOutputEnabled = consoleOutputEnabled
+                        )
+                    }
                     self$.showParametersOfOneGroup(
                         self$.getGeneratedParameters(),
                         "Results",
@@ -605,42 +605,10 @@ SimulationResults <- R6::R6Class(
             }
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         },
+
+        # Defines the order of the parameter output
         .getParametersToShow = function() {
-            parametersToShow <- self$.getVisibleFieldNames()
-            y <- c(
-                "iterations",
-                "overallReject", # base
-                "rejectAtLeastOne",
-                "rejectPerStage",
-                "rejectedArmsPerStage",
-                "rejectedPopulationsPerStage"
-            )
-            if (self$.design$kMax > 1) {
-                y <- c(y, "futilityStop")
-            }
-            y <- c(
-                y,
-                "futilityPerStage",
-                "earlyStop", # base
-                "successPerStage",
-                "selectedArms",
-                "selectedPopulations",
-                "numberOfSelectedArms",
-                "numberOfPopulations",
-                "singleEventsPerStage",
-                "singleEventsPerArmAndStage",
-                "singleEventsPerSubsetAndStage",
-                "cumulativeEventsPerStage",
-                "expectedNumberOfSubjects",
-                "expectedNumberOfEvents",
-                "numberOfSubjects",
-                "numberOfSubjects1",
-                "numberOfSubjects2",
-                "sampleSizes",
-                "conditionalPowerAchieved" # base
-            )
-            parametersToShow <- c(parametersToShow[!(parametersToShow %in% y)], y[y %in% parametersToShow])
-            return(parametersToShow)
+            return(C_PARAMETER_ORDER_DESIGN_PLAN)
         },
         .isSampleSizeObject = function() {
             return(FALSE)
@@ -1248,20 +1216,20 @@ SimulationResultsSurvival <- R6::R6Class(
         eventsPerStage = NULL,
         eventTime = NULL,
         expectedNumberOfSubjects = NULL,
-        hazardRatio = NULL,
+        maxNumberOfSubjects = NULL,
         kappa = NULL,
+        hazardRatio = NULL,
         lambda1 = NULL,
         lambda2 = NULL,
-        maxNumberOfSubjects = NULL,
         median1 = NULL,
         median2 = NULL,
+        pi1 = NULL,
+        pi2 = NULL,
         numberOfSubjects = NULL,
         numberOfSubjects1 = NULL,
         numberOfSubjects2 = NULL,
         overallEventsPerStage = NULL,
         overallReject = NULL,
-        pi1 = NULL,
-        pi2 = NULL,
         piecewiseSurvivalTime = NULL,
         rejectPerStage = NULL,
         singleEventsPerStage = NULL,
