@@ -1206,7 +1206,6 @@ NULL
     if (typeOfShape == "sigmoidEmax") {
         .setValueAndParameterType(simulationResults, "gED50", gED50, NA_real_)
     }
-    .setValueAndParameterType(simulationResults, "slope", slope, 1)
     if (typeOfSelection != "userDefined") {
         .setValueAndParameterType(simulationResults, "threshold", threshold, -Inf)
         .setValueAndParameterType(simulationResults, "epsilonValue", 
@@ -1218,6 +1217,8 @@ NULL
         simulationResults$.setParameterType("epsilonValue", C_PARAM_NOT_APPLICABLE)
         simulationResults$.setParameterType("rValue", C_PARAM_NOT_APPLICABLE)
     }
+
+    .setValueAndParameterType(simulationResults, "slope", slope, 1)
     .setValueAndParameterType(
         simulationResults,
         "intersectionTest",
@@ -1225,9 +1226,24 @@ NULL
         C_INTERSECTION_TEST_MULTIARMED_DEFAULT
     )
     .setValueAndParameterType(simulationResults, "typeOfSelection", typeOfSelection, C_TYPE_OF_SELECTION_DEFAULT)
-    .setValueAndParameterType(simulationResults, "typeOfShape", typeOfShape, C_TYPE_OF_SHAPE_DEFAULT)
     .setValueAndParameterType(simulationResults, "successCriterion", successCriterion, C_SUCCESS_CRITERION_DEFAULT)
     .setValueAndParameterType(simulationResults, "effectMeasure", effectMeasure, C_EFFECT_MEASURE_DEFAULT)
-
+    .setValueAndParameterType(simulationResults, "typeOfShape", typeOfShape, C_TYPE_OF_SHAPE_DEFAULT)
+    
+    if (activeArms == 1) {
+        simulationResults$.setParameterType("slope", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("threshold", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("intersectionTest", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("typeOfSelection", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("successCriterion", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("effectMeasure", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("epsilonValue", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("rValue", C_PARAM_NOT_APPLICABLE)
+    }
+    
+    if (design$kMax == 1) {
+        simulationResults$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
+    }
+    
     return(simulationResults)
 }

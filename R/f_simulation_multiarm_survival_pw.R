@@ -727,7 +727,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     )
     simulationResults$.setParameterType(
         "numberOfSelectedArms",
-        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
 
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
@@ -737,7 +737,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
     simulationResults$.setParameterType(
         "selectedArms",
-        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations

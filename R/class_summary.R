@@ -2397,7 +2397,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             effectMatrixLines <- substring(effectMatrixLines, 6)
         }
         
-        header <- paste0(header, "\n\nEffect matrix:\n", paste(effectMatrixLines, collapse = "\n"))
+        header <- paste0(header, "\n\n", 
+            "User defined effect shape:", 
+            "\n", paste(effectMatrixLines, collapse = "\n"))
     }
     
     return(header)
@@ -3870,7 +3872,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     if (simulationEnabled && (multiArmEnabled || enrichmentEnabled)) {
-        if (multiArmEnabled && outputSize %in% c("medium", "large")) {
+        if (multiArmEnabled && outputSize %in% c("medium", "large") && design$kMax > 1) {
             .addSimulationMultiArmArrayParameter(
                 designPlan = designPlan,
                 parameterName = "selectedArms",
@@ -3892,10 +3894,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
 
-        if (multiArmEnabled && outputSize %in% c("medium", "large")) {
+        if (multiArmEnabled && outputSize %in% c("medium", "large") && design$kMax > 1) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "numberOfSelectedArms",
-                parameterCaption = "Number of selected arms",
+                parameterCaption = "Number of selected active arms",
                 roundDigits = digitSettings$digitsGeneral,
                 transpose = TRUE
             )
@@ -3910,7 +3912,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
 
-        if (outputSize == "large") {
+        if (outputSize == "large" && design$kMax > 1) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "conditionalPowerAchieved",
                 parameterCaption = "Conditional power (achieved)",
@@ -4378,6 +4380,15 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         totalNumberOfGroups <- dim(designPlan[[ifelse(grepl("Survival", .getClassName(designPlan)),
             "cumulativeEventsPerStage", "sampleSizes"
         )]])[3]
+        if (is.null(totalNumberOfGroups) || is.na(totalNumberOfGroups)) {
+            totalNumberOfGroups <- designPlan$activeArms 
+        }
+        if (is.null(totalNumberOfGroups) || is.na(totalNumberOfGroups)) {
+            warning("Unable to identify 'totalNumberOfGroups' from ", 
+                .pQuote(parameterName), "in ", .getClassName(designPlan),
+                call = FALSE
+            )
+        }
 
         numberOfGroups <- dim(arrayData)[3]
         if (parameterName == "selectedArms" &&
@@ -4422,6 +4433,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     } else {
         data <- designPlan[[parameterName]]
         numberOfGroups <- ncol(data)
+        
         for (groupNumber in 1:numberOfGroups) {
             dataPerGroupAndStage <- data[, groupNumber]
             paramCaption <- ifelse(groupNumber == numberOfGroups,

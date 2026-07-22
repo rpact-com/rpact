@@ -742,10 +742,14 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 paramValueFormatted <- .listToString(paramValueFormatted)
             }
             if (is.function(paramValue) || grepl("Function$", paramName)) {
+                
+                defaultValue <- ifelse(identical(paramName, "calcEventsFunction"), 
+                    "Conditional power based", "default")
+                
                 paramValueFormatted <- ifelse(
                     self$isUserDefinedParameter(paramName),
                     ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"),
-                    "default"
+                    defaultValue
                 )
             }
             prefix <- ifelse(showParameterType, self$.showParameterType(paramName), "")
