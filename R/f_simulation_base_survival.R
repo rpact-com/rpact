@@ -510,7 +510,8 @@ getSimulationSurvival <- function(
     )
 
     simulationResults$accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
-    simulationResults$.setParameterType("accrualTime", accrualSetup$.getParameterType("accrualTime"))
+    simulationResults$.setParameterType("accrualTime", 
+        accrualSetup$.getParameterType("accrualTime"))
 
     simulationResults$accrualIntensity <- accrualSetup$accrualIntensity
     simulationResults$.setParameterType(
@@ -804,8 +805,7 @@ getSimulationSurvival <- function(
         overview
     )
 
-    if (pwsTimeObject$.isPiBased() &&
-            pwsTimeObject$.getParameterType("hazardRatio") != C_PARAM_USER_DEFINED) {
+    if (pwsTimeObject$.isPiBased() && !pwsTimeObject$isUserDefinedParameter("hazardRatio")) {
         simulationResults$hazardRatio <- matrix(overview$hazardRatio, nrow = design$kMax)[1, ]
     }
     simulationResults$iterations <- matrix(as.integer(overview$iterations), nrow = design$kMax)

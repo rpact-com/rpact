@@ -504,7 +504,7 @@ NULL
         )
     }
 
-    if (designPlan$.getParameterType("accountForObservationTimes") != C_PARAM_USER_DEFINED) {
+    if (!designPlan$isUserDefinedParameter("accountForObservationTimes")) {
         designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
     }
     designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
@@ -742,11 +742,7 @@ NULL
     designPlan$.accrualTime <- accrualSetup
 
     designPlan$totalAccrualTime <- accrualSetup$accrualTime[length(accrualSetup$accrualTime)]
-    if (length(accrualSetup$accrualTime) > 2) {
-        designPlan$.setParameterType("totalAccrualTime", C_PARAM_GENERATED)
-    } else {
-        designPlan$.setParameterType("totalAccrualTime", C_PARAM_NOT_APPLICABLE)
-    }
+    designPlan$.setParameterType("totalAccrualTime", C_PARAM_NOT_APPLICABLE)
 
     if (is.na(maxNumberOfSubjects)) {
         if (!is.na(accrualSetup$maxNumberOfSubjects)) {
@@ -770,7 +766,8 @@ NULL
         ) {
         designPlan$.setParameterType("accrualTime", C_PARAM_DEFAULT_VALUE)
     } else {
-        designPlan$.setParameterType("accrualTime", accrualSetup$.getParameterType("accrualTime"))
+        designPlan$.setParameterType("accrualTime", 
+            accrualSetup$.getParameterType("accrualTime"))
     }
 
     if (length(designPlan$accrualIntensity) == 1 &&
@@ -1540,12 +1537,7 @@ NULL
     designPlan$.setParameterType("maxNumberOfSubjects1", C_PARAM_GENERATED)
     designPlan$.setParameterType("maxNumberOfSubjects2", C_PARAM_GENERATED)
 
-    if (ncol(designPlan$informationRates) == 1 &&
-            identical(designPlan$informationRates[, 1], designPlan$.design$informationRates)) {
-        designPlan$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
-    } else {
-        designPlan$.setParameterType("informationRates", C_PARAM_GENERATED)
-    }
+    designPlan$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
     designPlan$.setParameterType("numberOfSubjects", C_PARAM_GENERATED)
     designPlan$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
 
@@ -2873,7 +2865,7 @@ getPowerSurvival <- function(
     if (!anyNA(designPlan$analysisTime) && !anyNA(designPlan$accrualTime)) {
         designPlan$followUpTime <- designPlan$analysisTime[kMax, ] -
             designPlan$accrualTime[length(designPlan$accrualTime)]
-        designPlan$.setParameterType("followUpTime", C_PARAM_GENERATED)
+        designPlan$.setParameterType("followUpTime", C_PARAM_NOT_APPLICABLE)
     }
 
     designPlan$singleEventsPerStage <- .getSingleEventsPerStage(designPlan$cumulativeEventsPerStage)

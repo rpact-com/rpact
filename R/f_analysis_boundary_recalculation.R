@@ -252,13 +252,13 @@ getObservedInformationRates <- function(
 .getRecalculatedDesign <- function(design, newArgumentValues, ignore = character()) {
     parametersToIgnore <- character()
     if (!("kMax" %in% names(newArgumentValues))) {
-        if (identical(design$.getParameterType("kMax"), C_PARAM_USER_DEFINED)) {
+        if (design$isUserDefinedParameter("kMax")) {
             parametersToIgnore <- c(parametersToIgnore, "kMax")
         }
         newArgumentValues$kMax <- NA_integer_
     }
     for (paramName in c("futilityBounds", ignore)) {
-        if (identical(design$.getParameterType(paramName), C_PARAM_USER_DEFINED)) {
+        if (design$isUserDefinedParameter(paramName)) {
             parametersToIgnore <- c(parametersToIgnore, paramName)
             if (!(paramName %in% names(newArgumentValues))) {
                 newArgumentValues[[paramName]] <- NA_real_

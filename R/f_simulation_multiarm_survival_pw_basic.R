@@ -588,7 +588,7 @@ NULL
         plannedEvents = plannedEvents,
         analysisTime = analysisTime,
         numberOfSubjects = numberOfSubjects,
-        ##  necessary for use in .performClosedCombinationTestForSimulationMultiArm():
+        # necessary for use in .performClosedCombinationTestForSimulationMultiArm():
         allocationRatioPlanned = rep(allocationFraction[1] / allocationFraction[2], kMax),
         testStatistics = testStatistics,
         overallEffects = overallEffects,

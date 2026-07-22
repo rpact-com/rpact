@@ -281,11 +281,17 @@ ParameterSet <- R6::R6Class("ParameterSet",
         isUserDefinedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_USER_DEFINED)
         },
+        isNotUserDefinedParameter = function(parameterName) {
+            return(!self$isUserDefinedParameter(parameterName))
+        },
         isDefaultParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE)
         },
         isGeneratedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_GENERATED)
+        },
+        isNotGeneratedParameter = function(parameterName) {
+            return(!self$isGeneratedParameter(parameterName))
         },
         isGeneratedOrDerivedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) %in% c(C_PARAM_GENERATED, C_PARAM_DERIVED))
@@ -296,8 +302,14 @@ ParameterSet <- R6::R6Class("ParameterSet",
         isUndefinedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN)
         },
+        isDefinedParameter = function(parameterName) {
+            return(!self$isUndefinedParameter(parameterName))
+        },
         isNotApplicableParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE)
+        },
+        isApplicableParameter = function(parameterName) {
+            return(!self$isNotApplicableParameter(parameterName))
         },
         isUserDefinedOrDerivedParameter = function(parameterName) {
             return(self$isUserDefinedParameter(parameterName) || self$isDerivedParameter(parameterName))

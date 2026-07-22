@@ -161,8 +161,8 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 if (self$kMax == C_KMAX_DEFAULT) {
                     self$.setParameterType("stages", C_PARAM_DEFAULT_VALUE)
                 } else {
-                    type <- self$.getParameterType("kMax")
-                    self$.setParameterType("stages", ifelse(type != C_PARAM_TYPE_UNKNOWN, type, C_PARAM_USER_DEFINED))
+                    self$.setParameterType("stages", ifelse(self$isDefinedParameter("kMax"), 
+                        self$.getParameterType("kMax"), C_PARAM_USER_DEFINED))
                 }
             } else {
                 self$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
@@ -871,7 +871,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             }
             if ((typeOfDesign == C_TYPE_OF_DESIGN_PT && !identical(bindingFutility, self$bindingFutility)) ||
                     (!identical(bindingFutility, self$bindingFutility) &&
-                        self$.getParameterType("futilityBounds") != C_PARAM_NOT_APPLICABLE &&
+                        self$isApplicableParameter("futilityBounds") &&
                         (sided == 1 || !grepl("^as.*", typeOfDesign) || typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) &&
                         (any(na.omit(futilityBounds) > -6) || any(na.omit(self$futilityBounds) > -6))
                     )) {

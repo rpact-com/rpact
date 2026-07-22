@@ -571,9 +571,9 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             }
 
             if (!is.na(self$eventTime) &&
-                    self$.getParameterType("pi1") != C_PARAM_USER_DEFINED &&
+                    self$isNotUserDefinedParameter("pi1") &&
                     self$.getParameterType("pi1") != C_PARAM_DEFAULT_VALUE &&
-                    self$.getParameterType("pi2") != C_PARAM_USER_DEFINED &&
+                    self$isNotUserDefinedParameter("pi2") &&
                     self$.getParameterType("pi2") != C_PARAM_DEFAULT_VALUE) {
                 if (self$isUserDefinedParameter("eventTime")) {
                     warning("'eventTime' (", round(self$eventTime, 3),
@@ -1022,7 +1022,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     }
                 }
 
-                hazardRatioCalculationEnabled <- !self$isUserDefinedParameter("hazardRatio")
+                hazardRatioCalculationEnabled <- self$isNotUserDefinedParameter("hazardRatio")
                 if (self$isUserDefinedParameter("pi1") && self$isUserDefinedParameter("pi2")) {
                     hazardRatioCalculationEnabled <- TRUE
                 }
@@ -1322,23 +1322,23 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
         .initMedian = function() {
             if (length(self$eventTime) == 1 && !is.na(self$eventTime)) {
                 if (length(self$pi1) > 0 && !all(is.na(self$pi1)) &&
-                        self$.getParameterType("median1") != C_PARAM_USER_DEFINED) {
+                        self$isNotUserDefinedParameter("median1")) {
                     self$median1 <- getMedianByPi(self$pi1, self$eventTime, kappa = self$kappa)
                     self$.setParameterType("median1", C_PARAM_DERIVED)
                 }
                 if (length(self$pi2) == 1 && !is.na(self$pi2) &&
-                        self$.getParameterType("median2") != C_PARAM_USER_DEFINED) {
+                        self$isNotUserDefinedParameter("median2")) {
                     self$median2 <- getMedianByPi(self$pi2, self$eventTime, kappa = self$kappa)
                     self$.setParameterType("median2", C_PARAM_DERIVED)
                 }
             } else {
                 if (length(self$lambda1) > 0 && !all(is.na(self$lambda1)) &&
-                        self$.getParameterType("median1") != C_PARAM_USER_DEFINED) {
+                        self$isNotUserDefinedParameter("median1")) {
                     self$median1 <- getMedianByLambda(self$lambda1, kappa = self$kappa)
                     self$.setParameterType("median1", C_PARAM_DERIVED)
                 }
                 if (length(self$lambda2) == 1 && !is.na(self$lambda2) &&
-                        self$.getParameterType("median2") != C_PARAM_USER_DEFINED) {
+                        self$isNotUserDefinedParameter("median2")) {
                     self$median2 <- getMedianByLambda(self$lambda2, kappa = self$kappa)
                     self$.setParameterType("median2", C_PARAM_DERIVED)
                 }
@@ -1399,14 +1399,14 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 if ((length(self$lambda1) == 1 && is.na(self$lambda1)) ||
                         (self$isGeneratedOrDerivedParameter("lambda1") &&
                             (
-                                self$.getParameterType("median1") != C_PARAM_USER_DEFINED ||
-                                    self$.getParameterType("median2") != C_PARAM_USER_DEFINED
+                                self$isNotUserDefinedParameter("median1") ||
+                                    self$isNotUserDefinedParameter("median2")
                             )
                         ) ||
                         (self$isGeneratedOrDerivedParameter("lambda2") &&
                             (
-                                self$.getParameterType("median1") != C_PARAM_USER_DEFINED ||
-                                    self$.getParameterType("median2") != C_PARAM_USER_DEFINED
+                                self$isNotUserDefinedParameter("median1") ||
+                                    self$isNotUserDefinedParameter("median2")
                             )
                         )
                     ) {

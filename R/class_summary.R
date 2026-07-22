@@ -792,7 +792,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                         }
 
                         if (inherits(parameterSet, "ClosedCombinationTestResults") &&
-                                parameterSet$.getParameterType("adjustedStageWisePValues") != "g" &&
+                                parameterSet$isNotGeneratedParameter("adjustedStageWisePValues") &&
                                 parameterName == "separatePValues") {
                             transposed <- TRUE
                         }
@@ -1775,8 +1775,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     paramValue1 <- analysisResults[[paramName1]]
-    case1 <- analysisResults$.getParameterType(paramName1) != C_PARAM_NOT_APPLICABLE &&
-        !all(is.na(paramValue1))
+    case1 <- analysisResults$isApplicableParameter(paramName1) && !all(is.na(paramValue1))
     if (!is.na(paramCaption1) && analysisResults$isGeneratedParameter(paramName1)) {
         paramCaption1 <- sub("assumed ", "overall ", paramCaption1)
     }
@@ -1784,7 +1783,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     case2 <- FALSE
     if (!is.na(paramName2)) {
         paramValue2 <- analysisResults[[paramName2]]
-        case2 <- analysisResults$.getParameterType(paramName2) != C_PARAM_NOT_APPLICABLE &&
+        case2 <- analysisResults$isApplicableParameter(paramName2) &&
             !all(is.na(paramValue2))
         if (!is.na(paramCaption2) && analysisResults$isGeneratedParameter(paramName2)) {
             paramCaption2 <- sub("assumed ", "overall ", paramCaption2)
@@ -3146,7 +3145,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 parameterCaption = "Planned sample size",
                 roundDigits = -1
             )
-        } else if (analysisResults$.getParameterType("nPlanned") != C_PARAM_NOT_APPLICABLE) {
+        } else if (analysisResults$isApplicableParameter("nPlanned")) {
             summaryFactory$addParameter(analysisResults,
                 parameterName = "nPlanned",
                 parameterCaption = "Planned sample size",
@@ -3164,7 +3163,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 smoothedZeroFormat = TRUE
             )
         } else if (!multiHypothesesEnabled &&
-                analysisResults$.getParameterType("nPlanned") != C_PARAM_NOT_APPLICABLE) {
+                analysisResults$isApplicableParameter("nPlanned")) {
             parameterName <- "conditionalPower"
             if (!is.null(analysisResults[["conditionalPowerSimulated"]]) &&
                     length(analysisResults[["conditionalPowerSimulated"]]) > 0) {
