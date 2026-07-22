@@ -2386,6 +2386,21 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         )
     }
     header <- paste0(header, ".")
+    
+    if ("effectMatrix" %in% names(designPlan) && !is.null(designPlan$effectMatrix)) {
+        effectMatrix <- designPlan$effectMatrix
+        activeArms <- nrow(effectMatrix)
+        if (activeArms == 1) {
+            rownames(effectMatrix) <- NULL
+        }
+        effectMatrixLines <- capture.output(print(effectMatrix))
+        if (activeArms == 1) {
+            effectMatrixLines <- substring(effectMatrixLines, 6)
+        }
+        
+        header <- paste0(header, "\n\nEffect matrix:\n", paste(effectMatrixLines, collapse = "\n"))
+    }
+    
     return(header)
 }
 
@@ -3631,16 +3646,6 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     if (simulationEnabled && (multiArmEnabled || enrichmentEnabled)) {
-#        if (multiArmEnabled) {
-#            .addSimulationMultiArmArrayParameter(designPlan,
-#                parameterName = "effectMatrix",
-#                parameterCaption = "Effect matrix",
-#                summaryFactory,
-#                roundDigits = digitSettings$digitsProbabilities,
-#                smoothedZeroFormat = TRUE
-#            )
-#        }
-        
         summaryFactory$addParameter(designPlan,
             parameterName = "rejectAtLeastOne",
             parameterCaption = "Reject at least one",
@@ -4420,16 +4425,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         numberOfGroups <- ncol(data)
         for (groupNumber in 1:numberOfGroups) {
             dataPerGroupAndStage <- data[, groupNumber]
-            
-            if (parameterName == "effectMatrix") {
-                paramCaption <- paste0(parameterCaption, " [", groupNumber, "]")
-            } else {
-                paramCaption <- ifelse(groupNumber == numberOfGroups,
-                    paste0(parameterCaption, ", control"),
-                    paste0(parameterCaption, ", treatment ", groupNumber)
-                )
-            }
-            
+            paramCaption <- ifelse(groupNumber == numberOfGroups,
+                paste0(parameterCaption, ", control"),
+                paste0(parameterCaption, ", treatment ", groupNumber)
+            )
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterName,
                 values = dataPerGroupAndStage,
