@@ -530,6 +530,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
             output <- ""
             tryCatch(
                 {
+                    if (parameterName %in% c("median", "lambda") && .isMultiArmSimulationResults(self)) {
+                        param$type <- "matrix"
+                    }
+                    
                     if (param$type == "array" && length(dim(param$paramValue)) == 3) {
                         numberOfEntries <- dim(param$paramValue)[3]
                         numberOfRows <- dim(param$paramValue)[1]
@@ -571,7 +575,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                                     paramValueFormatted = param$paramValueFormatted[[i]],
                                     showParameterType = showParameterType,
                                     category = category,
-                                    matrixRow = ifelse(n == 1, NA_integer_, i),
+                                    matrixRow = ifelse(n == 1 && !parameterName %in% c("median", "lambda"), NA_integer_, i),
                                     consoleOutputEnabled = consoleOutputEnabled,
                                     paramNameRaw = parameterName,
                                     numberOfCategories = n
@@ -730,7 +734,9 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         (inherits(self, "ClosedCombinationTestResults") &&
                             paramName %in% c("rejected", "separatePValues"))) {
                     paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
-                } else {
+                } else if (.isMultiArmSimulationResults(self) && paramName %in% c("lambda", "median")) {
+                    paramCaption <- paste0(paramCaption, " {", matrixRow, "}")
+                } else { 
                     paramCaption <- paste0(paramCaption, " [", matrixRow, "]")
                 }
             }

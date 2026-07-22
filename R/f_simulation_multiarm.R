@@ -1241,6 +1241,27 @@ NULL
         simulationResults$.setParameterType("rValue", C_PARAM_NOT_APPLICABLE)
     }
     
+    piControl <- simulationResults$piControl
+    hazardRatio <- simulationResults$effectMatrix
+    numberOfRows <- nrow(hazardRatio)
+    numberOfCols <- ncol(hazardRatio)
+    
+    simulationResults$lambdaControl <- getLambdaByPi(piControl, eventTime = simulationResults$eventTime, kappa = simulationResults$kappa)
+    simulationResults$lambda <- matrix(NA_real_, nrow = numberOfRows, ncol = numberOfCols)
+    for (i in 1:numberOfRows) {
+        simulationResults$lambda[i, ] <- getLambda1ByLambda2AndHazardRatio(simulationResults$lambdaControl, hazardRatio[i, ])
+    }
+    simulationResults$.setParameterType("lambda", C_PARAM_DERIVED)
+    simulationResults$.setParameterType("lambdaControl", C_PARAM_DERIVED)
+
+    simulationResults$median <- matrix(NA_real_, nrow = numberOfRows, ncol = numberOfCols)
+    for (i in 1:numberOfRows) {
+        simulationResults$median[i, ] <- getMedianByLambda(simulationResults$lambda[i, ], kappa = simulationResults$kappa)
+    }
+    simulationResults$medianControl <- getMedianByLambda(simulationResults$lambdaControl, kappa = simulationResults$kappa)
+    simulationResults$.setParameterType("median", C_PARAM_DERIVED)
+    simulationResults$.setParameterType("medianControl", C_PARAM_DERIVED)
+    
     if (design$kMax == 1) {
         simulationResults$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
     }
