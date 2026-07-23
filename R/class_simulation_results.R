@@ -1345,6 +1345,10 @@ SimulationResultsSurvival <- R6::R6Class(
 #' @template field_successPerStage
 #' @template field_threshold
 #' @template field_typeOfShape
+#' @template field_lambdaTreatment
+#' @template field_lambdaControl
+#' @template field_medianTreatment
+#' @template field_medianControl
 #'
 #' @details
 #' Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}

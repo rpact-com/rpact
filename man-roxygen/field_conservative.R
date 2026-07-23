@@ -1,3 +1,3 @@
-#' Field description: NA
+#' Field description: conservative
 #' @field conservative Conservative sample size calculation enabled or not Is a single logical value.
 #' @keywords internal
