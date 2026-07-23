@@ -99,7 +99,7 @@ getPerformanceScore <- function(simulationResult) {
         referenceValue <- simulationResult$pi2
         args$pi2 <- referenceValue
     } else {
-        stopIllegalArgument("performance score is not available for class ", 
+        stopIllegalArgument("performance score is not available for class ",
             .getClassName(simulationResult),
             functionName = "getPerformanceScore"
         )

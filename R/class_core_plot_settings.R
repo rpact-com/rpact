@@ -703,7 +703,7 @@ PlotSettings <- R6::R6Class("PlotSettings",
                 stopRuntimeIssue("'margin' (", .arrayToString(margin), ") ",
                     "must be a numeric vector with length 1 or 4",
                     functionName = "setMarginAroundPlot",
-                    parameter = "margin", 
+                    parameter = "margin",
                     value = margin
                 )
             }

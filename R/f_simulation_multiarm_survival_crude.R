@@ -332,27 +332,19 @@ NULL
 getSimulationMultiArmSurvivalBasic <- function(
         design = NULL,
         ...,
-        activeArms = NA_integer_,
-        # C_ACTIVE_ARMS_DEFAULT = 3L
+        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
-        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
-        # C_TYPE_OF_SHAPE_DEFAULT
-        omegaMaxVector = seq(1, 2.6, 0.4),
-        # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
+        omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
-        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
-        # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        directionUpper = NA,
-        # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
-        # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"),
-        # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"),
-        # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
         correlationComputation = c("alternative", "null"),
         epsilonValue = NA_real_,
         rValue = NA_real_,
@@ -363,8 +355,7 @@ getSimulationMultiArmSurvivalBasic <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = NA_integer_,
-        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,

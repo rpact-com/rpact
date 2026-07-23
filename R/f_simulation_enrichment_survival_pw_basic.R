@@ -470,33 +470,21 @@ updateSubGroupVector <- function(
         ...,
         effectList = NULL,
         kappa = 1,
-        eventTime = 12,
-        # C_EVENT_TIME_DEFAULT
-        accrualTime = c(0, 12),
-        # C_ACCRUAL_TIME_DEFAULT
-        accrualIntensity = 0.1,
-        # C_ACCRUAL_INTENSITY_DEFAULT
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
+        accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
+        accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),
-        dropoutRate1 = 0,
-        # C_DROP_OUT_RATE_DEFAULT
-        dropoutRate2 = 0,
-        # C_DROP_OUT_RATE_DEFAULT
-        dropoutTime = 12,
-        # C_DROP_OUT_TIME_DEFAULT
+        dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
+        dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
+        dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
         maxNumberOfSubjects = NA_real_,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
-        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE,
-        # C_STRATIFIED_ANALYSIS_DEFAULT
-        directionUpper = NA,
-        # C_DIRECTION_UPPER_DEFAULT
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
-        # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"),
-        # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"),
-        # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -506,8 +494,7 @@ updateSubGroupVector <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = NA_integer_,
-        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
@@ -679,8 +666,10 @@ updateSubGroupVector <- function(
         )
     }
     simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
-    simulationResults$.setParameterType("maxNumberOfSubjects", 
-        accrualSetup$.getParameterType("maxNumberOfSubjects"))
+    simulationResults$.setParameterType(
+        "maxNumberOfSubjects",
+        accrualSetup$.getParameterType("maxNumberOfSubjects")
+    )
 
     .setValueAndParameterType(simulationResults, "kappa", kappa, 1)
 

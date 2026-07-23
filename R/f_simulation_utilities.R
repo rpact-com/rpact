@@ -1101,5 +1101,3 @@ getRawData <- function(x, aggregate = FALSE) {
     simulationResults$seed <- .setSeed(seed)
     return(invisible(seed))
 }
-
-

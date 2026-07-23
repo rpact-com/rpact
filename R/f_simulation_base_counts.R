@@ -248,8 +248,7 @@ getSimulationCounts <- function(
         lambda2 = NA_real_,
         lambda = NA_real_,
         theta = NA_real_,
-        directionUpper = NA,
-        # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         thetaH0 = 1,
         overdispersion = 0,
         fixedExposureTime = NA_real_,
@@ -257,8 +256,7 @@ getSimulationCounts <- function(
         accrualIntensity = NA_real_,
         followUpTime = NA_real_,
         allocationRatioPlanned = NA_real_,
-        maxNumberOfIterations = NA_integer_,
-        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         showStatistics = FALSE) {
     if (is.null(design)) {
@@ -329,8 +327,10 @@ getSimulationCounts <- function(
             if (abs(plannedCalendarTime[kMax] - max(accrualTime) - followUpTime) > 1e-04) {
                 stopConflictingArguments(
                     sprintf(
-                        paste0("Last 'plannedCalendarTime' (%s) ", 
-                        "must be equal to %s (accrualTime + followUpTime)"),
+                        paste0(
+                            "Last 'plannedCalendarTime' (%s) ",
+                            "must be equal to %s (accrualTime + followUpTime)"
+                        ),
                         plannedCalendarTime[kMax], max(accrualTime) + followUpTime
                     ),
                     parameter = "plannedCalendarTime", value = plannedCalendarTime[kMax],
@@ -358,7 +358,7 @@ getSimulationCounts <- function(
     }
 
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
-    
+
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
     .validateAndSetSeed(simulationResults, seed)
 

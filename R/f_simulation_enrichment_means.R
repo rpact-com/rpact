@@ -502,17 +502,12 @@ getSimulationEnrichmentMeans <- function(
         design = NULL,
         ...,
         effectList = NULL,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
-        # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE,
-        # C_STRATIFIED_ANALYSIS_DEFAULT,
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT,
         adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
-        # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"),
-        # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"),
-        # C_SUCCESS_CRITERION_DEFAULT
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
         epsilonValue = NA_real_,
         rValue = NA_real_,
         threshold = -Inf,
@@ -523,8 +518,7 @@ getSimulationEnrichmentMeans <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
-        maxNumberOfIterations = NA_integer_,
-        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectPopulationsFunction = NULL,

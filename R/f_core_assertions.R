@@ -4545,7 +4545,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
             .sQuote("designPlan"), " must be a trial design plan or ",
             "simulation results object, but is of class ", .getClassName(designPlan),
             functionName = ".assertIsTrialDesignPlanOrSimulationResults",
-            parameter = "designPlan", 
+            parameter = "designPlan",
             value = .getClassName(designPlan)
         )
     }
@@ -4558,6 +4558,4 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         dupText <- paste(paste0(dupCounts$dupEntries, " (", dupCounts$Freq, ")"), collapse = ", ")
         stopRuntimeIssue(.sQuote(name), " contains duplicate entries: ", dupText, ".")
     }
-} 
-
-
+}

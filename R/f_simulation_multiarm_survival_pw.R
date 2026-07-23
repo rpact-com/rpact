@@ -555,7 +555,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
     maxNumberOfIterations <- simulationResults$maxNumberOfIterations
-    
+
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
     if (.isTrialDesignConditionalDunnett(design)) {

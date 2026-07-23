@@ -273,7 +273,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             }
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(result), result))
         },
-        
+
         # Defines the order of the parameter output
         .getParametersToShow = function() {
             return(C_PARAMETER_ORDER_DESIGN_PLAN)
@@ -543,7 +543,7 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
 #' @template field_futilityBoundsPValueScale
 #'
 #' @details
-#' This object cannot be created directly; 
+#' This object cannot be created directly;
 #' use \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
 #' with suitable arguments to create a design plan for a dataset of rates.
 #'
@@ -742,7 +742,7 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
 #' @template field_futilityBoundsPValueScale
 #'
 #' @details
-#' This object cannot be created directly; 
+#' This object cannot be created directly;
 #' use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 #' with suitable arguments to create a design plan for a dataset of survival data.
 #'

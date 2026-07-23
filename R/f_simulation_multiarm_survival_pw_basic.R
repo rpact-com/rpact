@@ -545,7 +545,7 @@ NULL
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stopIllegalArgument(
-                        "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", 
+                        "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
                         "the output must be a single numeric value",
                         functionName = ".getSimulatedStageResultsSurvivalMultiArmPatientWise",
                         parameter = "calcEventsFunction", value = calcEventsFunction

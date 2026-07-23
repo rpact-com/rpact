@@ -162,21 +162,17 @@ getSimulationMeans <- function(
         normalApproximation = TRUE,
         meanRatio = FALSE,
         thetaH0 = ifelse(meanRatio, 1, 0),
-        alternative = seq(0, 1, 0.2),
-        # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
-        stDev = 1,
-        # C_STDEV_DEFAULT
+        alternative = seq(0, 1, 0.2), # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
+        stDev = 1, # C_STDEV_DEFAULT
         plannedSubjects = NA_real_,
-        directionUpper = NA,
-        # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         allocationRatioPlanned = NA_real_,
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
-        maxNumberOfIterations = NA_integer_,
-        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         showStatistics = FALSE) {
@@ -240,7 +236,7 @@ getSimulationMeans <- function(
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
     simulationResults <- SimulationResultsMeans$new(design, showStatistics = showStatistics)
-    
+
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
     .validateAndSetSeed(simulationResults, seed)
 
@@ -345,7 +341,7 @@ getSimulationMeans <- function(
         if (any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0) &&
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage))) {
             stopIllegalArgument(
-                "'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), 
+                "'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage),
                 ") must be not smaller than minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
                 functionName = "getSimulationMeans",
@@ -403,7 +399,8 @@ getSimulationMeans <- function(
 
     effect <- alternative - thetaH0
     simulationResults$effect <- effect
-    simulationResults$.setParameterType("effect",
+    simulationResults$.setParameterType(
+        "effect",
         ifelse(thetaH0 == 0, C_PARAM_NOT_APPLICABLE, C_PARAM_DERIVED)
     )
 

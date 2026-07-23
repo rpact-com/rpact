@@ -239,7 +239,7 @@ NULL
     }
 
     if (intersectionTest == "SpiessensDebois" && varianceOption != "pooledFromFull" && !normalApproximation) {
-        stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ", 
+        stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ",
             "residual (stratified) variance from full population,\n\t\t\t select 'varianceOption' = \"pooledFromFull\"",
             parameter = "varianceOption", value = varianceOption, constraint = "pooledFromFull",
             functionName = ".getStageResultsMeansEnrichment"
@@ -247,7 +247,7 @@ NULL
     }
 
     if (intersectionTest == "SpiessensDebois" && !stratifiedAnalysis && !normalApproximation) {
-        stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ", 
+        stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ",
             "residual (stratified) variance from full population,\n\t\t\tselect 'stratifiedAnalysis' = TRUE",
             parameter = "stratifiedAnalysis", value = stratifiedAnalysis, constraint = TRUE,
             functionName = ".getStageResultsMeansEnrichment"
@@ -791,8 +791,10 @@ NULL
         if (maxSearchIterations < 0) {
             stopRuntimeIssue(
                 sprintf(
-                    paste0("failed to find theta (k = %s, firstValue = %s, ", 
-                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                    paste0(
+                        "failed to find theta (k = %s, firstValue = %s, ",
+                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
+                    ),
                     stage, stageResults[[firstParameterName]][population, stage], secondValue, firstValue, theta
                 ),
                 functionName = ".getUpperLowerThetaMeansEnrichment"
@@ -1024,7 +1026,9 @@ NULL
         functionName =
             ".getRepeatedConfidenceIntervalsMeansEnrichmentInverseNormal",
         ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
-            design, powerCalculationEnabled = TRUE), "stage"), ...
+            design,
+            powerCalculationEnabled = TRUE
+        ), "stage"), ...
     )
 
     return(.getRepeatedConfidenceIntervalsMeansEnrichmentAll(

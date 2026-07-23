@@ -178,20 +178,17 @@ getSimulationRates <- function(
         normalApproximation = TRUE,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = seq(0.2, 0.5, 0.1),
-        # C_PI_1_DEFAULT
+        pi1 = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
         pi2 = NA_real_,
         plannedSubjects = NA_real_,
-        directionUpper = NA,
-        # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         allocationRatioPlanned = NA_real_,
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
         conditionalPower = NA_real_,
         pi1H1 = NA_real_,
         pi2H1 = NA_real_,
-        maxNumberOfIterations = NA_integer_,
-        # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         showStatistics = FALSE) {
@@ -281,7 +278,7 @@ getSimulationRates <- function(
     }
 
     simulationResults <- SimulationResultsRates$new(design, showStatistics = showStatistics)
-    
+
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
     .validateAndSetSeed(simulationResults, seed)
 
@@ -309,7 +306,7 @@ getSimulationRates <- function(
         if (any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0) &&
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage))) {
             stopIllegalArgument(
-                "'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), 
+                "'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage),
                 ") must be not smaller than minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
                 functionName = "getSimulationRates",
@@ -403,7 +400,7 @@ getSimulationRates <- function(
             allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
         } else if (length(allocationRatioPlanned) != design$kMax) {
             stopIllegalArgument(
-                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", 
+                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
                 "must have length 1 or ",
                 design$kMax, " (kMax)",
                 functionName = "getSimulationRates",
@@ -437,7 +434,8 @@ getSimulationRates <- function(
         }
     }
     simulationResults$effect <- effect
-    simulationResults$.setParameterType("effect",
+    simulationResults$.setParameterType(
+        "effect",
         ifelse(groups == 1 && thetaH0 == 0, C_PARAM_NOT_APPLICABLE, C_PARAM_DERIVED)
     )
 

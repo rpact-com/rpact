@@ -161,8 +161,9 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 if (self$kMax == C_KMAX_DEFAULT) {
                     self$.setParameterType("stages", C_PARAM_DEFAULT_VALUE)
                 } else {
-                    self$.setParameterType("stages", ifelse(self$isDefinedParameter("kMax"), 
-                        self$.getParameterType("kMax"), C_PARAM_USER_DEFINED))
+                    self$.setParameterType("stages", ifelse(self$isDefinedParameter("kMax"),
+                        self$.getParameterType("kMax"), C_PARAM_USER_DEFINED
+                    ))
                 }
             } else {
                 self$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
