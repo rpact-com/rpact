@@ -1083,12 +1083,16 @@ getRawData <- function(x, aggregate = FALSE) {
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations",
         validateType = FALSE, naAllowed = TRUE
     )
+
+    defaultValue <- C_MAX_SIMULATION_ITERATIONS_DEFAULT
     if (is.na(maxNumberOfIterations)) {
         maxNumberOfIterations <- C_MAX_SIMULATION_ITERATIONS_DEFAULT
+    } else {
+        defaultValue <- -1L
     }
     .setValueAndParameterType(
         simulationResults, "maxNumberOfIterations",
-        as.integer(maxNumberOfIterations), C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        as.integer(maxNumberOfIterations), defaultValue
     )
     return(invisible(maxNumberOfIterations))
 }
