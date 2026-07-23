@@ -1569,7 +1569,7 @@ NULL
     return(designPlan)
 }
 
-.getNumberOfSubjectsSurvivalSurvivalSingleTimeValue <- function(
+.getNumberOfSubjectsSurvivalSingleTimeValue <- function(
         ...,
         timeValue,
         accrualTime,
@@ -1580,7 +1580,7 @@ NULL
         stopIllegalArgument("length of 'accrualTime' (", length(accrualTime), ") ",
             "must be equal to length of 'accrualIntensity' (",
             length(accrualIntensity), ")",
-            functionName = ".getNumberOfSubjectsSurvivalSurvivalSingleTimeValue",
+            functionName = ".getNumberOfSubjectsSurvivalSingleTimeValue",
             parameter = "accrualTime",
             relatedParameter = "accrualIntensity",
             relatedValue = length(accrualIntensity), value = accrualTime
@@ -1618,7 +1618,7 @@ NULL
 
         subjectNumbers <- c(
             subjectNumbers,
-            .getNumberOfSubjectsSurvivalSurvivalSingleTimeValue(
+            .getNumberOfSubjectsSurvivalSingleTimeValue(
                 timeValue = timeValue,
                 accrualTime = accrualTime,
                 accrualIntensity = accrualIntensity,
