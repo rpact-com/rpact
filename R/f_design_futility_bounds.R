@@ -857,9 +857,9 @@ getFutilityBounds <- function(
             numberOfSubjects <- designPlan$maxNumberOfEvents * designPlan$.design$informationRates
         }
     } else if (
-            is(designPlan, "SimulationResultsMeans") || 
-            is(designPlan, "SimulationResultsMultiArmMeans") || 
-            is(designPlan, "SimulationResultsRates") || 
+        is(designPlan, "SimulationResultsMeans") ||
+            is(designPlan, "SimulationResultsMultiArmMeans") ||
+            is(designPlan, "SimulationResultsRates") ||
             is(designPlan, "SimulationResultsMultiArmRates")) {
         numberOfSubjects <- designPlan$plannedSubjects
     } else if (is(designPlan, "SimulationResultsSurvival") || is(designPlan, "SimulationResultsMultiArmSurvival")) {
@@ -888,23 +888,24 @@ getFutilityBounds <- function(
 .getFisherInformationMeans <- function(designPlan, stage = NA_integer_) {
     nTotal <- .getNumberOfSubjects(designPlan, stage)
     stDev <- designPlan$stDev
-    
+
     # one group case
     if ((.isTrialDesignPlanMeans(designPlan) || is(designPlan, "SimulationResultsMeans")) && designPlan$groups == 1) {
         return(nTotal / stDev[1]^2)
-    } 
-    
-    allocationRatio <- .getAllocationRatioByStage(designPlan, stage)    
+    }
+
+    allocationRatio <- .getAllocationRatioByStage(designPlan, stage)
+
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmMeans")) {
-        return(nTotal / (designPlan$stDev[1]^2 * (1 + allocationRatio)))        
+        return(nTotal / (designPlan$stDev[1]^2 * (1 + allocationRatio)))
     }
-    
+
     # two group case
     if (length(stDev) == 1 && designPlan$groups == 2) {
         stDev <- rep(stDev, 2)
     }
-    
+
     n <- .getNumberOfSubjectsTwoSample(nTotal, allocationRatio)
     thetaMult <- ifelse(isTRUE(designPlan$meanRatio), designPlan$thetaH0^2, 1)
     return(.getFisherInformationMeansTwoSample(stDev, n$n1, n$n2, thetaMult))
@@ -916,15 +917,15 @@ getFutilityBounds <- function(
 
 .getFisherInformationRates <- function(designPlan, stage = NA_integer_) {
     nTotal <- .getNumberOfSubjects(designPlan, stage)
-  
+
     # one group case
     if ((.isTrialDesignPlanRates(designPlan) || is(designPlan, "SimulationResultsRates")) && designPlan$groups == 1) {
         pi0 <- designPlan$thetaH0
         return(nTotal / (pi0 * (1 - pi0)))
     }
-    
+
     allocationRatio <- .getAllocationRatioByStage(designPlan, stage)
-    
+
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmRates")) {
         n1 <- nTotal # active arm
@@ -933,7 +934,7 @@ getFutilityBounds <- function(
         pi2 <- designPlan$piControl
         return(.getFisherInformationRatesTwoSample(pi1, pi2, n1, n2))
     }
-    
+
     # two group case
     n <- .getNumberOfSubjectsTwoSample(nTotal, allocationRatio)
     return(.getFisherInformationRatesTwoSample(designPlan$pi1, designPlan$pi2, n$n1, n$n2))
@@ -943,9 +944,9 @@ getFutilityBounds <- function(
     allocationRatioPlanned <- designPlan$allocationRatioPlanned
     if (is.na(stage) || length(allocationRatioPlanned) == 1) {
         return(allocationRatioPlanned)
-    } 
-    
-    return(allocationRatioPlanned[stage])        
+    }
+
+    return(allocationRatioPlanned[stage])
 }
 
 .getFisherInformationSurvival <- function(designPlan, stage = NA_integer_) {
@@ -963,7 +964,7 @@ getFutilityBounds <- function(
                 1 + allocationRatio * colSums(omega),
                 FUN = "/"
             )
-        
+
         return(
             allocationRatio / (1 + allocationRatio)^2 *
                 cumulativeEventsPerComparison
@@ -1039,7 +1040,7 @@ getFisherInformation <- function(designPlan, stage = NA_integer_) {
     .assertIsTrialDesignPlanOrSimulationResults(designPlan)
     className <- .getClassName(designPlan)
     if (is.na(stage)) {
-        stage <- 1L 
+        stage <- 1L
     }
     if (grepl("Means", className)) {
         return(.getFisherInformationMeans(designPlan, stage = stage))
@@ -1048,7 +1049,7 @@ getFisherInformation <- function(designPlan, stage = NA_integer_) {
     } else if (grepl("Survival", className)) {
         return(.getFisherInformationSurvival(designPlan, stage = stage))
     }
-   
+
     return(NA_real_)
 }
 

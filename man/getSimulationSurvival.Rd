@@ -33,7 +33,7 @@ getSimulationSurvival(
   maxNumberOfEventsPerStage = NA_real_,
   conditionalPower = NA_real_,
   thetaH1 = NA_real_,
-  maxNumberOfIterations = 1000L,
+  maxNumberOfIterations = NA_integer_,
   maxNumberOfRawDatasetsPerStage = 0,
   longTimeSimulationAllowed = FALSE,
   seed = NA_real_,

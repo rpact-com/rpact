@@ -367,7 +367,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             } else {
                 parameterNames <- names(self$.parameterTypes[which(self$.parameterTypes %in% parameterType)])
             }
-            
+
             if (length(parameterNames) == 0) {
                 return(character())
             }
@@ -376,7 +376,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (is.null(parametersToShow) || length(parametersToShow) == 0) {
                 return(parameterNames)
             }
-            
+
             parametersToShow <- parametersToShow[parametersToShow %in% parameterNames]
             parameterNames <- parameterNames[!(parameterNames %in% parametersToShow)]
             parameterNames <- c(parametersToShow, parameterNames)
@@ -530,6 +530,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
             output <- ""
             tryCatch(
                 {
+                    if (parameterName %in% c("medianTreatment", "lambdaTreatment") && .isMultiArmSimulationResults(self)) {
+                        param$type <- "matrix"
+                    }
+
                     if (param$type == "array" && length(dim(param$paramValue)) == 3) {
                         numberOfEntries <- dim(param$paramValue)[3]
                         numberOfRows <- dim(param$paramValue)[1]
@@ -571,7 +575,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                                     paramValueFormatted = param$paramValueFormatted[[i]],
                                     showParameterType = showParameterType,
                                     category = category,
-                                    matrixRow = ifelse(n == 1, NA_integer_, i),
+                                    matrixRow = ifelse(n == 1 && !parameterName %in% c("medianTreatment", "lambdaTreatment"), NA_integer_, i),
                                     consoleOutputEnabled = consoleOutputEnabled,
                                     paramNameRaw = parameterName,
                                     numberOfCategories = n
@@ -626,8 +630,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 },
                 error = function(e) {
                     if (consoleOutputEnabled) {
-                        warning("Failed to extract parameter name and value from ", 
-                            sQuote(parameterName), ": ", e$message)
+                        warning(
+                            "Failed to extract parameter name and value from ",
+                            sQuote(parameterName), ": ", e$message
+                        )
                     }
                     return(list(parameterName = parameterName, paramValue = ""))
                 }
@@ -710,7 +716,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         } else if (inherits(self, "ClosedCombinationTestResults")) {
                             populations <- self$.getHypothesisPopulationVariants()[matrixRow]
                         } else {
-                            stopRuntimeIssue("only ClosedCombinationTestResults ", 
+                            stopRuntimeIssue("only ClosedCombinationTestResults ",
                                 "supports function .getHypothesisPopulationVariants() (object is ",
                                 .getClassName(self), ")",
                                 functionName = ".showParameterFormatted",
@@ -730,6 +736,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         (inherits(self, "ClosedCombinationTestResults") &&
                             paramName %in% c("rejected", "separatePValues"))) {
                     paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
+                } else if (.isMultiArmSimulationResults(self) && paramName %in% c("lambdaTreatment", "medianTreatment")) {
+                    paramCaption <- paste0(paramCaption, " {", matrixRow, "}")
                 } else {
                     paramCaption <- paste0(paramCaption, " [", matrixRow, "]")
                 }
@@ -742,10 +750,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 paramValueFormatted <- .listToString(paramValueFormatted)
             }
             if (is.function(paramValue) || grepl("Function$", paramName)) {
-                
-                defaultValue <- ifelse(identical(paramName, "calcEventsFunction"), 
-                    "Conditional power based", "default")
-                
+                defaultValue <- ifelse(identical(paramName, "calcEventsFunction"),
+                    "Conditional power based", "default"
+                )
+
                 paramValueFormatted <- ifelse(
                     self$isUserDefinedParameter(paramName),
                     ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"),
@@ -1112,10 +1120,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(paste(parameterValues, collapse = ", "))
         }
 
-        stopRuntimeIssue("parameter ", .pQuote(parameterName), " has an invalid ", 
+        stopRuntimeIssue("parameter ", .pQuote(parameterName), " has an invalid ",
             "dimension (length is ", length(parameterValues), ")",
             functionName = ".getDataFrameColumnValues",
-            parameter = parameterName, 
+            parameter = parameterName,
             value = length(parameterValues)
         )
     } else if (parameterName == "effectMatrix") {
@@ -1246,7 +1254,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
             {
                 if (!(parameterName %in% c(
                         "stages", "adaptations", "effectList",
-                        "doseLevels", "plannedCalendarTime"
+                        "doseLevels", "plannedCalendarTime",
+                        "lambdaTreatment", "medianTreatment"
                     )) &&
                         !grepl("Function$", parameterName) &&
                         (is.null(variedParameter) || parameterName != variedParameter)) {
@@ -1628,10 +1637,12 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
     }
 
     if (inherits(x, "AnalysisResults")) {
-        dfDesign <- as.data.frame(x$.design, 
-            niceColumnNamesEnabled = niceColumnNamesEnabled)
-        dfStageResults <- as.data.frame(x$.stageResults, 
-            niceColumnNamesEnabled = niceColumnNamesEnabled)
+        dfDesign <- as.data.frame(x$.design,
+            niceColumnNamesEnabled = niceColumnNamesEnabled
+        )
+        dfStageResults <- as.data.frame(x$.stageResults,
+            niceColumnNamesEnabled = niceColumnNamesEnabled
+        )
         dfStageResults <- dfStageResults[!is.na(dfStageResults[
             ,
             grep("(test statistic)|(testStatistics)", colnames(dfStageResults))
@@ -1686,7 +1697,7 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 #' @inheritParams param_digits
 #' @param output The output parts, default is \code{"all"}.
 #' @param printObject Show also the print output after the summary, default is \code{FALSE}.
-#' @param sep The separator line between the summary and the 
+#' @param sep The separator line between the summary and the
 #'        optional print output, default is \code{"\n\n-----\n\n"}.
 #' @inheritParams param_three_dots
 #'
@@ -1877,10 +1888,10 @@ fetch <- function(x, ..., output) UseMethod("fetch")
 #'  - a positive integer, giving the position counting from the left
 #'  - a negative integer, giving the position counting from the right.
 #' The default returns the last parameter.
-#' This argument is taken by expression and supports quasi-quotation 
+#' This argument is taken by expression and supports quasi-quotation
 #' (you can unquote column names and column locations).
 #' @param output A character defining the output type as follows:
-#'  - "named" (default) returns the named value if the value is 
+#'  - "named" (default) returns the named value if the value is
 #'    a single value, the value inside a named list otherwise
 #'  - "value" returns only the value itself
 #'  - "list" returns the value inside a named list

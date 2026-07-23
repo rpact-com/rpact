@@ -1,3 +1,3 @@
-#' Field description: NA
+#' Field description: overdispersion
 #' @field overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution Is a numeric vector.
 #' @keywords internal

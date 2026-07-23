@@ -153,7 +153,7 @@ initDictionary <- function(x, keyValuePairList) {
 addValueToDictionary <- function(x, key, value) {
     .assertIsDictionary(x)
     if (base::exists(key, envir = x)) {
-        stopIllegalArgument("dictionary ", base::sQuote(base::attr(x, "name")), 
+        stopIllegalArgument("dictionary ", base::sQuote(base::attr(x, "name")),
             " already contains key ", base::sQuote(key),
             functionName = "addValueToDictionary"
         )
@@ -169,7 +169,7 @@ setValueToDictionary <- function(x, key, value) {
 getValueFromDictionary <- function(x, key) {
     .assertIsDictionary(x)
     if (!base::exists(key, envir = x)) {
-        stopIllegalArgument("dictionary ", base::sQuote(base::attr(x, "name")), 
+        stopIllegalArgument("dictionary ", base::sQuote(base::attr(x, "name")),
             " does not contain key ", base::sQuote(key),
             functionName = "getValueFromDictionary"
         )

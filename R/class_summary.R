@@ -2385,7 +2385,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         )
     }
     header <- paste0(header, ".")
-    
+
     if ("effectMatrix" %in% names(designPlan) && !is.null(designPlan$effectMatrix)) {
         effectMatrix <- designPlan$effectMatrix
         activeArms <- nrow(effectMatrix)
@@ -2396,12 +2396,14 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (activeArms == 1) {
             effectMatrixLines <- substring(effectMatrixLines, 6)
         }
-        
-        header <- paste0(header, "\n\n", 
-            "User defined effect shape:", 
-            "\n", paste(effectMatrixLines, collapse = "\n"))
+
+        header <- paste0(
+            header, "\n\n",
+            "User defined effect shape:",
+            "\n", paste(effectMatrixLines, collapse = "\n")
+        )
     }
-    
+
     return(header)
 }
 
@@ -4323,9 +4325,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             numberOfGroups <- arrayDataDim[3]
         }
     }
-    
+
     if (is.na(numberOfGroups)) {
-        stopRuntimeIssue("Unable to identify 'numberOfGroups' from ", 
+        stopRuntimeIssue("Unable to identify 'numberOfGroups' from ",
             sQuote(parameterName), "in ", .getClassName(designPlan),
             functionName = ".addSimulationArrayToSummary",
             parameter = parameterName
@@ -4358,7 +4360,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             }
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterName,
-                values = dataPerGroupAndStage, 
+                values = dataPerGroupAndStage,
                 parameterCaption = groupCaption,
                 roundDigits = digitsSampleSize,
                 smoothedZeroFormat = smoothedZeroFormat,
@@ -4381,10 +4383,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             "cumulativeEventsPerStage", "sampleSizes"
         )]])[3]
         if (is.null(totalNumberOfGroups) || is.na(totalNumberOfGroups)) {
-            totalNumberOfGroups <- designPlan$activeArms 
+            totalNumberOfGroups <- designPlan$activeArms
         }
         if (is.null(totalNumberOfGroups) || is.na(totalNumberOfGroups)) {
-            warning("Unable to identify 'totalNumberOfGroups' from ", 
+            warning("Unable to identify 'totalNumberOfGroups' from ",
                 .pQuote(parameterName), "in ", .getClassName(designPlan),
                 call = FALSE
             )
@@ -4433,7 +4435,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     } else {
         data <- designPlan[[parameterName]]
         numberOfGroups <- ncol(data)
-        
+
         for (groupNumber in 1:numberOfGroups) {
             dataPerGroupAndStage <- data[, groupNumber]
             paramCaption <- ifelse(groupNumber == numberOfGroups,

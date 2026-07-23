@@ -21,7 +21,7 @@ getSimulationCounts(
   accrualIntensity = NA_real_,
   followUpTime = NA_real_,
   allocationRatioPlanned = NA_real_,
-  maxNumberOfIterations = 1000L,
+  maxNumberOfIterations = NA_integer_,
   seed = NA_real_,
   showStatistics = FALSE
 )

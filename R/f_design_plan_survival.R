@@ -766,8 +766,10 @@ NULL
         ) {
         designPlan$.setParameterType("accrualTime", C_PARAM_DEFAULT_VALUE)
     } else {
-        designPlan$.setParameterType("accrualTime", 
-            accrualSetup$.getParameterType("accrualTime"))
+        designPlan$.setParameterType(
+            "accrualTime",
+            accrualSetup$.getParameterType("accrualTime")
+        )
     }
 
     if (length(designPlan$accrualIntensity) == 1 &&
@@ -1567,14 +1569,18 @@ NULL
     return(designPlan)
 }
 
-.getNumberOfSubjectsSurvivalSurvivalSingleTimeValue <- function(
-        ..., timeValue, accrualTime, accrualIntensity, maxNumberOfSubjects) {
+.getNumberOfSubjectsSurvivalSingleTimeValue <- function(
+        ...,
+        timeValue,
+        accrualTime,
+        accrualIntensity,
+        maxNumberOfSubjects) {
     .assertIsSingleNumber(timeValue, "timeValue")
     if (length(accrualTime) != length(accrualIntensity)) {
         stopIllegalArgument("length of 'accrualTime' (", length(accrualTime), ") ",
             "must be equal to length of 'accrualIntensity' (",
             length(accrualIntensity), ")",
-            functionName = ".getNumberOfSubjectsSurvivalSurvivalSingleTimeValue",
+            functionName = ".getNumberOfSubjectsSurvivalSingleTimeValue",
             parameter = "accrualTime",
             relatedParameter = "accrualIntensity",
             relatedValue = length(accrualIntensity), value = accrualTime
@@ -1594,7 +1600,7 @@ NULL
             } else {
                 return(
                     (sum(densityVector[1:(l - 1)] * densityIntervals[1:(l - 1)]) +
-                            (timeValue - accrualTime[l - 1]) * densityVector[l]) *
+                        (timeValue - accrualTime[l - 1]) * densityVector[l]) *
                         maxNumberOfSubjects
                 )
             }
@@ -1612,10 +1618,10 @@ NULL
 
         subjectNumbers <- c(
             subjectNumbers,
-            .getNumberOfSubjectsSurvivalSurvivalSingleTimeValue(
-                timeValue = timeValue, 
+            .getNumberOfSubjectsSurvivalSingleTimeValue(
+                timeValue = timeValue,
                 accrualTime = accrualTime,
-                accrualIntensity = accrualIntensity, 
+                accrualIntensity = accrualIntensity,
                 maxNumberOfSubjects = maxNumberOfSubjects
             )
         )

@@ -490,7 +490,7 @@
                         )
 
                         if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                            stopRuntimeIssue("Cannot find theta. ", 
+                            stopRuntimeIssue("Cannot find theta. ",
                                 "The calculated variance estimate is invalid: ", vHat,
                                 functionName = ".getEffectScaleBoundaryCountDataTheta",
                                 parameter = "vHat", value = vHat
@@ -524,7 +524,7 @@
                     )
 
                     if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                        stopRuntimeIssue("cannot find theta. ", 
+                        stopRuntimeIssue("cannot find theta. ",
                             "The calculated variance estimate is invalid: ", vHat,
                             functionName = ".getEffectScaleBoundaryCountDataTheta",
                             parameter = "vHat", value = vHat
@@ -766,7 +766,7 @@
                 call. = FALSE
             )
         } else {
-            stopIllegalArgument("The specified 'directionUpper' (", directionUpperDefined, ") ", 
+            stopIllegalArgument("The specified 'directionUpper' (", directionUpperDefined, ") ",
                 "is not consistent with the calculated 'directionUpper' (",
                 .arrayToString(directionUpperCalculated), "). ",
                 functionName = ".setDirectionUpper",

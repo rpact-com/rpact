@@ -348,20 +348,14 @@ NULL
         ...,
         design,
         effectList,
-        kappa = NA_real_,
-        # survival only
-        dropoutRate1 = NA_real_,
-        # survival only
-        dropoutRate2 = NA_real_,
-        # survival only
-        dropoutTime = NA_real_,
-        # survival only
-        eventTime = NA_real_,
-        # survival only
+        kappa = NA_real_, # survival only
+        dropoutRate1 = NA_real_, # survival only
+        dropoutRate2 = NA_real_, # survival only
+        dropoutTime = NA_real_, # survival only
+        eventTime = NA_real_, # survival only
         intersectionTest,
         stratifiedAnalysis = NA,
-        directionUpper = NA,
-        # rates + survival only
+        directionUpper = NA, # rates + survival only
         adaptations,
         typeOfSelection,
         effectMeasure,
@@ -369,40 +363,25 @@ NULL
         epsilonValue,
         rValue,
         threshold,
-        plannedSubjects = NA_real_,
-        # means + rates only
-        plannedEvents = NA_real_,
-        # survival only
-        accrualTime = NA_real_,
-        # survival only
-        accrualIntensity = NA_real_,
-        # survival only
-        maxNumberOfSubjects = NA_real_,
-        # survival only
+        plannedSubjects = NA_real_, # means + rates only
+        plannedEvents = NA_real_, # survival only
+        accrualTime = NA_real_, # survival only
+        accrualIntensity = NA_real_, # survival only
+        maxNumberOfSubjects = NA_real_, # survival only
         allocationRatioPlanned,
-        minNumberOfSubjectsPerStage = NA_real_,
-        # means + rates only
-        maxNumberOfSubjectsPerStage = NA_real_,
-        # means + rates only
-        minNumberOfEventsPerStage = NA_real_,
-        # survival only
-        maxNumberOfEventsPerStage = NA_real_,
-        # survival only
+        minNumberOfSubjectsPerStage = NA_real_, # means + rates only
+        maxNumberOfSubjectsPerStage = NA_real_, # means + rates only
+        minNumberOfEventsPerStage = NA_real_, # survival only
+        maxNumberOfEventsPerStage = NA_real_, # survival only
         conditionalPower,
-        thetaH1 = NA_real_,
-        # means + survival only
-        stDevH1 = NA_real_,
-        # means only
-        piTreatmentH1 = NA_real_,
-        # rates only
-        piControlH1 = NA_real_,
-        # rates only
+        thetaH1 = NA_real_, # means + survival only
+        stDevH1 = NA_real_, # means only
+        piTreatmentH1 = NA_real_, # rates only
+        piControlH1 = NA_real_, # rates only
         maxNumberOfIterations,
         seed,
-        calcSubjectsFunction = NULL,
-        # means + rates only
-        calcEventsFunction = NULL,
-        # survival only
+        calcSubjectsFunction = NULL, # means + rates only
+        calcEventsFunction = NULL, # survival only
         selectPopulationsFunction,
         showStatistics,
         endpoint = c("means", "rates", "survival"),
@@ -453,9 +432,7 @@ NULL
         )
     }
 
-    .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
-    .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
 
     if (endpoint %in% c("rates", "survival")) {
         .assertIsSingleLogical(directionUpper, "directionUpper")
@@ -481,6 +458,9 @@ NULL
         simulationResults <- SimulationResultsEnrichmentSurvival$new(design, showStatistics = showStatistics)
         .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
     }
+
+    maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
+    .validateAndSetSeed(simulationResults, seed)
 
     effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
     if (endpoint == "survival" && is.null(effectList$hazardRatios) && !is.null(effectList$piTreatments)) {
@@ -975,14 +955,6 @@ NULL
     if (endpoint == "means") {
         .setValueAndParameterType(simulationResults, "stDevH1", stDevH1, NA_real_, notApplicableIfNA = TRUE)
     }
-    .setValueAndParameterType(
-        simulationResults,
-        "maxNumberOfIterations",
-        as.integer(maxNumberOfIterations),
-        C_MAX_SIMULATION_ITERATIONS_DEFAULT
-    )
-    simulationResults$.setParameterType("seed", ifelse(is.na(seed), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
-    simulationResults$seed <- .setSeed(seed)
 
     if (is.null(adaptations) || all(is.na(adaptations))) {
         adaptations <- rep(TRUE, kMax - 1)
@@ -1011,11 +983,15 @@ NULL
 
     if (typeOfSelection != "userDefined") {
         .setValueAndParameterType(simulationResults, "threshold", threshold, -Inf)
-        .setValueAndParameterType(simulationResults, "epsilonValue", 
-            epsilonValue, NA_real_, notApplicableIfNA = TRUE)
-        .setValueAndParameterType(simulationResults, "rValue", 
-            rValue, NA_real_, notApplicableIfNA = TRUE)
-    } else { 
+        .setValueAndParameterType(simulationResults, "epsilonValue",
+            epsilonValue, NA_real_,
+            notApplicableIfNA = TRUE
+        )
+        .setValueAndParameterType(simulationResults, "rValue",
+            rValue, NA_real_,
+            notApplicableIfNA = TRUE
+        )
+    } else {
         simulationResults$.setParameterType("threshold", C_PARAM_NOT_APPLICABLE)
         simulationResults$.setParameterType("epsilonValue", C_PARAM_NOT_APPLICABLE)
         simulationResults$.setParameterType("rValue", C_PARAM_NOT_APPLICABLE)

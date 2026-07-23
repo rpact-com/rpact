@@ -159,7 +159,7 @@ getSimulationMultiArmSurvival <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
@@ -426,7 +426,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
@@ -554,6 +554,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     maxNumberOfEventsPerStage <- simulationResults$maxNumberOfEventsPerStage # survival only
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
@@ -741,7 +742,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
-    if (gMax == 1) {
+    if (gMax == 1 || kMax == 1) {
         simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
     }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
@@ -783,7 +784,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         )
     }
 
-    if (any(simulationResults$rejectedArmsPerStage < 0)) {
+    if (kMax > 1 && any(simulationResults$rejectedArmsPerStage < 0)) {
         stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
             functionName = "getSimulationMultiArmSurvivalPatientWise"
         )

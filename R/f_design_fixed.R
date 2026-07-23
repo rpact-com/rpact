@@ -52,8 +52,7 @@
 getDesignFixed <- function(
         alpha = NA_real_,
         beta = NA_real_,
-        sided = 1L,
-        # C_SIDED_DEFAULT
+        sided = 1L, # C_SIDED_DEFAULT
         directionUpper = NA,
         twoSidedPower = NA) {
     .assertIsValidAlphaAndBeta(alpha = alpha, beta = beta, naAllowed = TRUE)

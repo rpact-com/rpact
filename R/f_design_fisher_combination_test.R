@@ -285,7 +285,7 @@ getDesignFisher <- function(
     .assertDesignParameterExists(design, "method", C_FISHER_METHOD_DEFAULT)
     .assertIsSingleCharacter(design$method, "method")
     if (!.isFisherMethod(design$method)) {
-        stopIllegalArgument("'method' must be one of the following: ", 
+        stopIllegalArgument("'method' must be one of the following: ",
             .arrayToString(.getFisherMethods(), encapsulate = TRUE),
             functionName = ".getDesignFisher",
             parameter = "method", value = method
