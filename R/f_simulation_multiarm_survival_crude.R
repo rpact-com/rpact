@@ -677,17 +677,17 @@ getSimulationMultiArmSurvivalBasic <- function(
     )
     simulationResults$.setParameterType(
         "numberOfSelectedArms",
-        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
 
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
     simulationResults$.setParameterType(
         "selectedArms",
-        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
-    if (gMax == 1) {
+    if (gMax == 1 || kMax == 1) {
         simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
     }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations

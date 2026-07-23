@@ -1214,27 +1214,51 @@ NULL
         simulationResults$.setParameterType("epsilonValue", C_PARAM_NOT_APPLICABLE)
         simulationResults$.setParameterType("rValue", C_PARAM_NOT_APPLICABLE)
     }
-
-    piControl <- simulationResults$piControl
-    hazardRatio <- simulationResults$effectMatrix
-    numberOfRows <- nrow(hazardRatio)
-    numberOfCols <- ncol(hazardRatio)
-
-    simulationResults$lambdaControl <- getLambdaByPi(piControl, eventTime = simulationResults$eventTime, kappa = simulationResults$kappa)
-    simulationResults$lambda <- matrix(NA_real_, nrow = numberOfRows, ncol = numberOfCols)
-    for (i in 1:numberOfRows) {
-        simulationResults$lambda[i, ] <- getLambda1ByLambda2AndHazardRatio(simulationResults$lambdaControl, hazardRatio[i, ])
+    
+    if (kMax == 1) {
+        simulationResults$.setParameterType("rejectedArmsPerStage", C_PARAM_NOT_APPLICABLE)
     }
-    simulationResults$.setParameterType("lambda", C_PARAM_DERIVED)
-    simulationResults$.setParameterType("lambdaControl", C_PARAM_DERIVED)
-
-    simulationResults$median <- matrix(NA_real_, nrow = numberOfRows, ncol = numberOfCols)
-    for (i in 1:numberOfRows) {
-        simulationResults$median[i, ] <- getMedianByLambda(simulationResults$lambda[i, ], kappa = simulationResults$kappa)
+    
+    if (endpoint == "survival" && !is.null(simulationResults$piControl) && 
+            !is.na(simulationResults$piControl)) {
+            
+        piControl <- simulationResults$piControl
+        hazardRatio <- simulationResults$effectMatrix
+        numberOfRows <- nrow(hazardRatio)
+        numberOfCols <- ncol(hazardRatio)
+        
+        kappa <- simulationResults$kappa
+        if (is.null(kappa) || is.na(kappa)) {
+            kappa <- 1
+        }
+        
+        eventTime <- simulationResults$eventTime
+        if (is.null(eventTime) || is.na(eventTime)) {
+            eventTime <- 12
+        }
+        
+        simulationResults$lambdaControl <- getLambdaByPi(piControl, eventTime = eventTime, kappa = kappa)
+        simulationResults$lambdaTreatment <- matrix(NA_real_, nrow = numberOfRows, ncol = numberOfCols)
+        for (i in 1:numberOfRows) {
+            simulationResults$lambdaTreatment[i, ] <- getLambda1ByLambda2AndHazardRatio(
+                simulationResults$lambdaControl, hazardRatio[i, ])
+        }
+        simulationResults$.setParameterType("lambdaTreatment", C_PARAM_DERIVED)
+        simulationResults$.setParameterType("lambdaControl", C_PARAM_DERIVED)
+    
+        simulationResults$medianTreatment <- matrix(NA_real_, nrow = numberOfRows, ncol = numberOfCols)
+        for (i in 1:numberOfRows) {
+            simulationResults$medianTreatment[i, ] <- getMedianByLambda(simulationResults$lambdaTreatment[i, ], kappa = kappa)
+        }
+        simulationResults$medianControl <- getMedianByLambda(simulationResults$lambdaControl, kappa = kappa)
+        simulationResults$.setParameterType("medianTreatment", C_PARAM_DERIVED)
+        simulationResults$.setParameterType("medianControl", C_PARAM_DERIVED)
+    } else {
+        simulationResults$.setParameterType("lambdaTreatment", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("lambdaControl", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("medianTreatment", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("medianControl", C_PARAM_NOT_APPLICABLE)
     }
-    simulationResults$medianControl <- getMedianByLambda(simulationResults$lambdaControl, kappa = simulationResults$kappa)
-    simulationResults$.setParameterType("median", C_PARAM_DERIVED)
-    simulationResults$.setParameterType("medianControl", C_PARAM_DERIVED)
 
     if (design$kMax == 1) {
         simulationResults$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)

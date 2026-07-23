@@ -742,7 +742,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
-    if (gMax == 1) {
+    if (gMax == 1 || kMax == 1) {
         simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
     }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
@@ -784,7 +784,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         )
     }
 
-    if (any(simulationResults$rejectedArmsPerStage < 0)) {
+    if (kMax > 1 && any(simulationResults$rejectedArmsPerStage < 0)) {
         stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
             functionName = "getSimulationMultiArmSurvivalPatientWise"
         )

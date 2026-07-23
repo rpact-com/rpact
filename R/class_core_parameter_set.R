@@ -530,7 +530,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             output <- ""
             tryCatch(
                 {
-                    if (parameterName %in% c("median", "lambda") && .isMultiArmSimulationResults(self)) {
+                    if (parameterName %in% c("medianTreatment", "lambdaTreatment") && .isMultiArmSimulationResults(self)) {
                         param$type <- "matrix"
                     }
 
@@ -575,7 +575,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                                     paramValueFormatted = param$paramValueFormatted[[i]],
                                     showParameterType = showParameterType,
                                     category = category,
-                                    matrixRow = ifelse(n == 1 && !parameterName %in% c("median", "lambda"), NA_integer_, i),
+                                    matrixRow = ifelse(n == 1 && !parameterName %in% c("medianTreatment", "lambdaTreatment"), NA_integer_, i),
                                     consoleOutputEnabled = consoleOutputEnabled,
                                     paramNameRaw = parameterName,
                                     numberOfCategories = n
@@ -736,7 +736,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         (inherits(self, "ClosedCombinationTestResults") &&
                             paramName %in% c("rejected", "separatePValues"))) {
                     paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
-                } else if (.isMultiArmSimulationResults(self) && paramName %in% c("lambda", "median")) {
+                } else if (.isMultiArmSimulationResults(self) && paramName %in% c("lambdaTreatment", "medianTreatment")) {
                     paramCaption <- paste0(paramCaption, " {", matrixRow, "}")
                 } else {
                     paramCaption <- paste0(paramCaption, " [", matrixRow, "]")
@@ -1254,7 +1254,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
             {
                 if (!(parameterName %in% c(
                         "stages", "adaptations", "effectList",
-                        "doseLevels", "plannedCalendarTime"
+                        "doseLevels", "plannedCalendarTime",
+                        "lambdaTreatment", "medianTreatment"
                     )) &&
                         !grepl("Function$", parameterName) &&
                         (is.null(variedParameter) || parameterName != variedParameter)) {
