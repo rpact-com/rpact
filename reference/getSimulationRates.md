@@ -24,7 +24,7 @@ getSimulationRates(
   conditionalPower = NA_real_,
   pi1H1 = NA_real_,
   pi2H1 = NA_real_,
-  maxNumberOfIterations = 1000L,
+  maxNumberOfIterations = NA_integer_,
   seed = NA_real_,
   calcSubjectsFunction = NULL,
   showStatistics = FALSE

@@ -28,7 +28,7 @@ getSimulationEnrichmentRates(
   conditionalPower = NA_real_,
   piTreatmentH1 = NA_real_,
   piControlH1 = NA_real_,
-  maxNumberOfIterations = 1000L,
+  maxNumberOfIterations = NA_integer_,
   seed = NA_real_,
   calcSubjectsFunction = NULL,
   selectPopulationsFunction = NULL,

@@ -24,7 +24,7 @@ getSimulationMeans(
   conditionalPower = NA_real_,
   thetaH1 = NA_real_,
   stDevH1 = NA_real_,
-  maxNumberOfIterations = 1000L,
+  maxNumberOfIterations = NA_integer_,
   seed = NA_real_,
   calcSubjectsFunction = NULL,
   showStatistics = FALSE

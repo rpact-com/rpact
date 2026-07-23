@@ -7,7 +7,7 @@ survival endpoints.
 ## Usage
 
 ``` r
-getFisherInformation(designPlan)
+getFisherInformation(designPlan, stage = NA_integer_)
 ```
 
 ## Arguments
@@ -24,15 +24,20 @@ getFisherInformation(designPlan)
   [`getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.md),
   [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md),
   [`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md),
-  or
-  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md).
+  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md),
+  or the corresponding multi-arm simulation functions.
+
+- stage:
+
+  Integer. The analysis stage for which the Fisher information is
+  requested. If `NA` (default), the first stage is used.
 
 ## Value
 
-A numeric value or numeric vector containing the first-stage Fisher
-information. A vector is returned if the object contains several
-planning alternatives or sample size values. `NA_real_` is returned if
-the endpoint type is not supported by this helper.
+A numeric value, vector, or matrix containing the first-stage Fisher
+information. A vector or matrix can be returned if the object contains
+several planning alternatives, arms, or sample size values. `NA_real_`
+is returned if the endpoint type is not supported by this helper.
 
 ## Details
 

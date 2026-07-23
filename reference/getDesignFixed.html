@@ -9,7 +9,7 @@ constructs an object of class TrialDesignFixed with kMax = 1."><meta property="o
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9312</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9313</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -133,6 +133,12 @@ desired type II error <code>beta</code> (or equivalently power = 1 - beta).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Critical values                 : 1.960 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Stage levels (one-sided)        : 0.0250 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ISSUES (parameters with undefined type):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cumulative alpha spending       : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Binding futility                : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Tolerance                       : 1e-06 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   User defined alpha spending     : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Custom significance and power</span></span></span>
 <span class="r-in"><span><span class="va">design2</span> <span class="op">&lt;-</span> <span class="fu">getDesignFixed</span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.05</span>, beta <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
@@ -149,6 +155,12 @@ desired type II error <code>beta</code> (or equivalently power = 1 - beta).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Output:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Critical values                 : 1.645 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Stage levels (one-sided)        : 0.0500 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ISSUES (parameters with undefined type):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cumulative alpha spending       : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Binding futility                : NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Tolerance                       : 1e-06 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   User defined alpha spending     : NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -9,7 +9,7 @@ a design plan or simulation results object for means, rates, or survival endpoin
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9312</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9313</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,7 @@ a design plan or simulation results object for means, rates, or survival endpoin
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getFisherInformation</span><span class="op">(</span><span class="va">designPlan</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getFisherInformation</span><span class="op">(</span><span class="va">designPlan</span>, stage <span class="op">=</span> <span class="cn">NA_integer_</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -61,16 +61,22 @@ a design plan or simulation results object for means, rates, or survival endpoin
 <code><a href="getSampleSizeSurvival.html">getSampleSizeSurvival()</a></code>,
 <code><a href="getPowerSurvival.html">getPowerSurvival()</a></code>,
 <code><a href="getSimulationMeans.html">getSimulationMeans()</a></code>,
-<code><a href="getSimulationRates.html">getSimulationRates()</a></code>, or
-<code><a href="getSimulationSurvival.html">getSimulationSurvival()</a></code>.</p></dd>
+<code><a href="getSimulationRates.html">getSimulationRates()</a></code>,
+<code><a href="getSimulationSurvival.html">getSimulationSurvival()</a></code>, or the
+corresponding multi-arm simulation functions.</p></dd>
+
+
+<dt id="arg-stage">stage<a class="anchor" aria-label="anchor" href="#arg-stage"></a></dt>
+<dd><p>Integer. The analysis stage for which the Fisher information is
+requested. If <code>NA</code> (default), the first stage is used.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A numeric value or numeric vector containing the first-stage Fisher
-information. A vector is returned if the object contains several
-planning alternatives or sample size values. <code>NA_real_</code> is returned if
-the endpoint type is not supported by this helper.</p>
+    <p>A numeric value, vector, or matrix containing the first-stage Fisher
+information. A vector or matrix can be returned if the object contains
+several planning alternatives, arms, or sample size values. <code>NA_real_</code>
+is returned if the endpoint type is not supported by this helper.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
