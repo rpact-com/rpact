@@ -282,7 +282,10 @@ NULL
     ))
 }
 
-.getCriticalValuesDunnettForSimulation <- function(alpha, indices, allocationRatioPlanned) {
+.getCriticalValuesDunnettForSimulation <- function(
+        alpha,
+        indices,
+        allocationRatioPlanned) {
     if (allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
         stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages",
             functionName = ".getCriticalValuesDunnettForSimulation"
@@ -433,32 +436,21 @@ NULL
         activeArms,
         effectMatrix,
         typeOfShape,
-        kappa = NA_real_,
-        # survival only
-        dropoutRate1 = NA_real_,
-        # survival only
-        dropoutRate2 = NA_real_,
-        # survival only
-        dropoutTime = NA_real_,
-        # survival only
-        eventTime = NA_real_,
-        # survival only
-        muMaxVector = NA_real_,
-        # means only
-        piMaxVector = NA_real_,
-        # rates only
-        piControl = NA_real_,
-        # rates and survival only
-        omegaMaxVector = NA_real_,
-        # survival only
+        kappa = NA_real_, # survival only
+        dropoutRate1 = NA_real_, # survival only
+        dropoutRate2 = NA_real_, # survival only
+        dropoutTime = NA_real_, # survival only
+        eventTime = NA_real_, # survival only
+        muMaxVector = NA_real_, # means only
+        piMaxVector = NA_real_, # rates only
+        piControl = NA_real_, # rates and survival only
+        omegaMaxVector = NA_real_, # survival only
         gED50,
         slope,
         doseLevels,
         intersectionTest,
-        stDev = NA_real_,
-        # means only
-        directionUpper = NA,
-        # rates + survival only
+        stDev = NA_real_, # means only
+        directionUpper = NA, # rates + survival only
         adaptations,
         typeOfSelection,
         effectMeasure,
@@ -467,38 +459,24 @@ NULL
         rValue,
         threshold,
         plannedSubjects = NA_real_,
-        accrualTime = NA_real_,
-        # survival only
-        accrualIntensity = NA_real_,
-        # survival only
-        maxNumberOfSubjects = NA_real_,
-        # survival only
-        plannedEvents = NA_real_,
-        # survival only
+        accrualTime = NA_real_, # survival only
+        accrualIntensity = NA_real_, # survival only
+        maxNumberOfSubjects = NA_real_, # survival only
+        plannedEvents = NA_real_, # survival only
         allocationRatioPlanned,
-        minNumberOfSubjectsPerStage = NA_real_,
-        # means + rates only
-        maxNumberOfSubjectsPerStage = NA_real_,
-        # means + rates only
-        minNumberOfEventsPerStage = NA_real_,
-        # survival only
-        maxNumberOfEventsPerStage = NA_real_,
-        # survival only
+        minNumberOfSubjectsPerStage = NA_real_, # means + rates only
+        maxNumberOfSubjectsPerStage = NA_real_, # means + rates only
+        minNumberOfEventsPerStage = NA_real_, # survival only
+        maxNumberOfEventsPerStage = NA_real_, # survival only
         conditionalPower,
-        thetaH1 = NA_real_,
-        # means + survival only
-        stDevH1 = NA_real_,
-        # means only
-        piTreatmentsH1 = NA_real_,
-        # rates only
-        piControlH1 = NA_real_,
-        # rates only
+        thetaH1 = NA_real_, # means + survival only
+        stDevH1 = NA_real_, # means only
+        piTreatmentsH1 = NA_real_, # rates only
+        piControlH1 = NA_real_, # rates only
         maxNumberOfIterations,
         seed,
-        calcSubjectsFunction = NULL,
-        # means + rates only
-        calcEventsFunction = NULL,
-        # survival only
+        calcSubjectsFunction = NULL, # means + rates only
+        calcEventsFunction = NULL, # survival only
         selectArmsFunction,
         showStatistics,
         endpoint = c("means", "rates", "survival"),
@@ -611,9 +589,9 @@ NULL
         )
     }
 
-    .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
+    maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
+    .validateAndSetSeed(simulationResults, seed)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
-    .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
 
     if (endpoint %in% c("rates", "survival")) {
         .assertIsSingleLogical(directionUpper, "directionUpper")
@@ -1183,14 +1161,6 @@ NULL
     if (endpoint == "means") {
         .setValueAndParameterType(simulationResults, "stDevH1", stDevH1, NA_real_, notApplicableIfNA = TRUE)
     }
-    .setValueAndParameterType(
-        simulationResults,
-        "maxNumberOfIterations",
-        as.integer(maxNumberOfIterations),
-        C_MAX_SIMULATION_ITERATIONS_DEFAULT
-    )
-    simulationResults$.setParameterType("seed", ifelse(is.na(seed), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
-    simulationResults$seed <- .setSeed(seed)
 
     if (is.null(adaptations) || all(is.na(adaptations))) {
         adaptations <- rep(TRUE, kMax - 1)
@@ -1208,11 +1178,15 @@ NULL
     }
     if (typeOfSelection != "userDefined") {
         .setValueAndParameterType(simulationResults, "threshold", threshold, -Inf)
-        .setValueAndParameterType(simulationResults, "epsilonValue", 
-            epsilonValue, NA_real_, notApplicableIfNA = TRUE)
-        .setValueAndParameterType(simulationResults, "rValue", 
-            rValue, NA_real_, notApplicableIfNA = TRUE)
-    } else { 
+        .setValueAndParameterType(simulationResults, "epsilonValue",
+            epsilonValue, NA_real_,
+            notApplicableIfNA = TRUE
+        )
+        .setValueAndParameterType(simulationResults, "rValue",
+            rValue, NA_real_,
+            notApplicableIfNA = TRUE
+        )
+    } else {
         simulationResults$.setParameterType("threshold", C_PARAM_NOT_APPLICABLE)
         simulationResults$.setParameterType("epsilonValue", C_PARAM_NOT_APPLICABLE)
         simulationResults$.setParameterType("rValue", C_PARAM_NOT_APPLICABLE)
@@ -1229,7 +1203,7 @@ NULL
     .setValueAndParameterType(simulationResults, "successCriterion", successCriterion, C_SUCCESS_CRITERION_DEFAULT)
     .setValueAndParameterType(simulationResults, "effectMeasure", effectMeasure, C_EFFECT_MEASURE_DEFAULT)
     .setValueAndParameterType(simulationResults, "typeOfShape", typeOfShape, C_TYPE_OF_SHAPE_DEFAULT)
-    
+
     if (activeArms == 1) {
         simulationResults$.setParameterType("slope", C_PARAM_NOT_APPLICABLE)
         simulationResults$.setParameterType("threshold", C_PARAM_NOT_APPLICABLE)
@@ -1240,12 +1214,12 @@ NULL
         simulationResults$.setParameterType("epsilonValue", C_PARAM_NOT_APPLICABLE)
         simulationResults$.setParameterType("rValue", C_PARAM_NOT_APPLICABLE)
     }
-    
+
     piControl <- simulationResults$piControl
     hazardRatio <- simulationResults$effectMatrix
     numberOfRows <- nrow(hazardRatio)
     numberOfCols <- ncol(hazardRatio)
-    
+
     simulationResults$lambdaControl <- getLambdaByPi(piControl, eventTime = simulationResults$eventTime, kappa = simulationResults$kappa)
     simulationResults$lambda <- matrix(NA_real_, nrow = numberOfRows, ncol = numberOfCols)
     for (i in 1:numberOfRows) {
@@ -1261,10 +1235,10 @@ NULL
     simulationResults$medianControl <- getMedianByLambda(simulationResults$lambdaControl, kappa = simulationResults$kappa)
     simulationResults$.setParameterType("median", C_PARAM_DERIVED)
     simulationResults$.setParameterType("medianControl", C_PARAM_DERIVED)
-    
+
     if (design$kMax == 1) {
         simulationResults$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
     }
-    
+
     return(simulationResults)
 }

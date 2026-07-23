@@ -506,7 +506,7 @@ updateSubGroupVector <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcEventsFunction = NULL,
@@ -616,6 +616,7 @@ updateSubGroupVector <- function(
     maxNumberOfEventsPerStage <- simulationResults$maxNumberOfEventsPerStage # survival only
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 

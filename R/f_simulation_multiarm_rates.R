@@ -446,7 +446,7 @@ getSimulationMultiArmRates <- function(
         conditionalPower = NA_real_,
         piTreatmentsH1 = NA_real_,
         piControlH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,

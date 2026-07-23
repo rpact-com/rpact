@@ -1078,3 +1078,28 @@ getRawData <- function(x, aggregate = FALSE) {
         parameter = "typeOfShape", value = typeOfShape
     )
 }
+
+.setMaxNumberOfIterations <- function(simulationResults, maxNumberOfIterations) {
+    .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations",
+        validateType = FALSE, naAllowed = TRUE
+    )
+    if (is.na(maxNumberOfIterations)) {
+        maxNumberOfIterations <- C_MAX_SIMULATION_ITERATIONS_DEFAULT
+    }
+    .setValueAndParameterType(
+        simulationResults, "maxNumberOfIterations",
+        as.integer(maxNumberOfIterations), C_MAX_SIMULATION_ITERATIONS_DEFAULT
+    )
+    return(invisible(maxNumberOfIterations))
+}
+
+.validateAndSetSeed <- function(simulationResults, seed) {
+    .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
+    simulationResults$.setParameterType("seed", ifelse(is.na(seed),
+        C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+    ))
+    simulationResults$seed <- .setSeed(seed)
+    return(invisible(seed))
+}
+
+

@@ -190,7 +190,7 @@ getSimulationRates <- function(
         conditionalPower = NA_real_,
         pi1H1 = NA_real_,
         pi2H1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
@@ -265,8 +265,6 @@ getSimulationRates <- function(
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
         lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
     )
-    .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
-    .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
@@ -283,6 +281,9 @@ getSimulationRates <- function(
     }
 
     simulationResults <- SimulationResultsRates$new(design, showStatistics = showStatistics)
+    
+    maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
+    .validateAndSetSeed(simulationResults, seed)
 
     conditionalPower <- .ignoreParameterIfNotUsed(
         "conditionalPower",
@@ -470,14 +471,6 @@ getSimulationRates <- function(
         notApplicableIfNA = TRUE
     )
     .setValueAndParameterType(simulationResults, "pi2H1", pi2H1, 0.2, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(
-        simulationResults, "maxNumberOfIterations",
-        as.integer(maxNumberOfIterations), C_MAX_SIMULATION_ITERATIONS_DEFAULT
-    )
-    simulationResults$.setParameterType("seed", ifelse(is.na(seed),
-        C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-    ))
-    simulationResults$seed <- .setSeed(seed)
 
     if (.isTrialDesignFixed(design)) {
         designNumber <- 0L

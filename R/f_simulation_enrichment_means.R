@@ -523,7 +523,7 @@ getSimulationEnrichmentMeans <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
@@ -596,6 +596,7 @@ getSimulationEnrichmentMeans <- function(
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
 
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)

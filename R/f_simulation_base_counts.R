@@ -257,7 +257,7 @@ getSimulationCounts <- function(
         accrualIntensity = NA_real_,
         followUpTime = NA_real_,
         allocationRatioPlanned = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         showStatistics = FALSE) {
@@ -357,9 +357,10 @@ getSimulationCounts <- function(
         accrualTime <- accrualTime[-1]
     }
 
-    .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
-    .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
+    
+    maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
+    .validateAndSetSeed(simulationResults, seed)
 
     .setValueAndParameterType(
         simulationResults, "plannedCalendarTime",
@@ -413,18 +414,9 @@ getSimulationCounts <- function(
         notApplicableIfNA = TRUE
     )
     .setValueAndParameterType(
-        simulationResults, "maxNumberOfIterations",
-        as.integer(maxNumberOfIterations), C_MAX_SIMULATION_ITERATIONS_DEFAULT
-    )
-    .setValueAndParameterType(
         simulationResults, "allocationRatioPlanned",
         allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
     )
-
-    simulationResults$.setParameterType("seed", ifelse(is.na(seed),
-        C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-    ))
-    simulationResults$seed <- .setSeed(seed)
 
     if (!is.na(lambda2) && !anyNA(theta)) {
         lambda1 <- lambda2 * theta

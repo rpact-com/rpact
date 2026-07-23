@@ -257,10 +257,8 @@ NULL
 getSimulationSurvival <- function(
         design = NULL,
         ...,
-        thetaH0 = 1,
-        # C_THETA_H0_SURVIVAL_DEFAULT
-        directionUpper = NA,
-        # C_DIRECTION_UPPER_DEFAULT
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         pi1 = NA_real_,
         pi2 = NA_real_,
         lambda1 = NA_real_,
@@ -270,31 +268,22 @@ getSimulationSurvival <- function(
         hazardRatio = NA_real_,
         kappa = 1,
         piecewiseSurvivalTime = NA_real_,
-        allocation1 = 1,
-        # C_ALLOCATION_1_DEFAULT
-        allocation2 = 1,
-        # C_ALLOCATION_2_DEFAULT
-        eventTime = 12,
-        # C_EVENT_TIME_DEFAULT
-        accrualTime = c(0, 12),
-        # C_ACCRUAL_TIME_DEFAULT
-        accrualIntensity = 0.1,
-        # C_ACCRUAL_INTENSITY_DEFAULT
+        allocation1 = 1, # C_ALLOCATION_1_DEFAULT
+        allocation2 = 1, # C_ALLOCATION_2_DEFAULT
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
+        accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
+        accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),
-        dropoutRate1 = 0,
-        # C_DROP_OUT_RATE_1_DEFAULT
-        dropoutRate2 = 0,
-        # C_DROP_OUT_RATE_2_DEFAULT
-        dropoutTime = 12,
-        # C_DROP_OUT_TIME_DEFAULT
+        dropoutRate1 = 0, # C_DROP_OUT_RATE_1_DEFAULT
+        dropoutRate2 = 0, # C_DROP_OUT_RATE_2_DEFAULT
+        dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
         maxNumberOfSubjects = NA_real_,
         plannedEvents = NA_real_,
         minNumberOfEventsPerStage = NA_real_,
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
-        #  C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = NA_integer_, #  C_MAX_SIMULATION_ITERATIONS_DEFAULT
         maxNumberOfRawDatasetsPerStage = 0,
         longTimeSimulationAllowed = FALSE,
         seed = NA_real_,
@@ -341,8 +330,6 @@ getSimulationSurvival <- function(
     )
     .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE)
     .assertIsInOpenInterval(thetaH1, "thetaH1", lower = 0, upper = NULL, naAllowed = TRUE)
-    .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
-    .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     lambda1 <- .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)
     lambda2 <- .assertIsNumericVector(lambda2, "lambda2", naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
@@ -495,10 +482,8 @@ getSimulationSurvival <- function(
         )
     }
 
-    simulationResults$.setParameterType("seed", ifelse(is.na(seed),
-        C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-    ))
-    simulationResults$seed <- .setSeed(seed)
+    maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
+    .validateAndSetSeed(simulationResults, seed)
 
     simulationResults$.accrualTime <- accrualSetup
 
@@ -510,8 +495,10 @@ getSimulationSurvival <- function(
     )
 
     simulationResults$accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
-    simulationResults$.setParameterType("accrualTime", 
-        accrualSetup$.getParameterType("accrualTime"))
+    simulationResults$.setParameterType(
+        "accrualTime",
+        accrualSetup$.getParameterType("accrualTime")
+    )
 
     simulationResults$accrualIntensity <- accrualSetup$accrualIntensity
     simulationResults$.setParameterType(
@@ -675,8 +662,10 @@ getSimulationSurvival <- function(
         simulationResults, "allocationRatioPlanned",
         allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
     )
-    .setValueAndParameterType(simulationResults, "conditionalPower", 
-        conditionalPower, NA_real_, notApplicableIfNA = TRUE)
+    .setValueAndParameterType(simulationResults, "conditionalPower",
+        conditionalPower, NA_real_,
+        notApplicableIfNA = TRUE
+    )
     if (!is.na(thetaH0) && !is.na(thetaH1) && thetaH0 != 1) {
         thetaH1 <- thetaH1 / thetaH0
         .setValueAndParameterType(simulationResults, "thetaH1", thetaH1, NA_real_)
@@ -688,10 +677,6 @@ getSimulationSurvival <- function(
         simulationResults$.setParameterType("thetaH1", C_PARAM_NOT_APPLICABLE)
     }
     .setValueAndParameterType(simulationResults, "kappa", kappa, 1)
-    .setValueAndParameterType(
-        simulationResults, "maxNumberOfIterations",
-        as.integer(maxNumberOfIterations), C_MAX_SIMULATION_ITERATIONS_DEFAULT
-    )
 
     phi <- -c(log(1 - dropoutRate1), log(1 - dropoutRate2)) / dropoutTime
 

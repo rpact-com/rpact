@@ -1033,7 +1033,7 @@ getSimulationEnrichmentRates <- function(
         conditionalPower = NA_real_,
         piTreatmentH1 = NA_real_,
         piControlH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
@@ -1118,6 +1118,7 @@ getSimulationEnrichmentRates <- function(
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
 
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)

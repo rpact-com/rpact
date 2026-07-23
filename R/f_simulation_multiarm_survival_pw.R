@@ -159,7 +159,7 @@ getSimulationMultiArmSurvival <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
@@ -426,7 +426,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         maxNumberOfEventsPerStage = NA_real_,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
@@ -554,7 +554,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     maxNumberOfEventsPerStage <- simulationResults$maxNumberOfEventsPerStage # survival only
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
-
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
+    
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
     if (.isTrialDesignConditionalDunnett(design)) {

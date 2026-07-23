@@ -175,7 +175,7 @@ getSimulationMeans <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
-        maxNumberOfIterations = 1000L,
+        maxNumberOfIterations = NA_integer_,
         # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
@@ -234,14 +234,15 @@ getSimulationMeans <- function(
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
         lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
     )
-    .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
-    .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     stDev <- .assertIsValidStandardDeviation(stDev, groups = groups)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
     .assertIsSingleLogical(normalApproximation, "normalApproximation", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
     simulationResults <- SimulationResultsMeans$new(design, showStatistics = showStatistics)
+    
+    maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
+    .validateAndSetSeed(simulationResults, seed)
 
     if (design$sided == 2) {
         stopIllegalArgument("only one-sided case is implemented for the simulation design",
@@ -443,14 +444,6 @@ getSimulationMeans <- function(
         stDevH1, NA_real_,
         notApplicableIfNA = TRUE
     )
-    .setValueAndParameterType(
-        simulationResults, "maxNumberOfIterations",
-        as.integer(maxNumberOfIterations), C_MAX_SIMULATION_ITERATIONS_DEFAULT
-    )
-    simulationResults$.setParameterType("seed", ifelse(is.na(seed),
-        C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-    ))
-    simulationResults$seed <- .setSeed(seed)
 
     if (.isTrialDesignFixed(design)) {
         designNumber <- 0L
