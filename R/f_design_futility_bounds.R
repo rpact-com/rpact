@@ -316,7 +316,8 @@ summary.FutilityBounds <- function(object, ...) {
                     sourceValue = futilityBounds,
                     sourceScale = futilityBoundsScale,
                     targetScale = targetScale,
-                    design = design
+                    design = design,
+                    directionUpper = directionUpper
                 )
             } else {
                 .warnInCaseOfUnusedArgument(
@@ -394,13 +395,14 @@ summary.FutilityBounds <- function(object, ...) {
 #' \code{targetScale} is \code{"reverseCondPower"} or if the conversion
 #' involves conditional or predictive power in a group sequential or Fisher design.
 #' Must be a one-sided two-stage group sequential design or Fisher's combination test design.
+#' @inheritParams param_directionUpper
 #' @param theta Numeric. The assumed effect size under the alternative hypothesis on the scale of the
 #'   test statistic. For example, in a survival design, this would be the on the log hazard ratio scale.
 #' @param information Numeric vector of length 1 or 2. The stage-wise information levels
 #'   (i.e. this is *not* the cumulative information). Note that depending on which conversion is performed,
-#'   either the first or second stage information may not be needed. In that case, a warning will be issued
-#'   if the unused information is provided. The warning can be avoided by either passing a single number,
-#'   or setting the unused information to \code{NA}.
+#'   either the first or second stage information may not be needed. In this case, a warning will be issued
+#'   if the unused information is provided. The warning can be avoided by either passing a single number
+#'   (setting both informations to be equal to each other), or setting the unused information to \code{NA}.
 #' @param naAllowed Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.
 #' @inheritParams param_three_dots
 #'
@@ -462,6 +464,7 @@ getFutilityBounds <- function(
             "effectEstimate"
         ),
         design = NULL,
+        directionUpper = NA,
         theta = NA_real_,
         information = NA_real_,
         naAllowed = FALSE) {
@@ -549,7 +552,31 @@ getFutilityBounds <- function(
             gsWeights <- c(1, sqrt((1 - design$informationRates[1]) / design$informationRates[1]))
         }
         criticalValue <- design$criticalValues[2]
+
+        if (is.na(directionUpper)) {
+            directionUpper <- if (is.na(design$directionUpper)) TRUE else design$directionUpper
+        } else {
+            if (!is.na(design$directionUpper) &&
+                    !identical(directionUpper, design$directionUpper)) {
+                stopConflictingArguments("in the design directionUpper = ",
+                    design$directionUpper, " is defined. ",
+                    "In getFutilityBounds() the same direction must be specified, but it is ",
+                    directionUpper,
+                    functionName = ".assertIsValidDirectionUpper",
+                    parameter = "directionUpper",
+                    value = design$directionUpper
+                )
+            } else if (is.na(design$directionUpper) && isFALSE(directionUpper) &&
+                    .isTrialDesignInverseNormalOrGroupSequential(design)) {
+                criticalValue <- -criticalValue
+            }
+        }
+    } else {
+        if (is.na(directionUpper)) {
+            directionUpper <- TRUE
+        }
     }
+    .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = FALSE)
 
     .assertIsSingleNumber(information1, infos$paramNames[1], naAllowed = TRUE)
     .assertIsInOpenInterval(
@@ -585,50 +612,50 @@ getFutilityBounds <- function(
             upper = 1,
             naAllowed = TRUE
         )
+        normQuantile <- if (directionUpper) qnorm(1 - sourceValue) else qnorm(sourceValue)
     }
 
-    sourceValues <- numeric()
-    if (sourceScale == "zValue") {
-        sourceValues <- sourceValue
+    sourceValues <- if (sourceScale == "zValue") {
+        sourceValue
     } else if (sourceScale == "pValue") {
-        sourceValues <- qnorm(1 - sourceValue)
+        normQuantile
     } else if (sourceScale == "effectEstimate") {
-        sourceValues <- sourceValue * sqrt(information1)
+        sourceValue * sqrt(information1)
     } else if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
         if (sourceScale == "conditionalPower") {
-            sourceValues <- (criticalValue - gsWeights[2] * (qnorm(1 - sourceValue) + theta * sqrt(information2))) /
+            (criticalValue - gsWeights[2] * (normQuantile + theta * sqrt(information2))) /
                 gsWeights[1]
         } else if (sourceScale == "condPowerAtObserved") {
-            sourceValues <- (criticalValue /
-                gsWeights[2] -
-                qnorm(1 - sourceValue)) /
+            (criticalValue /
+                gsWeights[2] - normQuantile) /
                 (gsWeights[1] / gsWeights[2] + sqrt(information2 / information1))
         } else if (sourceScale == "predictivePower") {
-            sourceValues <- (criticalValue /
+            (criticalValue /
                 gsWeights[2] -
-                sqrt((information1 + information2) / information1) * qnorm(1 - sourceValue)) /
+                sqrt((information1 + information2) / information1) * normQuantile) /
                 (gsWeights[1] / gsWeights[2] + sqrt(information2 / information1))
         } else if (sourceScale == "reverseCondPower") {
-            sourceValues <- sqrt(1 - design$informationRates[1]) *
-                qnorm(sourceValue) +
-                sqrt(design$informationRates[1]) * criticalValue
+            sqrt(design$informationRates[1]) * criticalValue -
+                sqrt(1 - design$informationRates[1]) * normQuantile
         }
     } else if (.isTrialDesignFisher(design)) {
-        sourceValues <- .getFutilityBoundSourceValuesFisher(
+        .getFutilityBoundSourceValuesFisher(
             sourceValue,
             criticalValue,
             gsWeights,
             sourceScale,
             theta,
             information1,
-            information2
+            information2,
+            directionUpper
         )
     }
 
     if (targetScale == "zValue") {
         return(.addFutilityBoundParameterTypes(sourceValues, args))
     } else if (targetScale == "pValue") {
-        return(.addFutilityBoundParameterTypes(1 - pnorm(sourceValues), args))
+        pval <- if (directionUpper) 1 - pnorm(sourceValues) else pnorm(sourceValues)
+        return(.addFutilityBoundParameterTypes(pval, args))
     } else if (targetScale == "effectEstimate") {
         return(.addFutilityBoundParameterTypes(sourceValues / sqrt(information1), args))
     } else if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
@@ -640,6 +667,7 @@ getFutilityBounds <- function(
             theta,
             information1,
             information2,
+            directionUpper,
             design
         )
         return(.addFutilityBoundParameterTypes(result, args))
@@ -653,7 +681,8 @@ getFutilityBounds <- function(
                 targetScale,
                 theta,
                 information1,
-                information2
+                information2,
+                directionUpper
             ))
         }
         .showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange(result, upperBound = NULL)
@@ -676,18 +705,21 @@ getFutilityBounds <- function(
         sourceScale,
         theta,
         information1,
-        information2) {
+        information2,
+        directionUpper) {
     if (is.na(sourceValue) || sourceValue >= 1 - 1e-07) {
         return(NA_real_)
     }
 
+    quantileSign <- if (directionUpper) +1 else -1
+
     tryCatch(
         {
             if (sourceScale == "conditionalPower") {
-                return(qnorm(1 - criticalValue /
-                    pnorm((qnorm(sourceValue) - theta * sqrt(information2)))^gsWeights[2]))
+                return(quantileSign * qnorm(1 - criticalValue /
+                    pnorm((qnorm(sourceValue) - quantileSign * theta * sqrt(information2)))^gsWeights[2]))
             } else if (sourceScale == "condPowerAtObserved") {
-                return(stats::uniroot(
+                return(quantileSign * stats::uniroot(
                     function(x) {
                         pmin(1, pnorm(
                             qnorm((criticalValue / (1 - pnorm(x)))^(1 / gsWeights[2])) +
@@ -699,7 +731,7 @@ getFutilityBounds <- function(
                     tol = .Machine$double.eps^0.5
                 )$root)
             } else if (sourceScale == "predictivePower") {
-                return(stats::uniroot(
+                return(quantileSign * stats::uniroot(
                     function(x) {
                         pmin(1, pnorm(
                             sqrt(information1 / (information1 + information2)) *
@@ -743,7 +775,8 @@ getFutilityBounds <- function(
         sourceScale,
         theta,
         information1,
-        information2) {
+        information2,
+        directionUpper) {
     sourceValuesCalculated <- numeric()
     for (sourceValue in sourceValues) {
         sourceValuesCalculated <- c(sourceValuesCalculated, .getFutilityBoundSourceValueFisher(
@@ -753,7 +786,8 @@ getFutilityBounds <- function(
             sourceScale,
             theta,
             information1,
-            information2
+            information2,
+            directionUpper
         ))
     }
     return(sourceValuesCalculated)
@@ -767,31 +801,27 @@ getFutilityBounds <- function(
         theta,
         information1,
         information2,
+        directionUpper,
         design) {
-    result <- NA_real_
-    if (targetScale == "conditionalPower") {
-        result <- 1 - pnorm(
-            (criticalValue - gsWeights[1] * sourceValues) /
-                gsWeights[2] -
-                theta * sqrt(information2)
-        )
+    normQuantile <- if (targetScale == "conditionalPower") {
+        (criticalValue - gsWeights[1] * sourceValues) /
+            gsWeights[2] - theta * sqrt(information2)
     } else if (targetScale == "condPowerAtObserved") {
-        result <- 1 - pnorm(
-            (criticalValue - gsWeights[1] * sourceValues) /
-                gsWeights[2] -
-                sourceValues * sqrt(information2 / information1)
-        )
+        (criticalValue - gsWeights[1] * sourceValues) /
+            gsWeights[2] -
+            sourceValues * sqrt(information2 / information1)
     } else if (targetScale == "predictivePower") {
-        result <- 1 - pnorm(
-            sqrt(information1 / (information1 + information2)) *
-                ((criticalValue - gsWeights[1] * sourceValues) /
-                    gsWeights[2] -
-                    sourceValues * sqrt(information2 / information1))
-        )
+        sqrt(information1 / (information1 + information2)) *
+            ((criticalValue - gsWeights[1] * sourceValues) /
+                gsWeights[2] -
+                sourceValues * sqrt(information2 / information1))
     } else if (targetScale == "reverseCondPower") {
-        result <- pnorm((sourceValues - sqrt(design$informationRates[1]) * criticalValue) /
-            sqrt(1 - design$informationRates[1]))
+        (sqrt(design$informationRates[1]) * criticalValue - sourceValues) /
+            sqrt(1 - design$informationRates[1])
     }
+
+    result <- if (directionUpper) 1 - pnorm(normQuantile) else pnorm(normQuantile)
+
     .showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange(result)
     return(result)
 }
@@ -803,34 +833,38 @@ getFutilityBounds <- function(
         targetScale,
         theta,
         information1,
-        information2) {
+        information2,
+        directionUpper) {
     if (is.na(sourceValue)) {
         return(NA_real_)
     }
 
-    if (1 - pnorm(sourceValue) <= criticalValue) {
+    normProbability <- if (directionUpper) 1 - pnorm(sourceValue) else pnorm(sourceValue)
+    if (normProbability <= criticalValue) {
         return(1)
     }
 
+    quantileSign <- if (directionUpper) +1 else -1
+
     if (targetScale == "conditionalPower") {
         return(pnorm(
-            qnorm((criticalValue / (1 - pnorm(sourceValue)))^(1 / gsWeights[2])) +
-                theta * sqrt(information2)
+            qnorm((criticalValue / normProbability)^(1 / gsWeights[2])) +
+                quantileSign * theta * sqrt(information2)
         ))
     }
 
     if (targetScale == "condPowerAtObserved") {
         return(pnorm(
-            qnorm((criticalValue / (1 - pnorm(sourceValue)))^(1 / gsWeights[2])) +
-                sourceValue * sqrt(information2 / information1)
+            qnorm((criticalValue / normProbability)^(1 / gsWeights[2])) +
+                quantileSign * sourceValue * sqrt(information2 / information1)
         ))
     }
 
     if (targetScale == "predictivePower") {
         return(pnorm(
             sqrt(information1 / (information1 + information2)) *
-                (qnorm((criticalValue / (1 - pnorm(sourceValue)))^(1 / gsWeights[2])) +
-                    sourceValue * sqrt(information2 / information1))
+                (qnorm((criticalValue / normProbability)^(1 / gsWeights[2])) +
+                    quantileSign * sourceValue * sqrt(information2 / information1))
         ))
     }
 
@@ -998,7 +1032,7 @@ getFutilityBounds <- function(
 #'        requested. If \code{NA} (default), the first stage is used.
 #'
 #' @details
-#' The returned information is the information used at the first stage of the
+#' The returned information is the Fisher information used at the first stage of the
 #' design plan or simulation setup. For group sequential designs, information at later stages can be
 #' obtained by multiplying this value by the ratio of the corresponding
 #' information rate to the first information rate.

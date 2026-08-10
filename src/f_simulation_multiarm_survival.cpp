@@ -233,7 +233,8 @@ List getSurvDropoutTimesMultiArm(
 		IntegerVector treatments,
 		NumericVector lambdaVector,
 		double kappa,
-		NumericVector phi) {
+		NumericVector phi1,
+		double phi2) {
 
 	// This is important to ensure that R's random number generator state is properly managed.
 	Rcpp::RNGScope scope; 
@@ -249,23 +250,12 @@ List getSurvDropoutTimesMultiArm(
         double u = R::runif(0, 1);
         survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[treatmentArm];
         
-        // Then handle dropout within same subject iteration
-        // Match R's exact structure with separate if statements
-        dropoutTime[i] = NA_REAL; // Initialize
-        
-        if (any(phi > 0).is_true()) {
-            if (phi[0] > 0) {
-                for (int g = 0; g < gMax; g++) {
-                    if (treatmentArm == g) {
-                        dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[0];
-                    }
-                }
-            }
-            if (phi[1] > 0) {
-                if (treatmentArm == gMax) {
-                    dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[1];
-                }
-            }
+        dropoutTime[i] = NA_REAL;
+        if (treatmentArm < gMax && phi1[treatmentArm] > 0) {
+            dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi1[treatmentArm];
+        }
+        if (treatmentArm == gMax && phi2 > 0) {
+            dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi2;
         }
     }
     
@@ -364,7 +354,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         NumericVector omegaVector,
         double piControl,
         double kappa,
-        NumericVector phi,
+        NumericVector phi1,
+        double phi2,
         double eventTime,
         NumericVector plannedEvents,
         NumericVector recruitmentTimes,
@@ -443,7 +434,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         treatments,
         lambdaVector,
         kappa,
-        phi
+        phi1,
+        phi2
     );
     NumericVector survivalTime = clone(as<NumericVector>(tmp["survivalTime"]));
 	NumericVector dropoutTime = clone(as<NumericVector>(tmp["dropoutTime"]));
@@ -530,19 +522,14 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                         double u = R::runif(0, 1);
                     	survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[gMax];
                     }
-                    if (any(phi > 0).is_true()) {
-                        if (phi[0] > 0) { 
-                            for (int g = 0; g < gMax; g++) {
-                                if (treatmentArm == g && selectedArms(g, k)) {
-                                    dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[0];
-                                }
-                            }
-                            if (treatmentArm == gMax) {
-                                dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[1];
-                            }
+                    dropoutTime[i] = NA_REAL;
+                    for (int g = 0; g < gMax; g++) {
+                        if (treatmentArm == g && selectedArms(g, k) && phi1[g] > 0) {
+                            dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi1[g];
                         }
-                    } else {
-                        dropoutTime[i] = NA_REAL;
+                    }
+                    if (treatmentArm == gMax && phi2 > 0) {
+                        dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi2;
                     }
                 }                    
                 survivalDataSet["survivalTime"] = survivalTime;
@@ -846,7 +833,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
 // @param omegaMaxVector Vector of omega max values per scenario
 // @param piControl Control group hazard
 // @param kappa Shape parameter for Weibull distribution
-// @param phi Dropout rates for treatment groups
+// @param phi1 Dropout rates for active treatment arms
+// @param phi2 Dropout rate for the control group
 // @param eventTime Event time
 // @param plannedEvents Planned events per stage
 // @param recruitmentTimes Recruitment times
@@ -882,7 +870,8 @@ List performSimulationMultiArmSurvivalLoop(
 		NumericVector omegaMaxVector,
 		double piControl,
 		double kappa,
-		NumericVector phi,
+		NumericVector phi1,
+		double phi2,
 		double eventTime,
 		NumericVector plannedEvents,
 		NumericVector recruitmentTimes,
@@ -984,7 +973,8 @@ List performSimulationMultiArmSurvivalLoop(
 				omegaVectorThisScenario,
 				piControl,
 				kappa,
-				phi,
+				phi1,
+				phi2,
 				eventTime,
                 plannedEventsThisIteration,
 				recruitmentTimes,

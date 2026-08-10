@@ -555,6 +555,9 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
     maxNumberOfIterations <- simulationResults$maxNumberOfIterations
+    dropoutRate1 <- simulationResults$dropoutRate1
+    dropoutRate2 <- simulationResults$dropoutRate2
+    dropoutTime <- simulationResults$dropoutTime
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
@@ -609,7 +612,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         accrualSetup$accrualIntensity
     )$recruit
     recruitmentTimes <- recruitmentTimes[1:accrualSetup$maxNumberOfSubjects]
-    phi <- c(-log(1 - dropoutRate1), -log(1 - dropoutRate2)) / dropoutTime
+    phi1 <- rep(-log(1 - dropoutRate1) / dropoutTime, length.out = gMax)
+    phi2 <- -log(1 - dropoutRate2) / dropoutTime
 
     # to force last value to be last accrualTime
     recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
@@ -633,7 +637,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             omegaMaxVector = omegaMaxVector,
             piControl = piControl,
             kappa = kappa,
-            phi = phi,
+            phi1 = phi1,
+            phi2 = phi2,
             eventTime = eventTime,
             plannedEvents = plannedEvents,
             recruitmentTimes = recruitmentTimes,
@@ -672,7 +677,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             omegaMaxVector = omegaMaxVector,
             piControl = piControl,
             kappa = kappa,
-            phi = phi,
+            phi1 = phi1,
+            phi2 = phi2,
             eventTime = eventTime,
             plannedEvents = plannedEvents,
             recruitmentTimes = recruitmentTimes,

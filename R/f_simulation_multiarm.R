@@ -769,28 +769,35 @@ NULL
         .setValueAndParameterType(simulationResults, "accrualTime", accrualTime, 12)
         .setValueAndParameterType(simulationResults, "accrualIntensity", accrualIntensity, 0.1)
 
-        .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, 0)
-        .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, 0)
-        .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, 12)
-
         if (!is.na(dropoutTime) && dropoutTime <= 0) {
             stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0",
                 functionName = ".createSimulationResultsMultiArmObject",
                 parameter = "dropoutTime", value = dropoutTime
             )
         }
-        if (!is.na(dropoutRate1) && (dropoutRate1 < 0 || dropoutRate1 >= 1)) {
-            stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
+        dropoutRate1 <- .assertIsNumericVector(
+            dropoutRate1,
+            "dropoutRate1",
+            len = unique(c(1L, activeArms)),
+            naAllowed = FALSE
+        )
+        .assertIsSingleNumber(dropoutRate2, "dropoutRate2")
+        if (any(dropoutRate1 < 0 | dropoutRate1 >= 1)) {
+            stopArgumentOutOfBounds(
+                "'dropoutRate1' (", .arrayToString(dropoutRate1), ") is out of bounds [0; 1)",
                 functionName = ".createSimulationResultsMultiArmObject",
                 parameter = "dropoutRate1", value = dropoutRate1
             )
         }
-        if (!is.na(dropoutRate2) && (dropoutRate2 < 0 || dropoutRate2 >= 1)) {
+        if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
             stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
                 functionName = ".createSimulationResultsMultiArmObject",
                 parameter = "dropoutRate2", value = dropoutRate2
             )
         }
+        .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, 0)
+        .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, 0)
+        .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, 12)
 
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {

@@ -1460,7 +1460,7 @@ getDesignInverseNormal <- function(
         betaAdjustment = NA,
         twoSidedPower = NA,
         tolerance = 1e-08) {
-    validTypesOfDesign <- c("asOF", "asP", "asKD", "asHSD")
+    validTypesOfDesign <- c("asOF", "asP", "asKD", "asHSD", "asUser")
     if (!(typeOfDesign %in% validTypesOfDesign)) {
         stopConflictingArguments(
             "'typeOfDesign' (", dQuote(typeOfDesign), ") must be one of the following ",
