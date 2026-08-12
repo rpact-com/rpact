@@ -18,29 +18,24 @@
 #' @include f_logger.R
 NULL
 
-.concatArgs <- function(...) {
-    args <- list(...)
-    return(paste0(unlist(args, use.names = FALSE), collapse = ""))
-}
-
 # single quote
-.sQuote <- function(...) {
-    return(paste0("'", .concatArgs(...), "'"))
+.sQuote <- function(x) {
+    return(paste0("'", x, "'"))
 }
 
 # parameter quote
-.pQuote <- function(...) {
-    return(paste0("'", .concatArgs(...), "'"))
+.pQuote <- function(x) {
+    return(paste0("'", x, "'"))
 }
 
 # value quote
-.vQuote <- function(...) {
-    return(paste0("'", .concatArgs(...), "'"))
+.vQuote <- function(x) {
+    return(paste0("'", x, "'"))
 }
 
 # double quote
-.dQuote <- function(...) {
-    return(paste0('"', .concatArgs(...), '"'))
+.dQuote <- function(x) {
+    return(paste0('"', x, '"'))
 }
 
 .getLogicalEnvironmentVariable <- function(variableName) {

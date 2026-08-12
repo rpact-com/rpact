@@ -2015,7 +2015,7 @@ NULL
             if (isTRUE(errorContextEnabled)) {
                 stopArgumentUnknown("argument ", .pQuote(argName), " ", 
                         "is unknown and not allowed in function ", functionName, "(). ",
-                        "Remove ", .pQuote(argName, " = ", argValue), 
+                        "Remove ", .pQuote(paste0(argName, " = ", argValue)), 
                         " from ", functionName, "()",
                     functionName = functionName,
                     parameter = argName,
