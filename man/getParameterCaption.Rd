@@ -12,14 +12,16 @@ getParameterCaption(obj, var)
 \item{var}{The variable/parameter name.}
 }
 \value{
-Returns a \code{\link[base]{character}} of specifying the corresponding caption of a given parameter name.
+Returns a \code{\link[base]{character}} of specifying
+the corresponding caption of a given parameter name.
 Returns \code{NULL} if the specified \code{parameterName} does not exist.
 }
 \description{
 Returns the parameter caption for a given object and parameter name.
 }
 \details{
-This function identifies and returns the caption that will be used in print outputs of an rpact result object.
+This function identifies and returns the caption that
+will be used in print outputs of an rpact result object.
 }
 \examples{
 \dontrun{
@@ -28,6 +30,7 @@ getParameterCaption(getDesignInverseNormal(), "kMax")
 
 }
 \seealso{
-\code{\link[=getParameterName]{getParameterName()}} for getting the parameter name for a given caption.
+\code{\link[=getParameterName]{getParameterName()}} for
+getting the parameter name for a given caption.
 }
 \keyword{internal}

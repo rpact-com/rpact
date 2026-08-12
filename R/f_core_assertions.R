@@ -359,84 +359,6 @@ NULL
     }
 }
 
-#'
-#' Assert Values Are in a Closed Interval
-#'
-#' @description
-#' Checks if every element of \code{x} is within the closed interval defined by \code{lower} and \code{upper}.
-#' If any element is outside the interval, an error is thrown.
-#'
-#' @param x Numeric vector. The values to be checked.
-#' @param xName Character. Used to label \code{x} in error messages.
-#' @param ... Additional arguments (unused).
-#' @param lower Numeric. The inclusive lower bound of the interval.
-#' @param upper Numeric. The inclusive upper bound of the interval. If \code{NULL} or \code{NA}, only the lower bound is enforced.
-#' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
-#' @param call. Logical. If \code{TRUE} the error message will include the call. Default is \code{FALSE}.
-#'
-#' @return Invisibly returns \code{x} if all elements are within the specified interval.
-#'
-#' @examples
-#' \dontrun{
-#' .assertIsInClosedInterval(1:10, "x", lower = 1, upper = 10)
-#' .assertIsInClosedInterval(c(1, NA, 5), "x", lower = 1, upper = 10, naAllowed = TRUE)
-#' }
-
-#'
-#' @noRd
-#'
-.assertIsInClosedInterval <- function(
-        x,
-        xName,
-        ...,
-        lower,
-        upper,
-        naAllowed = FALSE,
-        call. = FALSE) {
-        
-    .assertIsInInterval(x, xName, ..., 
-        lower = lower, 
-        upper = upper, 
-        lowerIncluded = TRUE, 
-        upperIncluded = TRUE, 
-        naAllowed = naAllowed, 
-        call. = call.)
-        
-#    .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
-#    if (naAllowed && all(is.na(x))) {
-#        return(invisible())
-#    }
-#
-#    functionName <- paste(deparse(sys.call()), collapse = "")
-#    .assertIsNumericVector(x, xName,
-#        naAllowed = naAllowed,
-#        functionName = functionName, call. = call.
-#    )
-#
-#    if (is.null(upper) || is.na(upper)) {
-#        if (any(x < lower, na.rm = TRUE)) {
-#            prefix <- ifelse(length(x) > 1, "each value of ", "")
-#            stopArgumentOutOfBounds(prefix, sQuote(xName), " (", .arrayToString(x), ") must be >= ", lower,
-#                parameter = xName,
-#                value = x, constraint = paste0(sQuote(xName), " >= ", lower),
-#                functionName = functionName, lowerBound = lower,
-#                upperBound = NULL
-#            )
-#        }
-#    } else if (any(x < lower, na.rm = TRUE) || any(x > upper, na.rm = TRUE)) {
-#        stopArgumentOutOfBounds(sQuote(xName), " (", .arrayToString(x), ") is out of bounds [", lower, "; ",
-#            upper, "]",
-#            parameter = xName, 
-#            value = x, 
-#            constraint = paste0(
-#                sQuote(xName), " >= ", lower, " and ",
-#                sQuote(xName), " <= ", upper
-#            ),
-#            functionName = functionName, lowerBound = lower, upperBound = upper
-#        )
-#    }
-}
-
 .assertIsInInterval <- function(
         x, 
         xName, 
@@ -459,20 +381,8 @@ NULL
         functionName = functionName, call. = call.
     )
     
-    if (is.na(lowerIncluded)) {
-        stopRuntimeIssue("'lowerIncluded' must be specified as TRUE or FALSE.",
-            functionName = ".assertIsInInterval",
-            parameter = "lowerIncluded",
-            value = lowerIncluded
-        )
-    }
-    if (is.na(upperIncluded)) {
-        stopRuntimeIssue("'upperIncluded' must be specified as TRUE or FALSE.",
-            functionName = ".assertIsInInterval",
-            parameter = "upperIncluded",
-            value = upperIncluded
-        )
-    }
+    .assertIsSingleLogical(lowerIncluded, "lowerIncluded")
+    .assertIsSingleLogical(upperIncluded, "upperIncluded")
     
     if (lowerIncluded) {
         lowerCheck <- x < lower
@@ -517,6 +427,49 @@ NULL
     }
 }
 
+#'
+#' Assert Values Are in a Closed Interval
+#'
+#' @description
+#' Checks if every element of \code{x} is within the closed interval defined by \code{lower} and \code{upper}.
+#' If any element is outside the interval, an error is thrown.
+#'
+#' @param x Numeric vector. The values to be checked.
+#' @param xName Character. Used to label \code{x} in error messages.
+#' @param ... Additional arguments (unused).
+#' @param lower Numeric. The inclusive lower bound of the interval.
+#' @param upper Numeric. The inclusive upper bound of the interval. If \code{NULL} or \code{NA}, only the lower bound is enforced.
+#' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
+#' @param call. Logical. If \code{TRUE} the error message will include the call. Default is \code{FALSE}.
+#'
+#' @return Invisibly returns \code{x} if all elements are within the specified interval.
+#'
+#' @examples
+#' \dontrun{
+#' .assertIsInClosedInterval(1:10, "x", lower = 1, upper = 10)
+#' .assertIsInClosedInterval(c(1, NA, 5), "x", lower = 1, upper = 10, naAllowed = TRUE)
+#' }
+#'
+#' @noRd
+#'
+.assertIsInClosedInterval <- function(
+        x,
+        xName,
+        ...,
+        lower,
+        upper,
+        naAllowed = FALSE,
+        call. = FALSE) {
+
+    .assertIsInInterval(x, xName, ..., 
+        lower = lower, 
+        upper = upper, 
+        lowerIncluded = TRUE, 
+        upperIncluded = TRUE, 
+        naAllowed = naAllowed, 
+        call. = call.)
+}
+
 #' Assert Values Are in an Open Interval
 #'
 #' @description
@@ -540,7 +493,6 @@ NULL
 #' \dontrun{
 #' .assertIsInOpenInterval(1:10, "x", lower = 0, upper = 11)
 #' }
-
 #'
 #' @noRd
 #'
@@ -552,45 +504,6 @@ NULL
         upperIncluded = FALSE, 
         naAllowed = naAllowed, 
         call. = call.)
-    
-#    if (naAllowed && all(is.na(x))) {
-#        return(invisible())
-#    }
-#
-#    functionName <- paste(deparse(sys.call()), collapse = "")
-#
-#    if (!naAllowed && length(x) > 1 && anyNA(x)) {
-#        stopIllegalArgument(.pQuote(xName), " (", .arrayToString(x), ") ",
-#            "must be a valid numeric vector or a single NA",
-#            functionName = functionName,
-#            parameter = xName,
-#            value = x
-#        )
-#    }
-#
-#    if (is.null(upper) || is.na(upper)) {
-#        if (any(x <= lower, na.rm = TRUE)) {
-#            prefix <- ifelse(length(x) > 1, "each value of ", "")
-#            stopArgumentOutOfBounds(prefix, .pQuote(xName), " (", .arrayToString(x), ") must be > ", lower,
-#                functionName = functionName,
-#                parameter = xName,
-#                value = x,
-#                constraint = paste0(sQuote(xName), " > ", lower),
-#                lowerBound = lower,
-#                upperBound = NULL
-#            )
-#        }
-#    } else if (any(x <= lower, na.rm = TRUE) || any(x >= upper, na.rm = TRUE)) {
-#        stopArgumentOutOfBounds(.pQuote(xName), " (", .arrayToString(x),
-#            ") is out of bounds (", lower, "; ", upper, ")",
-#            functionName = functionName,
-#            parameter = xName,
-#            value = x,
-#            constraint = paste0(sQuote(xName), " > ", lower, " and ", sQuote(xName), " < ", upper),
-#            lowerBound = lower,
-#            upperBound = upper
-#        )
-#    }
 }
 
 .assertIsValidDataInput <- function(dataInput, design = NULL, stage = NULL) {
