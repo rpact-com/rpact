@@ -123,7 +123,9 @@ The total study duration is \code{accrualTime + followUpTime}.}
 \item{maxNumberOfSubjects}{If \code{maxNumberOfSubjects > 0} is specified,
 the follow-up time for the required number of events is determined.}
 
-\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
+\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.
+For multi-arm simulations, this can be a vector of length equal to the number of active arms,
+specifying different drop-out rates for each active arm.}
 
 \item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
 

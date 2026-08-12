@@ -695,6 +695,8 @@ NULL
         ))) {
         return(FALSE)
     }
+    
+    # TODO system.file("STARTUP_MESSAGE", package = "rpact") # enabled / disabled
 
     lastShownTime <- .getEnvironmentVariable(
         "RPACT_STARTUP_MESSAGE_TIMESTAMP",

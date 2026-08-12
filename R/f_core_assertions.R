@@ -2008,19 +2008,33 @@ NULL
                     vectorLookAndFeelEnabled = length(arg) > 1,
                     encapsulate = is.character(arg)
                 )
-                argValue <- paste0(" = ", argValue)
             }, error = function(e) {})
-            if (exceptionEnabled) {
-                stopIllegalArgument("argument unknown in ", functionName, "(...): ", .pQuote(argName), argValue, " is not allowed",
+        
+            errorFactory <- getOption("rpact.error.factory.condition")
+            errorContextEnabled <- (!is.null(errorFactory) && is.function(errorFactory))
+            if (isTRUE(errorContextEnabled)) {
+                stopArgumentUnknown("argument ", .pQuote(argName), " ", 
+                        "is unknown and not allowed in function ", functionName, "(). ",
+                        "Remove ", .pQuote(argName, " = ", argValue), 
+                        " from ", functionName, "()",
+                    functionName = functionName,
+                    parameter = argName,
+                    value = argValue,
+                    relatedParameter = "functionName",
+                    relatedValue = functionName
+                )
+            } else if (exceptionEnabled) {
+                stopArgumentUnknown(.pQuote(argName), " = ", argValue,
+                    " is not allowed in ", functionName, "()",
                     functionName = ".warnInCaseOfUnknownArguments",
-                    parameter = "functionName",
-                    value = functionName,
-                    relatedParameter = "argName",
-                    relatedValue = argName
+                    parameter = argName,
+                    value = argValue,
+                    relatedParameter = "functionName",
+                    relatedValue = functionName
                 )
             } else {
-                warning("Argument unknown in ", functionName, "(...): ", .pQuote(argName),
-                    argValue, " will be ignored",
+                warning("Argument unknown in ", functionName, "(...): ", 
+                    .pQuote(argName), " = ", argValue, " will be ignored",
                     call. = FALSE
                 )
             }

@@ -1009,13 +1009,260 @@ getFutilityBounds <- function(
     return(allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents)
 }
 
+.getFisherInformationByStage <- function(information, stage = NA_integer_) {
+    if (is.na(stage)) {
+        return(information)
+    }
+    if (is.matrix(information)) {
+        return(information[stage, ])
+    }
+    return(information[stage])
+}
+
+.getCountDataVectorByParameter <- function(x, nParameters) {
+    if (is.null(x) || length(x) == 0) {
+        return(rep(NA_real_, nParameters))
+    }
+    if (length(x) == 1) {
+        return(rep(x, nParameters))
+    }
+    return(x)
+}
+
+.getCountDataPlanningRates <- function(designPlan, nParameters, allocationRatio) {
+    lambda1 <- .getCountDataVectorByParameter(designPlan$lambda1, nParameters)
+    lambda2 <- .getCountDataVectorByParameter(designPlan$lambda2, nParameters)
+    theta <- .getCountDataVectorByParameter(designPlan$theta, nParameters)
+    lambda <- .getCountDataVectorByParameter(designPlan$lambda, nParameters)
+
+    if (!all(is.na(lambda)) && !all(is.na(theta))) {
+        lambda2 <- (1 + allocationRatio) * lambda / (1 + allocationRatio * theta)
+        lambda1 <- lambda2 * theta
+    } else if (!all(is.na(lambda2)) && !all(is.na(theta))) {
+        lambda1 <- lambda2 * theta
+    } else if (!all(is.na(lambda1)) && !all(is.na(theta))) {
+        lambda2 <- lambda1 / theta
+    }
+
+    return(list(lambda1 = lambda1, lambda2 = lambda2))
+}
+
+.getCountDataAccrualTime <- function(designPlan) {
+    accrualTime <- designPlan$accrualTime
+    if (length(accrualTime) > 1 && accrualTime[1] == 0) {
+        accrualTime <- accrualTime[-1]
+    }
+    return(accrualTime)
+}
+
+.getCountDataRecruitmentTimes <- function(designPlan, allocationRatio, maxNumberOfSubjects) {
+    accrualTime <- .getCountDataAccrualTime(designPlan)
+    accrualIntensity <- designPlan$accrualIntensity
+
+    if (!anyNA(accrualIntensity)) {
+        recruitmentTimes <- .generateRecruitmentTimes(
+            allocationRatio,
+            accrualTime,
+            accrualIntensity
+        )
+        return(list(
+            recruit1 = recruitmentTimes$recruit[recruitmentTimes$treatments == 1],
+            recruit2 = recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
+        ))
+    }
+
+    n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
+    return(list(
+        recruit1 = seq(0, accrualTime, length.out = n$n1),
+        recruit2 = seq(0, accrualTime, length.out = n$n2)
+    ))
+}
+
+.getFisherInformationCountDataFixedExposure <- function(
+        lambda1,
+        lambda2,
+        overdispersion,
+        fixedExposureTime,
+        n1,
+        n2) {
+    sumLambda1 <- n1 * fixedExposureTime * lambda1 /
+        (1 + overdispersion * fixedExposureTime * lambda1)
+    sumLambda2 <- n2 * fixedExposureTime * lambda2 /
+        (1 + overdispersion * fixedExposureTime * lambda2)
+    return(1 / (1 / sumLambda1 + 1 / sumLambda2))
+}
+
+.getFisherInformationCountDataAtAnalysisTime <- function(
+        lambda1,
+        lambda2,
+        overdispersion,
+        fixedExposureTime,
+        analysisTime,
+        recruit1,
+        recruit2) {
+    timeUnderObservation1 <- pmax(analysisTime - recruit1, 0)
+    timeUnderObservation2 <- pmax(analysisTime - recruit2, 0)
+    if (!is.na(fixedExposureTime)) {
+        timeUnderObservation1 <- pmin(timeUnderObservation1, fixedExposureTime)
+        timeUnderObservation2 <- pmin(timeUnderObservation2, fixedExposureTime)
+    }
+    return(.getInformationCountData(
+        lambda1 = lambda1,
+        lambda2 = lambda2,
+        overdispersion = overdispersion,
+        recruit1 = timeUnderObservation1,
+        recruit2 = timeUnderObservation2
+    ))
+}
+
+.getFisherInformationCountDataFinal <- function(
+        designPlan,
+        lambda1,
+        lambda2,
+        allocationRatio,
+        maxNumberOfSubjects) {
+    overdispersion <- designPlan$overdispersion
+    fixedExposureTime <- designPlan$fixedExposureTime
+    if (!is.na(fixedExposureTime)) {
+        n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
+        return(.getFisherInformationCountDataFixedExposure(
+            lambda1,
+            lambda2,
+            overdispersion,
+            fixedExposureTime,
+            n$n1,
+            n$n2
+        ))
+    }
+
+    accrualTime <- .getCountDataAccrualTime(designPlan)
+    recruitmentTimes <- .getCountDataRecruitmentTimes(
+        designPlan,
+        allocationRatio,
+        maxNumberOfSubjects
+    )
+    return(.getFisherInformationCountDataAtAnalysisTime(
+        lambda1 = lambda1,
+        lambda2 = lambda2,
+        overdispersion = overdispersion,
+        fixedExposureTime = fixedExposureTime,
+        analysisTime = max(accrualTime) + designPlan$followUpTime,
+        recruit1 = recruitmentTimes$recruit1,
+        recruit2 = recruitmentTimes$recruit2
+    ))
+}
+
+.getFisherInformationCountDataPower <- function(designPlan) {
+    design <- designPlan$.design
+    nParameters <- max(
+        length(designPlan$lambda1),
+        length(designPlan$lambda2),
+        length(designPlan$lambda),
+        length(designPlan$theta),
+        length(designPlan$maxNumberOfSubjects),
+        length(designPlan$allocationRatioPlanned),
+        1
+    )
+    allocationRatio <- .getCountDataVectorByParameter(designPlan$allocationRatioPlanned, nParameters)
+    maxNumberOfSubjects <- .getCountDataVectorByParameter(designPlan$maxNumberOfSubjects, nParameters)
+    rates <- .getCountDataPlanningRates(designPlan, nParameters, allocationRatio)
+
+    maxInformation <- rep(NA_real_, nParameters)
+    for (index in seq_len(nParameters)) {
+        maxInformation[index] <- .getFisherInformationCountDataFinal(
+            designPlan = designPlan,
+            lambda1 = rates$lambda1[index],
+            lambda2 = rates$lambda2[index],
+            allocationRatio = allocationRatio[index],
+            maxNumberOfSubjects = maxNumberOfSubjects[index]
+        )
+    }
+
+    return(design$informationRates %*% t(maxInformation))
+}
+
+.getFisherInformationCountDataSimulation <- function(designPlan) {
+    design <- designPlan$.design
+    nParameters <- max(
+        length(designPlan$lambda1),
+        length(designPlan$lambda2),
+        length(designPlan$lambda),
+        length(designPlan$theta),
+        length(designPlan$maxNumberOfSubjects),
+        length(designPlan$allocationRatioPlanned),
+        1
+    )
+    allocationRatio <- .getCountDataVectorByParameter(designPlan$allocationRatioPlanned, nParameters)
+    maxNumberOfSubjects <- .getCountDataVectorByParameter(designPlan$maxNumberOfSubjects, nParameters)
+    rates <- .getCountDataPlanningRates(designPlan, nParameters, allocationRatio)
+
+    analysisTime <- designPlan$plannedCalendarTime
+    if (design$kMax == 1) {
+        accrualTime <- .getCountDataAccrualTime(designPlan)
+        followUpTime <- designPlan$followUpTime
+        if (!is.na(designPlan$fixedExposureTime)) {
+            followUpTime <- designPlan$fixedExposureTime
+        }
+        analysisTime <- max(accrualTime) + followUpTime
+    }
+
+    result <- matrix(NA_real_, nrow = design$kMax, ncol = nParameters)
+    for (index in seq_len(nParameters)) {
+        recruitmentTimes <- .getCountDataRecruitmentTimes(
+            designPlan,
+            allocationRatio[index],
+            maxNumberOfSubjects[index]
+        )
+        for (stageIndex in seq_len(design$kMax)) {
+            result[stageIndex, index] <- .getFisherInformationCountDataAtAnalysisTime(
+                lambda1 = rates$lambda1[index],
+                lambda2 = rates$lambda2[index],
+                overdispersion = designPlan$overdispersion,
+                fixedExposureTime = designPlan$fixedExposureTime,
+                analysisTime = analysisTime[stageIndex],
+                recruit1 = recruitmentTimes$recruit1,
+                recruit2 = recruitmentTimes$recruit2
+            )
+        }
+    }
+
+    return(result)
+}
+
+.getFisherInformationCountData <- function(designPlan, stage = NA_integer_) {
+    if (.isTrialDesignPlanCountData(designPlan) && designPlan$.isSampleSizeObject()) {
+        informationOverStages <- designPlan$informationOverStages
+        if (!is.null(informationOverStages) && length(informationOverStages) > 0 &&
+                !all(is.na(informationOverStages))) {
+            return(.getFisherInformationByStage(informationOverStages, stage))
+        }
+
+        maxInformation <- designPlan$maxInformation
+        if (!is.null(maxInformation) && length(maxInformation) > 0 && !all(is.na(maxInformation))) {
+            informationOverStages <- designPlan$.design$informationRates %*% t(maxInformation)
+            return(.getFisherInformationByStage(informationOverStages, stage))
+        }
+
+        return(NA_real_)
+    }
+
+    if (is(designPlan, "SimulationResultsCountData")) {
+        informationOverStages <- .getFisherInformationCountDataSimulation(designPlan)
+    } else {
+        informationOverStages <- .getFisherInformationCountDataPower(designPlan)
+    }
+
+    return(.getFisherInformationByStage(informationOverStages, stage))
+}
+
 #'
 #' @title
 #' Get Fisher Information From a Design Plan or Simulation Results
 #'
 #' @description
-#' Calculates the Fisher information at the first planned analysis stage for
-#' a design plan or simulation results object for means, rates, or survival endpoints.
+#' Calculates the Fisher information at a planned analysis stage for
+#' a design plan or simulation results object for means, rates, survival, or
+#' count data endpoints.
 #'
 #' @param designPlan A trial design plan or simulation results object as returned by functions such as
 #' \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}},
@@ -1024,27 +1271,31 @@ getFutilityBounds <- function(
 #' \code{\link[=getPowerRates]{getPowerRates()}},
 #' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}},
 #' \code{\link[=getPowerSurvival]{getPowerSurvival()}},
+#' \code{\link[=getSampleSizeCounts]{getSampleSizeCounts()}},
+#' \code{\link[=getPowerCounts]{getPowerCounts()}},
 #' \code{\link[=getSimulationMeans]{getSimulationMeans()}},
 #' \code{\link[=getSimulationRates]{getSimulationRates()}},
-#' \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, or the
+#' \code{\link[=getSimulationSurvival]{getSimulationSurvival()}},
+#' \code{\link[=getSimulationCounts]{getSimulationCounts()}}, or the
 #' corresponding multi-arm simulation functions.
 #' @param stage Integer. The analysis stage for which the Fisher information is
 #'        requested. If \code{NA} (default), the first stage is used.
 #'
 #' @details
-#' The returned information is the Fisher information used at the first stage of the
-#' design plan or simulation setup. For group sequential designs, information at later stages can be
-#' obtained by multiplying this value by the ratio of the corresponding
-#' information rate to the first information rate.
+#' The returned information is the Fisher information used at the requested
+#' analysis stage of the design plan or simulation setup. If \code{stage = NA},
+#' the first analysis stage is used.
 #'
 #' For means, the information is based on the planned sample size, standard
 #' deviations, allocation ratio, and, if applicable, the mean-ratio null value.
 #' For rates, it is based on the planned sample size and the binomial variance
 #' under the corresponding planning assumptions. For survival endpoints, it is
-#' based on the planned number of events and the allocation ratio.
+#' based on the planned number of events and the allocation ratio. For count data,
+#' it is based on the planned exposure times, event rates, allocation ratio, and
+#' overdispersion of the negative binomial model.
 #'
 #' @return
-#' A numeric value, vector, or matrix containing the first-stage Fisher
+#' A numeric value, vector, or matrix containing the requested-stage Fisher
 #' information. A vector or matrix can be returned if the object contains
 #' several planning alternatives, arms, or sample size values. \code{NA_real_}
 #' is returned if the endpoint type is not supported by this helper.
@@ -1082,6 +1333,8 @@ getFisherInformation <- function(designPlan, stage = NA_integer_) {
         return(.getFisherInformationRates(designPlan, stage = stage))
     } else if (grepl("Survival", className)) {
         return(.getFisherInformationSurvival(designPlan, stage = stage))
+    } else if (grepl("CountData", className)) {
+        return(.getFisherInformationCountData(designPlan, stage = stage))
     }
 
     return(NA_real_)

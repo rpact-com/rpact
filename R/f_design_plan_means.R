@@ -418,6 +418,7 @@ NULL
     .assertIsValidGroupsParameter(groups)
     stDev <- .assertIsValidStandardDeviation(stDev, groups = groups)
     .assertIsSingleNumber(thetaH0, "thetaH0")
+    .assertIsNumericVector(alternative, "alternative")
     .assertIsSingleLogical(meanRatio, "meanRatio")
     .assertIsValidThetaH0(thetaH0, endpoint = "means", groups = groups, ratioEnabled = meanRatio)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")

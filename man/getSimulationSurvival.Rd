@@ -125,7 +125,9 @@ intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTim
 Must be one of \code{"auto"}, \code{"absolute"}, or \code{"relative"}; default is \code{"auto"},
 i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code{"absolute"}.}
 
-\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
+\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.
+For multi-arm simulations, this can be a vector of length equal to the number of active arms,
+specifying different drop-out rates for each active arm.}
 
 \item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
 

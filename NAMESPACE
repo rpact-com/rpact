@@ -179,8 +179,10 @@ import(stats)
 import(tools)
 import(utils)
 importFrom(Rcpp,evalCpp)
-importFrom(knitr,kable)
-importFrom(knitr,knit_print)
+importFrom(knitr,
+  kable,
+  knit_print
+)
 importFrom(methods,new)
 importFrom(rlang,.data)
 useDynLib(rpact,.registration = TRUE)

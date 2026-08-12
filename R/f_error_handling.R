@@ -359,6 +359,34 @@ stopMissingArgument <- function(
     )
 }
 
+stopArgumentUnknown <- function(
+        ...,
+        parameter = NULL,
+        value = NULL,
+        constraint = NULL,
+        functionName = NULL,
+        relatedParameter = NULL,
+        relatedValue = NULL,
+        call = NULL) {
+    call <- .getErrorCall(call = call)
+    message <- .getErrorMessage(...)
+    .stopWithError(
+        message,
+        functionName = functionName,
+        parameter = parameter,
+        value = value,
+        constraint = constraint,
+        relatedParameter = relatedParameter,
+        relatedValue = relatedValue,
+        exceptionType = C_EXCEPTION_TYPE_UNKNOWN_ARGUMENT,
+        factoryKey = "rpact.error.factory.unknown.argument.condition",
+        code = "UNKNOWN_ARGUMENT",
+        category = "invalid_user_input",
+        class = c("rpact_unknown_argument_error", "rpact_input_error"),
+        call = call
+    )
+}
+
 stopIncompleteArguments <- function(
         ...,
         parameter = NULL,

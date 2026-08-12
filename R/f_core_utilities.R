@@ -18,24 +18,29 @@
 #' @include f_logger.R
 NULL
 
+.concatArgs <- function(...) {
+    args <- list(...)
+    return(paste0(unlist(args, use.names = FALSE), collapse = ""))
+}
+
 # single quote
-.sQuote <- function(x) {
-    return(paste0("'", x, "'"))
+.sQuote <- function(...) {
+    return(paste0("'", .concatArgs(...), "'"))
 }
 
 # parameter quote
-.pQuote <- function(x) {
-    return(paste0("'", x, "'"))
+.pQuote <- function(...) {
+    return(paste0("'", .concatArgs(...), "'"))
 }
 
 # value quote
-.vQuote <- function(x) {
-    return(paste0("'", x, "'"))
+.vQuote <- function(...) {
+    return(paste0("'", .concatArgs(...), "'"))
 }
 
 # double quote
-.dQuote <- function(x) {
-    return(paste0('"', x, '"'))
+.dQuote <- function(...) {
+    return(paste0('"', .concatArgs(...), '"'))
 }
 
 .getLogicalEnvironmentVariable <- function(variableName) {
@@ -2130,11 +2135,19 @@ getParameterName <- function(obj, parameterCaption) {
 saveOptions <- function() {
     tryCatch(
         {
-            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
-                return(invisible(FALSE))
+            pkgConfigDir <- .getEnvironmentVariable(
+                "RPACT_CONFIG_DIR_SAVE",
+                "rpact.config.dir.save",
+                default = "?$§",
+                type = "character"
+            )
+            if (!dir.exists(pkgConfigDir)) {
+                if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                    return(invisible(FALSE))
+                }
+                
+                pkgConfigDir <- rappdirs::user_config_dir("rpact")
             }
-
-            pkgConfigDir <- rappdirs::user_config_dir("rpact")
             if (!dir.exists(pkgConfigDir)) {
                 dir.create(pkgConfigDir, recursive = TRUE, showWarnings = FALSE)
             }
@@ -2218,15 +2231,25 @@ resetOptions <- function(persist = TRUE) {
 .loadOptions <- function() {
     tryCatch(
         {
-            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
-                packageStartupMessage(
-                    "Package \"rappdirs\" is needed for saving and loading rpact options. ",
-                    "Please install using, e.g., install.packages(\"rappdirs\")"
-                )
-                return(invisible(FALSE))
+            pkgConfigDir <- .getEnvironmentVariable(
+                "RPACT_CONFIG_DIR_LOAD",
+                "rpact.config.dir.load",
+                default = "?$§",
+                type = "character"
+            )
+            
+            if (!dir.exists(pkgConfigDir)) {
+                if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                    packageStartupMessage(
+                        "Package \"rappdirs\" is needed for saving and loading rpact options. ",
+                        "Please install using, e.g., install.packages(\"rappdirs\")"
+                    )
+                    return(invisible(FALSE))
+                }
+
+                pkgConfigDir <- rappdirs::user_config_dir("rpact")
             }
 
-            pkgConfigDir <- rappdirs::user_config_dir("rpact")
             if (!dir.exists(pkgConfigDir)) {
                 return(invisible(FALSE))
             }
