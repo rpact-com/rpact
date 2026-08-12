@@ -817,13 +817,8 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
             relatedParameter = "numeric"
         )
     }
-
-    if (n < 1 || n > 300) {
-        stopArgumentOutOfBounds("'n' (", n, ") is out of bounds [1; 300]",
-            functionName = ".getFormattedVariableName",
-            parameter = "n", value = n
-        )
-    }
+    
+    .assertIsInClosedInterval(n, "n", lower = 1, upper = 300)
 
     if (nchar(prefix) > 0) {
         name <- paste(prefix, name)

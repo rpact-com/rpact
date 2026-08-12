@@ -834,27 +834,9 @@ NULL
         .assertIsSingleNumber(dropoutRate1, "dropoutRate1")
         .assertIsSingleNumber(dropoutRate2, "dropoutRate2")
         .assertIsSingleNumber(dropoutTime, "dropoutTime")
-
-        if (!is.na(dropoutTime) && dropoutTime <= 0) {
-            stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "dropoutTime", value = dropoutTime
-            )
-        }
-
-        if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
-            stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "dropoutRate1", value = dropoutRate1
-            )
-        }
-
-        if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
-            stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "dropoutRate2", value = dropoutRate2
-            )
-        }
+        .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
+        .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+        .assertIsInInterval(dropoutRate2, "dropoutRate2", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
 
         if (!is.na(eventTime) && eventTime <= 0) {
             stopIllegalArgument("'eventTime' (", eventTime, ") must be > 0",
@@ -1700,27 +1682,9 @@ getEventProbabilities <- function(
     allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(hazardRatio, "hazardRatio", naAllowed = TRUE)
-
-    if (!is.na(dropoutTime) && dropoutTime <= 0) {
-        stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0",
-            functionName = "getEventProbabilities",
-            parameter = "dropoutTime", value = dropoutTime
-        )
-    }
-
-    if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
-        stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
-            functionName = "getEventProbabilities",
-            parameter = "dropoutRate1", value = dropoutRate1
-        )
-    }
-
-    if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
-        stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
-            functionName = "getEventProbabilities",
-            parameter = "dropoutRate2", value = dropoutRate2
-        )
-    }
+    .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
+    .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+    .assertIsInInterval(dropoutRate2, "dropoutRate2", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
 
     accrualSetup <- getAccrualTime(
         accrualTime = accrualTime,

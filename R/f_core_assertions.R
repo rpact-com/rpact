@@ -393,7 +393,62 @@ NULL
         upper,
         naAllowed = FALSE,
         call. = FALSE) {
-    .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
+        
+    .assertIsInInterval(x, xName, ..., 
+        lower = lower, 
+        upper = upper, 
+        lowerIncluded = TRUE, 
+        upperIncluded = TRUE, 
+        naAllowed = naAllowed, 
+        call. = call.)
+        
+#    .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
+#    if (naAllowed && all(is.na(x))) {
+#        return(invisible())
+#    }
+#
+#    functionName <- paste(deparse(sys.call()), collapse = "")
+#    .assertIsNumericVector(x, xName,
+#        naAllowed = naAllowed,
+#        functionName = functionName, call. = call.
+#    )
+#
+#    if (is.null(upper) || is.na(upper)) {
+#        if (any(x < lower, na.rm = TRUE)) {
+#            prefix <- ifelse(length(x) > 1, "each value of ", "")
+#            stopArgumentOutOfBounds(prefix, sQuote(xName), " (", .arrayToString(x), ") must be >= ", lower,
+#                parameter = xName,
+#                value = x, constraint = paste0(sQuote(xName), " >= ", lower),
+#                functionName = functionName, lowerBound = lower,
+#                upperBound = NULL
+#            )
+#        }
+#    } else if (any(x < lower, na.rm = TRUE) || any(x > upper, na.rm = TRUE)) {
+#        stopArgumentOutOfBounds(sQuote(xName), " (", .arrayToString(x), ") is out of bounds [", lower, "; ",
+#            upper, "]",
+#            parameter = xName, 
+#            value = x, 
+#            constraint = paste0(
+#                sQuote(xName), " >= ", lower, " and ",
+#                sQuote(xName), " <= ", upper
+#            ),
+#            functionName = functionName, lowerBound = lower, upperBound = upper
+#        )
+#    }
+}
+
+.assertIsInInterval <- function(
+        x, 
+        xName, 
+        ..., 
+        lower, 
+        upper, 
+        lowerIncluded = NA, 
+        upperIncluded = NA,
+        naAllowed = FALSE,
+        call. = FALSE) {
+    
+    .warnInCaseOfUnknownArguments(functionName = ".assertIsInInterval", ...)
     if (naAllowed && all(is.na(x))) {
         return(invisible())
     }
@@ -403,26 +458,62 @@ NULL
         naAllowed = naAllowed,
         functionName = functionName, call. = call.
     )
-
+    
+    if (is.na(lowerIncluded)) {
+        stopRuntimeIssue("'lowerIncluded' must be specified as TRUE or FALSE.",
+            functionName = ".assertIsInInterval",
+            parameter = "lowerIncluded",
+            value = lowerIncluded
+        )
+    }
+    if (is.na(upperIncluded)) {
+        stopRuntimeIssue("'upperIncluded' must be specified as TRUE or FALSE.",
+            functionName = ".assertIsInInterval",
+            parameter = "upperIncluded",
+            value = upperIncluded
+        )
+    }
+    
+    if (lowerIncluded) {
+        lowerCheck <- x < lower
+    } else {
+        lowerCheck <- x <= lower
+    }
+    
     if (is.null(upper) || is.na(upper)) {
-        if (any(x < lower, na.rm = TRUE)) {
+        if (any(lowerCheck, na.rm = TRUE)) {
             prefix <- ifelse(length(x) > 1, "each value of ", "")
-            stopArgumentOutOfBounds(prefix, sQuote(xName), " (", .arrayToString(x), ") must be >= ", lower,
+            stopArgumentOutOfBounds(prefix, .pQuote(xName), " (", .arrayToString(x), ") must be ",
+                ifelse(lowerIncluded, ">=", ">"), lower,
                 parameter = xName,
-                value = x, constraint = paste0(sQuote(xName), " >= ", lower),
-                functionName = functionName, lowerBound = lower,
+                value = x,
+                constraint = paste0(.pQuote(xName), ifelse(lowerIncluded, " >= ", " > "), lower),
+                functionName = functionName,
+                lowerBound = lower,
                 upperBound = NULL
             )
         }
-    } else if (any(x < lower, na.rm = TRUE) || any(x > upper, na.rm = TRUE)) {
-        stopArgumentOutOfBounds(sQuote(xName), " (", .arrayToString(x), ") is out of bounds [", lower, "; ",
-            upper, "]",
-            parameter = xName, value = x, constraint = paste0(
-                sQuote(xName), " >= ", lower, " and ",
-                sQuote(xName), " <= ", upper
-            ),
-            functionName = functionName, lowerBound = lower, upperBound = upper
-        )
+    } else {
+        if (upperIncluded) {
+            upperCheck <- x > upper
+        } else {
+            upperCheck <- x >= upper
+        }
+        
+        if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
+            stopArgumentOutOfBounds(.pQuote(xName), " (", .arrayToString(x), ") is out of bounds ",
+                ifelse(lowerIncluded, "[", "("), lower, "; ", upper, ifelse(upperIncluded, "]", ")"),
+                parameter = xName, 
+                value = x,
+                constraint = paste0(
+                    .pQuote(xName), ifelse(lowerIncluded, " >= ", " > "), lower, " and ",
+                    .pQuote(xName), ifelse(upperIncluded, " <= ", " < "), upper
+                ),
+                functionName = functionName,
+                lowerBound = lower,
+                upperBound = upper
+            )
+        }
     }
 }
 
@@ -454,44 +545,52 @@ NULL
 #' @noRd
 #'
 .assertIsInOpenInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE) {
-    if (naAllowed && all(is.na(x))) {
-        return(invisible())
-    }
-
-    functionName <- paste(deparse(sys.call()), collapse = "")
-
-    if (!naAllowed && length(x) > 1 && anyNA(x)) {
-        stopIllegalArgument(.pQuote(xName), " (", .arrayToString(x), ") ",
-            "must be a valid numeric vector or a single NA",
-            functionName = functionName,
-            parameter = xName,
-            value = x
-        )
-    }
-
-    if (is.null(upper) || is.na(upper)) {
-        if (any(x <= lower, na.rm = TRUE)) {
-            prefix <- ifelse(length(x) > 1, "each value of ", "")
-            stopArgumentOutOfBounds(prefix, .pQuote(xName), " (", .arrayToString(x), ") must be > ", lower,
-                functionName = functionName,
-                parameter = xName,
-                value = x,
-                constraint = paste0(sQuote(xName), " > ", lower),
-                lowerBound = lower,
-                upperBound = NULL
-            )
-        }
-    } else if (any(x <= lower, na.rm = TRUE) || any(x >= upper, na.rm = TRUE)) {
-        stopArgumentOutOfBounds(.pQuote(xName), " (", .arrayToString(x),
-            ") is out of bounds (", lower, "; ", upper, ")",
-            functionName = functionName,
-            parameter = xName,
-            value = x,
-            constraint = paste0(sQuote(xName), " > ", lower, " and ", sQuote(xName), " < ", upper),
-            lowerBound = lower,
-            upperBound = upper
-        )
-    }
+    .assertIsInInterval(x, xName, ..., 
+        lower = lower, 
+        upper = upper, 
+        lowerIncluded = FALSE, 
+        upperIncluded = FALSE, 
+        naAllowed = naAllowed, 
+        call. = call.)
+    
+#    if (naAllowed && all(is.na(x))) {
+#        return(invisible())
+#    }
+#
+#    functionName <- paste(deparse(sys.call()), collapse = "")
+#
+#    if (!naAllowed && length(x) > 1 && anyNA(x)) {
+#        stopIllegalArgument(.pQuote(xName), " (", .arrayToString(x), ") ",
+#            "must be a valid numeric vector or a single NA",
+#            functionName = functionName,
+#            parameter = xName,
+#            value = x
+#        )
+#    }
+#
+#    if (is.null(upper) || is.na(upper)) {
+#        if (any(x <= lower, na.rm = TRUE)) {
+#            prefix <- ifelse(length(x) > 1, "each value of ", "")
+#            stopArgumentOutOfBounds(prefix, .pQuote(xName), " (", .arrayToString(x), ") must be > ", lower,
+#                functionName = functionName,
+#                parameter = xName,
+#                value = x,
+#                constraint = paste0(sQuote(xName), " > ", lower),
+#                lowerBound = lower,
+#                upperBound = NULL
+#            )
+#        }
+#    } else if (any(x <= lower, na.rm = TRUE) || any(x >= upper, na.rm = TRUE)) {
+#        stopArgumentOutOfBounds(.pQuote(xName), " (", .arrayToString(x),
+#            ") is out of bounds (", lower, "; ", upper, ")",
+#            functionName = functionName,
+#            parameter = xName,
+#            value = x,
+#            constraint = paste0(sQuote(xName), " > ", lower, " and ", sQuote(xName), " < ", upper),
+#            lowerBound = lower,
+#            upperBound = upper
+#        )
+#    }
 }
 
 .assertIsValidDataInput <- function(dataInput, design = NULL, stage = NULL) {
