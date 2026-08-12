@@ -258,7 +258,7 @@ getSimulationSurvival <- function(
         design = NULL,
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_SURVIVAL_DEFAULT
         pi1 = NA_real_,
         pi2 = NA_real_,
         lambda1 = NA_real_,
@@ -310,9 +310,12 @@ getSimulationSurvival <- function(
         design <- .resetPipeOperatorQueue(design)
     }
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+    directionUpper <- .assertIsValidDirectionUpper(
+        directionUpper,
         design,
-        objectType = "power", userFunctionCallEnabled = TRUE
+        objectType = "power", 
+        userFunctionCallEnabled = TRUE,
+        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
     )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
@@ -637,7 +640,7 @@ getSimulationSurvival <- function(
         )
     }
 
-    .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
+    .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, C_DROP_OUT_RATE_1_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, C_DROP_OUT_RATE_2_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, C_DROP_OUT_TIME_DEFAULT)

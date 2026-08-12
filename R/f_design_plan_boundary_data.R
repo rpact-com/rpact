@@ -20,11 +20,14 @@
     if (is.null(directionUpper) || length(directionUpper) == 0 || all(is.na(directionUpper))) {
         directionUpper <- designPlan$directionUpper
     }
+    
+    directionUpperDefault <- ifelse(.isTrialDesignPlanSurvival(designPlan), 
+        C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT)
     if (setDefault) {
-        directionUpper[is.na(directionUpper)] <- C_DIRECTION_UPPER_DEFAULT
+        directionUpper[is.na(directionUpper)] <- directionUpperDefault
     }
     if (length(directionUpper) == 0) {
-        directionUpper <- ifelse(setDefault, C_DIRECTION_UPPER_DEFAULT, NA)
+        directionUpper <- ifelse(setDefault, directionUpperDefault, NA)
     }
     if (length(directionUpper) == 1 && nParameters > 1) {
         directionUpper <- rep(directionUpper, nParameters)
@@ -742,7 +745,8 @@
 .setDirectionUpper <- function(designPlan) {
     if (!designPlan$.isSampleSizeObject()) {
         if (is.null(designPlan$directionUpper) || all(is.na(designPlan$directionUpper))) {
-            designPlan$directionUpper <- C_DIRECTION_UPPER_DEFAULT
+            designPlan$directionUpper <- ifelse(.isTrialDesignPlanSurvival(designPlan), 
+                C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT)
             designPlan$.setParameterType("directionUpper", C_PARAM_DEFAULT_VALUE)
         }
 

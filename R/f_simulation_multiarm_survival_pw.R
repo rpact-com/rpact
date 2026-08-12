@@ -480,7 +480,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         directionUpper,
         design,
         objectType = "power",
-        userFunctionCallEnabled = TRUE
+        userFunctionCallEnabled = TRUE,
+        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
     )
 
     if (length(allocationRatioPlanned) != 1) {

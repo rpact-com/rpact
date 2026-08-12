@@ -1162,7 +1162,7 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
             }
 
             self$.setParameterType("directionUpper", ifelse(
-                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT),
+                identical(self$directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT),
                 C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },

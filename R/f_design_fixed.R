@@ -98,7 +98,7 @@ getDesignFixed <- function(
         if (is.na(directionUpper)) {
             design$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
         } else {
-            .setValueAndParameterType(design, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
+            .setValueAndParameterType(design, "directionUpper", directionUpper, NA)
         }
     }
 

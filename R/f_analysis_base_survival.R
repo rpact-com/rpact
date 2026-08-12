@@ -220,7 +220,7 @@ NULL
     }
     .warnInCaseOfUnusedConditionalPowerArgument(results, nPlanned, "thetaH1", thetaH1)
 
-    .setValueAndParameterType(results, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
+    .setValueAndParameterType(results, "directionUpper", directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT)
     .setValueAndParameterType(results, "normalApproximation", TRUE, TRUE)
     .setValueAndParameterType(results, "thetaH0", thetaH0, C_THETA_H0_SURVIVAL_DEFAULT)
     .setConditionalPowerArguments(results, dataInput, nPlanned, allocationRatioPlanned)

@@ -510,7 +510,7 @@ getSimulationEnrichmentSurvivalBasic <- function(
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
         stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_SURVIVAL_DEFAULT
         adaptations = NA,
         typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
         effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
@@ -560,7 +560,8 @@ getSimulationEnrichmentSurvivalBasic <- function(
         directionUpper,
         design,
         objectType = "power",
-        userFunctionCallEnabled = TRUE
+        userFunctionCallEnabled = TRUE,
+        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
     )
 
     simulationResults <- .createSimulationResultsEnrichmentObject(

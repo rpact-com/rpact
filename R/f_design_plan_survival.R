@@ -621,9 +621,12 @@ NULL
         .assertIsSingleLogical(accountForObservationTimes, "accountForObservationTimes", naAllowed = TRUE)
         .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
         .assertIsValidKappa(kappa)
-        directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        directionUpper <- .assertIsValidDirectionUpper(
+            directionUpper,
             design,
-            objectType = objectType, userFunctionCallEnabled = TRUE, default = NA
+            objectType = objectType, 
+            userFunctionCallEnabled = TRUE, 
+            default = NA
         )
 
         if (objectType == "power") {
@@ -903,7 +906,7 @@ NULL
         }
     }
 
-    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT)
     if (objectType == "power") {
         .setValueAndParameterType(designPlan, "maxNumberOfEvents", maxNumberOfEvents, NA_real_)
         designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
