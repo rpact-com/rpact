@@ -3651,7 +3651,8 @@ NULL
     .assertIsNumericVector(doseLevels, "doseLevels", naAllowed = TRUE)
     .assertHasLength(doseLevels, "doseLevels", gMax, "gMax", naAllowed = TRUE)
     .assertValuesAreStrictlyIncreasing(doseLevels, "doseLevels", naAllowed = TRUE)
-    .assertIsInOpenInterval(doseLevels, "doseLevels", lower = 0, upper = NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(doseLevels, "doseLevels", lower = 0, upper = NULL, 
+        naAllowed = TRUE, matrixAllowed = TRUE)
 
     if (typeOfShape == "userDefined") {
         effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
@@ -3663,13 +3664,11 @@ NULL
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         if (valueMaxVectorName == "piMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
-                lower = 0, upper = 1, naAllowed = FALSE
-            )
+                lower = 0, upper = 1, naAllowed = FALSE, matrixAllowed = TRUE)
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
-                lower = 0, upper = NULL, naAllowed = FALSE
-            )
+                lower = 0, upper = NULL, naAllowed = FALSE, matrixAllowed = TRUE)
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {
