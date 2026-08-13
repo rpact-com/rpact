@@ -962,7 +962,7 @@ getRawData <- function(x, aggregate = FALSE) {
             "use getSimulationSurvival() to create one",
             functionName = "getRawData",
             parameter = "x",
-            relatedParameter = "SimulationResultsSurvival", value = x
+            value = x
         )
     }
 

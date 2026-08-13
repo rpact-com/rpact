@@ -388,8 +388,8 @@ NULL
             )
         }
 
-        .assertIsInClosedInterval(pi1, "pi1", lower = 0, upper = 1)
-        .assertIsInClosedInterval(thetaH0, "thetaH0", lower = 0, upper = 1)
+        .assertIsInOpenInterval(pi1, "pi1", lower = 0, upper = 1)
+        .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = 1)
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
             stopIllegalArgument("exact sample size calculation not available for two-sided testing",

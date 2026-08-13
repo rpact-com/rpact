@@ -636,8 +636,8 @@ NULL
             )
         }
 
-        .assertIsInClosedInterval(pi1, "pi1", lower = 0, upper = 1, naAllowed = TRUE)
-        .assertIsInClosedInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(pi1, "pi1", lower = 0, upper = 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
 
         if (design$sided == 2 && thetaH0 != 1) {
             stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",

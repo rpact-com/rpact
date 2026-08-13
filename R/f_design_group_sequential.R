@@ -292,7 +292,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     )
 
     .assertDesignParameterExists(design, "tolerance", C_DESIGN_TOLERANCE_DEFAULT)
-    .assertIsInOpenInterval(design$tolerance, "tolerance", lower = 1e-10, upper = 1e-03)
+    .assertIsInClosedInterval(design$tolerance, "tolerance", lower = 1e-10, upper = 1e-03)
 
     return(invisible(design))
 }
@@ -1194,6 +1194,7 @@ getDesignInverseNormal <- function(
         futilityBoundsScale = futilityBoundsScale,
         functionName = "getDesignGroupSequential",
         design = design,
+        directionUpper = directionUpper,
         ...
     )
 
@@ -2303,6 +2304,7 @@ getDesignGroupSequential <- function(
         futilityBoundsScale = futilityBoundsScale,
         functionName = "getDesignGroupSequential",
         design = design,
+        directionUpper = directionUpper,
         ...
     )
 

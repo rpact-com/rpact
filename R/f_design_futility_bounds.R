@@ -279,7 +279,14 @@ summary.FutilityBounds <- function(object, ...) {
     return(NULL)
 }
 
-.getFutilityBoundsFromArgs <- function(..., futilityBounds, futilityBoundsScale, functionName, design, fisherDesign = FALSE) {
+.getFutilityBoundsFromArgs <- function(
+        ...,
+        futilityBounds,
+        futilityBoundsScale,
+        functionName,
+        design,
+        directionUpper = NA,
+        fisherDesign = FALSE) {
     futilityBoundsFromArgs <- .getFutilityBoundsFromThreeDots(...)
 
     futilityBoundsName <- ifelse(fisherDesign, "alpha0Vec", "futilityBounds")
@@ -1072,8 +1079,10 @@ getFutilityBounds <- function(
     }
 
     n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
+    
+    # TODO accrualTime can be a vector, but recruitment times are generated as if it was a single number
     return(list(
-        recruit1 = seq(0, accrualTime, length.out = n$n1),
+        recruit1 = seq(0, accrualTime, length.out = n$n1), 
         recruit2 = seq(0, accrualTime, length.out = n$n2)
     ))
 }
