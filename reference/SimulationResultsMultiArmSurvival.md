@@ -250,3 +250,23 @@ to create an object of this type.
 
   The shape of the dose-response relationship over the treatment groups.
   Is a single character value.
+
+- `lambdaTreatment`:
+
+  The assumed hazard rate in the active arm. Is a numeric vector of
+  length number of stages times number of groups.
+
+- `lambdaControl`:
+
+  The assumed hazard rate in the reference group. Is a single numeric
+  value.
+
+- `medianTreatment`:
+
+  The assumed median survival time in the active arm. Is a numeric
+  vector of length number of stages times number of groups.
+
+- `medianControl`:
+
+  The assumed median survival time in the reference group. Is a single
+  numeric value.

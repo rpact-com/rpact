@@ -9,7 +9,7 @@ for testing the hazard ratio in a two treatment groups survival design."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9313</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9314</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -206,7 +206,9 @@ i.e., if all values are &lt; 1 the type is <code>"relative"</code>, otherwise it
 
 
 <dt id="arg-dropoutrate-">dropoutRate1<a class="anchor" aria-label="anchor" href="#arg-dropoutrate-"></a></dt>
-<dd><p>The assumed drop-out rate in the treatment group, default is <code>0</code>.</p></dd>
+<dd><p>The assumed drop-out rate in the treatment group, default is <code>0</code>.
+For multi-arm simulations, this can be a vector of length equal to the number of active arms,
+specifying different drop-out rates for each active arm.</p></dd>
 
 
 <dt id="arg-dropoutrate-">dropoutRate2<a class="anchor" aria-label="anchor" href="#arg-dropoutrate-"></a></dt>

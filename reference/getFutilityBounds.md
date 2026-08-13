@@ -15,6 +15,7 @@ getFutilityBounds(
   targetScale = c("zValue", "pValue", "conditionalPower", "condPowerAtObserved",
     "predictivePower", "reverseCondPower", "effectEstimate"),
   design = NULL,
+  directionUpper = NA,
   theta = NA_real_,
   information = NA_real_,
   naAllowed = FALSE
@@ -53,6 +54,12 @@ getFutilityBounds(
   design. Must be a one-sided two-stage group sequential design or
   Fisher's combination test design.
 
+- directionUpper:
+
+  Logical. Specifies the direction of the alternative, only applicable
+  for one-sided testing; default is `TRUE` which means that larger
+  values of the test statistics yield smaller p-values.
+
 - theta:
 
   Numeric. The assumed effect size under the alternative hypothesis on
@@ -64,10 +71,10 @@ getFutilityBounds(
   Numeric vector of length 1 or 2. The stage-wise information levels
   (i.e. this is *not* the cumulative information). Note that depending
   on which conversion is performed, either the first or second stage
-  information may not be needed. In that case, a warning will be issued
+  information may not be needed. In this case, a warning will be issued
   if the unused information is provided. The warning can be avoided by
-  either passing a single number, or setting the unused information to
-  `NA`.
+  either passing a single number (setting both informations to be equal
+  to each other), or setting the unused information to `NA`.
 
 - naAllowed:
 
