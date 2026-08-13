@@ -362,20 +362,20 @@ NULL
 .rangeLimitPrint <- function(boundary) {
     if (is.null(boundary) || length(boundary) == 0) {
         return("NULL")
-    } 
-    
+    }
+
     if (is.na(boundary)) {
         return("NA")
-    } 
-        
+    }
+
     if (is.infinite(boundary)) {
         return(ifelse(boundary > 0, "Inf", "-Inf"))
-    } 
-    
+    }
+
     if (abs(boundary) < 1e-14) {
         boundary <- round(boundary, digits = 6)
     }
-    
+
     return(as.character(boundary))
 }
 
@@ -393,7 +393,7 @@ NULL
     if (naAllowed && all(is.na(x))) {
         return(invisible())
     }
-
+    
     functionName <- paste(deparse(sys.call()), collapse = "")
     .assertIsNumericVector(x, xName, naAllowed = naAllowed, matrixAllowed = matrixAllowed)
     .assertIsSingleLogical(lowerIncluded, "lowerIncluded")
@@ -424,7 +424,7 @@ NULL
         } else {
             upperCheck <- x >= upper
         }
-        
+
         if (lower == upper) {
             if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
                 stopArgumentOutOfRange(.pQuote(xName), " (", .arrayToString(x), ") ",
@@ -439,7 +439,7 @@ NULL
             }
         } else if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
             stopArgumentOutOfRange(.pQuote(xName), " (", .arrayToString(x), ") must be in ",
-                ifelse(lowerIncluded, "[", "("), .rangeLimitPrint(lower), "; ", 
+                ifelse(lowerIncluded, "[", "("), .rangeLimitPrint(lower), "; ",
                 .rangeLimitPrint(upper), ifelse(upperIncluded, "]", ")"),
                 parameter = xName,
                 value = x,
@@ -527,7 +527,13 @@ NULL
 #' @noRd
 #'
 .assertIsInOpenInterval <- function(
-        x, xName, ..., lower, upper, naAllowed = FALSE, matrixAllowed = FALSE) {
+        x,
+        xName,
+        ...,
+        lower,
+        upper,
+        naAllowed = FALSE,
+        matrixAllowed = FALSE) {
     .assertIsInInterval(
         x = x,
         xName = xName,
@@ -742,7 +748,7 @@ NULL
         ...,
         naAllowed = FALSE,
         noDefaultAvailable = FALSE,
-        len = NA_integer_, 
+        len = NA_integer_,
         matrixAllowed = FALSE) {
     functionName <- paste(deparse(sys.call()), collapse = "")
     argumentValue <- NULL
@@ -1393,7 +1399,6 @@ NULL
             relatedParameter = "stDev",
             relatedValue = stDev
         )
-        
     }
 
     return(invisible(stDev))
@@ -1556,8 +1561,10 @@ NULL
         return(invisible())
     }
 
-    .assertIsInInterval(informationRates, "informationRates", lower = 0, upper = 1,
-        lowerIncluded = FALSE, upperIncluded = TRUE)
+    .assertIsInInterval(informationRates, "informationRates",
+        lower = 0, upper = 1,
+        lowerIncluded = FALSE, upperIncluded = TRUE
+    )
 
     if (min(informationRates) <= 0 || max(informationRates) > 1 ||
             any(informationRates[2:kMax] <= informationRates[1:(kMax - 1)])) {
@@ -1705,16 +1712,27 @@ NULL
         kMax = length(futilityBounds) + 1,
         directionUpper = TRUE,
         kMaxLowerBound = 1,
-        kMaxUpperBound = C_KMAX_UPPER_BOUND) {
+        kMaxUpperBound = C_KMAX_UPPER_BOUND,
+        naAllowed = FALSE) {
     if (length(futilityBounds) < kMaxLowerBound - 1) {
         upperBound <- ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND,
             kMax - 1, C_KMAX_UPPER_BOUND - 1
         )
-        stopArgumentLengthOutOfBounds(
-            sprintf(
+
+        if (kMaxLowerBound - 1 == upperBound) {
+            msg <- sprintf(
+                "length of 'futilityBounds' (%s) must be %s", length(futilityBounds),
+                kMaxLowerBound - 1
+            )
+        } else {
+            msg <- sprintf(
                 "length of 'futilityBounds' (%s) must be in [%s; %s]", length(futilityBounds),
                 kMaxLowerBound - 1, upperBound
-            ),
+            )
+        }
+
+        stopArgumentLengthOutOfBounds(
+            msg,
             parameter = "futilityBounds",
             value = futilityBounds,
             lowerBound = kMaxLowerBound - 1,
@@ -1739,7 +1757,8 @@ NULL
     lowerBound <- ifelse(isFALSE(directionUpper), -6, -Inf)
     upperBound <- ifelse(isFALSE(directionUpper), Inf, 6)
     .assertIsInClosedInterval(futilityBounds, "futilityBounds",
-        lower = lowerBound, upper = upperBound)
+        lower = lowerBound, upper = upperBound, naAllowed = naAllowed
+    )
 }
 
 .assertIsValidCipher <- function(key, value) {
@@ -1785,8 +1804,10 @@ NULL
         )
     }
 
-    .assertIsInInterval(alpha0Vec, "alpha0Vec", lower = 0, upper = 1,
-        lowerIncluded = FALSE, upperIncluded = TRUE)
+    .assertIsInInterval(alpha0Vec, "alpha0Vec",
+        lower = 0, upper = 1,
+        lowerIncluded = FALSE, upperIncluded = TRUE
+    )
 }
 
 .assertIsValidSidedParameter <- function(sided) {
@@ -2281,7 +2302,7 @@ NULL
     if (all(is.na(piValue))) {
         return(invisible())
     }
-    
+
     .assertIsNumericVector(piValue, piName)
     .assertIsInOpenInterval(piValue, piName, lower = -1e-16, upper = 1 + 1e-16)
 }
@@ -2796,7 +2817,8 @@ NULL
     }
 
     if (showUnusedArgumentsMessage && length(unusedArgs) > 0) {
-        message("Note that the following arguments can optionally be used in ",
+        message(
+            "Note that the following arguments can optionally be used in ",
             .pQuote(funArgName), " (", functionName, "): \n",
             .arrayToString(unusedArgs)
         )
@@ -3651,8 +3673,10 @@ NULL
     .assertIsNumericVector(doseLevels, "doseLevels", naAllowed = TRUE)
     .assertHasLength(doseLevels, "doseLevels", gMax, "gMax", naAllowed = TRUE)
     .assertValuesAreStrictlyIncreasing(doseLevels, "doseLevels", naAllowed = TRUE)
-    .assertIsInOpenInterval(doseLevels, "doseLevels", lower = 0, upper = NULL, 
-        naAllowed = TRUE, matrixAllowed = TRUE)
+    .assertIsInOpenInterval(doseLevels, "doseLevels",
+        lower = 0, upper = NULL,
+        naAllowed = TRUE, matrixAllowed = TRUE
+    )
 
     if (typeOfShape == "userDefined") {
         effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
@@ -3664,11 +3688,13 @@ NULL
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         if (valueMaxVectorName == "piMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
-                lower = 0, upper = 1, naAllowed = FALSE, matrixAllowed = TRUE)
+                lower = 0, upper = 1, naAllowed = FALSE, matrixAllowed = TRUE
+            )
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
-                lower = 0, upper = NULL, naAllowed = FALSE, matrixAllowed = TRUE)
+                lower = 0, upper = NULL, naAllowed = FALSE, matrixAllowed = TRUE
+            )
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {

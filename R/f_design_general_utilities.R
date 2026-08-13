@@ -158,7 +158,8 @@ NULL
                 kMax = design$kMax,
                 directionUpper = design$directionUpper,
                 kMaxLowerBound = kMaxLowerBound,
-                kMaxUpperBound = kMaxUpperBound
+                kMaxUpperBound = kMaxUpperBound,
+                naAllowed = (design$.getParameterType(parameterName) == C_PARAM_GENERATED)
             )
         }
     }
@@ -240,7 +241,8 @@ NULL
             kMax = design$kMax,
             directionUpper = design$directionUpper,
             kMaxLowerBound = kMaxLowerBound,
-            kMaxUpperBound = kMaxUpperBound
+            kMaxUpperBound = kMaxUpperBound,
+            naAllowed = (design$.getParameterType(parameterName) == C_PARAM_GENERATED)
         )
     }
 
