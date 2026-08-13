@@ -96,7 +96,7 @@ NULL
         design,
         dataInput,
         ...,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT) {
+        directionUpper) {
     .assertIsTrialDesignInverseNormalOrFisherOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)

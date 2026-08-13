@@ -70,7 +70,9 @@ the optimal allocation ratio yielding the smallest overall sample size is determ
 If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
 not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
 
-\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
+\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.
+For multi-arm simulations, this can be a vector of length equal to the number of active arms,
+specifying different drop-out rates for each active arm.}
 
 \item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
 

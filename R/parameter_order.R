@@ -157,13 +157,12 @@ C_PARAMETER_ORDER_DESIGN_PLAN <- c(
     "rejectedArmsPerStage",
     "rejectedPopulationsPerStage",
     "overallReject",
-    "conditionalPowerAchieved",
+    "futilityStop",
+    "futilityPerStage",    
     "earlyStop",
     "analysisTime",
     "studyDuration",
     "maxStudyDuration",
-    "futilityPerStage",
-    "futilityStop",
     "successPerStage",
     "selectedArms",
     "selectedPopulations",
@@ -180,6 +179,7 @@ C_PARAMETER_ORDER_DESIGN_PLAN <- c(
     "futilityBoundsEffectScaleUpper",
     "futilityBoundsPValueScale",
     "futilityBoundsPValueScaleDelayedInformation",
+    "conditionalPowerAchieved",
     "iterations"
 )
 

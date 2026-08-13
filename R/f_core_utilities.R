@@ -43,7 +43,9 @@ NULL
     return(ifelse(is.na(result), FALSE, result))
 }
 
-.getParsedEnvironmentVariable <- function(value, type = c("unknown", "character", "integer", "numeric", "logical")) {
+.getParsedEnvironmentVariable <- function(
+        value, 
+        type = c("unknown", "character", "integer", "numeric", "logical")) {
     type <- match.arg(type)
     if (identical(type, "character")) {
         return(as.character(value))
@@ -267,7 +269,8 @@ NULL
                 }
             },
             error = function(e) {
-                stopMissingArgument("the object ", .pQuote(paramName), " has not been defined anywhere. ",
+                stopMissingArgument("the object ", .pQuote(paramName), 
+                    " has not been defined anywhere. ",
                     "Please define it first, e.g., run '",
                     paramName, " <- 1'",
                     functionName = ".isDefinedArgument",
@@ -296,7 +299,8 @@ NULL
         warning = function(e) {
             paramName <- deparse(substitute(arg))
             .logWarn(
-                "Failed to execute '.isDefinedArgument(%s)' ('%s' is an instance of class '%s'): %s",
+                "Failed to execute '.isDefinedArgument(%s)' ",
+                "('%s' is an instance of class '%s'): %s",
                 paramName, paramName, .getClassName(arg), e
             )
         }
@@ -1059,7 +1063,8 @@ getTestLabel <- function(x) {
 #' @description
 #' How to cite \code{rpact} and \code{R} in publications.
 #'
-#' @param inclusiveR If \code{TRUE} (default) the information on how to cite the base R system in publications will be added.
+#' @param inclusiveR If \code{TRUE} (default) the information on 
+#'        how to cite the base R system in publications will be added.
 #' @param language Language code to use for the output, default is "en".
 #' @param markdown If \code{TRUE}, the output will be created in Markdown.
 #'
@@ -1179,12 +1184,15 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
 #' @param var The variable/parameter name.
 #'
 #' @details
-#' This function identifies and returns the caption that will be used in print outputs of an rpact result object.
+#' This function identifies and returns the caption that 
+#' will be used in print outputs of an rpact result object.
 #'
 #' @seealso
-#' \code{\link[=getParameterName]{getParameterName()}} for getting the parameter name for a given caption.
+#' \code{\link[=getParameterName]{getParameterName()}} for 
+#' getting the parameter name for a given caption.
 #'
-#' @return Returns a \code{\link[base]{character}} of specifying the corresponding caption of a given parameter name.
+#' @return Returns a \code{\link[base]{character}} of specifying 
+#' the corresponding caption of a given parameter name.
 #' Returns \code{NULL} if the specified \code{parameterName} does not exist.
 #'
 #' @examples
@@ -1220,7 +1228,8 @@ getParameterCaption <- function(obj, var) {
 #' @param var The variable/parameter name.
 #'
 #' @details
-#' This function identifies and returns the type that will be used in print outputs of an rpact result object.
+#' This function identifies and returns the type that will 
+#' be used in print outputs of an rpact result object.
 #'
 #' @seealso
 #' \code{\link[=getParameterName]{getParameterName()}} for getting the parameter name for a given caption.
@@ -1367,7 +1376,8 @@ getParameterName <- function(obj, parameterCaption) {
         )
     }
     if (is.null(columnName) || length(columnName) != 1 || is.na(columnName) || !is.character(columnName)) {
-        stopIllegalArgument(sQuote("columnName"), " (", .getClassName(columnName), ") must be a valid character value",
+        stopIllegalArgument(sQuote("columnName"), " (", .getClassName(columnName), ") ",
+                "must be a valid character value",
             parameter = "columnName", value = columnName, constraint = "valid character value",
             functionName = ".moveColumn"
         )
@@ -2130,11 +2140,19 @@ getParameterName <- function(obj, parameterCaption) {
 saveOptions <- function() {
     tryCatch(
         {
-            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
-                return(invisible(FALSE))
+            pkgConfigDir <- .getEnvironmentVariable(
+                "RPACT_CONFIG_DIR_SAVE",
+                "rpact.config.dir.save",
+                default = "#?#",
+                type = "character"
+            )
+            if (!dir.exists(pkgConfigDir)) {
+                if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                    return(invisible(FALSE))
+                }
+                
+                pkgConfigDir <- rappdirs::user_config_dir("rpact")
             }
-
-            pkgConfigDir <- rappdirs::user_config_dir("rpact")
             if (!dir.exists(pkgConfigDir)) {
                 dir.create(pkgConfigDir, recursive = TRUE, showWarnings = FALSE)
             }
@@ -2218,15 +2236,25 @@ resetOptions <- function(persist = TRUE) {
 .loadOptions <- function() {
     tryCatch(
         {
-            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
-                packageStartupMessage(
-                    "Package \"rappdirs\" is needed for saving and loading rpact options. ",
-                    "Please install using, e.g., install.packages(\"rappdirs\")"
-                )
-                return(invisible(FALSE))
+            pkgConfigDir <- .getEnvironmentVariable(
+                "RPACT_CONFIG_DIR_LOAD",
+                "rpact.config.dir.load",
+                default = "#?#",
+                type = "character"
+            )
+            
+            if (!dir.exists(pkgConfigDir)) {
+                if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                    packageStartupMessage(
+                        "Package \"rappdirs\" is needed for saving and loading rpact options. ",
+                        "Please install using, e.g., install.packages(\"rappdirs\")"
+                    )
+                    return(invisible(FALSE))
+                }
+
+                pkgConfigDir <- rappdirs::user_config_dir("rpact")
             }
 
-            pkgConfigDir <- rappdirs::user_config_dir("rpact")
             if (!dir.exists(pkgConfigDir)) {
                 return(invisible(FALSE))
             }

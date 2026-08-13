@@ -194,8 +194,12 @@ getAnalysisResults <- function(
     designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
     design <- designAndDataInput$design
     dataInput <- designAndDataInput$dataInput
+    
+    directionUpperDefault <- ifelse(dataInput$isDatasetSurvival(), 
+        C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT)
+    
     directionUpper <- .assertIsValidDirectionUpper(directionUpper, design,
-        objectType = "analysis", userFunctionCallEnabled = TRUE
+        objectType = "analysis", userFunctionCallEnabled = TRUE, default = directionUpperDefault
     )
 
     recalculationResult <- .getDesignWithRecalculatedBoundaries(
@@ -238,7 +242,8 @@ getAnalysisResults <- function(
             stage = stage,
             showWarnings = TRUE
         )
-        directionUpper <- .assertIsValidDirectionUpper(directionUpper, design, objectType = "analysis")
+        directionUpper <- .assertIsValidDirectionUpper(directionUpper, design, 
+            objectType = "analysis", default = directionUpperDefault)
         .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
         on.exit(dataInput$.trim())
         .assertIsValidThetaH0DataInput(thetaH0, dataInput)
@@ -381,9 +386,11 @@ getStageResults <- function(
     design <- designAndDataInput$design
     dataInput <- designAndDataInput$dataInput
 
+    directionUpperDefault <- ifelse(dataInput$isDatasetSurvival(), 
+        C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT)
     directionUpper <- .assertIsValidDirectionUpper(directionUpper, design,
-        objectType = "analysis", userFunctionCallEnabled = TRUE
-    )
+        objectType = "analysis", userFunctionCallEnabled = TRUE, 
+        default = directionUpperDefault)
 
     if (.isEnrichmentDataset(dataInput)) {
         return(.getStageResultsEnrichment(
@@ -680,9 +687,11 @@ getRepeatedConfidenceIntervals <- function(
         stage = NA_integer_) {
     .assertIsValidTolerance(tolerance)
 
+    directionUpperDefault <- ifelse(dataInput$isDatasetSurvival(), 
+        C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT)
     directionUpper <- .assertIsValidDirectionUpper(directionUpper, design,
-        objectType = "analysis", userFunctionCallEnabled = TRUE
-    )
+        objectType = "analysis", userFunctionCallEnabled = TRUE, 
+        default = directionUpperDefault)
 
     designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
     design <- designAndDataInput$design
@@ -1615,9 +1624,11 @@ getFinalConfidenceInterval <- function(
         )
     }
 
+    directionUpperDefault <- ifelse(dataInput$isDatasetSurvival(), 
+        C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT)
     directionUpper <- .assertIsValidDirectionUpper(directionUpper, design,
-        objectType = "analysis", userFunctionCallEnabled = TRUE
-    )
+        objectType = "analysis", userFunctionCallEnabled = TRUE, 
+        default = directionUpperDefault)
 
     finalConfidenceInterval <- NULL
     if (dataInput$isDatasetMeans()) {

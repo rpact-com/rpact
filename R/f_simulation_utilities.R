@@ -635,6 +635,9 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (!is.matrix(effectList[[matrixNameNew]])) {
         effectList[[matrixNameNew]] <- matrix(effectList[[matrixNameNew]], ncol = 1)
     }
+    if ("piControls" %in% names(effectList) && length(effectList$piControls) == 0) {
+        effectList$piControls <- NULL
+    }
 
     if (parameterNameWarningsEnabled && !is.na(endpoint)) {
         if (endpoint == "means") {
@@ -661,24 +664,24 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         .assertIsValidMatrix(effectList$effects, "effectList$effects")
     }
     for (piParam in c("piControls", "piTreatments")) {
-        if (!is.null(effectList[[piParam]])) {
+        if (piParam %in% names(effectList) && !is.null(effectList[[piParam]])) {
             if (piParam == matrixNameNew && is.matrix(effectList[[piParam]])) {
                 for (i in 1:nrow(effectList[[piParam]])) {
                     .assertIsInOpenInterval(effectList[[piParam]][i, ], paste0("effectList$", piParam),
-                        lower = 0, upper = 1
+                        lower = 0, upper = 1, matrixAllowed = TRUE
                     )
                 }
             } else {
                 .assertIsInOpenInterval(effectList[[piParam]], paste0("effectList$", piParam),
-                    lower = 0, upper = 1
+                    lower = 0, upper = 1, matrixAllowed = TRUE
                 )
             }
         }
     }
     for (ratioParam in c("hazardRatios", "stDevs")) {
-        if (!is.null(effectList[[ratioParam]])) {
+        if (ratioParam %in% names(effectList) && !is.null(effectList[[ratioParam]])) {
             .assertIsInOpenInterval(effectList[[ratioParam]], paste0("effectList$", ratioParam),
-                lower = 0, upper = NULL
+                lower = 0, upper = NULL, matrixAllowed = TRUE
             )
         }
     }
@@ -959,7 +962,7 @@ getRawData <- function(x, aggregate = FALSE) {
             "use getSimulationSurvival() to create one",
             functionName = "getRawData",
             parameter = "x",
-            relatedParameter = "SimulationResultsSurvival", value = x
+            value = x
         )
     }
 

@@ -644,7 +644,8 @@ NULL
     }
 
     if (endpoint %in% c("rates", "survival")) {
-        .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
+        .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, 
+            ifelse(identical(endpoint, "survival"), C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT))
     }
 
     if (endpoint == "means") {
@@ -769,28 +770,21 @@ NULL
         .setValueAndParameterType(simulationResults, "accrualTime", accrualTime, 12)
         .setValueAndParameterType(simulationResults, "accrualIntensity", accrualIntensity, 0.1)
 
+        .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
+        if (is.na(dropoutRate1)) {
+            dropoutRate1 <- 0
+        }
+        if (is.na(dropoutRate2)) {
+            dropoutRate2 <- 0
+        }
+        dropoutRate1 <- .assertIsNumericVector(dropoutRate1, "dropoutRate1",
+            len = unique(c(1L, activeArms)), naAllowed = FALSE)
+        .assertIsSingleNumber(dropoutRate2, "dropoutRate2")
+        .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+        .assertIsInInterval(dropoutRate2, "dropoutRate2", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
         .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, 0)
         .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, 0)
         .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, 12)
-
-        if (!is.na(dropoutTime) && dropoutTime <= 0) {
-            stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0",
-                functionName = ".createSimulationResultsMultiArmObject",
-                parameter = "dropoutTime", value = dropoutTime
-            )
-        }
-        if (!is.na(dropoutRate1) && (dropoutRate1 < 0 || dropoutRate1 >= 1)) {
-            stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
-                functionName = ".createSimulationResultsMultiArmObject",
-                parameter = "dropoutRate1", value = dropoutRate1
-            )
-        }
-        if (!is.na(dropoutRate2) && (dropoutRate2 < 0 || dropoutRate2 >= 1)) {
-            stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
-                functionName = ".createSimulationResultsMultiArmObject",
-                parameter = "dropoutRate2", value = dropoutRate2
-            )
-        }
 
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {

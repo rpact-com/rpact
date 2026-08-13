@@ -695,6 +695,14 @@ NULL
         ))) {
         return(FALSE)
     }
+    
+    cfg <- system.file("STARTUP_MESSAGE", package = "rpact")
+    if (file.exists(cfg)) {
+        cfgContent <- readLines(cfg, warn = FALSE)
+        if (any(grepl("disabled", cfgContent, ignore.case = TRUE))) {
+            return(FALSE)
+        }
+    }
 
     lastShownTime <- .getEnvironmentVariable(
         "RPACT_STARTUP_MESSAGE_TIMESTAMP",
@@ -702,6 +710,7 @@ NULL
         type = "character"
     )
     currentTime <- Sys.time()
+    currentTime <- as.POSIXct(currentTime, tz = "UTC")
     if (is.null(lastShownTime) || !grepl("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", lastShownTime)) {
         base::options("rpact.startup.message.timestamp" = currentTime)
         return(TRUE)
@@ -709,9 +718,10 @@ NULL
 
     lastShownTime <- as.POSIXct(lastShownTime, tz = "UTC")
     timeDiff <- as.numeric(difftime(currentTime, lastShownTime, units = "mins"))
-
-    # If the time difference is greater than 72 hours, show the message again
-    if (timeDiff > 72 * 60) {
+    
+    # If the time difference is greater than a random value 
+    # between 72 and 144 hours (3 to 6 days), show the message again
+    if (timeDiff > floor(runif(1, 72, 144)) * 60) {
         base::options("rpact.startup.message.timestamp" = currentTime)
         saveOptions()
         return(TRUE)

@@ -292,13 +292,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     )
 
     .assertDesignParameterExists(design, "tolerance", C_DESIGN_TOLERANCE_DEFAULT)
-    if (design$tolerance < 1e-10 || design$tolerance > 1e-03) {
-        stopArgumentOutOfBounds("'tolerance' (", design$tolerance, ") out of bounds [1e-10; 1e-03]",
-            functionName = ".validateBaseParameters",
-            parameter = "tolerance",
-            value = design$tolerance
-        )
-    }
+    .assertIsInClosedInterval(design$tolerance, "tolerance", lower = 1e-10, upper = 1e-03)
 
     return(invisible(design))
 }
@@ -1200,6 +1194,7 @@ getDesignInverseNormal <- function(
         futilityBoundsScale = futilityBoundsScale,
         functionName = "getDesignGroupSequential",
         design = design,
+        directionUpper = directionUpper,
         ...
     )
 
@@ -1460,7 +1455,7 @@ getDesignInverseNormal <- function(
         betaAdjustment = NA,
         twoSidedPower = NA,
         tolerance = 1e-08) {
-    validTypesOfDesign <- c("asOF", "asP", "asKD", "asHSD")
+    validTypesOfDesign <- c("asOF", "asP", "asKD", "asHSD", "asUser")
     if (!(typeOfDesign %in% validTypesOfDesign)) {
         stopConflictingArguments(
             "'typeOfDesign' (", dQuote(typeOfDesign), ") must be one of the following ",
@@ -2309,6 +2304,7 @@ getDesignGroupSequential <- function(
         futilityBoundsScale = futilityBoundsScale,
         functionName = "getDesignGroupSequential",
         design = design,
+        directionUpper = directionUpper,
         ...
     )
 

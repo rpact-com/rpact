@@ -253,7 +253,8 @@ NULL
         omegaVector,
         piControl,
         kappa,
-        phi,
+        phi1,
+        phi2,
         eventTime,
         plannedEvents,
         recruitmentTimes,
@@ -315,21 +316,14 @@ NULL
                     lambdaVector[g]
             }
         }
-        if (any(phi > 0)) {
-            if (phi[1] > 0) {
-                for (g in 1:gMax) {
-                    if (survivalDataSet$treatmentArm[i] == g) {
-                        survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi[1]
-                    }
-                }
+        survivalDataSet$dropoutTime[i] <- NA_real_
+        for (g in 1:gMax) {
+            if (survivalDataSet$treatmentArm[i] == g && phi1[g] > 0) {
+                survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi1[g]
             }
-            if (phi[2] > 0) {
-                if (survivalDataSet$treatmentArm[i] == gMax + 1) {
-                    survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi[2]
-                }
-            }
-        } else {
-            survivalDataSet$dropoutTime[i] <- NA_real_
+        }
+        if (survivalDataSet$treatmentArm[i] == gMax + 1 && phi2 > 0) {
+            survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi2
         }
     }
 
@@ -386,19 +380,15 @@ NULL
                             survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
                                 lambdaVector[gMax + 1]
                         }
-                        if (any(phi > 0)) {
-                            if (phi[1] > 0) {
-                                for (g in 1:gMax) {
-                                    if (survivalDataSet$treatmentArm[i] == g && selectedArms[g, k]) {
-                                        survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi[1]
-                                    }
-                                }
-                                if (survivalDataSet$treatmentArm[i] == (gMax + 1)) {
-                                    survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi[2]
-                                }
+                        survivalDataSet$dropoutTime[i] <- NA_real_
+                        for (g in 1:gMax) {
+                            if (survivalDataSet$treatmentArm[i] == g &&
+                                    selectedArms[g, k] && phi1[g] > 0) {
+                                survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi1[g]
                             }
-                        } else {
-                            survivalDataSet$dropoutTime[i] <- NA_real_
+                        }
+                        if (survivalDataSet$treatmentArm[i] == (gMax + 1) && phi2 > 0) {
+                            survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi2
                         }
                     }
                 }
@@ -609,7 +599,8 @@ NULL
         omegaMaxVector,
         piControl,
         kappa,
-        phi,
+        phi1,
+        phi2,
         eventTime,
         plannedEvents,
         recruitmentTimes,
@@ -680,7 +671,8 @@ NULL
                 omegaVector = effectMatrix[i, ],
                 piControl = piControl,
                 kappa = kappa,
-                phi = phi,
+                phi1 = phi1,
+                phi2 = phi2,
                 eventTime = eventTime,
                 plannedEvents = plannedEvents,
                 recruitmentTimes = recruitmentTimes,

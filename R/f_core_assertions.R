@@ -359,6 +359,102 @@ NULL
     }
 }
 
+.rangeLimitPrint <- function(boundary) {
+    if (is.null(boundary) || length(boundary) == 0) {
+        return("NULL")
+    }
+
+    if (is.na(boundary)) {
+        return("NA")
+    }
+
+    if (is.infinite(boundary)) {
+        return(ifelse(boundary > 0, "Inf", "-Inf"))
+    }
+
+    if (abs(boundary) < 1e-14) {
+        boundary <- round(boundary, digits = 6)
+    }
+
+    return(as.character(boundary))
+}
+
+.assertIsInInterval <- function(
+        x,
+        xName,
+        ...,
+        lower,
+        upper,
+        lowerIncluded = NA,
+        upperIncluded = NA,
+        naAllowed = FALSE,
+        matrixAllowed = FALSE) {
+    .warnInCaseOfUnknownArguments(functionName = ".assertIsInInterval", ...)
+    if (naAllowed && all(is.na(x))) {
+        return(invisible())
+    }
+    
+    functionName <- paste(deparse(sys.call()), collapse = "")
+    .assertIsNumericVector(x, xName, naAllowed = naAllowed, matrixAllowed = matrixAllowed)
+    .assertIsSingleLogical(lowerIncluded, "lowerIncluded")
+    .assertIsSingleLogical(upperIncluded, "upperIncluded")
+
+    if (lowerIncluded) {
+        lowerCheck <- x < lower
+    } else {
+        lowerCheck <- x <= lower
+    }
+
+    if (is.null(upper) || is.na(upper)) {
+        if (any(lowerCheck, na.rm = TRUE)) {
+            prefix <- ifelse(length(x) > 1, "each value of ", "")
+            stopArgumentOutOfRange(prefix, .pQuote(xName), " (", .arrayToString(x), ") must be ",
+                ifelse(lowerIncluded, ">=", ">"), " ", .rangeLimitPrint(lower),
+                parameter = xName,
+                value = x,
+                constraint = paste0(.pQuote(xName), ifelse(lowerIncluded, " >= ", " > "), lower),
+                functionName = functionName,
+                lowerBound = lower,
+                upperBound = NULL
+            )
+        }
+    } else {
+        if (upperIncluded) {
+            upperCheck <- x > upper
+        } else {
+            upperCheck <- x >= upper
+        }
+
+        if (lower == upper) {
+            if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
+                stopArgumentOutOfRange(.pQuote(xName), " (", .arrayToString(x), ") ",
+                    "must be equal to ", .rangeLimitPrint(lower),
+                    parameter = xName,
+                    value = x,
+                    constraint = paste0(.pQuote(xName), " == ", lower),
+                    functionName = functionName,
+                    lowerBound = lower,
+                    upperBound = upper
+                )
+            }
+        } else if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
+            stopArgumentOutOfRange(.pQuote(xName), " (", .arrayToString(x), ") must be in ",
+                ifelse(lowerIncluded, "[", "("), .rangeLimitPrint(lower), "; ",
+                .rangeLimitPrint(upper), ifelse(upperIncluded, "]", ")"),
+                parameter = xName,
+                value = x,
+                constraint = paste0(
+                    .pQuote(xName), ifelse(lowerIncluded, " >= ", " > "), lower, " and ",
+                    .pQuote(xName), ifelse(upperIncluded, " <= ", " < "), upper
+                ),
+                functionName = functionName,
+                lowerBound = lower,
+                upperBound = upper
+            )
+        }
+    }
+}
+
 #'
 #' Assert Values Are in a Closed Interval
 #'
@@ -372,7 +468,6 @@ NULL
 #' @param lower Numeric. The inclusive lower bound of the interval.
 #' @param upper Numeric. The inclusive upper bound of the interval. If \code{NULL} or \code{NA}, only the lower bound is enforced.
 #' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
-#' @param call. Logical. If \code{TRUE} the error message will include the call. Default is \code{FALSE}.
 #'
 #' @return Invisibly returns \code{x} if all elements are within the specified interval.
 #'
@@ -381,7 +476,6 @@ NULL
 #' .assertIsInClosedInterval(1:10, "x", lower = 1, upper = 10)
 #' .assertIsInClosedInterval(c(1, NA, 5), "x", lower = 1, upper = 10, naAllowed = TRUE)
 #' }
-
 #'
 #' @noRd
 #'
@@ -392,38 +486,18 @@ NULL
         lower,
         upper,
         naAllowed = FALSE,
-        call. = FALSE) {
-    .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
-    if (naAllowed && all(is.na(x))) {
-        return(invisible())
-    }
-
-    functionName <- paste(deparse(sys.call()), collapse = "")
-    .assertIsNumericVector(x, xName,
+        matrixAllowed = FALSE) {
+    .assertIsInInterval(
+        x = x,
+        xName = xName,
+        lower = lower,
+        upper = upper,
+        lowerIncluded = TRUE,
+        upperIncluded = TRUE,
         naAllowed = naAllowed,
-        functionName = functionName, call. = call.
+        matrixAllowed = matrixAllowed,
+        ...
     )
-
-    if (is.null(upper) || is.na(upper)) {
-        if (any(x < lower, na.rm = TRUE)) {
-            prefix <- ifelse(length(x) > 1, "each value of ", "")
-            stopArgumentOutOfBounds(prefix, sQuote(xName), " (", .arrayToString(x), ") must be >= ", lower,
-                parameter = xName,
-                value = x, constraint = paste0(sQuote(xName), " >= ", lower),
-                functionName = functionName, lowerBound = lower,
-                upperBound = NULL
-            )
-        }
-    } else if (any(x < lower, na.rm = TRUE) || any(x > upper, na.rm = TRUE)) {
-        stopArgumentOutOfBounds(sQuote(xName), " (", .arrayToString(x), ") is out of bounds [", lower, "; ",
-            upper, "]",
-            parameter = xName, value = x, constraint = paste0(
-                sQuote(xName), " >= ", lower, " and ",
-                sQuote(xName), " <= ", upper
-            ),
-            functionName = functionName, lowerBound = lower, upperBound = upper
-        )
-    }
 }
 
 #' Assert Values Are in an Open Interval
@@ -449,49 +523,28 @@ NULL
 #' \dontrun{
 #' .assertIsInOpenInterval(1:10, "x", lower = 0, upper = 11)
 #' }
-
 #'
 #' @noRd
 #'
-.assertIsInOpenInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE) {
-    if (naAllowed && all(is.na(x))) {
-        return(invisible())
-    }
-
-    functionName <- paste(deparse(sys.call()), collapse = "")
-
-    if (!naAllowed && length(x) > 1 && anyNA(x)) {
-        stopIllegalArgument(.pQuote(xName), " (", .arrayToString(x), ") ",
-            "must be a valid numeric vector or a single NA",
-            functionName = functionName,
-            parameter = xName,
-            value = x
-        )
-    }
-
-    if (is.null(upper) || is.na(upper)) {
-        if (any(x <= lower, na.rm = TRUE)) {
-            prefix <- ifelse(length(x) > 1, "each value of ", "")
-            stopArgumentOutOfBounds(prefix, .pQuote(xName), " (", .arrayToString(x), ") must be > ", lower,
-                functionName = functionName,
-                parameter = xName,
-                value = x,
-                constraint = paste0(sQuote(xName), " > ", lower),
-                lowerBound = lower,
-                upperBound = NULL
-            )
-        }
-    } else if (any(x <= lower, na.rm = TRUE) || any(x >= upper, na.rm = TRUE)) {
-        stopArgumentOutOfBounds(.pQuote(xName), " (", .arrayToString(x),
-            ") is out of bounds (", lower, "; ", upper, ")",
-            functionName = functionName,
-            parameter = xName,
-            value = x,
-            constraint = paste0(sQuote(xName), " > ", lower, " and ", sQuote(xName), " < ", upper),
-            lowerBound = lower,
-            upperBound = upper
-        )
-    }
+.assertIsInOpenInterval <- function(
+        x,
+        xName,
+        ...,
+        lower,
+        upper,
+        naAllowed = FALSE,
+        matrixAllowed = FALSE) {
+    .assertIsInInterval(
+        x = x,
+        xName = xName,
+        lower = lower,
+        upper = upper,
+        lowerIncluded = FALSE,
+        upperIncluded = FALSE,
+        naAllowed = naAllowed,
+        matrixAllowed = matrixAllowed,
+        ...
+    )
 }
 
 .assertIsValidDataInput <- function(dataInput, design = NULL, stage = NULL) {
@@ -696,7 +749,7 @@ NULL
         naAllowed = FALSE,
         noDefaultAvailable = FALSE,
         len = NA_integer_,
-        call. = FALSE) {
+        matrixAllowed = FALSE) {
     functionName <- paste(deparse(sys.call()), collapse = "")
     argumentValue <- NULL
     if (!missing(x)) {
@@ -715,16 +768,18 @@ NULL
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
-    illegalMatrix <- !all(is.na(x)) && is.matrix(x) && all(dim(x) > 1)
-    if (illegalMatrix || (!naAllowed && anyNA(x)) || !is.numeric(x)) {
-        stopIllegalArgument(sQuote(argumentName), " (", .arrayToString(x), ") must be a valid numeric value or vector",
-            ifelse(!is.vector(x), paste0(" (is ", .getClassName(x), ")"), ""),
-            parameter = argumentName, value = x,
-            constraint = "must be a valid numeric value or vector",
-            functionName = functionName,
-            relatedParameter = paste0("class of ", argumentName),
-            relatedValue = .getClassName(x)
-        )
+    if (!isTRUE(matrixAllowed)) {
+        illegalMatrix <- !all(is.na(x)) && is.matrix(x) && all(dim(x) > 1)
+        if (illegalMatrix || (!naAllowed && anyNA(x)) || !is.numeric(x)) {
+            stopIllegalArgument(sQuote(argumentName), " (", .arrayToString(x), ") must be a valid numeric value or vector",
+                ifelse(!is.vector(x), paste0(" (is ", .getClassName(x), ")"), ""),
+                parameter = argumentName, value = x,
+                constraint = "must be a valid numeric value or vector",
+                functionName = functionName,
+                relatedParameter = paste0("class of ", argumentName),
+                relatedValue = .getClassName(x)
+            )
+        }
     }
 
     if (!anyNA(len) && !length(x) %in% len) {
@@ -750,8 +805,7 @@ NULL
         ...,
         naAllowed = FALSE,
         validateType = TRUE,
-        noDefaultAvailable = FALSE,
-        call. = FALSE) {
+        noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stopMissingArgument(.pQuote(argumentName), " must be a valid integer value or vector",
@@ -785,8 +839,7 @@ NULL
         argumentName,
         ...,
         naAllowed = FALSE,
-        noDefaultAvailable = FALSE,
-        call. = FALSE) {
+        noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stopMissingArgument(.pQuote(argumentName), " ", "must be a valid logical value or vector",
@@ -861,8 +914,7 @@ NULL
         argumentName,
         ...,
         naAllowed = FALSE,
-        noDefaultAvailable = FALSE,
-        call. = FALSE) {
+        noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stopMissingArgument(.pQuote(argumentName), " must be a valid numeric value",
@@ -902,16 +954,14 @@ NULL
         ...,
         naAllowed = FALSE,
         validateType = TRUE,
-        noDefaultAvailable = FALSE,
-        call. = FALSE) {
+        noDefaultAvailable = FALSE) {
     return(invisible(.assertIsSinglePositiveInteger(
         x = x,
         argumentName = argumentName,
         naAllowed = naAllowed,
         validateType = validateType,
         mustBePositive = FALSE,
-        noDefaultAvailable = noDefaultAvailable,
-        call. = call.
+        noDefaultAvailable = noDefaultAvailable
     )))
 }
 
@@ -922,8 +972,7 @@ NULL
         naAllowed = FALSE,
         validateType = TRUE,
         mustBePositive = TRUE,
-        noDefaultAvailable = FALSE,
-        call. = FALSE) {
+        noDefaultAvailable = FALSE) {
     prefix <- ifelse(mustBePositive, "single positive ", "single ")
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
@@ -977,8 +1026,7 @@ NULL
         argumentName,
         ...,
         naAllowed = FALSE,
-        noDefaultAvailable = FALSE,
-        call. = FALSE) {
+        noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stopMissingArgument(.pQuote(argumentName), " must be a valid character value",
@@ -1343,7 +1391,7 @@ NULL
     }
 
     if (any(stDev <= 0)) {
-        stopArgumentOutOfBounds("standard deviation ", .pQuote(name), " ",
+        stopArgumentOutOfRange("standard deviation ", .pQuote(name), " ",
             "(", .arrayToString(stDev), ") must be > 0",
             functionName = ".assertIsValidStandardDeviation",
             parameter = "name",
@@ -1384,12 +1432,8 @@ NULL
 
 .assertIsValidStage <- function(stage, kMax) {
     .assertIsSingleNumber(stage, "stage")
-    if (stage < 1 || stage > kMax) {
-        stopArgumentOutOfBounds("'stage' (", stage, ") is out of bounds [1; ", kMax, "]",
-            functionName = ".assertIsValidStage",
-            parameter = "stage", value = stage
-        )
-    }
+    .assertIsSingleNumber(kMax, "kMax")
+    .assertIsInClosedInterval(stage, "stage", lower = 1, upper = kMax)
 }
 
 .assertIsValidIterationsAndSeed <- function(iterations, seed, ..., zeroIterationsAllowed = TRUE) {
@@ -1487,7 +1531,7 @@ NULL
         )
         stopArgumentLengthOutOfBounds(
             sprintf(
-                "length of 'informationRates' (%s) is out of bounds [%s; %s]",
+                "length of 'informationRates' (%s) must be in [%s; %s]",
                 length(informationRates), kMaxLowerBound, upperBound
             ),
             parameter = "informationRates",
@@ -1517,9 +1561,9 @@ NULL
         return(invisible())
     }
 
-    .assertValuesAreInsideBounds("informationRates", informationRates,
-        0, 1,
-        lowerBoundInclusive = FALSE
+    .assertIsInInterval(informationRates, "informationRates",
+        lower = 0, upper = 1,
+        lowerIncluded = FALSE, upperIncluded = TRUE
     )
 
     if (min(informationRates) <= 0 || max(informationRates) > 1 ||
@@ -1544,37 +1588,6 @@ NULL
             ") outside validated range",
             call. = FALSE
         )
-    }
-}
-
-.assertValuesAreInsideBounds <- function(
-        parameterName,
-        values,
-        lowerBound,
-        upperBound,
-        ...,
-        lowerBoundInclusive = TRUE,
-        upperBoundInclusive = TRUE) {
-    lower <- min(values)
-    upper <- max(values)
-    lowerInvalid <- ifelse(lowerBoundInclusive, lower < lowerBound, lower <= lowerBound)
-    upperInvalid <- ifelse(upperBoundInclusive, upper > upperBound, upper >= upperBound)
-    if (!is.na(lowerInvalid)) {
-        if (lowerInvalid || upperInvalid) {
-            stopArgumentOutOfBounds(
-                sprintf(
-                    "'%s' (%s) is out of bounds %s%s; %s%s", parameterName, .arrayToString(values,
-                        vectorLookAndFeelEnabled = FALSE
-                    ), ifelse(lowerBoundInclusive, "[", "("), lowerBound, upperBound,
-                    ifelse(upperBoundInclusive, "]", ")")
-                ),
-                parameter = parameterName,
-                value = values,
-                lowerBound = lowerBound,
-                upperBound = upperBound,
-                functionName = ".assertValuesAreInsideBounds"
-            )
-        }
     }
 }
 
@@ -1699,16 +1712,27 @@ NULL
         kMax = length(futilityBounds) + 1,
         directionUpper = TRUE,
         kMaxLowerBound = 1,
-        kMaxUpperBound = C_KMAX_UPPER_BOUND) {
+        kMaxUpperBound = C_KMAX_UPPER_BOUND,
+        naAllowed = FALSE) {
     if (length(futilityBounds) < kMaxLowerBound - 1) {
         upperBound <- ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND,
             kMax - 1, C_KMAX_UPPER_BOUND - 1
         )
-        stopArgumentLengthOutOfBounds(
-            sprintf(
-                "length of 'futilityBounds' (%s) is out of bounds [%s; %s]", length(futilityBounds),
+
+        if (kMaxLowerBound - 1 == upperBound) {
+            msg <- sprintf(
+                "length of 'futilityBounds' (%s) must be %s", length(futilityBounds),
+                kMaxLowerBound - 1
+            )
+        } else {
+            msg <- sprintf(
+                "length of 'futilityBounds' (%s) must be in [%s; %s]", length(futilityBounds),
                 kMaxLowerBound - 1, upperBound
-            ),
+            )
+        }
+
+        stopArgumentLengthOutOfBounds(
+            msg,
             parameter = "futilityBounds",
             value = futilityBounds,
             lowerBound = kMaxLowerBound - 1,
@@ -1732,8 +1756,8 @@ NULL
 
     lowerBound <- ifelse(isFALSE(directionUpper), -6, -Inf)
     upperBound <- ifelse(isFALSE(directionUpper), Inf, 6)
-    .assertValuesAreInsideBounds("futilityBounds", futilityBounds,
-        lowerBound = lowerBound, upperBound = upperBound
+    .assertIsInClosedInterval(futilityBounds, "futilityBounds",
+        lower = lowerBound, upper = upperBound, naAllowed = naAllowed
     )
 }
 
@@ -1757,7 +1781,7 @@ NULL
     if (length(alpha0Vec) < kMaxLowerBound - 1) {
         stopArgumentLengthOutOfBounds(
             sprintf(
-                "length of 'alpha0Vec' (%s) is out of bounds [%s; %s]", length(alpha0Vec),
+                "length of 'alpha0Vec' (%s) must be in [%s; %s]", length(alpha0Vec),
                 kMaxLowerBound - 1, kMax - 1
             ),
             parameter = "alpha0Vec",
@@ -1780,7 +1804,10 @@ NULL
         )
     }
 
-    .assertValuesAreInsideBounds("alpha0Vec", alpha0Vec, 0, 1, lowerBoundInclusive = FALSE)
+    .assertIsInInterval(alpha0Vec, "alpha0Vec",
+        lower = 0, upper = 1,
+        lowerIncluded = FALSE, upperIncluded = TRUE
+    )
 }
 
 .assertIsValidSidedParameter <- function(sided) {
@@ -2008,19 +2035,33 @@ NULL
                     vectorLookAndFeelEnabled = length(arg) > 1,
                     encapsulate = is.character(arg)
                 )
-                argValue <- paste0(" = ", argValue)
             }, error = function(e) {})
-            if (exceptionEnabled) {
-                stopIllegalArgument("argument unknown in ", functionName, "(...): ", .pQuote(argName), argValue, " is not allowed",
+
+            errorFactory <- getOption("rpact.error.factory.condition")
+            errorContextEnabled <- (!is.null(errorFactory) && is.function(errorFactory))
+            if (isTRUE(errorContextEnabled)) {
+                stopArgumentUnknown("argument ", .pQuote(argName), " ",
+                    "is unknown and not allowed in function ", functionName, "(). ",
+                    "Remove ", .pQuote(paste0(argName, " = ", argValue)),
+                    " from ", functionName, "()",
+                    functionName = functionName,
+                    parameter = argName,
+                    value = argValue,
+                    relatedParameter = "functionName",
+                    relatedValue = functionName
+                )
+            } else if (exceptionEnabled) {
+                stopArgumentUnknown(.pQuote(argName), " = ", argValue,
+                    " is not allowed in ", functionName, "()",
                     functionName = ".warnInCaseOfUnknownArguments",
-                    parameter = "functionName",
-                    value = functionName,
-                    relatedParameter = "argName",
-                    relatedValue = argName
+                    parameter = argName,
+                    value = argValue,
+                    relatedParameter = "functionName",
+                    relatedValue = functionName
                 )
             } else {
-                warning("Argument unknown in ", functionName, "(...): ", .pQuote(argName),
-                    argValue, " will be ignored",
+                warning("Argument unknown in ", functionName, "(...): ",
+                    .pQuote(argName), " = ", argValue, " will be ignored",
                     call. = FALSE
                 )
             }
@@ -2030,14 +2071,15 @@ NULL
 
 .warnInCaseOfUnusedArgument <- function(arg, argName, defaultValue, functionName) {
     if (!identical(arg, defaultValue)) {
-        warning("Unused argument in ", functionName, "(...): ", .pQuote(argName), " = ", .arrayToString(
-            arg,
-            vectorLookAndFeelEnabled = (length(arg) > 1),
-            maxLength = 10,
-            encapsulate = !is.null(arg) && any(is.character(arg))
-        ),
-        " will be ignored",
-        call. = FALSE
+        warning(
+            "Unused argument in ", functionName, "(...): ", .pQuote(argName), " = ", .arrayToString(
+                arg,
+                vectorLookAndFeelEnabled = (length(arg) > 1),
+                maxLength = 10,
+                encapsulate = !is.null(arg) && any(is.character(arg))
+            ),
+            " will be ignored",
+            call. = FALSE
         )
     }
 }
@@ -2261,27 +2303,8 @@ NULL
         return(invisible())
     }
 
-    if (!is.numeric(piValue) || anyNA(piValue)) {
-        stopIllegalArgument(.pQuote(piName), " (", .arrayToString(piValue),
-            ") must be a valid numeric value",
-            functionName = ".assertIsValidPi",
-            parameter = "piName",
-            value = piName,
-            relatedParameter = "piValue",
-            relatedValue = piValue
-        )
-    }
-
-    if (any(piValue <= -1e-16) || any(piValue >= 1 + 1e-16)) {
-        stopArgumentOutOfBounds(.pQuote(piName), " (",
-            .arrayToString(piValue), ") ", "is out of bounds (0; 1) or event time too long",
-            functionName = ".assertIsValidPi",
-            parameter = "piName",
-            value = piName,
-            relatedParameter = "piValue",
-            relatedValue = piValue
-        )
-    }
+    .assertIsNumericVector(piValue, piName)
+    .assertIsInOpenInterval(piValue, piName, lower = -1e-16, upper = 1 + 1e-16)
 }
 
 .assertIsValidPi1 <- function(pi1, stageResults = NULL, stage = NULL) {
@@ -2331,8 +2354,7 @@ NULL
         naAllowed = TRUE
     )
     .assertIsInClosedInterval(allocationRatioPlanned, "allocationRatioPlanned",
-        lower = 0,
-        upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
     )
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
 
@@ -2356,8 +2378,12 @@ NULL
     return(invisible(allocationRatioPlanned))
 }
 
-.assertIsValidThetaH1 <- function(thetaH1, stageResults = NULL,
-                                          stage = NULL, ..., results = NULL) {
+.assertIsValidThetaH1 <- function(
+        thetaH1,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     if (is.na(thetaH1) && !is.null(stageResults) && !is.null(stage)) {
         thetaH1 <- stageResults$effectSizes[stage]
         if (!is.null(results)) {
@@ -2791,10 +2817,10 @@ NULL
     }
 
     if (showUnusedArgumentsMessage && length(unusedArgs) > 0) {
-        message("Note that the following arguments can optionally be used in ",
+        message(
+            "Note that the following arguments can optionally be used in ",
             .pQuote(funArgName), " (", functionName, "): \n",
-            .arrayToString(unusedArgs),
-            call. = FALSE
+            .arrayToString(unusedArgs)
         )
     }
 }
@@ -3647,7 +3673,10 @@ NULL
     .assertIsNumericVector(doseLevels, "doseLevels", naAllowed = TRUE)
     .assertHasLength(doseLevels, "doseLevels", gMax, "gMax", naAllowed = TRUE)
     .assertValuesAreStrictlyIncreasing(doseLevels, "doseLevels", naAllowed = TRUE)
-    .assertIsInOpenInterval(doseLevels, "doseLevels", lower = 0, upper = NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(doseLevels, "doseLevels",
+        lower = 0, upper = NULL,
+        naAllowed = TRUE, matrixAllowed = TRUE
+    )
 
     if (typeOfShape == "userDefined") {
         effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
@@ -3659,12 +3688,12 @@ NULL
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         if (valueMaxVectorName == "piMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
-                lower = 0, upper = 1, naAllowed = FALSE
+                lower = 0, upper = 1, naAllowed = FALSE, matrixAllowed = TRUE
             )
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
-                lower = 0, upper = NULL, naAllowed = FALSE
+                lower = 0, upper = NULL, naAllowed = FALSE, matrixAllowed = TRUE
             )
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }

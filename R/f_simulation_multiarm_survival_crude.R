@@ -340,7 +340,7 @@ getSimulationMultiArmSurvivalBasic <- function(
         slope = 1,
         doseLevels = NA_real_,
         intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_SURVIVAL_DEFAULT
         adaptations = NA,
         typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
         effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
@@ -380,9 +380,12 @@ getSimulationMultiArmSurvivalBasic <- function(
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+    directionUpper <- .assertIsValidDirectionUpper(
+        directionUpper,
         design,
-        objectType = "power", userFunctionCallEnabled = TRUE
+        objectType = "power", 
+        userFunctionCallEnabled = TRUE,
+        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
     )
 
     simulationResults <- .createSimulationResultsMultiArmObject(

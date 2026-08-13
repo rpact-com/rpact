@@ -279,7 +279,14 @@ summary.FutilityBounds <- function(object, ...) {
     return(NULL)
 }
 
-.getFutilityBoundsFromArgs <- function(..., futilityBounds, futilityBoundsScale, functionName, design, fisherDesign = FALSE) {
+.getFutilityBoundsFromArgs <- function(
+        ...,
+        futilityBounds,
+        futilityBoundsScale,
+        functionName,
+        design,
+        directionUpper = NA,
+        fisherDesign = FALSE) {
     futilityBoundsFromArgs <- .getFutilityBoundsFromThreeDots(...)
 
     futilityBoundsName <- ifelse(fisherDesign, "alpha0Vec", "futilityBounds")
@@ -316,7 +323,8 @@ summary.FutilityBounds <- function(object, ...) {
                     sourceValue = futilityBounds,
                     sourceScale = futilityBoundsScale,
                     targetScale = targetScale,
-                    design = design
+                    design = design,
+                    directionUpper = directionUpper
                 )
             } else {
                 .warnInCaseOfUnusedArgument(
@@ -394,13 +402,14 @@ summary.FutilityBounds <- function(object, ...) {
 #' \code{targetScale} is \code{"reverseCondPower"} or if the conversion
 #' involves conditional or predictive power in a group sequential or Fisher design.
 #' Must be a one-sided two-stage group sequential design or Fisher's combination test design.
+#' @inheritParams param_directionUpper
 #' @param theta Numeric. The assumed effect size under the alternative hypothesis on the scale of the
 #'   test statistic. For example, in a survival design, this would be the on the log hazard ratio scale.
 #' @param information Numeric vector of length 1 or 2. The stage-wise information levels
 #'   (i.e. this is *not* the cumulative information). Note that depending on which conversion is performed,
-#'   either the first or second stage information may not be needed. In that case, a warning will be issued
-#'   if the unused information is provided. The warning can be avoided by either passing a single number,
-#'   or setting the unused information to \code{NA}.
+#'   either the first or second stage information may not be needed. In this case, a warning will be issued
+#'   if the unused information is provided. The warning can be avoided by either passing a single number
+#'   (setting both informations to be equal to each other), or setting the unused information to \code{NA}.
 #' @param naAllowed Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.
 #' @inheritParams param_three_dots
 #'
@@ -462,6 +471,7 @@ getFutilityBounds <- function(
             "effectEstimate"
         ),
         design = NULL,
+        directionUpper = NA,
         theta = NA_real_,
         information = NA_real_,
         naAllowed = FALSE) {
@@ -549,7 +559,31 @@ getFutilityBounds <- function(
             gsWeights <- c(1, sqrt((1 - design$informationRates[1]) / design$informationRates[1]))
         }
         criticalValue <- design$criticalValues[2]
+
+        if (is.na(directionUpper)) {
+            directionUpper <- if (is.na(design$directionUpper)) TRUE else design$directionUpper
+        } else {
+            if (!is.na(design$directionUpper) &&
+                    !identical(directionUpper, design$directionUpper)) {
+                stopConflictingArguments("in the design directionUpper = ",
+                    design$directionUpper, " is defined. ",
+                    "In getFutilityBounds() the same direction must be specified, but it is ",
+                    directionUpper,
+                    functionName = ".assertIsValidDirectionUpper",
+                    parameter = "directionUpper",
+                    value = design$directionUpper
+                )
+            } else if (is.na(design$directionUpper) && isFALSE(directionUpper) &&
+                    .isTrialDesignInverseNormalOrGroupSequential(design)) {
+                criticalValue <- -criticalValue
+            }
+        }
+    } else {
+        if (is.na(directionUpper)) {
+            directionUpper <- TRUE
+        }
     }
+    .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = FALSE)
 
     .assertIsSingleNumber(information1, infos$paramNames[1], naAllowed = TRUE)
     .assertIsInOpenInterval(
@@ -585,50 +619,50 @@ getFutilityBounds <- function(
             upper = 1,
             naAllowed = TRUE
         )
+        normQuantile <- if (directionUpper) qnorm(1 - sourceValue) else qnorm(sourceValue)
     }
 
-    sourceValues <- numeric()
-    if (sourceScale == "zValue") {
-        sourceValues <- sourceValue
+    sourceValues <- if (sourceScale == "zValue") {
+        sourceValue
     } else if (sourceScale == "pValue") {
-        sourceValues <- qnorm(1 - sourceValue)
+        normQuantile
     } else if (sourceScale == "effectEstimate") {
-        sourceValues <- sourceValue * sqrt(information1)
+        sourceValue * sqrt(information1)
     } else if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
         if (sourceScale == "conditionalPower") {
-            sourceValues <- (criticalValue - gsWeights[2] * (qnorm(1 - sourceValue) + theta * sqrt(information2))) /
+            (criticalValue - gsWeights[2] * (normQuantile + theta * sqrt(information2))) /
                 gsWeights[1]
         } else if (sourceScale == "condPowerAtObserved") {
-            sourceValues <- (criticalValue /
-                gsWeights[2] -
-                qnorm(1 - sourceValue)) /
+            (criticalValue /
+                gsWeights[2] - normQuantile) /
                 (gsWeights[1] / gsWeights[2] + sqrt(information2 / information1))
         } else if (sourceScale == "predictivePower") {
-            sourceValues <- (criticalValue /
+            (criticalValue /
                 gsWeights[2] -
-                sqrt((information1 + information2) / information1) * qnorm(1 - sourceValue)) /
+                sqrt((information1 + information2) / information1) * normQuantile) /
                 (gsWeights[1] / gsWeights[2] + sqrt(information2 / information1))
         } else if (sourceScale == "reverseCondPower") {
-            sourceValues <- sqrt(1 - design$informationRates[1]) *
-                qnorm(sourceValue) +
-                sqrt(design$informationRates[1]) * criticalValue
+            sqrt(design$informationRates[1]) * criticalValue -
+                sqrt(1 - design$informationRates[1]) * normQuantile
         }
     } else if (.isTrialDesignFisher(design)) {
-        sourceValues <- .getFutilityBoundSourceValuesFisher(
+        .getFutilityBoundSourceValuesFisher(
             sourceValue,
             criticalValue,
             gsWeights,
             sourceScale,
             theta,
             information1,
-            information2
+            information2,
+            directionUpper
         )
     }
 
     if (targetScale == "zValue") {
         return(.addFutilityBoundParameterTypes(sourceValues, args))
     } else if (targetScale == "pValue") {
-        return(.addFutilityBoundParameterTypes(1 - pnorm(sourceValues), args))
+        pval <- if (directionUpper) 1 - pnorm(sourceValues) else pnorm(sourceValues)
+        return(.addFutilityBoundParameterTypes(pval, args))
     } else if (targetScale == "effectEstimate") {
         return(.addFutilityBoundParameterTypes(sourceValues / sqrt(information1), args))
     } else if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
@@ -640,6 +674,7 @@ getFutilityBounds <- function(
             theta,
             information1,
             information2,
+            directionUpper,
             design
         )
         return(.addFutilityBoundParameterTypes(result, args))
@@ -653,7 +688,8 @@ getFutilityBounds <- function(
                 targetScale,
                 theta,
                 information1,
-                information2
+                information2,
+                directionUpper
             ))
         }
         .showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange(result, upperBound = NULL)
@@ -676,18 +712,21 @@ getFutilityBounds <- function(
         sourceScale,
         theta,
         information1,
-        information2) {
+        information2,
+        directionUpper) {
     if (is.na(sourceValue) || sourceValue >= 1 - 1e-07) {
         return(NA_real_)
     }
 
+    quantileSign <- if (directionUpper) +1 else -1
+
     tryCatch(
         {
             if (sourceScale == "conditionalPower") {
-                return(qnorm(1 - criticalValue /
-                    pnorm((qnorm(sourceValue) - theta * sqrt(information2)))^gsWeights[2]))
+                return(quantileSign * qnorm(1 - criticalValue /
+                    pnorm((qnorm(sourceValue) - quantileSign * theta * sqrt(information2)))^gsWeights[2]))
             } else if (sourceScale == "condPowerAtObserved") {
-                return(stats::uniroot(
+                return(quantileSign * stats::uniroot(
                     function(x) {
                         pmin(1, pnorm(
                             qnorm((criticalValue / (1 - pnorm(x)))^(1 / gsWeights[2])) +
@@ -699,7 +738,7 @@ getFutilityBounds <- function(
                     tol = .Machine$double.eps^0.5
                 )$root)
             } else if (sourceScale == "predictivePower") {
-                return(stats::uniroot(
+                return(quantileSign * stats::uniroot(
                     function(x) {
                         pmin(1, pnorm(
                             sqrt(information1 / (information1 + information2)) *
@@ -743,7 +782,8 @@ getFutilityBounds <- function(
         sourceScale,
         theta,
         information1,
-        information2) {
+        information2,
+        directionUpper) {
     sourceValuesCalculated <- numeric()
     for (sourceValue in sourceValues) {
         sourceValuesCalculated <- c(sourceValuesCalculated, .getFutilityBoundSourceValueFisher(
@@ -753,7 +793,8 @@ getFutilityBounds <- function(
             sourceScale,
             theta,
             information1,
-            information2
+            information2,
+            directionUpper
         ))
     }
     return(sourceValuesCalculated)
@@ -767,31 +808,27 @@ getFutilityBounds <- function(
         theta,
         information1,
         information2,
+        directionUpper,
         design) {
-    result <- NA_real_
-    if (targetScale == "conditionalPower") {
-        result <- 1 - pnorm(
-            (criticalValue - gsWeights[1] * sourceValues) /
-                gsWeights[2] -
-                theta * sqrt(information2)
-        )
+    normQuantile <- if (targetScale == "conditionalPower") {
+        (criticalValue - gsWeights[1] * sourceValues) /
+            gsWeights[2] - theta * sqrt(information2)
     } else if (targetScale == "condPowerAtObserved") {
-        result <- 1 - pnorm(
-            (criticalValue - gsWeights[1] * sourceValues) /
-                gsWeights[2] -
-                sourceValues * sqrt(information2 / information1)
-        )
+        (criticalValue - gsWeights[1] * sourceValues) /
+            gsWeights[2] -
+            sourceValues * sqrt(information2 / information1)
     } else if (targetScale == "predictivePower") {
-        result <- 1 - pnorm(
-            sqrt(information1 / (information1 + information2)) *
-                ((criticalValue - gsWeights[1] * sourceValues) /
-                    gsWeights[2] -
-                    sourceValues * sqrt(information2 / information1))
-        )
+        sqrt(information1 / (information1 + information2)) *
+            ((criticalValue - gsWeights[1] * sourceValues) /
+                gsWeights[2] -
+                sourceValues * sqrt(information2 / information1))
     } else if (targetScale == "reverseCondPower") {
-        result <- pnorm((sourceValues - sqrt(design$informationRates[1]) * criticalValue) /
-            sqrt(1 - design$informationRates[1]))
+        (sqrt(design$informationRates[1]) * criticalValue - sourceValues) /
+            sqrt(1 - design$informationRates[1])
     }
+
+    result <- if (directionUpper) 1 - pnorm(normQuantile) else pnorm(normQuantile)
+
     .showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange(result)
     return(result)
 }
@@ -803,34 +840,38 @@ getFutilityBounds <- function(
         targetScale,
         theta,
         information1,
-        information2) {
+        information2,
+        directionUpper) {
     if (is.na(sourceValue)) {
         return(NA_real_)
     }
 
-    if (1 - pnorm(sourceValue) <= criticalValue) {
+    normProbability <- if (directionUpper) 1 - pnorm(sourceValue) else pnorm(sourceValue)
+    if (normProbability <= criticalValue) {
         return(1)
     }
 
+    quantileSign <- if (directionUpper) +1 else -1
+
     if (targetScale == "conditionalPower") {
         return(pnorm(
-            qnorm((criticalValue / (1 - pnorm(sourceValue)))^(1 / gsWeights[2])) +
-                theta * sqrt(information2)
+            qnorm((criticalValue / normProbability)^(1 / gsWeights[2])) +
+                quantileSign * theta * sqrt(information2)
         ))
     }
 
     if (targetScale == "condPowerAtObserved") {
         return(pnorm(
-            qnorm((criticalValue / (1 - pnorm(sourceValue)))^(1 / gsWeights[2])) +
-                sourceValue * sqrt(information2 / information1)
+            qnorm((criticalValue / normProbability)^(1 / gsWeights[2])) +
+                quantileSign * sourceValue * sqrt(information2 / information1)
         ))
     }
 
     if (targetScale == "predictivePower") {
         return(pnorm(
             sqrt(information1 / (information1 + information2)) *
-                (qnorm((criticalValue / (1 - pnorm(sourceValue)))^(1 / gsWeights[2])) +
-                    sourceValue * sqrt(information2 / information1))
+                (qnorm((criticalValue / normProbability)^(1 / gsWeights[2])) +
+                    quantileSign * sourceValue * sqrt(information2 / information1))
         ))
     }
 
@@ -975,13 +1016,262 @@ getFutilityBounds <- function(
     return(allocationRatio / (1 + allocationRatio)^2 * cumulativeEvents)
 }
 
+.getFisherInformationByStage <- function(information, stage = NA_integer_) {
+    if (is.na(stage)) {
+        return(information)
+    }
+    if (is.matrix(information)) {
+        return(information[stage, ])
+    }
+    return(information[stage])
+}
+
+.getCountDataVectorByParameter <- function(x, nParameters) {
+    if (is.null(x) || length(x) == 0) {
+        return(rep(NA_real_, nParameters))
+    }
+    if (length(x) == 1) {
+        return(rep(x, nParameters))
+    }
+    return(x)
+}
+
+.getCountDataPlanningRates <- function(designPlan, nParameters, allocationRatio) {
+    lambda1 <- .getCountDataVectorByParameter(designPlan$lambda1, nParameters)
+    lambda2 <- .getCountDataVectorByParameter(designPlan$lambda2, nParameters)
+    theta <- .getCountDataVectorByParameter(designPlan$theta, nParameters)
+    lambda <- .getCountDataVectorByParameter(designPlan$lambda, nParameters)
+
+    if (!all(is.na(lambda)) && !all(is.na(theta))) {
+        lambda2 <- (1 + allocationRatio) * lambda / (1 + allocationRatio * theta)
+        lambda1 <- lambda2 * theta
+    } else if (!all(is.na(lambda2)) && !all(is.na(theta))) {
+        lambda1 <- lambda2 * theta
+    } else if (!all(is.na(lambda1)) && !all(is.na(theta))) {
+        lambda2 <- lambda1 / theta
+    }
+
+    return(list(lambda1 = lambda1, lambda2 = lambda2))
+}
+
+.getCountDataAccrualTime <- function(designPlan) {
+    accrualTime <- designPlan$accrualTime
+    if (length(accrualTime) > 1 && accrualTime[1] == 0) {
+        accrualTime <- accrualTime[-1]
+    }
+    return(accrualTime)
+}
+
+.getCountDataRecruitmentTimes <- function(designPlan, allocationRatio, maxNumberOfSubjects) {
+    accrualTime <- .getCountDataAccrualTime(designPlan)
+    accrualIntensity <- designPlan$accrualIntensity
+
+    if (!anyNA(accrualIntensity)) {
+        recruitmentTimes <- .generateRecruitmentTimes(
+            allocationRatio,
+            accrualTime,
+            accrualIntensity
+        )
+        return(list(
+            recruit1 = recruitmentTimes$recruit[recruitmentTimes$treatments == 1],
+            recruit2 = recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
+        ))
+    }
+
+    n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
+    
+    # TODO accrualTime can be a vector, but recruitment times are generated as if it was a single number
+    return(list(
+        recruit1 = seq(0, accrualTime, length.out = n$n1), 
+        recruit2 = seq(0, accrualTime, length.out = n$n2)
+    ))
+}
+
+.getFisherInformationCountDataFixedExposure <- function(
+        lambda1,
+        lambda2,
+        overdispersion,
+        fixedExposureTime,
+        n1,
+        n2) {
+    sumLambda1 <- n1 * fixedExposureTime * lambda1 /
+        (1 + overdispersion * fixedExposureTime * lambda1)
+    sumLambda2 <- n2 * fixedExposureTime * lambda2 /
+        (1 + overdispersion * fixedExposureTime * lambda2)
+    return(1 / (1 / sumLambda1 + 1 / sumLambda2))
+}
+
+.getFisherInformationCountDataAtAnalysisTime <- function(
+        lambda1,
+        lambda2,
+        overdispersion,
+        fixedExposureTime,
+        analysisTime,
+        recruit1,
+        recruit2) {
+    timeUnderObservation1 <- pmax(analysisTime - recruit1, 0)
+    timeUnderObservation2 <- pmax(analysisTime - recruit2, 0)
+    if (!is.na(fixedExposureTime)) {
+        timeUnderObservation1 <- pmin(timeUnderObservation1, fixedExposureTime)
+        timeUnderObservation2 <- pmin(timeUnderObservation2, fixedExposureTime)
+    }
+    return(.getInformationCountData(
+        lambda1 = lambda1,
+        lambda2 = lambda2,
+        overdispersion = overdispersion,
+        recruit1 = timeUnderObservation1,
+        recruit2 = timeUnderObservation2
+    ))
+}
+
+.getFisherInformationCountDataFinal <- function(
+        designPlan,
+        lambda1,
+        lambda2,
+        allocationRatio,
+        maxNumberOfSubjects) {
+    overdispersion <- designPlan$overdispersion
+    fixedExposureTime <- designPlan$fixedExposureTime
+    if (!is.na(fixedExposureTime)) {
+        n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
+        return(.getFisherInformationCountDataFixedExposure(
+            lambda1,
+            lambda2,
+            overdispersion,
+            fixedExposureTime,
+            n$n1,
+            n$n2
+        ))
+    }
+
+    accrualTime <- .getCountDataAccrualTime(designPlan)
+    recruitmentTimes <- .getCountDataRecruitmentTimes(
+        designPlan,
+        allocationRatio,
+        maxNumberOfSubjects
+    )
+    return(.getFisherInformationCountDataAtAnalysisTime(
+        lambda1 = lambda1,
+        lambda2 = lambda2,
+        overdispersion = overdispersion,
+        fixedExposureTime = fixedExposureTime,
+        analysisTime = max(accrualTime) + designPlan$followUpTime,
+        recruit1 = recruitmentTimes$recruit1,
+        recruit2 = recruitmentTimes$recruit2
+    ))
+}
+
+.getFisherInformationCountDataPower <- function(designPlan) {
+    design <- designPlan$.design
+    nParameters <- max(
+        length(designPlan$lambda1),
+        length(designPlan$lambda2),
+        length(designPlan$lambda),
+        length(designPlan$theta),
+        length(designPlan$maxNumberOfSubjects),
+        length(designPlan$allocationRatioPlanned),
+        1
+    )
+    allocationRatio <- .getCountDataVectorByParameter(designPlan$allocationRatioPlanned, nParameters)
+    maxNumberOfSubjects <- .getCountDataVectorByParameter(designPlan$maxNumberOfSubjects, nParameters)
+    rates <- .getCountDataPlanningRates(designPlan, nParameters, allocationRatio)
+
+    maxInformation <- rep(NA_real_, nParameters)
+    for (index in seq_len(nParameters)) {
+        maxInformation[index] <- .getFisherInformationCountDataFinal(
+            designPlan = designPlan,
+            lambda1 = rates$lambda1[index],
+            lambda2 = rates$lambda2[index],
+            allocationRatio = allocationRatio[index],
+            maxNumberOfSubjects = maxNumberOfSubjects[index]
+        )
+    }
+
+    return(design$informationRates %*% t(maxInformation))
+}
+
+.getFisherInformationCountDataSimulation <- function(designPlan) {
+    design <- designPlan$.design
+    nParameters <- max(
+        length(designPlan$lambda1),
+        length(designPlan$lambda2),
+        length(designPlan$lambda),
+        length(designPlan$theta),
+        length(designPlan$maxNumberOfSubjects),
+        length(designPlan$allocationRatioPlanned),
+        1
+    )
+    allocationRatio <- .getCountDataVectorByParameter(designPlan$allocationRatioPlanned, nParameters)
+    maxNumberOfSubjects <- .getCountDataVectorByParameter(designPlan$maxNumberOfSubjects, nParameters)
+    rates <- .getCountDataPlanningRates(designPlan, nParameters, allocationRatio)
+
+    analysisTime <- designPlan$plannedCalendarTime
+    if (design$kMax == 1) {
+        accrualTime <- .getCountDataAccrualTime(designPlan)
+        followUpTime <- designPlan$followUpTime
+        if (!is.na(designPlan$fixedExposureTime)) {
+            followUpTime <- designPlan$fixedExposureTime
+        }
+        analysisTime <- max(accrualTime) + followUpTime
+    }
+
+    result <- matrix(NA_real_, nrow = design$kMax, ncol = nParameters)
+    for (index in seq_len(nParameters)) {
+        recruitmentTimes <- .getCountDataRecruitmentTimes(
+            designPlan,
+            allocationRatio[index],
+            maxNumberOfSubjects[index]
+        )
+        for (stageIndex in seq_len(design$kMax)) {
+            result[stageIndex, index] <- .getFisherInformationCountDataAtAnalysisTime(
+                lambda1 = rates$lambda1[index],
+                lambda2 = rates$lambda2[index],
+                overdispersion = designPlan$overdispersion,
+                fixedExposureTime = designPlan$fixedExposureTime,
+                analysisTime = analysisTime[stageIndex],
+                recruit1 = recruitmentTimes$recruit1,
+                recruit2 = recruitmentTimes$recruit2
+            )
+        }
+    }
+
+    return(result)
+}
+
+.getFisherInformationCountData <- function(designPlan, stage = NA_integer_) {
+    if (.isTrialDesignPlanCountData(designPlan) && designPlan$.isSampleSizeObject()) {
+        informationOverStages <- designPlan$informationOverStages
+        if (!is.null(informationOverStages) && length(informationOverStages) > 0 &&
+                !all(is.na(informationOverStages))) {
+            return(.getFisherInformationByStage(informationOverStages, stage))
+        }
+
+        maxInformation <- designPlan$maxInformation
+        if (!is.null(maxInformation) && length(maxInformation) > 0 && !all(is.na(maxInformation))) {
+            informationOverStages <- designPlan$.design$informationRates %*% t(maxInformation)
+            return(.getFisherInformationByStage(informationOverStages, stage))
+        }
+
+        return(NA_real_)
+    }
+
+    if (is(designPlan, "SimulationResultsCountData")) {
+        informationOverStages <- .getFisherInformationCountDataSimulation(designPlan)
+    } else {
+        informationOverStages <- .getFisherInformationCountDataPower(designPlan)
+    }
+
+    return(.getFisherInformationByStage(informationOverStages, stage))
+}
+
 #'
 #' @title
 #' Get Fisher Information From a Design Plan or Simulation Results
 #'
 #' @description
-#' Calculates the Fisher information at the first planned analysis stage for
-#' a design plan or simulation results object for means, rates, or survival endpoints.
+#' Calculates the Fisher information at a planned analysis stage for
+#' a design plan or simulation results object for means, rates, survival, or
+#' count data endpoints.
 #'
 #' @param designPlan A trial design plan or simulation results object as returned by functions such as
 #' \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}},
@@ -990,27 +1280,31 @@ getFutilityBounds <- function(
 #' \code{\link[=getPowerRates]{getPowerRates()}},
 #' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}},
 #' \code{\link[=getPowerSurvival]{getPowerSurvival()}},
+#' \code{\link[=getSampleSizeCounts]{getSampleSizeCounts()}},
+#' \code{\link[=getPowerCounts]{getPowerCounts()}},
 #' \code{\link[=getSimulationMeans]{getSimulationMeans()}},
 #' \code{\link[=getSimulationRates]{getSimulationRates()}},
-#' \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, or the
+#' \code{\link[=getSimulationSurvival]{getSimulationSurvival()}},
+#' \code{\link[=getSimulationCounts]{getSimulationCounts()}}, or the
 #' corresponding multi-arm simulation functions.
 #' @param stage Integer. The analysis stage for which the Fisher information is
 #'        requested. If \code{NA} (default), the first stage is used.
 #'
 #' @details
-#' The returned information is the information used at the first stage of the
-#' design plan or simulation setup. For group sequential designs, information at later stages can be
-#' obtained by multiplying this value by the ratio of the corresponding
-#' information rate to the first information rate.
+#' The returned information is the Fisher information used at the requested
+#' analysis stage of the design plan or simulation setup. If \code{stage = NA},
+#' the first analysis stage is used.
 #'
 #' For means, the information is based on the planned sample size, standard
 #' deviations, allocation ratio, and, if applicable, the mean-ratio null value.
 #' For rates, it is based on the planned sample size and the binomial variance
 #' under the corresponding planning assumptions. For survival endpoints, it is
-#' based on the planned number of events and the allocation ratio.
+#' based on the planned number of events and the allocation ratio. For count data,
+#' it is based on the planned exposure times, event rates, allocation ratio, and
+#' overdispersion of the negative binomial model.
 #'
 #' @return
-#' A numeric value, vector, or matrix containing the first-stage Fisher
+#' A numeric value, vector, or matrix containing the requested-stage Fisher
 #' information. A vector or matrix can be returned if the object contains
 #' several planning alternatives, arms, or sample size values. \code{NA_real_}
 #' is returned if the endpoint type is not supported by this helper.
@@ -1048,6 +1342,8 @@ getFisherInformation <- function(designPlan, stage = NA_integer_) {
         return(.getFisherInformationRates(designPlan, stage = stage))
     } else if (grepl("Survival", className)) {
         return(.getFisherInformationSurvival(designPlan, stage = stage))
+    } else if (grepl("CountData", className)) {
+        return(.getFisherInformationCountData(designPlan, stage = stage))
     }
 
     return(NA_real_)

@@ -258,7 +258,7 @@ getSimulationSurvival <- function(
         design = NULL,
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_SURVIVAL_DEFAULT
         pi1 = NA_real_,
         pi2 = NA_real_,
         lambda1 = NA_real_,
@@ -310,9 +310,12 @@ getSimulationSurvival <- function(
         design <- .resetPipeOperatorQueue(design)
     }
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+    directionUpper <- .assertIsValidDirectionUpper(
+        directionUpper,
         design,
-        objectType = "power", userFunctionCallEnabled = TRUE
+        objectType = "power", 
+        userFunctionCallEnabled = TRUE,
+        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
     )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
@@ -343,25 +346,10 @@ getSimulationSurvival <- function(
     .assertIsSingleLogical(longTimeSimulationAllowed, "longTimeSimulationAllowed")
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedEvents, parameterName = "plannedEvents")
-
-    if (!is.na(dropoutTime) && dropoutTime <= 0) {
-        stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0",
-            functionName = "getSimulationSurvival",
-            parameter = "dropoutTime", value = dropoutTime
-        )
-    }
-    if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
-        stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
-            functionName = "getSimulationSurvival",
-            parameter = "dropoutRate1", value = dropoutRate1
-        )
-    }
-    if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
-        stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
-            functionName = "getSimulationSurvival",
-            parameter = "dropoutRate2", value = dropoutRate2
-        )
-    }
+    .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
+    .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+    .assertIsInInterval(dropoutRate2, "dropoutRate2", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+    
     if (design$sided == 2) {
         stopIllegalArgument("Only one-sided case is implemented for the survival simulation design",
             functionName = "getSimulationSurvival"
@@ -637,7 +625,7 @@ getSimulationSurvival <- function(
         )
     }
 
-    .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
+    .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, C_DROP_OUT_RATE_1_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, C_DROP_OUT_RATE_2_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, C_DROP_OUT_TIME_DEFAULT)

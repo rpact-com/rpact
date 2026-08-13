@@ -4,7 +4,9 @@
 \alias{param_dropoutRate1}
 \title{Parameter Description: Dropout Rate (1)}
 \arguments{
-\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
+\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.
+For multi-arm simulations, this can be a vector of length equal to the number of active arms,
+specifying different drop-out rates for each active arm.}
 }
 \description{
 Parameter Description: Dropout Rate (1)

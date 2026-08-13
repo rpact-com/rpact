@@ -126,7 +126,9 @@ If accrual time and accrual intensity are specified, this will be calculated. Mu
 \item{maxNumberOfEvents}{\code{maxNumberOfEvents > 0} is the maximum number of events, it determines
 the power of the test and needs to be specified.}
 
-\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
+\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.
+For multi-arm simulations, this can be a vector of length equal to the number of active arms,
+specifying different drop-out rates for each active arm.}
 
 \item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
 

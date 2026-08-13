@@ -621,9 +621,12 @@ NULL
         .assertIsSingleLogical(accountForObservationTimes, "accountForObservationTimes", naAllowed = TRUE)
         .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
         .assertIsValidKappa(kappa)
-        directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        directionUpper <- .assertIsValidDirectionUpper(
+            directionUpper,
             design,
-            objectType = objectType, userFunctionCallEnabled = TRUE, default = NA
+            objectType = objectType, 
+            userFunctionCallEnabled = TRUE, 
+            default = NA
         )
 
         if (objectType == "power") {
@@ -633,19 +636,8 @@ NULL
             )
         }
 
-        if (!anyNA(pi1) && (any(pi1 <= 0) || any(pi1 >= 1))) {
-            stopArgumentOutOfBounds("event rate 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "pi1", value = pi1
-            )
-        }
-
-        if (!anyNA(pi2) && (any(pi2 <= 0) || any(pi2 >= 1))) {
-            stopArgumentOutOfBounds("event rate 'pi2' (", .arrayToString(pi2), ") is out of bounds (0; 1)",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "pi2", value = pi2
-            )
-        }
+        .assertIsInOpenInterval(pi1, "pi1", lower = 0, upper = 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
 
         if (design$sided == 2 && thetaH0 != 1) {
             stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
@@ -831,27 +823,9 @@ NULL
         .assertIsSingleNumber(dropoutRate1, "dropoutRate1")
         .assertIsSingleNumber(dropoutRate2, "dropoutRate2")
         .assertIsSingleNumber(dropoutTime, "dropoutTime")
-
-        if (!is.na(dropoutTime) && dropoutTime <= 0) {
-            stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "dropoutTime", value = dropoutTime
-            )
-        }
-
-        if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
-            stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "dropoutRate1", value = dropoutRate1
-            )
-        }
-
-        if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
-            stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "dropoutRate2", value = dropoutRate2
-            )
-        }
+        .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
+        .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+        .assertIsInInterval(dropoutRate2, "dropoutRate2", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
 
         if (!is.na(eventTime) && eventTime <= 0) {
             stopIllegalArgument("'eventTime' (", eventTime, ") must be > 0",
@@ -903,7 +877,7 @@ NULL
         }
     }
 
-    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT)
     if (objectType == "power") {
         .setValueAndParameterType(designPlan, "maxNumberOfEvents", maxNumberOfEvents, NA_real_)
         designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
@@ -1697,27 +1671,9 @@ getEventProbabilities <- function(
     allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(hazardRatio, "hazardRatio", naAllowed = TRUE)
-
-    if (!is.na(dropoutTime) && dropoutTime <= 0) {
-        stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0",
-            functionName = "getEventProbabilities",
-            parameter = "dropoutTime", value = dropoutTime
-        )
-    }
-
-    if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
-        stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
-            functionName = "getEventProbabilities",
-            parameter = "dropoutRate1", value = dropoutRate1
-        )
-    }
-
-    if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
-        stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
-            functionName = "getEventProbabilities",
-            parameter = "dropoutRate2", value = dropoutRate2
-        )
-    }
+    .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
+    .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+    .assertIsInInterval(dropoutRate2, "dropoutRate2", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
 
     accrualSetup <- getAccrualTime(
         accrualTime = accrualTime,
