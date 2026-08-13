@@ -2143,7 +2143,7 @@ saveOptions <- function() {
             pkgConfigDir <- .getEnvironmentVariable(
                 "RPACT_CONFIG_DIR_SAVE",
                 "rpact.config.dir.save",
-                default = "?$§",
+                default = "#?#",
                 type = "character"
             )
             if (!dir.exists(pkgConfigDir)) {
@@ -2239,7 +2239,7 @@ resetOptions <- function(persist = TRUE) {
             pkgConfigDir <- .getEnvironmentVariable(
                 "RPACT_CONFIG_DIR_LOAD",
                 "rpact.config.dir.load",
-                default = "?$§",
+                default = "#?#",
                 type = "character"
             )
             
