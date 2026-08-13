@@ -481,7 +481,7 @@ NULL
     if (length(design$userBetaSpending) < 2 || length(design$userBetaSpending) > C_KMAX_UPPER_BOUND) {
         stopArgumentLengthOutOfBounds(
             sprintf(
-                "length of 'userBetaSpending' (%s) is out of bounds [2; %s]", length(design$userBetaSpending),
+                "length of 'userBetaSpending' (%s) must be in [2; %s]", length(design$userBetaSpending),
                 C_KMAX_UPPER_BOUND
             ),
             parameter = "userBetaSpending", value = length(design$userBetaSpending), constraint = paste0(
@@ -530,7 +530,7 @@ NULL
     if (length(design$userAlphaSpending) < 1 || length(design$userAlphaSpending) > C_KMAX_UPPER_BOUND) {
         stopArgumentLengthOutOfBounds(
             sprintf(
-                "length of 'userAlphaSpending' (%s) is out of bounds [1; %s]",
+                "length of 'userAlphaSpending' (%s) must be in [1; %s]",
                 length(design$userAlphaSpending), C_KMAX_UPPER_BOUND
             ),
             parameter = "userAlphaSpending", value = length(design$userAlphaSpending),

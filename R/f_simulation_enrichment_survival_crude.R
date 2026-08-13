@@ -588,6 +588,9 @@ getSimulationEnrichmentSurvivalBasic <- function(
         calcEventsFunction = calcEventsFunction, # survival only
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
+        dropoutRate1 = 0,
+        dropoutRate2 = 0,
+        dropoutTime = 12,
         endpoint = "survival",
         simulationType = "testStatisticBased"
     )

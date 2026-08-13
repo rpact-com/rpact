@@ -292,13 +292,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     )
 
     .assertDesignParameterExists(design, "tolerance", C_DESIGN_TOLERANCE_DEFAULT)
-    if (design$tolerance < 1e-10 || design$tolerance > 1e-03) {
-        stopArgumentOutOfBounds("'tolerance' (", design$tolerance, ") out of bounds [1e-10; 1e-03]",
-            functionName = ".validateBaseParameters",
-            parameter = "tolerance",
-            value = design$tolerance
-        )
-    }
+    .assertIsInOpenInterval(design$tolerance, "tolerance", lower = 1e-10, upper = 1e-03)
 
     return(invisible(design))
 }

@@ -229,7 +229,7 @@ stopConflictingArguments <- function(
     )
 }
 
-stopArgumentOutOfBounds <- function(
+stopArgumentOutOfRange <- function(
         ...,
         parameter = NULL,
         value = NULL,
@@ -252,11 +252,11 @@ stopArgumentOutOfBounds <- function(
         relatedValue = relatedValue,
         lowerBound = lowerBound,
         upperBound = upperBound,
-        exceptionType = C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-        factoryKey = "rpact.error.factory.argument.out.of.bounds.condition",
-        code = "ARGUMENT_OUT_OF_BOUNDS",
+        exceptionType = C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_RANGE,
+        factoryKey = "rpact.error.factory.argument.out.of.range.condition",
+        code = "ARGUMENT_OUT_OF_RANGE",
         category = "invalid_user_input",
-        class = c("rpact_argument_out_of_bounds_error", "rpact_input_error"),
+        class = c("rpact_argument_out_of_range_error", "rpact_input_error"),
         call = call
     )
 }
@@ -288,11 +288,11 @@ stopArgumentLengthOutOfBounds <- function(
         upperBound = upperBound,
         expectedLength = expectedLength,
         actualLength = actualLength,
-        exceptionType = C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
-        factoryKey = "rpact.error.factory.argument.length.out.of.bounds.condition",
-        code = "ARGUMENT_LENGTH_OUT_OF_BOUNDS",
+        exceptionType = C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_RANGE,
+        factoryKey = "rpact.error.factory.argument.length.out.of.range.condition",
+        code = "ARGUMENT_LENGTH_OUT_OF_RANGE",
         category = "invalid_user_input",
-        class = c("rpact_argument_length_out_of_bounds_error", "rpact_input_error"),
+        class = c("rpact_argument_length_out_of_range_error", "rpact_input_error"),
         call = call
     )
 }

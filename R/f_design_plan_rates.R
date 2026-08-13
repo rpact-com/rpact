@@ -388,19 +388,8 @@ NULL
             )
         }
 
-        if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
-            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)",
-                functionName = ".createDesignPlanRates",
-                parameter = "pi1", value = pi1
-            )
-        }
-
-        if (thetaH0 >= 1 || thetaH0 <= 0) {
-            stopArgumentOutOfBounds("'thetaH0' (", thetaH0, ") is out of bounds (0; 1)",
-                functionName = ".createDesignPlanRates",
-                parameter = "thetaH0", value = thetaH0
-            )
-        }
+        .assertIsInClosedInterval(pi1, "pi1", lower = 0, upper = 1)
+        .assertIsInClosedInterval(thetaH0, "thetaH0", lower = 0, upper = 1)
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
             stopIllegalArgument("exact sample size calculation not available for two-sided testing",
@@ -445,21 +434,8 @@ NULL
             )
         }
 
-        if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
-            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") ",
-                "is out of bounds (0; 1)",
-                functionName = ".createDesignPlanRates",
-                parameter = "pi1", value = pi1
-            )
-        }
-
-        if (anyNA(pi2) || any(pi2 <= 0) || any(pi2 >= 1)) {
-            stopArgumentOutOfBounds("probability 'pi2' (", .arrayToString(pi2), ") ",
-                "is out of bounds (0; 1)",
-                functionName = ".createDesignPlanRates",
-                parameter = "pi2", value = pi2
-            )
-        }
+        .assertIsInClosedInterval(pi1, "pi1", lower = 0, upper = 1)
+        .assertIsInClosedInterval(pi2, "pi2", lower = 0, upper = 1)
 
         if (
             design$sided == 2 &&

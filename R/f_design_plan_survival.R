@@ -636,19 +636,8 @@ NULL
             )
         }
 
-        if (!anyNA(pi1) && (any(pi1 <= 0) || any(pi1 >= 1))) {
-            stopArgumentOutOfBounds("event rate 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "pi1", value = pi1
-            )
-        }
-
-        if (!anyNA(pi2) && (any(pi2 <= 0) || any(pi2 >= 1))) {
-            stopArgumentOutOfBounds("event rate 'pi2' (", .arrayToString(pi2), ") is out of bounds (0; 1)",
-                functionName = ".createDesignPlanSurvival",
-                parameter = "pi2", value = pi2
-            )
-        }
+        .assertIsInClosedInterval(pi1, "pi1", lower = 0, upper = 1, naAllowed = TRUE)
+        .assertIsInClosedInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
 
         if (design$sided == 2 && thetaH0 != 1) {
             stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
