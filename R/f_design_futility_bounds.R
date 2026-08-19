@@ -1123,8 +1123,8 @@ getFutilityBounds <- function(
         lambda1 = lambda1,
         lambda2 = lambda2,
         overdispersion = overdispersion,
-        recruit1 = timeUnderObservation1,
-        recruit2 = timeUnderObservation2
+        exposure1 = timeUnderObservation1,
+        exposure2 = timeUnderObservation2
     ))
 }
 
