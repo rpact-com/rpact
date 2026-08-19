@@ -971,6 +971,8 @@ getFutilityBounds <- function(
     if (is(designPlan, "SimulationResultsMultiArmRates")) {
         n1 <- nTotal # active arm
         n2 <- trunc(nTotal / allocationRatio) # common control arm TODO is truncation correct here?
+        # Daniel - I think we can keep n2 continuous here, as this will align
+        # better with the way we calculate otherwise in rpact
         pi1 <- designPlan$effectMatrix
         pi2 <- designPlan$piControl
         return(.getFisherInformationRatesTwoSample(pi1, pi2, n1, n2))
@@ -1081,6 +1083,8 @@ getFutilityBounds <- function(
     n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
     
     # TODO accrualTime can be a vector, but recruitment times are generated as if it was a single number
+    # Daniel - added assertion here accordingly, otherwise result will not be correct.
+    stopifnot(length(accrualTime) == 1, "accrualTime must be a single number")
     return(list(
         recruit1 = seq(0, accrualTime, length.out = n$n1), 
         recruit2 = seq(0, accrualTime, length.out = n$n2)
@@ -1450,6 +1454,9 @@ getFisherInformation <- function(designPlan, stage = NA_integer_) {
     futilityBounds <- futilityBounds[seq_len(nStages)]
 
     informationRates <- design$informationRates[seq_len(nStages)]
+    # TODO: Daniel's question: Should we instead use getFisherInformation() to get
+    # stage-specific information when count data is used? e.g. by using a wrapper for
+    # this calculation?
     stageInformation <- (informationRates / design$informationRates[1]) %*% t(fisherInformation)
     standardizedFutilityBounds <- matrix(futilityBounds, nrow = nStages, ncol = nParameters)
     if (.isTrialDesignPlanMeans(designPlan) && !designPlan$normalApproximation) {
