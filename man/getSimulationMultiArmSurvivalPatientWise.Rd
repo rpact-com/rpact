@@ -40,6 +40,7 @@ getSimulationMultiArmSurvivalPatientWise(
   conditionalPower = NA_real_,
   thetaH1 = NA_real_,
   maxNumberOfIterations = NA_integer_,
+  maxNumberOfRawDatasetsPerStage = 0,
   seed = NA_real_,
   calcEventsFunction = NULL,
   selectArmsFunction = NULL,
@@ -193,6 +194,11 @@ hazard ratios) as parameters under which it is calculated and the sample size re
 the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.}
 
 \item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
+
+\item{maxNumberOfRawDatasetsPerStage}{The maximum number of patient-level datasets
+to retain for each scenario and stopping stage. The default is \code{0}, which
+retains no patient-level data. Use \code{\link[=getRawData]{getRawData()}} to
+retrieve retained datasets.}
 
 \item{seed}{The seed to reproduce the simulation, default is a random seed.}
 

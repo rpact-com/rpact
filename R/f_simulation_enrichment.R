@@ -457,6 +457,12 @@ NULL
     } else if (endpoint == "survival") {
         simulationResults <- SimulationResultsEnrichmentSurvival$new(design, showStatistics = showStatistics)
         .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
+        simulationResults$simulationType <- ifelse(
+            identical(simulationType, "testStatisticBased"),
+            "testStatisticBased",
+            "patientWise"
+        )
+        simulationResults$.setParameterType("simulationType", C_PARAM_DERIVED)
     }
 
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)

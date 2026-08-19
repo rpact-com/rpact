@@ -1340,6 +1340,7 @@ SimulationResultsSurvival <- R6::R6Class(
 #' @template field_singleEventsPerArmAndStage
 #' @template field_singleEventsPerStage
 #' @template field_singleNumberOfEventsPerStage
+#' @template field_simulationType
 #' @template field_slope
 #' @template field_studyDuration
 #' @template field_successPerStage
@@ -1411,6 +1412,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         singleEventsPerArmAndStage = NULL,
         singleEventsPerStage = NULL, # only necessary for old simulation routine
         singleNumberOfEventsPerStage = NULL, # only necessary for old simulation routine
+        simulationType = NULL,
         slope = NULL,
         studyDuration = NULL,
         successCriterion = NULL,
@@ -1693,6 +1695,7 @@ SimulationResultsEnrichmentRates <- R6::R6Class(
 #' @template field_selectedPopulations
 #' @template field_selectPopulationsFunction
 #' @template field_singleNumberOfEventsPerStage
+#' @template field_simulationType
 #' @template field_stratifiedAnalysis
 #' @template field_studyDuration
 #' @template field_successCriterion
@@ -1754,6 +1757,7 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
         rValue = NULL,
         selectedPopulations = NULL,
         selectPopulationsFunction = NULL,
+        simulationType = NULL,
         stratifiedAnalysis = NULL,
         studyDuration = NULL,
         successCriterion = NULL,

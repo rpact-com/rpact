@@ -75,6 +75,7 @@ NULL
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
 #' @inheritParams param_showStatistics
+#' @inheritParams param_maxNumberOfRawDatasetsPerStage
 #' @inheritParams param_simulationType_multiarm_survival
 #' @param piControl The assumed probability in the control arm, default is \code{0.2}.
 #'
@@ -160,11 +161,15 @@ getSimulationMultiArmSurvival <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         maxNumberOfIterations = NA_integer_,
+        maxNumberOfRawDatasetsPerStage = 0,
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
         showStatistics = FALSE) {
     simulationType <- match.arg(simulationType)
+    maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
+        maxNumberOfRawDatasetsPerStage
+    )
 
     callArgs <- names(as.list(match.call(expand.dots = FALSE)))
     hasArg <- function(x) x %in% callArgs
@@ -178,7 +183,7 @@ getSimulationMultiArmSurvival <- function(
         ),
         hasArg,
         FALSE
-    ))
+    )) || maxNumberOfRawDatasetsPerStage > 0
 
     if (simulationType == "auto") {
         if (usesBasicOnlyArgs && usesPatientWiseOnlyArgs) {
@@ -200,6 +205,16 @@ getSimulationMultiArmSurvival <- function(
     }
 
     if (simulationType == "testStatisticBased") {
+        if (maxNumberOfRawDatasetsPerStage > 0) {
+            stopIllegalArgument(
+                "raw data are only available for patient-wise simulations",
+                functionName = "getSimulationMultiArmSurvival",
+                parameter = "maxNumberOfRawDatasetsPerStage",
+                relatedParameter = "simulationType",
+                value = maxNumberOfRawDatasetsPerStage,
+                relatedValue = simulationType
+            )
+        }
         if (usesPatientWiseOnlyArgs) {
             stopIllegalArgument(
                 "patient-wise simulation arguments cannot be specified ",
@@ -295,6 +310,7 @@ getSimulationMultiArmSurvival <- function(
             conditionalPower = conditionalPower,
             thetaH1 = thetaH1,
             maxNumberOfIterations = maxNumberOfIterations,
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
             seed = seed,
             calcEventsFunction = calcEventsFunction,
             selectArmsFunction = selectArmsFunction,
@@ -353,6 +369,7 @@ getSimulationMultiArmSurvival <- function(
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
 #' @inheritParams param_showStatistics
+#' @inheritParams param_maxNumberOfRawDatasetsPerStage
 #'
 #' @details
 #' At given design the function simulates the analysis times, power, stopping
@@ -427,6 +444,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         maxNumberOfIterations = NA_integer_,
+        maxNumberOfRawDatasetsPerStage = 0,
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
@@ -462,6 +480,9 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     .assertIsValidMaxNumberOfSubjects(
         maxNumberOfSubjects,
         naAllowed = TRUE
+    )
+    maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
+        maxNumberOfRawDatasetsPerStage
     )
 
     if (isFALSE(cppEnabled)) {
@@ -666,7 +687,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             },
             successCriterion = successCriterion,
             gMax = gMax,
-            kMax = kMax
+            kMax = kMax,
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage
         )
     } else {
         .performSimulationMultiArmSurvivalLoop(
@@ -706,7 +728,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             },
             successCriterion = successCriterion,
             gMax = gMax,
-            kMax = kMax
+            kMax = kMax,
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage
         )
     }
 
@@ -798,6 +821,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     }
 
     simulationResults$.data <- loopResult$data
+    simulationResults$.rawData <- .createSimulationSurvivalRawData(loopResult$rawData)
 
     return(simulationResults)
 }

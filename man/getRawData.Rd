@@ -7,7 +7,10 @@
 getRawData(x, aggregate = FALSE)
 }
 \arguments{
-\item{x}{A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.}
+\item{x}{A survival \code{\link{SimulationResults}} object created by
+\code{\link[=getSimulationSurvival]{getSimulationSurvival()}},
+\code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}, or
+\code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurvival()}}.}
 
 \item{aggregate}{Logical. If \code{TRUE} the raw data will be aggregated similar to
 the result of \code{\link[=getData]{getData()}}, default is \code{FALSE}.}
@@ -19,13 +22,12 @@ Returns a \code{\link[base]{data.frame}}.
 Returns the raw survival data which was generated for simulation.
 }
 \details{
-This function works only if \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} was called with a \cr
-\code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}).
+This function works only if the simulation function was called with
+\code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}). Multi-arm and
+enrichment simulations must use a patient-wise simulation type.
 
 This function can be used to get the simulated raw data from a simulation results
-object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
-Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
-must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
+object obtained from an ordinary, multi-arm, or enrichment survival simulation.
 The data frame contains the following columns:
 \enumerate{
 \item \code{iterationNumber}: The number of the simulation iteration.
@@ -50,6 +52,10 @@ The data frame contains the following columns:
 \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
 \item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
 }
+Multi-arm and enrichment raw data additionally contain a stable integer \code{scenario}
+identifier. Enrichment raw data also contain the subject's \code{subGroup}. For these
+simulation types, \code{aggregate = TRUE} aggregates multi-arm data by scenario and
+iteration and enrichment data by scenario, iteration, and subgroup.
 }
 \examples{
 \dontrun{

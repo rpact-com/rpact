@@ -16,6 +16,7 @@
 
 C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     iterations = "Iterations",
+    simulationType = "Simulation type",
     seed = "Seed",
     groups = "Treatment groups",
     stages = "Stages",

@@ -997,6 +997,15 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Maximum Number of Raw Datasets Per Stage
+#' @param maxNumberOfRawDatasetsPerStage The maximum number of patient-level datasets
+#'     to retain for each scenario and stopping stage. The default is \code{0}, which
+#'     retains no patient-level data. Use \code{\link[=getRawData]{getRawData()}} to
+#'     retrieve retained datasets.
+#' @name param_maxNumberOfRawDatasetsPerStage
+#' @keywords internal
+NULL
+
 #' Parameter Description: Two-sided Power
 #' @param twoSidedPower For two-sided testing, if \code{twoSidedPower = TRUE} is specified
 #'     the sample size calculation is performed by considering both tails of the distribution.
