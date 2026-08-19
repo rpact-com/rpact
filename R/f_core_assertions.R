@@ -2291,7 +2291,7 @@ NULL
     invisible(piTreatmentRange)
 }
 
-.assertIsValidPi <- function(piValue, piName) {
+.assertIsValidPi <- function(piValue, piName, matrixAllowed = FALSE) {
     if (is.null(piValue) || length(piValue) == 0) {
         stopIllegalArgument(.pQuote(piName), " must be a valid numeric value",
             functionName = ".assertIsValidPi",
@@ -2303,8 +2303,9 @@ NULL
         return(invisible())
     }
 
-    .assertIsNumericVector(piValue, piName)
-    .assertIsInOpenInterval(piValue, piName, lower = -1e-16, upper = 1 + 1e-16)
+    .assertIsNumericVector(piValue, piName, matrixAllowed = matrixAllowed)
+    .assertIsInOpenInterval(piValue, piName, 
+        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed)
 }
 
 .assertIsValidPi1 <- function(pi1, stageResults = NULL, stage = NULL) {

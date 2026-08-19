@@ -977,8 +977,9 @@ getLambdaByPi <- function(
         piValue,
         eventTime = 12,
         # C_EVENT_TIME_DEFAULT
-        kappa = 1) {
-    .assertIsValidPi(piValue, "pi")
+        kappa = 1, 
+        matrixAllowed = FALSE) { # TODO implement
+    .assertIsValidPi(piValue, "pi") # TODO allow matrix input for piValue; check print ouput
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
