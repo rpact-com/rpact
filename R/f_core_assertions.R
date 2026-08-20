@@ -2306,9 +2306,8 @@ NULL
     }
 
     .assertIsNumericVector(piValue, piName, matrixAllowed = matrixAllowed)
-    .assertIsInOpenInterval(piValue, piName,
-        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed
-    )
+    .assertIsInOpenInterval(piValue, piName, 
+        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed)
 }
 
 .assertIsValidPi1 <- function(pi1, stageResults = NULL, stage = NULL) {
