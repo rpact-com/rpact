@@ -1081,9 +1081,17 @@ getFutilityBounds <- function(
     n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
     
     # TODO accrualTime can be a vector, but recruitment times are generated as if it was a single number
+    # old solution:
+    #    return(list(
+    #        recruit1 = seq(0, accrualTime, length.out = n$n1), 
+    #        recruit2 = seq(0, accrualTime, length.out = n$n2)
+    #    ))
+    # @Gernot: check new solution:
+    
+    accrualTimeMax <- max(accrualTime)
     return(list(
-        recruit1 = seq(0, accrualTime, length.out = n$n1), 
-        recruit2 = seq(0, accrualTime, length.out = n$n2)
+        recruit1 = seq(0, accrualTimeMax, length.out = n$n1), 
+        recruit2 = seq(0, accrualTimeMax, length.out = n$n2)
     ))
 }
 
