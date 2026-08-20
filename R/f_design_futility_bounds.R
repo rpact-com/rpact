@@ -970,7 +970,7 @@ getFutilityBounds <- function(
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmRates")) {
         n1 <- nTotal # active arm
-        n2 <- trunc(nTotal / allocationRatio) # common control arm TODO is truncation correct here?
+        n2 <- trunc(nTotal / allocationRatio) # common control arm TODO @Gernot: is truncation correct here?
         pi1 <- designPlan$effectMatrix
         pi2 <- designPlan$piControl
         return(.getFisherInformationRatesTwoSample(pi1, pi2, n1, n2))
@@ -1080,13 +1080,13 @@ getFutilityBounds <- function(
 
     n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
     
-    # TODO accrualTime can be a vector, but recruitment times are generated as if it was a single number
+    # accrualTime can be a vector, but recruitment times are generated as if it was a single number
     # old solution:
     #    return(list(
     #        recruit1 = seq(0, accrualTime, length.out = n$n1), 
     #        recruit2 = seq(0, accrualTime, length.out = n$n2)
     #    ))
-    # @Gernot: check new solution:
+    # TODO @Gernot: check new solution:
     
     accrualTimeMax <- max(accrualTime)
     return(list(

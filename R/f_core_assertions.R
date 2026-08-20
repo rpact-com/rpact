@@ -393,7 +393,7 @@ NULL
     if (naAllowed && all(is.na(x))) {
         return(invisible())
     }
-    
+
     functionName <- paste(deparse(sys.call()), collapse = "")
     .assertIsNumericVector(x, xName, naAllowed = naAllowed, matrixAllowed = matrixAllowed)
     .assertIsSingleLogical(lowerIncluded, "lowerIncluded")
@@ -1292,12 +1292,14 @@ NULL
     .assertIsInOpenInterval(kappa, "kappa", lower = 0, upper = NULL)
 }
 
-.assertIsValidLambda <- function(lambda, lambdaNumber = 0) {
+.assertIsValidLambda <- function(lambda, lambdaNumber = 0, matrixAllowed = FALSE) {
     argumentName <- "lambda"
     if (lambdaNumber >= 1) {
         argumentName <- paste0("lambda", lambdaNumber)
     }
-    lambda <- .assertIsNumericVector(lambda, argumentName, naAllowed = TRUE)
+    lambda <- .assertIsNumericVector(lambda, argumentName,
+        naAllowed = TRUE, matrixAllowed = matrixAllowed
+    )
     if (all(is.na(lambda))) {
         return(invisible(lambda))
     }
@@ -2304,8 +2306,9 @@ NULL
     }
 
     .assertIsNumericVector(piValue, piName, matrixAllowed = matrixAllowed)
-    .assertIsInOpenInterval(piValue, piName, 
-        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed)
+    .assertIsInOpenInterval(piValue, piName,
+        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed
+    )
 }
 
 .assertIsValidPi1 <- function(pi1, stageResults = NULL, stage = NULL) {
@@ -2575,8 +2578,8 @@ NULL
     return(invisible(hazardRatio))
 }
 
-.assertIsValidHazardRatioVector <- function(hazardRatio) {
-    hazardRatio <- .assertIsNumericVector(hazardRatio, "hazardRatio")
+.assertIsValidHazardRatioVector <- function(hazardRatio, matrixAllowed = FALSE) {
+    hazardRatio <- .assertIsNumericVector(hazardRatio, "hazardRatio", matrixAllowed = matrixAllowed)
     if (any(hazardRatio <= 0)) {
         if (length(hazardRatio) == 1) {
             stopIllegalArgument("'hazardRatio' (", hazardRatio, ") must be > 0",
