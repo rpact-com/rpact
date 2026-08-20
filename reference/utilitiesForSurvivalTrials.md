@@ -6,7 +6,7 @@ each other.
 ## Usage
 
 ``` r
-getLambdaByPi(piValue, eventTime = 12, kappa = 1)
+getLambdaByPi(piValue, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
 getLambdaByMedian(median, kappa = 1)
 
