@@ -1168,7 +1168,7 @@ plot.TrialDesignSet <- function(
     .assertIsSingleCharacter(palette, "palette", naAllowed = TRUE)
     theta <- .assertIsValidThetaRange(thetaRange = theta)
     .assertIsSingleNumber(nMax, "nMax", naAllowed = TRUE)
-    .assertIsInClosedInterval(nMax, "nMax", lower = 1L, upper = 1e10)
+    .assertIsInClosedInterval(nMax, "nMax", lower = 1L, upper = 1e10, naAllowed = TRUE)
     .assertIsSingleLogical(plotPointsEnabled, "plotPointsEnabled", naAllowed = TRUE)
     .assertIsValidLegendPosition(legendPosition)
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)

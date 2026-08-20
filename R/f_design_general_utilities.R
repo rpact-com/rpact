@@ -960,6 +960,7 @@ rpwexp <- function(n, ..., s = NA_real_, lambda = NA_real_, kappa = 1) {
 #' @param piValue,pi1,pi2,lambda,lambda1,lambda2,median,median1,median2 Value that shall be converted.
 #' @inheritParams param_eventTime
 #' @inheritParams param_kappa
+#' @param matrixAllowed Logical flag indicating whether a matrix is allowed as input, default is `FALSE`.
 #'
 #' @details
 #' Can be used, e.g., to convert pi, median, or lambda values into pi, median, lambda, or hazard ratio values, e.g, for usage in
@@ -975,11 +976,10 @@ NULL
 #' @export
 getLambdaByPi <- function(
         piValue,
-        eventTime = 12,
-        # C_EVENT_TIME_DEFAULT
-        kappa = 1, 
-        matrixAllowed = FALSE) { # TODO implement
-    .assertIsValidPi(piValue, "pi") # TODO allow matrix input for piValue; check print ouput
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
+        kappa = 1,
+        matrixAllowed = FALSE) { 
+    .assertIsValidPi(piValue, "pi", matrixAllowed = matrixAllowed)
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
@@ -999,8 +999,11 @@ getLambdaByPi <- function(
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getLambdaByMedian <- function(median, kappa = 1) {
-    median <- .assertIsNumericVector(median, "median")
+getLambdaByMedian <- function(
+        median,
+        kappa = 1,
+        matrixAllowed = FALSE) {
+    median <- .assertIsNumericVector(median, "median", matrixAllowed = matrixAllowed)
     .assertIsValidKappa(kappa)
     return(log(2)^(1 / kappa) / median)
 }
@@ -1031,42 +1034,54 @@ getLambdaByMedian <- function(median, kappa = 1) {
 getHazardRatioByPi <- function(
         pi1,
         pi2,
-        eventTime = 12,
-        # C_EVENT_TIME_DEFAULT
-        kappa = 1) {
-    .assertIsValidPi(pi1, "pi1")
-    .assertIsValidPi(pi2, "pi2")
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
+        kappa = 1,
+        matrixAllowed = FALSE) {
+    .assertIsValidPi(pi1, "pi1", matrixAllowed = matrixAllowed)
+    .assertIsValidPi(pi2, "pi2", matrixAllowed = matrixAllowed)
     .assertHasCompatibleLength(pi1, pi2, "pi1", "pi2")
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
-    return(getLambdaByPi(pi1, eventTime, kappa) / getLambdaByPi(pi2, eventTime, kappa))
+    return(getLambdaByPi(pi1, eventTime, kappa, matrixAllowed = matrixAllowed) / 
+            getLambdaByPi(pi2, eventTime, kappa, matrixAllowed = matrixAllowed))
 }
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getHazardRatioByLambda <- function(lambda1, lambda2) {
-    lambda1 <- .assertIsValidLambda(lambda1, 1)
-    lambda2 <- .assertIsValidLambda(lambda2, 2)
+getHazardRatioByLambda <- function(
+        lambda1,
+        lambda2,
+        matrixAllowed = FALSE) {
+    lambda1 <- .assertIsValidLambda(lambda1, 1, matrixAllowed = matrixAllowed)
+    lambda2 <- .assertIsValidLambda(lambda2, 2, matrixAllowed = matrixAllowed)
     .assertHasCompatibleLength(lambda1, lambda2, "lambda1", "lambda2")
     return(lambda1 / lambda2)
 }
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getHazardRatioByMedian <- function(median1, median2, kappa = 1) {
-    median1 <- .assertIsNumericVector(median1, "median1")
-    median2 <- .assertIsNumericVector(median2, "median2")
+getHazardRatioByMedian <- function(
+        median1,
+        median2,
+        kappa = 1,
+        matrixAllowed = FALSE) {
+    median1 <- .assertIsNumericVector(median1, "median1", matrixAllowed = matrixAllowed)
+    median2 <- .assertIsNumericVector(median2, "median2", matrixAllowed = matrixAllowed)
     .assertHasCompatibleLength(median1, median2, "median1", "median2")
-    return(getLambdaByMedian(median1, kappa = kappa) / getLambdaByMedian(median2, kappa = kappa))
+    return(getLambdaByMedian(median1, kappa = kappa, matrixAllowed = matrixAllowed) / 
+            getLambdaByMedian(median2, kappa = kappa, matrixAllowed = matrixAllowed))
 }
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 #' @keywords internal
-getLambda1ByLambda2AndHazardRatio <- function(lambda2, hazardRatio) {
-    lambda2 <- .assertIsValidLambda(lambda2, 2)
-    .assertIsValidHazardRatioVector(hazardRatio)
+getLambda1ByLambda2AndHazardRatio <- function(
+        lambda2,
+        hazardRatio,
+        matrixAllowed = FALSE) {
+    lambda2 <- .assertIsValidLambda(lambda2, 2, matrixAllowed = matrixAllowed)
+    .assertIsValidHazardRatioVector(hazardRatio, matrixAllowed = matrixAllowed)
     .assertHasCompatibleLength(lambda2, hazardRatio, "lambda2", "hazardRatio")
     return(lambda2 * hazardRatio)
 }
@@ -1074,9 +1089,12 @@ getLambda1ByLambda2AndHazardRatio <- function(lambda2, hazardRatio) {
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 #' @keywords internal
-getLambda2ByLambda1AndHazardRatio <- function(lambda1, hazardRatio) {
-    lambda1 <- .assertIsValidLambda(lambda1, 1)
-    .assertIsValidHazardRatioVector(hazardRatio)
+getLambda2ByLambda1AndHazardRatio <- function(
+        lambda1,
+        hazardRatio,
+        matrixAllowed = FALSE) {
+    lambda1 <- .assertIsValidLambda(lambda1, 1, matrixAllowed = matrixAllowed)
+    .assertIsValidHazardRatioVector(hazardRatio, matrixAllowed = matrixAllowed)
     .assertHasCompatibleLength(lambda1, hazardRatio, "lambda1", "hazardRatio")
     return(lambda1 / hazardRatio)
 }
@@ -1084,26 +1102,36 @@ getLambda2ByLambda1AndHazardRatio <- function(lambda1, hazardRatio) {
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 #' @keywords internal
-getPi1ByPi2AndHazardRatio <- function(pi2, hazardRatio, eventTime = 12, kappa = 1) {
-    .assertIsValidPi(pi2, "pi2")
-    .assertIsValidHazardRatioVector(hazardRatio)
+getPi1ByPi2AndHazardRatio <- function(
+        pi2,
+        hazardRatio,
+        eventTime = 12,
+        kappa = 1,
+        matrixAllowed = FALSE) {
+    .assertIsValidPi(pi2, "pi2", matrixAllowed = matrixAllowed)
+    .assertIsValidHazardRatioVector(hazardRatio, matrixAllowed = matrixAllowed)
     .assertIsValidKappa(kappa)
-    lambda2 <- getLambdaByPi(pi2, eventTime, kappa = kappa)
-    lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
-    pi1 <- getPiByLambda(lambda1, eventTime, kappa = kappa)
+    lambda2 <- getLambdaByPi(pi2, eventTime, kappa = kappa, matrixAllowed = matrixAllowed)
+    lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio, matrixAllowed = matrixAllowed)
+    pi1 <- getPiByLambda(lambda1, eventTime, kappa = kappa, matrixAllowed = matrixAllowed)
     return(pi1)
 }
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 #' @keywords internal
-getPi2ByPi1AndHazardRatio <- function(pi1, hazardRatio, eventTime = 12, kappa = 1) {
-    .assertIsValidPi(pi1, "pi1")
-    .assertIsValidHazardRatioVector(hazardRatio)
+getPi2ByPi1AndHazardRatio <- function(
+        pi1,
+        hazardRatio,
+        eventTime = 12,
+        kappa = 1,
+        matrixAllowed = FALSE) {
+    .assertIsValidPi(pi1, "pi1", matrixAllowed = matrixAllowed)
+    .assertIsValidHazardRatioVector(hazardRatio, matrixAllowed = matrixAllowed)
     .assertIsValidKappa(kappa)
-    lambda1 <- getLambdaByPi(pi1, eventTime, kappa = kappa)
-    lambda2 <- getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio)
-    pi2 <- getPiByLambda(lambda2, eventTime, kappa = kappa)
+    lambda1 <- getLambdaByPi(pi1, eventTime, kappa = kappa, matrixAllowed = matrixAllowed)
+    lambda2 <- getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio, matrixAllowed = matrixAllowed)
+    pi2 <- getPiByLambda(lambda2, eventTime, kappa = kappa, matrixAllowed = matrixAllowed)
     return(pi2)
 }
 
@@ -1111,10 +1139,10 @@ getPi2ByPi1AndHazardRatio <- function(pi1, hazardRatio, eventTime = 12, kappa = 
 #' @export
 getPiByLambda <- function(
         lambda,
-        eventTime = 12,
-        # C_EVENT_TIME_DEFAULT
-        kappa = 1) {
-    lambda <- .assertIsValidLambda(lambda)
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
+        kappa = 1,
+        matrixAllowed = FALSE) {
+    lambda <- .assertIsValidLambda(lambda, matrixAllowed = matrixAllowed)
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
@@ -1133,10 +1161,10 @@ getPiByLambda <- function(
 #' @export
 getPiByMedian <- function(
         median,
-        eventTime = 12,
-        # C_EVENT_TIME_DEFAULT
-        kappa = 1) {
-    median <- .assertIsNumericVector(median, "median")
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
+        kappa = 1,
+        matrixAllowed = FALSE) {
+    median <- .assertIsNumericVector(median, "median", matrixAllowed = matrixAllowed)
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
@@ -1145,8 +1173,11 @@ getPiByMedian <- function(
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getMedianByLambda <- function(lambda, kappa = 1) {
-    lambda <- .assertIsValidLambda(lambda)
+getMedianByLambda <- function(
+        lambda,
+        kappa = 1,
+        matrixAllowed = FALSE) {
+    lambda <- .assertIsValidLambda(lambda, matrixAllowed = matrixAllowed)
     .assertIsValidKappa(kappa)
     return(log(2)^(1 / kappa) / lambda)
 }
@@ -1155,14 +1186,14 @@ getMedianByLambda <- function(lambda, kappa = 1) {
 #' @export
 getMedianByPi <- function(
         piValue,
-        eventTime = 12,
-        # C_EVENT_TIME_DEFAULT
-        kappa = 1) {
-    .assertIsValidPi(piValue, "piValue")
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
+        kappa = 1,
+        matrixAllowed = FALSE) {
+    .assertIsValidPi(piValue, "piValue", matrixAllowed = matrixAllowed)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
     .assertIsValidKappa(kappa)
-    getMedianByLambda(getLambdaByPi(piValue, eventTime, kappa), kappa)
+    getMedianByLambda(getLambdaByPi(piValue, eventTime, kappa, matrixAllowed = matrixAllowed), kappa)
 }
 
 .convertStageWiseToOverallValuesInner <- function(valuesPerStage) {
