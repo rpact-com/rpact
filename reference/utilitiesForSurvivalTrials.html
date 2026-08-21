@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9314</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9315</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,29 +44,41 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getLambdaByPi</span><span class="op">(</span><span class="va">piValue</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getLambdaByMedian</span><span class="op">(</span><span class="va">median</span>, kappa <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">getLambdaByMedian</span><span class="op">(</span><span class="va">median</span>, kappa <span class="op">=</span> <span class="fl">1</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getHazardRatioByPi</span><span class="op">(</span><span class="va">pi1</span>, <span class="va">pi2</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">getHazardRatioByPi</span><span class="op">(</span><span class="va">pi1</span>, <span class="va">pi2</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getHazardRatioByLambda</span><span class="op">(</span><span class="va">lambda1</span>, <span class="va">lambda2</span><span class="op">)</span></span>
+<span><span class="fu">getHazardRatioByLambda</span><span class="op">(</span><span class="va">lambda1</span>, <span class="va">lambda2</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getHazardRatioByMedian</span><span class="op">(</span><span class="va">median1</span>, <span class="va">median2</span>, kappa <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">getHazardRatioByMedian</span><span class="op">(</span><span class="va">median1</span>, <span class="va">median2</span>, kappa <span class="op">=</span> <span class="fl">1</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getLambda1ByLambda2AndHazardRatio</span><span class="op">(</span><span class="va">lambda2</span>, <span class="va">hazardRatio</span><span class="op">)</span></span>
+<span><span class="fu">getLambda1ByLambda2AndHazardRatio</span><span class="op">(</span><span class="va">lambda2</span>, <span class="va">hazardRatio</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getLambda2ByLambda1AndHazardRatio</span><span class="op">(</span><span class="va">lambda1</span>, <span class="va">hazardRatio</span><span class="op">)</span></span>
+<span><span class="fu">getLambda2ByLambda1AndHazardRatio</span><span class="op">(</span><span class="va">lambda1</span>, <span class="va">hazardRatio</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getPi1ByPi2AndHazardRatio</span><span class="op">(</span><span class="va">pi2</span>, <span class="va">hazardRatio</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">getPi1ByPi2AndHazardRatio</span><span class="op">(</span></span>
+<span>  <span class="va">pi2</span>,</span>
+<span>  <span class="va">hazardRatio</span>,</span>
+<span>  eventTime <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  kappa <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getPi2ByPi1AndHazardRatio</span><span class="op">(</span><span class="va">pi1</span>, <span class="va">hazardRatio</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">getPi2ByPi1AndHazardRatio</span><span class="op">(</span></span>
+<span>  <span class="va">pi1</span>,</span>
+<span>  <span class="va">hazardRatio</span>,</span>
+<span>  eventTime <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  kappa <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getPiByLambda</span><span class="op">(</span><span class="va">lambda</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">getPiByLambda</span><span class="op">(</span><span class="va">lambda</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getPiByMedian</span><span class="op">(</span><span class="va">median</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">getPiByMedian</span><span class="op">(</span><span class="va">median</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getMedianByLambda</span><span class="op">(</span><span class="va">lambda</span>, kappa <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">getMedianByLambda</span><span class="op">(</span><span class="va">lambda</span>, kappa <span class="op">=</span> <span class="fl">1</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getMedianByPi</span><span class="op">(</span><span class="va">piValue</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">getMedianByPi</span><span class="op">(</span><span class="va">piValue</span>, eventTime <span class="op">=</span> <span class="fl">12</span>, kappa <span class="op">=</span> <span class="fl">1</span>, matrixAllowed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -93,6 +105,10 @@ of the <code>stats</code> package, i.e., the scale parameter is <code>1 / 'hazar
 For example,
 <code>getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)</code>
 and <code>pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)</code> provide the same result.</p></dd>
+
+
+<dt id="arg-matrixallowed">matrixAllowed<a class="anchor" aria-label="anchor" href="#arg-matrixallowed"></a></dt>
+<dd><p>Logical flag indicating whether a matrix is allowed as input, default is <code>FALSE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

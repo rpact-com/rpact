@@ -8,29 +8,41 @@ each other.
 ``` r
 getLambdaByPi(piValue, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getLambdaByMedian(median, kappa = 1)
+getLambdaByMedian(median, kappa = 1, matrixAllowed = FALSE)
 
-getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1)
+getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getHazardRatioByLambda(lambda1, lambda2)
+getHazardRatioByLambda(lambda1, lambda2, matrixAllowed = FALSE)
 
-getHazardRatioByMedian(median1, median2, kappa = 1)
+getHazardRatioByMedian(median1, median2, kappa = 1, matrixAllowed = FALSE)
 
-getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
+getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio, matrixAllowed = FALSE)
 
-getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio)
+getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio, matrixAllowed = FALSE)
 
-getPi1ByPi2AndHazardRatio(pi2, hazardRatio, eventTime = 12, kappa = 1)
+getPi1ByPi2AndHazardRatio(
+  pi2,
+  hazardRatio,
+  eventTime = 12,
+  kappa = 1,
+  matrixAllowed = FALSE
+)
 
-getPi2ByPi1AndHazardRatio(pi1, hazardRatio, eventTime = 12, kappa = 1)
+getPi2ByPi1AndHazardRatio(
+  pi1,
+  hazardRatio,
+  eventTime = 12,
+  kappa = 1,
+  matrixAllowed = FALSE
+)
 
-getPiByLambda(lambda, eventTime = 12, kappa = 1)
+getPiByLambda(lambda, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getPiByMedian(median, eventTime = 12, kappa = 1)
+getPiByMedian(median, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getMedianByLambda(lambda, kappa = 1)
+getMedianByLambda(lambda, kappa = 1, matrixAllowed = FALSE)
 
-getMedianByPi(piValue, eventTime = 12, kappa = 1)
+getMedianByPi(piValue, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 ```
 
 ## Arguments
@@ -59,6 +71,11 @@ getMedianByPi(piValue, eventTime = 12, kappa = 1)
   `getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)`
   and `pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)` provide the
   same result.
+
+- matrixAllowed:
+
+  Logical flag indicating whether a matrix is allowed as input, default
+  is `FALSE`.
 
 ## Value
 
