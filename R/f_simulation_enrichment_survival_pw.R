@@ -170,8 +170,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         naAllowed = TRUE
     )
     maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
-        maxNumberOfRawDatasetsPerStage
-    )
+        maxNumberOfRawDatasetsPerStage)
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
@@ -561,8 +560,7 @@ getSimulationEnrichmentSurvival <- function(
         showStatistics = FALSE) {
     simulationType <- match.arg(simulationType)
     maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
-        maxNumberOfRawDatasetsPerStage
-    )
+        maxNumberOfRawDatasetsPerStage)
 
     callArgs <- names(as.list(match.call(expand.dots = FALSE)))
     hasArg <- function(arg) {
@@ -601,8 +599,8 @@ getSimulationEnrichmentSurvival <- function(
                 "raw data are only available for patient-wise simulations",
                 functionName = "getSimulationEnrichmentSurvival",
                 parameter = "maxNumberOfRawDatasetsPerStage",
-                relatedParameter = "simulationType",
                 value = maxNumberOfRawDatasetsPerStage,
+                relatedParameter = "simulationType",
                 relatedValue = simulationType
             )
         }

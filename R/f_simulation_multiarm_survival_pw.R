@@ -168,8 +168,7 @@ getSimulationMultiArmSurvival <- function(
         showStatistics = FALSE) {
     simulationType <- match.arg(simulationType)
     maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
-        maxNumberOfRawDatasetsPerStage
-    )
+        maxNumberOfRawDatasetsPerStage)
 
     callArgs <- names(as.list(match.call(expand.dots = FALSE)))
     hasArg <- function(x) x %in% callArgs
@@ -210,8 +209,8 @@ getSimulationMultiArmSurvival <- function(
                 "raw data are only available for patient-wise simulations",
                 functionName = "getSimulationMultiArmSurvival",
                 parameter = "maxNumberOfRawDatasetsPerStage",
-                relatedParameter = "simulationType",
                 value = maxNumberOfRawDatasetsPerStage,
+                relatedParameter = "simulationType",
                 relatedValue = simulationType
             )
         }
@@ -220,7 +219,8 @@ getSimulationMultiArmSurvival <- function(
                 "patient-wise simulation arguments cannot be specified ",
                 "if 'simulationType' = \"testStatisticBased\"",
                 functionName = "getSimulationMultiArmSurvival",
-                parameter = "simulationType", value = simulationType
+                parameter = "simulationType", 
+                value = simulationType
             )
         }
 
@@ -482,8 +482,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         naAllowed = TRUE
     )
     maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
-        maxNumberOfRawDatasetsPerStage
-    )
+        maxNumberOfRawDatasetsPerStage)
 
     if (isFALSE(cppEnabled)) {
         message(
