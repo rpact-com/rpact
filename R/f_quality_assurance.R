@@ -540,12 +540,10 @@ NULL
         {
             result <- suppressWarnings(base::readLines(sprintf(
                 paste0(
-                    "https://rpact-",
+                    paste0(c("h", "t", "t", "p", "s", ":", "//"), collapse = ""),
                     paste0(c(
                         "metadata",
-                        "share",
-                        "connect",
-                        "posit",
+                        "rpact",
                         "cloud"
                     ), collapse = "."),
                     "?token=%s&secret=%s&action=%s"
