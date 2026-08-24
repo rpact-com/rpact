@@ -1110,8 +1110,8 @@ getRawData <- function(x, aggregate = FALSE) {
                 "'maxNumberOfRawDatasetsPerStage' > 0",
                 functionName = "getRawData",
                 parameter = "simulationType",
-                relatedParameter = "maxNumberOfRawDatasetsPerStage",
-                value = x$simulationType
+                value = x$simulationType,
+                relatedParameter = "maxNumberOfRawDatasetsPerStage"
             )
         }
         simulationFunction <- if (inherits(x, "SimulationResultsMultiArmSurvival")) {
@@ -1137,9 +1137,11 @@ getRawData <- function(x, aggregate = FALSE) {
     if (inherits(x, "SimulationResultsMultiArmSurvival")) {
         return(.getAggregatedDataMultiArmSurvival(rawData))
     }
+    
     if (inherits(x, "SimulationResultsEnrichmentSurvival")) {
         return(.getAggregatedDataEnrichmentSurvival(rawData))
     }
+    
     return(.getAggregatedData(rawData))
 }
 
