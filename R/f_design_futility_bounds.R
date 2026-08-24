@@ -1127,8 +1127,8 @@ getFutilityBounds <- function(
         lambda1 = lambda1,
         lambda2 = lambda2,
         overdispersion = overdispersion,
-        recruit1 = timeUnderObservation1,
-        recruit2 = timeUnderObservation2
+        recruit1 = timeUnderObservation1, # TODO rename recruit1 to exposure1
+        recruit2 = timeUnderObservation2  # TODO rename recruit2 to exposure2
     ))
 }
 
@@ -1458,6 +1458,9 @@ getFisherInformation <- function(designPlan, stage = NA_integer_) {
     futilityBounds <- futilityBounds[seq_len(nStages)]
 
     informationRates <- design$informationRates[seq_len(nStages)]
+    # TODO: Daniel's question: Should we instead use getFisherInformation() to get
+    # stage-specific information when count data is used? e.g. by using a wrapper for
+    # this calculation?
     stageInformation <- (informationRates / design$informationRates[1]) %*% t(fisherInformation)
     standardizedFutilityBounds <- matrix(futilityBounds, nrow = nStages, ncol = nParameters)
     if (.isTrialDesignPlanMeans(designPlan) && !designPlan$normalApproximation) {
