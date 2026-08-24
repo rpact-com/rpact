@@ -493,6 +493,12 @@ NULL
     } else if (endpoint == "survival") {
         simulationResults <- SimulationResultsMultiArmSurvival$new(design, showStatistics = showStatistics)
         .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
+        simulationResults$simulationType <- ifelse(
+            identical(simulationType, "testStatisticBased"),
+            "testStatisticBased",
+            "patientWise"
+        )
+        simulationResults$.setParameterType("simulationType", C_PARAM_DERIVED)
     }
 
     if (is.na(activeArms)) {
