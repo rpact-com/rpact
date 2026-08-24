@@ -970,7 +970,7 @@ getFutilityBounds <- function(
     # multi-arm case
     if (is(designPlan, "SimulationResultsMultiArmRates")) {
         n1 <- nTotal # active arm
-        n2 <- trunc(nTotal / allocationRatio) # common control arm TODO @Gernot: is truncation correct here?
+        n2 <- nTotal / allocationRatio
         pi1 <- designPlan$effectMatrix
         pi2 <- designPlan$piControl
         return(.getFisherInformationRatesTwoSample(pi1, pi2, n1, n2))
@@ -1086,7 +1086,7 @@ getFutilityBounds <- function(
     #        recruit1 = seq(0, accrualTime, length.out = n$n1), 
     #        recruit2 = seq(0, accrualTime, length.out = n$n2)
     #    ))
-    # TODO @Gernot: check new solution:
+    # TODO: check new solution:
     
     accrualTimeMax <- max(accrualTime)
     return(list(
@@ -1127,8 +1127,8 @@ getFutilityBounds <- function(
         lambda1 = lambda1,
         lambda2 = lambda2,
         overdispersion = overdispersion,
-        recruit1 = timeUnderObservation1, # TODO rename recruit1 to exposure1
-        recruit2 = timeUnderObservation2  # TODO rename recruit2 to exposure2
+        exposure1 = timeUnderObservation1,
+        exposure2 = timeUnderObservation2  
     ))
 }
 
@@ -1454,14 +1454,20 @@ getFisherInformation <- function(designPlan, stage = NA_integer_) {
     if (length(futilityBounds) == 0) {
         return(result)
     }
+    
     futilityBounds[.getInvalidFutilityBoundsIndices(design)] <- NA_real_
     futilityBounds <- futilityBounds[seq_len(nStages)]
 
     informationRates <- design$informationRates[seq_len(nStages)]
-    # TODO: Daniel's question: Should we instead use getFisherInformation() to get
-    # stage-specific information when count data is used? e.g. by using a wrapper for
-    # this calculation?
-    stageInformation <- (informationRates / design$informationRates[1]) %*% t(fisherInformation)
+    if (grepl("CountData", .getClassName(designPlan))) {
+        stageInformation <- NULL
+        for (stage in seq_len(nStages)) {
+            stageInformation <- rbind(stageInformation, getFisherInformation(designPlan, stage = stage))
+        }
+    } else { 
+        stageInformation <- (informationRates / design$informationRates[1]) %*% t(fisherInformation)
+    }
+    
     standardizedFutilityBounds <- matrix(futilityBounds, nrow = nStages, ncol = nParameters)
     if (.isTrialDesignPlanMeans(designPlan) && !designPlan$normalApproximation) {
         degreesOfFreedom <- pmax(

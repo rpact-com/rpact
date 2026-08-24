@@ -24,8 +24,8 @@
 #' @param lambda1 A numeric vector representing the event rates for group 1.
 #' @param lambda2 A numeric vector representing the event rates for group 2.
 #' @param overdispersion A numeric value representing the overdispersion parameter.
-#' @param recruit1 A numeric vector representing the recruitment times for group 1.
-#' @param recruit2 A numeric vector representing the recruitment times for group 2.
+#' @param exposure1 A numeric vector representing the exposure times for group 1.
+#' @param exposure2 A numeric vector representing the exposure times for group 2.
 #'
 #' @details
 #' The function computes the Fisher information for two groups by summing the contributions
@@ -39,9 +39,9 @@
 #' lambda1 <- c(0.1, 0.2, 0.3)
 #' lambda2 <- c(0.15, 0.25, 0.35)
 #' overdispersion <- 0.1
-#' recruit1 <- c(1, 2, 3)
-#' recruit2 <- c(2, 3, 4)
-#' info <- .getInformationCountData(lambda1, lambda2, overdispersion, recruit1, recruit2)
+#' exposure1 <- c(1, 2, 3)
+#' exposure2 <- c(2, 3, 4)
+#' info <- .getInformationCountData(lambda1, lambda2, overdispersion, exposure1, exposure2)
 #' print(info)
 #' }
 #'
@@ -53,12 +53,12 @@
         lambda1,
         lambda2,
         overdispersion,
-        recruit1,
-        recruit2) {
-    sumLambda1 <- sum(recruit1 * lambda1 /
-        (1 + overdispersion * recruit1 * lambda1))
-    sumLambda2 <- sum(recruit2 * lambda2 /
-        (1 + overdispersion * recruit2 * lambda2))
+        exposure1,
+        exposure2) {
+    sumLambda1 <- sum(exposure1 * lambda1 /
+        (1 + overdispersion * exposure1 * lambda1))
+    sumLambda2 <- sum(exposure2 * lambda2 /
+        (1 + overdispersion * exposure2 * lambda2))
     return(1 / (1 / sumLambda1 + 1 / sumLambda2))
 }
 
@@ -539,8 +539,8 @@ getSimulationCounts <- function(
                     lambda1 = nb[1],
                     lambda2 = nb[2],
                     overdispersion = nb[3],
-                    recruit1 = timeUnderObservation1,
-                    recruit2 = timeUnderObservation2
+                    exposure1 = timeUnderObservation1,
+                    exposure2 = timeUnderObservation2
                 )
                 zValue <- (2 * directionUpper - 1) *
                     (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(infoAnalysis)
@@ -638,8 +638,8 @@ getSimulationCounts <- function(
                         lambda1 = nb[1], # negative binomial estimate 1
                         lambda2 = nb[2], # negative binomial estimate 2
                         overdispersion = nb[3], # negative binomial overdispersion
-                        recruit1 = timeUnderObservation1,
-                        recruit2 = timeUnderObservation2
+                        exposure1 = timeUnderObservation1,
+                        exposure2 = timeUnderObservation2
                     )
                     zValue <- (2 * directionUpper - 1) *
                         (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(infoAnalysis)
