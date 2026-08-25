@@ -818,6 +818,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             functionName = "getSimulationMultiArmSurvivalPatientWise"
         )
     }
+    
+    .addStudyDurationToDesignPlan(simulationResults)
 
     simulationResults$.data <- loopResult$data
     simulationResults$.rawData <- .createSimulationSurvivalRawData(loopResult$rawData)

@@ -955,6 +955,8 @@ getSimulationSurvival <- function(
     rawData <- rawData[, colnames(rawData) != "censorIndicator"]
 
     simulationResults$.rawData <- rawData
+    
+    .addStudyDurationToDesignPlan(simulationResults)
 
     return(simulationResults)
 }

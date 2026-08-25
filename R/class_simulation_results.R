@@ -1097,6 +1097,8 @@ SimulationResultsBaseSurvival <- R6::R6Class(
         minNumberOfEventsPerStage = NULL,
         plannedEvents = NULL,
         thetaH1 = NULL,
+        studyDuration = NULL,
+        maxStudyDuration = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             generatedParams <- c(
@@ -1114,6 +1116,7 @@ SimulationResultsBaseSurvival <- R6::R6Class(
             for (generatedParam in generatedParams) {
                 self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
+            self$.setParameterType("maxStudyDuration", C_PARAM_NOT_APPLICABLE)
         }
     )
 )
@@ -1233,7 +1236,6 @@ SimulationResultsSurvival <- R6::R6Class(
         piecewiseSurvivalTime = NULL,
         rejectPerStage = NULL,
         singleEventsPerStage = NULL,
-        studyDuration = NULL,
         thetaH0 = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
@@ -1414,7 +1416,6 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         singleNumberOfEventsPerStage = NULL, # only necessary for old simulation routine
         simulationType = NULL,
         slope = NULL,
-        studyDuration = NULL,
         successCriterion = NULL,
         successPerStage = NULL,
         threshold = NULL,
@@ -1759,7 +1760,6 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
         selectPopulationsFunction = NULL,
         simulationType = NULL,
         stratifiedAnalysis = NULL,
-        studyDuration = NULL,
         successCriterion = NULL,
         successPerStage = NULL,
         threshold = NULL,

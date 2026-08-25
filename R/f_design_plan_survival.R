@@ -18,7 +18,7 @@
 NULL
 
 .addStudyDurationToDesignPlan <- function(designPlan) {
-    if (!designPlan$accountForObservationTimes) {
+    if (isFALSE(designPlan$accountForObservationTimes)) {
         return(invisible())
     }
 
@@ -491,8 +491,8 @@ NULL
 
     if (!anyNA(designPlan$followUpTime)) {
         if (any(designPlan$followUpTime < -1e-02)) {
-            warning("Accrual duration longer than maximal study ",
-                "duration (time to maximal number of events); followUpTime = ",
+            warning("Accrual duration longer than maximum study ",
+                "duration (time to maximum number of events); followUpTime = ",
                 .arrayToString(designPlan$followUpTime),
                 call. = FALSE
             )

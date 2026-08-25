@@ -203,6 +203,11 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
                     "Default parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
+                
+                if (identical(self$.objectType, "sampleSize")) {
+                    derivedParameters <- c(".design$power", derivedParameters)
+                }
+                
                 if (length(derivedParameters) > 0) {
                     self$.showParametersOfOneGroup(
                         derivedParameters,

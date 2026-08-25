@@ -422,12 +422,15 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
             functionName = "getSimulationEnrichmentSurvivalPatientWise"
         )
     }
+    
+    .addStudyDurationToDesignPlan(simulationResults)
 
     simulationResults$.data <- loopResult$data
     simulationResults$.rawData <- .createSimulationSurvivalRawData(
         loopResult$rawData,
         enrichment = TRUE
     )
+    
     return(simulationResults)
 }
 

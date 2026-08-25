@@ -202,7 +202,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     subjects = "Subjects",
     futilityStop = "Overall futility stop",
     studyDuration = "Expected study duration",
-    maxStudyDuration = "Maximal study duration",
+    maxStudyDuration = "Maximum study duration",
     directionUpper = "Direction upper",
     piecewiseSurvivalTime = "Piecewise survival times",
     lambda1 = "lambda(1)",
