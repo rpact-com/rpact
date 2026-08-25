@@ -1269,3 +1269,20 @@ getRawData <- function(x, aggregate = FALSE) {
     simulationResults$seed <- .setSeed(seed)
     return(invisible(seed))
 }
+
+.setEventsNotAchieved <- function(simulationResults, accrualSetup, ..., eventsNotAchieved) {
+    simulationResults$eventsNotAchieved <- eventsNotAchieved
+    if (any(simulationResults$eventsNotAchieved > 0)) { 
+        simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_GENERATED)
+        warning("Presumably due to drop-outs, required number of events ",
+            "were not achieved for at least one situation. ",
+            "Increase the maximum number of subjects (",
+            accrualSetup$maxNumberOfSubjects, ") ",
+            "to avoid this situation",
+            call. = FALSE
+        )
+    } else {
+        simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_NOT_APPLICABLE)
+    }
+    return(invisible(eventsNotAchieved))
+}

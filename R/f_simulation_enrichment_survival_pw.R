@@ -367,7 +367,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$populationEventsPerStage <- simulatedPopulationEventsPerStage
     simulationResults$analysisTime <- simulatedAnalysisTime
-    simulationResults$eventsNotAchieved <- simulatedNumberEventsNotAchieved / maxNumberOfIterations
+    .setEventsNotAchieved(simulationResults, accrualSetup, 
+        eventsNotAchieved = simulatedNumberEventsNotAchieved / maxNumberOfIterations)
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$selectedPopulations <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedPopulationsPerStage <- simulatedRejections / maxNumberOfIterations
@@ -403,18 +404,6 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     simulationResults$.setParameterType("analysisTime", C_PARAM_GENERATED)
     if (!all(is.na(simulationResults$conditionalPowerAchieved))) {
         simulationResults$.setParameterType("conditionalPowerAchieved", C_PARAM_GENERATED)
-    }
-
-    if (any(simulationResults$eventsNotAchieved > 0)) {
-        warning(
-            "Presumably due to small number of subjects in selected arms, ",
-            "required number of events were not achieved for at least one situation. ",
-            "Increase the maximum number of subjects (",
-            accrualSetup$maxNumberOfSubjects,
-            ") ",
-            "to avoid this situation",
-            call. = FALSE
-        )
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
