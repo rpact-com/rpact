@@ -214,6 +214,49 @@ NULL
     return(NULL)
 }
 
+.getParameterSetParameterCaptionPerCategory <- function(parameterSet, paramName, paramCaption, category, matrixRow) {
+    if (.isMultiArmSimulationResults(parameterSet) &&
+            paramName %in% c("singleEventsPerArmAndStage", "selectedArms")) {
+        if (!inherits(parameterSet, "SimulationResultsEnrichmentSurvival") &&
+                !is.na(numberOfCategories) && numberOfCategories == category &&
+                paramName == "singleEventsPerArmAndStage") {
+            category <- "control"
+        }
+        paramCaption <- paste0(paramCaption, " {", category, "}")
+    } else if (paramName == "effectList") {
+        paramCaption <- paste0(paramCaption, " [", category, "]")
+    } else if (.isEnrichmentSimulationResults(parameterSet)) {
+        categoryCaption <- .getCategoryCaptionEnrichment(parameterSet, paramName, category)
+        paramCaption <- paste0(paramCaption, " (", categoryCaption, ")")
+    } else {
+        paramCaption <- paste0(paramCaption, " (", category, ")")
+    }
+
+    if (!is.na(matrixRow)) {
+        if (paramName == "effectList") {
+            paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
+        } else {
+            paramCaption <- paste0(paramCaption, " [", matrixRow, "]")
+        }
+    }
+    return(paramCaption)
+}
+
+.getParameterSetParameterCaptionPerRow <- function(parameterSet, paramName, paramCaption, matrixRow) {
+    if (.isMultiArmAnalysisResults(parameterSet) || grepl("StageResultsMultiArm", .getClassName(parameterSet)) ||
+            (inherits(parameterSet, "SimulationResults") && paramName == "effectMatrix") ||
+            (inherits(parameterSet, "ClosedCombinationTestResults") &&
+                paramName %in% c("rejected", "separatePValues"))) {
+        return(paste0(paramCaption, " (", matrixRow, ")"))
+    }
+
+    if (.isMultiArmSimulationResults(parameterSet) && paramName %in% c("lambdaTreatment", "medianTreatment")) {
+        return(paste0(paramCaption, " {", matrixRow, "}"))
+    }
+
+    return(paste0(paramCaption, " [", matrixRow, "]"))
+}
+
 .getParameterSetParameterCaption <- function(
         parameterSet,
         ...,
@@ -222,7 +265,6 @@ NULL
         matrixRow = NA_integer_,
         paramNameRaw = NA_character_,
         numberOfCategories = NA_integer_) {
-    
     paramCaption <- NULL
     if (!is.na(paramNameRaw)) {
         paramCaption <- .getParameterCaption(paramNameRaw, parameterSet)
@@ -233,40 +275,16 @@ NULL
     if (is.null(paramCaption)) {
         paramCaption <- paste0("%", paramName, "%")
     }
-    
+
     if ((is.null(category) || is.na(category)) && is.na(matrixRow)) {
         return(paramCaption)
     }
-    
-    if (!is.null(category) && !is.na(category)) {
-        if (.isMultiArmSimulationResults(parameterSet) &&
-                paramName %in% c("singleEventsPerArmAndStage", "selectedArms")) {
-            if (!inherits(parameterSet, "SimulationResultsEnrichmentSurvival") &&
-                    !is.na(numberOfCategories) && numberOfCategories == category &&
-                    paramName == "singleEventsPerArmAndStage") {
-                category <- "control"
-            }
-            paramCaption <- paste0(paramCaption, " {", category, "}")
-        } else if (paramName == "effectList") {
-            paramCaption <- paste0(paramCaption, " [", category, "]")
-        } else if (.isEnrichmentSimulationResults(parameterSet)) {
-            categoryCaption <- .getCategoryCaptionEnrichment(parameterSet, paramName, category)
-            paramCaption <- paste0(paramCaption, " (", categoryCaption, ")")
-        } else {
-            paramCaption <- paste0(paramCaption, " (", category, ")")
-        }
 
-        if (!is.na(matrixRow)) {
-            if (paramName == "effectList") {
-                paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
-            } else {
-                paramCaption <- paste0(paramCaption, " [", matrixRow, "]")
-            }
-        }
-        
-        return(paramCaption)
-    } 
-    
+    if (!is.null(category) && !is.na(category)) {
+        return(.getParameterSetParameterCaptionPerCategory(
+            parameterSet, paramName, paramCaption, category, matrixRow))
+    }
+
     if (.isMultiArmAnalysisResults(parameterSet) && paramName %in%
             c(
                 "conditionalErrorRate", "secondStagePValues",
@@ -277,10 +295,10 @@ NULL
             "Treatment", ifelse(grepl(",", treatments), "s", ""), " ",
             treatments, " vs. control"
         )
-        
+
         return(paramCaption)
-    } 
-    
+    }
+
     if (.isEnrichmentAnalysisResults(parameterSet) || .isEnrichmentStageResults(parameterSet) ||
             (inherits(parameterSet, "ClosedCombinationTestResults") && isTRUE(parameterSet$.enrichment))) {
         if (paramName %in% c(
@@ -307,24 +325,9 @@ NULL
                 paramCaption <- paste0(paramCaption, " S", matrixRow)
             }
         }
-        
+
         return(paramCaption)
-    } 
-    
-    if (.isMultiArmAnalysisResults(parameterSet) || grepl("StageResultsMultiArm", .getClassName(parameterSet)) ||
-            (inherits(parameterSet, "SimulationResults") && paramName == "effectMatrix") ||
-            (inherits(parameterSet, "ClosedCombinationTestResults") &&
-                paramName %in% c("rejected", "separatePValues"))) {
-        paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
-        return(paramCaption)
-    } 
-    
-    if (.isMultiArmSimulationResults(parameterSet) && paramName %in% c("lambdaTreatment", "medianTreatment")) {
-        paramCaption <- paste0(paramCaption, " {", matrixRow, "}")
-        return(paramCaption)
-    } 
-    
-    paramCaption <- paste0(paramCaption, " [", matrixRow, "]")
-    
-    return(paramCaption)
+    }
+
+    return(.getParameterSetParameterCaptionPerRow(parameterSet, paramName, paramCaption, matrixRow))
 }
