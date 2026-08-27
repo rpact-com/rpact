@@ -216,7 +216,7 @@ NULL
 
 .getParameterSetParameterCaptionPerCategory <- function(parameterSet, paramName, paramCaption, category, matrixRow, numberOfCategories) {
     if (.isMultiArmSimulationResults(parameterSet) &&
-            paramName %in% c("singleEventsPerArmAndStage")) { # TODO add selectedArms?
+            paramName %in% c("singleEventsPerArmAndStage")) {
         if (!inherits(parameterSet, "SimulationResultsEnrichmentSurvival") &&
                 !is.na(numberOfCategories) && 
                 numberOfCategories > 2 &&

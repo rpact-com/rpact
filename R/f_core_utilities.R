@@ -1666,7 +1666,7 @@ getParameterName <- function(obj, parameterCaption) {
     maxValue <- max(values)
     by <- (maxValue - minValue) / (length(values) - 1)
     valuesTemp <- seq(minValue, maxValue, by)
-    if (isTRUE(all.equal(values, valuesTemp, tolerance = 1e-10))) {
+    if (equals(values, valuesTemp, tolerance = 1e-10)) {
         return(paste0("seq(", minValue, ", ", maxValue, ", ", by, ")"))
     }
 
@@ -2296,4 +2296,80 @@ resetOptions <- function(persist = TRUE) {
             return(invisible(FALSE))
         }
     )
+}
+
+equals <- function(x, y, ..., tolerance = 0) {
+    comparisonEnvironment <- parent.frame()
+
+    compare <- function(x, y) {
+        attributesEqual <- function(x, y) {
+            xAttributes <- attributes(x)
+            yAttributes <- attributes(y)
+
+            if (
+                length(xAttributes) != length(yAttributes) ||
+                    !identical(names(xAttributes), names(yAttributes))
+            ) {
+                return(FALSE)
+            }
+
+            for (i in seq_along(xAttributes)) {
+                if (!compare(xAttributes[[i]], yAttributes[[i]])) {
+                    return(FALSE)
+                }
+            }
+
+            return(TRUE)
+        }
+
+        if (is.environment(x) || is.environment(y)) {
+            return(identical(x, y))
+        }
+
+        if (is.list(x) || is.list(y)) {
+            if (!is.list(x) || !is.list(y) || length(x) != length(y)) {
+                return(FALSE)
+            }
+
+            if (!attributesEqual(x, y)) {
+                return(FALSE)
+            }
+
+            for (i in seq_along(x)) {
+                if (!compare(x[[i]], y[[i]])) {
+                    return(FALSE)
+                }
+            }
+
+            return(TRUE)
+        }
+
+        if (
+            length(x) == 1 && length(y) == 1 &&
+                (is.logical(x) || is.numeric(x)) &&
+                (is.logical(y) || is.numeric(y)) &&
+                is.na(x) && is.na(y) && !is.nan(x) && !is.nan(y)
+        ) {
+            return(attributesEqual(x, y))
+        }
+
+        if (any(is.numeric(x)) && any(is.nan(x))) {
+            return(identical(x, y))
+        }
+
+        if (any(is.numeric(y)) && any(is.nan(y))) {
+            return(identical(x, y))
+        }
+
+        tryCatch(
+            isTRUE(eval(
+                quote(all.equal(x, y, tolerance = tolerance)),
+                envir = list(x = x, y = y, tolerance = tolerance),
+                enclos = comparisonEnvironment
+            )),
+            error = function(e) FALSE
+        )
+    }
+
+    return(compare(x, y))
 }

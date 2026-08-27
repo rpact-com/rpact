@@ -2058,7 +2058,7 @@ plot.AnalysisResults <- function(
     }
 
     treatmentArmsToShowCmd <- ""
-    if (!is.null(treatmentArmsToShow) && !isTRUE(all.equal(sort(unique(treatmentArmsToShow)), 1:nrow(data)))) {
+    if (!is.null(treatmentArmsToShow) && !equals(sort(unique(treatmentArmsToShow)), 1:nrow(data))) {
         treatmentArmsToShowCmd <- paste0(", ", .arrayToString(treatmentArmsToShow, mode = "vector"))
     }
     dataCmd <- paste0("rpact:::.getConfidenceIntervalData(", analysisResultsName, treatmentArmsToShowCmd, ")")

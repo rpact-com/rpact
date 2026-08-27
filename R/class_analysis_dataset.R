@@ -1382,7 +1382,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     for (s in subsets) {
         subsetStages <- as.integer(sort(unique(na.omit(as.character(dataFrame$stage[dataFrame$subset == s])))))
         kMax <- max(subsetStages)
-        if (!isTRUE(all.equal(1:kMax, subsetStages))) {
+        if (!equals(1:kMax, subsetStages)) {
             stopIllegalArgument(
                 gettextf(
                     "subset %s has incomplete stages (%s)",

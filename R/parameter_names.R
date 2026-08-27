@@ -425,12 +425,20 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
         return(C_PARAMETER_NAMES_PLOT_SETTINGS[[parameterName]])
     }
     
-    if (identical(parameterName, "lambdaControl") && identical(as.integer(obj$activeArms), 1L)) {
+    if (identical(parameterName, "lambdaControl") && equals(obj$activeArms, 1L)) {
         return("Lambda (2)")
     }
     
-    if (identical(parameterName, "medianControl") && identical(as.integer(obj$activeArms), 1L)) {
+    if (identical(parameterName, "medianControl") && equals(obj$activeArms, 1L)) {
         return("Median (2)")
+    }
+    
+    if (identical(parameterName, "dropoutRate1") && !equals(obj$activeArms, 1L)) {
+        return("Drop-out rate (per arm)")
+    }
+    
+    if (identical(parameterName, "dropoutRate2") && !equals(obj$activeArms, 1L)) {
+        return("Drop-out rate (control)")
     }
 
     pluralExt <- ifelse(tableOutputEnabled, "", "s")

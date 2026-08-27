@@ -109,10 +109,12 @@ StageResults <- R6::R6Class("StageResults",
                 self$.isMultiArm(), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED
             ))
             self$.setParameterType("thetaH0", ifelse(
-                isTRUE(all.equal(self$thetaH0, C_THETA_H0_MEANS_DEFAULT)), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                equals(self$thetaH0, C_THETA_H0_MEANS_DEFAULT), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
             self$.setParameterType("direction", ifelse(
-                identical(self$direction, C_DIRECTION_UPPER), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$direction, C_DIRECTION_UPPER), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         getPlotSettings = function() {

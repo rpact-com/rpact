@@ -750,12 +750,8 @@ NULL
         designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_USER_DEFINED)
     }
 
-    if (isTRUE(all.equal(accrualSetup$accrualTime, C_ACCRUAL_TIME_DEFAULT)) ||
-            isTRUE(all.equal(
-                as.integer(c(0L, accrualSetup$.getAccrualTimeWithoutLeadingZero())),
-                C_ACCRUAL_TIME_DEFAULT
-            ))
-        ) {
+    if (equals(accrualSetup$accrualTime, C_ACCRUAL_TIME_DEFAULT) ||
+            equals(c(0L, accrualSetup$.getAccrualTimeWithoutLeadingZero()), C_ACCRUAL_TIME_DEFAULT)) {
         designPlan$.setParameterType("accrualTime", C_PARAM_DEFAULT_VALUE)
     } else {
         designPlan$.setParameterType(
@@ -863,7 +859,7 @@ NULL
             designPlan$.setParameterType(p, C_PARAM_NOT_APPLICABLE)
         }
         if (designPlan$isUserDefinedParameter("accrualTime") ||
-                !isTRUE(all.equal(accrualTime, C_ACCRUAL_TIME_DEFAULT))) {
+                !equals(accrualTime, C_ACCRUAL_TIME_DEFAULT)) {
             designPlan$.warnInCaseArgumentExists(accrualSetup$accrualTime, "accrualTime")
         }
         designPlan$.warnInCaseArgumentExists(dropoutRate1, "dropoutRate1")

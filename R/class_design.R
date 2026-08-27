@@ -441,7 +441,7 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
             if (!identical(beta, self$beta)) {
                 return(self$.pasteComparisonResult("beta", beta, self$beta))
             }
-            if (!isTRUE(all.equal(sided, self$sided))) {
+            if (!equals(sided, self$sided)) {
                 return(self$.pasteComparisonResult("sided", sided, self$sided))
             }
             if (!identical(twoSidedPower, self$twoSidedPower)) {
@@ -558,13 +558,13 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             if (anyNA(alpha0VecTemp)) {
                 alpha0VecTemp <- rep(C_ALPHA_0_VEC_DEFAULT, kMax - 1)
             }
-            if (!isTRUE(all.equal(kMax, self$kMax))) {
+            if (!equals(kMax, self$kMax)) {
                 return(TRUE)
             }
             if (!identical(alpha, self$alpha)) {
                 return(TRUE)
             }
-            if (!isTRUE(all.equal(sided, self$sided))) {
+            if (!equals(sided, self$sided)) {
                 return(TRUE)
             }
             if (!identical(method, self$method)) {
@@ -776,7 +776,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             if (anyNA(futilityBoundsTemp)) {
                 futilityBoundsTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
             }
-            if (!isTRUE(all.equal(kMax, self$kMax))) {
+            if (!equals(kMax, self$kMax)) {
                 return(self$.pasteComparisonResult("kMax", kMax, self$kMax))
             }
             if (!identical(alpha, self$alpha)) {
@@ -785,7 +785,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             if (!identical(beta, self$beta)) {
                 return(self$.pasteComparisonResult("beta", beta, self$beta))
             }
-            if (!isTRUE(all.equal(sided, self$sided))) {
+            if (!equals(sided, self$sided)) {
                 return(self$.pasteComparisonResult("sided", sided, self$sided))
             }
             if (!identical(twoSidedPower, self$twoSidedPower)) {
