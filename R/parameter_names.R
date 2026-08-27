@@ -185,7 +185,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     expectedEventsH0 = "Expected number of events under H0",
     expectedEventsH01 = "Expected number of events under H0/H1",
     expectedEventsH1 = "Expected number of events under H1",
-    studyDurationH1 = "Expected study duration under H1",
+    studyDurationH1 = "Expected study duration under H1", # deprecated
     twoSidedPower = "Two-sided power",
     plannedEvents = "Planned cumulative events",
     plannedSubjects = "Planned cumulative subjects", # per arm (multi-arm); overall (base)

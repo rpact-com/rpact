@@ -19,12 +19,12 @@
 NULL
 
 .formatSummaryValues <- function(
-    values,
-    ...,
-    digits,
-    smoothedZeroFormat = FALSE,
-    formatRepeatedPValues = FALSE,
-    showNA = FALSE) {
+        values,
+        ...,
+        digits,
+        smoothedZeroFormat = FALSE,
+        formatRepeatedPValues = FALSE,
+        showNA = FALSE) {
     if (is.na(digits)) {
         digits <- 3
     }
@@ -75,7 +75,7 @@ NULL
 
     if (formatRepeatedPValues) {
         formattedValue[!is.na(formattedValue) &
-                nchar(gsub("\\D", "", (formattedValue))) > 0 & formattedValue > 0.4999] <- ">0.5"
+            nchar(gsub("\\D", "", (formattedValue))) > 0 & formattedValue > 0.4999] <- ">0.5"
     }
 
     if (as.logical(.getEnvironmentVariable(
@@ -97,27 +97,27 @@ NULL
 
     formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <-
         ifelse(showNA, "n/a", .getEnvironmentVariable(
-                "RPACT_SUMMARY_NA",
-                "rpact.summary.na",
-                default = "",
-                type = "character"
-            ))
+            "RPACT_SUMMARY_NA",
+            "rpact.summary.na",
+            default = "",
+            type = "character"
+        ))
 
     return(formattedValue)
 }
 
 .getSummaryValuesFormatted <- function(
-    fieldSet,
-    parameterName,
-    values,
-    ...,
-    roundDigits = NA_integer_,
-    ceilingEnabled = FALSE,
-    cumsumEnabled = FALSE,
-    smoothedZeroFormat = FALSE,
-    formatRepeatedPValues = FALSE,
-    roundDigitsAsInformation = FALSE,
-    showNA = FALSE) {
+        fieldSet,
+        parameterName,
+        values,
+        ...,
+        roundDigits = NA_integer_,
+        ceilingEnabled = FALSE,
+        cumsumEnabled = FALSE,
+        smoothedZeroFormat = FALSE,
+        formatRepeatedPValues = FALSE,
+        roundDigitsAsInformation = FALSE,
+        showNA = FALSE) {
     if (!is.numeric(values)) {
         return(values)
     }
@@ -147,9 +147,9 @@ NULL
                     if (parameterName == "futilityBounds") {
                         values <- .getFormattedFutilityBounds(design = fieldSet, futilityBounds = values)
                     } else if (parameterName %in% c(
-                        "criticalValues",
-                        "decisionCriticalValue", "overallAdjustedTestStatistics"
-                    )) {
+                            "criticalValues",
+                            "decisionCriticalValue", "overallAdjustedTestStatistics"
+                        )) {
                         design <- fieldSet
                         if (!.isTrialDesign(design)) {
                             design <- fieldSet[[".design"]]
@@ -160,7 +160,7 @@ NULL
                     }
                     if (!is.na(roundDigits) && roundDigits == 0) {
                         if (inherits(fieldSet, "Dataset") &&
-                            grepl("samplesize|event", tolower(parameterName))) {} else {
+                                grepl("samplesize|event", tolower(parameterName))) {} else {
                             formatFunctionName <- .getParameterFormatFunction(parameterName, fieldSet)
                         }
                     }
@@ -250,18 +250,18 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
             }
             if (grid > 0) {
                 suppressWarnings(print(plot(
-                            x = x$object, y = NULL, markdown = FALSE,
-                            parentFunctionCallArgs = parentFunctionCallArgs,
-                            cmd = cmd,
-                            ...
-                        )))
+                    x = x$object, y = NULL, markdown = FALSE,
+                    parentFunctionCallArgs = parentFunctionCallArgs,
+                    cmd = cmd,
+                    ...
+                )))
             } else {
                 suppressWarnings(plot(
-                        x = x$object, y = NULL, markdown = TRUE,
-                        parentFunctionCallArgs = parentFunctionCallArgs,
-                        cmd = cmd,
-                        ...
-                    ))
+                    x = x$object, y = NULL, markdown = TRUE,
+                    parentFunctionCallArgs = parentFunctionCallArgs,
+                    cmd = cmd,
+                    ...
+                ))
             }
             return(.knitPrintQueue(x, sep = sep, prefix = sep))
         } else {
@@ -269,11 +269,11 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
         }
     }
     suppressWarnings(print(plot(
-                x = x$object, y = NULL,
-                parentFunctionCallArgs = parentFunctionCallArgs,
-                cmd = cmd,
-                ...
-            )))
+        x = x$object, y = NULL,
+        parentFunctionCallArgs = parentFunctionCallArgs,
+        cmd = cmd,
+        ...
+    )))
 }
 
 .getKnitPrintPart <- function(x) {
@@ -400,10 +400,10 @@ knit_print.SummaryFactory <- function(x, ...) {
 #' @export
 #'
 print.SummaryFactory <- function(
-    x,
-    ...,
-    markdown = NA,
-    sep = NA_character_) {
+        x,
+        ...,
+        markdown = NA,
+        sep = NA_character_) {
     .assertIsSingleCharacter(sep, "sep", naAllowed = TRUE)
 
     if (is.na(markdown)) {
@@ -496,12 +496,12 @@ print.SummaryFactory <- function(
         digitsTime <- digits
     }
     return(list(
-            digits = digits,
-            digitsSampleSize = digitsSampleSize,
-            digitsGeneral = digitsGeneral,
-            digitsProbabilities = digitsProbabilities,
-            digitsTime = digitsTime
-        ))
+        digits = digits,
+        digitsSampleSize = digitsSampleSize,
+        digitsGeneral = digitsGeneral,
+        digitsProbabilities = digitsProbabilities,
+        digitsTime = digitsTime
+    ))
 }
 
 .getSummaryValuesInPercent <- function(values, percentFormatEnabled = TRUE, digits = 1) {
@@ -531,7 +531,7 @@ print.SummaryFactory <- function(
     return(NULL)
 }
 
-.addParameterToSummaryFactory = function(
+.addParameterToSummaryFactory <- function(
         summaryFactory,
         parameterSet,
         ...,
@@ -553,10 +553,10 @@ print.SummaryFactory <- function(
         roundDigitsAsInformation = FALSE,
         showNA = FALSE) {
     if (!is.null(parameterName) && length(parameterName) == 1 &&
-        inherits(parameterSet, "ParameterSet") &&
-        parameterSet$isNotApplicableParameter(parameterName)) {
+            inherits(parameterSet, "ParameterSet") &&
+            parameterSet$isNotApplicableParameter(parameterName)) {
         if (!is.null(values) && .getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE") &&
-            validateParameterType && !.isMarkdownEnabled()) {
+                validateParameterType && !.isMarkdownEnabled()) {
             warning(
                 "Failed to add parameter ", .arrayToString(parameterName), " (",
                 .arrayToString(values), ") stored in ",
@@ -619,18 +619,18 @@ print.SummaryFactory <- function(
                 nCol <- lastStage - ncol(values)
                 values <- cbind(matrix(rep(NA_real_, nCol * nrow(values)), nrow = nrow(values)), values)
                 if (!is.null(parameterName) && length(parameterName) == 1 &&
-                    parameterName %in% c(
-                        "expectedNumberOfSubjects",
-                        "expectedNumberOfSubjectsH1",
-                        "expectedEventsH1",
-                        "expectedNumberOfEvents",
-                        "expectedStudyDurationH1",
-                        "expectedInformationH0",
-                        "expectedInformationH01",
-                        "expectedInformationH1",
-                        "studyDuration",
-                        "earlyStop"
-                    )) {
+                        parameterName %in% c(
+                            "expectedNumberOfSubjects",
+                            "expectedNumberOfSubjectsH1",
+                            "expectedEventsH1",
+                            "expectedNumberOfEvents",
+                            "expectedStudyDurationH1",
+                            "expectedInformationH0",
+                            "expectedInformationH01",
+                            "expectedInformationH1",
+                            "studyDuration",
+                            "earlyStop"
+                        )) {
                     transposed <- TRUE
                 }
             }
@@ -676,7 +676,7 @@ print.SummaryFactory <- function(
     }
 
     if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
-        isTRUE(parameterSet[[".piecewiseSurvivalTime"]]$delayedResponseEnabled)) {
+            isTRUE(parameterSet[[".piecewiseSurvivalTime"]]$delayedResponseEnabled)) {
         numberOfVariants <- 1
     }
 
@@ -769,24 +769,26 @@ print.SummaryFactory <- function(
 
         userDefinedEffectMatrix <- FALSE
         if (grepl("MultiArm|Enrichment", .getClassName(parameterSet)) ||
-            inherits(parameterSet, "AnalysisResultsConditionalDunnett") ||
-            inherits(parameterSet, "ClosedCombinationTestResults") ||
-            inherits(parameterSet, "ConditionalPowerResults")) {
+                inherits(parameterSet, "AnalysisResultsConditionalDunnett") ||
+                inherits(parameterSet, "ClosedCombinationTestResults") ||
+                inherits(parameterSet, "ConditionalPowerResults")) {
             if (grepl("SimulationResults(MultiArm|Enrichment)", .getClassName(parameterSet)) &&
-                parameterName %in% c(
-                    "rejectAtLeastOne",
-                    "earlyStop",
-                    "futilityPerStage",
-                    "successPerStage",
-                    "expectedNumberOfSubjects",
-                    "expectedNumberOfEvents",
-                    "singleEventsPerArmAndStage",
-                    "singleEventsPerSubsetAndStage",
-                    "numberOfSelectedArms",
-                    "numberOfPopulations",
-                    "conditionalPowerAchieved",
-                    "plannedCalendarTime"
-                )) {
+                    parameterName %in% c(
+                        "rejectAtLeastOne",
+                        "earlyStop",
+                        "futilityPerStage",
+                        "successPerStage",
+                        "expectedNumberOfSubjects",
+                        "expectedNumberOfEvents",
+                        "singleEventsPerArmAndStage",
+                        "singleEventsPerSubsetAndStage",
+                        "numberOfSelectedArms",
+                        "numberOfPopulations",
+                        "conditionalPowerAchieved",
+                        "plannedCalendarTime",
+                        "analysisTime",
+                        "studyDuration"
+                    )) {
                 transposed <- TRUE
                 userDefinedEffectMatrix <-
                     parameterSet$isUserDefinedOrDerivedParameter("effectMatrix")
@@ -794,7 +796,7 @@ print.SummaryFactory <- function(
                     legendEntry[["[j]"]] <- "effect matrix row j (situation to consider)"
                 }
                 if (grepl("Survival", .getClassName(parameterSet)) &&
-                    !grepl("Enrichment", .getClassName(parameterSet))) {
+                        !grepl("Enrichment", .getClassName(parameterSet))) {
                     legendEntry[["(i)"]] <- "results of treatment arm i vs. control arm"
                 }
 
@@ -830,13 +832,13 @@ print.SummaryFactory <- function(
                 transposed <- TRUE
                 variedParameterCaption <- "populations"
                 if (parameterName1 %in% c(
-                    "indices",
-                    "conditionalErrorRate",
-                    "secondStagePValues",
-                    "adjustedStageWisePValues",
-                    "overallAdjustedTestStatistics",
-                    "rejectedIntersections"
-                )) {
+                        "indices",
+                        "conditionalErrorRate",
+                        "secondStagePValues",
+                        "adjustedStageWisePValues",
+                        "overallAdjustedTestStatistics",
+                        "rejectedIntersections"
+                    )) {
                     if (.isEnrichmentAnalysisResults(parameterSet)) {
                         variedParameterValues <- parameterSet$.closedTestResults$.getHypothesisPopulationVariants()
                     } else {
@@ -849,25 +851,25 @@ print.SummaryFactory <- function(
                 legendEntry[["S[i]"]] <- "population i"
                 legendEntry[["F"]] <- "full population"
             } else if (!inherits(parameterSet, "ClosedCombinationTestResults") ||
-                parameterName %in% c("rejected", "separatePValues")) {
+                    parameterName %in% c("rejected", "separatePValues")) {
                 if (inherits(parameterSet, "AnalysisResultsConditionalDunnett") &&
-                    (!is.matrix(values) || ncol(values) > 1)) {
+                        (!is.matrix(values) || ncol(values) > 1)) {
                     transposed <- TRUE
                 }
 
                 if (inherits(parameterSet, "ClosedCombinationTestResults") &&
-                    parameterSet$isNotGeneratedParameter("adjustedStageWisePValues") &&
-                    parameterName == "separatePValues") {
+                        parameterSet$isNotGeneratedParameter("adjustedStageWisePValues") &&
+                        parameterName == "separatePValues") {
                     transposed <- TRUE
                 }
 
                 if (inherits(parameterSet, "ClosedCombinationTestResults") &&
-                    parameterName %in% c("rejected")) {
+                        parameterName %in% c("rejected")) {
                     transposed <- TRUE
                 }
 
                 if (inherits(parameterSet, "ConditionalPowerResults") &&
-                    parameterName %in% c("conditionalPower", "values")) {
+                        parameterName %in% c("conditionalPower", "values")) {
                     transposed <- TRUE
                 }
 
@@ -957,20 +959,20 @@ print.SummaryFactory <- function(
                 summaryFactory$addItem(parameterCaption, colValues, legendEntry)
             } else if (summaryFactory$.isEnrichmentObject(parameterSet)) {
                 summaryFactory$addItem(paste0(
-                        parameterCaption, " ",
-                        variedParameterValues[variantIndex]
-                    ), colValues, legendEntry)
+                    parameterCaption, " ",
+                    variedParameterValues[variantIndex]
+                ), colValues, legendEntry)
             } else if (
                 (grepl("MultiArm|Enrichment", .getClassName(parameterSet)) &&
                     !grepl("Simulation", .getClassName(parameterSet))) ||
-                inherits(parameterSet, "AnalysisResultsConditionalDunnett") ||
-                inherits(parameterSet, "ClosedCombinationTestResults") ||
-                inherits(parameterSet, "ConditionalPowerResults")) {
+                    inherits(parameterSet, "AnalysisResultsConditionalDunnett") ||
+                    inherits(parameterSet, "ClosedCombinationTestResults") ||
+                    inherits(parameterSet, "ConditionalPowerResults")) {
                 spacePrefix <- ifelse(parameterCaption %in% c("pi", "lambda", "median"), "", " ")
                 summaryFactory$addItem(paste0(
-                        parameterCaption, spacePrefix,
-                        "(", variedParameterValues[variantIndex], ")"
-                    ), colValues, legendEntry)
+                    parameterCaption, spacePrefix,
+                    "(", variedParameterValues[variantIndex], ")"
+                ), colValues, legendEntry)
             } else if (userDefinedEffectMatrix) {
                 summaryFactory$addItem(paste0(parameterCaption, " [", variantIndex, "]"), colValues, legendEntry)
             } else {

@@ -23,7 +23,11 @@ SummaryItem <- R6::R6Class("SummaryItem",
         title = NULL,
         values = NULL,
         legendEntry = NULL,
-        initialize = function(title = NA_character_, values = NA_character_, legendEntry = NULL, ...) {
+        initialize = function(
+                title = NA_character_,
+                values = NA_character_,
+                legendEntry = NULL,
+                ...) {
             self$title <- title
             self$values <- values
             self$legendEntry <- legendEntry
@@ -107,7 +111,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 if (is.null(self$title) || length(self$title) == 0) {
                     self$title <- .createSummaryTitleObject(self$object)
                 }
-                if (!is.null(self$title) && length(self$title) == 1 && trimws(self$title) != "") {
+                if (!is.null(self$title) &&
+                        length(self$title) == 1 &&
+                        trimws(self$title) != "") {
                     self$.cat(self$title, "\n\n",
                         heading = 1,
                         consoleOutputEnabled = consoleOutputEnabled
@@ -119,7 +125,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 if (is.null(self$header) || length(self$header) == 0) {
                     self$header <- .createSummaryHeaderObject(self$object, self, digits)
                 }
-                if (!is.null(self$header) && length(self$header) == 1 && trimws(self$header) != "") {
+                if (!is.null(self$header) &&
+                        length(self$header) == 1 &&
+                        trimws(self$header) != "") {
                     self$.cat(self$header, "\n\n",
                         consoleOutputEnabled = consoleOutputEnabled
                     )
@@ -134,7 +142,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             legendEntriesUnique <- c()
             summaryItemNames <- c()
             for (summaryItem in self$summaryItems) {
-                if (!is.null(summaryItem$title) && length(summaryItem$title) == 1 && !is.na(summaryItem$title)) {
+                if (!is.null(summaryItem$title) &&
+                        length(summaryItem$title) == 1 &&
+                        !is.na(summaryItem$title)) {
                     summaryItemNames <- c(summaryItemNames, summaryItem$title)
                 }
                 if (length(summaryItem$legendEntry) > 0) {
@@ -171,7 +181,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                         values <- trimws(values)
                         indices <- !grepl("(\\])$", values)
                         values[indices] <- paste0(values[indices], " ")
-                        values <- format(c(spaceString, values), justify = self$justify)[2:(length(values) + 1)]
+                        values <- format(c(spaceString, values),
+                            justify = self$justify
+                        )[2:(length(values) + 1)]
                         self$.cat(summaryItemName, values, "\n",
                             tableColumns = tableColumns,
                             consoleOutputEnabled = consoleOutputEnabled, na = na
@@ -204,10 +216,13 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             }
             tryCatch(
                 {
-                    self$addSummaryItem(SummaryItem$new(title = title, values = values, legendEntry = legendEntry))
+                    self$addSummaryItem(SummaryItem$new(
+                        title = title, values = values, legendEntry = legendEntry
+                    ))
                 },
                 error = function(e) {
-                    stopRuntimeIssue("failed to add summary item ", .pQuote(title), " = ", .arrayToString(values),
+                    stopRuntimeIssue("failed to add summary item ",
+                        .pQuote(title), " = ", .arrayToString(values),
                         " (class: ", .getClassName(values), "): ", e$message,
                         functionName = "addItem",
                         parameter = "title",
@@ -231,7 +246,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             self$summaryItems <- c(self$summaryItems, summaryItem)
         },
         .getFormattedParameterValue = function(valuesToShow, valuesToShow2) {
-            naText <- .getEnvironmentVariable("RPACT_SUMMARY_NA", "rpact.summary.na", default = "", type = "character")
+            naText <- .getEnvironmentVariable("RPACT_SUMMARY_NA", "rpact.summary.na",
+                default = "", type = "character"
+            )
             if (length(valuesToShow) == length(valuesToShow2) && !all(is.na(valuesToShow2))) {
                 for (variantIndex in seq_len(length(valuesToShow))) {
                     value1 <- trimws(as.character(valuesToShow[variantIndex]))
@@ -245,7 +262,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     if (value1 == "" && value2 == "") {
                         valuesToShow[variantIndex] <- naText
                     } else {
-                        valuesToShow[variantIndex] <- sprintf(self$intervalFormat, value1, value2)
+                        valuesToShow[variantIndex] <- sprintf(
+                            self$intervalFormat, value1, value2
+                        )
                     }
                 }
             } else {
@@ -293,7 +312,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 validateParameterType = validateParameterType,
                 lastStage = lastStage,
                 roundDigitsAsInformation = roundDigitsAsInformation,
-                showNA = showNA)
+                showNA = showNA
+            )
         },
         .isEnrichmentObject = function(parameterSet) {
             return(
@@ -319,7 +339,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
             return(values[, 1])
         },
-        .getColumnValues = function(parameterName, values, variantIndex, transposed = FALSE) {
+        .getColumnValues = function(
+                parameterName,
+                values,
+                variantIndex,
+                transposed = FALSE) {
             tryCatch(
                 {
                     if (transposed) {
@@ -369,8 +393,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     return(colValues)
                 },
                 error = function(e) {
-                    stopRuntimeIssue(".getColumnValues(", dQuote(parameterName), "): ", e$message, "; .getClassName(values) = ",
-                        .getClassName(values), "; dim(values) = ", .arrayToString(dim(values), vectorLookAndFeelEnabled = TRUE),
+                    stopRuntimeIssue(".getColumnValues(", dQuote(parameterName), "): ",
+                        e$message, "; .getClassName(values) = ",
+                        .getClassName(values), "; dim(values) = ",
+                        .arrayToString(dim(values), vectorLookAndFeelEnabled = TRUE),
                         "; variantIndex = ", variantIndex, "; transposed = ", transposed,
                         parameter = parameterName, value = values,
                         functionName = ".getColumnValues"
@@ -380,4 +406,3 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
     )
 )
-

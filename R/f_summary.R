@@ -1135,14 +1135,14 @@ NULL
     if (survivalPatientWiseEnabled) {
         if (outputSize == "large") {
             summaryFactory$addParameter(designPlan,
-                parameterName = "analysisTime", # TODO by situation
+                parameterName = "analysisTime", 
                 parameterCaption = "Analysis time",
                 roundDigits = digitSettings$digitsTime
             )
         }
 
         summaryFactory$addParameter(designPlan,
-            parameterName = "studyDuration", # TODO by situation
+            parameterName = "studyDuration", 
             parameterCaption = "Expected study duration under H1",
             roundDigits = digitSettings$digitsTime,
             smoothedZeroFormat = TRUE,
