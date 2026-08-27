@@ -389,7 +389,7 @@ NULL
 
         for (groupNumber in 1:numberOfGroups) {
             dataPerGroupAndStage <- arrayData
-            if (length(arrayDataDim) > 2 && (numberOfVariedParams == 1 || numberOfGroups == 1)) {
+            if (length(arrayDataDim) > 2) {
                 dataPerGroupAndStage <- arrayData[, variedParamNumber, groupNumber]
             }
             if (numberOfGroups > 1) {
