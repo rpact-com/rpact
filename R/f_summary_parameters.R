@@ -28,11 +28,12 @@ NULL
     populations <- NA_integer_
     if (inherits(object, "AnalysisResults") || inherits(object, "StageResults")) {
         groups <- object$.dataInput$getNumberOfGroups()
-        meansEnabled <- grepl("Means", .getClassName(object$.dataInput))
-        ratesEnabled <- grepl("Rates", .getClassName(object$.dataInput))
-        survivalEnabled <- grepl("Survival", .getClassName(object$.dataInput))
+        meansEnabled <- object$.dataInput$isDatasetMeans()
+        ratesEnabled <- object$.dataInput$isDatasetRates()
+        survivalEnabled <- object$.dataInput$isDatasetSurvival()
     } else {
-        meansEnabled <- grepl("Means", .getClassName(object))
+        meansEnabled <- grepl("Means", .getClassName(object)) ||
+            (inherits(object, "Dataset") && object$isDatasetEstimates())
         ratesEnabled <- grepl("Rates", .getClassName(object))
         survivalEnabled <- grepl("Survival", .getClassName(object))
         countDataEnabled <- grepl("CountData", .getClassName(object))

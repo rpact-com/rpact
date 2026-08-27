@@ -16,6 +16,9 @@
 
 C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS", list(
     means = ".formatMeans",
+    estimates = ".formatMeans",
+    degreesOfFreedom = ".formatMeans",
+    standardErrors = ".formatStDevs",
     stDevs = ".formatStDevs",
     stDev = ".formatStDevs",
     thetaH0 = ".formatStDevs",
