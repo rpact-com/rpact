@@ -765,8 +765,8 @@ NULL
 NULL
 
 #' Parameter Description: Effect Matrix
-#' @param effectMatrix Matrix of effect sizes with \code{activeArms} columns and number of rows
-#'   reflecting the different situations to consider.
+#' @param effectMatrix Matrix of effect sizes with \code{activeArms} columns and one or more rows,
+#'   where each row represents a different situation to consider.
 #' @name param_effectMatrix
 #' @keywords internal
 NULL

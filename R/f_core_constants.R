@@ -380,3 +380,8 @@ C_FISHER_METHOD_EQUAL_ALPHA <- "equalAlpha"
 C_FISHER_METHOD_NO_INTERACTION <- "noInteraction"
 C_FISHER_METHOD_USER_DEFINED_ALPHA <- "userDefinedAlpha"
 C_FISHER_METHOD_DEFAULT <- C_FISHER_METHOD_EQUAL_ALPHA
+
+C_SUMMARY_LEGEND_ENTRY_EFFECT_MATRIX <- list("[j]" = "effect shape situation j")
+C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARM <- list("(i)" = "results of treatment arm i vs. control arm")
+C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARMS <- list("(i, j, ...)" = "comparison of treatment arms 'i, j, ...' vs. control arm")
+C_SUMMARY_LEGEND_ENTRY_TREATMENT_EFFECT_SCALE <- list("(t)" = "treatment effect scale")

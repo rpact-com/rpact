@@ -382,8 +382,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     if (nrow(matrixValues) == 0) {
         stopIllegalArgument(
-            sQuote(paste0("effectList$", matrixName)), " must have one or more rows ",
-            "reflecting the different situations to consider",
+            sQuote(paste0("effectList$", matrixName)), " must have at least one row, ",
+            "with each row representing a different situation to consider",
             functionName = ".getEffectData",
             parameter = paste0("effectList$", matrixName)
         )

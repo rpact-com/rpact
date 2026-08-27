@@ -531,6 +531,26 @@ print.SummaryFactory <- function(
     return(NULL)
 }
 
+.addLegendEntry <- function(
+        type = c("effectMatrix", "treatmentArm", "treatmentArms", "treatmentEffectScale"), 
+        legendEntry = list()) {
+        
+    type <- match.arg(type)
+    if (type == "effectMatrix") {
+        entry <- C_SUMMARY_LEGEND_ENTRY_EFFECT_MATRIX
+    } else if (type == "treatmentArm") {
+        entry <- C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARM
+    } else if (type == "treatmentArms") {
+        entry <- C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARMS
+    }
+    if (!is.null(names(entry)) && !is.null(names(legendEntry)) && any(names(entry) %in% names(legendEntry))) {
+        return(legendEntry)
+    }
+    
+    legendEntry <- c(legendEntry, entry)
+    return(legendEntry)
+}
+
 .addParameterToSummaryFactory <- function(
         summaryFactory,
         parameterSet,
@@ -793,11 +813,11 @@ print.SummaryFactory <- function(
                 userDefinedEffectMatrix <-
                     parameterSet$isUserDefinedOrDerivedParameter("effectMatrix")
                 if (userDefinedEffectMatrix) {
-                    legendEntry[["[j]"]] <- "effect matrix row j (situation to consider)"
+                    legendEntry <- .addLegendEntry("effectMatrix", legendEntry)
                 }
                 if (grepl("Survival", .getClassName(parameterSet)) &&
                         !grepl("Enrichment", .getClassName(parameterSet))) {
-                    legendEntry[["(i)"]] <- "results of treatment arm i vs. control arm"
+                    legendEntry <- .addLegendEntry("treatmentArm", legendEntry)
                 }
 
                 if (grepl("SimulationResultsEnrichment", .getClassName(parameterSet))) {
@@ -875,13 +895,13 @@ print.SummaryFactory <- function(
 
                 variedParameterCaption <- "arm"
                 variedParameterValues <- 1:numberOfVariants
-                legendEntry[["(i)"]] <- "results of treatment arm i vs. control arm"
+                legendEntry <- .addLegendEntry("treatmentArm", legendEntry)
             } else {
                 transposed <- TRUE
                 variedParameterCaption <- "arms"
                 variedParameterValues <- parameterSet$.getHypothesisTreatmentArmVariants()
                 numberOfVariants <- length(variedParameterValues)
-                legendEntry[["(i, j, ...)"]] <- "comparison of treatment arms 'i, j, ...' vs. control arm"
+                legendEntry <- .addLegendEntry("treatmentArms", legendEntry)
             }
         } else {
             if (inherits(parameterSet, "Dataset")) {

@@ -777,16 +777,16 @@ NULL
         .setValueAndParameterType(simulationResults, "accrualIntensity", accrualIntensity, 0.1)
 
         .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
-        if (is.na(dropoutRate1)) {
+        dropoutRate1 <- .assertIsNumericVector(dropoutRate1, "dropoutRate1",
+            len = unique(c(1L, activeArms)), naAllowed = TRUE)
+        if (all(is.na(dropoutRate1))) {
             dropoutRate1 <- 0
         }
+        .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+        .assertIsSingleNumber(dropoutRate2, "dropoutRate2", naAllowed = TRUE)
         if (is.na(dropoutRate2)) {
             dropoutRate2 <- 0
         }
-        dropoutRate1 <- .assertIsNumericVector(dropoutRate1, "dropoutRate1",
-            len = unique(c(1L, activeArms)), naAllowed = FALSE)
-        .assertIsSingleNumber(dropoutRate2, "dropoutRate2")
-        .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
         .assertIsInInterval(dropoutRate2, "dropoutRate2", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
         .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, 0)
         .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, 0)

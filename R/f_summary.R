@@ -395,7 +395,7 @@ NULL
                 )
             }
         } else if (outputSize == "medium") {
-            legendEntry <- list("(i, j, ...)" = "comparison of treatment arms 'i, j, ...' vs. control arm")
+            legendEntry <- .addLegendEntry("treatmentArms")
             gMax <- stageResults$getGMax()
             if (.isTrialDesignConditionalDunnett(design)) {
                 summaryFactory$addParameter(closedTestResults,
@@ -671,8 +671,7 @@ NULL
     }
 
     if (planningEnabled) {
-        legendEntry <- list("(t)" = "treatment effect scale")
-
+        legendEntry <- .addLegendEntry("treatmentEffectScale")
         if (!is.null(designPlan[["criticalValuesEffectScale"]]) &&
                 ncol(designPlan$criticalValuesEffectScale) > 0 &&
                 !all(is.na(designPlan$criticalValuesEffectScale))) {

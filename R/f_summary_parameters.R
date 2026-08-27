@@ -286,7 +286,7 @@ NULL
     if (userDefinedEffectMatrix) {
         return(list(
             groupCaption = paste0(parameterCaption, " [", variedParamNumber, "]"),
-            legendEntry = list("[j]" = "effect matrix row j (situation to consider)")
+            legendEntry <- .addLegendEntry("effectMatrix", legendEntry)
         ))
     }
     if (is.matrix(variedParameterValues)) {
