@@ -2731,7 +2731,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
     design$criticalValues[design$criticalValues <= -7.5 + 1e-8] <- -Inf
     designCharacteristics$.setParameterType("shift", C_PARAM_GENERATED)
     designCharacteristics$.setParameterType("power", C_PARAM_GENERATED)
-    designCharacteristics$.setParameterType(".probs", C_PARAM_GENERATED)
+    #designCharacteristics$.setParameterType(".probs", C_PARAM_GENERATED)
     designCharacteristics$.setParameterType("rejectionProbabilities", C_PARAM_GENERATED)
     designCharacteristics$.setParameterType("information", C_PARAM_GENERATED)
     designCharacteristics$.setParameterType("futilityProbabilities", C_PARAM_GENERATED)

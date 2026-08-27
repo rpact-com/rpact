@@ -993,18 +993,6 @@ NULL
         }
     }
 
-    if (simulationEnabled && (multiArmEnabled || enrichmentEnabled || countDataEnabled) &&
-            design$kMax > 1 && outputSize %in% c("medium", "large")) {
-        summaryFactory$addParameter(designPlan,
-            parameterName = "earlyStop",
-            parameterCaption = "Overall exit probability", # (under H1)
-            roundDigits = digitSettings$digitsProbabilities,
-            smoothedZeroFormat = TRUE,
-            transpose = TRUE,
-            lastStage = design$kMax
-        )
-    }
-
     if (simulationEnabled && (multiArmEnabled || enrichmentEnabled)) {
         if (multiArmEnabled && outputSize %in% c("medium", "large") && design$kMax > 1) {
             .addSimulationMultiArmArrayParameter(
@@ -1136,7 +1124,8 @@ NULL
             summaryFactory$addParameter(designPlan,
                 parameterName = "analysisTime", 
                 parameterCaption = "Analysis time",
-                roundDigits = digitSettings$digitsTime
+                roundDigits = digitSettings$digitsTime,
+                transpose = multiArmEnabled || enrichmentEnabled
             )
         }
 
@@ -1170,7 +1159,7 @@ NULL
 
     probsH0 <- NULL
     probsH1 <- NULL
-    if (design$kMax > 1) {
+    if (planningEnabled && design$kMax > 1) {
         if (!is.null(designCharacteristics) &&
                 .isTrialDesignInverseNormalOrGroupSequential(design) &&
                 length(designCharacteristics$shift) == 1 &&
@@ -1199,16 +1188,38 @@ NULL
         }
     }
 
-    if (planningEnabled) {
-        if (!is.null(probsH1) && !is.null(probsH0) && design$kMax > 1) {
-            probsH0$earlyStop <- matrix(probsH0$earlyStop[1:(design$kMax - 1), 1], ncol = 1)
-            probsH0$rejectPerStage <- matrix(probsH0$rejectPerStage[1:(design$kMax - 1), 1], ncol = 1)
+    if (design$kMax > 1 && 
+            outputSize %in% c("medium", "large") &&
+            !is.null(designPlan[["earlyStop"]])) {
+        summaryFactory$addParameter(
+            designPlan,
+            parameterName = "earlyStop",
+            parameterCaption = paste0("Stopping probability", 
+                ifelse(survivalPatientWiseEnabled, " by stage", "")), # under H1
+            roundDigits = digitSettings$digitsProbabilities,
+            smoothedZeroFormat = TRUE,
+            transpose = !is(designPlan, "SimulationResultsSurvival"),
+            lastStage = design$kMax
+        )
+    }
+    
+    if (planningEnabled && !is.null(probsH1)) {
+        if (design$kMax > 1) {
+            if (!is.null(probsH0)) {
+                probsH0$earlyStop <- matrix(
+                    probsH0$earlyStop[1:(design$kMax - 1), 1], 
+                    ncol = 1)
+                probsH0$rejectPerStage <- matrix(
+                    probsH0$rejectPerStage[1:(design$kMax - 1), 1], 
+                    ncol = 1)
+            }
 
             if (is.matrix(probsH1$rejectPerStage)) {
                 if (design$kMax > 1 && designPlan$.isSampleSizeObject()) {
                     probsH1$rejectPerStage <- probsH1$rejectPerStage[1:(design$kMax - 1), 1]
                 } else {
-                    probsH1$rejectPerStage <- matrix(probsH1$rejectPerStage[1:(design$kMax - 1), ],
+                    probsH1$rejectPerStage <- matrix(
+                        probsH1$rejectPerStage[1:(design$kMax - 1), ],
                         ncol = ncol(probsH1$rejectPerStage)
                     )
                 }
@@ -1218,18 +1229,22 @@ NULL
 
             if (.isTrialDesignWithValidFutilityBounds(design)) {
                 if (is.matrix(probsH1$earlyStop)) {
-                    probsH1$earlyStop <- matrix(probsH1$earlyStop[1:(design$kMax - 1), ],
+                    probsH1$earlyStop <- matrix(
+                        probsH1$earlyStop[1:(design$kMax - 1), ],
                         ncol = ncol(probsH1$earlyStop)
                     )
                 } else {
                     probsH1$earlyStop <- probsH1$earlyStop[1:(design$kMax - 1)]
                 }
-                summaryFactory$addParameter(probsH0,
-                    parameterName = "earlyStop",
-                    parameterCaption = "Overall exit probability (under H0)",
-                    roundDigits = digitSettings$digitsProbabilities,
-                    smoothedZeroFormat = TRUE
-                )
+                if (!is.null(probsH0)) {
+                    summaryFactory$addParameter(
+                        probsH0,
+                        parameterName = "earlyStop",
+                        parameterCaption = "Stopping probability by stage (under H0)",
+                        roundDigits = digitSettings$digitsProbabilities,
+                        smoothedZeroFormat = TRUE
+                    )
+                }
                 x <- designPlan
                 if (is.null(x)) {
                     x <- design
@@ -1237,41 +1252,45 @@ NULL
                 summaryFactory$addParameter(x,
                     parameterName = "earlyStop",
                     values = probsH1$earlyStop,
-                    parameterCaption = "Overall exit probability (under H1)",
+                    parameterCaption = "Stopping probability by stage",
                     roundDigits = digitSettings$digitsProbabilities,
                     smoothedZeroFormat = TRUE
                 )
             }
-            summaryFactory$addParameter(probsH0,
-                parameterName = "rejectPerStage",
-                parameterCaption = "Exit probability for efficacy (under H0)",
-                roundDigits = digitSettings$digitsProbabilities,
-                smoothedZeroFormat = TRUE
-            )
+            if (!is.null(probsH0)) {
+                summaryFactory$addParameter(probsH0,
+                    parameterName = "rejectPerStage",
+                    parameterCaption = "Efficacy stopping probability by stage (under H0)",
+                    roundDigits = digitSettings$digitsProbabilities,
+                    smoothedZeroFormat = TRUE
+                )
+            }
             if (designPlan$.isPowerObject()) {
                 summaryFactory$addParameter(designPlan,
                     parameterName = "rejectPerStage",
                     values = probsH1$rejectPerStage,
-                    parameterCaption = "Exit probability for efficacy (under H1)",
+                    parameterCaption = "Efficacy stopping probability by stage",
                     roundDigits = digitSettings$digitsProbabilities,
                     smoothedZeroFormat = TRUE
                 )
             } else {
                 summaryFactory$addParameter(probsH1,
                     parameterName = "rejectPerStage",
-                    parameterCaption = "Exit probability for efficacy (under H1)",
+                    parameterCaption = "Efficacy stopping probability by stage",
                     roundDigits = digitSettings$digitsProbabilities,
                     smoothedZeroFormat = TRUE
                 )
             }
-
+            
             if (.isTrialDesignWithValidFutilityBounds(design)) {
-                summaryFactory$addParameter(probsH0,
-                    parameterName = "futilityPerStage",
-                    parameterCaption = "Exit probability for futility (under H0)",
-                    roundDigits = digitSettings$digitsProbabilities,
-                    smoothedZeroFormat = TRUE
-                )
+                if (!is.null(probsH0)) {
+                    summaryFactory$addParameter(probsH0,
+                        parameterName = "futilityPerStage",
+                        parameterCaption = "Futility stopping probability by stage (under H0)",
+                        roundDigits = digitSettings$digitsProbabilities,
+                        smoothedZeroFormat = TRUE
+                    )
+                }
                 futilityPerStage <- probsH1$futilityPerStage
                 if (designPlan$.isSampleSizeObject() && ncol(futilityPerStage) > 1) {
                     futilityPerStage <- futilityPerStage[, 1]
@@ -1279,7 +1298,7 @@ NULL
                 summaryFactory$addParameter(designPlan,
                     parameterName = "futilityPerStage",
                     values = futilityPerStage,
-                    parameterCaption = "Exit probability for futility (under H1)",
+                    parameterCaption = "Futility stopping probability by stage",
                     roundDigits = digitSettings$digitsProbabilities,
                     smoothedZeroFormat = TRUE
                 )
@@ -1289,7 +1308,9 @@ NULL
         rejectPerStageValues <- NULL
         if (!is.null(probsH1) && !simulationEnabled) {
             if (is.matrix(probsH1$rejectPerStage)) {
-                rejectPerStageValues <- matrix(probsH1$rejectPerStage[1:(design$kMax - 1), ], ncol = ncol(probsH1$rejectPerStage))
+                rejectPerStageValues <- matrix(
+                    probsH1$rejectPerStage[1:(design$kMax - 1), ], 
+                    ncol = ncol(probsH1$rejectPerStage))
             } else {
                 rejectPerStageValues <- probsH1$rejectPerStage[1:(design$kMax - 1)]
             }
@@ -1298,7 +1319,7 @@ NULL
             summaryFactory$addParameter(designPlan,
                 parameterName = "rejectPerStage",
                 values = rejectPerStageValues,
-                parameterCaption = "Exit probability for efficacy",
+                parameterCaption = "Efficacy stopping probability by stage",
                 roundDigits = digitSettings$digitsProbabilities,
                 smoothedZeroFormat = TRUE
             )
@@ -1311,7 +1332,7 @@ NULL
                 any(designPlan$futilityPerStage > 1e-08)) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "futilityPerStage",
-                parameterCaption = "Exit probability for futility", # under H1
+                parameterCaption = "Futility stopping probability by stage", # under H1
                 roundDigits = digitSettings$digitsProbabilities,
                 smoothedZeroFormat = TRUE,
                 transpose = grepl("MultiArm|Enrichment", .getClassName(designPlan))

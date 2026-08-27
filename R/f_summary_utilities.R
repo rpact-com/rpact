@@ -516,7 +516,7 @@ print.SummaryFactory <- function(
         return(NULL)
     }
 
-    if (!.isTrialDesignGroupSequentialOrFixed(design)) {
+    if (!.isTrialDesignGroupSequentialOrFixed(design) && !.isTrialDesignInverseNormal(design)) {
         return(NULL)
     }
 
@@ -542,6 +542,14 @@ print.SummaryFactory <- function(
         entry <- C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARM
     } else if (type == "treatmentArms") {
         entry <- C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARMS
+    } else if (type == "treatmentEffectScale") {
+        entry <- C_SUMMARY_LEGEND_ENTRY_TREATMENT_EFFECT_SCALE
+    } else {
+        stopRuntimeIssue("type ", .pQuote(type), " is not yet implemented for legend entry addition",
+            functionName = ".addLegendEntry",
+            parameter = "type", 
+            value = type
+        )
     }
     if (!is.null(names(entry)) && !is.null(names(legendEntry)) && any(names(entry) %in% names(legendEntry))) {
         return(legendEntry)
@@ -842,7 +850,8 @@ print.SummaryFactory <- function(
                     variedParameterCaption <- .getParameterCaption(variedParameterName)
                     numberOfVariants <- length(variedParameterValues)
                 } else {
-                    stopRuntimeIssue("varied parameter identification ", "is not implemented for ", .getClassName(parameterSet),
+                    stopRuntimeIssue("varied parameter identification ", 
+                        "is not implemented for ", .getClassName(parameterSet),
                         functionName = "addParameter",
                         parameter = "parameterSet", value = parameterSet
                     )
