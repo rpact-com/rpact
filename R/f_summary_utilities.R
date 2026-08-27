@@ -531,3 +531,463 @@ print.SummaryFactory <- function(
     return(NULL)
 }
 
+.addParameterToSummaryFactory = function(
+        summaryFactory,
+        parameterSet,
+        ...,
+        parameterName = NULL,
+        values = NULL,
+        parameterCaption,
+        roundDigits = NA_integer_,
+        ceilingEnabled = FALSE,
+        cumsumEnabled = FALSE,
+        twoSided = FALSE,
+        transpose = FALSE,
+        smoothedZeroFormat = FALSE,
+        parameterCaptionSingle = parameterCaption,
+        legendEntry = list(),
+        enforceFirstCase = FALSE,
+        formatRepeatedPValues = FALSE,
+        validateParameterType = TRUE,
+        lastStage = NA_integer_,
+        roundDigitsAsInformation = FALSE,
+        showNA = FALSE) {
+    if (!is.null(parameterName) && length(parameterName) == 1 &&
+        inherits(parameterSet, "ParameterSet") &&
+        parameterSet$isNotApplicableParameter(parameterName)) {
+        if (!is.null(values) && .getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE") &&
+            validateParameterType && !.isMarkdownEnabled()) {
+            warning(
+                "Failed to add parameter ", .arrayToString(parameterName), " (",
+                .arrayToString(values), ") stored in ",
+                .getClassName(parameterSet), " because the ",
+                "parameter has type C_PARAM_NOT_APPLICABLE"
+            )
+        }
+
+        return(invisible())
+    }
+
+    parameterName1 <- parameterName[1]
+    if (!is.null(parameterName1) && is.character(parameterName1) && is.null(values)) {
+        values <- parameterSet[[parameterName1]]
+        if (is.null(values)) {
+            stopRuntimeIssue(.getClassName(parameterSet), " does not ",
+                "contain a field ", .pQuote(parameterName1), "",
+                functionName = "addParameter",
+                parameter = "parameterSet",
+                value = parameterSet,
+                relatedParameter = "parameterName1",
+                relatedValue = parameterName1
+            )
+        }
+    }
+
+    parameterName2 <- NA_character_
+    values2 <- NA_real_
+    if (!is.null(parameterName) && length(parameterName) > 1) {
+        parameterName2 <- parameterName[2]
+        values2 <- parameterSet[[parameterName2]]
+        parameterName <- parameterName[1]
+        if (is.null(values2)) {
+            stopRuntimeIssue(.getClassName(parameterSet), " does not ",
+                "contain a field ", .pQuote(parameterName2), "",
+                functionName = "addParameter",
+                parameter = "parameterSet",
+                value = parameterSet,
+                relatedParameter = "parameterName2",
+                relatedValue = parameterName2
+            )
+        }
+    }
+
+    if (is.null(values) && is.null(parameterName1)) {
+        stopRuntimeIssue("'parameterName' or 'values' must be defined",
+            functionName = "addParameter",
+            parameter = "parameterName",
+            value = parameterName,
+            relatedParameter = "values",
+            relatedValue = values
+        )
+    }
+
+    transposed <- NA
+    if (transpose) {
+        if (!is.matrix(values)) {
+            values <- as.matrix(values)
+            if (!is.na(lastStage) && lastStage > ncol(values)) {
+                nCol <- lastStage - ncol(values)
+                values <- cbind(matrix(rep(NA_real_, nCol * nrow(values)), nrow = nrow(values)), values)
+                if (!is.null(parameterName) && length(parameterName) == 1 &&
+                    parameterName %in% c(
+                        "expectedNumberOfSubjects",
+                        "expectedNumberOfSubjectsH1",
+                        "expectedEventsH1",
+                        "expectedNumberOfEvents",
+                        "expectedStudyDurationH1",
+                        "expectedInformationH0",
+                        "expectedInformationH01",
+                        "expectedInformationH1",
+                        "studyDuration",
+                        "earlyStop"
+                    )) {
+                    transposed <- TRUE
+                }
+            }
+        } else {
+            values <- t(values)
+        }
+    }
+
+    if (is.list(parameterSet) && is.matrix(values)) {
+        parameterSet <- parameterSet[["parameterSet"]]
+        if (is.null(parameterSet)) {
+            stopRuntimeIssue("'parameterSet' must be added to list",
+                functionName = "addParameter",
+                parameter = "parameterSet", value = parameterSet
+            )
+        }
+    }
+
+    parameterNames <- ""
+    numberOfVariants <- 1
+    numberOfStages <- ifelse(is.matrix(values), ncol(values), length(values))
+    if (inherits(parameterSet, "ParameterSet")) {
+        parameterNames <- parameterSet$.getVisibleFieldNamesOrdered()
+        numberOfVariants <- .getMultidimensionalNumberOfVariants(parameterSet, parameterNames)
+        numberOfStages <- parameterSet$.getMultidimensionalNumberOfStages(parameterNames)
+    }
+
+    stages <- parameterSet[["stages"]]
+    if (is.null(stages) && !is.null(parameterSet[[".stageResults"]])) {
+        stages <- parameterSet[[".stageResults"]][["stages"]]
+    }
+    if (is.null(stages) && inherits(parameterSet, "ClosedCombinationTestResults")) {
+        stages <- parameterSet[[".design"]][["stages"]]
+    }
+    if (!is.null(stages) && length(stages) > 0) {
+        numberOfStages <- max(na.omit(stages))
+        if (is.matrix(values) && nrow(values) > 0) {
+            numberOfVariants <- nrow(values)
+        }
+        if (is.matrix(values) && ncol(values) > 0) {
+            numberOfStages <- ncol(values)
+        }
+    }
+
+    if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
+        isTRUE(parameterSet[[".piecewiseSurvivalTime"]]$delayedResponseEnabled)) {
+        numberOfVariants <- 1
+    }
+
+    if (twoSided) {
+        values <- 2 * values
+    }
+
+    caseCondition <- list(
+        and1 = enforceFirstCase,
+        and2 = inherits(parameterSet, "Dataset"),
+        and3 = list(
+            or1 = list(
+                and1 = !transpose,
+                and2 = numberOfVariants == 1
+            ),
+            or2 = list(
+                and1 = !is.matrix(values),
+                and2 = (!transpose && ncol(values) == 1),
+                and3 = (transpose && nrow(values) == 1)
+            ),
+            or3 = list(
+                and1 = .isTrialDesign(parameterSet),
+                and2 = (numberOfStages > 1 && numberOfStages == length(values)),
+                and3 = length(values) != numberOfVariants,
+                and4 = length(values) == 1,
+                and5 = !is.null(parameterName) && length(parameterName) == 1 &&
+                    parameterName %in% c(
+                        "futilityBoundsEffectScale",
+                        "futilityBoundsEffectScaleLower",
+                        "futilityBoundsEffectScaleUpper",
+                        "futilityPerStage",
+                        "earlyStop"
+                    )
+            )
+        )
+    )
+
+    if (.isConditionTrue(caseCondition, "or", showDebugMessages = FALSE)) {
+        valuesToShow <- .getSummaryValuesFormatted(
+            parameterSet,
+            parameterName1,
+            values,
+            roundDigits = roundDigits,
+            ceilingEnabled = ceilingEnabled,
+            cumsumEnabled = cumsumEnabled,
+            smoothedZeroFormat = smoothedZeroFormat,
+            formatRepeatedPValues = formatRepeatedPValues,
+            roundDigitsAsInformation = roundDigitsAsInformation,
+            showNA = showNA
+        )
+
+        if (parameterName1 %in% c("piControl", "overallPiControl", "overallPooledStDevs")) {
+            valuesToShow <- summaryFactory$.getInnerValues(valuesToShow, transpose = TRUE)
+        } else {
+            valuesToShow <- summaryFactory$.getInnerValues(valuesToShow, transpose = transpose)
+        }
+
+        valuesToShow2 <- NA_real_
+        if (!all(is.na(values2))) {
+            valuesToShow2 <- .getSummaryValuesFormatted(parameterSet,
+                parameterName1, values2,
+                roundDigits = roundDigits,
+                ceilingEnabled = ceilingEnabled,
+                cumsumEnabled = cumsumEnabled,
+                smoothedZeroFormat = smoothedZeroFormat,
+                formatRepeatedPValues = formatRepeatedPValues,
+                roundDigitsAsInformation = roundDigitsAsInformation,
+                showNA = showNA
+            )
+            valuesToShow2 <- summaryFactory$.getInnerValues(valuesToShow2, transpose = transpose)
+        }
+
+        valuesToShow <- summaryFactory$.getFormattedParameterValue(valuesToShow, valuesToShow2)
+        summaryFactory$addItem(parameterCaptionSingle, valuesToShow, legendEntry)
+    } else {
+        if (!inherits(parameterSet, "ParameterSet")) {
+            stopIllegalArgument("for varied values 'parameterSet' must be an instance of ",
+                "class 'ParameterSet' (was ", .getClassName(parameterSet, quote = TRUE), ")",
+                functionName = "addParameter",
+                parameter = "parameterSet",
+                value = parameterSet
+            )
+        }
+
+        if (is.na(transposed)) {
+            transposed <- !transpose &&
+                grepl("MultiArm|Enrichment", .getClassName(parameterSet)) &&
+                (!is.matrix(values) || ncol(values) > 1)
+        }
+
+        userDefinedEffectMatrix <- FALSE
+        if (grepl("MultiArm|Enrichment", .getClassName(parameterSet)) ||
+            inherits(parameterSet, "AnalysisResultsConditionalDunnett") ||
+            inherits(parameterSet, "ClosedCombinationTestResults") ||
+            inherits(parameterSet, "ConditionalPowerResults")) {
+            if (grepl("SimulationResults(MultiArm|Enrichment)", .getClassName(parameterSet)) &&
+                parameterName %in% c(
+                    "rejectAtLeastOne",
+                    "earlyStop",
+                    "futilityPerStage",
+                    "successPerStage",
+                    "expectedNumberOfSubjects",
+                    "expectedNumberOfEvents",
+                    "singleEventsPerArmAndStage",
+                    "singleEventsPerSubsetAndStage",
+                    "numberOfSelectedArms",
+                    "numberOfPopulations",
+                    "conditionalPowerAchieved",
+                    "plannedCalendarTime"
+                )) {
+                transposed <- TRUE
+                userDefinedEffectMatrix <-
+                    parameterSet$isUserDefinedOrDerivedParameter("effectMatrix")
+                if (userDefinedEffectMatrix) {
+                    legendEntry[["[j]"]] <- "effect matrix row j (situation to consider)"
+                }
+                if (grepl("Survival", .getClassName(parameterSet)) &&
+                    !grepl("Enrichment", .getClassName(parameterSet))) {
+                    legendEntry[["(i)"]] <- "results of treatment arm i vs. control arm"
+                }
+
+                if (grepl("SimulationResultsEnrichment", .getClassName(parameterSet))) {
+                    variedParameterName <- .getSummaryVariedParameterNameEnrichment(parameterSet)
+                    variedParameterValues <- parameterSet$effectList[[variedParameterName]]
+                    if (variedParameterName == "piTreatments") {
+                        variedParameterCaption <- "pi(treatment)"
+                    } else {
+                        variedParameterCaption <- .getParameterCaption(variedParameterName)
+                        if (is.matrix(variedParameterValues) && ncol(variedParameterValues) == 1) {
+                            variedParameterCaption <- sub("s$", "", variedParameterCaption)
+                        }
+                    }
+                    if (is.matrix(variedParameterValues)) {
+                        numberOfVariants <- nrow(variedParameterValues)
+                    } else {
+                        numberOfVariants <- length(variedParameterValues)
+                    }
+                } else if (grepl("SimulationResultsMultiArm", .getClassName(parameterSet))) {
+                    variedParameterName <- .getVariedParameterSimulationMultiArm(parameterSet)
+                    variedParameterValues <- parameterSet[[variedParameterName]]
+                    variedParameterCaption <- .getParameterCaption(variedParameterName)
+                    numberOfVariants <- length(variedParameterValues)
+                } else {
+                    stopRuntimeIssue("varied parameter identification ", "is not implemented for ", .getClassName(parameterSet),
+                        functionName = "addParameter",
+                        parameter = "parameterSet", value = parameterSet
+                    )
+                }
+                variedParameterCaption <- tolower(variedParameterCaption)
+            } else if (summaryFactory$.isEnrichmentObject(parameterSet)) {
+                transposed <- TRUE
+                variedParameterCaption <- "populations"
+                if (parameterName1 %in% c(
+                    "indices",
+                    "conditionalErrorRate",
+                    "secondStagePValues",
+                    "adjustedStageWisePValues",
+                    "overallAdjustedTestStatistics",
+                    "rejectedIntersections"
+                )) {
+                    if (.isEnrichmentAnalysisResults(parameterSet)) {
+                        variedParameterValues <- parameterSet$.closedTestResults$.getHypothesisPopulationVariants()
+                    } else {
+                        variedParameterValues <- parameterSet$.getHypothesisPopulationVariants()
+                    }
+                } else {
+                    variedParameterValues <- c(paste0("S", 1:(numberOfVariants - 1)), "F")
+                }
+                numberOfVariants <- length(variedParameterValues)
+                legendEntry[["S[i]"]] <- "population i"
+                legendEntry[["F"]] <- "full population"
+            } else if (!inherits(parameterSet, "ClosedCombinationTestResults") ||
+                parameterName %in% c("rejected", "separatePValues")) {
+                if (inherits(parameterSet, "AnalysisResultsConditionalDunnett") &&
+                    (!is.matrix(values) || ncol(values) > 1)) {
+                    transposed <- TRUE
+                }
+
+                if (inherits(parameterSet, "ClosedCombinationTestResults") &&
+                    parameterSet$isNotGeneratedParameter("adjustedStageWisePValues") &&
+                    parameterName == "separatePValues") {
+                    transposed <- TRUE
+                }
+
+                if (inherits(parameterSet, "ClosedCombinationTestResults") &&
+                    parameterName %in% c("rejected")) {
+                    transposed <- TRUE
+                }
+
+                if (inherits(parameterSet, "ConditionalPowerResults") &&
+                    parameterName %in% c("conditionalPower", "values")) {
+                    transposed <- TRUE
+                }
+
+                variedParameterCaption <- "arm"
+                variedParameterValues <- 1:numberOfVariants
+                legendEntry[["(i)"]] <- "results of treatment arm i vs. control arm"
+            } else {
+                transposed <- TRUE
+                variedParameterCaption <- "arms"
+                variedParameterValues <- parameterSet$.getHypothesisTreatmentArmVariants()
+                numberOfVariants <- length(variedParameterValues)
+                legendEntry[["(i, j, ...)"]] <- "comparison of treatment arms 'i, j, ...' vs. control arm"
+            }
+        } else {
+            if (inherits(parameterSet, "Dataset")) {
+                variedParameter <- "groups"
+            } else if (inherits(parameterSet, "PerformanceScore")) {
+                variedParameter <- ".alternative"
+            } else {
+                variedParameter <- parameterSet$.getVariedParameter(parameterNames, numberOfVariants)
+            }
+            if (is.null(variedParameter) || length(variedParameter) == 0 || variedParameter == "") {
+                if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE")) {
+                    warning(
+                        "Failed to get varied parameter from ", .getClassName(parameterSet),
+                        " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ";",
+                        length(variedParameter), " varied parameter values)"
+                    )
+                }
+                return(invisible())
+            }
+
+            variedParameterCaption <- parameterSet$.getDataFrameColumnCaption(
+                variedParameter,
+                niceColumnNamesEnabled = TRUE
+            )
+            variedParameterCaption <- tolower(variedParameterCaption)
+
+            if (variedParameterCaption == "alternative" || variedParameterCaption == ".alternative") {
+                legendEntry[["alt."]] <- "alternative"
+                variedParameterCaption <- "alt."
+            } else if (variedParameterCaption == "hazard ratio") {
+                legendEntry[["HR"]] <- "hazard ratio"
+                variedParameterCaption <- "HR"
+            } else if (grepl("\\(1\\)$", variedParameterCaption)) {
+                groups <- parameterSet[["groups"]]
+                if (!is.null(groups) && length(groups) == 1 && groups == 1) {
+                    variedParameterCaption <- sub(" \\(1\\)$", "", variedParameterCaption)
+                }
+            }
+
+            variedParameterValues <- round(parameterSet[[variedParameter]], 3)
+        }
+
+        for (variantIndex in 1:numberOfVariants) {
+            colValues <- summaryFactory$.getColumnValues(parameterName, values, variantIndex, transposed)
+            colValues <- .getSummaryValuesFormatted(
+                parameterSet,
+                parameterName1,
+                values = colValues,
+                roundDigits = roundDigits,
+                ceilingEnabled = ceilingEnabled, cumsumEnabled = cumsumEnabled,
+                smoothedZeroFormat = smoothedZeroFormat,
+                formatRepeatedPValues = formatRepeatedPValues,
+                roundDigitsAsInformation = roundDigitsAsInformation,
+                showNA = showNA
+            )
+            colValues2 <- NA_real_
+            if (!all(is.na(values2))) {
+                colValues2 <- summaryFactory$.getColumnValues(parameterName, values2, variantIndex, transposed)
+                colValues2 <- .getSummaryValuesFormatted(
+                    parameterSet,
+                    parameterName2,
+                    values = colValues2,
+                    roundDigits = roundDigits,
+                    ceilingEnabled = ceilingEnabled,
+                    cumsumEnabled = cumsumEnabled,
+                    smoothedZeroFormat = smoothedZeroFormat,
+                    formatRepeatedPValues = formatRepeatedPValues,
+                    roundDigitsAsInformation = roundDigitsAsInformation,
+                    showNA = showNA
+                )
+            }
+            colValues <- summaryFactory$.getFormattedParameterValue(valuesToShow = colValues, valuesToShow2 = colValues2)
+
+            if (numberOfVariants == 1) {
+                summaryFactory$addItem(parameterCaption, colValues, legendEntry)
+            } else if (summaryFactory$.isEnrichmentObject(parameterSet)) {
+                summaryFactory$addItem(paste0(
+                        parameterCaption, " ",
+                        variedParameterValues[variantIndex]
+                    ), colValues, legendEntry)
+            } else if (
+                (grepl("MultiArm|Enrichment", .getClassName(parameterSet)) &&
+                    !grepl("Simulation", .getClassName(parameterSet))) ||
+                inherits(parameterSet, "AnalysisResultsConditionalDunnett") ||
+                inherits(parameterSet, "ClosedCombinationTestResults") ||
+                inherits(parameterSet, "ConditionalPowerResults")) {
+                spacePrefix <- ifelse(parameterCaption %in% c("pi", "lambda", "median"), "", " ")
+                summaryFactory$addItem(paste0(
+                        parameterCaption, spacePrefix,
+                        "(", variedParameterValues[variantIndex], ")"
+                    ), colValues, legendEntry)
+            } else if (userDefinedEffectMatrix) {
+                summaryFactory$addItem(paste0(parameterCaption, " [", variantIndex, "]"), colValues, legendEntry)
+            } else {
+                if (is.matrix(variedParameterValues) && ncol(variedParameterValues) > 1) {
+                    variedParameterValuesFormatted <-
+                        .arrayToString(variedParameterValues[variantIndex, ], vectorLookAndFeelEnabled = TRUE)
+                } else {
+                    variedParameterValuesFormatted <- variedParameterValues[variantIndex]
+                }
+                summaryFactory$addItem(
+                    paste0(
+                        parameterCaption, ", ",
+                        variedParameterCaption, " = ", variedParameterValuesFormatted
+                    ),
+                    colValues, legendEntry
+                )
+            }
+        }
+    }
+}
