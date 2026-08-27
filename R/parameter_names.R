@@ -89,9 +89,9 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     pi1 = "Assumed treatment rate",
     pi2 = "Assumed control rate",
     lambdaTreatment = "Lambda",
-    lambdaControl = "Lambda {control}",
+    lambdaControl = "Lambda (control)",
     medianTreatment = "Median",
-    medianControl = "Median {control}",
+    medianControl = "Median (control)",
     overallPi1 = "Cumulative treatment rate",
     overallPi2 = "Cumulative control rate",
     pi1H1 = "pi(1) under H1",
@@ -424,6 +424,14 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     if (inherits(obj, "PlotSettings")) {
         return(C_PARAMETER_NAMES_PLOT_SETTINGS[[parameterName]])
     }
+    
+    if (identical(parameterName, "lambdaControl") && identical(as.integer(obj$activeArms), 1L)) {
+        return("Lambda (2)")
+    }
+    
+    if (identical(parameterName, "medianControl") && identical(as.integer(obj$activeArms), 1L)) {
+        return("Median (2)")
+    }
 
     pluralExt <- ifelse(tableOutputEnabled, "", "s")
 
@@ -468,6 +476,11 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
             inherits(obj, "TrialDesignPlan") &&
             identical(obj$.design$kMax, 1L)) {
         return("Study duration")
+    }
+
+    if (identical(parameterName, "futilityPerStage") && !is.null(obj$.design) && 
+            !is.null(obj$.design$kMax) && obj$.design$kMax <= 2L) {
+        return("Futility stop")
     }
 
     if (inherits(obj, "AnalysisResults")) {

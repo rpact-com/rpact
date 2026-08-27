@@ -373,11 +373,11 @@ SimulationResults <- R6::R6Class(
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
 
                     if (multiArmSurvivalEnabled) {
-                        self$.cat(
-                            "  (i): values of treatment arm i compared to control\n",
-                            consoleOutputEnabled = consoleOutputEnabled
-                        )
-                        self$.cat("  {j}: values of treatment arm j\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
+                        if (!identical(as.integer(self$activeArms), 1L)) {
+                            self$.cat("  {j}: values of treatment arm j compared to control\n",
+                                consoleOutputEnabled = consoleOutputEnabled)
+                        }
                     } else if (enrichmentEnabled) {
                         matrixName <- .getSimulationEnrichmentEffectMatrixName(self)
                         if (nrow(self$effectList[[matrixName]]) > 1) {
