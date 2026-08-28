@@ -72,8 +72,8 @@ simulation is used for backward compatibility.}
 
 \item{piControl}{The assumed probability in the control arm, default is \code{0.2}.}
 
-\item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and number of rows
-reflecting the different situations to consider.}
+\item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and one or more rows,
+where each row represents a different situation to consider.}
 
 \item{typeOfShape}{The shape of the dose-response relationship over the treatment groups.
 This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"},
