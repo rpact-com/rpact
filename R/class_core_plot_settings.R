@@ -438,7 +438,7 @@ PlotSettings <- R6::R6Class("PlotSettings",
                 ylab = NA_character_,
                 scalingFactor1 = 1,
                 scalingFactor2 = 1) {
-            if (is.null(xAxisLabel) && !is.na(xlab)) {
+            if (!is.na(xlab)) { # TODO check: is.null(xAxisLabel) && 
                 xAxisLabel <- xlab
             }
 
@@ -459,7 +459,7 @@ PlotSettings <- R6::R6Class("PlotSettings",
                     xAxisLabel <- bquote(bold("Theta" ~ Theta))
                 }
             }
-
+            
             p <- p + ggplot2::xlab(xAxisLabel)
             if (sum(is.na(ylab)) == 0) {
                 yAxisLabel1 <- ylab[1]
@@ -469,7 +469,8 @@ PlotSettings <- R6::R6Class("PlotSettings",
             }
             p <- p + ggplot2::ylab(yAxisLabel1)
 
-            p <- self$setSecondYAxisOnRightSide(p, yAxisLabel1, yAxisLabel2, scalingFactor1, scalingFactor2)
+            p <- self$setSecondYAxisOnRightSide(
+                p, yAxisLabel1, yAxisLabel2, scalingFactor1, scalingFactor2)
 
             return(p)
         },

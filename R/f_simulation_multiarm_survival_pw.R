@@ -173,8 +173,6 @@ getSimulationMultiArmSurvival <- function(
     callArgs <- names(as.list(match.call(expand.dots = FALSE)))
     hasArg <- function(x) x %in% callArgs
 
-    # TODO add assertion for dropoutRate1 and allow vector
-    
     usesBasicOnlyArgs <- hasArg("correlationComputation")
     usesPatientWiseOnlyArgs <- any(vapply(
         c(

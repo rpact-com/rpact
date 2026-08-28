@@ -478,7 +478,7 @@ getAvailablePlotTypes <- function(
         if (!grepl("(MultiArm|CountData)", .getClassName(obj)) || obj$.design$kMax > 1) {
             types <- c(types, 9)
         }
-        if (inherits(obj, "SimulationResultsSurvival")) {
+        if (inherits(obj, "SimulationResultsSurvival") || equals(obj[["simulationType"]], "patientWise")) {
             types <- c(types, 10:14)
         }
         plotTypesToCheck <- c(4:14)
@@ -1497,7 +1497,8 @@ getAvailablePlotTypes <- function(
     yAxisLabel1 <- .toCapitalized(yAxisLabel1)
     yAxisLabel2 <- .toCapitalized(yAxisLabel2)
 
-    p <- plotSettings$setAxesLabels(p,
+    p <- plotSettings$setAxesLabels(
+        p = p,
         xAxisLabel = xAxisLabel,
         yAxisLabel1 = yAxisLabel1,
         yAxisLabel2 = yAxisLabel2,
