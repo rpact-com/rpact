@@ -120,9 +120,12 @@ NULL
     }
 
     userDefinedEffectMatrix <- multiArmEnabled && simulationResults$isUserDefinedParameter("effectMatrix")
-    return(ifelse(userDefinedEffectMatrix, 
-        paste0("Effect Shape", ifelse(situationEnabled, " Situation", "")), 
-        "Maximum Effect"))
+    
+    if (!userDefinedEffectMatrix || !situationEnabled) {
+        return("Maximum Effect") # Effect size in highest dose arm
+    }
+    
+    return("Effect Shape Situation")
 }
 
 .getPowerAndStoppingProbabilities <- function(simulationResults, xValues, parameters) {
@@ -895,14 +898,17 @@ NULL
         }
 
         data <- NULL
+        xParameterNameSrc <- xParameterName
         for (k in 1:designMaster$kMax) {
-            subData <- simulationResults[[xParameterName]]
-            if (is.matrix(subData) && nrow(subData) >= gMax) {
-                subData <- as.numeric(subData[gMax, ])
+            xData <- simulationResults[[xParameterName]]
+            if (identical(xParameterName, "effectMatrix")) {
+                xData <- seq_len(ncol(xData))
+                xParameterNameSrc <- paste0("seq_len(", max(xData), ")")
             }
+            
             part <- data.frame(
-                categories = rep(k, length(subData)),
-                xValues = subData,
+                categories = rep(k, length(xData)),
+                xValues = xData,
                 yValues = simulationResults$analysisTime[k, ]
             )
             data <- rbind(data, part)
@@ -911,10 +917,10 @@ NULL
         if (is.na(legendPosition)) {
             legendPosition <- C_POSITION_LEFT_CENTER
         }
-
+        
         srcCmd <- .showPlotSourceInformation(
             objectName = simulationResultsName,
-            xParameterName = xParameterName,
+            xParameterName = xParameterNameSrc,
             yParameterNames = yParameterNamesSrc,
             hint = showSourceHint, 
             nMax = nMax,

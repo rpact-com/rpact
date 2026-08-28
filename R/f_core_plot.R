@@ -644,7 +644,7 @@ getAvailablePlotTypes <- function(
 
     xAxisCmd <- .reconstructSequenceCommand(xValues)
     if (is.na(xAxisCmd)) {
-        if (!grepl("(\\$)|(^c\\()", xParameterName) || grepl("^\\.design", xParameterName)) {
+        if (!grepl("seq_len|c\\(|(\\$)|(^c\\()", xParameterName) || grepl("^\\.design", xParameterName)) {
             if (length(objectName) == 0 || is.na(objectName)) {
                 objectName <- "x"
             }
