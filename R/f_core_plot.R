@@ -478,8 +478,11 @@ getAvailablePlotTypes <- function(
         if (!grepl("(MultiArm|CountData)", .getClassName(obj)) || obj$.design$kMax > 1) {
             types <- c(types, 9)
         }
-        if (inherits(obj, "SimulationResultsSurvival") || equals(obj[["simulationType"]], "patientWise")) {
+        if (inherits(obj, "SimulationResultsSurvival")) {
             types <- c(types, 10:14)
+        }
+        else if (equals(obj[["simulationType"]], "patientWise")) {
+            types <- c(types, 10:12)
         }
         plotTypesToCheck <- c(4:14)
         if (grepl("MultiArm", .getClassName(obj))) {
