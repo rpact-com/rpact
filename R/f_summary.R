@@ -816,13 +816,15 @@ NULL
             )
         }
 
-        summaryFactory$addParameter(designPlan,
-            parameterName = "successPerStage",
-            parameterCaption = "Success per stage",
-            roundDigits = digitSettings$digitsProbabilities,
-            smoothedZeroFormat = TRUE,
-            transpose = TRUE
-        )
+        if (!(survivalEnabled && multiArmEnabled)) {
+            summaryFactory$addParameter(designPlan,
+                parameterName = "successPerStage",
+                parameterCaption = "Success per stage",
+                roundDigits = digitSettings$digitsProbabilities,
+                smoothedZeroFormat = TRUE,
+                transpose = TRUE
+            )
+        }
     }
 
     if (baseEnabled) {
@@ -1306,7 +1308,24 @@ NULL
         }
     } else {
         rejectPerStageValues <- NULL
-        if (!is.null(probsH1) && !simulationEnabled) {
+        rejectPerStageParameterSet <- designPlan
+        rejectPerStageParameterName <- "rejectPerStage"
+        rejectPerStageTranspose <- FALSE
+        if (simulationEnabled && survivalEnabled && design$kMax > 1) {
+            if (baseEnabled && !is.null(designPlan[["rejectPerStage"]])) {
+                rejectPerStageValues <- designPlan$rejectPerStage[seq_len(design$kMax - 1), , drop = FALSE]
+            } else if (multiArmEnabled && !is.null(designPlan[["successPerStage"]])) {
+                rejectPerStageValues <- designPlan$successPerStage[seq_len(design$kMax - 1), , drop = FALSE]
+                # For a single active arm, successPerStage is intentionally marked as
+                # not applicable in the result object although it is needed here as
+                # the trial-level efficacy stopping probability. Wrapping the object
+                # retains its varied-parameter metadata without applying that field's
+                # visibility setting.
+                rejectPerStageParameterSet <- list(parameterSet = designPlan)
+                rejectPerStageParameterName <- "successPerStage"
+                rejectPerStageTranspose <- TRUE
+            }
+        } else if (!is.null(probsH1) && !simulationEnabled) {
             if (is.matrix(probsH1$rejectPerStage)) {
                 rejectPerStageValues <- matrix(
                     probsH1$rejectPerStage[1:(design$kMax - 1), ], 
@@ -1316,12 +1335,13 @@ NULL
             }
         }
         if (!is.null(rejectPerStageValues)) {
-            summaryFactory$addParameter(designPlan,
-                parameterName = "rejectPerStage",
+            summaryFactory$addParameter(rejectPerStageParameterSet,
+                parameterName = rejectPerStageParameterName,
                 values = rejectPerStageValues,
                 parameterCaption = "Efficacy stopping probability by stage",
                 roundDigits = digitSettings$digitsProbabilities,
-                smoothedZeroFormat = TRUE
+                smoothedZeroFormat = TRUE,
+                transpose = rejectPerStageTranspose
             )
         }
 
