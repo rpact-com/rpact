@@ -206,6 +206,8 @@ NULL
     .assertIsSimulationResults(simulationResults)
     .assertIsValidLegendPosition(legendPosition)
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
+    type <- .assertIsAvailablePlotType(simulationResults, type, 
+        functionName = ".plotSimulationResults")
     theta <- .assertIsValidThetaRange(thetaRange = theta)
 
     if (is.null(plotSettings)) {
@@ -965,11 +967,7 @@ NULL
             plotSettings = plotSettings
         ))
     } else {
-        stopIllegalArgument("'type' (", type, ") is not allowed; ",
-            "must be 5, 6, ..., 14",
-            functionName = ".plotSimulationResults",
-            parameter = "type", value = type
-        )
+        .showPlotTypeNotImplementedError(type, ".plotSimulationResults", simulationResults)
     }
 
     if (!is.null(srcCmd)) {
@@ -1074,29 +1072,7 @@ plot.SimulationResults <- function(
     fCall <- match.call(expand.dots = FALSE)
     simulationResultsName <- deparse(fCall$x)
     .assertIsValidPlotType(type, naAllowed = TRUE)
-    availablePlotTypes <- getAvailablePlotTypes(x, 
-        output = "numeric", numberInCaptionEnabled = FALSE)
-    if (length(availablePlotTypes) == 0) {
-        stopIllegalArgument(
-            "no plot type available for the specified simulation result",
-            functionName = "plot.SimulationResults"
-        )
-    }
-    
-    if (all(is.na(type))) {
-        type <- availablePlotTypes[1]
-    }
-    
-    if (!(type %in% availablePlotTypes)) {
-        stopIllegalArgument(
-            "'type' (", type, ") is not available; 'type' can ",
-            ifelse(length(availablePlotTypes) == 1, "only ", ""), "be ",
-            .arrayToString(availablePlotTypes, mode = "or"),
-            functionName = "plot.SimulationResults",
-            parameter = "type", value = type
-        )
-    }
-    
+    type <- .assertIsAvailablePlotType(x, type, functionName = "plot.SimulationResults")
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {

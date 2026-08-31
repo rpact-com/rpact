@@ -2200,13 +2200,8 @@ plot.AnalysisResults <- function(
         analysisResultsName,
         plotSettings = NULL) {
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-    if (!(type %in% c(1, 2))) {
-        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1 or 2",
-            functionName = ".plotAnalysisResults",
-            parameter = "type", value = type
-        )
-    }
-
+    type <- .assertIsAvailablePlotType(x, type, availablePlotTypes = c(1, 2), 
+        functionName = ".plotAnalysisResults", allOptionAllowed = FALSE)
     .assertIsAnalysisResults(x)
     .assertIsValidLegendPosition(legendPosition = legendPosition)
 

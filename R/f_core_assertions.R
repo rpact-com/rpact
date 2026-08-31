@@ -2306,8 +2306,9 @@ NULL
     }
 
     .assertIsNumericVector(piValue, piName, matrixAllowed = matrixAllowed)
-    .assertIsInOpenInterval(piValue, piName, 
-        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed)
+    .assertIsInOpenInterval(piValue, piName,
+        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed
+    )
 }
 
 .assertIsValidPi1 <- function(pi1, stageResults = NULL, stage = NULL) {
@@ -4337,6 +4338,48 @@ NULL
             naAllowed = naAllowed, validateType = FALSE
         )
     }
+}
+
+.assertIsAvailablePlotType <- function(
+        x,
+        type,
+        availablePlotTypes = NULL,
+        ...,
+        functionName = ".assertIsAvailablePlotType",
+        allOptionAllowed = TRUE) {
+    if (is.null(availablePlotTypes)) {
+        availablePlotTypes <- getAvailablePlotTypes(x,
+            output = "numeric", numberInCaptionEnabled = FALSE
+        )
+    }
+
+    if (length(availablePlotTypes) == 0) {
+        stopIllegalArgument(
+            "no plot type available for the specified result object",
+            functionName = functionName
+        )
+    }
+
+    if (all(is.na(type))) {
+        type <- availablePlotTypes[1]
+    }
+    
+    if (allOptionAllowed) {    
+        vailablePlotTypes <- c(availablePlotTypes, "all")
+    }
+
+    if (!(type %in% availablePlotTypes)) {
+        stopIllegalArgument(
+            "'type' (", type, ") is not available; 'type' can ",
+            ifelse(length(availablePlotTypes) == 1, "only ", ""), "be ",
+            .arrayToString(availablePlotTypes, mode = "or"),
+            functionName = functionName,
+            parameter = "type",
+            value = type
+        )
+    }
+
+    return(invisible(type))
 }
 
 .showFutilityBoundsUnnecessaryArgumentWarning <- function(

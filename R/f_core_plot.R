@@ -1872,3 +1872,13 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         }
     }
 }
+
+.showPlotTypeNotImplementedError <- function(type, functionName, x) {
+    stopRuntimeIssue("'type' (", type, ") is not yet implemented",
+        functionName = functionName,
+        parameter = "type", 
+        value = type, 
+        relatedParameter = "class", 
+        relatedValue = .getClassName(x)
+    )
+}
