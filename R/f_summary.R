@@ -1121,7 +1121,8 @@ NULL
         )
     }
 
-    if (survivalPatientWiseEnabled) {
+    if (!is.null(designPlan[["studyDuration"]]) &&
+            designPlan$isGeneratedParameter("studyDuration")) {
         if (outputSize == "large") {
             summaryFactory$addParameter(designPlan,
                 parameterName = "analysisTime", 

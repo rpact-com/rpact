@@ -1891,6 +1891,10 @@ getDesignInverseNormal <- function(
         design$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
         design$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
     }
+    
+    if (all(is.na(design$power))) {
+        design$power <- 1 - design$beta
+    }
 
     delayedInformation <- .assertIsNumericVector(
         delayedInformation, "delayedInformation",
@@ -2081,7 +2085,7 @@ getDesignInverseNormal <- function(
     design$delayedInformation[design$delayedInformation < 1e-03] <- 0
     design$.setParameterType("decisionCriticalValues", C_PARAM_GENERATED)
     design$.setParameterType("reversalProbabilities", C_PARAM_GENERATED)
-
+    
     warning("The delayed information design feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
         call. = FALSE
@@ -2748,7 +2752,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
             functionName = ".getDesignCharacteristics"
         )
     }
-
+    
     return(designCharacteristics)
 }
 

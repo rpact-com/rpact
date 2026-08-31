@@ -739,6 +739,19 @@
             functionName = ".getDirectionUpperCalculated"
         )
     }
+    
+    if (length(unique(directionUpperCalculated)) > 1) {
+        stopRuntimeIssue("Cannot determine the direction of the test. ",
+            "The calculated 'directionUpper' values are inconsistent: ",
+            .arrayToString(directionUpperCalculated),
+            functionName = ".getDirectionUpperCalculated"
+        )
+    }
+    
+    if (length(unique(directionUpperCalculated)) == 1) {
+        directionUpperCalculated <- directionUpperCalculated[1]
+    }
+    
     return(directionUpperCalculated)
 }
 
