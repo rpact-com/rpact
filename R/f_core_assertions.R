@@ -4364,10 +4364,10 @@ NULL
         type <- availablePlotTypes[1]
     }
     
-    if (allOptionAllowed) {    
-        vailablePlotTypes <- c(availablePlotTypes, "all")
+    if (isTRUE(allOptionAllowed)) {    
+        availablePlotTypes <- c(availablePlotTypes, "all")
     }
-
+    
     if (!(type %in% availablePlotTypes)) {
         stopIllegalArgument(
             "'type' (", type, ") is not available; 'type' can ",
