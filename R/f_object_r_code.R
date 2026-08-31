@@ -801,8 +801,8 @@ getObjectRCode <- function(
         if (!is.null(informationRates) && length(informationRates) > 0) {
             kMax <- obj[["kMax"]]
             if (equals(
-                    target = .getInformationRatesDefault(kMax),
-                    current = informationRates,
+                    .getInformationRatesDefault(kMax),
+                    informationRates,
                     tolerance = tolerance)) {
                 objNames <- objNames[objNames != "informationRates"]
                 if (!("kMax" %in% objNames) && kMax != 3) {

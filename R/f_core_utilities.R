@@ -2298,7 +2298,7 @@ resetOptions <- function(persist = TRUE) {
     )
 }
 
-equals <- function(x, y, ..., tolerance = 0) {
+equals <- function(x, y, ..., tolerance = sqrt(.Machine$double.eps)) {
     comparisonEnvironment <- parent.frame()
 
     compare <- function(x, y) {

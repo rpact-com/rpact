@@ -640,7 +640,10 @@ print.SummaryFactory <- function(
     }
 
     transposed <- NA
-    if (transpose) {
+    if (is.null(values) || length(values) <= 1) {
+        transpose <- FALSE
+    }
+    if (isTRUE(transpose)) {
         if (!is.matrix(values)) {
             values <- as.matrix(values)
             if (!is.na(lastStage) && lastStage > ncol(values)) {
@@ -954,7 +957,8 @@ print.SummaryFactory <- function(
         }
 
         for (variantIndex in 1:numberOfVariants) {
-            colValues <- summaryFactory$.getColumnValues(parameterName, values, variantIndex, transposed)
+            colValues <- summaryFactory$.getColumnValues(
+                parameterName, values, variantIndex, transposed)
             colValues <- .getSummaryValuesFormatted(
                 parameterSet,
                 parameterName1,
@@ -968,7 +972,8 @@ print.SummaryFactory <- function(
             )
             colValues2 <- NA_real_
             if (!all(is.na(values2))) {
-                colValues2 <- summaryFactory$.getColumnValues(parameterName, values2, variantIndex, transposed)
+                colValues2 <- summaryFactory$.getColumnValues(
+                    parameterName, values2, variantIndex, transposed)
                 colValues2 <- .getSummaryValuesFormatted(
                     parameterSet,
                     parameterName2,
@@ -982,7 +987,8 @@ print.SummaryFactory <- function(
                     showNA = showNA
                 )
             }
-            colValues <- summaryFactory$.getFormattedParameterValue(valuesToShow = colValues, valuesToShow2 = colValues2)
+            colValues <- summaryFactory$.getFormattedParameterValue(
+                valuesToShow = colValues, valuesToShow2 = colValues2)
 
             if (numberOfVariants == 1) {
                 summaryFactory$addItem(parameterCaption, colValues, legendEntry)
