@@ -438,7 +438,7 @@ PlotSettings <- R6::R6Class("PlotSettings",
                 ylab = NA_character_,
                 scalingFactor1 = 1,
                 scalingFactor2 = 1) {
-            if (!is.na(xlab)) { # TODO check: is.null(xAxisLabel) && 
+            if (!is.na(xlab)) {  
                 xAxisLabel <- xlab
             }
 
