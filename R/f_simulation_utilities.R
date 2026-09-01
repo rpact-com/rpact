@@ -787,6 +787,13 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 #' }
 #' A subset of variables is provided for \code{\link[=getSimulationMeans]{getSimulationMeans()}}, \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr
 #'  \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
+#' Multi-arm simulation data additionally contain \code{selectedForNextStage}. At
+#' non-final stages, this logical value indicates whether the adaptation selected
+#' the arm to continue, conditional on the trial not stopping; it is \code{NA} at
+#' the final stage. In contrast,
+#' \code{rejectPerStage} indicates rejection of the arm's null hypothesis, while
+#' \code{futilityPerStage} is a trial-level futility-stopping decision repeated for
+#' the arm rows of the stage.
 #'
 #' @template return_dataframe
 #'
@@ -1056,7 +1063,6 @@ getData.SimulationResults <- function(x) {
 #'   \item \code{treatmentGroup}: The treatment group number (1 or 2).
 #'   \item \code{survivalTime}: The survival time of the subject.
 #'   \item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
-#'   \item \code{lastObservationTime}: The specific observation time.
 #'   \item \code{timeUnderObservation}: The time under observation is defined as follows:
 #' ```
 #' if (event == TRUE) {
@@ -1064,9 +1070,11 @@ getData.SimulationResults <- function(x) {
 #' } else if (dropoutEvent == TRUE) {
 #'     timeUnderObservation <- dropoutTime
 #' } else {
-#'     timeUnderObservation <- lastObservationTime - accrualTime
+#'     timeUnderObservation <- analysisTime - accrualTime
 #' }
 #' ```
+#' where \code{analysisTime} is available from the corresponding row of
+#' \code{\link[=getData]{getData()}}.
 #'   \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
 #'   \item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
 #' }
@@ -1131,7 +1139,7 @@ getRawData <- function(x, aggregate = FALSE) {
     }
 
     if (!aggregate) {
-        return(rawData)
+        return(rawData[, names(rawData) != "lastObservationTime", drop = FALSE])
     }
 
     if (inherits(x, "SimulationResultsMultiArmSurvival")) {
