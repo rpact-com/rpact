@@ -626,7 +626,7 @@ NULL
             design,
             objectType = objectType, 
             userFunctionCallEnabled = TRUE, 
-            default = NA
+            default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
         )
 
         if (objectType == "power") {

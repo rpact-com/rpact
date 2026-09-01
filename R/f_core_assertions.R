@@ -2644,6 +2644,24 @@ NULL
     return(invisible(directionUpper))
 }
 
+.warnInCaseOfChangedDirectionUpperSurvivalDefault <- function(
+        directionUpper,
+        default,
+        sided,
+        ...,
+        userFunctionCallEnabled = TRUE) {
+    if (userFunctionCallEnabled &&
+            sided == 1 &&
+            identical(default, C_DIRECTION_UPPER_SURVIVAL_DEFAULT) &&
+            isTRUE(is.na(directionUpper))) {
+        warning(
+            "The default value of 'directionUpper' for survival endpoints has changed ",
+            "from TRUE to FALSE. Please specify 'directionUpper' explicitly to avoid this warning.",
+            call. = FALSE
+        )
+    }
+}
+
 .assertIsValidDirectionUpper <- function(
         directionUpper,
         design,
@@ -2654,6 +2672,13 @@ NULL
     objectType <- match.arg(objectType)
 
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
+
+    .warnInCaseOfChangedDirectionUpperSurvivalDefault(
+        directionUpper,
+        default,
+        design$sided,
+        userFunctionCallEnabled = userFunctionCallEnabled
+    )
 
     if (!is.na(directionUpper) && !is.na(design$directionUpper) &&
             !identical(directionUpper, design$directionUpper)) {

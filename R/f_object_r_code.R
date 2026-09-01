@@ -702,6 +702,14 @@ getObjectRCode <- function(
         objNames <- objNames[objNames != "stages"]
     }
 
+    isSurvivalObject <-
+        inherits(obj, "TrialDesignPlanSurvival") ||
+        inherits(obj, "SimulationResultsBaseSurvival") ||
+        (inherits(obj, "AnalysisResults") && obj$getDataInput()$isDatasetSurvival())
+    if (isSurvivalObject && obj[[".design"]]$sided == 1 && "directionUpper" %in% names(obj)) {
+        objNames <- union(objNames, "directionUpper")
+    }
+
     if (
         inherits(obj, "TrialDesign") &&
             !inherits(obj, "TrialDesignFixed") &&
