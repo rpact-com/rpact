@@ -4355,7 +4355,7 @@ NULL
 
     if (length(availablePlotTypes) == 0) {
         stopIllegalArgument(
-            "no plot type available for the specified result object",
+            "no plot type available for this object",
             functionName = functionName
         )
     }
@@ -4370,9 +4370,9 @@ NULL
     
     if (!(type %in% availablePlotTypes)) {
         stopIllegalArgument(
-            "'type' (", type, ") is not available; 'type' can ",
-            ifelse(length(availablePlotTypes) == 1, "only ", ""), "be ",
-            .arrayToString(availablePlotTypes, mode = "or"),
+            "'type' (", type, ") is not available; ",
+            ifelse(length(availablePlotTypes) == 1, "available is only", "available values are"), " ",
+            .arrayToString(availablePlotTypes, mode = "or", compactEnabled = TRUE),
             functionName = functionName,
             parameter = "type",
             value = type
