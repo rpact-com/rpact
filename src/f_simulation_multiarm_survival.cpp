@@ -954,6 +954,7 @@ List performSimulationMultiArmSurvivalLoop(
 	NumericVector dataAnalysisTime(len, NA_REAL);
 	NumericVector dataNumberOfSubjects(len, NA_REAL);
 	NumericVector dataNumberOfEvents(len, NA_REAL);
+	LogicalVector dataSelectedForNextStage(len, NA_LOGICAL);
 	LogicalVector dataRejectPerStage(len, NA_LOGICAL);
 	LogicalVector dataFutilityStop(len, NA_LOGICAL);
 	LogicalVector dataSuccessStop(len, NA_LOGICAL);
@@ -1137,6 +1138,9 @@ List performSimulationMultiArmSurvivalLoop(
 						dataAnalysisTime[index] = analysisTime[k];
 						dataNumberOfSubjects[index] = numberOfSubjects[k];
 						dataNumberOfEvents[index] = round(cumulativeEventsPerStage(g, k), 1);
+						if (k < kMax - 1) {
+							dataSelectedForNextStage[index] = selectedArmsTest(g, k + 1);
+						}
 						dataRejectPerStage[index] = rejected(g, k);
 						dataTestStatistics[index] = testStatistics(g, k);
 						dataSuccessStop[index] = successStop[k];
@@ -1279,6 +1283,7 @@ List performSimulationMultiArmSurvivalLoop(
 		_["pValue"] = dataPValuesSeparate[validRows],
 		_["conditionalCriticalValue"] = dataConditionalCriticalValue[validRows],
 		_["conditionalPowerAchieved"] = dataConditionalPowerAchieved[validRows],
+		_["selectedForNextStage"] = dataSelectedForNextStage[validRows],
 		_["rejectPerStage"] = dataRejectPerStage[validRows],
 		_["successStop"] = dataSuccessStop[validRows],
 		_["futilityPerStage"] = dataFutilityStop[validRows]
