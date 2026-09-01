@@ -23,6 +23,9 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     sampleSizes = "Sample sizes",
     means = "Means",
     stDevs = "Standard deviations",
+    estimates = "Estimates",
+    degreesOfFreedom = "Degrees of freedom",
+    standardErrors = "Standard errors",
     overallEvents = "Cumulative events",
     overallEvents1 = "Cumulative events (1)",
     overallEvents2 = "Cumulative events (2)",
@@ -491,6 +494,14 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (inherits(obj, "AnalysisResults")) {
+        if (!is.null(obj[[".dataInput"]]) && obj$.dataInput$isDatasetEstimates()) {
+            if (identical(parameterName, "estimates")) {
+                return("Estimate")
+            }
+            if (identical(parameterName, "standardErrors")) {
+                return("Standard error")
+            }
+        }
         if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds") &&
                 .isTrialDesignConditionalDunnett(obj$.design)) {
             return(paste0("Overall confidence interval", pluralExt, " (lower)"))

@@ -56,11 +56,13 @@ NULL
             title <- "Analysis results for a "
         }
 
-        if (grepl("Means", .getClassName(analysisResults$.dataInput))) {
+        if (analysisResults$.dataInput$isDatasetEstimates()) {
+            title <- paste0(title, "general estimates")
+        } else if (analysisResults$.dataInput$isDatasetMeans()) {
             title <- paste0(title, "continuous endpoint")
-        } else if (grepl("Rates", .getClassName(analysisResults$.dataInput))) {
+        } else if (analysisResults$.dataInput$isDatasetRates()) {
             title <- paste0(title, "binary endpoint")
-        } else if (grepl("Survival", .getClassName(analysisResults$.dataInput))) {
+        } else if (analysisResults$.dataInput$isDatasetSurvival()) {
             title <- paste0(title, "survival endpoint")
         }
 

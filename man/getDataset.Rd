@@ -34,9 +34,12 @@ The following generics (R generic functions) are available for this result objec
 Creates a dataset object and returns it.
 }
 \details{
-The different dataset types \code{DatasetMeans}, of \code{DatasetRates}, or
+The different dataset types \code{DatasetEstimates}, \code{DatasetMeans}, \code{DatasetRates}, or
 \code{DatasetSurvival} can be created as follows:
 \itemize{
+\item An element of \code{\link{DatasetEstimates}} for general estimates is created by \cr
+\code{getDataset(df =, est =, se =)} where \code{df}, \code{est}, and \code{se} are vectors
+with stage-wise degrees of freedom, estimates, and standard errors.
 \item An element of \code{\link{DatasetMeans}} for one sample is created by \cr
 \code{getDataset(sampleSizes =, means =, stDevs =)} where \cr
 \code{sampleSizes}, \code{means}, \code{stDevs} are vectors with stage-wise sample sizes,

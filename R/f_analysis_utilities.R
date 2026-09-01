@@ -772,6 +772,16 @@ NULL
     return(.isDataObject(..., dataObjectkeyWords = dataObjectkeyWords))
 }
 
+.isDataObjectEstimates <- function(...) {
+    return(.isDataObject(...,
+        dataObjectkeyWords = c(
+            C_KEY_WORDS_DEGREES_OF_FREEDOM,
+            C_KEY_WORDS_ESTIMATES,
+            C_KEY_WORDS_STANDARD_ERRORS
+        )
+    ))
+}
+
 .isDataObjectRates <- function(...) {
     dataObjectkeyWordsExpected <- c(
         C_KEY_WORDS_EVENTS,

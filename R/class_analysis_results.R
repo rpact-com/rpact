@@ -782,7 +782,7 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
                     stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$effectSizes")
                 }
 
-                if (grepl("Means", .getClassName(self$.dataInput))) {
+                if (self$.dataInput$isDatasetMeans()) {
                     stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallStDevs")
                 }
                 if (grepl("Rates", .getClassName(self$.dataInput))) {
@@ -884,6 +884,26 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
                 generatedParams <- generatedParams[!(generatedParams %in%
                     c("assumedStDevs", "thetaH1", "pi1", "pi2", "piTreatments", "piTreatments", "piControl", "piControls"))]
 
+                if (self$.dataInput$isDatasetEstimates()) {
+                    generatedParams <- generatedParams[generatedParams != "assumedStDev"]
+                    estimateParameterNames <- c("estimates", "degreesOfFreedom", "standardErrors")
+                    estimateParameterValues <- lapply(estimateParameterNames, function(parameterName) {
+                        self$.dataInput[[parameterName]]
+                    })
+                    names(estimateParameterValues) <- estimateParameterNames
+                    on.exit({
+                        for (parameterName in estimateParameterNames) {
+                            self$.dataInput[[parameterName]] <- estimateParameterValues[[parameterName]]
+                        }
+                    }, add = TRUE)
+                    for (parameterName in estimateParameterNames) {
+                        self$.dataInput[[parameterName]] <- .fillWithNAs(
+                            self$.dataInput[[parameterName]], self$.design$kMax
+                        )
+                    }
+                    generatedParams <- c(paste0(".dataInput$", estimateParameterNames), generatedParams)
+                }
+
                 if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(self))) {
                     if (all(c("conditionalPowerSimulated", "conditionalRejectionProbabilities") %in% generatedParams)) {
                         generatedParams <- .moveValue(
@@ -936,15 +956,19 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
             numberOfGroups <- self$.dataInput$getNumberOfGroups()
             str <- paste0(str, " (")
 
-            str <- paste0(str, tolower(sub("Dataset(Enrichment)?", "", .getClassName(self$.dataInput))))
-            if (grepl("Survival", .getClassName(.getClassName))) {
-                str <- paste0(str, " data")
-            }
-
-            if (numberOfGroups == 1) {
-                str <- paste0(str, " of one group")
+            if (self$.dataInput$isDatasetEstimates()) {
+                str <- paste0(str, "general estimates")
             } else {
-                str <- paste0(str, " of ", numberOfGroups, " groups")
+                str <- paste0(str, tolower(sub("Dataset(Enrichment)?", "", .getClassName(self$.dataInput))))
+                if (grepl("Survival", .getClassName(.getClassName))) {
+                    str <- paste0(str, " data")
+                }
+
+                if (numberOfGroups == 1) {
+                    str <- paste0(str, " of one group")
+                } else {
+                    str <- paste0(str, " of ", numberOfGroups, " groups")
+                }
             }
 
             if (self$.design$kMax > 1) {
