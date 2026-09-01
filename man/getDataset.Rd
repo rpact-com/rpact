@@ -38,8 +38,9 @@ The different dataset types \code{DatasetGeneral}, \code{DatasetMeans}, \code{Da
 \code{DatasetSurvival} can be created as follows:
 \itemize{
 \item An element of \code{\link{DatasetGeneral}} for general estimates is created by \cr
-\code{getDataset(df =, est =, se =)} where \code{df}, \code{est}, and \code{se} are vectors
-with stage-wise degrees of freedom, estimates, and standard errors.
+\code{getDataset(est =, se =, df =)} where \code{est}, \code{se}, and optionally \code{df}
+are vectors with stage-wise estimates, standard errors, and degrees of freedom. If \code{df}
+is omitted, the degrees of freedom are set to \code{Inf}, corresponding to a normal approximation.
 \item An element of \code{\link{DatasetMeans}} for one sample is created by \cr
 \code{getDataset(sampleSizes =, means =, stDevs =)} where \cr
 \code{sampleSizes}, \code{means}, \code{stDevs} are vectors with stage-wise sample sizes,

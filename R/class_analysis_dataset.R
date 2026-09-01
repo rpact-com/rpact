@@ -650,8 +650,9 @@ writeDatasets <- function(
 #' \code{DatasetSurvival} can be created as follows:
 #' \itemize{
 #'   \item An element of \code{\link{DatasetGeneral}} for general estimates is created by \cr
-#'     \code{getDataset(df =, est =, se =)} where \code{df}, \code{est}, and \code{se} are vectors
-#'     with stage-wise degrees of freedom, estimates, and standard errors.
+#'     \code{getDataset(est =, se =, df =)} where \code{est}, \code{se}, and optionally \code{df}
+#'     are vectors with stage-wise estimates, standard errors, and degrees of freedom. If \code{df}
+#'     is omitted, the degrees of freedom are set to \code{Inf}, corresponding to a normal approximation.
 #'   \item An element of \code{\link{DatasetMeans}} for one sample is created by \cr
 #'     \code{getDataset(sampleSizes =, means =, stDevs =)} where \cr
 #'     \code{sampleSizes}, \code{means}, \code{stDevs} are vectors with stage-wise sample sizes,
@@ -2527,16 +2528,18 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #' Dataset of General Estimates
 #'
 #' @description
-#' Class for a dataset of general estimates with degrees of freedom and standard errors.
+#' Class for a dataset of general estimates with optional degrees of freedom and standard errors.
 #'
 #' @template field_stages
 #' @field estimates Stage-wise estimates.
-#' @field degreesOfFreedom Stage-wise degrees of freedom.
+#' @field degreesOfFreedom Stage-wise degrees of freedom. If omitted on input, these are set to \code{Inf}.
 #' @field standardErrors Stage-wise standard errors.
 #'
 #' @details
 #' This object cannot be created directly; use \code{\link{getDataset}} with
-#' \code{df}, \code{est}, and \code{se} to create a dataset of general estimates.
+#' \code{est}, \code{se}, and optionally \code{df} to create a dataset of general estimates.
+#' If \code{df} is omitted, it is internally set to \code{Inf} for every stage,
+#' corresponding to a normal approximation.
 #'
 #' The estimates are endpoint-independent. Test statistics and information are
 #' calculated directly from estimates, standard errors, and degrees of freedom.
@@ -2588,12 +2591,19 @@ DatasetGeneral <- R6::R6Class("DatasetGeneral",
         .initByDataFrame = function(dataFrame) {
             super$.initByDataFrame(dataFrame)
 
-            self$degreesOfFreedom <- self$.getValuesByParameterName(
-                dataFrame, C_KEY_WORDS_DEGREES_OF_FREEDOM
-            )
             self$estimates <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_ESTIMATES)
             self$standardErrors <- self$.getValuesByParameterName(
                 dataFrame, C_KEY_WORDS_STANDARD_ERRORS
+            )
+            degreesOfFreedomUserDefined <- any(vapply(
+                C_KEY_WORDS_DEGREES_OF_FREEDOM,
+                function(parameterName) self$.paramExists(dataFrame, parameterName),
+                logical(1)
+            ))
+            self$degreesOfFreedom <- self$.getValuesByParameterName(
+                dataFrame,
+                C_KEY_WORDS_DEGREES_OF_FREEDOM,
+                defaultValues = rep(Inf, length(self$estimates))
             )
 
             self$.validateValues(self$degreesOfFreedom, "df")
@@ -2619,8 +2629,31 @@ DatasetGeneral <- R6::R6Class("DatasetGeneral",
             self$.recreateDataFrame()
 
             self$.setParameterType("groups", C_PARAM_NOT_APPLICABLE)
-            for (parameterName in c("estimates", "degreesOfFreedom", "standardErrors")) {
+            for (parameterName in c("estimates", "standardErrors")) {
                 self$.setParameterType(parameterName, C_PARAM_USER_DEFINED)
+            }
+            self$.setParameterType("degreesOfFreedom", ifelse(
+                degreesOfFreedomUserDefined,
+                C_PARAM_USER_DEFINED,
+                C_PARAM_DEFAULT_VALUE
+            ))
+        },
+        .validateDataset = function() {
+            .assertIsValidKMax(kMax = self$getNumberOfStages())
+
+            for (var in names(self)) {
+                values <- self[[var]]
+                infiniteValuesAreInvalid <- var != "degreesOfFreedom" && any(is.infinite(values))
+                if (any(is.nan(values)) || infiniteValuesAreInvalid) {
+                    stopRuntimeIssue(.pQuote(var), " (", .arrayToString(values), ") ",
+                        "contains illegal values, i.e., something went wrong",
+                        functionName = ".validateDataset",
+                        parameter = "var",
+                        value = var,
+                        relatedParameter = "values",
+                        relatedValue = values
+                    )
+                }
             }
         },
         .recreateDataFrame = function() {

@@ -4,11 +4,13 @@
 \alias{DatasetGeneral}
 \title{Dataset of General Estimates}
 \description{
-Class for a dataset of general estimates with degrees of freedom and standard errors.
+Class for a dataset of general estimates with optional degrees of freedom and standard errors.
 }
 \details{
 This object cannot be created directly; use \code{\link{getDataset}} with
-\code{df}, \code{est}, and \code{se} to create a dataset of general estimates.
+\code{est}, \code{se}, and optionally \code{df} to create a dataset of general estimates.
+If \code{df} is omitted, it is internally set to \code{Inf} for every stage,
+corresponding to a normal approximation.
 
 The estimates are endpoint-independent. Test statistics and information are
 calculated directly from estimates, standard errors, and degrees of freedom.
@@ -23,7 +25,7 @@ errors and Satterthwaite degrees of freedom calculated on the same scale.
 
 \item{\code{estimates}}{Stage-wise estimates.}
 
-\item{\code{degreesOfFreedom}}{Stage-wise degrees of freedom.}
+\item{\code{degreesOfFreedom}}{Stage-wise degrees of freedom. If omitted on input, these are set to \code{Inf}.}
 
 \item{\code{standardErrors}}{Stage-wise standard errors.}
 }}

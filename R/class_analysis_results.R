@@ -965,7 +965,7 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
                 str <- paste0(str, "general estimates")
             } else {
                 str <- paste0(str, tolower(sub("Dataset(Enrichment)?", "", .getClassName(self$.dataInput))))
-                if (grepl("Survival", .getClassName(.getClassName))) {
+                if (self$.dataInput$isDatasetSurvival()) {
                     str <- paste0(str, " data")
                 }
 

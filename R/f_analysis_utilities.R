@@ -484,7 +484,10 @@ NULL
             }
         }
 
-        if (sum(is.infinite(argValues)) > 0) {
+        infiniteDegreesOfFreedom <-
+            tolower(argName) %in% tolower(C_KEY_WORDS_DEGREES_OF_FREEDOM) &&
+            all(argValues[is.infinite(argValues)] > 0)
+        if (sum(is.infinite(argValues)) > 0 && !infiniteDegreesOfFreedom) {
             stopIllegalArgument("all data values must be finite; ", .pQuote(argName), " contains infinite values",
                 functionName = ".createDataFrame",
                 parameter = argName

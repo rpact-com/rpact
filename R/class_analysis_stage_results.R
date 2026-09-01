@@ -109,8 +109,12 @@ StageResults <- R6::R6Class("StageResults",
             self$.setParameterType("pValues", ifelse(
                 self$.isMultiArm(), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED
             ))
+            thetaH0Default <- ifelse(
+                self$isDatasetMeans(), C_THETA_H0_MEANS_DEFAULT,
+                ifelse(self$isDatasetRates(), C_THETA_H0_RATES_DEFAULT, C_THETA_H0_SURVIVAL_DEFAULT)
+            )
             self$.setParameterType("thetaH0", ifelse(
-                equals(self$thetaH0, C_THETA_H0_MEANS_DEFAULT), 
+                equals(self$thetaH0, thetaH0Default), 
                 C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
             self$.setParameterType("direction", ifelse(
