@@ -37,7 +37,6 @@ The data frame contains the following columns:
 \item \code{treatmentGroup}: The treatment group number (1 or 2).
 \item \code{survivalTime}: The survival time of the subject.
 \item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
-\item \code{lastObservationTime}: The specific observation time.
 \item \code{timeUnderObservation}: The time under observation is defined as follows:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{if (event == TRUE) \{
@@ -45,10 +44,12 @@ The data frame contains the following columns:
 \} else if (dropoutEvent == TRUE) \{
     timeUnderObservation <- dropoutTime
 \} else \{
-    timeUnderObservation <- lastObservationTime - accrualTime
+    timeUnderObservation <- analysisTime - accrualTime
 \}
 }\if{html}{\out{</div>}}
 
+where \code{analysisTime} is available from the corresponding row of
+\code{\link[=getData]{getData()}}.
 \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
 \item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
 }

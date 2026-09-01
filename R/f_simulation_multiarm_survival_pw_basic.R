@@ -660,6 +660,7 @@ NULL
     dataAnalysisTime <- rep(NA_real_, len)
     dataNumberOfSubjects <- rep(NA_real_, len)
     dataNumberOfEvents <- rep(NA_real_, len)
+    dataSelectedForNextStage <- rep(NA, len)
     dataRejectPerStage <- rep(NA, len)
     dataFutilityStop <- rep(NA_real_, len)
     dataSuccessStop <- rep(NA, len)
@@ -793,6 +794,9 @@ NULL
                         dataAnalysisTime[index] <- stageResults$analysisTime[k]
                         dataNumberOfSubjects[index] <- stageResults$numberOfSubjects[k]
                         dataNumberOfEvents[index] <- round(stageResults$cumulativeEventsPerStage[g, k], 1)
+                        if (k < kMax) {
+                            dataSelectedForNextStage[index] <- closedTest$selectedArms[g, k + 1]
+                        }
                         dataRejectPerStage[index] <- closedTest$rejected[g, k]
                         dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                         dataSuccessStop[index] <- closedTest$successStop[k]
@@ -889,6 +893,7 @@ NULL
         pValue = dataPValuesSeparate,
         conditionalCriticalValue = round(dataConditionalCriticalValue, 6),
         conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6),
+        selectedForNextStage = dataSelectedForNextStage,
         rejectPerStage = dataRejectPerStage,
         successStop = dataSuccessStop,
         futilityPerStage = dataFutilityStop
