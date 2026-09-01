@@ -1020,7 +1020,7 @@ getSampleSizeCounts <- function(
     designPlan$studyDuration <- studyDuration
     designPlan$.setParameterType("studyDuration",
         ifelse(!all(is.na(calendarTime)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE))
-    .addDeprecatedFieldValues(designPlan, "expectedStudyDurationH1", designPlan$singleEventsPerStage)
+    .addDeprecatedFieldValues(designPlan, "expectedStudyDurationH1", designPlan$studyDuration)
 
     designPlan$expectedNumberOfSubjectsH1 <- expectedNumberOfSubjectsH1
     designPlan$.setParameterType(

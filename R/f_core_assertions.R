@@ -691,7 +691,7 @@ NULL
 .assertIsDataset <- function(dataInput) {
     if (!.isDataset(dataInput)) {
         stopIllegalArgument("'dataInput' must be an instance of class ",
-            "'DatasetGeneral', 'DatasetMeans', 'DatasetRates' or 'DatasetSurvival' ",
+            "'DatasetGeneral', 'DatasetMeans', 'DatasetRates', or 'DatasetSurvival' ",
             "(is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDataset",
             parameter = "dataInput",
@@ -3169,7 +3169,7 @@ NULL
     )
     if (!(.getClassName(stageResults) %in% allowedClasses)) {
         stopIllegalArgument("'stageResults' must be an instance of ",
-            .arrayToString(allowedClasses, vectorLookAndFeelEnabled = FALSE),
+            .arrayToString(allowedClasses, vectorLookAndFeelEnabled = FALSE, encapsulate = TRUE),
             " (is ", .getClassName(stageResults, quote = TRUE), ")",
             functionName = ".assertIsStageResultsNonMultiHypotheses",
             parameter = "stageResults",
