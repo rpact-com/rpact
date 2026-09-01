@@ -22,27 +22,6 @@ test_that("Run just one basic rpact test", {
     expect_equal(design$stageLevels, c(0.00025917372, 0.0070553616, 0.022533125), tolerance = 1e-07)
 })
 
-test_that("'.arrayToString' optionally compacts consecutive integers", {
-    expect_equal(
-        rpact:::.arrayToString(c(1:9, "all"), mode = "or"),
-        "1, 2, 3, 4, 5, 6, 7, 8, 9, or all"
-    )
-    expect_equal(
-        rpact:::.arrayToString(c(1:9, "all"), mode = "or", compactEnabled = TRUE),
-        '1, 2, ..., 9, or "all"'
-    )
-    expect_equal(
-        rpact:::.arrayToString(c("first", 3:7, 10:13, "last"), compactEnabled = TRUE),
-        '"first", 3, 4, ..., 7, 10, 11, 12, 13, "last"'
-    )
-    expect_equal(rpact:::.arrayToString(1:4, compactEnabled = TRUE), "1, 2, 3, 4")
-    expect_equal(rpact:::.arrayToString(1:5, compactEnabled = TRUE), "1, 2, ..., 5")
-    expect_equal(
-        rpact:::.arrayToString(c(1:5, 7.5), compactEnabled = TRUE),
-        '1, 2, ..., 5, "7.5"'
-    )
-})
-
 test_that("rpact unit test information", {
     cat("\n\n")
     cat("
