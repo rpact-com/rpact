@@ -409,6 +409,7 @@ getTestLabel <- function(x) {
         separator = ", ",
         vectorLookAndFeelEnabled = FALSE,
         encapsulate = FALSE,
+        compactEnabled = FALSE,
         digits = 3,
         maxLength = 80L,
         maxCharacters = 160L,
@@ -419,6 +420,7 @@ getTestLabel <- function(x) {
     .assertIsInClosedInterval(maxLength, "maxLength", lower = 1, upper = NULL)
     .assertIsSingleInteger(maxCharacters, "maxCharacters", naAllowed = FALSE, validateType = FALSE)
     .assertIsInClosedInterval(maxCharacters, "maxCharacters", lower = 3, upper = NULL)
+    .assertIsSingleLogical(compactEnabled, "compactEnabled")
 
     if (missing(x) || is.null(x) || length(x) == 0) {
         return("NULL")
@@ -458,7 +460,37 @@ getTestLabel <- function(x) {
         return(.getConcatenatedValues(result, separator = separator, mode = mode))
     }
 
-    if (encapsulate) {
+    if (compactEnabled) {
+        values <- as.character(x)
+        integerIndices <- !is.na(x) & grepl("^-?(0|[1-9][0-9]*)$", values)
+        integerValues <- rep(NA_real_, length(values))
+        integerValues[integerIndices] <- suppressWarnings(as.numeric(values[integerIndices]))
+        integerIndices[!is.finite(integerValues)] <- FALSE
+
+        result <- character()
+        index <- 1L
+        while (index <= length(values)) {
+            lastIndex <- index
+            if (integerIndices[index]) {
+                while (lastIndex < length(values) &&
+                        integerIndices[lastIndex + 1L] &&
+                        integerValues[lastIndex + 1L] == integerValues[lastIndex] + 1) {
+                    lastIndex <- lastIndex + 1L
+                }
+            }
+
+            if (lastIndex - index + 1L >= 5L) {
+                result <- c(result, values[index], values[index + 1L], "...", values[lastIndex])
+            } else {
+                currentValues <- values[index:lastIndex]
+                quoteIndices <- !integerIndices[index:lastIndex] & !is.na(x[index:lastIndex])
+                currentValues[quoteIndices] <- encodeString(currentValues[quoteIndices], quote = '"')
+                result <- c(result, currentValues)
+            }
+            index <- lastIndex + 1L
+        }
+        x <- result
+    } else if (encapsulate) {
         x <- .sQuote(x)
     }
 

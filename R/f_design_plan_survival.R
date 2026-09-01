@@ -1517,7 +1517,6 @@ NULL
         designPlan$analysisTime <- analysisTime
         designPlan$expectedNumberOfSubjectsH1 <- expectedNumberOfSubjectsH1
         designPlan$studyDuration <- studyDuration
-        designPlan$studyDurationH1 <- studyDuration # deprecated
 
         designPlan$.setParameterType("analysisTime", C_PARAM_GENERATED)
         designPlan$.setParameterType("expectedNumberOfSubjectsH1", C_PARAM_GENERATED)

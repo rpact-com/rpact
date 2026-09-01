@@ -444,7 +444,7 @@
         designPlan$.setParameterType("studyTime", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("numberOfSubjects", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("calendarTime", C_PARAM_NOT_APPLICABLE)
-        designPlan$.setParameterType("expectedStudyDurationH1", C_PARAM_NOT_APPLICABLE)
+        designPlan$.setParameterType("studyDuration", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("expectedNumberOfSubjectsH1", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("informationOverStages", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("maxInformation", C_PARAM_NOT_APPLICABLE)
@@ -713,7 +713,7 @@ getSampleSizeCounts <- function(
     }
     n1 <- rep(NA_real_, totalCases)
     n2 <- rep(NA_real_, totalCases)
-    expectedStudyDurationH1 <- rep(NA_real_, totalCases)
+    studyDuration <- rep(NA_real_, totalCases)
     expectedNumberOfSubjectsH1 <- rep(NA_real_, totalCases)
 
     for (iCase in 1:totalCases) {
@@ -956,9 +956,9 @@ getSampleSizeCounts <- function(
         }
 
         if (!anyNA(calendarTime[, iCase])) {
-            expectedStudyDurationH1[iCase] <- calendarTime[kMax, iCase]
+            studyDuration[iCase] <- calendarTime[kMax, iCase]
             if (kMax > 1) {
-                expectedStudyDurationH1[iCase] <- calendarTime[kMax, iCase] -
+                studyDuration[iCase] <- calendarTime[kMax, iCase] -
                     sum(
                         (designCharacteristics$rejectionProbabilities[1:(kMax - 1)] +
                             designCharacteristics$futilityProbabilities[1:(kMax - 1)]) *
@@ -1017,11 +1017,10 @@ getSampleSizeCounts <- function(
         )
     )
 
-    designPlan$expectedStudyDurationH1 <- expectedStudyDurationH1
-    designPlan$.setParameterType(
-        "expectedStudyDurationH1",
-        ifelse(!all(is.na(calendarTime)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
-    )
+    designPlan$studyDuration <- studyDuration
+    designPlan$.setParameterType("studyDuration",
+        ifelse(!all(is.na(calendarTime)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE))
+    .addDeprecatedFieldValues(designPlan, "expectedStudyDurationH1", designPlan$singleEventsPerStage)
 
     designPlan$expectedNumberOfSubjectsH1 <- expectedNumberOfSubjectsH1
     designPlan$.setParameterType(

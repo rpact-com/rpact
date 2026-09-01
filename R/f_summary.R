@@ -1046,38 +1046,8 @@ NULL
         }
     }
 
-    if (baseEnabled && countDataEnabled && !is.null(designPlan[["calendarTime"]]) &&
-            designPlan$isGeneratedParameter("calendarTime")) {
-        summaryFactory$addParameter(designPlan,
-            parameterName = "calendarTime",
-            parameterCaption = "Calendar time",
-            roundDigits = digitSettings$digitsTime,
-            showNA = TRUE
-        )
-    }
-
-    if (baseEnabled && countDataEnabled && !is.null(designPlan[["expectedStudyDurationH1"]]) &&
-            designPlan$isGeneratedParameter("expectedStudyDurationH1")) {
-        summaryFactory$addParameter(designPlan,
-            parameterName = "expectedStudyDurationH1",
-            parameterCaption = "Expected study duration under H1",
-            roundDigits = digitSettings$digitsTime,
-            transpose = TRUE,
-            lastStage = design$kMax
-        )
-    }
-
-    if (baseEnabled && countDataEnabled && !is.null(designPlan[["studyTime"]]) &&
-            designPlan$isGeneratedParameter("studyTime")) {
-        summaryFactory$addParameter(designPlan,
-            parameterName = "studyTime",
-            parameterCaption = "Study time",
-            roundDigits = digitSettings$digitsTime
-        )
-    }
-
     if (baseEnabled && countDataEnabled && design$kMax > 1 && outputSize %in% c("medium", "large") &&
-            designPlan$.isSampleSizeObject()) {
+        designPlan$.isSampleSizeObject()) {
         if (outputSize == "large") {
             summaryFactory$addParameter(designPlan,
                 parameterName = "informationOverStages",
@@ -1120,21 +1090,41 @@ NULL
             transpose = TRUE
         )
     }
+    
+    if (baseEnabled && countDataEnabled && !is.null(designPlan[["calendarTime"]]) &&
+            designPlan$isGeneratedParameter("calendarTime")) {
+        summaryFactory$addParameter(designPlan,
+            parameterName = "calendarTime",
+            parameterCaption = "Calendar time",
+            roundDigits = digitSettings$digitsTime,
+            showNA = TRUE
+        )
+    }
 
+    if (outputSize == "large" && !is.null(designPlan[["analysisTime"]]) &&
+        designPlan$isGeneratedParameter("analysisTime")) {
+        summaryFactory$addParameter(designPlan,
+            parameterName = "analysisTime", 
+            parameterCaption = "Analysis time",
+            roundDigits = digitSettings$digitsTime,
+            transpose = multiArmEnabled || enrichmentEnabled
+        )
+    }
+    
+    if (baseEnabled && countDataEnabled && !is.null(designPlan[["studyTime"]]) &&
+            designPlan$isGeneratedParameter("studyTime")) {
+        summaryFactory$addParameter(designPlan,
+            parameterName = "studyTime",
+            parameterCaption = "Study time",
+            roundDigits = digitSettings$digitsTime
+        )
+    }
+    
     if (!is.null(designPlan[["studyDuration"]]) &&
             designPlan$isGeneratedParameter("studyDuration")) {
-        if (outputSize == "large") {
-            summaryFactory$addParameter(designPlan,
-                parameterName = "analysisTime", 
-                parameterCaption = "Analysis time",
-                roundDigits = digitSettings$digitsTime,
-                transpose = multiArmEnabled || enrichmentEnabled
-            )
-        }
-
         summaryFactory$addParameter(designPlan,
             parameterName = "studyDuration", 
-            parameterCaption = "Expected study duration under H1",
+            parameterCaption = "Expected study duration",
             roundDigits = digitSettings$digitsTime,
             smoothedZeroFormat = TRUE,
             transpose = TRUE,

@@ -723,7 +723,6 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
 #' @template field_earlyStop
 #' @template field_informationRates
 #' @template field_analysisTime
-#' @template field_studyDurationH1
 #' @template field_studyDuration
 #' @template field_maxStudyDuration
 #' @template field_eventsPerStage
@@ -811,7 +810,6 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
         earlyStop = NULL,
         informationRates = NULL,
         analysisTime = NULL,
-        studyDurationH1 = NULL,
         studyDuration = NULL,
         maxStudyDuration = NULL,
         eventsPerStage = NULL, # deprecated
@@ -1025,7 +1023,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
 #' @template field_accrualIntensity
 #' @template field_followUpTime
 #' @template field_calendarTime
-#' @template field_expectedStudyDurationH1
+#' @template field_studyDuration
 #' @template field_studyTime
 #' @template field_numberOfSubjects
 #' @template field_expectedNumberOfSubjectsH1
@@ -1079,7 +1077,8 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
         accrualIntensity = NULL,
         followUpTime = NULL,
         calendarTime = NULL,
-        expectedStudyDurationH1 = NULL,
+        studyDuration = NULL,
+        expectedStudyDurationH1 = NULL, # deprecated
         studyTime = NULL,
         numberOfSubjects = NULL,
         expectedNumberOfSubjectsH1 = NULL,

@@ -184,7 +184,6 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     analysisTime = "Analysis time",
     eventsPerStage1 = "Observed events by stage (1)",
     eventsPerStage2 = "Observed events by stage (2)",
-    studyDurationH1 = "Expected study duration H1",
     twoSidedPower = "Two-sided power",
     plannedEvents = "Planned cumulative events",
     plannedSubjects = "Planned cumulative subjects",
@@ -319,7 +318,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     calendarTime = "Calendar time",
     studyTime = "Study time",
     studySubjects = "Study subjects",
-    expectedStudyDurationH1 = "Expected study duration under H1",
+    expectedStudyDurationH1 = "Expected study duration under H1", # deprecated
     informationOverStages = "Information over stages",
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
