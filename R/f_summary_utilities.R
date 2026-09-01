@@ -655,7 +655,6 @@ print.SummaryFactory <- function(
                             "expectedNumberOfSubjectsH1",
                             "expectedEventsH1",
                             "expectedNumberOfEvents",
-                            "studyDuration",
                             "expectedInformationH0",
                             "expectedInformationH01",
                             "expectedInformationH1",
