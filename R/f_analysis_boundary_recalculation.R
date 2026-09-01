@@ -26,7 +26,10 @@
 
     informationRates <- rep(NA_real_, stage)
     absoluteInformations <- rep(NA_real_, stage)
-    if (.isDatasetMeans(dataInput) || .isDatasetRates(dataInput)) {
+    if (.isDatasetGeneral(dataInput)) {
+        absoluteInformations <- cumsum(dataInput$getInformationsUpTo(stage))
+        informationRates <- absoluteInformations / maxInformation
+    } else if (.isDatasetMeans(dataInput) || .isDatasetRates(dataInput)) {
         for (k in 1:stage) {
             sampleSizes <- dataInput$getOverallSampleSizes(stage = k)
             absoluteInformations[k] <- sum(sampleSizes, na.rm = TRUE)
@@ -65,7 +68,8 @@
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' For means and rates the maximum information is the maximum number of subjects
+#' For general estimates, information is calculated as the cumulative inverse
+#' squared standard error. For means and rates the maximum information is the maximum number of subjects
 #' or the relative proportion if \code{informationEpsilon} < 1;
 #' for survival data it is the maximum number of events
 #' or the relative proportion if \code{informationEpsilon} < 1.

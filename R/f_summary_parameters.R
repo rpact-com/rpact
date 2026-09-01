@@ -24,16 +24,18 @@ NULL
     enrichmentEnabled <- grepl("Enrichment", .getClassName(object))
     simulationEnabled <- grepl("Simulation", .getClassName(object))
     countDataEnabled <- FALSE
+    generalEnabled <- FALSE
     ratioEnabled <- FALSE
     populations <- NA_integer_
     if (inherits(object, "AnalysisResults") || inherits(object, "StageResults")) {
         groups <- object$.dataInput$getNumberOfGroups()
+        generalEnabled <- object$.dataInput$isDatasetGeneral()
         meansEnabled <- object$.dataInput$isDatasetMeans()
         ratesEnabled <- object$.dataInput$isDatasetRates()
         survivalEnabled <- object$.dataInput$isDatasetSurvival()
     } else {
-        meansEnabled <- grepl("Means", .getClassName(object)) ||
-            (inherits(object, "Dataset") && object$isDatasetEstimates())
+        generalEnabled <- inherits(object, "Dataset") && object$isDatasetGeneral()
+        meansEnabled <- grepl("Means", .getClassName(object))
         ratesEnabled <- grepl("Rates", .getClassName(object))
         survivalEnabled <- grepl("Survival", .getClassName(object))
         countDataEnabled <- grepl("CountData", .getClassName(object))
@@ -51,6 +53,7 @@ NULL
 
     return(list(
         meansEnabled = meansEnabled,
+        generalEnabled = generalEnabled,
         ratesEnabled = ratesEnabled,
         survivalEnabled = survivalEnabled,
         countDataEnabled = countDataEnabled,

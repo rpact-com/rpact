@@ -87,14 +87,9 @@
     }
     if (!isTRUE(.installationQualificationDone()) &&
             .isStartupMessagingEnabled()) {
-        packageStartupMessage(paste0(
-            "Installation qualification for rpact ",
-            .getPackageVersionString(), " has not yet been performed."
-        ))
-        packageStartupMessage(paste0(
-            "Please run testPackage() before ",
-            "using the package in GxP relevant environments."
-        ))
+        for (msg in .getInstallationQualificationMissingText()) {
+            packageStartupMessage(msg)
+        }
     }
 }
 

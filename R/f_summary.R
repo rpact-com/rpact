@@ -89,7 +89,9 @@ NULL
     }
 
     value <- "?"
-    if (settings$meansEnabled) {
+    if (settings$generalEnabled) {
+        value <- "theta"
+    } else if (settings$meansEnabled) {
         value <- "mu"
     } else if (settings$ratesEnabled) {
         value <- "pi"
@@ -288,7 +290,13 @@ NULL
         roundDigits = digitSettings$digitsGeneral
     )
 
-    if (stageResults$isDatasetMeans()) {
+    if (stageResults$isDatasetGeneral()) {
+        summaryFactory$addParameter(stageResults,
+            parameterName = "overallStandardErrors",
+            parameterCaption = "Cumulative standard error",
+            roundDigits = digitSettings$digitsGeneral
+        )
+    } else if (stageResults$isDatasetMeans()) {
         parameterCaption <- ifelse(stageResults$isOneSampleDataset(),
             "Cumulative standard deviation", "Cumulative (pooled) standard deviation"
         )

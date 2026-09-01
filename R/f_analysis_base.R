@@ -256,7 +256,9 @@ getAnalysisResults <- function(
         )
 
         fun <- NULL
-        if (dataInput$isDatasetMeans()) {
+        if (dataInput$isDatasetGeneral()) {
+            fun <- .getAnalysisResultsGeneral
+        } else if (dataInput$isDatasetMeans()) {
             fun <- .getAnalysisResultsMeans
         } else if (dataInput$isDatasetRates()) {
             fun <- .getAnalysisResultsRates
@@ -317,11 +319,12 @@ getAnalysisResults <- function(
 #' @param ... Further (optional) arguments to be passed:
 #' \describe{
 #'   \item{\code{thetaH0}}{The null hypothesis value,
-#'       default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+#'       default is \code{0} for general estimates, the normal case, and the binary case,
 #'       it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 #'       For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 #'       That is, in case of (one-sided) testing of
 #'       \itemize{
+#'         \item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
 #'         \item \emph{means}: a value \code{!= 0}
 #'             (or a value \code{!= 1} for testing the mean ratio) can be specified.
 #'         \item \emph{rates}: a value \code{!= 0}
@@ -414,6 +417,17 @@ getStageResults <- function(
         )
         .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
         on.exit(dataInput$.trim())
+
+        if (dataInput$isDatasetGeneral()) {
+            return(.getStageResultsGeneral(
+                design = design,
+                dataInput = dataInput,
+                stage = stage,
+                directionUpper = directionUpper,
+                userFunctionCallEnabled = TRUE,
+                ...
+            ))
+        }
 
         if (dataInput$isDatasetMeans()) {
             return(.getStageResultsMeans(
@@ -720,6 +734,17 @@ getRepeatedConfidenceIntervals <- function(
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
+
+    if (dataInput$isDatasetGeneral()) {
+        return(.getRepeatedConfidenceIntervalsGeneral(
+            design = design,
+            dataInput = dataInput,
+            directionUpper = directionUpper,
+            tolerance = tolerance,
+            stage = stage,
+            ...
+        ))
+    }
 
     if (dataInput$isDatasetMeans()) {
         return(.getRepeatedConfidenceIntervalsMeans(
@@ -1631,7 +1656,16 @@ getFinalConfidenceInterval <- function(
         default = directionUpperDefault)
 
     finalConfidenceInterval <- NULL
-    if (dataInput$isDatasetMeans()) {
+    if (dataInput$isDatasetGeneral()) {
+        finalConfidenceInterval <- .getFinalConfidenceIntervalGeneral(
+            design = design,
+            dataInput = dataInput,
+            directionUpper = directionUpper,
+            tolerance = tolerance,
+            stage = stage,
+            ...
+        )
+    } else if (dataInput$isDatasetMeans()) {
         finalConfidenceInterval <- .getFinalConfidenceIntervalMeans(
             design = design,
             dataInput = dataInput,

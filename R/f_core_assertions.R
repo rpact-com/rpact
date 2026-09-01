@@ -576,7 +576,18 @@ NULL
 
     if (!is.null(stage)) {
         if (dataInput$getNumberOfGroups() == 1) {
-            if (.isDatasetMeans(dataInput)) {
+            if (.isDatasetGeneral(dataInput)) {
+                if (any(na.omit(dataInput$getStandardErrorsUpTo(stage)) <= 0)) {
+                    stopIllegalDataInput("all standard errors must be > 0",
+                        functionName = ".assertIsValidDataInput"
+                    )
+                }
+                if (any(na.omit(dataInput$getDegreesOfFreedomUpTo(stage)) <= 0)) {
+                    stopIllegalDataInput("all degrees of freedom must be > 0",
+                        functionName = ".assertIsValidDataInput"
+                    )
+                }
+            } else if (.isDatasetMeans(dataInput)) {
                 if (any(na.omit(dataInput$getStDevsUpTo(stage)) <= 0)) {
                     stopIllegalDataInput("all standard deviations must be > 0",
                         functionName = ".assertIsValidDataInput"
@@ -680,7 +691,7 @@ NULL
 .assertIsDataset <- function(dataInput) {
     if (!.isDataset(dataInput)) {
         stopIllegalArgument("'dataInput' must be an instance of class ",
-            "'DatasetMeans', 'DatasetRates' or 'DatasetSurvival' ",
+            "'DatasetGeneral', 'DatasetMeans', 'DatasetRates' or 'DatasetSurvival' ",
             "(is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDataset",
             parameter = "dataInput",
@@ -694,6 +705,17 @@ NULL
         stopIllegalArgument("'dataInput' must be an instance of class ",
             "'DatasetMeans' (is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetMeans",
+            parameter = "dataInput",
+            value = dataInput
+        )
+    }
+}
+
+.assertIsDatasetGeneral <- function(dataInput) {
+    if (!.isDatasetGeneral(dataInput = dataInput)) {
+        stopIllegalArgument("'dataInput' must be an instance of class ",
+            "'DatasetGeneral' (is ", .getClassName(dataInput, quote = TRUE), ")",
+            functionName = ".assertIsDatasetGeneral",
             parameter = "dataInput",
             value = dataInput
         )
@@ -724,9 +746,14 @@ NULL
 }
 
 .isDataset <- function(dataInput) {
-    return(.isDatasetMeans(dataInput) ||
+    return(.isDatasetGeneral(dataInput) ||
+        .isDatasetMeans(dataInput) ||
         .isDatasetRates(dataInput) ||
         .isDatasetSurvival(dataInput))
+}
+
+.isDatasetGeneral <- function(dataInput) {
+    return(inherits(dataInput, "DatasetGeneral"))
 }
 
 .isDatasetMeans <- function(dataInput) {
@@ -2170,7 +2197,7 @@ NULL
 .assertIsValidThetaH0 <- function(
         thetaH0,
         ...,
-        endpoint = c("means", "rates", "survival", "counts"),
+        endpoint = c("general", "means", "rates", "survival", "counts"),
         groups,
         ratioEnabled = FALSE,
         naAllowed = FALSE) {
@@ -2976,7 +3003,15 @@ NULL
 
     param <- NA_character_
     paramValues <- NA_real_
-    if (dataInput$isDatasetSurvival()) {
+    if (dataInput$isDatasetGeneral()) {
+        observedInformations <- cumsum(dataInput$getInformationsUpTo(stage))
+        if (any(abs(design$informationRates[2:stage] -
+                observedInformations[2:stage] / observedInformations[1] * design$informationRates[1]) >
+                C_ACCEPT_DEVIATION_INFORMATIONRATES)) {
+            param <- "information values"
+            paramValues <- observedInformations
+        }
+    } else if (dataInput$isDatasetSurvival()) {
         if (any(abs(design$informationRates[2:stage] - dataInput$getOverallEventsUpTo(stage)[2:stage] /
                 dataInput$getOverallEventsUpTo(1) * design$informationRates[1]) >
                 C_ACCEPT_DEVIATION_INFORMATIONRATES)) {
@@ -3127,6 +3162,7 @@ NULL
     }
 
     allowedClasses <- c(
+        "StageResultsGeneral",
         "StageResultsMeans",
         "StageResultsRates",
         "StageResultsSurvival"

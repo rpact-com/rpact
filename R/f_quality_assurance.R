@@ -802,6 +802,15 @@ enableStartupMessages <- function() {
     saveOptions()
 }
 
+.getInstallationQualificationMissingText <- function() {
+    return(c(
+        paste0("Installation qualification for rpact ", .getPackageVersionString(),
+            " could not be verified on this system."),
+        paste0("Before using the package in a GxP-relevant environment, please ensure that installation ",
+            "qualification has been successfully performed."),
+        "If required, run testPackage()."
+    ))
+}
 
 #'
 #' @title
@@ -842,11 +851,7 @@ checkInstallationQualificationStatus <- function(showMessage = TRUE) {
         return(invisible(FALSE))
     }
 
-    message(
-        "Installation qualification for rpact ", .getPackageVersionString(),
-        " has not yet been performed. Please run testPackage() ",
-        "before using the package in GxP relevant environments."
-    )
+    message(paste0(.getInstallationQualificationMissingText(), collapse = " "))
     return(invisible(FALSE))
 }
 

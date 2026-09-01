@@ -9,7 +9,7 @@ Basic class for datasets.
 \details{
 \code{Dataset} is the basic class for
 \itemize{
-\item \code{\link{DatasetEstimates}},
+\item \code{\link{DatasetGeneral}},
 \item \code{\link{DatasetMeans}},
 \item \code{\link{DatasetRates}},
 \item \code{\link{DatasetSurvival}}, and

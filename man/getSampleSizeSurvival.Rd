@@ -44,11 +44,12 @@ the default is \code{"Schoenfeld"}. For details, see Hsieh (Statistics in Medici
 For non-inferiority testing (i.e., \code{thetaH0 != 1}), only Schoenfeld's formula can be used.}
 
 \item{thetaH0}{The null hypothesis value,
-default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+default is \code{0} for general estimates, the normal case, and the binary case,
 it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
+\item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
 \item \emph{means}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the mean ratio) can be specified.
 \item \emph{rates}: a value \code{!= 0}

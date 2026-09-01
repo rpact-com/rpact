@@ -782,7 +782,12 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
                     stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$effectSizes")
                 }
 
-                if (self$.dataInput$isDatasetMeans()) {
+                if (self$.dataInput$isDatasetGeneral()) {
+                    stageResultParametersToShow <- c(
+                        stageResultParametersToShow,
+                        ".stageResults$overallStandardErrors"
+                    )
+                } else if (self$.dataInput$isDatasetMeans()) {
                     stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallStDevs")
                 }
                 if (grepl("Rates", .getClassName(self$.dataInput))) {
@@ -884,7 +889,7 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
                 generatedParams <- generatedParams[!(generatedParams %in%
                     c("assumedStDevs", "thetaH1", "pi1", "pi2", "piTreatments", "piTreatments", "piControl", "piControls"))]
 
-                if (self$.dataInput$isDatasetEstimates()) {
+                if (self$.dataInput$isDatasetGeneral()) {
                     generatedParams <- generatedParams[generatedParams != "assumedStDev"]
                     estimateParameterNames <- c("estimates", "degreesOfFreedom", "standardErrors")
                     estimateParameterValues <- lapply(estimateParameterNames, function(parameterName) {
@@ -956,7 +961,7 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
             numberOfGroups <- self$.dataInput$getNumberOfGroups()
             str <- paste0(str, " (")
 
-            if (self$.dataInput$isDatasetEstimates()) {
+            if (self$.dataInput$isDatasetGeneral()) {
                 str <- paste0(str, "general estimates")
             } else {
                 str <- paste0(str, tolower(sub("Dataset(Enrichment)?", "", .getClassName(self$.dataInput))))

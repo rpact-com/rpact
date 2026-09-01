@@ -772,7 +772,7 @@ NULL
     return(.isDataObject(..., dataObjectkeyWords = dataObjectkeyWords))
 }
 
-.isDataObjectEstimates <- function(...) {
+.isDataObjectGeneral <- function(...) {
     return(.isDataObject(...,
         dataObjectkeyWords = c(
             C_KEY_WORDS_DEGREES_OF_FREEDOM,
@@ -1088,6 +1088,10 @@ getLongFormat <- function(dataInput) {
 }
 
 .getDatasetEndpoint <- function(dataInput) {
+    if (.isDatasetGeneral(dataInput)) {
+        return("general")
+    }
+
     if (.isDatasetMeans(dataInput)) {
         return("means")
     }
@@ -1106,6 +1110,10 @@ getLongFormat <- function(dataInput) {
 .getDefaultThetaH0 <- function(dataInput, thetaH0) {
     if (!is.na(thetaH0)) {
         return(thetaH0)
+    }
+
+    if (.isDatasetGeneral(dataInput)) {
+        return(C_THETA_H0_GENERAL_DEFAULT)
     }
 
     if (.isDatasetMeans(dataInput)) {

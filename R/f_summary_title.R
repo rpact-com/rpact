@@ -56,8 +56,8 @@ NULL
             title <- "Analysis results for a "
         }
 
-        if (analysisResults$.dataInput$isDatasetEstimates()) {
-            title <- paste0(title, "general estimates")
+        if (analysisResults$.dataInput$isDatasetGeneral()) {
+            title <- paste0(title, "dataset of general estimates")
         } else if (analysisResults$.dataInput$isDatasetMeans()) {
             title <- paste0(title, "continuous endpoint")
         } else if (analysisResults$.dataInput$isDatasetRates()) {

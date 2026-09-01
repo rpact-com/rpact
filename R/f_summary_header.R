@@ -509,7 +509,9 @@ NULL
     header <- paste0(header, "\n")
 
     header <- paste0(header, "The results were calculated using a ")
-    if (stageResults$isDatasetMeans()) {
+    if (stageResults$isDatasetGeneral()) {
+        header <- paste0(header, "t-test based on general estimates")
+    } else if (stageResults$isDatasetMeans()) {
         if (dataInput$getNumberOfGroups() == 1) {
             header <- paste0(header, "one-sample t-test")
         } else if (dataInput$getNumberOfGroups() == 2) {

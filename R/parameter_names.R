@@ -130,6 +130,9 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     overallSampleSizes2 = "Cumulative sample sizes (2)",
     overallTestStatistics = "Overall test statistics",
     overallPValues = "Overall p-values",
+    overallEstimates = "Cumulative estimates",
+    overallStandardErrors = "Cumulative standard errors",
+    overallDegreesOfFreedom = "Cumulative degrees of freedom",
     overallMeans = "Cumulative means",
     overallMeans1 = "Cumulative means (1)",
     overallMeans2 = "Cumulative means (2)",
@@ -494,7 +497,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (inherits(obj, "AnalysisResults")) {
-        if (!is.null(obj[[".dataInput"]]) && obj$.dataInput$isDatasetEstimates()) {
+        if (!is.null(obj[[".dataInput"]]) && obj$.dataInput$isDatasetGeneral()) {
             if (identical(parameterName, "estimates")) {
                 return("Estimate")
             }

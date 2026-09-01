@@ -582,8 +582,8 @@ writeDatasets <- function(
 
     enrichmentEnabled <- .isDataObjectEnrichment(...)
 
-    if (.isDataObjectEstimates(...)) {
-        return(DatasetEstimates$new(
+    if (.isDataObjectGeneral(...)) {
+        return(DatasetGeneral$new(
             dataFrame = dataFrame,
             floatingPointNumbersEnabled = TRUE,
             enrichmentEnabled = FALSE,
@@ -646,10 +646,10 @@ writeDatasets <- function(
 #'        samples sizes and event numbers defined as floating-point numbers will be truncated.
 #'
 #' @details
-#' The different dataset types \code{DatasetEstimates}, \code{DatasetMeans}, \code{DatasetRates}, or
+#' The different dataset types \code{DatasetGeneral}, \code{DatasetMeans}, \code{DatasetRates}, or
 #' \code{DatasetSurvival} can be created as follows:
 #' \itemize{
-#'   \item An element of \code{\link{DatasetEstimates}} for general estimates is created by \cr
+#'   \item An element of \code{\link{DatasetGeneral}} for general estimates is created by \cr
 #'     \code{getDataset(df =, est =, se =)} where \code{df}, \code{est}, and \code{se} are vectors
 #'     with stage-wise degrees of freedom, estimates, and standard errors.
 #'   \item An element of \code{\link{DatasetMeans}} for one sample is created by \cr
@@ -1567,7 +1567,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #' @details
 #' \code{Dataset} is the basic class for
 #' \itemize{
-#'   \item \code{\link{DatasetEstimates}},
+#'   \item \code{\link{DatasetGeneral}},
 #'   \item \code{\link{DatasetMeans}},
 #'   \item \code{\link{DatasetRates}},
 #'   \item \code{\link{DatasetSurvival}}, and
@@ -2017,8 +2017,8 @@ Dataset <- R6::R6Class("Dataset",
         isDatasetMeans = function() {
             return(inherits(self, "DatasetMeans"))
         },
-        isDatasetEstimates = function() {
-            return(inherits(self, "DatasetEstimates"))
+        isDatasetGeneral = function() {
+            return(inherits(self, "DatasetGeneral"))
         },
         isDatasetRates = function() {
             return(inherits(self, "DatasetRates"))
@@ -2521,7 +2521,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 )
 
 #'
-#' @name DatasetEstimates
+#' @name DatasetGeneral
 #'
 #' @title
 #' Dataset of General Estimates
@@ -2538,77 +2538,126 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #' This object cannot be created directly; use \code{\link{getDataset}} with
 #' \code{df}, \code{est}, and \code{se} to create a dataset of general estimates.
 #'
-#' Internally, the data are represented as one-sample means data with sample sizes
-#' \code{df + 1} and standard deviations \code{se * sqrt(df + 1)}. This allows the
-#' established continuous endpoint analysis calculations to be reused without
-#' rounding the degrees of freedom.
+#' The estimates are endpoint-independent. Test statistics and information are
+#' calculated directly from estimates, standard errors, and degrees of freedom.
+#' Stage-wise test statistics are calculated as \code{(estimate - thetaH0) / se}.
+#' Cumulative estimates use inverse-variance weighting, with cumulative standard
+#' errors and Satterthwaite degrees of freedom calculated on the same scale.
 #'
 #' @keywords internal
 #'
-DatasetEstimates <- R6::R6Class("DatasetEstimates",
-    inherit = DatasetMeans,
+DatasetGeneral <- R6::R6Class("DatasetGeneral",
+    inherit = Dataset,
     public = list(
         estimates = NULL,
         degreesOfFreedom = NULL,
         standardErrors = NULL,
+        getEstimate = function(stage) {
+            return(self$.data$estimate[self$.getIndices(stage = stage, group = 1)])
+        },
+        getEstimates = function(..., stage = NA_integer_) {
+            stage <- self$.getValidatedStage(stage)
+            return(self$.data$estimate[self$.getIndices(stage = stage, group = 1)])
+        },
+        getEstimatesUpTo = function(to) {
+            return(self$getEstimates(stage = seq_len(to)))
+        },
+        getDegreesOfFreedom = function(..., stage = NA_integer_) {
+            stage <- self$.getValidatedStage(stage)
+            return(self$.data$degreesOfFreedom[self$.getIndices(stage = stage, group = 1)])
+        },
+        getDegreesOfFreedomUpTo = function(to) {
+            return(self$getDegreesOfFreedom(stage = seq_len(to)))
+        },
+        getStandardError = function(stage) {
+            return(self$.data$standardError[self$.getIndices(stage = stage, group = 1)])
+        },
+        getStandardErrors = function(..., stage = NA_integer_) {
+            stage <- self$.getValidatedStage(stage)
+            return(self$.data$standardError[self$.getIndices(stage = stage, group = 1)])
+        },
+        getStandardErrorsUpTo = function(to) {
+            return(self$getStandardErrors(stage = seq_len(to)))
+        },
+        getInformations = function(..., stage = NA_integer_) {
+            return(1 / self$getStandardErrors(stage = stage)^2)
+        },
+        getInformationsUpTo = function(to) {
+            return(self$getInformations(stage = seq_len(to)))
+        },
         .initByDataFrame = function(dataFrame) {
-            degreesOfFreedom <- self$.getValuesByParameterName(
+            super$.initByDataFrame(dataFrame)
+
+            self$degreesOfFreedom <- self$.getValuesByParameterName(
                 dataFrame, C_KEY_WORDS_DEGREES_OF_FREEDOM
             )
-            estimates <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_ESTIMATES)
-            standardErrors <- self$.getValuesByParameterName(
+            self$estimates <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_ESTIMATES)
+            self$standardErrors <- self$.getValuesByParameterName(
                 dataFrame, C_KEY_WORDS_STANDARD_ERRORS
             )
 
-            if (any(stats::na.omit(degreesOfFreedom) <= 0)) {
+            self$.validateValues(self$degreesOfFreedom, "df")
+            self$.validateValues(self$estimates, "est")
+            self$.validateValues(self$standardErrors, "se")
+
+            if (any(stats::na.omit(self$degreesOfFreedom) <= 0)) {
                 stopIllegalArgument("all degrees of freedom must be > 0",
                     functionName = ".initByDataFrame",
                     parameter = "df",
-                    value = degreesOfFreedom
+                    value = self$degreesOfFreedom
                 )
             }
-            if (any(stats::na.omit(standardErrors) <= 0)) {
+            if (any(stats::na.omit(self$standardErrors) <= 0)) {
                 stopIllegalArgument("all standard errors must be > 0",
                     functionName = ".initByDataFrame",
                     parameter = "se",
-                    value = standardErrors
+                    value = self$standardErrors
                 )
             }
 
-            stageValues <- self$.getValuesByParameterName(dataFrame, c("stages", "stage"))
-            sampleSizes <- degreesOfFreedom + 1
-            meansDataFrame <- data.frame(
-                stages = stageValues,
-                sampleSizes = sampleSizes,
-                means = estimates,
-                stDevs = standardErrors * sqrt(sampleSizes)
-            )
-            super$.initByDataFrame(meansDataFrame)
+            self$.inputType <- "stagewise"
+            self$.recreateDataFrame()
 
-            self$.synchronizeEstimateParameters()
             self$.setParameterType("groups", C_PARAM_NOT_APPLICABLE)
             for (parameterName in c("estimates", "degreesOfFreedom", "standardErrors")) {
                 self$.setParameterType(parameterName, C_PARAM_USER_DEFINED)
             }
-            for (parameterName in c(
-                    "sampleSizes", "means", "stDevs",
-                    "overallSampleSizes", "overallMeans", "overallStDevs")) {
-                self$.setParameterType(parameterName, C_PARAM_NOT_APPLICABLE)
-            }
         },
-        .synchronizeEstimateParameters = function() {
-            self$estimates <- self$means
-            self$degreesOfFreedom <- self$sampleSizes - 1
-            self$standardErrors <- self$stDevs / sqrt(self$sampleSizes)
+        .recreateDataFrame = function() {
+            super$.recreateDataFrame()
+            self$.data <- cbind(self$.data, data.frame(
+                estimate = self$estimates,
+                degreesOfFreedom = self$degreesOfFreedom,
+                standardError = self$standardErrors
+            ))
+            self$.orderDataByStageAndGroup()
+            self$.setDataToVariables()
+        },
+        .setDataToVariables = function() {
+            super$.setDataToVariables()
+            self$estimates <- self$.data$estimate
+            self$degreesOfFreedom <- self$.data$degreesOfFreedom
+            self$standardErrors <- self$.data$standardError
         },
         .fillWithNAs = function(kMax) {
             super$.fillWithNAs(kMax)
-            self$.synchronizeEstimateParameters()
+            n <- self$.getNumberOfNAsToAdd(kMax)
+            naRealsToAdd <- rep(NA_real_, n)
+            self$estimates <- c(self$estimates, naRealsToAdd)
+            self$degreesOfFreedom <- c(self$degreesOfFreedom, naRealsToAdd)
+            self$standardErrors <- c(self$standardErrors, naRealsToAdd)
+            self$.recreateDataFrame()
         },
         .trim = function(kMax = NA_integer_) {
-            trimmed <- super$.trim(kMax)
-            self$.synchronizeEstimateParameters()
-            return(invisible(trimmed))
+            indices <- super$.trim(kMax)
+            if (length(indices) == 0) {
+                return(invisible(FALSE))
+            }
+            self$estimates <- self$estimates[indices]
+            self$degreesOfFreedom <- self$degreesOfFreedom[indices]
+            self$standardErrors <- self$standardErrors[indices]
+            self$.recreateDataFrame()
+            return(invisible(TRUE))
         },
         .getVisibleFieldNames = function() {
             return(c("stages", "groups", "estimates", "degreesOfFreedom", "standardErrors"))
@@ -2637,7 +2686,7 @@ DatasetEstimates <- R6::R6Class("DatasetEstimates",
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
-            value <- "dataset of estimates"
+            value <- "dataset of general estimates"
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(value), value))
         }
     )
@@ -2998,6 +3047,13 @@ plot.Dataset <- function(
     }
 
     .assertGgplotIsInstalled()
+
+    if (x$isDatasetGeneral()) {
+        stopRuntimeIssue(
+            "plotting endpoint-specific random data is not available for DatasetGeneral",
+            functionName = "plot.Dataset"
+        )
+    }
 
     if (x$isDatasetMeans()) {
         data <- x$getRandomData()
@@ -4529,7 +4585,7 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
     kMax <- object$getNumberOfStages()
     summaryFactory$title <- .firstCharacterToUpperCase(s)
 
-    if (object$isDatasetEstimates()) {
+    if (object$isDatasetGeneral()) {
         summaryFactory$header <- paste0(
             "The dataset contains general estimates with degrees of freedom and standard errors",
             ifelse(kMax > 1,

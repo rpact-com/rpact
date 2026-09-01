@@ -37,6 +37,7 @@
 #' \code{StageResults} is the basic class for
 #' \itemize{
 #'   \item \code{\link{StageResultsMeans}},
+#'   \item \code{\link{StageResultsGeneral}},
 #'   \item \code{\link{StageResultsRates}},
 #'   \item \code{\link{StageResultsSurvival}},
 #'   \item \code{\link{StageResultsMultiArmMeans}},
@@ -195,7 +196,9 @@ StageResults <- R6::R6Class("StageResults",
                 s <- paste(s, "enrichment")
             }
 
-            if (grepl("Means", .getClassName(self))) {
+            if (grepl("General", .getClassName(self))) {
+                s <- paste(s, "general estimates")
+            } else if (grepl("Means", .getClassName(self))) {
                 s <- paste(s, "means")
             }
 
@@ -228,6 +231,9 @@ StageResults <- R6::R6Class("StageResults",
         isDatasetMeans = function() {
             return(self$.dataInput$isDatasetMeans())
         },
+        isDatasetGeneral = function() {
+            return(self$.dataInput$isDatasetGeneral())
+        },
         isDatasetRates = function() {
             return(self$.dataInput$isDatasetRates())
         },
@@ -251,6 +257,82 @@ StageResults <- R6::R6Class("StageResults",
                 length(stats::na.omit(self$effectSizes)),
                 length(stats::na.omit(self$pValues))
             ))
+        }
+    )
+)
+
+#'
+#' @name StageResultsGeneral
+#'
+#' @title Stage Results of General Estimates
+#'
+#' @description
+#' Class for stage results calculated from endpoint-independent estimates,
+#' standard errors, and degrees of freedom.
+#'
+#' @keywords internal
+#'
+StageResultsGeneral <- R6::R6Class("StageResultsGeneral",
+    inherit = StageResults,
+    public = list(
+        combInverseNormal = NULL,
+        combFisher = NULL,
+        overallTestStatistics = NULL,
+        overallPValues = NULL,
+        effectSizes = NULL,
+        testStatistics = NULL,
+        overallEstimates = NULL,
+        overallStandardErrors = NULL,
+        overallDegreesOfFreedom = NULL,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
+                combInverseNormal = NULL,
+                combFisher = NULL,
+                overallTestStatistics = NULL,
+                overallPValues = NULL,
+                effectSizes = NULL,
+                testStatistics = NULL,
+                overallEstimates = NULL,
+                overallStandardErrors = NULL,
+                overallDegreesOfFreedom = NULL) {
+            super$initialize(.design = design, .dataInput = dataInput, ...)
+
+            self$combInverseNormal <- combInverseNormal
+            self$combFisher <- combFisher
+            self$overallTestStatistics <- overallTestStatistics
+            self$overallPValues <- overallPValues
+            self$effectSizes <- effectSizes
+            self$testStatistics <- testStatistics
+            self$overallEstimates <- overallEstimates
+            self$overallStandardErrors <- overallStandardErrors
+            self$overallDegreesOfFreedom <- overallDegreesOfFreedom
+
+            self$init(design = design, dataInput = dataInput)
+
+            for (parameterName in self$.getParametersToShow()) {
+                self$.setParameterType(parameterName, C_PARAM_GENERATED)
+            }
+        },
+        .getParametersToShow = function() {
+            parametersToShow <- c(
+                "stages",
+                "overallTestStatistics",
+                "overallPValues",
+                "overallEstimates",
+                "overallStandardErrors",
+                "overallDegreesOfFreedom",
+                "testStatistics",
+                "pValues",
+                "effectSizes"
+            )
+            if (.isTrialDesignInverseNormal(self$.design)) {
+                parametersToShow <- c(parametersToShow, "combInverseNormal", "weightsInverseNormal")
+            } else if (.isTrialDesignFisher(self$.design)) {
+                parametersToShow <- c(parametersToShow, "combFisher", "weightsFisher")
+            }
+            return(c(parametersToShow, "thetaH0", "direction"))
         }
     )
 )
