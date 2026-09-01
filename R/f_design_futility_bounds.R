@@ -1056,7 +1056,7 @@ getFutilityBounds <- function(
 
 .getCountDataAccrualTime <- function(designPlan) {
     accrualTime <- designPlan$accrualTime
-    if (length(accrualTime) > 1 && accrualTime[1] == 0) {
+    if (length(accrualTime) > 1 && equals(accrualTime[1], 0, tolerance = 0)) {
         accrualTime <- accrualTime[-1]
     }
     return(accrualTime)
@@ -1077,21 +1077,24 @@ getFutilityBounds <- function(
             recruit2 = recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
         ))
     }
+    
+    if (length(accrualTime) > 1) {
+        stopIllegalArgument(
+            "if no 'accrualIntensity' is specified, 'accrualTime' (", .arrayToString(accrualTime), ") ",
+            "must be a single number or a vector of length 2 starting with 0, ",
+            "but it is of length ", length(accrualTime),
+            functionName = ".getCountDataRecruitmentTimes",
+            parameter = "accrualTime",
+            value = accrualTime,
+            relatedParameter = "accrualIntensity",
+            relatedValue = accrualIntensity
+        )
+    }
 
     n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
-    
-    # accrualTime can be a vector, but recruitment times are generated as if it was a single number
-    # old solution:
-    #    return(list(
-    #        recruit1 = seq(0, accrualTime, length.out = n$n1), 
-    #        recruit2 = seq(0, accrualTime, length.out = n$n2)
-    #    ))
-    # TODO: check new solution:
-    
-    accrualTimeMax <- max(accrualTime)
     return(list(
-        recruit1 = seq(0, accrualTimeMax, length.out = n$n1), 
-        recruit2 = seq(0, accrualTimeMax, length.out = n$n2)
+        recruit1 = seq(0, accrualTime, length.out = n$n1), 
+        recruit2 = seq(0, accrualTime, length.out = n$n2)
     ))
 }
 

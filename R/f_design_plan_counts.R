@@ -525,7 +525,7 @@
         designPlan$.setParameterType("lambda2", C_PARAM_GENERATED)
     }
 
-    if (length(accrualTime) == 2 && accrualTime[1] == 0) {
+    if (length(accrualTime) == 2 && equale(accrualTime[1], 0, tolerance = 0)) {
         accrualTime <- accrualTime[-1]
         designPlan$accrualTime <- accrualTime
     }

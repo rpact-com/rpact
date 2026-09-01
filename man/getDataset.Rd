@@ -108,6 +108,15 @@ and the independent increments are calculated.
 }
 \examples{
 \dontrun{
+# Create a Dataset of General Estimates without specifying degrees
+# of freedom (internally, df is set to Inf for all stages):
+datasetOfGeneralEstimates <- getDataset(
+    est = c(0.10, 0.25, 0.38),
+    se  = c(0.20, 0.18, 0.15)
+)
+datasetOfGeneralEstimates
+datasetOfGeneralEstimates$degreesOfFreedom
+
 # Create a Dataset of Means (one group):
 datasetOfMeans <- getDataset(
     n      = c(22, 11, 22, 11),
