@@ -4389,13 +4389,13 @@ NULL
         )
     }
 
-    if (length(availablePlotTypes) == 0) {
+    if (length(availablePlotTypes) == 0 || all(is.na(availablePlotTypes))) {
         stopIllegalArgument(
             "no plot type available for this object",
             functionName = functionName
         )
     }
-
+    
     if (all(is.na(type))) {
         type <- availablePlotTypes[1]
     }
@@ -4411,7 +4411,9 @@ NULL
             .arrayToString(availablePlotTypes, mode = "or", compactEnabled = TRUE),
             functionName = functionName,
             parameter = "type",
-            value = type
+            value = type,
+            relatedParameter = "availablePlotTypes",
+            relatedValue = getAvailablePlotTypes(x, output = "numcap")
         )
     }
 

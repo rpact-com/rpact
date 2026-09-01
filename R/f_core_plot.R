@@ -445,16 +445,16 @@ getAvailablePlotTypes <- function(
         }
         types <- .removeInvalidPlotTypes(obj, types, c(5:14))
     } else if (inherits(obj, "SimulationResults")) {
-        if (grepl("Enrichment", .getClassName(obj)) && !.getSimulationEnrichmentEffectData(
-                obj,
-                validatePlotCapability = FALSE
-            )$valid) {
+        if (grepl("Enrichment", .getClassName(obj)) && 
+                !.getSimulationEnrichmentEffectData(obj, validatePlotCapability = FALSE)$valid) {
             if (output == "numeric") {
                 return(NA_real_)
             }
+            
             if (output == "caption") {
                 return(NA_character_)
             }
+            
             return(list())
         }
 
