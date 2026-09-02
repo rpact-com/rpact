@@ -7,6 +7,7 @@
 getSimulationMultiArmSurvival(
   design = NULL,
   ...,
+  thetaH0 = 1,
   simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
   activeArms = NA_integer_,
   piControl = 0.2,
@@ -56,6 +57,23 @@ and \code{sided} can be directly entered as argument where necessary.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
+
+\item{thetaH0}{The null hypothesis value,
+default is \code{0} for general estimates, the normal case, and the binary case,
+it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
+For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
+That is, in case of (one-sided) testing of
+\itemize{
+\item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
+\item \emph{means}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the mean ratio) can be specified.
+\item \emph{rates}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
+\item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{count data}: a bound for testing H0: \code{lambda1 / lambda2 = thetaH0 != 1} can be specified.
+}
+For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
+defining the null hypothesis H0: \code{pi = thetaH0}.}
 
 \item{simulationType}{Character value specifying the simulation approach:
 \code{"auto"}, \code{"patientWise"}, \code{"testStatisticBased"}, or
@@ -259,6 +277,8 @@ Depending on \code{simulationType}, either a patient-wise survival simulation is
 a patient-wise basic approximation is used, or normally distributed log-rank test statistics
 are simulated. The default \code{simulationType = "auto"} chooses the simulation approach
 automatically based on the explicitly specified arguments.
+The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
+than 1 can be used, for example, to simulate non-inferiority designs.
 }
 \details{
 At given design the function simulates the analysis times, power, stopping
@@ -289,6 +309,7 @@ The function might depend on the variables
 \code{selectedArms},
 \code{plannedEvents},
 \code{directionUpper},
+\code{thetaH0},
 \code{allocationRatioPlanned},
 \code{minNumberOfEventsPerStage},
 \code{maxNumberOfEventsPerStage},
@@ -343,6 +364,16 @@ y2$rejectAtLeastOne
 
 y1$selectedArms
 y2$selectedArms
+
+# Non-inferiority with one active arm (H0: hazard ratio = 1.2)
+simulationResultsNonInferiority <- getSimulationMultiArmSurvival(
+    design = getDesignFixed(sided = 1), thetaH0 = 1.2,
+    directionUpper = FALSE, activeArms = 1,
+    typeOfShape = "userDefined", effectMatrix = matrix(1),
+    piControl = 0.3, plannedEvents = 80,
+    allocationRatioPlanned = 1, maxNumberOfSubjects = 400,
+    accrualTime = c(0, 20), accrualIntensity = 20,
+    maxNumberOfIterations = 50, simulationType = "patientWise")
 }
 
 }

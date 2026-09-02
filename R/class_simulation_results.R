@@ -1096,6 +1096,7 @@ SimulationResultsBaseSurvival <- R6::R6Class(
         maxNumberOfEventsPerStage = NULL,
         minNumberOfEventsPerStage = NULL,
         plannedEvents = NULL,
+        thetaH0 = NULL,
         thetaH1 = NULL,
         studyDuration = NULL,
         maxStudyDuration = NULL,
@@ -1236,7 +1237,6 @@ SimulationResultsSurvival <- R6::R6Class(
         piecewiseSurvivalTime = NULL,
         rejectPerStage = NULL,
         singleEventsPerStage = NULL,
-        thetaH0 = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             for (notApplicableParam in c(
@@ -1345,6 +1345,7 @@ SimulationResultsSurvival <- R6::R6Class(
 #' @template field_simulationType
 #' @template field_slope
 #' @template field_studyDuration
+#' @template field_thetaH0
 #' @template field_successPerStage
 #' @template field_threshold
 #' @template field_typeOfShape
@@ -1701,6 +1702,7 @@ SimulationResultsEnrichmentRates <- R6::R6Class(
 #' @template field_studyDuration
 #' @template field_successCriterion
 #' @template field_successPerStage
+#' @template field_thetaH0
 #' @template field_thetaH1_survival
 #' @template field_threshold
 #' @template field_typeOfSelection
