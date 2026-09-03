@@ -2439,7 +2439,6 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
 }
 
 .getPi2Default <- function(endpoint = c("rates", "survival")) {
-    type <- match.arg(type)
     endpoint <- match.arg(endpoint)
     if (endpoint == "rates") {
         return(C_PI_2_RATES_DEFAULT)
@@ -2454,15 +2453,22 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
         ...,
         parameterName = c("pi1", "piTreatment"),
         type = c("sampleSize", "power"),
-        endpoint = c("rates", "survival")) {
+        endpoint = c("rates", "survival"),
+        closedInterval = FALSE) {
     parameterName <- match.arg(parameterName)
+    type <- match.arg(type)
     endpoint <- match.arg(endpoint)
+    .assertIsSingleLogical(closedInterval, "closedInterval")
     .assertIsNumericVector(pi1, parameterName, naAllowed = TRUE)
-    .assertIsInOpenInterval(pi1, parameterName, lower = 0, upper = 1, naAllowed = TRUE)
     defaultValue <- NA_real_
     if (all(is.na(pi1))) {
         defaultValue <- .getPi1Default(type = type, endpoint = endpoint)
         pi1 <- defaultValue
+    }
+    if (closedInterval) {
+        .assertIsInClosedInterval(pi1, parameterName, lower = 0, upper = 1)
+    } else {
+        .assertIsInOpenInterval(pi1, parameterName, lower = 0, upper = 1)
     }
     .setValueAndParameterType(parameterSet, parameterName, pi1, defaultValue)
     return(invisible(pi1))
@@ -2474,17 +2480,26 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
         ...,
         parameterName = c("pi2", "piControl"),
         endpoint = c("rates", "survival"),
-        applyToObject = TRUE) {
+        applyToObject = TRUE,
+        closedInterval = FALSE) {
     parameterName <- match.arg(parameterName)
     endpoint <- match.arg(endpoint)
+    .assertIsSingleLogical(applyToObject, "applyToObject")
+    .assertIsSingleLogical(closedInterval, "closedInterval")
     .assertIsSingleNumber(pi2, parameterName, naAllowed = TRUE)
-    .assertIsInOpenInterval(pi2, parameterName, lower = 0, upper = 1, naAllowed = TRUE)
-    if (isTRUE(applyToObject)) {
-        defaultValue <- NA_real_
-        if (is.na(pi2)) {
-            defaultValue <- .getPi2Default(endpoint = endpoint)
-            pi2 <- defaultValue
-        }
+    defaultValue <- NA_real_
+    if (applyToObject && is.na(pi2)) {
+        defaultValue <- .getPi2Default(endpoint = endpoint)
+        pi2 <- defaultValue
+    }
+    if (closedInterval) {
+        .assertIsInClosedInterval(pi2, parameterName,
+            lower = 0, upper = 1, naAllowed = !applyToObject)
+    } else {
+        .assertIsInOpenInterval(pi2, parameterName,
+            lower = 0, upper = 1, naAllowed = !applyToObject)
+    }
+    if (applyToObject) {
         .setValueAndParameterType(parameterSet, parameterName, pi2, defaultValue)
     }
     return(invisible(pi2))

@@ -38,8 +38,8 @@ C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES <- list(
     conservative = TRUE,
     riskRatio = FALSE,
     thetaH0 = 0,
-    pi1 = .getPi1Default(type = "sampleSize", endpoint = "rates"),
-    pi2 = .getPi2Default(endpoint = "rates"),
+    pi1 = NA_real_,
+    pi2 = NA_real_,
     groups = 2L,
     allocationRatioPlanned = 1
 )
@@ -47,8 +47,8 @@ C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES <- list(
 C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_SURVIVAL <- list(
     typeOfComputation = "Schoenfeld",
     thetaH0 = 1,
-    pi1 = .getPi1Default(type = "sampleSize", endpoint = "survival"),
-    pi2 = .getPi2Default(endpoint = "rates"),
+    pi1 = NA_real_,
+    pi2 = NA_real_,
     allocationRatioPlanned = 1,
     accountForObservationTimes = NA,
     eventTime = 12,

@@ -382,8 +382,10 @@ NULL
         design = design,
         objectType = objectType)
     
-    pi1 <- .setPi1(designPlan, pi1, type = objectType, endpoint = "rates")
-    pi2 <- .setPi2(designPlan, pi2, endpoint = "rates", applyToObject = (groups == 2L))
+    pi1 <- .setPi1(designPlan, pi1,
+        type = objectType, endpoint = "rates", closedInterval = (groups == 2L))
+    pi2 <- .setPi2(designPlan, pi2,
+        endpoint = "rates", applyToObject = (groups == 2L), closedInterval = (groups == 2L))
 
     if (groups == 1L) {
         if (!anyNA(pi1) && any(pi1 == thetaH0) && objectType == "sampleSize") {
@@ -514,9 +516,8 @@ NULL
     }
     .setValueAndParameterType(designPlan, "thetaH0", thetaH0, ifelse(riskRatio, 1, 0))
     .assertIsValidThetaH0(thetaH0, endpoint = "rates", groups = groups, ratioEnabled = riskRatio)
-    .setValueAndParameterType(designPlan, "pi1", pi1, .getPi1Default(type = objectType, endpoint = "rates"))
-    .setValueAndParameterType(designPlan, "pi2", pi2, .getPi2Default(endpoint = "rates"), notApplicableIfNA = TRUE)
     if (groups == 1) {
+        .setValueAndParameterType(designPlan, "pi2", pi2, NA_real_, notApplicableIfNA = TRUE)
         if (designPlan$isUserDefinedParameter("pi2")) {
             warning(
                 "'pi2' (",

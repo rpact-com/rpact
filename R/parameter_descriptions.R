@@ -180,7 +180,7 @@ NULL
 #' Parameter Description: Pi (1) for Survival Data
 #' @param pi1 A numeric value or vector that represents the assumed event rate in the treatment group,
 #'   default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
-#'   \code{seq(0.4, 0.6, 0.1)} (sample size calculations).
+#'   \code{c(0.1, 0.2, 0.3)} (sample size calculations).
 #' @name param_pi1_survival
 #' @keywords internal
 NULL
@@ -193,7 +193,7 @@ NULL
 NULL
 
 #' Parameter Description: Pi (2) for Survival Data
-#' @param pi2 A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.
+#' @param pi2 A numeric value that represents the assumed event rate in the control group, default is \code{0.5}.
 #' @name param_pi2_survival
 #' @keywords internal
 NULL

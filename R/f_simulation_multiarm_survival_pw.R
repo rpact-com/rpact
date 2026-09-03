@@ -77,7 +77,7 @@ NULL
 #' @inheritParams param_showStatistics
 #' @inheritParams param_maxNumberOfRawDatasetsPerStage
 #' @inheritParams param_simulationType_multiarm_survival
-#' @param piControl The assumed probability in the control arm, default is \code{0.2}.
+#' @param piControl The assumed probability in the control arm, default is \code{0.5}.
 #'
 #' @details
 #' At given design the function simulates the analysis times, power, stopping
@@ -128,7 +128,7 @@ getSimulationMultiArmSurvival <- function(
         ...,
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
         activeArms = NA_integer_,
-        piControl = 0.2,
+        piControl = NA_real_,
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
         omegaMaxVector = seq(1, 2.6, 0.4),

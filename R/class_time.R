@@ -1006,8 +1006,8 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                             self$.setParameterType("median2", C_PARAM_DERIVED)
                         } else {
                             .logDebug(".init: set pi2 to default")
-                            self$median2 <- getMedianByPi(pi = self$pi2, eventTime = self$eventTime, kappa = self$kappa)
                             self$pi2 <- .getPi2Default(endpoint = "survival")
+                            self$median2 <- getMedianByPi(pi = self$pi2, eventTime = self$eventTime, kappa = self$kappa)
                             self$.setParameterType("pi2", C_PARAM_DEFAULT_VALUE)
                         }
                     }

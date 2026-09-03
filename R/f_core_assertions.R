@@ -2673,12 +2673,14 @@ NULL
 
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
 
-    .warnInCaseOfChangedDirectionUpperSurvivalDefault(
-        directionUpper,
-        default,
-        design$sided,
-        userFunctionCallEnabled = userFunctionCallEnabled
-    )
+    if (!identical(objectType, "sampleSize")) {
+        .warnInCaseOfChangedDirectionUpperSurvivalDefault(
+            directionUpper,
+            default,
+            design$sided,
+            userFunctionCallEnabled = userFunctionCallEnabled
+        )
+    }
 
     if (!is.na(directionUpper) && !is.na(design$directionUpper) &&
             !identical(directionUpper, design$directionUpper)) {
