@@ -178,7 +178,7 @@ getSimulationRates <- function(
         normalApproximation = TRUE,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
+        pi1 = NA_real_,
         pi2 = NA_real_,
         plannedSubjects = NA_real_,
         directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
@@ -233,10 +233,11 @@ getSimulationRates <- function(
             )
         }
     }
-    pi1 <- .assertIsNumericVector(pi1, "pi1", naAllowed = FALSE)
-    .assertIsInOpenInterval(pi1, "pi1",
-        lower = 0, upper = 1, naAllowed = FALSE
-    )
+    pi1 <- .assertIsNumericVector(pi1, "pi1", naAllowed = TRUE)
+    if (all(is.na(pi1))) {
+        pi1 <- .getPi1Default(type = "power", endpoint = "rates")
+    }
+    .assertIsInOpenInterval(pi1, "pi1", lower = 0, upper = 1, naAllowed = FALSE)
     pi2 <- .assertIsNumericVector(pi2, "pi2", naAllowed = TRUE)
     .assertIsInOpenInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
     minNumberOfSubjectsPerStage <- .assertIsNumericVector(
@@ -392,7 +393,7 @@ getSimulationRates <- function(
             allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
         }
         if (is.na(pi2)) {
-            pi2 <- C_PI_2_DEFAULT
+            pi2 <- .getPi2Default(endpoint = "rates")
             simulationResults$pi2 <- pi2
             simulationResults$.setParameterType("pi2", C_PARAM_DEFAULT_VALUE)
         }
@@ -442,7 +443,7 @@ getSimulationRates <- function(
     .setValueAndParameterType(simulationResults, "normalApproximation", normalApproximation, TRUE)
     .setValueAndParameterType(simulationResults, "riskRatio", riskRatio, FALSE)
     .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, ifelse(riskRatio, 1, 0))
-    .setValueAndParameterType(simulationResults, "pi1", pi1, C_PI_1_DEFAULT)
+    .setValueAndParameterType(simulationResults, "pi1", pi1, NA_real_)
     .setValueAndParameterType(simulationResults, "groups", as.integer(groups), 2L)
     .setValueAndParameterType(
         simulationResults, "plannedSubjects",

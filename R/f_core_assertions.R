@@ -3755,7 +3755,7 @@ NULL
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
                 lower = 0, upper = 1, naAllowed = FALSE, matrixAllowed = TRUE
             )
-            valueMaxVectorDefault <- C_PI_1_DEFAULT
+            valueMaxVectorDefault <- .getPi1Default(type = "power", endpoint = "survival")
         } else if (valueMaxVectorName == "omegaMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
                 lower = 0, upper = NULL, naAllowed = FALSE, matrixAllowed = TRUE

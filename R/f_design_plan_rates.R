@@ -341,6 +341,21 @@ NULL
     }
 }
 
+
+designPlan <- .createDesignPlanRates(
+    objectType = "power",
+    design = design,
+    riskRatio = riskRatio,
+    thetaH0 = thetaH0,
+    pi1 = pi1,
+    pi2 = pi2,
+    directionUpper = directionUpper,
+    maxNumberOfSubjects = maxNumberOfSubjects,
+    groups = groups,
+    allocationRatioPlanned = allocationRatioPlanned,
+    ...
+)
+
 #
 # note that 'maxNumberOfSubjects' is only applicable for 'objectType' = "power"
 #
@@ -348,16 +363,16 @@ NULL
         ...,
         objectType = c("sampleSize", "power"),
         design,
-        normalApproximation = TRUE,
-        conservative = TRUE,
-        riskRatio = FALSE,
-        thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = C_PI_1_SAMPLE_SIZE_DEFAULT,
-        pi2 = C_PI_2_DEFAULT,
-        directionUpper = NA,
+        riskRatio,
+        thetaH0,
+        pi1,
+        pi2,
+        directionUpper,
         maxNumberOfSubjects = NA_real_,
         groups = 2,
-        allocationRatioPlanned = NA_real_) {
+        allocationRatioPlanned,
+        normalApproximation = TRUE,
+        conservative = TRUE) {
     objectType <- match.arg(objectType)
 
     .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
@@ -483,8 +498,9 @@ NULL
         }
     }
 
-    designPlan <- TrialDesignPlanRates$new(design = design)
-    designPlan$.setObjectType(objectType)
+    designPlan <- TrialDesignPlanRates$new(
+        design = design,
+        objectType = objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {
@@ -514,11 +530,7 @@ NULL
     }
     .setValueAndParameterType(designPlan, "thetaH0", thetaH0, ifelse(riskRatio, 1, 0))
     .assertIsValidThetaH0(thetaH0, endpoint = "rates", groups = groups, ratioEnabled = riskRatio)
-    if (objectType == "power") {
-        .setValueAndParameterType(designPlan, "pi1", pi1, C_PI_1_DEFAULT)
-    } else {
-        .setValueAndParameterType(designPlan, "pi1", pi1, C_PI_1_SAMPLE_SIZE_DEFAULT)
-    }
+    .setValueAndParameterType(designPlan, "pi1", pi1, .getPi1Default(type = objectType, endpoint = "rates"))
     .setValueAndParameterType(designPlan, "pi2", pi2, 0.2, notApplicableIfNA = TRUE)
     if (groups == 1) {
         if (designPlan$isUserDefinedParameter("pi2")) {

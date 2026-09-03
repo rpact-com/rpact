@@ -485,7 +485,8 @@ NULL
     simulationType <- match.arg(simulationType)
 
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
-
+    piMaxVector <- .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = TRUE)
+    
     if (endpoint == "means") {
         simulationResults <- SimulationResultsMultiArmMeans$new(design, showStatistics = showStatistics)
     } else if (endpoint == "rates") {
@@ -693,9 +694,14 @@ NULL
 
         .setValueAndParameterType(simulationResults, "piTreatmentsH1", piTreatmentsH1, NA_real_)
 
-        .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE)
+        .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)
+        piControlDefault <- NA_real_
+        if (is.na(piControl)) {
+            piControlDefault <- .getPi2Default(endpoint = endpoint)
+            piControl <- piControlDefault
+        }
         .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = FALSE)
-        .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
+        .setValueAndParameterType(simulationResults, "piControl", piControl, piControlDefault)
 
         piControlH1 <- .ignoreParameterIfNotUsed(
             "piControlH1",
@@ -724,8 +730,16 @@ NULL
 
         if (typeOfShape == "userDefined") {
             piMaxVector <- effectMatrix[, gMax]
+            if (!all(is.na(piMaxVector))) {
+                warning("'piMaxVector' (", .arrayToString(piMaxVector), ") will be ignored ",
+                    "because 'typeOfShape' = \"userDefined\"", call. = FALSE)
+            }
+        } else if (!all(is.na(piMaxVector))) {
+            .assertIsInOpenInterval(piMaxVector, "piMaxVector", lower = 0, upper = 1, naAllowed = FALSE)
+        } else { 
+            piMaxVector <- .getPi1Default(type = "power", endpoint = "rates")
         }
-        .setValueAndParameterType(simulationResults, "piMaxVector", piMaxVector, C_PI_1_DEFAULT)
+        .setValueAndParameterType(simulationResults, "piMaxVector", piMaxVector, NA_real_)
         if (typeOfShape == "userDefined") {
             simulationResults$.setParameterType("piMaxVector", C_PARAM_DERIVED)
         }

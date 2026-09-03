@@ -38,8 +38,8 @@ C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES <- list(
     conservative = TRUE,
     riskRatio = FALSE,
     thetaH0 = 0,
-    pi1 = C_PI_1_SAMPLE_SIZE_DEFAULT,
-    pi2 = C_PI_2_DEFAULT,
+    pi1 = .getPi1Default(type = "sampleSize", endpoint = "rates"),
+    pi2 = .getPi2Default(endpoint = "rates"),
     groups = 2L,
     allocationRatioPlanned = 1
 )
@@ -47,8 +47,8 @@ C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES <- list(
 C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_SURVIVAL <- list(
     typeOfComputation = "Schoenfeld",
     thetaH0 = 1,
-    pi2 = C_PI_2_DEFAULT,
-    pi1 = C_PI_1_SAMPLE_SIZE_DEFAULT,
+    pi1 = .getPi1Default(type = "sampleSize", endpoint = "survival"),
+    pi2 = .getPi2Default(endpoint = "rates"),
     allocationRatioPlanned = 1,
     accountForObservationTimes = NA,
     eventTime = 12,
@@ -106,8 +106,9 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
         .plotSettings = NULL,
         .design = NULL,
         .objectType = NULL, # "sampleSize" or "power"
-        initialize = function(design, ...) {
+        initialize = function(design, ..., objectType = c("sampleSize", "power")) {
             self$.design <- design
+            self$.objectType <- match.arg(objectType)
 
             super$initialize(...)
 
@@ -117,8 +118,12 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
                 defaultValueList <- C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS
             } else if (.isTrialDesignPlanRates(self)) {
                 defaultValueList <- C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES
+                defaultValueList$pi1 = .getPi1Default(type = self$.objectType, endpoint = "rates")
+                defaultValueList$pi2 = .getPi2Default(endpoint = "rates")
             } else if (.isTrialDesignPlanSurvival(self)) {
                 defaultValueList <- C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_SURVIVAL
+                defaultValueList$pi1 = .getPi1Default(type = self$.objectType, endpoint = "survival")
+                defaultValueList$pi2 = .getPi2Default(endpoint = "survival")
             } else if (.isTrialDesignPlanCountData(self)) {
                 defaultValueList <- C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_COUNT_DATA
             }
@@ -136,16 +141,6 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
                 }
             }
             self$.setParameterType("optimumAllocationRatio", C_PARAM_NOT_APPLICABLE)
-        },
-        .setObjectType = function(objectType) {
-            if (length(objectType) == 0 || !(objectType %in% c("sampleSize", "power"))) {
-                stopRuntimeIssue("'.objectType' (", objectType, ") must be specified as 'sampleSize' or 'power'",
-                    functionName = ".setObjectType",
-                    parameter = "objectType",
-                    value = objectType
-                )
-            }
-            self$.objectType <- objectType
         },
         .isSampleSizeObject = function() {
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
@@ -924,11 +919,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                 if (self$isUserDefinedParameter("pi1")) {
                     pi1 <- self$pi1
                 } else if (anyNA(hazardRatio)) {
-                    if (self$.objectType == "sampleSize") {
-                        pi1 <- C_PI_1_SAMPLE_SIZE_DEFAULT
-                    } else {
-                        pi1 <- C_PI_1_DEFAULT
-                    }
+                    pi1 <- .getPi1Default(type = self$.objectType, endpoint = "survival")
                 }
             }
 

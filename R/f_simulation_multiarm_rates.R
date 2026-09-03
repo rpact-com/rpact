@@ -415,8 +415,8 @@ getSimulationMultiArmRates <- function(
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        piMaxVector = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
-        piControl = 0.2, # C_PI_2_DEFAULT
+        piMaxVector = NA_real_,
+        piControl = NA_real_,
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,

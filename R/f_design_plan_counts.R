@@ -418,9 +418,9 @@
         directionUpper) {
     designPlan <- TrialDesignPlanCountData$new(
         design = design,
-        designCharacteristics = designCharacteristics
+        designCharacteristics = designCharacteristics,
+        objectType = objectType
     )
-    designPlan$.setObjectType(objectType)
     sampleSizeEnabled <- identical(objectType, "sampleSize")
 
     directionUpper <- .assertIsValidDirectionUpper(

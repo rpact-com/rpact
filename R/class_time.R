@@ -1007,13 +1007,14 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                         } else {
                             .logDebug(".init: set pi2 to default")
                             self$median2 <- getMedianByPi(pi = self$pi2, eventTime = self$eventTime, kappa = self$kappa)
-                            self$pi2 <- C_PI_2_DEFAULT
+                            self$pi2 <- .getPi2Default(endpoint = "survival")
                             self$.setParameterType("pi2", C_PARAM_DEFAULT_VALUE)
                         }
                     }
                 } else {
                     .assertIsSingleNumber(self$pi2, "pi2")
-                    self$.setParameterType("pi2", ifelse(self$pi2 == C_PI_2_DEFAULT,
+                    self$.setParameterType("pi2", 
+                        ifelse(.isPi2Default(self$pi2, endpoint = "survival"),
                         C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
                     ))
                     if (!anyNA(self$median2)) {
@@ -1105,7 +1106,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                                 length(self$.pi1Default) > 0) {
                             self$pi1 <- self$.pi1Default
                         } else {
-                            self$pi1 <- C_PI_1_SAMPLE_SIZE_DEFAULT
+                            self$pi1 <- .getPi1Default(type = "power", endpoint = "survival")
                         }
                         self$.setParameterType("pi1", C_PARAM_DEFAULT_VALUE)
                     }
@@ -1141,7 +1142,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 }
 
                 if (length(self$pi1) > 0 && !anyNA(self$pi1)) {
-                    pi1Default <- C_PI_1_SAMPLE_SIZE_DEFAULT
+                    pi1Default <- .getPi1Default(type = "power", endpoint = "survival")
                     if (!is.null(self$.pi1Default) && is.numeric(self$.pi1Default) &&
                             length(self$.pi1Default) > 0) {
                         pi1Default <- self$.pi1Default
@@ -1350,11 +1351,11 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             if (!is.na(self$eventTime) && self$isUserDefinedParameter("eventTime")) {
                 warning("'eventTime' (", round(self$eventTime, 3), ") will be ignored", call. = FALSE)
             }
-            if (!is.na(self$pi1) && !identical(self$pi2, C_PI_1_DEFAULT) &&
-                    !identical(self$pi2, C_PI_1_SAMPLE_SIZE_DEFAULT)) {
+            if (!.isPi1Default(self$pi1, type = "sampleSize", endpoint = "survival") &&
+                    !.isPi1Default(self$pi1, type = "power", endpoint = "survival")) {
                 warning("'pi1' (", .arrayToString(self$pi1), ") will be ignored", call. = FALSE)
             }
-            if (!is.na(self$pi2) && self$pi2 != C_PI_2_DEFAULT) {
+            if (!.isPi2Default(self$pi2, endpoint = "survival")) {
                 warning("'pi2' (", self$pi2, ") will be ignored", call. = FALSE)
             }
 

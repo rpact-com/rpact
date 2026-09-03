@@ -706,7 +706,8 @@ NULL
         dropoutRate1 = dropoutRate1,
         dropoutRate2 = dropoutRate2,
         dropoutTime = dropoutTime,
-        hazardRatio = hazardRatio
+        hazardRatio = hazardRatio,
+        objectType = objectType
     )
 
     .setValueAndParameterType(
@@ -717,8 +718,6 @@ NULL
     .setValueAndParameterType(designPlan, "dropoutRate2", dropoutRate2, C_DROP_OUT_RATE_2_DEFAULT)
     .setValueAndParameterType(designPlan, "dropoutTime", dropoutTime, C_DROP_OUT_TIME_DEFAULT)
     .setValueAndParameterType(designPlan, "kappa", kappa, 1)
-
-    designPlan$.setObjectType(objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {
@@ -780,11 +779,6 @@ NULL
     .assertIsSingleNumber(designPlan$dropoutRate2, "dropoutRate2")
     .assertIsSingleNumber(designPlan$dropoutTime, "dropoutTime")
 
-    if (objectType == "power") {
-        pi1Default <- C_PI_1_DEFAULT
-    } else {
-        pi1Default <- C_PI_1_SAMPLE_SIZE_DEFAULT
-    }
     designPlan$.piecewiseSurvivalTime <- getPiecewiseSurvivalTime(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
         lambda2 = lambda2,
@@ -796,7 +790,7 @@ NULL
         pi2 = pi2,
         eventTime = eventTime,
         kappa = kappa,
-        .pi1Default = pi1Default,
+        .pi1Default = .getPi1Default(type = objectType, endpoint = "survival"),
         .silent = TRUE
     )
     designPlan$.setParameterType("kappa", designPlan$.piecewiseSurvivalTime$.getParameterType("kappa"))

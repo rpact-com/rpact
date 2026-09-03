@@ -2405,3 +2405,45 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
 
     return(compare(x, y))
 }
+
+.isPi1Default <- function(pi1, type = c("sampleSize", "power"), endpoint = c("rates", "survival")) {
+    type <- match.arg(type)
+    endpoint <- match.arg(endpoint)
+    pi1Default <- .getPi1Default(type = type, endpoint = endpoint)
+    return(identical(pi1, pi1Default))
+}
+
+.isPi2Default <- function(pi2, endpoint = c("rates", "survival")) {
+    endpoint <- match.arg(endpoint)
+    pi2Default <- .getPi2Default(endpoint = endpoint)
+    return(identical(pi2, pi2Default))
+}
+
+.getPi1Default <- function(type = c("sampleSize", "power"), endpoint = c("rates", "survival")) {
+    type <- match.arg(type)
+    endpoint <- match.arg(endpoint)
+    if (type == "sampleSize") {
+        if (endpoint == "rates") {
+            return(C_PI_1_SAMPLE_SIZE_RATES_DEFAULT)
+        }
+        if (endpoint == "survival") {
+            return(C_PI_1_SAMPLE_SIZE_SURVIVAL_DEFAULT)
+        }
+    }
+    
+    if (endpoint == "rates") {
+        return(C_PI_1_POWER_RATES_DEFAULT)
+    }
+    
+    return(C_PI_1_POWER_SURVIVAL_DEFAULT)
+}
+
+.getPi2Default <- function(endpoint = c("rates", "survival")) {
+    type <- match.arg(type)
+    endpoint <- match.arg(endpoint)
+    if (endpoint == "rates") {
+        return(C_PI_2_RATES_DEFAULT)
+    }
+    
+    return(C_PI_2_SURVIVAL_DEFAULT)
+}
