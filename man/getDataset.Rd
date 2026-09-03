@@ -117,6 +117,16 @@ datasetOfGeneralEstimates <- getDataset(
 datasetOfGeneralEstimates
 datasetOfGeneralEstimates$degreesOfFreedom
 
+# It is also possible to specify the degrees of freedom for each stage.
+# Typically these come from a linear model analysis, e.g. with repeated measures
+# using the [`mmrm`](https://cran.r-project.org/package=mmrm) package.
+datasetOfLeastSquareMeans <- getDataset(
+    est = c(0.10, 0.25, 0.38),
+    se  = c(0.20, 0.18, 0.15),
+    df  = c(10.3, 12.5, 15.1)
+)
+datasetOfLeastSquareMeans
+
 # Create a Dataset of Means (one group):
 datasetOfMeans <- getDataset(
     n      = c(22, 11, 22, 11),

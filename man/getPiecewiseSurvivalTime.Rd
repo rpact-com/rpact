@@ -40,9 +40,9 @@ not to be specified as it is calculated, there is no default. Must be a positive
 
 \item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
 default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
-\code{seq(0.4, 0.6, 0.1)} (sample size calculations).}
+\code{c(0.1, 0.2, 0.3)} (sample size calculations).}
 
-\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
+\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.5}.}
 
 \item{median1}{The assumed median survival time in the treatment group, there is no default.}
 

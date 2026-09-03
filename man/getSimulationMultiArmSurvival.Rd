@@ -9,7 +9,7 @@ getSimulationMultiArmSurvival(
   ...,
   simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
   activeArms = NA_integer_,
-  piControl = 0.2,
+  piControl = NA_real_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
   omegaMaxVector = seq(1, 2.6, 0.4),
@@ -70,7 +70,7 @@ simulation is used for backward compatibility.}
 
 \item{activeArms}{The number of active treatment arms to be compared with control, default is \code{3}.}
 
-\item{piControl}{The assumed probability in the control arm, default is \code{0.2}.}
+\item{piControl}{The assumed probability in the control arm, default is \code{0.5}.}
 
 \item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and one or more rows,
 where each row represents a different situation to consider.}

@@ -11,7 +11,7 @@ getSimulationRates(
   normalApproximation = TRUE,
   riskRatio = FALSE,
   thetaH0 = ifelse(riskRatio, 1, 0),
-  pi1 = seq(0.2, 0.5, 0.1),
+  pi1 = NA_real_,
   pi2 = NA_real_,
   plannedSubjects = NA_real_,
   directionUpper = NA,

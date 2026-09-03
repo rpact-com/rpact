@@ -12,8 +12,8 @@ getSampleSizeRates(
   conservative = TRUE,
   riskRatio = FALSE,
   thetaH0 = ifelse(riskRatio, 1, 0),
-  pi1 = c(0.4, 0.5, 0.6),
-  pi2 = 0.2,
+  pi1 = NA_real_,
+  pi2 = NA_real_,
   directionUpper = NA,
   allocationRatioPlanned = NA_real_
 )

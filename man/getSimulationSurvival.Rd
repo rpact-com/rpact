@@ -72,9 +72,9 @@ which means that larger values of the test statistics yield smaller p-values.}
 
 \item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
 default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
-\code{seq(0.4, 0.6, 0.1)} (sample size calculations).}
+\code{c(0.1, 0.2, 0.3)} (sample size calculations).}
 
-\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
+\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.5}.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
 \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
