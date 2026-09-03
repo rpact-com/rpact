@@ -233,13 +233,7 @@ getSimulationRates <- function(
             )
         }
     }
-    pi1 <- .assertIsNumericVector(pi1, "pi1", naAllowed = TRUE)
-    if (all(is.na(pi1))) {
-        pi1 <- .getPi1Default(type = "power", endpoint = "rates")
-    }
-    .assertIsInOpenInterval(pi1, "pi1", lower = 0, upper = 1, naAllowed = FALSE)
-    pi2 <- .assertIsNumericVector(pi2, "pi2", naAllowed = TRUE)
-    .assertIsInOpenInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
+        
     minNumberOfSubjectsPerStage <- .assertIsNumericVector(
         minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage",
         naAllowed = TRUE
@@ -273,13 +267,17 @@ getSimulationRates <- function(
     }
 
     if (!normalApproximation && (groups == 2) && (riskRatio || (thetaH0 != 0))) {
-        stopIllegalArgument("in the two-sample case, exact test is implemented only for testing H0: pi1 - pi2 = 0",
+        stopIllegalArgument("in the two-sample case, exact test is ",
+            "implemented only for testing H0: pi1 - pi2 = 0",
             functionName = "getSimulationRates"
         )
     }
 
     simulationResults <- SimulationResultsRates$new(design, showStatistics = showStatistics)
 
+    pi1 <- .setPi1(simulationResults, pi1, type = "power", endpoint = "rates")
+    pi2 <- .setPi2(simulationResults, pi2, endpoint = "rates", applyToObject = (groups == 2L))
+    
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
     .validateAndSetSeed(simulationResults, seed)
 
@@ -361,8 +359,6 @@ getSimulationRates <- function(
     pi1H1 <- .ignoreParameterIfNotUsed("pi1H1", pi1H1, groups == 2, "'groups' = 1")
     pi2H1 <- .ignoreParameterIfNotUsed("pi2H1", pi2H1, groups == 2, "'groups' = 1")
 
-    .setValueAndParameterType(simulationResults, "pi2", pi2, NA_real_)
-
     if (groups == 1L) {
         if (isTRUE(riskRatio)) {
             warning("'riskRatio' (", riskRatio, ") will be ignored ",
@@ -391,11 +387,6 @@ getSimulationRates <- function(
     } else {
         if (anyNA(allocationRatioPlanned)) {
             allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
-        }
-        if (is.na(pi2)) {
-            pi2 <- .getPi2Default(endpoint = "rates")
-            simulationResults$pi2 <- pi2
-            simulationResults$.setParameterType("pi2", C_PARAM_DEFAULT_VALUE)
         }
         if (length(allocationRatioPlanned) == 1) {
             allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
@@ -443,7 +434,6 @@ getSimulationRates <- function(
     .setValueAndParameterType(simulationResults, "normalApproximation", normalApproximation, TRUE)
     .setValueAndParameterType(simulationResults, "riskRatio", riskRatio, FALSE)
     .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, ifelse(riskRatio, 1, 0))
-    .setValueAndParameterType(simulationResults, "pi1", pi1, NA_real_)
     .setValueAndParameterType(simulationResults, "groups", as.integer(groups), 2L)
     .setValueAndParameterType(
         simulationResults, "plannedSubjects",

@@ -44,7 +44,7 @@ NULL
 }
 
 .getParsedEnvironmentVariable <- function(
-        value, 
+        value,
         type = c("unknown", "character", "integer", "numeric", "logical")) {
     type <- match.arg(type)
     if (identical(type, "character")) {
@@ -269,7 +269,7 @@ NULL
                 }
             },
             error = function(e) {
-                stopMissingArgument("the object ", .pQuote(paramName), 
+                stopMissingArgument("the object ", .pQuote(paramName),
                     " has not been defined anywhere. ",
                     "Please define it first, e.g., run '",
                     paramName, " <- 1'",
@@ -473,8 +473,8 @@ getTestLabel <- function(x) {
             lastIndex <- index
             if (integerIndices[index]) {
                 while (lastIndex < length(values) &&
-                        integerIndices[lastIndex + 1L] &&
-                        integerValues[lastIndex + 1L] == integerValues[lastIndex] + 1) {
+                    integerIndices[lastIndex + 1L] &&
+                    integerValues[lastIndex + 1L] == integerValues[lastIndex] + 1) {
                     lastIndex <- lastIndex + 1L
                 }
             }
@@ -1095,7 +1095,7 @@ getTestLabel <- function(x) {
 #' @description
 #' How to cite \code{rpact} and \code{R} in publications.
 #'
-#' @param inclusiveR If \code{TRUE} (default) the information on 
+#' @param inclusiveR If \code{TRUE} (default) the information on
 #'        how to cite the base R system in publications will be added.
 #' @param language Language code to use for the output, default is "en".
 #' @param markdown If \code{TRUE}, the output will be created in Markdown.
@@ -1216,14 +1216,14 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
 #' @param var The variable/parameter name.
 #'
 #' @details
-#' This function identifies and returns the caption that 
+#' This function identifies and returns the caption that
 #' will be used in print outputs of an rpact result object.
 #'
 #' @seealso
-#' \code{\link[=getParameterName]{getParameterName()}} for 
+#' \code{\link[=getParameterName]{getParameterName()}} for
 #' getting the parameter name for a given caption.
 #'
-#' @return Returns a \code{\link[base]{character}} of specifying 
+#' @return Returns a \code{\link[base]{character}} of specifying
 #' the corresponding caption of a given parameter name.
 #' Returns \code{NULL} if the specified \code{parameterName} does not exist.
 #'
@@ -1260,7 +1260,7 @@ getParameterCaption <- function(obj, var) {
 #' @param var The variable/parameter name.
 #'
 #' @details
-#' This function identifies and returns the type that will 
+#' This function identifies and returns the type that will
 #' be used in print outputs of an rpact result object.
 #'
 #' @seealso
@@ -1409,7 +1409,7 @@ getParameterName <- function(obj, parameterCaption) {
     }
     if (is.null(columnName) || length(columnName) != 1 || is.na(columnName) || !is.character(columnName)) {
         stopIllegalArgument(sQuote("columnName"), " (", .getClassName(columnName), ") ",
-                "must be a valid character value",
+            "must be a valid character value",
             parameter = "columnName", value = columnName, constraint = "valid character value",
             functionName = ".moveColumn"
         )
@@ -2182,7 +2182,7 @@ saveOptions <- function() {
                 if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
                     return(invisible(FALSE))
                 }
-                
+
                 pkgConfigDir <- rappdirs::user_config_dir("rpact")
             }
             if (!dir.exists(pkgConfigDir)) {
@@ -2274,7 +2274,7 @@ resetOptions <- function(persist = TRUE) {
                 default = "#?#",
                 type = "character"
             )
-            
+
             if (!dir.exists(pkgConfigDir)) {
                 if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
                     packageStartupMessage(
@@ -2341,7 +2341,7 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
             if (
                 length(xAttributes) != length(yAttributes) ||
                     !identical(names(xAttributes), names(yAttributes))
-            ) {
+                ) {
                 return(FALSE)
             }
 
@@ -2381,7 +2381,7 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
                 (is.logical(x) || is.numeric(x)) &&
                 (is.logical(y) || is.numeric(y)) &&
                 is.na(x) && is.na(y) && !is.nan(x) && !is.nan(y)
-        ) {
+            ) {
             return(attributesEqual(x, y))
         }
 
@@ -2430,11 +2430,11 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
             return(C_PI_1_SAMPLE_SIZE_SURVIVAL_DEFAULT)
         }
     }
-    
+
     if (endpoint == "rates") {
         return(C_PI_1_POWER_RATES_DEFAULT)
     }
-    
+
     return(C_PI_1_POWER_SURVIVAL_DEFAULT)
 }
 
@@ -2444,6 +2444,48 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
     if (endpoint == "rates") {
         return(C_PI_2_RATES_DEFAULT)
     }
-    
+
     return(C_PI_2_SURVIVAL_DEFAULT)
+}
+
+.setPi1 <- function(
+        parameterSet,
+        pi1,
+        ...,
+        parameterName = c("pi1", "piTreatment"),
+        type = c("sampleSize", "power"),
+        endpoint = c("rates", "survival")) {
+    parameterName <- match.arg(parameterName)
+    endpoint <- match.arg(endpoint)
+    .assertIsNumericVector(pi1, parameterName, naAllowed = TRUE)
+    .assertIsInOpenInterval(pi1, parameterName, lower = 0, upper = 1, naAllowed = TRUE)
+    defaultValue <- NA_real_
+    if (all(is.na(pi1))) {
+        defaultValue <- .getPi1Default(type = type, endpoint = endpoint)
+        pi1 <- defaultValue
+    }
+    .setValueAndParameterType(parameterSet, parameterName, pi1, defaultValue)
+    return(invisible(pi1))
+}
+
+.setPi2 <- function(
+        parameterSet,
+        pi2,
+        ...,
+        parameterName = c("pi2", "piControl"),
+        endpoint = c("rates", "survival"),
+        applyToObject = TRUE) {
+    parameterName <- match.arg(parameterName)
+    endpoint <- match.arg(endpoint)
+    .assertIsSingleNumber(pi2, parameterName, naAllowed = TRUE)
+    .assertIsInOpenInterval(pi2, parameterName, lower = 0, upper = 1, naAllowed = TRUE)
+    if (isTRUE(applyToObject)) {
+        defaultValue <- NA_real_
+        if (is.na(pi2)) {
+            defaultValue <- .getPi2Default(endpoint = endpoint)
+            pi2 <- defaultValue
+        }
+        .setValueAndParameterType(parameterSet, parameterName, pi2, defaultValue)
+    }
+    return(invisible(pi2))
 }

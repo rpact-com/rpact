@@ -693,15 +693,7 @@ NULL
         )
 
         .setValueAndParameterType(simulationResults, "piTreatmentsH1", piTreatmentsH1, NA_real_)
-
-        .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)
-        piControlDefault <- NA_real_
-        if (is.na(piControl)) {
-            piControlDefault <- .getPi2Default(endpoint = endpoint)
-            piControl <- piControlDefault
-        }
-        .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = FALSE)
-        .setValueAndParameterType(simulationResults, "piControl", piControl, piControlDefault)
+        piControl <- .setPi2(simulationResults, piControl, parameterName = "piControl", endpoint = endpoint)
 
         piControlH1 <- .ignoreParameterIfNotUsed(
             "piControlH1",
@@ -773,9 +765,7 @@ NULL
             )
         }
 
-        .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)
-        .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = TRUE)
-        .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
+        piControl <- .setPi2(simulationResults, piControl, parameterName = "piControl", endpoint = endpoint)
         .setValueAndParameterType(simulationResults, "eventTime", eventTime, 12)
 
         if (!is.na(eventTime) && eventTime <= 0) {
