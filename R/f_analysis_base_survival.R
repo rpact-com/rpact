@@ -392,14 +392,17 @@ NULL
         stage = as.integer(stage),
         thetaH0 = thetaH0
     )
-    directionUpper <- .setDirectionUpper(
-        stageResults,
-        design,
-        directionUpper,
-        objectType = "analysis",
-        endpoint = "survival",
-        userFunctionCallEnabled = userFunctionCallEnabled
-    )
+    
+    if (userFunctionCallEnabled) {
+        directionUpper <- .setDirectionUpper(
+            stageResults,
+            design,
+            directionUpper,
+            objectType = "analysis",
+            endpoint = "survival",
+            userFunctionCallEnabled = userFunctionCallEnabled
+        )
+    }
 
     stageResults$overallEvents <- .fillWithNAs(
         dataInput$getOverallEventsUpTo(stage, group = 1), design$kMax
@@ -848,10 +851,9 @@ NULL
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    if (stageResults$directionUpper) {
-        thetaH1 <- log(thetaH1 / stageResults$thetaH0)
-    } else {
-        thetaH1 <- -log(thetaH1 / stageResults$thetaH0)
+    thetaH1 <- log(thetaH1 / stageResults$thetaH0)
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -thetaH1
     }
 
     # Shifted decision region for use in getGroupSeqProbs
@@ -989,10 +991,9 @@ NULL
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    if (stageResults$directionUpper) {
-        thetaH1 <- log(thetaH1 / stageResults$thetaH0)
-    } else {
-        thetaH1 <- -log(thetaH1 / stageResults$thetaH0)
+    thetaH1 <- log(thetaH1 / stageResults$thetaH0)
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -thetaH1
     }
 
     # Shifted decision region for use in getGroupSeqProbs
@@ -1110,11 +1111,11 @@ NULL
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    if (stageResults$directionUpper) {
-        thetaH1 <- log(thetaH1 / stageResults$thetaH0)
-    } else {
-        thetaH1 <- -log(thetaH1 / stageResults$thetaH0)
+    thetaH1 <- log(thetaH1 / stageResults$thetaH0)
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -thetaH1
     }
+    
 
     criticalValues <- .getCriticalValues(design)
     weightsFisher <- stageResults$weightsFisher

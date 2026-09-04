@@ -184,13 +184,15 @@ NULL
         stage = stage
     )
     
-    directionUpper <- .setDirectionUpper(
-        stageResults,
-        design,
-        directionUpper,
-        objectType = "analysis",
-        endpoint = "survival",
-        userFunctionCallEnabled = userFunctionCallEnabled)
+    if (userFunctionCallEnabled) {
+        directionUpper <- .setDirectionUpper(
+            stageResults,
+            design,
+            directionUpper,
+            objectType = "analysis",
+            endpoint = "survival",
+            userFunctionCallEnabled = userFunctionCallEnabled)
+    }
 
     .setValueAndParameterType(
         stageResults, "stratifiedAnalysis",
@@ -1049,11 +1051,11 @@ NULL
         results$.setParameterType("thetaH1", C_PARAM_DEFAULT_VALUE)
     }
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- log(thetaH1 / stageResults$thetaH0)
-    } else {
-        standardizedEffect <- -log(thetaH1 / stageResults$thetaH0)
+    standardizedEffect <- log(thetaH1 / stageResults$thetaH0)
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
+    
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
     criticalValues <- .getCriticalValues(design)
     for (population in 1:gMax) {
@@ -1148,11 +1150,11 @@ NULL
         results$.setParameterType("thetaH1", C_PARAM_DEFAULT_VALUE)
     }
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- log(thetaH1 / stageResults$thetaH0)
-    } else {
-        standardizedEffect <- -log(thetaH1 / stageResults$thetaH0)
+    standardizedEffect <- log(thetaH1 / stageResults$thetaH0)
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
+    
     nPlanned <- c(rep(NA_real_, stage), nPlanned)
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     ctr <- .performClosedCombinationTest(stageResults = stageResults)

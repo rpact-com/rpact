@@ -271,13 +271,15 @@ NULL
         stage = stage
     )
     
-    directionUpper <- .setDirectionUpper(
-        stageResults,
-        design,
-        directionUpper,
-        objectType = "analysis",
-        endpoint = "means",
-        userFunctionCallEnabled = userFunctionCallEnabled)
+    if (userFunctionCallEnabled) {
+        directionUpper <- .setDirectionUpper(
+            stageResults,
+            design,
+            directionUpper,
+            objectType = "analysis",
+            endpoint = "means",
+            userFunctionCallEnabled = userFunctionCallEnabled)
+    }
 
     .setValueAndParameterType(
         stageResults, "intersectionTest", intersectionTest,
@@ -1279,10 +1281,9 @@ NULL
     }
     results$.setParameterType("assumedStDevs", C_PARAM_DEFAULT_VALUE)
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
-    } else {
-        standardizedEffect <- -(thetaH1 - stageResults$thetaH0) / assumedStDevs
+    standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
     criticalValues <- .getCriticalValues(design)
@@ -1390,10 +1391,9 @@ NULL
     }
     results$.setParameterType("assumedStDevs", C_PARAM_DEFAULT_VALUE)
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
-    } else {
-        standardizedEffect <- -(thetaH1 - stageResults$thetaH0) / assumedStDevs
+    standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
     nPlanned <- c(rep(NA_real_, stage), nPlanned)
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned

@@ -490,14 +490,17 @@ NULL
         thetaH0 = thetaH0,
         normalApproximation = normalApproximation
     )
-    directionUpper <- .setDirectionUpper(
-        stageResults,
-        design,
-        directionUpper,
-        objectType = "analysis",
-        endpoint = "rates",
-        userFunctionCallEnabled = userFunctionCallEnabled
-    )
+    
+    if (userFunctionCallEnabled) {
+        directionUpper <- .setDirectionUpper(
+            stageResults,
+            design,
+            directionUpper,
+            objectType = "analysis",
+            endpoint = "rates",
+            userFunctionCallEnabled = userFunctionCallEnabled
+        )
+    }
 
     stageResults$effectSizes <- rep(NA_real_, design$kMax)
 
@@ -1129,10 +1132,10 @@ NULL
                 sqrt(sum(nPlanned[(stage + 1):kMax]))
         }
 
-        if (stageResults$directionUpper) {
-            thetaH1 <- (pi1 - stageResults$thetaH0) / sqrt(pi1 * (1 - pi1)) + adjustment
-        } else {
+        if (isFALSE(stageResults$directionUpper)) {
             thetaH1 <- -(pi1 - stageResults$thetaH0) / sqrt(pi1 * (1 - pi1)) + adjustment
+        } else {
+            thetaH1 <- (pi1 - stageResults$thetaH0) / sqrt(pi1 * (1 - pi1)) + adjustment
         }
 
         return(list(thetaH1 = thetaH1, nPlanned = nPlanned))
@@ -1167,13 +1170,13 @@ NULL
             )
     }
 
-    if (stageResults$directionUpper) {
-        thetaH1 <- (pi1 - pi2 - stageResults$thetaH0) /
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -(pi1 - pi2 - stageResults$thetaH0) /
             sqrt(pi1 * (1 - pi1) + allocationRatioPlanned * pi2 * (1 - pi2)) *
             sqrt(1 + allocationRatioPlanned) +
             adjustment
     } else {
-        thetaH1 <- -(pi1 - pi2 - stageResults$thetaH0) /
+        thetaH1 <- (pi1 - pi2 - stageResults$thetaH0) /
             sqrt(pi1 * (1 - pi1) + allocationRatioPlanned * pi2 * (1 - pi2)) *
             sqrt(1 + allocationRatioPlanned) +
             adjustment

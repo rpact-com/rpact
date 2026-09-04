@@ -253,13 +253,15 @@ NULL
         stage = stage
     )
     
-    directionUpper <- .setDirectionUpper(
-        stageResults,
-        design,
-        directionUpper,
-        objectType = "analysis",
-        endpoint = "rates",
-        userFunctionCallEnabled = userFunctionCallEnabled)
+    if (userFunctionCallEnabled) {
+        directionUpper <- .setDirectionUpper(
+            stageResults,
+            design,
+            directionUpper,
+            objectType = "analysis",
+            endpoint = "rates",
+            userFunctionCallEnabled = userFunctionCallEnabled)
+    }
 
     .setValueAndParameterType(
         stageResults, "stratifiedAnalysis",
@@ -1142,14 +1144,12 @@ NULL
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (piTreatments - piControls - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    } else {
-        standardizedEffect <- -(piTreatments - piControls - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
+    standardizedEffect <- (piTreatments - piControls - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
+        allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
-
+    
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
@@ -1269,13 +1269,11 @@ NULL
     } else {
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
-
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (piTreatments - piControls) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    } else {
-        standardizedEffect <- -(piTreatments - piControls - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
+    
+    standardizedEffect <- (piTreatments - piControls) / sqrt(piTreatments * (1 - piTreatments) +
+        allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
 
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned

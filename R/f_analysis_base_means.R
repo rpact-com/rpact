@@ -429,7 +429,8 @@ NULL
         ),
         ...
     )
-    stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
+    stage <- .getStageFromOptionalArguments(..., 
+        dataInput = dataInput, design = design, stage = stage)
 
     stageResults <- StageResultsMeans$new(
         design = design,
@@ -440,14 +441,16 @@ NULL
         equalVariances = equalVariances
     )
     
-    directionUpper <- .setDirectionUpper(
-        stageResults,
-        design,
-        directionUpper,
-        objectType = "analysis",
-        endpoint = "means",
-        userFunctionCallEnabled = userFunctionCallEnabled
-    )
+    if (userFunctionCallEnabled) {
+        directionUpper <- .setDirectionUpper(
+            stageResults,
+            design,
+            directionUpper,
+            objectType = "analysis",
+            endpoint = "means",
+            userFunctionCallEnabled = userFunctionCallEnabled
+        )
+    }
     
     stageResults$effectSizes <- rep(NA_real_, design$kMax)
 
@@ -781,7 +784,7 @@ NULL
             normalApproximation = normalApproximation,
             equalVariances = equalVariances
         )
-
+        
         firstValue <- stageResults[[firstParameterName]][stage]
 
         if (.isTrialDesignGroupSequential(design)) {
@@ -831,8 +834,6 @@ NULL
         conditionFunction <- .isFirstValueGreaterThanSecondValue
     }
     
-    print(directionUpper) # TODO remove this line, it is only for debugging purposes
-
     repeatedConfidenceIntervals <- matrix(NA_real_, nrow = 2, ncol = design$kMax)
     for (k in 1:stage) {
         startTime <- Sys.time()
@@ -900,7 +901,7 @@ NULL
                 parameterName <- ifelse(.isTrialDesignFisher(design), "pValues", firstParameterName)
 
                 #  Calculate new lower and upper bounds
-                if (is.na(directionUpper) || isTRUE(directionUpper)) {
+                if (!isFALSE(directionUpper)) {
                     thetaLow <- .getUpperLowerThetaMeans(
                         design = design,
                         dataInput = dataInput,
@@ -943,7 +944,7 @@ NULL
                     callingFunctionInformation = paste0("Repeated confidence interval, futility correction [", k, "]")
                 )
 
-                if (is.na(directionUpper) || isTRUE(directionUpper)) {
+                if (!isFALSE(directionUpper)) {
                     repeatedConfidenceIntervals[1, k] <- min(min(futilityCorr[2:k]), repeatedConfidenceIntervals[1, k])
                 } else {
                     repeatedConfidenceIntervals[2, k] <- max(max(futilityCorr[2:k]), repeatedConfidenceIntervals[2, k])
@@ -1134,11 +1135,10 @@ NULL
         )
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
-
-    if (stageResults$directionUpper) {
-        thetaH1 <- (thetaH1 - stageResults$thetaH0) / assumedStDev
-    } else {
-        thetaH1 <- -(thetaH1 - stageResults$thetaH0) / assumedStDev
+    
+    thetaH1 <- (thetaH1 - stageResults$thetaH0) / assumedStDev
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -thetaH1
     }
 
     # shifted decision region for use in getGroupSeqProbs
@@ -1275,11 +1275,10 @@ NULL
         )
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
-
-    if (stageResults$directionUpper) {
-        thetaH1 <- (thetaH1 - stageResults$thetaH0) / assumedStDev
-    } else {
-        thetaH1 <- -(thetaH1 - stageResults$thetaH0) / assumedStDev
+    
+    thetaH1 <- (thetaH1 - stageResults$thetaH0) / assumedStDev
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -thetaH1
     }
 
     # shifted decision region for use in getGroupSeqProbs
@@ -1402,11 +1401,10 @@ NULL
         )
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
-
-    if (stageResults$directionUpper) {
-        thetaH1 <- (thetaH1 - stageResults$thetaH0) / assumedStDev
-    } else {
-        thetaH1 <- -(thetaH1 - stageResults$thetaH0) / assumedStDev
+    
+    thetaH1 <- (thetaH1 - stageResults$thetaH0) / assumedStDev
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -thetaH1
     }
 
     criticalValues <- .getCriticalValues(design)
