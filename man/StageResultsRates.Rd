@@ -25,6 +25,8 @@ with suitable arguments to create the stage results of a dataset of rates.
 
 \item{\code{effectSizes}}{The stage-wise effect sizes. Is a numeric vector of length \code{kMax}.}
 
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
+
 \item{\code{direction}}{Specifies the direction of the alternative, is either "upper" or "lower". Only applicable for one-sided testing.}
 
 \item{\code{testActions}}{The test decisions at each stage of the trial. Is a character vector of length \code{kMax}.}

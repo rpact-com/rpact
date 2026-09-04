@@ -2494,13 +2494,53 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
     }
     if (closedInterval) {
         .assertIsInClosedInterval(pi2, parameterName,
-            lower = 0, upper = 1, naAllowed = !applyToObject)
+            lower = 0, upper = 1, naAllowed = !applyToObject
+        )
     } else {
         .assertIsInOpenInterval(pi2, parameterName,
-            lower = 0, upper = 1, naAllowed = !applyToObject)
+            lower = 0, upper = 1, naAllowed = !applyToObject
+        )
     }
     if (applyToObject) {
         .setValueAndParameterType(parameterSet, parameterName, pi2, defaultValue)
     }
     return(invisible(pi2))
+}
+
+.setDirectionUpper <- function(
+        parameterSet,
+        design,
+        directionUpper,
+        ...,
+        objectType = c("sampleSize", "power", "analysis"),
+        endpoint = c("means", "rates", "survival", "counts"),
+        userFunctionCallEnabled = TRUE) {
+    .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
+    endpoint <- match.arg(endpoint)
+    defaultValue <- ifelse(identical(endpoint, "survival"),
+        C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT
+    )
+    forceUserDefinedDirectionUpper <- !is.na(directionUpper)
+    directionUpper <- .assertIsValidDirectionUpper(
+        directionUpper,
+        design,
+        objectType = objectType,
+        userFunctionCallEnabled = userFunctionCallEnabled,
+        default = defaultValue
+    )
+    .setValueAndParameterType(parameterSet, "directionUpper", directionUpper, defaultValue)
+    if (forceUserDefinedDirectionUpper) {
+        parameterSet$.setParameterType("directionUpper", C_PARAM_USER_DEFINED)
+    }
+
+    if ("direction" %in% names(parameterSet)) {
+        parameterSet$direction <- "undefined"
+        if (design$sided == 1) {
+            parameterSet$direction <- ifelse(
+                !isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER
+            )
+        }
+    }
+
+    return(invisible(directionUpper))
 }

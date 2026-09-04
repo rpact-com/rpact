@@ -431,10 +431,26 @@ NULL
     )
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
 
-    effectSizes <- rep(NA_real_, design$kMax)
+    stageResults <- StageResultsMeans$new(
+        design = design,
+        dataInput = dataInput,
+        stage = as.integer(stage),
+        thetaH0 = thetaH0,
+        normalApproximation = normalApproximation,
+        equalVariances = equalVariances
+    )
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "means"
+    )
+
+    stageResults$effectSizes <- rep(NA_real_, design$kMax)
 
     if (dataInput$getNumberOfGroups() == 1) {
-        overallTestStatistics <- c(
+        stageResults$overallTestStatistics <- c(
             (dataInput$getOverallMeansUpTo(stage) - thetaH0) /
                 dataInput$getOverallStDevsUpTo(stage) *
                 sqrt(dataInput$getOverallSampleSizesUpTo(stage)),
@@ -442,22 +458,31 @@ NULL
         )
 
         if (normalApproximation) {
-            overallPValues <- 1 - stats::pnorm(overallTestStatistics)
+            stageResults$overallPValues <- 1 - stats::pnorm(stageResults$overallTestStatistics)
         } else {
-            overallPValues <- 1 -
+            stageResults$overallPValues <- 1 -
                 stats::pt(
-                    overallTestStatistics,
+                    stageResults$overallTestStatistics,
                     dataInput$getOverallSampleSizesUpTo(stage) - 1
                 )
         }
-        effectSizes[1:stage] <- dataInput$getOverallMeansUpTo(stage)
+        stageResults$effectSizes[1:stage] <- dataInput$getOverallMeansUpTo(stage)
+        stageResults$overallMeans <- .trimAnalysisMeansResultObjectAndFillWithNAs(
+            dataInput$getOverallMeans(), design$kMax
+        )
+        stageResults$overallStDevs <- .trimAnalysisMeansResultObjectAndFillWithNAs(
+            dataInput$getOverallStDevs(), design$kMax
+        )
+        stageResults$overallSampleSizes <- .fillWithNAs(
+            dataInput$getOverallSampleSizesUpTo(stage), design$kMax
+        )
     }
 
     if (dataInput$getNumberOfGroups() == 2) {
         # common variance
-        overallStDevs <- rep(NA_real_, design$kMax)
+        stageResults$overallStDevs <- rep(NA_real_, design$kMax)
         for (k in 1:stage) {
-            overallStDevs[k] <- sqrt(
+            stageResults$overallStDevs[k] <- sqrt(
                 ((sum(dataInput$getSampleSizesUpTo(k, 1)) - 1) *
                     dataInput$getOverallStDev(k)^2 +
                     (sum(dataInput$getSampleSizesUpTo(k, 2)) - 1) * dataInput$getOverallStDev(k, 2)^2) /
@@ -469,16 +494,16 @@ NULL
         overallSampleSizes2 <- dataInput$getOverallSampleSizesUpTo(stage, 2)
 
         if (equalVariances) {
-            overallTestStatistics <- c(
+            stageResults$overallTestStatistics <- c(
                 (dataInput$getOverallMeansUpTo(stage) -
                     dataInput$getOverallMeansUpTo(stage, 2) -
                     thetaH0) /
-                    overallStDevs[1:stage] /
+                    stageResults$overallStDevs[1:stage] /
                     sqrt(1 / overallSampleSizes1 + 1 / overallSampleSizes2),
                 rep(NA_real_, design$kMax - stage)
             )
         } else {
-            overallTestStatistics <- c(
+            stageResults$overallTestStatistics <- c(
                 (dataInput$getOverallMeansUpTo(stage) -
                     dataInput$getOverallMeansUpTo(stage, 2) -
                     thetaH0) /
@@ -492,12 +517,12 @@ NULL
         }
 
         if (normalApproximation) {
-            overallPValues <- 1 - stats::pnorm(overallTestStatistics)
+            stageResults$overallPValues <- 1 - stats::pnorm(stageResults$overallTestStatistics)
         } else {
             if (equalVariances) {
-                overallPValues <- 1 -
+                stageResults$overallPValues <- 1 -
                     stats::pt(
-                        overallTestStatistics,
+                        stageResults$overallTestStatistics,
                         overallSampleSizes1 + overallSampleSizes2 - 2
                     )
             } else {
@@ -506,46 +531,64 @@ NULL
                     (dataInput$getOverallStDevsUpTo(stage)^2 /
                         overallSampleSizes1 +
                         dataInput$getOverallStDevsUpTo(stage, 2)^2 / overallSampleSizes2)
-                overallPValues <- 1 -
+                stageResults$overallPValues <- 1 -
                     stats::pt(
-                        overallTestStatistics,
+                        stageResults$overallTestStatistics,
                         1 / (u^2 / (overallSampleSizes1 - 1) + (1 - u)^2 / (overallSampleSizes2 - 1))
                     )
             }
         }
-        effectSizes[1:stage] <- dataInput$getOverallMeansUpTo(stage) - dataInput$getOverallMeansUpTo(stage, 2)
+        stageResults$effectSizes[1:stage] <-
+            dataInput$getOverallMeansUpTo(stage) - dataInput$getOverallMeansUpTo(stage, 2)
+        stageResults$overallMeans1 <- .trimAnalysisMeansResultObjectAndFillWithNAs(
+            dataInput$getOverallMeans(group = 1), design$kMax
+        )
+        stageResults$overallMeans2 <- .trimAnalysisMeansResultObjectAndFillWithNAs(
+            dataInput$getOverallMeans(group = 2), design$kMax
+        )
+        stageResults$overallStDevs1 <- .trimAnalysisMeansResultObjectAndFillWithNAs(
+            dataInput$getOverallStDevs(group = 1), design$kMax
+        )
+        stageResults$overallStDevs2 <- .trimAnalysisMeansResultObjectAndFillWithNAs(
+            dataInput$getOverallStDevs(group = 2), design$kMax
+        )
+        stageResults$overallSampleSizes1 <- .fillWithNAs(overallSampleSizes1, design$kMax)
+        stageResults$overallSampleSizes2 <- .fillWithNAs(overallSampleSizes2, design$kMax)
     }
+
     if (isFALSE(directionUpper)) {
-        overallPValues <- 1 - overallPValues
+        stageResults$overallPValues <- 1 - stageResults$overallPValues
     }
 
     # calculation of stage-wise test statistics and combination tests
-    testStatistics <- rep(NA_real_, design$kMax)
-    pValues <- rep(NA_real_, design$kMax)
-    combInverseNormal <- rep(NA_real_, design$kMax)
-    combFisher <- rep(NA_real_, design$kMax)
-    weightsInverseNormal <- .getWeightsInverseNormal(design)
-    weightsFisher <- .getWeightsFisher(design)
+    stageResults$testStatistics <- rep(NA_real_, design$kMax)
+    stageResults$pValues <- rep(NA_real_, design$kMax)
+    stageResults$combInverseNormal <- rep(NA_real_, design$kMax)
+    stageResults$combFisher <- rep(NA_real_, design$kMax)
+    stageResults$weightsInverseNormal <- .getWeightsInverseNormal(design)
+    stageResults$weightsFisher <- .getWeightsFisher(design)
 
     for (k in 1:stage) {
         if (dataInput$getNumberOfGroups() == 1) {
             # stage-wise test statistics
-            testStatistics[k] <- (dataInput$getMean(k) - thetaH0) /
+            stageResults$testStatistics[k] <- (dataInput$getMean(k) - thetaH0) /
                 dataInput$getStDev(k) *
                 sqrt(dataInput$getSampleSize(k))
 
             if (normalApproximation) {
                 # stage-wise p-values
-                pValues[k] <- 1 - stats::pnorm(testStatistics[k])
+                stageResults$pValues[k] <- 1 - stats::pnorm(stageResults$testStatistics[k])
             } else {
-                pValues[k] <- 1 - stats::pt(testStatistics[k], dataInput$getSampleSize(k) - 1)
+                stageResults$pValues[k] <-
+                    1 - stats::pt(stageResults$testStatistics[k], dataInput$getSampleSize(k) - 1)
             }
         }
 
         if (dataInput$getNumberOfGroups() == 2) {
             # stage-wise test statistics
             if (equalVariances) {
-                testStatistics[k] <- (dataInput$getMean(k, 1) - dataInput$getMean(k, 2) - thetaH0) /
+                stageResults$testStatistics[k] <-
+                    (dataInput$getMean(k, 1) - dataInput$getMean(k, 2) - thetaH0) /
                     sqrt(
                         ((dataInput$getSampleSize(k, 1) - 1) *
                             dataInput$getStDev(k, 1)^2 +
@@ -554,7 +597,8 @@ NULL
                     ) /
                     sqrt(1 / dataInput$getSampleSize(k, 1) + 1 / dataInput$getSampleSize(k, 2))
             } else {
-                testStatistics[k] <- (dataInput$getMean(k, 1) - dataInput$getMean(k, 2) - thetaH0) /
+                stageResults$testStatistics[k] <-
+                    (dataInput$getMean(k, 1) - dataInput$getMean(k, 2) - thetaH0) /
                     sqrt(
                         dataInput$getStDev(k, 1)^2 /
                             dataInput$getSampleSize(k, 1) +
@@ -564,12 +608,12 @@ NULL
 
             if (normalApproximation) {
                 # stage-wise p-values
-                pValues[k] <- 1 - stats::pnorm(testStatistics[k])
+                stageResults$pValues[k] <- 1 - stats::pnorm(stageResults$testStatistics[k])
             } else {
                 if (equalVariances) {
-                    pValues[k] <- 1 -
+                    stageResults$pValues[k] <- 1 -
                         stats::pt(
-                            testStatistics[k],
+                            stageResults$testStatistics[k],
                             dataInput$getSampleSize(k, 1) + dataInput$getSampleSize(k, 2) - 2
                         )
                 } else {
@@ -578,9 +622,9 @@ NULL
                         (dataInput$getStDev(k, 1)^2 /
                             dataInput$getSampleSize(k, 1) +
                             dataInput$getStDev(k, 2)^2 / dataInput$getSampleSize(k, 2))
-                    pValues[k] <- 1 -
+                    stageResults$pValues[k] <- 1 -
                         stats::pt(
-                            testStatistics[k],
+                            stageResults$testStatistics[k],
                             1 /
                                 (u^2 /
                                     (dataInput$getSampleSize(k, 1) - 1) +
@@ -590,89 +634,20 @@ NULL
             }
         }
         if (isFALSE(directionUpper)) {
-            pValues[k] <- 1 - pValues[k]
+            stageResults$pValues[k] <- 1 - stageResults$pValues[k]
         }
 
         # inverse normal test
-        combInverseNormal[k] <- (weightsInverseNormal[1:k] %*% .getOneMinusQNorm(pValues[1:k])) /
-            sqrt(sum(weightsInverseNormal[1:k]^2))
+        stageResults$combInverseNormal[k] <-
+            (stageResults$weightsInverseNormal[1:k] %*%
+                .getOneMinusQNorm(stageResults$pValues[1:k])) /
+            sqrt(sum(stageResults$weightsInverseNormal[1:k]^2))
 
         # Fisher combination test
-        combFisher[k] <- prod(pValues[1:k]^weightsFisher[1:k])
+        stageResults$combFisher[k] <-
+            prod(stageResults$pValues[1:k]^stageResults$weightsFisher[1:k])
     }
 
-    direction <- "undefined"
-    if (design$sided == 1) {
-        direction <- ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER)
-    }
-
-    if (dataInput$getNumberOfGroups() == 1) {
-        stageResults <- StageResultsMeans$new(
-            design = design,
-            dataInput = dataInput,
-            stage = as.integer(stage),
-            overallTestStatistics = .fillWithNAs(overallTestStatistics, design$kMax),
-            overallPValues = .fillWithNAs(overallPValues, design$kMax),
-            overallMeans = .trimAnalysisMeansResultObjectAndFillWithNAs(
-                dataInput$getOverallMeans(),
-                design$kMax
-            ),
-            overallStDevs = .trimAnalysisMeansResultObjectAndFillWithNAs(
-                dataInput$getOverallStDevs(),
-                design$kMax
-            ),
-            overallSampleSizes = .fillWithNAs(dataInput$getOverallSampleSizesUpTo(stage), design$kMax),
-            testStatistics = testStatistics,
-            effectSizes = effectSizes,
-            pValues = pValues,
-            combInverseNormal = combInverseNormal,
-            combFisher = combFisher,
-            weightsFisher = weightsFisher,
-            weightsInverseNormal = weightsInverseNormal,
-            thetaH0 = thetaH0,
-            direction = direction,
-            normalApproximation = normalApproximation,
-            equalVariances = equalVariances
-        )
-    } else if (dataInput$getNumberOfGroups() == 2) {
-        stageResults <- StageResultsMeans$new(
-            design = design,
-            dataInput = dataInput,
-            stage = as.integer(stage),
-            overallTestStatistics = .fillWithNAs(overallTestStatistics, design$kMax),
-            overallPValues = .fillWithNAs(overallPValues, design$kMax),
-            overallMeans1 = .trimAnalysisMeansResultObjectAndFillWithNAs(
-                dataInput$getOverallMeans(group = 1),
-                design$kMax
-            ),
-            overallMeans2 = .trimAnalysisMeansResultObjectAndFillWithNAs(
-                dataInput$getOverallMeans(group = 2),
-                design$kMax
-            ),
-            overallStDevs1 = .trimAnalysisMeansResultObjectAndFillWithNAs(
-                dataInput$getOverallStDevs(group = 1),
-                design$kMax
-            ),
-            overallStDevs2 = .trimAnalysisMeansResultObjectAndFillWithNAs(
-                dataInput$getOverallStDevs(group = 2),
-                design$kMax
-            ),
-            overallStDevs = overallStDevs, # common variance
-            overallSampleSizes1 = .fillWithNAs(dataInput$getOverallSampleSizesUpTo(stage), design$kMax),
-            overallSampleSizes2 = .fillWithNAs(dataInput$getOverallSampleSizesUpTo(stage, 2), design$kMax),
-            effectSizes = effectSizes,
-            testStatistics = testStatistics,
-            pValues = pValues,
-            combInverseNormal = combInverseNormal,
-            combFisher = combFisher,
-            weightsFisher = weightsFisher,
-            weightsInverseNormal = weightsInverseNormal,
-            thetaH0 = thetaH0,
-            direction = direction,
-            normalApproximation = normalApproximation,
-            equalVariances = equalVariances
-        )
-    }
     if (.isTrialDesignFisher(design)) {
         stageResults$.setParameterType("combFisher", C_PARAM_GENERATED)
         stageResults$.setParameterType("weightsFisher", C_PARAM_GENERATED)

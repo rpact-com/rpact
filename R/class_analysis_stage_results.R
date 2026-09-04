@@ -71,6 +71,7 @@ StageResults <- R6::R6Class("StageResults",
         weightsFisher = NULL,
         weightsInverseNormal = NULL,
         thetaH0 = NULL,
+        directionUpper = NULL,
         direction = NULL,
         initialize = function(
                 ...,
@@ -80,13 +81,16 @@ StageResults <- R6::R6Class("StageResults",
                 weightsFisher = NULL,
                 weightsInverseNormal = NULL,
                 thetaH0 = NULL,
-                direction = NULL) {
+                directionUpper = NULL,
+                direction = NULL
+                ) {
             self$stage <- stage
             self$stages <- stages
             self$pValues <- pValues
             self$weightsFisher <- weightsFisher
             self$weightsInverseNormal <- weightsInverseNormal
             self$thetaH0 <- thetaH0
+            self$directionUpper <- directionUpper
             self$direction <- direction
             super$initialize(...)
         },
@@ -357,6 +361,7 @@ StageResultsGeneral <- R6::R6Class("StageResultsGeneral",
 #' @template field_overallPValues
 #' @template field_effectSizes
 #' @template field_testActions
+#' @template field_directionUpper
 #' @template field_direction
 #' @template field_normalApproximation
 #' @template field_equalVariances
@@ -511,6 +516,7 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
+                "directionUpper",
                 "direction",
                 "normalApproximation"
             )
@@ -703,6 +709,7 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
 #' @template field_pValues
 #' @template field_overallPValues
 #' @template field_effectSizes
+#' @template field_directionUpper
 #' @template field_direction
 #' @template field_testActions
 #' @template field_thetaH0
@@ -853,6 +860,7 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
+                "directionUpper",
                 "direction",
                 "normalApproximation"
             )
@@ -1142,6 +1150,7 @@ StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
+                "directionUpper",
                 "direction"
             )
             return(parametersToShow)

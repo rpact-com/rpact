@@ -990,7 +990,7 @@ getSampleSizeCounts <- function(
     designPlan$lambda2 <- lambda2
     designPlan$allocationRatioPlanned <- allocationRatioPlanned
 
-    .setDirectionUpper(designPlan)
+    .setDirectionUpperDesignPlan(designPlan)
 
     designPlan$calendarTime <- calendarTime
     designPlan$.setParameterType(

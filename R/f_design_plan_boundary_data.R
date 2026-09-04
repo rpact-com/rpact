@@ -755,7 +755,7 @@
     return(directionUpperCalculated)
 }
 
-.setDirectionUpper <- function(designPlan) {
+.setDirectionUpperDesignPlan <- function(designPlan) {
     if (!designPlan$.isSampleSizeObject()) {
         if (is.null(designPlan$directionUpper) || all(is.na(designPlan$directionUpper))) {
             designPlan$directionUpper <- ifelse(.isTrialDesignPlanSurvival(designPlan), 
@@ -797,7 +797,7 @@
     .assertIsTrialDesignPlan(designPlan)
 
     design <- designPlan$.design
-    .setDirectionUpper(designPlan)
+    .setDirectionUpperDesignPlan(designPlan)
     if (.isTrialDesignPlanMeans(designPlan)) {
         if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
             designPlan$maxNumberOfSubjects <- designPlan$nFixed

@@ -510,7 +510,7 @@ NULL
     designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
 
     .addStudyDurationToDesignPlan(designPlan)
-    .setDirectionUpper(designPlan)
+    .setDirectionUpperDesignPlan(designPlan)
 
     return(designPlan)
 }

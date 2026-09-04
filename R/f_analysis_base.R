@@ -389,12 +389,6 @@ getStageResults <- function(
     design <- designAndDataInput$design
     dataInput <- designAndDataInput$dataInput
 
-    directionUpperDefault <- ifelse(dataInput$isDatasetSurvival(), 
-        C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT)
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, design,
-        objectType = "analysis", userFunctionCallEnabled = TRUE, 
-        default = directionUpperDefault)
-
     if (.isEnrichmentDataset(dataInput)) {
         return(.getStageResultsEnrichment(
             design = design,
