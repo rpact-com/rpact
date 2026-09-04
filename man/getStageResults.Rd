@@ -16,18 +16,20 @@ getStageResults(
 \item{design}{The trial design.}
 
 \item{dataInput}{The summary data used for calculating the test results.
-This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival}
+This is an element of \code{DatasetGeneral}, \code{DatasetMeans},
+\code{DatasetRates}, or \code{DatasetSurvival}
 and should be created with the function \code{\link[=getDataset]{getDataset()}}.
 For more information see \code{\link[=getDataset]{getDataset()}}.}
 
 \item{...}{Further (optional) arguments to be passed:
 \describe{
 \item{\code{thetaH0}}{The null hypothesis value,
-default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+default is \code{0} for general estimates, the normal case, and the binary case,
 it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
+\item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
 \item \emph{means}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the mean ratio) can be specified.
 \item \emph{rates}: a value \code{!= 0}

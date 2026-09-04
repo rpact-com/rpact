@@ -10,6 +10,7 @@ Basic class for stage results.
 \code{StageResults} is the basic class for
 \itemize{
 \item \code{\link{StageResultsMeans}},
+\item \code{\link{StageResultsGeneral}},
 \item \code{\link{StageResultsRates}},
 \item \code{\link{StageResultsSurvival}},
 \item \code{\link{StageResultsMultiArmMeans}},

@@ -386,74 +386,91 @@ NULL
     )
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
 
-    overallEvents <- dataInput$getOverallEventsUpTo(stage, group = 1)
-    overallAllocationRatios <- dataInput$getOverallAllocationRatiosUpTo(stage, group = 1)
-
-    # Calculation of overall log-ranks for specified hypothesis
-    overallLogRankTestStatistics <- dataInput$getOverallLogRanksUpTo(stage, group = 1) -
-        sqrt(overallEvents) * sqrt(overallAllocationRatios) / (1 + overallAllocationRatios) * log(thetaH0)
-
-    effectSizes <- exp(
-        dataInput$getOverallLogRanksUpTo(stage, group = 1) *
-            (1 + overallAllocationRatios[1:stage]) /
-            sqrt(overallAllocationRatios[1:stage] * overallEvents[1:stage])
-    )
-
-    events <- dataInput$getEventsUpTo(stage, group = 1)
-    allocationRatios <- dataInput$getAllocationRatiosUpTo(stage, group = 1)
-
-    # Calculation of log-ranks for specified hypothesis
-    logRankTestStatistics <- dataInput$getLogRanksUpTo(stage, group = 1) -
-        sqrt(events) * sqrt(allocationRatios) / (1 + allocationRatios) * log(thetaH0)
-
-    # Calculation of stage-wise test statistics and combination tests
-    pValues <- rep(NA_real_, design$kMax)
-    combInverseNormal <- rep(NA_real_, design$kMax)
-    combFisher <- rep(NA_real_, design$kMax)
-    weightsInverseNormal <- .getWeightsInverseNormal(design)
-    weightsFisher <- .getWeightsFisher(design)
-    pValues <- .applyDirectionOfAlternative(
-        stats::pnorm(logRankTestStatistics),
-        directionUpper,
-        type = "oneMinusValue",
-        phase = "analysis"
-    )
-    overallPValues <- .applyDirectionOfAlternative(
-        stats::pnorm(overallLogRankTestStatistics),
-        directionUpper,
-        type = "oneMinusValue",
-        phase = "analysis"
-    )
-
-    for (k in 1:stage) {
-        # Inverse normal test
-        combInverseNormal[k] <- (weightsInverseNormal[1:k] %*% .getOneMinusQNorm(pValues[1:k])) /
-            sqrt(sum(weightsInverseNormal[1:k]^2))
-
-        # Fisher combination test
-        combFisher[k] <- prod(pValues[1:k]^weightsFisher[1:k])
-    }
-
     stageResults <- StageResultsSurvival$new(
         design = design,
         dataInput = dataInput,
         stage = as.integer(stage),
-        overallTestStatistics = .fillWithNAs(overallLogRankTestStatistics, design$kMax),
-        overallPValues = .fillWithNAs(overallPValues, design$kMax),
-        overallEvents = .fillWithNAs(overallEvents, design$kMax),
-        overallAllocationRatios = .fillWithNAs(overallAllocationRatios, design$kMax),
-        events = .fillWithNAs(events, design$kMax),
-        allocationRatios = .fillWithNAs(allocationRatios, design$kMax),
-        testStatistics = .fillWithNAs(logRankTestStatistics, design$kMax),
-        pValues = .fillWithNAs(pValues, design$kMax),
-        effectSizes = .fillWithNAs(effectSizes, design$kMax),
-        combInverseNormal = combInverseNormal,
-        combFisher = combFisher,
-        weightsFisher = weightsFisher,
-        weightsInverseNormal = weightsInverseNormal,
-        thetaH0 = thetaH0,
-        direction = ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER)
+        thetaH0 = thetaH0
     )
+    
+    if (userFunctionCallEnabled) {
+        directionUpper <- .setDirectionUpper(
+            stageResults,
+            design,
+            directionUpper,
+            objectType = "analysis",
+            endpoint = "survival",
+            userFunctionCallEnabled = userFunctionCallEnabled
+        )
+    }
+
+    stageResults$overallEvents <- .fillWithNAs(
+        dataInput$getOverallEventsUpTo(stage, group = 1), design$kMax
+    )
+    stageResults$overallAllocationRatios <- .fillWithNAs(
+        dataInput$getOverallAllocationRatiosUpTo(stage, group = 1), design$kMax
+    )
+
+    # Calculation of overall log-ranks for specified hypothesis
+    stageResults$overallTestStatistics <- .fillWithNAs(
+        dataInput$getOverallLogRanksUpTo(stage, group = 1) -
+            sqrt(stageResults$overallEvents[1:stage]) *
+                sqrt(stageResults$overallAllocationRatios[1:stage]) /
+                (1 + stageResults$overallAllocationRatios[1:stage]) * log(thetaH0),
+        design$kMax
+    )
+
+    stageResults$effectSizes <- .fillWithNAs(exp(
+        dataInput$getOverallLogRanksUpTo(stage, group = 1) *
+            (1 + stageResults$overallAllocationRatios[1:stage]) /
+            sqrt(stageResults$overallAllocationRatios[1:stage] *
+                stageResults$overallEvents[1:stage])
+    ), design$kMax)
+
+    stageResults$events <- .fillWithNAs(
+        dataInput$getEventsUpTo(stage, group = 1), design$kMax
+    )
+    stageResults$allocationRatios <- .fillWithNAs(
+        dataInput$getAllocationRatiosUpTo(stage, group = 1), design$kMax
+    )
+
+    # Calculation of log-ranks for specified hypothesis
+    stageResults$testStatistics <- .fillWithNAs(
+        dataInput$getLogRanksUpTo(stage, group = 1) -
+            sqrt(stageResults$events[1:stage]) * sqrt(stageResults$allocationRatios[1:stage]) /
+                (1 + stageResults$allocationRatios[1:stage]) * log(thetaH0),
+        design$kMax
+    )
+
+    # Calculation of stage-wise test statistics and combination tests
+    stageResults$combInverseNormal <- rep(NA_real_, design$kMax)
+    stageResults$combFisher <- rep(NA_real_, design$kMax)
+    stageResults$weightsInverseNormal <- .getWeightsInverseNormal(design)
+    stageResults$weightsFisher <- .getWeightsFisher(design)
+    stageResults$pValues <- .fillWithNAs(.applyDirectionOfAlternative(
+        stats::pnorm(stageResults$testStatistics[1:stage]),
+        directionUpper,
+        type = "oneMinusValue",
+        phase = "analysis"
+    ), design$kMax)
+    stageResults$overallPValues <- .fillWithNAs(.applyDirectionOfAlternative(
+        stats::pnorm(stageResults$overallTestStatistics[1:stage]),
+        directionUpper,
+        type = "oneMinusValue",
+        phase = "analysis"
+    ), design$kMax)
+
+    for (k in 1:stage) {
+        # Inverse normal test
+        stageResults$combInverseNormal[k] <-
+            (stageResults$weightsInverseNormal[1:k] %*%
+                .getOneMinusQNorm(stageResults$pValues[1:k])) /
+            sqrt(sum(stageResults$weightsInverseNormal[1:k]^2))
+
+        # Fisher combination test
+        stageResults$combFisher[k] <-
+            prod(stageResults$pValues[1:k]^stageResults$weightsFisher[1:k])
+    }
 
     if (.isTrialDesignFisher(design)) {
         stageResults$.setParameterType("combFisher", C_PARAM_GENERATED)
@@ -834,10 +851,9 @@ NULL
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    if (stageResults$direction == "upper") {
-        thetaH1 <- log(thetaH1 / stageResults$thetaH0)
-    } else {
-        thetaH1 <- -log(thetaH1 / stageResults$thetaH0)
+    thetaH1 <- log(thetaH1 / stageResults$thetaH0)
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -thetaH1
     }
 
     # Shifted decision region for use in getGroupSeqProbs
@@ -975,10 +991,9 @@ NULL
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    if (stageResults$direction == "upper") {
-        thetaH1 <- log(thetaH1 / stageResults$thetaH0)
-    } else {
-        thetaH1 <- -log(thetaH1 / stageResults$thetaH0)
+    thetaH1 <- log(thetaH1 / stageResults$thetaH0)
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -thetaH1
     }
 
     # Shifted decision region for use in getGroupSeqProbs
@@ -1096,11 +1111,11 @@ NULL
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    if (stageResults$direction == "upper") {
-        thetaH1 <- log(thetaH1 / stageResults$thetaH0)
-    } else {
-        thetaH1 <- -log(thetaH1 / stageResults$thetaH0)
+    thetaH1 <- log(thetaH1 / stageResults$thetaH0)
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -thetaH1
     }
+    
 
     criticalValues <- .getCriticalValues(design)
     weightsFisher <- stageResults$weightsFisher

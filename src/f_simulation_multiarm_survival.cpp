@@ -372,7 +372,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         double thetaH1,
         Nullable<Function> calcEventsFunction = R_NilValue,
         bool calcEventsFunctionIsUserDefined = false,
-        Nullable<Function> selectArmsFunction = R_NilValue) {
+        Nullable<Function> selectArmsFunction = R_NilValue,
+        bool returnRawData = false) {
     
     // This is important to ensure that R's random number generator state is properly managed
     Rcpp::RNGScope scope;
@@ -801,7 +802,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         }
     }
        
-    return List::create(
+    List result = List::create(
         _["eventsNotAchieved"] = eventsNotAchieved,
         _["singleEventsPerStage"] = singleEventsPerStage,
         _["cumulativeEventsPerStage"] = cumulativeEventsPerStage,
@@ -817,6 +818,10 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         _["conditionalPowerPerStage"] = conditionalPowerPerStage,
         _["selectedArms"] = selectedArms
     );
+    if (returnRawData) {
+        result["rawData"] = survivalDataSet;
+    }
+    return result;
 }
 
 // Perform Simulation Multi-Arm Survival Loop
@@ -894,7 +899,8 @@ List performSimulationMultiArmSurvivalLoop(
 		Nullable<NumericVector> criticalValuesDunnett,
 		std::string successCriterion,
 		int gMax,
-		int kMax) {
+		int kMax,
+		int maxNumberOfRawDatasetsPerStage = 0) {
 
 	// Initialize simulation result matrices
 	IntegerMatrix simulatedNumberEventsNotAchieved(kMax, cols);
@@ -917,6 +923,8 @@ List performSimulationMultiArmSurvivalLoop(
 	NumericVector expectedNumberOfSubjects(cols);
 	NumericVector expectedStudyDuration(cols);
 	NumericMatrix iterations(kMax, cols);
+	IntegerMatrix rawDataPerStage(cols, kMax);
+	List rawDataSets;
 	
 	// Initialize all these with zeros
 	std::fill(simulatedNumberEventsNotAchieved.begin(), simulatedNumberEventsNotAchieved.end(), 0);
@@ -946,6 +954,7 @@ List performSimulationMultiArmSurvivalLoop(
 	NumericVector dataAnalysisTime(len, NA_REAL);
 	NumericVector dataNumberOfSubjects(len, NA_REAL);
 	NumericVector dataNumberOfEvents(len, NA_REAL);
+	LogicalVector dataSelectedForNextStage(len, NA_LOGICAL);
 	LogicalVector dataRejectPerStage(len, NA_LOGICAL);
 	LogicalVector dataFutilityStop(len, NA_LOGICAL);
 	LogicalVector dataSuccessStop(len, NA_LOGICAL);
@@ -963,6 +972,15 @@ List performSimulationMultiArmSurvivalLoop(
 	// Main simulation loop
 	for (int i = 0; i < cols; i++) {
 		for (int j = 0; j < maxNumberOfIterations; j++) {
+			bool returnRawData = false;
+			if (maxNumberOfRawDatasetsPerStage > 0) {
+				for (int k = 0; k < kMax; k++) {
+					if (rawDataPerStage(i, k) < maxNumberOfRawDatasetsPerStage) {
+						returnRawData = true;
+						break;
+					}
+				}
+			}
 			NumericVector omegaVectorThisScenario = effectMatrix(i, _);
             NumericVector plannedEventsThisIteration = clone(plannedEvents);
 			
@@ -991,7 +1009,8 @@ List performSimulationMultiArmSurvivalLoop(
 				thetaH1,
 				calcEventsFunction,
 				calcEventsFunctionIsUserDefined,
-				selectArmsFunction
+				selectArmsFunction,
+				returnRawData
 			);
 			
 			List closedTest;
@@ -1035,6 +1054,28 @@ List performSimulationMultiArmSurvivalLoop(
 			LogicalVector successStop = closedTest["successStop"];
 			LogicalVector futilityStop = closedTest["futilityStop"];
 			NumericMatrix separatePValuesTest = closedTest["separatePValues"];
+
+			int stopStage = -1;
+			for (int k = 0; k < kMax; k++) {
+				bool success = !LogicalVector::is_na(successStop[k]) && successStop[k];
+				bool futility = k < kMax - 1 &&
+					!LogicalVector::is_na(futilityStop[k]) && futilityStop[k];
+				if (!eventsNotAchieved[k] && (success || futility || k == kMax - 1)) {
+					stopStage = k;
+					break;
+				}
+			}
+			if (returnRawData && stopStage >= 0 &&
+					rawDataPerStage(i, stopStage) < maxNumberOfRawDatasetsPerStage) {
+				rawDataSets.push_back(List::create(
+					_["data"] = stageResults["rawData"],
+					_["scenario"] = i + 1,
+					_["iterationNumber"] = j + 1,
+					_["stopStage"] = stopStage + 1,
+					_["analysisTime"] = analysisTime[stopStage]
+				));
+				rawDataPerStage(i, stopStage)++;
+			}
 			
 			// Loop over stages
 			for (int k = 0; k < kMax; k++) {
@@ -1097,6 +1138,9 @@ List performSimulationMultiArmSurvivalLoop(
 						dataAnalysisTime[index] = analysisTime[k];
 						dataNumberOfSubjects[index] = numberOfSubjects[k];
 						dataNumberOfEvents[index] = round(cumulativeEventsPerStage(g, k), 1);
+						if (k < kMax - 1) {
+							dataSelectedForNextStage[index] = selectedArmsTest(g, k + 1);
+						}
 						dataRejectPerStage[index] = rejected(g, k);
 						dataTestStatistics[index] = testStatistics(g, k);
 						dataSuccessStop[index] = successStop[k];
@@ -1239,6 +1283,7 @@ List performSimulationMultiArmSurvivalLoop(
 		_["pValue"] = dataPValuesSeparate[validRows],
 		_["conditionalCriticalValue"] = dataConditionalCriticalValue[validRows],
 		_["conditionalPowerAchieved"] = dataConditionalPowerAchieved[validRows],
+		_["selectedForNextStage"] = dataSelectedForNextStage[validRows],
 		_["rejectPerStage"] = dataRejectPerStage[validRows],
 		_["successStop"] = dataSuccessStop[validRows],
 		_["futilityPerStage"] = dataFutilityStop[validRows]
@@ -1261,7 +1306,7 @@ List performSimulationMultiArmSurvivalLoop(
 		_["expectedNumberOfSubjects"] = expectedNumberOfSubjects,
 		_["expectedStudyDuration"] = expectedStudyDuration,
 		_["iterations"] = iterations,
-		_["data"] = filteredData
+		_["data"] = filteredData,
+		_["rawData"] = rawDataSets
 	);
 }
-

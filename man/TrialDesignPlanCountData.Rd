@@ -65,7 +65,7 @@ with suitable arguments to create a design plan for a dataset of rates.
 
 \item{\code{calendarTime}}{The calendar time Is a numeric vector.}
 
-\item{\code{expectedStudyDurationH1}}{The expected study duration under H1 Is a numeric vector.}
+\item{\code{studyDuration}}{The study duration for specified effect size. Is a positive numeric vector.}
 
 \item{\code{studyTime}}{The study time Is a numeric vector.}
 

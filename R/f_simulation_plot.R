@@ -99,7 +99,7 @@ NULL
     return("effect")
 }
 
-.getSimulationPlotXAxisLabel <- function(simulationResults, xlab = NULL) {
+.getSimulationPlotXAxisLabel <- function(simulationResults, xlab = NULL, ..., situationEnabled = TRUE) {
     if (grepl("SimulationResultsEnrichment", .getClassName(simulationResults))) {
         effectDataList <- .getSimulationEnrichmentEffectData(simulationResults)
         if (ncol(effectDataList$effectData) == 1) {
@@ -111,7 +111,6 @@ NULL
     }
 
     multiArmEnabled <- grepl("MultiArm", .getClassName(simulationResults))
-    userDefinedEffectMatrix <- multiArmEnabled && simulationResults$isUserDefinedParameter("effectMatrix")
     if (!is.null(xlab) && !is.na(xlab)) {
         return(xlab)
     }
@@ -120,7 +119,13 @@ NULL
         return("Effect")
     }
 
-    return(ifelse(userDefinedEffectMatrix, "Effect Matrix Row", "Maximum Effect"))
+    userDefinedEffectMatrix <- multiArmEnabled && simulationResults$isUserDefinedParameter("effectMatrix")
+    
+    if (!userDefinedEffectMatrix || !situationEnabled) {
+        return("Maximum Effect") # Effect size in highest dose arm
+    }
+    
+    return("Effect Shape Situation")
 }
 
 .getPowerAndStoppingProbabilities <- function(simulationResults, xValues, parameters) {
@@ -201,6 +206,8 @@ NULL
     .assertIsSimulationResults(simulationResults)
     .assertIsValidLegendPosition(legendPosition)
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
+    type <- .assertIsAvailablePlotType(simulationResults, type, 
+        functionName = ".plotSimulationResults")
     theta <- .assertIsValidThetaRange(thetaRange = theta)
 
     if (is.null(plotSettings)) {
@@ -212,6 +219,7 @@ NULL
     multiArmEnabled <- grepl("MultiArm", .getClassName(simulationResults))
     enrichmentEnabled <- grepl("Enrichment", .getClassName(simulationResults))
     countDataEnabled <- grepl("CountData", .getClassName(simulationResults))
+    patienWiseSimulationEnabled <- equals(simulationResults[["simulationType"]], "patientWise")
     userDefinedEffectMatrix <- multiArmEnabled &&
         simulationResults$isUserDefinedParameter("effectMatrix")
 
@@ -231,33 +239,7 @@ NULL
     } else {
         nMax <- simulationResults$expectedNumberOfSubjects[1]
     }
-
-    if (type %in% c(1:3) && !multiArmEnabled && !enrichmentEnabled) {
-        stopIllegalArgument(
-            "'type' (", type, ") is not available for non-multi-arm/non-enrichment ",
-            "simulation results (type must be > 3)",
-            functionName = ".plotSimulationResults",
-            parameter = "type", value = type
-        )
-    }
-
-    if ((!survivalEnabled || multiArmEnabled || enrichmentEnabled) && type %in% c(10:14)) {
-        if (multiArmEnabled || enrichmentEnabled) {
-            stopIllegalArgument(
-                "'type' (", type, ") is only available for ",
-                "non-multi-arm/non-enrichment survival simulation results",
-                functionName = ".plotSimulationResults",
-                parameter = "type", value = type
-            )
-        } else {
-            stopIllegalArgument(
-                "'type' (", type, ") is only available for survival simulation results",
-                functionName = ".plotSimulationResults",
-                parameter = "type", value = type
-            )
-        }
-    }
-
+    
     variedParameters <- logical(0)
 
     if (is.na(plotPointsEnabled)) {
@@ -331,13 +313,17 @@ NULL
 
         return(.plotDataFrame(data,
             mainTitle = main,
-            xlab = NA_character_, ylab = NA_character_,
+            xlab = NA_character_, 
+            ylab = NA_character_,
             xAxisLabel = .getSimulationPlotXAxisLabel(simulationResults),
             yAxisLabel1 = "Overall Success",
             yAxisLabel2 = NA_character_,
-            plotPointsEnabled = plotPointsEnabled, legendTitle = NA_character_,
-            legendPosition = legendPosition, sided = designMaster$sided,
-            palette = palette, plotSettings = plotSettings,
+            plotPointsEnabled = plotPointsEnabled, 
+            legendTitle = NA_character_,
+            legendPosition = legendPosition, 
+            sided = designMaster$sided,
+            palette = palette, 
+            plotSettings = plotSettings,
             discreteXAxis = discreteXAxis
         ))
     } else if (type == 2) { # Multi-arm, Success per Stage
@@ -395,13 +381,17 @@ NULL
 
         return(.plotDataFrame(data,
             mainTitle = main,
-            xlab = NA_character_, ylab = NA_character_,
+            xlab = NA_character_, 
+            ylab = NA_character_,
             xAxisLabel = .getSimulationPlotXAxisLabel(simulationResults),
             yAxisLabel1 = "Success",
             yAxisLabel2 = NA_character_,
-            plotPointsEnabled = plotPointsEnabled, legendTitle = "Stage",
-            legendPosition = legendPosition, sided = designMaster$sided,
-            palette = palette, plotSettings = plotSettings,
+            plotPointsEnabled = plotPointsEnabled, 
+            legendTitle = "Stage",
+            legendPosition = legendPosition, 
+            sided = designMaster$sided,
+            palette = palette, 
+            plotSettings = plotSettings,
             discreteXAxis = discreteXAxis
         ))
     } else if (type == 3) { # Multi-arm, Selected Arms/Populations per Stage
@@ -486,14 +476,17 @@ NULL
         )
         return(.plotDataFrame(data,
             mainTitle = main,
-            xlab = NA_character_, ylab = NA_character_,
+            xlab = NA_character_, 
+            ylab = NA_character_,
             xAxisLabel = .getSimulationPlotXAxisLabel(simulationResults),
             yAxisLabel1 = paste0("Selected ", armsCaption),
             yAxisLabel2 = NA_character_,
             plotPointsEnabled = plotPointsEnabled,
             legendTitle = legendTitle,
-            legendPosition = legendPosition, sided = designMaster$sided,
-            palette = palette, plotSettings = plotSettings,
+            legendPosition = legendPosition, 
+            sided = designMaster$sided,
+            palette = palette, 
+            plotSettings = plotSettings,
             discreteXAxis = discreteXAxis
         ))
     } else if (type == 4) { # Multi-arm, Rejected Arms/Populations per Stage
@@ -615,14 +608,17 @@ NULL
         )
         return(.plotDataFrame(data,
             mainTitle = main,
-            xlab = NA_character_, ylab = NA_character_,
+            xlab = NA_character_, 
+            ylab = NA_character_,
             xAxisLabel = .getSimulationPlotXAxisLabel(simulationResults),
             yAxisLabel1 = yAxisLabel1,
             yAxisLabel2 = NA_character_,
             plotPointsEnabled = plotPointsEnabled,
             legendTitle = legendTitle,
-            legendPosition = legendPosition, sided = designMaster$sided,
-            palette = palette, plotSettings = plotSettings,
+            legendPosition = legendPosition, 
+            sided = designMaster$sided,
+            palette = palette, 
+            plotSettings = plotSettings,
             discreteXAxis = discreteXAxis
         ))
     } else if (type == 5) { # Power and Stopping Probabilities
@@ -639,7 +635,8 @@ NULL
         xParameterName <- .getSimulationPlotXAxisParameterName(simulationResults)
 
         if ((multiArmEnabled || enrichmentEnabled) && designMaster$kMax > 1) {
-            powerAndStoppingProbabilities <- .getPowerAndStoppingProbabilities(simulationResults,
+            powerAndStoppingProbabilities <- .getPowerAndStoppingProbabilities(
+                simulationResults,
                 xValues = xValues,
                 parameters = c("rejectAtLeastOne", "futilityStop", "earlyStop")
             )
@@ -657,7 +654,7 @@ NULL
             yParameterNamesSrc <- yParameterNames
         }
 
-        xlab <- .getSimulationPlotXAxisLabel(simulationResults, xlab)
+        xlab <- .getSimulationPlotXAxisLabel(simulationResults, xlab, situationEnabled = FALSE)
         ylab <- ifelse(is.na(ylab), "", ylab)
         legendPosition <- ifelse(is.na(legendPosition), C_POSITION_LEFT_TOP, legendPosition)
 
@@ -665,8 +662,10 @@ NULL
             objectName = simulationResultsName,
             xParameterName = xParameterNameSrc,
             yParameterNames = yParameterNamesSrc,
-            hint = showSourceHint, nMax = nMax,
-            type = type, showSource = showSource
+            hint = showSourceHint, 
+            nMax = nMax,
+            type = type, 
+            showSource = showSource
         )
         if (!is.null(srcCmd)) {
             if (.isSpecialPlotShowSourceArgument(showSource)) {
@@ -678,37 +677,56 @@ NULL
         if ((multiArmEnabled || enrichmentEnabled) && designMaster$kMax > 1) {
             return(.plotDataFrame(data,
                 mainTitle = main,
-                xlab = xlab, ylab = ylab,
-                xAxisLabel = .getSimulationPlotXAxisLabel(simulationResults),
-                yAxisLabel1 = NA_character_,
-                yAxisLabel2 = NA_character_,
+                xlab = xlab, 
+                ylab = ylab,
                 plotPointsEnabled = plotPointsEnabled,
                 legendTitle = NA_character_,
-                legendPosition = legendPosition, sided = designMaster$sided,
-                palette = palette, plotSettings = plotSettings,
+                legendPosition = legendPosition, 
+                sided = designMaster$sided,
+                palette = palette, 
+                plotSettings = plotSettings,
                 discreteXAxis = discreteXAxis
             ))
         } else {
             if (is.null(list(...)[["ylim"]])) {
                 ylim <- c(0, 1)
                 return(.plotParameterSet(
-                    parameterSet = simulationResults, designMaster = designMaster,
+                    parameterSet = simulationResults, 
+                    designMaster = designMaster,
                     xParameterName = xParameterName,
-                    yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-                    palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
-                    legendPosition = legendPosition, variedParameters = variedParameters,
-                    qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings, ylim = ylim # , ...
-                )) # ratioEnabled = TRUE
+                    yParameterNames = yParameterNames, 
+                    mainTitle = main, 
+                    xlab = xlab, 
+                    ylab = ylab,
+                    palette = palette, 
+                    theta = theta, 
+                    nMax = nMax, 
+                    plotPointsEnabled = plotPointsEnabled,
+                    legendPosition = legendPosition, 
+                    variedParameters = variedParameters,
+                    qnormAlphaLineEnabled = FALSE, 
+                    yAxisScalingEnabled = FALSE,
+                    plotSettings = plotSettings, 
+                    ylim = ylim 
+                )) 
             } else {
                 return(.plotParameterSet(
-                    parameterSet = simulationResults, designMaster = designMaster,
+                    parameterSet = simulationResults, 
+                    designMaster = designMaster,
                     xParameterName = xParameterName,
-                    yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-                    palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
-                    legendPosition = legendPosition, variedParameters = variedParameters,
-                    qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings # , ...
+                    yParameterNames = yParameterNames, 
+                    mainTitle = main, 
+                    xlab = xlab, 
+                    ylab = ylab,
+                    palette = palette, 
+                    theta = theta, 
+                    nMax = nMax, 
+                    plotPointsEnabled = plotPointsEnabled,
+                    legendPosition = legendPosition, 
+                    variedParameters = variedParameters,
+                    qnormAlphaLineEnabled = FALSE, 
+                    yAxisScalingEnabled = FALSE,
+                    plotSettings = plotSettings
                 ))
             }
         }
@@ -755,19 +773,24 @@ NULL
         }
 
         xParameterName <- .getSimulationPlotXAxisParameterName(simulationResults)
-        yParameterNames <- ifelse(multiArmEnabled || enrichmentEnabled, "rejectAtLeastOne", "overallReject")
+        yParameterNames <- ifelse(multiArmEnabled || enrichmentEnabled, 
+            "rejectAtLeastOne", "overallReject")
         xlab <- .getSimulationPlotXAxisLabel(simulationResults, xlab)
-        legendPosition <- ifelse(is.na(legendPosition), C_POSITION_RIGHT_CENTER, legendPosition)
+        legendPosition <- ifelse(is.na(legendPosition), 
+            C_POSITION_RIGHT_CENTER, legendPosition)
         srcCmd <- .showPlotSourceInformation(
             objectName = simulationResultsName,
             xParameterName = xParameterNameSrc,
             yParameterNames = yParameterNames,
-            hint = showSourceHint, nMax = nMax,
-            type = type, showSource = showSource
+            hint = showSourceHint, 
+            nMax = nMax,
+            type = type, 
+            showSource = showSource
         )
     } else if (type == 8) {
         if (designMaster$kMax == 1) {
-            stopIllegalArgument("plot type 8 (Early Stopping) is not available for 'kMax' = 1",
+            stopIllegalArgument("plot type 8 (Early Stopping) ",
+                "is not available for 'kMax' = 1",
                 functionName = ".plotSimulationResults",
                 parameter = "kMax"
             )
@@ -792,13 +815,16 @@ NULL
             yParameterNames <- c(yParameterNames, "futilityStop")
         }
         xlab <- .getSimulationPlotXAxisLabel(simulationResults, xlab)
-        legendPosition <- ifelse(is.na(legendPosition), C_POSITION_LEFT_CENTER, legendPosition)
+        legendPosition <- ifelse(is.na(legendPosition), 
+            C_POSITION_LEFT_CENTER, legendPosition)
         srcCmd <- .showPlotSourceInformation(
             objectName = simulationResultsName,
             xParameterName = xParameterNameSrc,
             yParameterNames = yParameterNames,
-            hint = showSourceHint, nMax = nMax,
-            type = type, showSource = showSource
+            hint = showSourceHint, 
+            nMax = nMax,
+            type = type, 
+            showSource = showSource
         )
     } else if (type == 9) {
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
@@ -811,14 +837,17 @@ NULL
         }
 
         xParameterName <- .getSimulationPlotXAxisParameterName(simulationResults)
-        yParameterNames <- ifelse(survivalEnabled, "expectedNumberOfEvents", "expectedNumberOfSubjects")
+        yParameterNames <- ifelse(survivalEnabled, 
+            "expectedNumberOfEvents", "expectedNumberOfSubjects")
         xlab <- .getSimulationPlotXAxisLabel(simulationResults, xlab)
         srcCmd <- .showPlotSourceInformation(
             objectName = simulationResultsName,
             xParameterName = xParameterNameSrc,
             yParameterNames = yParameterNames,
-            hint = showSourceHint, nMax = nMax,
-            type = type, showSource = showSource
+            hint = showSourceHint, 
+            nMax = nMax,
+            type = type, 
+            showSource = showSource
         )
     } else if (type == 10) { # Study Duration
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
@@ -826,14 +855,17 @@ NULL
             main <- PlotSubTitleItems$new(title = "Study Duration")
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
-        xParameterName <- "hazardRatio"
+        xParameterName <- .getSimulationPlotXAxisParameterName(simulationResults)
         yParameterNames <- "studyDuration"
+        xlab <- .getSimulationPlotXAxisLabel(simulationResults, xlab)
         srcCmd <- .showPlotSourceInformation(
             objectName = simulationResultsName,
             xParameterName = xParameterName,
             yParameterNames = yParameterNames,
-            hint = showSourceHint, nMax = nMax,
-            type = type, showSource = showSource
+            hint = showSourceHint, 
+            nMax = nMax,
+            type = type, 
+            showSource = showSource
         )
     } else if (type == 11) {
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
@@ -841,14 +873,17 @@ NULL
             main <- PlotSubTitleItems$new(title = "Expected Number of Subjects")
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
-        xParameterName <- "hazardRatio"
+        xParameterName <- .getSimulationPlotXAxisParameterName(simulationResults)
         yParameterNames <- "expectedNumberOfSubjects"
+        xlab <- .getSimulationPlotXAxisLabel(simulationResults, xlab)
         srcCmd <- .showPlotSourceInformation(
             objectName = simulationResultsName,
             xParameterName = xParameterName,
             yParameterNames = yParameterNames,
-            hint = showSourceHint, nMax = nMax,
-            type = type, showSource = showSource
+            hint = showSourceHint, 
+            nMax = nMax,
+            type = type, 
+            showSource = showSource
         )
     } else if (type == 12) { # Analysis Time
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
@@ -857,7 +892,7 @@ NULL
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
 
-        xParameterName <- "hazardRatio"
+        xParameterName <- .getSimulationPlotXAxisParameterName(simulationResults)
         yParameterNames <- "analysisTime"
         yParameterNamesSrc <- c()
         for (i in 1:nrow(simulationResults[["analysisTime"]])) {
@@ -865,29 +900,34 @@ NULL
         }
 
         data <- NULL
+        xParameterNameSrc <- xParameterName
         for (k in 1:designMaster$kMax) {
+            xData <- simulationResults[[xParameterName]]
+            if (identical(xParameterName, "effectMatrix")) {
+                xData <- seq_len(ncol(xData))
+                xParameterNameSrc <- paste0("seq_len(", max(xData), ")")
+            }
+            
             part <- data.frame(
-                categories = rep(k, length(simulationResults$hazardRatio)),
-                xValues = simulationResults$hazardRatio,
+                categories = rep(k, length(xData)),
+                xValues = xData,
                 yValues = simulationResults$analysisTime[k, ]
             )
-            if (is.null(data)) {
-                data <- part
-            } else {
-                data <- rbind(data, part)
-            }
+            data <- rbind(data, part)
         }
 
         if (is.na(legendPosition)) {
             legendPosition <- C_POSITION_LEFT_CENTER
         }
-
+        
         srcCmd <- .showPlotSourceInformation(
             objectName = simulationResultsName,
-            xParameterName = xParameterName,
+            xParameterName = xParameterNameSrc,
             yParameterNames = yParameterNamesSrc,
-            hint = showSourceHint, nMax = nMax,
-            type = type, showSource = showSource
+            hint = showSourceHint, 
+            nMax = nMax,
+            type = type, 
+            showSource = showSource
         )
         if (!is.null(srcCmd)) {
             if (.isSpecialPlotShowSourceArgument(showSource)) {
@@ -896,26 +936,38 @@ NULL
             return(srcCmd)
         }
 
-        return(.plotDataFrame(data,
+        return(.plotDataFrame(
+            data = data,
             mainTitle = main,
-            xlab = NA_character_, ylab = NA_character_, xAxisLabel = "Hazard Ratio",
-            yAxisLabel1 = "Analysis Time", yAxisLabel2 = NA_character_,
-            plotPointsEnabled = TRUE, legendTitle = "Stage",
-            legendPosition = legendPosition, sided = designMaster$sided, plotSettings = plotSettings,
+            xlab = NA_character_,
+            ylab = NA_character_,
+            xAxisLabel = .getSimulationPlotXAxisLabel(simulationResults, xlab),
+            yAxisLabel1 = "Analysis Time",
+            yAxisLabel2 = NA_character_,
+            plotPointsEnabled = TRUE,
+            legendTitle = "Stage",
+            legendPosition = legendPosition,
+            sided = designMaster$sided,
+            plotSettings = plotSettings,
             discreteXAxis = discreteXAxis
         ))
-    } else if (type == 13 || type == 14) { # Cumulative Distribution Function / Survival function
-        return(.plotSurvivalFunction(simulationResults,
-            designMaster = designMaster, type = type, main = main,
-            xlab = xlab, ylab = ylab, palette = palette,
-            legendPosition = legendPosition, designPlanName = simulationResultsName,
-            showSource = showSource, plotSettings = plotSettings
+    } else if (type == 13 || type == 14) { 
+        # Cumulative Distribution Function / Survival function
+        return(.plotSurvivalFunction(
+            simulationResults,
+            designMaster = designMaster,
+            type = type,
+            main = main,
+            xlab = xlab,
+            ylab = ylab,
+            palette = palette,
+            legendPosition = legendPosition,
+            designPlanName = simulationResultsName,
+            showSource = showSource,
+            plotSettings = plotSettings
         ))
     } else {
-        stopIllegalArgument("'type' (", type, ") is not allowed; must be 5, 6, ..., 14",
-            functionName = ".plotSimulationResults",
-            parameter = "type", value = type
-        )
+        .showPlotTypeNotImplementedError(type, ".plotSimulationResults", simulationResults)
     }
 
     if (!is.null(srcCmd)) {
@@ -924,14 +976,24 @@ NULL
         }
         return(srcCmd)
     }
-
+    
     return(.plotParameterSet(
-        parameterSet = simulationResults, designMaster = designMaster,
+        parameterSet = simulationResults,
+        designMaster = designMaster,
         xParameterName = xParameterName,
-        yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-        palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
-        legendPosition = legendPosition, variedParameters = variedParameters,
-        qnormAlphaLineEnabled = (type != 2), ratioEnabled = TRUE, plotSettings = plotSettings # , ...
+        yParameterNames = yParameterNames,
+        mainTitle = main,
+        xlab = xlab,
+        ylab = ylab,
+        palette = palette, 
+        theta = theta, 
+        nMax = nMax, 
+        plotPointsEnabled = plotPointsEnabled,
+        legendPosition = legendPosition, 
+        variedParameters = variedParameters,
+        qnormAlphaLineEnabled = (type != 2), 
+        ratioEnabled = TRUE, 
+        plotSettings = plotSettings
     ))
 }
 
@@ -1007,17 +1069,10 @@ plot.SimulationResults <- function(
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
+    fCall <- match.call(expand.dots = FALSE)
+    simulationResultsName <- deparse(fCall$x)
     .assertIsValidPlotType(type, naAllowed = TRUE)
-    if (all(is.na(type))) {
-        type <- na.omit(getAvailablePlotTypes(x))
-        if (length(type) == 0) {
-            stopIllegalArgument("not plot type available",
-                functionName = "plot.SimulationResults"
-            )
-        }
-
-        type <- type[1]
-    }
+    type <- .assertIsAvailablePlotType(x, type, functionName = "plot.SimulationResults")
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
@@ -1038,6 +1093,7 @@ plot.SimulationResults <- function(
         showSource = showSource,
         grid = grid,
         plotSettings = plotSettings,
+        simulationResultsName = simulationResultsName,
         ...
     )
 
@@ -1072,9 +1128,8 @@ plot.SimulationResults <- function(
         legendPosition = NA_integer_,
         showSource = FALSE,
         grid = 1,
-        plotSettings = NULL) {
-    fCall <- match.call(expand.dots = FALSE)
-    simulationResultsName <- deparse(fCall$x)
+        plotSettings = NULL,
+        simulationResultsName = NA_character_) {
     .assertGgplotIsInstalled()
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     typeNumbers <- .getPlotTypeNumber(type, x)
@@ -1085,12 +1140,20 @@ plot.SimulationResults <- function(
     plotList <- list()
     for (typeNumber in typeNumbers) {
         p <- .plotSimulationResults(
-            simulationResults = x, designMaster = x$.design,
-            main = main, xlab = xlab, ylab = ylab, type = typeNumber,
-            palette = palette, theta = theta, plotPointsEnabled = plotPointsEnabled,
+            simulationResults = x, 
+            designMaster = x$.design,
+            main = main, 
+            xlab = xlab, 
+            ylab = ylab, 
+            type = typeNumber,
+            palette = palette, 
+            theta = theta, 
+            plotPointsEnabled = plotPointsEnabled,
             legendPosition = .getGridLegendPosition(legendPosition, typeNumbers, grid),
-            showSource = showSource, simulationResultsName = simulationResultsName,
-            plotSettings = plotSettings, ...
+            showSource = showSource, 
+            simulationResultsName = simulationResultsName,
+            plotSettings = plotSettings, 
+            ...
         )
         .printPlotShowSourceSeparator(showSource, typeNumber, typeNumbers)
         if (length(typeNumbers) > 1) {

@@ -18,7 +18,7 @@
 NULL
 
 .addStudyDurationToDesignPlan <- function(designPlan) {
-    if (!designPlan$accountForObservationTimes) {
+    if (isFALSE(designPlan$accountForObservationTimes)) {
         return(invisible())
     }
 
@@ -491,8 +491,8 @@ NULL
 
     if (!anyNA(designPlan$followUpTime)) {
         if (any(designPlan$followUpTime < -1e-02)) {
-            warning("Accrual duration longer than maximal study ",
-                "duration (time to maximal number of events); followUpTime = ",
+            warning("Accrual duration longer than maximum study ",
+                "duration (time to maximum number of events); followUpTime = ",
                 .arrayToString(designPlan$followUpTime),
                 call. = FALSE
             )
@@ -510,7 +510,7 @@ NULL
     designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
 
     .addStudyDurationToDesignPlan(designPlan)
-    .setDirectionUpper(designPlan)
+    .setDirectionUpperDesignPlan(designPlan)
 
     return(designPlan)
 }
@@ -626,7 +626,7 @@ NULL
             design,
             objectType = objectType, 
             userFunctionCallEnabled = TRUE, 
-            default = NA
+            default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
         )
 
         if (objectType == "power") {
@@ -706,7 +706,8 @@ NULL
         dropoutRate1 = dropoutRate1,
         dropoutRate2 = dropoutRate2,
         dropoutTime = dropoutTime,
-        hazardRatio = hazardRatio
+        hazardRatio = hazardRatio,
+        objectType = objectType
     )
 
     .setValueAndParameterType(
@@ -717,8 +718,6 @@ NULL
     .setValueAndParameterType(designPlan, "dropoutRate2", dropoutRate2, C_DROP_OUT_RATE_2_DEFAULT)
     .setValueAndParameterType(designPlan, "dropoutTime", dropoutTime, C_DROP_OUT_TIME_DEFAULT)
     .setValueAndParameterType(designPlan, "kappa", kappa, 1)
-
-    designPlan$.setObjectType(objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {
@@ -750,12 +749,8 @@ NULL
         designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_USER_DEFINED)
     }
 
-    if (isTRUE(all.equal(accrualSetup$accrualTime, C_ACCRUAL_TIME_DEFAULT)) ||
-            isTRUE(all.equal(
-                as.integer(c(0L, accrualSetup$.getAccrualTimeWithoutLeadingZero())),
-                C_ACCRUAL_TIME_DEFAULT
-            ))
-        ) {
+    if (equals(accrualSetup$accrualTime, C_ACCRUAL_TIME_DEFAULT) ||
+            equals(c(0L, accrualSetup$.getAccrualTimeWithoutLeadingZero()), C_ACCRUAL_TIME_DEFAULT)) {
         designPlan$.setParameterType("accrualTime", C_PARAM_DEFAULT_VALUE)
     } else {
         designPlan$.setParameterType(
@@ -784,11 +779,6 @@ NULL
     .assertIsSingleNumber(designPlan$dropoutRate2, "dropoutRate2")
     .assertIsSingleNumber(designPlan$dropoutTime, "dropoutTime")
 
-    if (objectType == "power") {
-        pi1Default <- C_PI_1_DEFAULT
-    } else {
-        pi1Default <- C_PI_1_SAMPLE_SIZE_DEFAULT
-    }
     designPlan$.piecewiseSurvivalTime <- getPiecewiseSurvivalTime(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
         lambda2 = lambda2,
@@ -800,7 +790,7 @@ NULL
         pi2 = pi2,
         eventTime = eventTime,
         kappa = kappa,
-        .pi1Default = pi1Default,
+        .pi1Default = .getPi1Default(type = objectType, endpoint = "survival"),
         .silent = TRUE
     )
     designPlan$.setParameterType("kappa", designPlan$.piecewiseSurvivalTime$.getParameterType("kappa"))
@@ -863,7 +853,7 @@ NULL
             designPlan$.setParameterType(p, C_PARAM_NOT_APPLICABLE)
         }
         if (designPlan$isUserDefinedParameter("accrualTime") ||
-                !isTRUE(all.equal(accrualTime, C_ACCRUAL_TIME_DEFAULT))) {
+                !equals(accrualTime, C_ACCRUAL_TIME_DEFAULT)) {
             designPlan$.warnInCaseArgumentExists(accrualSetup$accrualTime, "accrualTime")
         }
         designPlan$.warnInCaseArgumentExists(dropoutRate1, "dropoutRate1")
@@ -1202,7 +1192,7 @@ NULL
 
     if (userDefinedMaxNumberOfSubjects) {
         designPlan$followUpTime <- timeVector - accrualTime[length(accrualTime)]
-        designPlan$.setParameterType("followUpTime", C_PARAM_DERIVED)
+        designPlan$.setParameterType("followUpTime", C_PARAM_GENERATED)
     }
 
     designPlan$nFixed2 <- designPlan$nFixed / (1 + allocationRatioPlanned)
@@ -1521,7 +1511,6 @@ NULL
         designPlan$analysisTime <- analysisTime
         designPlan$expectedNumberOfSubjectsH1 <- expectedNumberOfSubjectsH1
         designPlan$studyDuration <- studyDuration
-        designPlan$studyDurationH1 <- studyDuration # deprecated
 
         designPlan$.setParameterType("analysisTime", C_PARAM_GENERATED)
         designPlan$.setParameterType("expectedNumberOfSubjectsH1", C_PARAM_GENERATED)
@@ -2475,7 +2464,7 @@ getSampleSizeSurvival <- function(
 
             if (sampleSizeSurvival$followUpTime < followUpTime - 1e-02 ||
                     sampleSizeSurvival$followUpTime > followUpTime + 1e-02) {
-                sampleSizeSurvival$.setParameterType("followUpTime", C_PARAM_DERIVED)
+                sampleSizeSurvival$.setParameterType("followUpTime", C_PARAM_GENERATED)
                 warning("User defined 'followUpTime' (", followUpTime, ") ignored because ",
                     "follow-up time is ", round(sampleSizeSurvival$followUpTime, 4),
                     call. = FALSE

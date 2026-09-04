@@ -469,8 +469,10 @@ NULL
         }
     }
 
-    designPlan <- TrialDesignPlanMeans$new(design = design, meanRatio = meanRatio)
-    designPlan$.setObjectType(objectType)
+    designPlan <- TrialDesignPlanMeans$new(
+        design = design, 
+        meanRatio = meanRatio,
+        objectType = objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {

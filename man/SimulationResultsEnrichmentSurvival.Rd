@@ -93,6 +93,9 @@ to create an object of this type.
 
 \item{\code{singleNumberOfEventsPerStage}}{Deprecated: use \code{singleEventsPerArmAndStage} or \code{singleEventsPerSubsetAndStage} instead}
 
+\item{\code{simulationType}}{The simulation approach used: \code{"patientWise"} or
+\code{"testStatisticBased"}.}
+
 \item{\code{stratifiedAnalysis}}{For enrichment designs, typically a stratified analysis should be chosen. When testing means and rates, a non-stratified analysis can be performed on overall data. For survival data, only a stratified analysis is possible. Is a single logical value.}
 
 \item{\code{studyDuration}}{The study duration for specified effect size. Is a positive numeric vector.}

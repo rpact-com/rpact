@@ -9,7 +9,7 @@ getSimulationMultiArmSurvival(
   ...,
   simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
   activeArms = NA_integer_,
-  piControl = 0.2,
+  piControl = NA_real_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
   omegaMaxVector = seq(1, 2.6, 0.4),
@@ -42,6 +42,7 @@ getSimulationMultiArmSurvival(
   conditionalPower = NA_real_,
   thetaH1 = NA_real_,
   maxNumberOfIterations = NA_integer_,
+  maxNumberOfRawDatasetsPerStage = 0,
   seed = NA_real_,
   calcEventsFunction = NULL,
   selectArmsFunction = NULL,
@@ -69,10 +70,10 @@ simulation is used for backward compatibility.}
 
 \item{activeArms}{The number of active treatment arms to be compared with control, default is \code{3}.}
 
-\item{piControl}{The assumed probability in the control arm, default is \code{0.2}.}
+\item{piControl}{The assumed probability in the control arm, default is \code{0.5}.}
 
-\item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and number of rows
-reflecting the different situations to consider.}
+\item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and one or more rows,
+where each row represents a different situation to consider.}
 
 \item{typeOfShape}{The shape of the dose-response relationship over the treatment groups.
 This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"},
@@ -215,6 +216,11 @@ hazard ratios) as parameters under which it is calculated and the sample size re
 the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.}
 
 \item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
+
+\item{maxNumberOfRawDatasetsPerStage}{The maximum number of patient-level datasets
+to retain for each scenario and stopping stage. The default is \code{0}, which
+retains no patient-level data. Use \code{\link[=getRawData]{getRawData()}} to
+retrieve retained datasets.}
 
 \item{seed}{The seed to reproduce the simulation, default is a random seed.}
 

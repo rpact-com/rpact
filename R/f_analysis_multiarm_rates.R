@@ -340,7 +340,7 @@ NULL
         design,
         dataInput,
         thetaH0 = NA_real_,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
         calculateSingleStepAdjusted = FALSE,
@@ -387,11 +387,19 @@ NULL
         dataInput = dataInput,
         intersectionTest = intersectionTest,
         thetaH0 = thetaH0,
-        direction = ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER),
         normalApproximation = normalApproximation,
-        directionUpper = directionUpper,
         stage = stage
     )
+    
+    if (userFunctionCallEnabled) {
+        directionUpper <- .setDirectionUpper(
+            stageResults,
+            design,
+            directionUpper,
+            objectType = "analysis",
+            endpoint = "rates",
+            userFunctionCallEnabled = userFunctionCallEnabled)
+    }
 
     piControl <- matrix(rep(NA_real_, kMax), 1, kMax)
     piTreatments <- matrix(NA_real_, nrow = gMax, ncol = kMax)
@@ -1235,14 +1243,12 @@ NULL
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    } else {
-        standardizedEffect <- -(piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
+    standardizedEffect <- (piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
+        allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
-
+    
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
@@ -1364,12 +1370,10 @@ NULL
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (piTreatments - piControl) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    } else {
-        standardizedEffect <- -(piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
+    standardizedEffect <- (piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
+        allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
 
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
@@ -1475,14 +1479,13 @@ NULL
     }
 
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    } else {
-        standardizedEffect <- -(piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    }
 
+    standardizedEffect <- (piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
+        allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
+    }
+    
     ctr <- .getClosedConditionalDunnettTestResults(stageResults = stageResults, design = design, stage = stage)
 
     for (treatmentArm in 1:gMax) {

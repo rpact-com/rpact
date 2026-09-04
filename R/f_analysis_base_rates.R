@@ -474,18 +474,39 @@ NULL
     )
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
 
-    effectSizes <- rep(NA_real_, design$kMax)
+    if (dataInput$getNumberOfGroups() == 1 && is.na(thetaH0)) {
+        stopMissingArgument("'thetaH0' must be defined",
+            functionName = ".getStageResultsRates",
+            parameter = "thetaH0", value = thetaH0
+        )
+    } else if (dataInput$getNumberOfGroups() == 2 && is.na(thetaH0)) {
+        thetaH0 <- C_THETA_H0_RATES_DEFAULT
+    }
+
+    stageResults <- StageResultsRates$new(
+        design = design,
+        dataInput = dataInput,
+        stage = as.integer(stage),
+        thetaH0 = thetaH0,
+        normalApproximation = normalApproximation
+    )
+    
+    if (userFunctionCallEnabled) {
+        directionUpper <- .setDirectionUpper(
+            stageResults,
+            design,
+            directionUpper,
+            objectType = "analysis",
+            endpoint = "rates",
+            userFunctionCallEnabled = userFunctionCallEnabled
+        )
+    }
+
+    stageResults$effectSizes <- rep(NA_real_, design$kMax)
 
     if (dataInput$getNumberOfGroups() == 1) {
-        if (is.na(thetaH0)) {
-            stopMissingArgument("'thetaH0' must be defined",
-                functionName = ".getStageResultsRates",
-                parameter = "thetaH0", value = thetaH0
-            )
-        }
-
         if (normalApproximation) {
-            overallTestStatistics <- c(
+            stageResults$overallTestStatistics <- c(
                 (dataInput$getOverallEventsUpTo(stage) /
                     dataInput$getOverallSampleSizesUpTo(stage) -
                     thetaH0) /
@@ -493,15 +514,15 @@ NULL
                     sqrt(dataInput$getOverallSampleSizesUpTo(stage)),
                 rep(NA_real_, design$kMax - stage)
             )
-            overallPValues <- .applyDirectionOfAlternative(
-                stats::pnorm(overallTestStatistics),
+            stageResults$overallPValues <- .applyDirectionOfAlternative(
+                stats::pnorm(stageResults$overallTestStatistics),
                 directionUpper,
                 type = "oneMinusValue",
                 phase = "analysis"
             )
         } else {
-            overallTestStatistics <- rep(NA_real_, design$kMax)
-            overallPValues <- stats::pbinom(
+            stageResults$overallTestStatistics <- rep(NA_real_, design$kMax)
+            stageResults$overallPValues <- stats::pbinom(
                 .applyDirectionOfAlternative(
                     dataInput$getOverallEventsUpTo(stage),
                     directionUpper,
@@ -517,22 +538,18 @@ NULL
                     phase = "analysis"
                 )
             )
-            overallTestStatistics <- .getOneMinusQNorm(overallPValues)
+            stageResults$overallTestStatistics <- .getOneMinusQNorm(stageResults$overallPValues)
         }
-        effectSizes[1:stage] <- dataInput$getOverallEventsUpTo(stage) /
+        stageResults$effectSizes[1:stage] <- dataInput$getOverallEventsUpTo(stage) /
             dataInput$getOverallSampleSizesUpTo(stage)
     }
 
     if (dataInput$getNumberOfGroups() == 2) {
-        if (is.na(thetaH0)) {
-            thetaH0 <- C_THETA_H0_RATES_DEFAULT
-        }
-
         overallEvents1 <- dataInput$getOverallEvents(group = 1)
         overallEvents2 <- dataInput$getOverallEvents(group = 2)
 
-        overallTestStatistics <- rep(NA_real_, design$kMax)
-        overallPValues <- rep(NA_real_, design$kMax)
+        stageResults$overallTestStatistics <- rep(NA_real_, design$kMax)
+        stageResults$overallPValues <- rep(NA_real_, design$kMax)
 
         for (k in 1:stage) {
             if (normalApproximation) {
@@ -543,11 +560,11 @@ NULL
                                 sum(dataInput$getSampleSizesUpTo(k, 1)) +
                                     sum(dataInput$getSampleSizesUpTo(k, 2)))
                         ) {
-                        overallTestStatistics[k] <- 0
+                        stageResults$overallTestStatistics[k] <- 0
                     } else {
                         overallRateH0 <- (overallEvents1[k] + overallEvents2[k]) /
                             (sum(dataInput$getSampleSizesUpTo(k, 1)) + sum(dataInput$getSampleSizesUpTo(k, 2)))
-                        overallTestStatistics[k] <-
+                        stageResults$overallTestStatistics[k] <-
                             (overallEvents1[k] /
                                 sum(dataInput$getSampleSizesUpTo(k, 1)) -
                                 overallEvents2[k] / sum(dataInput$getSampleSizesUpTo(k, 2)) -
@@ -569,7 +586,7 @@ NULL
                             sum(dataInput$getSampleSizesUpTo(k, 2)),
                         "diff"
                     )
-                    overallTestStatistics[k] <-
+                    stageResults$overallTestStatistics[k] <-
                         (overallEvents1[k] /
                             sum(dataInput$getSampleSizesUpTo(k, 1)) -
                             overallEvents2[k] / sum(dataInput$getSampleSizesUpTo(k, 2)) -
@@ -581,8 +598,8 @@ NULL
                                     y$ml2 * (1 - y$ml2) / sum(dataInput$getSampleSizesUpTo(k, 2))
                             )
                 }
-                overallPValues[k] <- .applyDirectionOfAlternative(
-                    stats::pnorm(overallTestStatistics[k]),
+                stageResults$overallPValues[k] <- .applyDirectionOfAlternative(
+                    stats::pnorm(stageResults$overallTestStatistics[k]),
                     directionUpper,
                     type = "oneMinusValue",
                     phase = "analysis"
@@ -594,7 +611,7 @@ NULL
                     )
                 }
 
-                overallPValues[k] <- stats::phyper(
+                stageResults$overallPValues[k] <- stats::phyper(
                     .applyDirectionOfAlternative(
                         overallEvents1[k],
                         directionUpper,
@@ -614,37 +631,44 @@ NULL
                         phase = "analysis"
                     )
                 )
-                overallTestStatistics <- .getOneMinusQNorm(overallPValues)
+                stageResults$overallTestStatistics <-
+                    .getOneMinusQNorm(stageResults$overallPValues)
             }
         }
-        effectSizes[1:stage] <- overallEvents1[1:stage] /
+        stageResults$effectSizes[1:stage] <- overallEvents1[1:stage] /
             cumsum(dataInput$getSampleSizesUpTo(stage, 1)) -
             overallEvents2[1:stage] / cumsum(dataInput$getSampleSizesUpTo(stage, 2))
     }
 
+    stageResults$overallTestStatistics <- .fillWithNAs(
+        stageResults$overallTestStatistics, design$kMax
+    )
+    stageResults$overallPValues <- .fillWithNAs(stageResults$overallPValues, design$kMax)
+
     # calculation of stage-wise test statistics and combination tests
-    testStatistics <- rep(NA_real_, design$kMax)
-    pValues <- rep(NA_real_, design$kMax)
-    combInverseNormal <- rep(NA_real_, design$kMax)
-    combFisher <- rep(NA_real_, design$kMax)
-    weightsInverseNormal <- .getWeightsInverseNormal(design)
-    weightsFisher <- .getWeightsFisher(design)
+    stageResults$testStatistics <- rep(NA_real_, design$kMax)
+    stageResults$pValues <- rep(NA_real_, design$kMax)
+    stageResults$combInverseNormal <- rep(NA_real_, design$kMax)
+    stageResults$combFisher <- rep(NA_real_, design$kMax)
+    stageResults$weightsInverseNormal <- .getWeightsInverseNormal(design)
+    stageResults$weightsFisher <- .getWeightsFisher(design)
     for (k in 1:stage) {
         if (dataInput$getNumberOfGroups() == 1) {
             if (normalApproximation) {
                 # stage-wise test statistics
-                testStatistics[k] <- (dataInput$getEvent(k) / dataInput$getSampleSize(k) - thetaH0) /
+                stageResults$testStatistics[k] <-
+                    (dataInput$getEvent(k) / dataInput$getSampleSize(k) - thetaH0) /
                     sqrt(thetaH0 * (1 - thetaH0)) *
                     sqrt(dataInput$getSampleSize(k))
-                pValues[k] <- .applyDirectionOfAlternative(
-                    stats::pnorm(testStatistics[k]),
+                stageResults$pValues[k] <- .applyDirectionOfAlternative(
+                    stats::pnorm(stageResults$testStatistics[k]),
                     directionUpper,
                     type = "oneMinusValue",
                     phase = "analysis"
                 )
             } else {
-                testStatistics[k] <- NA_real_
-                pValues[k] <- stats::pbinom(
+                stageResults$testStatistics[k] <- NA_real_
+                stageResults$pValues[k] <- stats::pbinom(
                     .applyDirectionOfAlternative(
                         dataInput$getEvent(k),
                         directionUpper,
@@ -670,11 +694,11 @@ NULL
                             (dataInput$getEvent(k, 1) + dataInput$getEvent(k, 2) ==
                                 dataInput$getSampleSize(k, 1) + dataInput$getSampleSize(k, 2))
                         ) {
-                        testStatistics[k] <- 0
+                        stageResults$testStatistics[k] <- 0
                     } else {
                         rateH0 <- (dataInput$getEvent(k, 1) + dataInput$getEvent(k, 2)) /
                             (dataInput$getSampleSize(k, 1) + dataInput$getSampleSize(k, 2))
-                        testStatistics[k] <-
+                        stageResults$testStatistics[k] <-
                             (dataInput$getEvent(k, 1) /
                                 dataInput$getSampleSize(k, 1) -
                                 dataInput$getEvent(k, 2) / dataInput$getSampleSize(k, 2) -
@@ -694,7 +718,7 @@ NULL
                         method = "diff"
                     )
 
-                    testStatistics[k] <- (dataInput$getEvent(k, 1) /
+                    stageResults$testStatistics[k] <- (dataInput$getEvent(k, 1) /
                         dataInput$getSampleSize(k, 1) -
                         dataInput$getEvent(k, 2) / dataInput$getSampleSize(k, 2) -
                         thetaH0) /
@@ -705,16 +729,16 @@ NULL
                                 y$ml2 * (1 - y$ml2) / dataInput$getSampleSize(k, 2)
                         )
                 }
-                pValues[k] <- .applyDirectionOfAlternative(
-                    stats::pnorm(testStatistics[k]),
+                stageResults$pValues[k] <- .applyDirectionOfAlternative(
+                    stats::pnorm(stageResults$testStatistics[k]),
                     directionUpper,
                     type = "oneMinusValue",
                     phase = "analysis"
                 )
             } else {
-                testStatistics[k] <- NA_real_
+                stageResults$testStatistics[k] <- NA_real_
 
-                pValues[k] <- stats::phyper(
+                stageResults$pValues[k] <- stats::phyper(
                     .applyDirectionOfAlternative(
                         dataInput$getEvent(k, 1),
                         directionUpper,
@@ -738,35 +762,15 @@ NULL
         }
 
         # inverse normal test
-        combInverseNormal[k] <- (weightsInverseNormal[1:k] %*% .getOneMinusQNorm(pValues[1:k])) /
-            sqrt(sum(weightsInverseNormal[1:k]^2))
+        stageResults$combInverseNormal[k] <-
+            (stageResults$weightsInverseNormal[1:k] %*%
+                .getOneMinusQNorm(stageResults$pValues[1:k])) /
+            sqrt(sum(stageResults$weightsInverseNormal[1:k]^2))
 
         # Fisher combination test
-        combFisher[k] <- prod(pValues[1:k]^weightsFisher[1:k])
+        stageResults$combFisher[k] <-
+            prod(stageResults$pValues[1:k]^stageResults$weightsFisher[1:k])
     }
-
-    direction <- ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER)
-
-    stageResults <- StageResultsRates$new(
-        # R6$new
-        design = design,
-        dataInput = dataInput,
-        stage = as.integer(stage),
-        overallTestStatistics = .fillWithNAs(overallTestStatistics, design$kMax),
-        overallPValues = .fillWithNAs(overallPValues, design$kMax),
-        effectSizes = effectSizes,
-        overallEvents = .fillWithNAs(dataInput$getOverallEventsUpTo(stage, group = 1), design$kMax),
-        overallSampleSizes = .fillWithNAs(dataInput$getOverallSampleSizesUpTo(stage, 1), design$kMax),
-        testStatistics = testStatistics,
-        pValues = pValues,
-        combInverseNormal = combInverseNormal,
-        combFisher = combFisher,
-        weightsInverseNormal = weightsInverseNormal,
-        weightsFisher = weightsFisher,
-        thetaH0 = thetaH0,
-        direction = ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER),
-        normalApproximation = normalApproximation
-    )
 
     if (dataInput$getNumberOfGroups() == 1) {
         stageResults$overallEvents <- .fillWithNAs(dataInput$getOverallEventsUpTo(stage, group = 1), design$kMax)
@@ -774,8 +778,8 @@ NULL
         stageResults$overallPi1 <- stageResults$overallEvents / stageResults$overallSampleSizes
         stageResults$.setParameterType("overallPi1", C_PARAM_GENERATED)
     } else if (dataInput$getNumberOfGroups() == 2) {
-        stageResults$overallEvents1 <- .fillWithNAs(dataInput$getOverallEventsUpTo(stage, group <- 1), design$kMax)
-        stageResults$overallEvents2 <- .fillWithNAs(dataInput$getOverallEventsUpTo(stage, group <- 2), design$kMax)
+        stageResults$overallEvents1 <- .fillWithNAs(dataInput$getOverallEventsUpTo(stage, group = 1), design$kMax)
+        stageResults$overallEvents2 <- .fillWithNAs(dataInput$getOverallEventsUpTo(stage, group = 2), design$kMax)
         stageResults$overallSampleSizes1 <- .fillWithNAs(dataInput$getOverallSampleSizesUpTo(stage, 1), design$kMax)
         stageResults$overallSampleSizes2 <- .fillWithNAs(dataInput$getOverallSampleSizesUpTo(stage, 2), design$kMax)
         stageResults$overallPi1 <- stageResults$overallEvents1 / stageResults$overallSampleSizes1
@@ -1128,10 +1132,10 @@ NULL
                 sqrt(sum(nPlanned[(stage + 1):kMax]))
         }
 
-        if (stageResults$direction == "upper") {
-            thetaH1 <- (pi1 - stageResults$thetaH0) / sqrt(pi1 * (1 - pi1)) + adjustment
-        } else {
+        if (isFALSE(stageResults$directionUpper)) {
             thetaH1 <- -(pi1 - stageResults$thetaH0) / sqrt(pi1 * (1 - pi1)) + adjustment
+        } else {
+            thetaH1 <- (pi1 - stageResults$thetaH0) / sqrt(pi1 * (1 - pi1)) + adjustment
         }
 
         return(list(thetaH1 = thetaH1, nPlanned = nPlanned))
@@ -1166,13 +1170,13 @@ NULL
             )
     }
 
-    if (stageResults$direction == "upper") {
-        thetaH1 <- (pi1 - pi2 - stageResults$thetaH0) /
+    if (isFALSE(stageResults$directionUpper)) {
+        thetaH1 <- -(pi1 - pi2 - stageResults$thetaH0) /
             sqrt(pi1 * (1 - pi1) + allocationRatioPlanned * pi2 * (1 - pi2)) *
             sqrt(1 + allocationRatioPlanned) +
             adjustment
     } else {
-        thetaH1 <- -(pi1 - pi2 - stageResults$thetaH0) /
+        thetaH1 <- (pi1 - pi2 - stageResults$thetaH0) /
             sqrt(pi1 * (1 - pi1) + allocationRatioPlanned * pi2 * (1 - pi2)) *
             sqrt(1 + allocationRatioPlanned) +
             adjustment

@@ -782,7 +782,12 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
                     stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$effectSizes")
                 }
 
-                if (grepl("Means", .getClassName(self$.dataInput))) {
+                if (self$.dataInput$isDatasetGeneral()) {
+                    stageResultParametersToShow <- c(
+                        stageResultParametersToShow,
+                        ".stageResults$overallStandardErrors"
+                    )
+                } else if (self$.dataInput$isDatasetMeans()) {
                     stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallStDevs")
                 }
                 if (grepl("Rates", .getClassName(self$.dataInput))) {
@@ -884,6 +889,26 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
                 generatedParams <- generatedParams[!(generatedParams %in%
                     c("assumedStDevs", "thetaH1", "pi1", "pi2", "piTreatments", "piTreatments", "piControl", "piControls"))]
 
+                if (self$.dataInput$isDatasetGeneral()) {
+                    generatedParams <- generatedParams[generatedParams != "assumedStDev"]
+                    estimateParameterNames <- c("estimates", "degreesOfFreedom", "standardErrors")
+                    estimateParameterValues <- lapply(estimateParameterNames, function(parameterName) {
+                        self$.dataInput[[parameterName]]
+                    })
+                    names(estimateParameterValues) <- estimateParameterNames
+                    on.exit({
+                        for (parameterName in estimateParameterNames) {
+                            self$.dataInput[[parameterName]] <- estimateParameterValues[[parameterName]]
+                        }
+                    }, add = TRUE)
+                    for (parameterName in estimateParameterNames) {
+                        self$.dataInput[[parameterName]] <- .fillWithNAs(
+                            self$.dataInput[[parameterName]], self$.design$kMax
+                        )
+                    }
+                    generatedParams <- c(paste0(".dataInput$", estimateParameterNames), generatedParams)
+                }
+
                 if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(self))) {
                     if (all(c("conditionalPowerSimulated", "conditionalRejectionProbabilities") %in% generatedParams)) {
                         generatedParams <- .moveValue(
@@ -936,15 +961,19 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
             numberOfGroups <- self$.dataInput$getNumberOfGroups()
             str <- paste0(str, " (")
 
-            str <- paste0(str, tolower(sub("Dataset(Enrichment)?", "", .getClassName(self$.dataInput))))
-            if (grepl("Survival", .getClassName(.getClassName))) {
-                str <- paste0(str, " data")
-            }
-
-            if (numberOfGroups == 1) {
-                str <- paste0(str, " of one group")
+            if (self$.dataInput$isDatasetGeneral()) {
+                str <- paste0(str, "general estimates")
             } else {
-                str <- paste0(str, " of ", numberOfGroups, " groups")
+                str <- paste0(str, tolower(sub("Dataset(Enrichment)?", "", .getClassName(self$.dataInput))))
+                if (self$.dataInput$isDatasetSurvival()) {
+                    str <- paste0(str, " data")
+                }
+
+                if (numberOfGroups == 1) {
+                    str <- paste0(str, " of one group")
+                } else {
+                    str <- paste0(str, " of ", numberOfGroups, " groups")
+                }
             }
 
             if (self$.design$kMax > 1) {
@@ -2058,7 +2087,7 @@ plot.AnalysisResults <- function(
     }
 
     treatmentArmsToShowCmd <- ""
-    if (!is.null(treatmentArmsToShow) && !isTRUE(all.equal(sort(unique(treatmentArmsToShow)), 1:nrow(data)))) {
+    if (!is.null(treatmentArmsToShow) && !equals(sort(unique(treatmentArmsToShow)), 1:nrow(data))) {
         treatmentArmsToShowCmd <- paste0(", ", .arrayToString(treatmentArmsToShow, mode = "vector"))
     }
     dataCmd <- paste0("rpact:::.getConfidenceIntervalData(", analysisResultsName, treatmentArmsToShowCmd, ")")
@@ -2200,13 +2229,8 @@ plot.AnalysisResults <- function(
         analysisResultsName,
         plotSettings = NULL) {
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-    if (!(type %in% c(1, 2))) {
-        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1 or 2",
-            functionName = ".plotAnalysisResults",
-            parameter = "type", value = type
-        )
-    }
-
+    type <- .assertIsAvailablePlotType(x, type, availablePlotTypes = c(1, 2), 
+        functionName = ".plotAnalysisResults", allOptionAllowed = FALSE)
     .assertIsAnalysisResults(x)
     .assertIsValidLegendPosition(legendPosition = legendPosition)
 

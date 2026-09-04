@@ -4,7 +4,7 @@
 \alias{param_pi2_survival}
 \title{Parameter Description: Pi (2) for Survival Data}
 \arguments{
-\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
+\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.5}.}
 }
 \description{
 Parameter Description: Pi (2) for Survival Data

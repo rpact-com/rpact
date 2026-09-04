@@ -81,7 +81,8 @@ updateSubGroupVector <- function(
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
-        selectPopulationsFunction) {
+        selectPopulationsFunction,
+        returnRawData = FALSE) {
     kMax <- length(plannedEvents)
     pMax <- length(hazardRatios)
     gMax <- log(length(hazardRatios), 2) + 1
@@ -444,7 +445,7 @@ updateSubGroupVector <- function(
         }
     }
 
-    list(
+    result <- list(
         eventsNotAchieved = eventsNotAchieved,
         populationEventsPerStage = populationEventsPerStage,
         plannedEvents = plannedEvents,
@@ -458,6 +459,10 @@ updateSubGroupVector <- function(
         conditionalPowerPerStage = conditionalPowerPerStage,
         selectedPopulations = selectedPopulations
     )
+    if (isTRUE(returnRawData)) {
+        result$rawData <- survivalDataSet
+    }
+    return(result)
 }
 
 #'
@@ -495,6 +500,7 @@ updateSubGroupVector <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfRawDatasetsPerStage = 0,
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
@@ -530,6 +536,9 @@ updateSubGroupVector <- function(
     .assertIsValidMaxNumberOfSubjects(
         maxNumberOfSubjects,
         naAllowed = TRUE
+    )
+    maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
+        maxNumberOfRawDatasetsPerStage
     )
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
@@ -626,6 +635,8 @@ updateSubGroupVector <- function(
     expectedNumberOfSubjects <- rep(0, cols)
     expectedStudyDuration <- rep(0, cols)
     iterations <- matrix(0, nrow = kMax, ncol = cols)
+    rawDataPerStage <- matrix(0L, nrow = cols, ncol = kMax)
+    rawDataSets <- list()
 
     len <- maxNumberOfIterations * kMax * gMax * cols
 
@@ -705,6 +716,8 @@ updateSubGroupVector <- function(
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
+            returnRawData <- maxNumberOfRawDatasetsPerStage > 0 &&
+                any(rawDataPerStage[i, ] < maxNumberOfRawDatasetsPerStage)
             stageResults <- .getSimulatedStageResultsSurvivalEnrichmentPatientWise(
                 design = design,
                 weights = weights,
@@ -732,7 +745,8 @@ updateSubGroupVector <- function(
                 thetaH1 = thetaH1,
                 calcEventsFunction = calcEventsFunction,
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
-                selectPopulationsFunction = selectPopulationsFunction
+                selectPopulationsFunction = selectPopulationsFunction,
+                returnRawData = returnRawData
             )
 
             closedTest <- .performClosedCombinationTestForSimulationEnrichment(
@@ -742,6 +756,28 @@ updateSubGroupVector <- function(
                 intersectionTest = intersectionTest,
                 successCriterion = successCriterion
             )
+
+            stopStage <- NA_integer_
+            for (k in seq_len(kMax)) {
+                stoppedEarly <- k < kMax && (
+                    isTRUE(closedTest$successStop[k]) || isTRUE(closedTest$futilityStop[k])
+                )
+                if (!stageResults$eventsNotAchieved[k] && (stoppedEarly || k == kMax)) {
+                    stopStage <- k
+                    break
+                }
+            }
+            if (!is.na(stopStage) && returnRawData &&
+                    rawDataPerStage[i, stopStage] < maxNumberOfRawDatasetsPerStage) {
+                rawDataSets[[length(rawDataSets) + 1L]] <- list(
+                    data = stageResults$rawData,
+                    scenario = i,
+                    iterationNumber = j,
+                    stopStage = stopStage,
+                    analysisTime = stageResults$analysisTime[stopStage]
+                )
+                rawDataPerStage[i, stopStage] <- rawDataPerStage[i, stopStage] + 1L
+            }
 
             rejectAtSomeStage <- FALSE
             rejectedPopulationsBefore <- rep(FALSE, gMax)
@@ -894,7 +930,8 @@ updateSubGroupVector <- function(
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$populationEventsPerStage <- simulatedPopulationEventsPerStage
     simulationResults$analysisTime <- simulatedAnalysisTime
-    simulationResults$eventsNotAchieved <- simulatedNumberEventsNotAchieved / maxNumberOfIterations
+    .setEventsNotAchieved(simulationResults, accrualSetup, 
+        eventsNotAchieved = simulatedNumberEventsNotAchieved / maxNumberOfIterations)
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$selectedPopulations <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedPopulationsPerStage <- simulatedRejections / maxNumberOfIterations
@@ -932,18 +969,6 @@ updateSubGroupVector <- function(
         simulationResults$.setParameterType("conditionalPowerAchieved", C_PARAM_GENERATED)
     }
 
-    if (any(simulationResults$eventsNotAchieved > 0)) {
-        warning(
-            "Presumably due to small number of subjects in selected arms, ",
-            "required number of events were not achieved for at least one situation. ",
-            "Increase the maximum number of subjects (",
-            accrualSetup$maxNumberOfSubjects,
-            ") ",
-            "to avoid this situation",
-            call. = FALSE
-        )
-    }
-
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
         stopRuntimeIssue(
             "internal error, simulation not possible due to numerical overflow",
@@ -972,6 +997,10 @@ updateSubGroupVector <- function(
 
     data <- data[!is.na(data$effectEstimate), ]
     simulationResults$.data <- data
+    simulationResults$.rawData <- .createSimulationSurvivalRawData(
+        rawDataSets,
+        enrichment = TRUE
+    )
 
     return(simulationResults)
 }

@@ -97,6 +97,9 @@ to create an object of this type.
 
 \item{\code{singleNumberOfEventsPerStage}}{Deprecated: use \code{singleEventsPerArmAndStage} or \code{singleEventsPerSubsetAndStage} instead}
 
+\item{\code{simulationType}}{The simulation approach used: \code{"patientWise"} or
+\code{"testStatisticBased"}.}
+
 \item{\code{slope}}{The slope of the sigmoid Emax model, if \code{typeOfShape = "sigmoidEmax"} Is a single numeric value.}
 
 \item{\code{studyDuration}}{The study duration for specified effect size. Is a positive numeric vector.}

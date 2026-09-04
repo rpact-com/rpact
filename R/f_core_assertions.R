@@ -576,7 +576,18 @@ NULL
 
     if (!is.null(stage)) {
         if (dataInput$getNumberOfGroups() == 1) {
-            if (.isDatasetMeans(dataInput)) {
+            if (.isDatasetGeneral(dataInput)) {
+                if (any(na.omit(dataInput$getStandardErrorsUpTo(stage)) <= 0)) {
+                    stopIllegalDataInput("all standard errors must be > 0",
+                        functionName = ".assertIsValidDataInput"
+                    )
+                }
+                if (any(na.omit(dataInput$getDegreesOfFreedomUpTo(stage)) <= 0)) {
+                    stopIllegalDataInput("all degrees of freedom must be > 0",
+                        functionName = ".assertIsValidDataInput"
+                    )
+                }
+            } else if (.isDatasetMeans(dataInput)) {
                 if (any(na.omit(dataInput$getStDevsUpTo(stage)) <= 0)) {
                     stopIllegalDataInput("all standard deviations must be > 0",
                         functionName = ".assertIsValidDataInput"
@@ -680,7 +691,7 @@ NULL
 .assertIsDataset <- function(dataInput) {
     if (!.isDataset(dataInput)) {
         stopIllegalArgument("'dataInput' must be an instance of class ",
-            "'DatasetMeans', 'DatasetRates' or 'DatasetSurvival' ",
+            "'DatasetGeneral', 'DatasetMeans', 'DatasetRates', or 'DatasetSurvival' ",
             "(is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDataset",
             parameter = "dataInput",
@@ -694,6 +705,17 @@ NULL
         stopIllegalArgument("'dataInput' must be an instance of class ",
             "'DatasetMeans' (is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetMeans",
+            parameter = "dataInput",
+            value = dataInput
+        )
+    }
+}
+
+.assertIsDatasetGeneral <- function(dataInput) {
+    if (!.isDatasetGeneral(dataInput = dataInput)) {
+        stopIllegalArgument("'dataInput' must be an instance of class ",
+            "'DatasetGeneral' (is ", .getClassName(dataInput, quote = TRUE), ")",
+            functionName = ".assertIsDatasetGeneral",
             parameter = "dataInput",
             value = dataInput
         )
@@ -724,9 +746,14 @@ NULL
 }
 
 .isDataset <- function(dataInput) {
-    return(.isDatasetMeans(dataInput) ||
+    return(.isDatasetGeneral(dataInput) ||
+        .isDatasetMeans(dataInput) ||
         .isDatasetRates(dataInput) ||
         .isDatasetSurvival(dataInput))
+}
+
+.isDatasetGeneral <- function(dataInput) {
+    return(inherits(dataInput, "DatasetGeneral"))
 }
 
 .isDatasetMeans <- function(dataInput) {
@@ -2170,7 +2197,7 @@ NULL
 .assertIsValidThetaH0 <- function(
         thetaH0,
         ...,
-        endpoint = c("means", "rates", "survival", "counts"),
+        endpoint = c("general", "means", "rates", "survival", "counts"),
         groups,
         ratioEnabled = FALSE,
         naAllowed = FALSE) {
@@ -2306,8 +2333,9 @@ NULL
     }
 
     .assertIsNumericVector(piValue, piName, matrixAllowed = matrixAllowed)
-    .assertIsInOpenInterval(piValue, piName, 
-        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed)
+    .assertIsInOpenInterval(piValue, piName,
+        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed
+    )
 }
 
 .assertIsValidPi1 <- function(pi1, stageResults = NULL, stage = NULL) {
@@ -2616,6 +2644,24 @@ NULL
     return(invisible(directionUpper))
 }
 
+.warnInCaseOfChangedDirectionUpperSurvivalDefault <- function(
+        directionUpper,
+        default,
+        sided,
+        ...,
+        userFunctionCallEnabled = TRUE) {
+    if (userFunctionCallEnabled &&
+            sided == 1 &&
+            identical(default, C_DIRECTION_UPPER_SURVIVAL_DEFAULT) &&
+            isTRUE(is.na(directionUpper))) {
+        warning(
+            "The default value of 'directionUpper' for survival endpoints has changed ",
+            "from TRUE to FALSE. Please specify 'directionUpper' explicitly to avoid this warning.",
+            call. = FALSE
+        )
+    }
+}
+
 .assertIsValidDirectionUpper <- function(
         directionUpper,
         design,
@@ -2627,7 +2673,17 @@ NULL
 
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
 
-    if (!is.na(directionUpper) && !is.na(design$directionUpper) &&
+    if (!identical(objectType, "sampleSize")) {
+        .warnInCaseOfChangedDirectionUpperSurvivalDefault(
+            directionUpper,
+            default,
+            design$sided,
+            userFunctionCallEnabled = userFunctionCallEnabled
+        )
+    }
+
+    if (isTRUE(userFunctionCallEnabled) && 
+            !is.na(directionUpper) && !is.na(design$directionUpper) &&
             !identical(directionUpper, design$directionUpper)) {
         stopConflictingArguments("in the design directionUpper = ",
             design$directionUpper, " is defined. ", "In the ",
@@ -2975,7 +3031,15 @@ NULL
 
     param <- NA_character_
     paramValues <- NA_real_
-    if (dataInput$isDatasetSurvival()) {
+    if (dataInput$isDatasetGeneral()) {
+        observedInformations <- cumsum(dataInput$getInformationsUpTo(stage))
+        if (any(abs(design$informationRates[2:stage] -
+                observedInformations[2:stage] / observedInformations[1] * design$informationRates[1]) >
+                C_ACCEPT_DEVIATION_INFORMATIONRATES)) {
+            param <- "information values"
+            paramValues <- observedInformations
+        }
+    } else if (dataInput$isDatasetSurvival()) {
         if (any(abs(design$informationRates[2:stage] - dataInput$getOverallEventsUpTo(stage)[2:stage] /
                 dataInput$getOverallEventsUpTo(1) * design$informationRates[1]) >
                 C_ACCEPT_DEVIATION_INFORMATIONRATES)) {
@@ -3126,13 +3190,14 @@ NULL
     }
 
     allowedClasses <- c(
+        "StageResultsGeneral",
         "StageResultsMeans",
         "StageResultsRates",
         "StageResultsSurvival"
     )
     if (!(.getClassName(stageResults) %in% allowedClasses)) {
         stopIllegalArgument("'stageResults' must be an instance of ",
-            .arrayToString(allowedClasses, vectorLookAndFeelEnabled = FALSE),
+            .arrayToString(allowedClasses, vectorLookAndFeelEnabled = FALSE, encapsulate = TRUE),
             " (is ", .getClassName(stageResults, quote = TRUE), ")",
             functionName = ".assertIsStageResultsNonMultiHypotheses",
             parameter = "stageResults",
@@ -3693,7 +3758,7 @@ NULL
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
                 lower = 0, upper = 1, naAllowed = FALSE, matrixAllowed = TRUE
             )
-            valueMaxVectorDefault <- C_PI_1_DEFAULT
+            valueMaxVectorDefault <- .getPi1Default(type = "power", endpoint = "survival")
         } else if (valueMaxVectorName == "omegaMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
                 lower = 0, upper = NULL, naAllowed = FALSE, matrixAllowed = TRUE
@@ -4337,6 +4402,50 @@ NULL
             naAllowed = naAllowed, validateType = FALSE
         )
     }
+}
+
+.assertIsAvailablePlotType <- function(
+        x,
+        type,
+        availablePlotTypes = NULL,
+        ...,
+        functionName = ".assertIsAvailablePlotType",
+        allOptionAllowed = TRUE) {
+    if (is.null(availablePlotTypes)) {
+        availablePlotTypes <- getAvailablePlotTypes(x,
+            output = "numeric", numberInCaptionEnabled = FALSE
+        )
+    }
+
+    if (length(availablePlotTypes) == 0 || all(is.na(availablePlotTypes))) {
+        stopIllegalArgument(
+            "no plot type available for this object",
+            functionName = functionName
+        )
+    }
+    
+    if (all(is.na(type))) {
+        type <- availablePlotTypes[1]
+    }
+    
+    if (isTRUE(allOptionAllowed)) {    
+        availablePlotTypes <- c(availablePlotTypes, "all")
+    }
+    
+    if (!(type %in% availablePlotTypes)) {
+        stopIllegalArgument(
+            "'type' (", type, ") is not available; ",
+            ifelse(length(availablePlotTypes) == 1, "available is only", "available values are"), " ",
+            .arrayToString(availablePlotTypes, mode = "or", compactEnabled = TRUE),
+            functionName = functionName,
+            parameter = "type",
+            value = type,
+            relatedParameter = "availablePlotTypes",
+            relatedValue = getAvailablePlotTypes(x, output = "numcap")
+        )
+    }
+
+    return(invisible(type))
 }
 
 .showFutilityBoundsUnnecessaryArgumentWarning <- function(

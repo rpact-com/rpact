@@ -50,11 +50,12 @@ and \code{sided} can be directly entered as argument where necessary.}
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{thetaH0}{The null hypothesis value,
-default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+default is \code{0} for general estimates, the normal case, and the binary case,
 it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
+\item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
 \item \emph{means}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the mean ratio) can be specified.
 \item \emph{rates}: a value \code{!= 0}
@@ -71,9 +72,9 @@ which means that larger values of the test statistics yield smaller p-values.}
 
 \item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
 default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
-\code{seq(0.4, 0.6, 0.1)} (sample size calculations).}
+\code{c(0.1, 0.2, 0.3)} (sample size calculations).}
 
-\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
+\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.5}.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
 \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).

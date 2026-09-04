@@ -19,18 +19,18 @@ NULL
 
 .getSampleSizeFixedRates <- function(
         ...,
-        alpha = 0.025,
-        beta = 0.2,
-        sided = 1,
-        normalApproximation = TRUE,
-        conservative = TRUE,
-        riskRatio = FALSE,
-        thetaH0 = 0,
-        pi1 = seq(0.4, 0.6, 0.1),
-        pi2 = 0.2,
-        directionUpper = NA,
-        groups = 2,
-        allocationRatioPlanned = 1) {
+        alpha,
+        beta,
+        sided,
+        normalApproximation,
+        conservative,
+        riskRatio,
+        thetaH0,
+        pi1,
+        pi2,
+        directionUpper,
+        groups,
+        allocationRatioPlanned) {
     if (groups == 1) {
         nFixed <- rep(NA_real_, length(pi1))
 
@@ -348,16 +348,16 @@ NULL
         ...,
         objectType = c("sampleSize", "power"),
         design,
-        normalApproximation = TRUE,
-        conservative = TRUE,
-        riskRatio = FALSE,
-        thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = C_PI_1_SAMPLE_SIZE_DEFAULT,
-        pi2 = C_PI_2_DEFAULT,
-        directionUpper = NA,
+        riskRatio,
+        thetaH0,
+        pi1,
+        pi2,
+        directionUpper,
         maxNumberOfSubjects = NA_real_,
         groups = 2,
-        allocationRatioPlanned = NA_real_) {
+        allocationRatioPlanned,
+        normalApproximation = TRUE,
+        conservative = TRUE) {
     objectType <- match.arg(objectType)
 
     .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
@@ -377,9 +377,18 @@ NULL
         userFunctionCallEnabled = TRUE,
         default = NA
     )
+    
+    designPlan <- TrialDesignPlanRates$new(
+        design = design,
+        objectType = objectType)
+    
+    pi1 <- .setPi1(designPlan, pi1,
+        type = objectType, endpoint = "rates", closedInterval = (groups == 2L))
+    pi2 <- .setPi2(designPlan, pi2,
+        endpoint = "rates", applyToObject = (groups == 2L), closedInterval = (groups == 2L))
 
-    if (groups == 1) {
-        if (!anyNA(pi1) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
+    if (groups == 1L) {
+        if (!anyNA(pi1) && any(pi1 == thetaH0) && objectType == "sampleSize") {
             stopIllegalArgument("any 'pi1' (", .arrayToString(pi1), ") must be != 'thetaH0' (", thetaH0, ")",
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1", value = pi1,
@@ -388,7 +397,6 @@ NULL
             )
         }
 
-        .assertIsInOpenInterval(pi1, "pi1", lower = 0, upper = 1)
         .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = 1)
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
@@ -403,7 +411,7 @@ NULL
                 parameter = "conservative", value = conservative
             )
         }
-    } else if (groups == 2) {
+    } else if (groups == 2L) {
         if (
             !anyNA(c(pi1, pi2)) &&
                 any(abs(pi1 - pi2 - thetaH0) < 1e-12) &&
@@ -433,9 +441,6 @@ NULL
                 relatedValue = thetaH0
             )
         }
-
-        .assertIsInClosedInterval(pi1, "pi1", lower = 0, upper = 1)
-        .assertIsInClosedInterval(pi2, "pi2", lower = 0, upper = 1)
 
         if (
             design$sided == 2 &&
@@ -483,9 +488,6 @@ NULL
         }
     }
 
-    designPlan <- TrialDesignPlanRates$new(design = design)
-    designPlan$.setObjectType(objectType)
-
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {
         designPlan$criticalValuesPValueScale <- designPlan$criticalValuesPValueScale * 2
@@ -514,13 +516,8 @@ NULL
     }
     .setValueAndParameterType(designPlan, "thetaH0", thetaH0, ifelse(riskRatio, 1, 0))
     .assertIsValidThetaH0(thetaH0, endpoint = "rates", groups = groups, ratioEnabled = riskRatio)
-    if (objectType == "power") {
-        .setValueAndParameterType(designPlan, "pi1", pi1, C_PI_1_DEFAULT)
-    } else {
-        .setValueAndParameterType(designPlan, "pi1", pi1, C_PI_1_SAMPLE_SIZE_DEFAULT)
-    }
-    .setValueAndParameterType(designPlan, "pi2", pi2, 0.2, notApplicableIfNA = TRUE)
     if (groups == 1) {
+        .setValueAndParameterType(designPlan, "pi2", pi2, NA_real_, notApplicableIfNA = TRUE)
         if (designPlan$isUserDefinedParameter("pi2")) {
             warning(
                 "'pi2' (",
@@ -614,8 +611,8 @@ getPowerRates <- function(
         groups = 2L,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = seq(0.2, 0.5, 0.1),
-        pi2 = 0.2,
+        pi1 = NA_real_,
+        pi2 = NA_real_,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
         allocationRatioPlanned = NA_real_) {
@@ -815,8 +812,8 @@ getSampleSizeRates <- function(
         conservative = TRUE,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
-        pi1 = c(0.4, 0.5, 0.6),
-        pi2 = 0.2,
+        pi1 = NA_real_,
+        pi2 = NA_real_,
         directionUpper = NA,
         allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {

@@ -509,7 +509,7 @@ getSimulationSurvival <- function(
         eventTime = eventTime,
         kappa = kappa,
         delayedResponseAllowed = TRUE,
-        .pi1Default = C_PI_1_DEFAULT,
+        .pi1Default = .getPi1Default(type = "power", endpoint = "survival"),
         .silent = TRUE
     )
 
@@ -787,16 +787,8 @@ getSimulationSurvival <- function(
         simulationResults$.setParameterType("singleEventsPerStage", C_PARAM_GENERATED)
         .addDeprecatedFieldValues(simulationResults, "eventsPerStage", simulationResults$singleEventsPerStage)
     }
-    simulationResults$eventsNotAchieved <- matrix(overview$eventsNotAchieved, nrow = design$kMax)
-    if (any(simulationResults$eventsNotAchieved > 0)) {
-        warning("Presumably due to drop-outs, required number of events ",
-            "were not achieved for at least one situation. ",
-            "Increase the maximum number of subjects (",
-            accrualSetup$maxNumberOfSubjects, ") ",
-            "to avoid this situation",
-            call. = FALSE
-        )
-    }
+    .setEventsNotAchieved(simulationResults, accrualSetup, 
+        eventsNotAchieved = matrix(overview$eventsNotAchieved, nrow = design$kMax))
 
     simulationResults$numberOfSubjects <- matrix(overview$numberOfSubjects, nrow = design$kMax)
 
@@ -955,6 +947,8 @@ getSimulationSurvival <- function(
     rawData <- rawData[, colnames(rawData) != "censorIndicator"]
 
     simulationResults$.rawData <- rawData
+    
+    .addStudyDurationToDesignPlan(simulationResults)
 
     return(simulationResults)
 }

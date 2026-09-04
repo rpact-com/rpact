@@ -474,6 +474,7 @@ getSimulationMultiArmMeans <- function(
     dataSubjectsActiveArm <- rep(NA_real_, len)
     dataNumberOfSubjects <- rep(NA_real_, len)
     dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
+    dataSelectedForNextStage <- rep(NA, len)
     dataRejectPerStage <- rep(NA, len)
     dataSuccessStop <- rep(NA, len)
     dataFutilityStop <- rep(NA, len)
@@ -570,6 +571,9 @@ getSimulationMultiArmMeans <- function(
                     dataSubjectsActiveArm[index] <- round(stageResults$subjectsPerStage[g, k], 1)
                     dataNumberOfSubjects[index] <- round(sum(stageResults$subjectsPerStage[, k], na.rm = TRUE), 1)
                     dataNumberOfCumulatedSubjects[index] <- round(sum(stageResults$subjectsPerStage[, 1:k], na.rm = TRUE), 1)
+                    if (k < kMax) {
+                        dataSelectedForNextStage[index] <- closedTest$selectedArms[g, k + 1]
+                    }
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -682,6 +686,7 @@ getSimulationMultiArmMeans <- function(
         pValue = dataPValuesSeparate,
         conditionalCriticalValue = round(dataConditionalCriticalValue, 6),
         conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6),
+        selectedForNextStage = dataSelectedForNextStage,
         rejectPerStage = dataRejectPerStage,
         successStop = dataSuccessStop,
         futilityPerStage = dataFutilityStop

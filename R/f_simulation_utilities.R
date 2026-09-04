@@ -382,8 +382,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     if (nrow(matrixValues) == 0) {
         stopIllegalArgument(
-            sQuote(paste0("effectList$", matrixName)), " must have one or more rows ",
-            "reflecting the different situations to consider",
+            sQuote(paste0("effectList$", matrixName)), " must have at least one row, ",
+            "with each row representing a different situation to consider",
             functionName = ".getEffectData",
             parameter = paste0("effectList$", matrixName)
         )
@@ -393,7 +393,12 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     colNames <- paste0(matrixName, 1:ncol(matrixValues))
     colnames(matrixValues) <- colNames
     matrixValues$situation <- 1:nrow(matrixValues)
-    longData <- stats::reshape(data = matrixValues, direction = "long", varying = colNames, idvar = "situation", sep = "")
+    longData <- stats::reshape(
+        data = matrixValues, 
+        direction = "long", 
+        varying = colNames, 
+        idvar = "situation", 
+        sep = "")
     timeColumnIndex <- which(colnames(longData) == "time")
     colnames(longData)[timeColumnIndex] <- "subGroupNumber"
     longData$subGroups <- rep(NA_character_, nrow(longData))
@@ -787,6 +792,13 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 #' }
 #' A subset of variables is provided for \code{\link[=getSimulationMeans]{getSimulationMeans()}}, \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr
 #'  \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
+#' Multi-arm simulation data additionally contain \code{selectedForNextStage}. At
+#' non-final stages, this logical value indicates whether the adaptation selected
+#' the arm to continue, conditional on the trial not stopping; it is \code{NA} at
+#' the final stage. In contrast,
+#' \code{rejectPerStage} indicates rejection of the arm's null hypothesis, while
+#' \code{futilityPerStage} is a trial-level futility-stopping decision repeated for
+#' the arm rows of the stage.
 #'
 #' @template return_dataframe
 #'
@@ -820,6 +832,87 @@ getData <- function(x) {
 #' @export
 getData.SimulationResults <- function(x) {
     return(x$.data)
+}
+
+.assertIsValidMaxNumberOfRawDatasetsPerStage <- function(maxNumberOfRawDatasetsPerStage) {
+    maxNumberOfRawDatasetsPerStage <- .assertIsSingleInteger(
+        maxNumberOfRawDatasetsPerStage,
+        "maxNumberOfRawDatasetsPerStage",
+        validateType = FALSE
+    )
+    .assertIsInClosedInterval(
+        maxNumberOfRawDatasetsPerStage,
+        "maxNumberOfRawDatasetsPerStage",
+        lower = 0,
+        upper = NULL
+    )
+    return(maxNumberOfRawDatasetsPerStage)
+}
+
+.createSimulationSurvivalRawData <- function(rawDataSets, enrichment = FALSE) {
+    if (is.null(rawDataSets) || length(rawDataSets) == 0) {
+        rawData <- data.frame(
+            scenario = integer(0),
+            iterationNumber = integer(0),
+            stopStage = integer(0),
+            subjectId = integer(0),
+            accrualTime = numeric(0),
+            treatmentGroup = integer(0),
+            survivalTime = numeric(0),
+            dropoutTime = numeric(0),
+            lastObservationTime = numeric(0),
+            timeUnderObservation = numeric(0),
+            event = logical(0),
+            dropoutEvent = logical(0)
+        )
+        if (isTRUE(enrichment)) {
+            rawData$subGroup <- character(0)
+            rawData <- rawData[, c(
+                "scenario", "iterationNumber", "stopStage", "subjectId", "accrualTime",
+                "treatmentGroup", "subGroup", "survivalTime", "dropoutTime",
+                "lastObservationTime", "timeUnderObservation", "event", "dropoutEvent"
+            )]
+        }
+        return(rawData)
+    }
+
+    dataList <- lapply(rawDataSets, function(rawDataSet) {
+        data <- rawDataSet$data
+        analysisTime <- rawDataSet$analysisTime
+        event <- data$accrualTime + data$survivalTime < analysisTime &
+            (is.na(data$dropoutTime) | data$dropoutTime > data$survivalTime)
+        dropoutEvent <- !is.na(data$dropoutTime) &
+            data$accrualTime + data$dropoutTime < analysisTime &
+            data$dropoutTime < data$survivalTime
+        timeUnderObservation <- analysisTime - data$accrualTime
+        timeUnderObservation[event] <- data$survivalTime[event]
+        timeUnderObservation[dropoutEvent] <- data$dropoutTime[dropoutEvent]
+
+        result <- data.frame(
+            scenario = as.integer(rawDataSet$scenario),
+            iterationNumber = as.integer(rawDataSet$iterationNumber),
+            stopStage = as.integer(rawDataSet$stopStage),
+            subjectId = seq_len(nrow(data)),
+            accrualTime = data$accrualTime,
+            treatmentGroup = as.integer(data$treatmentArm),
+            survivalTime = data$survivalTime,
+            dropoutTime = data$dropoutTime,
+            lastObservationTime = analysisTime,
+            timeUnderObservation = timeUnderObservation,
+            event = event,
+            dropoutEvent = dropoutEvent
+        )
+        if (isTRUE(enrichment)) {
+            result$subGroup <- as.character(data$subGroup)
+            result <- result[, c(1:6, 13, 7:12)]
+        }
+        return(result)
+    })
+
+    rawData <- do.call(rbind, dataList)
+    rawData <- rawData[order(rawData$scenario, rawData$iterationNumber, rawData$subjectId), ]
+    rownames(rawData) <- NULL
+    return(rawData)
 }
 
 .getAggregatedDataByIterationNumber <- function(rawData, iterationNumber, pi1 = NA_real_) {
@@ -896,6 +989,55 @@ getData.SimulationResults <- function(x) {
     return(data)
 }
 
+.getAggregatedDataMultiArmSurvival <- function(rawData) {
+    treatmentGroups <- sort(unique(rawData$treatmentGroup))
+    dataSets <- split(rawData, interaction(rawData$scenario, rawData$iterationNumber, drop = TRUE))
+    result <- lapply(dataSets, function(data) {
+        row <- data.frame(
+            scenario = data$scenario[1],
+            iterationNumber = data$iterationNumber[1],
+            stageNumber = data$stopStage[1],
+            analysisTime = max(data$lastObservationTime, na.rm = TRUE),
+            numberOfSubjects = nrow(data)
+        )
+        for (treatmentGroup in treatmentGroups) {
+            row[[paste0("eventsPerStage", treatmentGroup)]] <- sum(
+                data$event[data$treatmentGroup == treatmentGroup]
+            )
+        }
+        row$eventsPerStage <- sum(data$event)
+        return(row)
+    })
+    result <- do.call(rbind, result)
+    rownames(result) <- NULL
+    return(result[order(result$scenario, result$iterationNumber), ])
+}
+
+.getAggregatedDataEnrichmentSurvival <- function(rawData) {
+    dataSets <- split(
+        rawData,
+        interaction(rawData$scenario, rawData$iterationNumber, rawData$subGroup, drop = TRUE)
+    )
+    result <- lapply(dataSets, function(data) {
+        eventsPerStage1 <- sum(data$event[data$treatmentGroup == 1])
+        eventsPerStage2 <- sum(data$event[data$treatmentGroup == 2])
+        data.frame(
+            scenario = data$scenario[1],
+            iterationNumber = data$iterationNumber[1],
+            subGroup = data$subGroup[1],
+            stageNumber = data$stopStage[1],
+            analysisTime = max(data$lastObservationTime, na.rm = TRUE),
+            numberOfSubjects = nrow(data),
+            eventsPerStage1 = eventsPerStage1,
+            eventsPerStage2 = eventsPerStage2,
+            eventsPerStage = eventsPerStage1 + eventsPerStage2
+        )
+    })
+    result <- do.call(rbind, result)
+    rownames(result) <- NULL
+    return(result[order(result$scenario, result$iterationNumber, result$subGroup), ])
+}
+
 #'
 #' @title
 #' Get Simulation Raw Data for Survival
@@ -903,18 +1045,20 @@ getData.SimulationResults <- function(x) {
 #' @description
 #' Returns the raw survival data which was generated for simulation.
 #'
-#' @param x A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
+#' @param x A survival \code{\link{SimulationResults}} object created by
+#'        \code{\link[=getSimulationSurvival]{getSimulationSurvival()}},
+#'        \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}, or
+#'        \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurvival()}}.
 #' @param aggregate Logical. If \code{TRUE} the raw data will be aggregated similar to
 #'        the result of \code{\link[=getData]{getData()}}, default is \code{FALSE}.
 #'
 #' @details
-#' This function works only if \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} was called with a \cr
-#' \code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}).
+#' This function works only if the simulation function was called with
+#' \code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}). Multi-arm and
+#' enrichment simulations must use a patient-wise simulation type.
 #'
 #' This function can be used to get the simulated raw data from a simulation results
-#' object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
-#' Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
-#' must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
+#' object obtained from an ordinary, multi-arm, or enrichment survival simulation.
 #' The data frame contains the following columns:
 #' \enumerate{
 #'   \item \code{iterationNumber}: The number of the simulation iteration.
@@ -924,7 +1068,6 @@ getData.SimulationResults <- function(x) {
 #'   \item \code{treatmentGroup}: The treatment group number (1 or 2).
 #'   \item \code{survivalTime}: The survival time of the subject.
 #'   \item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
-#'   \item \code{lastObservationTime}: The specific observation time.
 #'   \item \code{timeUnderObservation}: The time under observation is defined as follows:
 #' ```
 #' if (event == TRUE) {
@@ -932,12 +1075,18 @@ getData.SimulationResults <- function(x) {
 #' } else if (dropoutEvent == TRUE) {
 #'     timeUnderObservation <- dropoutTime
 #' } else {
-#'     timeUnderObservation <- lastObservationTime - accrualTime
+#'     timeUnderObservation <- analysisTime - accrualTime
 #' }
 #' ```
+#' where \code{analysisTime} is available from the corresponding row of
+#' \code{\link[=getData]{getData()}}.
 #'   \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
 #'   \item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
 #' }
+#' Multi-arm and enrichment raw data additionally contain a stable integer \code{scenario}
+#' identifier. Enrichment raw data also contain the subject's \code{subGroup}. For these
+#' simulation types, \code{aggregate = TRUE} aggregates multi-arm data by scenario and
+#' iteration and enrichment data by scenario, iteration, and subgroup.
 #'
 #' @template return_dataframe
 #'
@@ -956,10 +1105,9 @@ getData.SimulationResults <- function(x) {
 #' @export
 #'
 getRawData <- function(x, aggregate = FALSE) {
-    if (!inherits(x, "SimulationResultsSurvival")) {
+    if (!inherits(x, "SimulationResultsBaseSurvival")) {
         stopIllegalArgument(
-            "'x' must be a 'SimulationResultsSurvival' object; ",
-            "use getSimulationSurvival() to create one",
+            "'x' must be a survival simulation results object",
             functionName = "getRawData",
             parameter = "x",
             value = x
@@ -968,19 +1116,45 @@ getRawData <- function(x, aggregate = FALSE) {
 
     rawData <- x$.rawData
     if (is.null(rawData) || ncol(rawData) == 0 || nrow(rawData) == 0) {
+        if (!is.null(x$simulationType) && identical(x$simulationType, "testStatisticBased")) {
+            stopIllegalArgument(
+                "test-statistic-based simulations generate no patient-level raw data; ",
+                "choose 'simulationType' = \"patientWise\" and a ",
+                "'maxNumberOfRawDatasetsPerStage' > 0",
+                functionName = "getRawData",
+                parameter = "simulationType",
+                value = x$simulationType,
+                relatedParameter = "maxNumberOfRawDatasetsPerStage"
+            )
+        }
+        simulationFunction <- if (inherits(x, "SimulationResultsMultiArmSurvival")) {
+            "getSimulationMultiArmSurvival"
+        } else if (inherits(x, "SimulationResultsEnrichmentSurvival")) {
+            "getSimulationEnrichmentSurvival"
+        } else {
+            "getSimulationSurvival"
+        }
         stopIllegalArgument(
             "simulation results contain no raw data; ",
             "choose a 'maxNumberOfRawDatasetsPerStage' > 0, e.g., ",
-            "getSimulationSurvival(..., maxNumberOfRawDatasetsPerStage = 1)",
+            simulationFunction, "(..., maxNumberOfRawDatasetsPerStage = 1)",
             functionName = "getRawData",
             parameter = "maxNumberOfRawDatasetsPerStage"
         )
     }
 
     if (!aggregate) {
-        return(rawData)
+        return(rawData[, names(rawData) != "lastObservationTime", drop = FALSE])
     }
 
+    if (inherits(x, "SimulationResultsMultiArmSurvival")) {
+        return(.getAggregatedDataMultiArmSurvival(rawData))
+    }
+    
+    if (inherits(x, "SimulationResultsEnrichmentSurvival")) {
+        return(.getAggregatedDataEnrichmentSurvival(rawData))
+    }
+    
     return(.getAggregatedData(rawData))
 }
 
@@ -1107,4 +1281,21 @@ getRawData <- function(x, aggregate = FALSE) {
     ))
     simulationResults$seed <- .setSeed(seed)
     return(invisible(seed))
+}
+
+.setEventsNotAchieved <- function(simulationResults, accrualSetup, ..., eventsNotAchieved) {
+    simulationResults$eventsNotAchieved <- eventsNotAchieved
+    if (any(simulationResults$eventsNotAchieved > 0)) { 
+        simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_GENERATED)
+        warning("Presumably due to drop-outs, required number of events ",
+            "were not achieved for at least one situation. ",
+            "Increase the maximum number of subjects (",
+            accrualSetup$maxNumberOfSubjects, ") ",
+            "to avoid this situation",
+            call. = FALSE
+        )
+    } else {
+        simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_NOT_APPLICABLE)
+    }
+    return(invisible(eventsNotAchieved))
 }

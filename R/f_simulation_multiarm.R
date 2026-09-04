@@ -485,7 +485,8 @@ NULL
     simulationType <- match.arg(simulationType)
 
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
-
+    piMaxVector <- .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = TRUE)
+    
     if (endpoint == "means") {
         simulationResults <- SimulationResultsMultiArmMeans$new(design, showStatistics = showStatistics)
     } else if (endpoint == "rates") {
@@ -493,6 +494,12 @@ NULL
     } else if (endpoint == "survival") {
         simulationResults <- SimulationResultsMultiArmSurvival$new(design, showStatistics = showStatistics)
         .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
+        simulationResults$simulationType <- ifelse(
+            identical(simulationType, "testStatisticBased"),
+            "testStatisticBased",
+            "patientWise"
+        )
+        simulationResults$.setParameterType("simulationType", C_PARAM_DERIVED)
     }
 
     if (is.na(activeArms)) {
@@ -686,10 +693,7 @@ NULL
         )
 
         .setValueAndParameterType(simulationResults, "piTreatmentsH1", piTreatmentsH1, NA_real_)
-
-        .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE)
-        .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = FALSE)
-        .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
+        piControl <- .setPi2(simulationResults, piControl, parameterName = "piControl", endpoint = endpoint)
 
         piControlH1 <- .ignoreParameterIfNotUsed(
             "piControlH1",
@@ -718,8 +722,16 @@ NULL
 
         if (typeOfShape == "userDefined") {
             piMaxVector <- effectMatrix[, gMax]
+            if (!all(is.na(piMaxVector))) {
+                warning("'piMaxVector' (", .arrayToString(piMaxVector), ") will be ignored ",
+                    "because 'typeOfShape' = \"userDefined\"", call. = FALSE)
+            }
+        } else if (!all(is.na(piMaxVector))) {
+            .assertIsInOpenInterval(piMaxVector, "piMaxVector", lower = 0, upper = 1, naAllowed = FALSE)
+        } else { 
+            piMaxVector <- .getPi1Default(type = "power", endpoint = "rates")
         }
-        .setValueAndParameterType(simulationResults, "piMaxVector", piMaxVector, C_PI_1_DEFAULT)
+        .setValueAndParameterType(simulationResults, "piMaxVector", piMaxVector, NA_real_)
         if (typeOfShape == "userDefined") {
             simulationResults$.setParameterType("piMaxVector", C_PARAM_DERIVED)
         }
@@ -753,9 +765,7 @@ NULL
             )
         }
 
-        .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)
-        .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = TRUE)
-        .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
+        piControl <- .setPi2(simulationResults, piControl, parameterName = "piControl", endpoint = endpoint)
         .setValueAndParameterType(simulationResults, "eventTime", eventTime, 12)
 
         if (!is.na(eventTime) && eventTime <= 0) {
@@ -771,16 +781,16 @@ NULL
         .setValueAndParameterType(simulationResults, "accrualIntensity", accrualIntensity, 0.1)
 
         .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
-        if (is.na(dropoutRate1)) {
+        dropoutRate1 <- .assertIsNumericVector(dropoutRate1, "dropoutRate1",
+            len = unique(c(1L, activeArms)), naAllowed = TRUE)
+        if (all(is.na(dropoutRate1))) {
             dropoutRate1 <- 0
         }
+        .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+        .assertIsSingleNumber(dropoutRate2, "dropoutRate2", naAllowed = TRUE)
         if (is.na(dropoutRate2)) {
             dropoutRate2 <- 0
         }
-        dropoutRate1 <- .assertIsNumericVector(dropoutRate1, "dropoutRate1",
-            len = unique(c(1L, activeArms)), naAllowed = FALSE)
-        .assertIsSingleNumber(dropoutRate2, "dropoutRate2")
-        .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
         .assertIsInInterval(dropoutRate2, "dropoutRate2", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
         .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, 0)
         .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, 0)

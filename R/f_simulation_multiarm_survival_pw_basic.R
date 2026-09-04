@@ -271,7 +271,8 @@ NULL
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
-        selectArmsFunction) {
+        selectArmsFunction,
+        returnRawData = FALSE) {
     kMax <- length(plannedEvents)
     gMax <- length(omegaVector)
     maxNumberOfSubjects <- length(recruitmentTimes)
@@ -571,7 +572,7 @@ NULL
         }
     }
 
-    return(list(
+    result <- list(
         eventsNotAchieved = eventsNotAchieved,
         singleEventsPerStage = singleEventsPerStage,
         cumulativeEventsPerStage = cumulativeEventsPerStage,
@@ -587,7 +588,11 @@ NULL
         conditionalCriticalValue = conditionalCriticalValue,
         conditionalPowerPerStage = conditionalPowerPerStage,
         selectedArms = selectedArms
-    ))
+    )
+    if (isTRUE(returnRawData)) {
+        result$rawData <- survivalDataSet
+    }
+    return(result)
 }
 
 .performSimulationMultiArmSurvivalLoop <- function(
@@ -623,7 +628,8 @@ NULL
         criticalValuesDunnett,
         successCriterion,
         gMax,
-        kMax) {
+        kMax,
+        maxNumberOfRawDatasetsPerStage = 0) {
     # Initialize simulation result matrices
     simulatedNumberEventsNotAchieved <- matrix(0, nrow = kMax, ncol = cols)
     simulatedAnalysisTime <- matrix(0, nrow = kMax, ncol = cols)
@@ -641,6 +647,8 @@ NULL
     expectedNumberOfSubjects <- rep(0, cols)
     expectedStudyDuration <- rep(0, cols)
     iterations <- matrix(0, nrow = kMax, ncol = cols)
+    rawDataPerStage <- matrix(0L, nrow = cols, ncol = kMax)
+    rawDataSets <- list()
 
     len <- maxNumberOfIterations * kMax * gMax * cols
 
@@ -652,6 +660,7 @@ NULL
     dataAnalysisTime <- rep(NA_real_, len)
     dataNumberOfSubjects <- rep(NA_real_, len)
     dataNumberOfEvents <- rep(NA_real_, len)
+    dataSelectedForNextStage <- rep(NA, len)
     dataRejectPerStage <- rep(NA, len)
     dataFutilityStop <- rep(NA_real_, len)
     dataSuccessStop <- rep(NA, len)
@@ -665,6 +674,8 @@ NULL
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
+            returnRawData <- maxNumberOfRawDatasetsPerStage > 0 &&
+                any(rawDataPerStage[i, ] < maxNumberOfRawDatasetsPerStage)
             stageResults <- .getSimulatedStageResultsSurvivalMultiArmPatientWise(
                 design = design,
                 directionUpper = directionUpper,
@@ -689,7 +700,8 @@ NULL
                 thetaH1 = thetaH1,
                 calcEventsFunction = calcEventsFunction,
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
-                selectArmsFunction = selectArmsFunction
+                selectArmsFunction = selectArmsFunction,
+                returnRawData = returnRawData
             )
             closedTest <- if (.isTrialDesignConditionalDunnett(design)) {
                 .performClosedConditionalDunnettTestForSimulation(
@@ -707,6 +719,28 @@ NULL
                     intersectionTest = intersectionTest,
                     successCriterion = successCriterion
                 )
+            }
+
+            stopStage <- NA_integer_
+            for (k in seq_len(kMax)) {
+                stoppedEarly <- k < kMax && (
+                    isTRUE(closedTest$successStop[k]) || isTRUE(closedTest$futilityStop[k])
+                )
+                if (!stageResults$eventsNotAchieved[k] && (stoppedEarly || k == kMax)) {
+                    stopStage <- k
+                    break
+                }
+            }
+            if (!is.na(stopStage) && returnRawData &&
+                    rawDataPerStage[i, stopStage] < maxNumberOfRawDatasetsPerStage) {
+                rawDataSets[[length(rawDataSets) + 1L]] <- list(
+                    data = stageResults$rawData,
+                    scenario = i,
+                    iterationNumber = j,
+                    stopStage = stopStage,
+                    analysisTime = stageResults$analysisTime[stopStage]
+                )
+                rawDataPerStage[i, stopStage] <- rawDataPerStage[i, stopStage] + 1L
             }
 
             rejectAtSomeStage <- FALSE
@@ -760,6 +794,9 @@ NULL
                         dataAnalysisTime[index] <- stageResults$analysisTime[k]
                         dataNumberOfSubjects[index] <- stageResults$numberOfSubjects[k]
                         dataNumberOfEvents[index] <- round(stageResults$cumulativeEventsPerStage[g, k], 1)
+                        if (k < kMax) {
+                            dataSelectedForNextStage[index] <- closedTest$selectedArms[g, k + 1]
+                        }
                         dataRejectPerStage[index] <- closedTest$rejected[g, k]
                         dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                         dataSuccessStop[index] <- closedTest$successStop[k]
@@ -856,6 +893,7 @@ NULL
         pValue = dataPValuesSeparate,
         conditionalCriticalValue = round(dataConditionalCriticalValue, 6),
         conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6),
+        selectedForNextStage = dataSelectedForNextStage,
         rejectPerStage = dataRejectPerStage,
         successStop = dataSuccessStop,
         futilityPerStage = dataFutilityStop
@@ -880,6 +918,7 @@ NULL
         expectedNumberOfSubjects = expectedNumberOfSubjects,
         expectedStudyDuration = expectedStudyDuration,
         iterations = iterations,
-        data = data
+        data = data,
+        rawData = rawDataSets
     )
 }

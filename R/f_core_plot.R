@@ -445,16 +445,16 @@ getAvailablePlotTypes <- function(
         }
         types <- .removeInvalidPlotTypes(obj, types, c(5:14))
     } else if (inherits(obj, "SimulationResults")) {
-        if (grepl("Enrichment", .getClassName(obj)) && !.getSimulationEnrichmentEffectData(
-                obj,
-                validatePlotCapability = FALSE
-            )$valid) {
+        if (grepl("Enrichment", .getClassName(obj)) && 
+                !.getSimulationEnrichmentEffectData(obj, validatePlotCapability = FALSE)$valid) {
             if (output == "numeric") {
                 return(NA_real_)
             }
+            
             if (output == "caption") {
                 return(NA_character_)
             }
+            
             return(list())
         }
 
@@ -480,6 +480,9 @@ getAvailablePlotTypes <- function(
         }
         if (inherits(obj, "SimulationResultsSurvival")) {
             types <- c(types, 10:14)
+        }
+        else if (equals(obj[["simulationType"]], "patientWise")) {
+            types <- c(types, 10:12)
         }
         plotTypesToCheck <- c(4:14)
         if (grepl("MultiArm", .getClassName(obj))) {
@@ -641,7 +644,7 @@ getAvailablePlotTypes <- function(
 
     xAxisCmd <- .reconstructSequenceCommand(xValues)
     if (is.na(xAxisCmd)) {
-        if (!grepl("(\\$)|(^c\\()", xParameterName) || grepl("^\\.design", xParameterName)) {
+        if (!grepl("seq_len|c\\(|(\\$)|(^c\\()", xParameterName) || grepl("^\\.design", xParameterName)) {
             if (length(objectName) == 0 || is.na(objectName)) {
                 objectName <- "x"
             }
@@ -1497,7 +1500,8 @@ getAvailablePlotTypes <- function(
     yAxisLabel1 <- .toCapitalized(yAxisLabel1)
     yAxisLabel2 <- .toCapitalized(yAxisLabel2)
 
-    p <- plotSettings$setAxesLabels(p,
+    p <- plotSettings$setAxesLabels(
+        p = p,
         xAxisLabel = xAxisLabel,
         yAxisLabel1 = yAxisLabel1,
         yAxisLabel2 = yAxisLabel2,
@@ -1867,4 +1871,14 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
             )
         }
     }
+}
+
+.showPlotTypeNotImplementedError <- function(type, functionName, x) {
+    stopRuntimeIssue("'type' (", type, ") is not yet implemented",
+        functionName = functionName,
+        parameter = "type", 
+        value = type, 
+        relatedParameter = "class", 
+        relatedValue = .getClassName(x)
+    )
 }

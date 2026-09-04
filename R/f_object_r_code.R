@@ -702,6 +702,14 @@ getObjectRCode <- function(
         objNames <- objNames[objNames != "stages"]
     }
 
+    isSurvivalObject <-
+        inherits(obj, "TrialDesignPlanSurvival") ||
+        inherits(obj, "SimulationResultsBaseSurvival") ||
+        (inherits(obj, "AnalysisResults") && obj$getDataInput()$isDatasetSurvival())
+    if (isSurvivalObject && obj[[".design"]]$sided == 1 && "directionUpper" %in% names(obj)) {
+        objNames <- union(objNames, "directionUpper")
+    }
+
     if (
         inherits(obj, "TrialDesign") &&
             !inherits(obj, "TrialDesignFixed") &&
@@ -800,13 +808,10 @@ getObjectRCode <- function(
         informationRates <- obj[["informationRates"]]
         if (!is.null(informationRates) && length(informationRates) > 0) {
             kMax <- obj[["kMax"]]
-            if (
-                isTRUE(all.equal(
-                    target = .getInformationRatesDefault(kMax),
-                    current = informationRates,
-                    tolerance = tolerance
-                ))
-                ) {
+            if (equals(
+                    .getInformationRatesDefault(kMax),
+                    informationRates,
+                    tolerance = tolerance)) {
                 objNames <- objNames[objNames != "informationRates"]
                 if (!("kMax" %in% objNames) && kMax != 3) {
                     objNames <- c("kMax", objNames)
