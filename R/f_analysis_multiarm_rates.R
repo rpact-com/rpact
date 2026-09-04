@@ -396,7 +396,8 @@ NULL
         design,
         directionUpper,
         objectType = "analysis",
-        endpoint = "rates")
+        endpoint = "rates",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     piControl <- matrix(rep(NA_real_, kMax), 1, kMax)
     piTreatments <- matrix(NA_real_, nrow = gMax, ncol = kMax)

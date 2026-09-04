@@ -495,7 +495,8 @@ NULL
         design,
         directionUpper,
         objectType = "analysis",
-        endpoint = "rates"
+        endpoint = "rates",
+        userFunctionCallEnabled = userFunctionCallEnabled
     )
 
     stageResults$effectSizes <- rep(NA_real_, design$kMax)
@@ -1128,7 +1129,7 @@ NULL
                 sqrt(sum(nPlanned[(stage + 1):kMax]))
         }
 
-        if (stageResults$direction == "upper") {
+        if (stageResults$directionUpper) {
             thetaH1 <- (pi1 - stageResults$thetaH0) / sqrt(pi1 * (1 - pi1)) + adjustment
         } else {
             thetaH1 <- -(pi1 - stageResults$thetaH0) / sqrt(pi1 * (1 - pi1)) + adjustment
@@ -1166,7 +1167,7 @@ NULL
             )
     }
 
-    if (stageResults$direction == "upper") {
+    if (stageResults$directionUpper) {
         thetaH1 <- (pi1 - pi2 - stageResults$thetaH0) /
             sqrt(pi1 * (1 - pi1) + allocationRatioPlanned * pi2 * (1 - pi2)) *
             sqrt(1 + allocationRatioPlanned) +

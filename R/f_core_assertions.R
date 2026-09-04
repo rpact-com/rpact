@@ -2682,7 +2682,8 @@ NULL
         )
     }
 
-    if (!is.na(directionUpper) && !is.na(design$directionUpper) &&
+    if (isTRUE(userFunctionCallEnabled) && 
+            !is.na(directionUpper) && !is.na(design$directionUpper) &&
             !identical(directionUpper, design$directionUpper)) {
         stopConflictingArguments("in the design directionUpper = ",
             design$directionUpper, " is defined. ", "In the ",

@@ -57,11 +57,6 @@ NULL
         combFisher[k] <- prod(pValues[seq_len(k)]^weightsFisher[seq_len(k)])
     }
 
-    direction <- "undefined"
-    if (design$sided == 1) {
-        direction <- ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER)
-    }
-
     return(StageResultsGeneral$new(
         design = design,
         dataInput = dataInput,
@@ -79,7 +74,7 @@ NULL
         weightsInverseNormal = weightsInverseNormal,
         weightsFisher = weightsFisher,
         thetaH0 = thetaH0,
-        direction = direction
+        directionUpper = directionUpper
     ))
 }
 

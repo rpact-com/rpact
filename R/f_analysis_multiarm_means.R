@@ -411,7 +411,8 @@ NULL
         design,
         directionUpper,
         objectType = "analysis",
-        endpoint = "means")
+        endpoint = "means",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         stageResults, "intersectionTest",

@@ -21,6 +21,7 @@
 * Refactored error handling in plotting functions to use more specific internal error functions (`stopIllegalArgument`, `stopMissingArgument`) for clearer and more consistent error messages.
 * Standardized and clarified function signatures for R6 class initializers and S3 methods, improving readability and maintainability. This includes consistent formatting and argument ordering across multiple classes 
 * `getSampleSizeCounts()`: field 'expectedStudyDurationH1' in result object was replaced by 'studyDuration', i.e., 'expectedStudyDurationH1' is deprecated 
+* For consistency with other result objects, the `direction` field in `getStageResults()` result objects was renamed to `directionUpper`.
 
 # rpact 4.4.0
 

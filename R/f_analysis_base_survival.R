@@ -397,7 +397,8 @@ NULL
         design,
         directionUpper,
         objectType = "analysis",
-        endpoint = "survival"
+        endpoint = "survival",
+        userFunctionCallEnabled = userFunctionCallEnabled
     )
 
     stageResults$overallEvents <- .fillWithNAs(
@@ -847,7 +848,7 @@ NULL
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    if (stageResults$direction == "upper") {
+    if (stageResults$directionUpper) {
         thetaH1 <- log(thetaH1 / stageResults$thetaH0)
     } else {
         thetaH1 <- -log(thetaH1 / stageResults$thetaH0)
@@ -988,7 +989,7 @@ NULL
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    if (stageResults$direction == "upper") {
+    if (stageResults$directionUpper) {
         thetaH1 <- log(thetaH1 / stageResults$thetaH0)
     } else {
         thetaH1 <- -log(thetaH1 / stageResults$thetaH0)
@@ -1109,7 +1110,7 @@ NULL
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    if (stageResults$direction == "upper") {
+    if (stageResults$directionUpper) {
         thetaH1 <- log(thetaH1 / stageResults$thetaH0)
     } else {
         thetaH1 <- -log(thetaH1 / stageResults$thetaH0)

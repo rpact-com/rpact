@@ -72,7 +72,6 @@ StageResults <- R6::R6Class("StageResults",
         weightsInverseNormal = NULL,
         thetaH0 = NULL,
         directionUpper = NULL,
-        direction = NULL,
         initialize = function(
                 ...,
                 stage = NULL,
@@ -81,8 +80,7 @@ StageResults <- R6::R6Class("StageResults",
                 weightsFisher = NULL,
                 weightsInverseNormal = NULL,
                 thetaH0 = NULL,
-                directionUpper = NULL,
-                direction = NULL
+                directionUpper = NULL
                 ) {
             self$stage <- stage
             self$stages <- stages
@@ -91,7 +89,6 @@ StageResults <- R6::R6Class("StageResults",
             self$weightsInverseNormal <- weightsInverseNormal
             self$thetaH0 <- thetaH0
             self$directionUpper <- directionUpper
-            self$direction <- direction
             super$initialize(...)
         },
         init = function(design, dataInput) {
@@ -119,10 +116,6 @@ StageResults <- R6::R6Class("StageResults",
             )
             self$.setParameterType("thetaH0", ifelse(
                 equals(self$thetaH0, thetaH0Default), 
-                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-            ))
-            self$.setParameterType("direction", ifelse(
-                identical(self$direction, C_DIRECTION_UPPER), 
                 C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
@@ -171,9 +164,6 @@ StageResults <- R6::R6Class("StageResults",
                     self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
             }
-        },
-        isDirectionUpper = function() {
-            return(self$direction == C_DIRECTION_UPPER)
         },
         .isMultiArm = function() {
             return(grepl("multi", tolower(.getClassName(self))))
@@ -340,7 +330,7 @@ StageResultsGeneral <- R6::R6Class("StageResultsGeneral",
             } else if (.isTrialDesignFisher(self$.design)) {
                 parametersToShow <- c(parametersToShow, "combFisher", "weightsFisher")
             }
-            return(c(parametersToShow, "thetaH0", "direction"))
+            return(c(parametersToShow, "thetaH0", "directionUpper"))
         }
     )
 )
@@ -517,7 +507,6 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
                 parametersToShow,
                 "thetaH0",
                 "directionUpper",
-                "direction",
                 "normalApproximation"
             )
             if (self$.dataInput$getNumberOfGroups() == 2) {
@@ -662,7 +651,7 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
             parametersToShow <- c(
                 "stages",
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation",
                 "directionUpper",
                 "varianceOption",
@@ -861,7 +850,6 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
                 parametersToShow,
                 "thetaH0",
                 "directionUpper",
-                "direction",
                 "normalApproximation"
             )
             return(parametersToShow)
@@ -992,7 +980,7 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
             parametersToShow <- c(
                 "stages",
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation",
                 "directionUpper",
                 "overallPiControl",
@@ -1150,8 +1138,7 @@ StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
-                "directionUpper",
-                "direction"
+                "directionUpper"
             )
             return(parametersToShow)
         }
@@ -1267,7 +1254,6 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
             parametersToShow <- c(
                 "stages",
                 "thetaH0",
-                "direction",
                 "directionUpper",
                 "intersectionTest",
                 "overallTestStatistics",

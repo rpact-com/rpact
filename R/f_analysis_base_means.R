@@ -439,14 +439,16 @@ NULL
         normalApproximation = normalApproximation,
         equalVariances = equalVariances
     )
+    
     directionUpper <- .setDirectionUpper(
         stageResults,
         design,
         directionUpper,
         objectType = "analysis",
-        endpoint = "means"
+        endpoint = "means",
+        userFunctionCallEnabled = userFunctionCallEnabled
     )
-
+    
     stageResults$effectSizes <- rep(NA_real_, design$kMax)
 
     if (dataInput$getNumberOfGroups() == 1) {
@@ -750,6 +752,7 @@ NULL
         conditionFunction,
         firstParameterName,
         secondValue) {
+    
     stageResults <- .getStageResultsMeans(
         design = design,
         dataInput = dataInput,
@@ -759,7 +762,7 @@ NULL
         normalApproximation = normalApproximation,
         equalVariances = equalVariances
     )
-
+    
     firstValue <- stageResults[[firstParameterName]][stage]
     if (.isTrialDesignGroupSequential(design)) {
         firstValue <- .getOneMinusQNorm(firstValue)
@@ -827,6 +830,8 @@ NULL
         border <- C_FUTILITY_BOUNDS_DEFAULT
         conditionFunction <- .isFirstValueGreaterThanSecondValue
     }
+    
+    print(directionUpper) # TODO remove this line, it is only for debugging purposes
 
     repeatedConfidenceIntervals <- matrix(NA_real_, nrow = 2, ncol = design$kMax)
     for (k in 1:stage) {
@@ -1130,7 +1135,7 @@ NULL
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
 
-    if (stageResults$direction == "upper") {
+    if (stageResults$directionUpper) {
         thetaH1 <- (thetaH1 - stageResults$thetaH0) / assumedStDev
     } else {
         thetaH1 <- -(thetaH1 - stageResults$thetaH0) / assumedStDev
@@ -1271,7 +1276,7 @@ NULL
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
 
-    if (stageResults$direction == "upper") {
+    if (stageResults$directionUpper) {
         thetaH1 <- (thetaH1 - stageResults$thetaH0) / assumedStDev
     } else {
         thetaH1 <- -(thetaH1 - stageResults$thetaH0) / assumedStDev
@@ -1398,7 +1403,7 @@ NULL
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
 
-    if (stageResults$direction == "upper") {
+    if (stageResults$directionUpper) {
         thetaH1 <- (thetaH1 - stageResults$thetaH0) / assumedStDev
     } else {
         thetaH1 <- -(thetaH1 - stageResults$thetaH0) / assumedStDev

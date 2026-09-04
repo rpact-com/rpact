@@ -242,8 +242,6 @@ getAnalysisResults <- function(
             stage = stage,
             showWarnings = TRUE
         )
-        directionUpper <- .assertIsValidDirectionUpper(directionUpper, design, 
-            objectType = "analysis", default = directionUpperDefault)
         .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
         on.exit(dataInput$.trim())
         .assertIsValidThetaH0DataInput(thetaH0, dataInput)
@@ -1762,9 +1760,12 @@ getFinalConfidenceInterval <- function(
 
                     return(y$criticalValues[design$kMax] -
                         .getOneMinusQNorm(stageResults$overallPValues[design$kMax]))
-                }, lower = lower, upper = upper,
-                tolerance = tolerance, direction = -1,
-                acceptResultsOutOfTolerance = TRUE, suppressWarnings = TRUE,
+                }, lower = lower, 
+                upper = upper,
+                tolerance = tolerance, 
+                direction = -1,
+                acceptResultsOutOfTolerance = TRUE, 
+                suppressWarnings = TRUE,
                 callingFunctionInformation = ".getRepeatedPValuesGroupSequential"
             )
             .logProgress("Repeated p-values for final stage calculated", startTime = startTime)
@@ -1814,9 +1815,12 @@ getFinalConfidenceInterval <- function(
                         }
 
                         return(y$criticalValues[k] - .getOneMinusQNorm(stageResults$overallPValues[k]))
-                    }, lower = tolerance, upper = upper,
-                    tolerance = tolerance, direction = -1,
-                    acceptResultsOutOfTolerance = TRUE, suppressWarnings = TRUE,
+                    }, lower = tolerance, 
+                    upper = upper,
+                    tolerance = tolerance, 
+                    direction = -1,
+                    acceptResultsOutOfTolerance = TRUE, 
+                    suppressWarnings = TRUE,
                     callingFunctionInformation = ".getRepeatedPValuesGroupSequential"
                 )
                 .logProgress("Repeated p-values of stage %s calculated", startTime = startTime, k)
@@ -1872,9 +1876,12 @@ getFinalConfidenceInterval <- function(
                     }
 
                     return(y$criticalValues[design$kMax] - stageResults$combInverseNormal[design$kMax])
-                }, lower = lower, upper = upper,
-                tolerance = tolerance, direction = -1,
-                acceptResultsOutOfTolerance = TRUE, suppressWarnings = TRUE,
+                }, lower = lower, 
+                upper = upper,
+                tolerance = tolerance, 
+                direction = -1,
+                acceptResultsOutOfTolerance = TRUE, 
+                suppressWarnings = TRUE,
                 callingFunctionInformation = ".getRepeatedPValuesInverseNormal"
             )
             .logProgress("Repeated p-values for final stage calculated", startTime = startTime)
@@ -1925,9 +1932,12 @@ getFinalConfidenceInterval <- function(
                         }
 
                         return(y$criticalValues[k] - stageResults$combInverseNormal[k])
-                    }, lower = tolerance, upper = upper,
-                    tolerance = tolerance, direction = -1,
-                    acceptResultsOutOfTolerance = TRUE, suppressWarnings = TRUE,
+                    }, lower = tolerance, 
+                    upper = upper,
+                    tolerance = tolerance, 
+                    direction = -1,
+                    acceptResultsOutOfTolerance = TRUE, 
+                    suppressWarnings = TRUE,
                     callingFunctionInformation = ".getRepeatedPValuesInverseNormal"
                 )
                 .logProgress("Repeated p-values of stage %s calculated", startTime = startTime, k)
@@ -1974,8 +1984,12 @@ getFinalConfidenceInterval <- function(
                     }
                     return(y$criticalValues[k] - stageResults$combFisher[k])
                 },
-                lower = tolerance, upper = 0.5, tolerance = tolerance, direction = 1,
-                acceptResultsOutOfTolerance = TRUE, suppressWarnings = TRUE,
+                lower = tolerance, 
+                upper = 0.5, 
+                tolerance = tolerance, 
+                direction = 1,
+                acceptResultsOutOfTolerance = TRUE, 
+                suppressWarnings = TRUE,
                 callingFunctionInformation = ".getRepeatedPValuesFisher"
             )
             .logProgress("Repeated p-values of stage %s calculated", startTime = startTime, k)

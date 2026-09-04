@@ -2521,6 +2521,7 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
         C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT
     )
     forceUserDefinedDirectionUpper <- !is.na(directionUpper)
+    
     directionUpper <- .assertIsValidDirectionUpper(
         directionUpper,
         design,
@@ -2531,15 +2532,6 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
     .setValueAndParameterType(parameterSet, "directionUpper", directionUpper, defaultValue)
     if (forceUserDefinedDirectionUpper) {
         parameterSet$.setParameterType("directionUpper", C_PARAM_USER_DEFINED)
-    }
-
-    if ("direction" %in% names(parameterSet)) {
-        parameterSet$direction <- "undefined"
-        if (design$sided == 1) {
-            parameterSet$direction <- ifelse(
-                !isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER
-            )
-        }
     }
 
     return(invisible(directionUpper))

@@ -71,7 +71,6 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     probs = "Internal calculation probabilities",
     power = "Power",
     theta = "Effect",
-    direction = "Direction",
     normalApproximation = "Normal approximation",
     conservative = "Conservative",
     equalVariances = "Equal variance",

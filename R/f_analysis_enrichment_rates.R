@@ -258,7 +258,8 @@ NULL
         design,
         directionUpper,
         objectType = "analysis",
-        endpoint = "rates")
+        endpoint = "rates",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         stageResults, "stratifiedAnalysis",

@@ -347,7 +347,8 @@ NULL
         design,
         directionUpper,
         objectType = "analysis",
-        endpoint = "survival")
+        endpoint = "survival",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     effectSizes <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     testStatistics <- matrix(NA_real_, nrow = gMax, ncol = kMax)

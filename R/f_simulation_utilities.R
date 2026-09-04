@@ -393,7 +393,12 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     colNames <- paste0(matrixName, 1:ncol(matrixValues))
     colnames(matrixValues) <- colNames
     matrixValues$situation <- 1:nrow(matrixValues)
-    longData <- stats::reshape(data = matrixValues, direction = "long", varying = colNames, idvar = "situation", sep = "")
+    longData <- stats::reshape(
+        data = matrixValues, 
+        direction = "long", 
+        varying = colNames, 
+        idvar = "situation", 
+        sep = "")
     timeColumnIndex <- which(colnames(longData) == "time")
     colnames(longData)[timeColumnIndex] <- "subGroupNumber"
     longData$subGroups <- rep(NA_character_, nrow(longData))

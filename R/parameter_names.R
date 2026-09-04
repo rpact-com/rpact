@@ -71,7 +71,6 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     probs = "Exit probabilities",
     power = "Power",
     theta = "Effect",
-    direction = "Direction",
     normalApproximation = "Normal approximation",
     conservative = "Conservative",
     equalVariances = "Equal variances",

@@ -189,7 +189,8 @@ NULL
         design,
         directionUpper,
         objectType = "analysis",
-        endpoint = "survival")
+        endpoint = "survival",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         stageResults, "stratifiedAnalysis",
