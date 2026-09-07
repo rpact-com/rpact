@@ -184,15 +184,13 @@ NULL
         stage = stage
     )
     
-    if (userFunctionCallEnabled) {
-        directionUpper <- .setDirectionUpper(
-            stageResults,
-            design,
-            directionUpper,
-            objectType = "analysis",
-            endpoint = "survival",
-            userFunctionCallEnabled = userFunctionCallEnabled)
-    }
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "survival",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         stageResults, "stratifiedAnalysis",

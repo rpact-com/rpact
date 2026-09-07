@@ -491,16 +491,14 @@ NULL
         normalApproximation = normalApproximation
     )
     
-    if (userFunctionCallEnabled) {
-        directionUpper <- .setDirectionUpper(
-            stageResults,
-            design,
-            directionUpper,
-            objectType = "analysis",
-            endpoint = "rates",
-            userFunctionCallEnabled = userFunctionCallEnabled
-        )
-    }
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "rates",
+        userFunctionCallEnabled = userFunctionCallEnabled
+    )
 
     stageResults$effectSizes <- rep(NA_real_, design$kMax)
 

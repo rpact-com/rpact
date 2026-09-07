@@ -391,16 +391,14 @@ NULL
         stage = stage
     )
     
-    if (userFunctionCallEnabled) {
-        directionUpper <- .setDirectionUpper(
-            stageResults,
-            design,
-            directionUpper,
-            objectType = "analysis",
-            endpoint = "rates",
-            userFunctionCallEnabled = userFunctionCallEnabled)
-    }
-
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "rates",
+        userFunctionCallEnabled = userFunctionCallEnabled)
+    
     piControl <- matrix(rep(NA_real_, kMax), 1, kMax)
     piTreatments <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     testStatistics <- matrix(NA_real_, nrow = gMax, ncol = kMax)

@@ -199,7 +199,8 @@ getAnalysisResults <- function(
         C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT)
     
     directionUpper <- .assertIsValidDirectionUpper(directionUpper, design,
-        objectType = "analysis", userFunctionCallEnabled = TRUE, default = directionUpperDefault
+        objectType = "analysis", userFunctionCallEnabled = TRUE, 
+        default = directionUpperDefault
     )
 
     recalculationResult <- .getDesignWithRecalculatedBoundaries(

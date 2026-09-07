@@ -2515,24 +2515,26 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
         objectType = c("sampleSize", "power", "analysis"),
         endpoint = c("means", "rates", "survival", "counts"),
         userFunctionCallEnabled = TRUE) {
+                       
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
     endpoint <- match.arg(endpoint)
     defaultValue <- ifelse(identical(endpoint, "survival"),
         C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT
     )
     forceUserDefinedDirectionUpper <- !is.na(directionUpper)
-    
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = objectType,
-        userFunctionCallEnabled = userFunctionCallEnabled,
-        default = defaultValue
-    )
+    if (isTRUE(userFunctionCallEnabled)) {
+        directionUpper <- .assertIsValidDirectionUpper(
+            directionUpper,
+            design,
+            objectType = objectType,
+            userFunctionCallEnabled = userFunctionCallEnabled,
+            default = defaultValue
+        )
+    }
     .setValueAndParameterType(parameterSet, "directionUpper", directionUpper, defaultValue)
-    if (forceUserDefinedDirectionUpper) {
+    if (userFunctionCallEnabled && forceUserDefinedDirectionUpper) {
         parameterSet$.setParameterType("directionUpper", C_PARAM_USER_DEFINED)
     }
-
+    
     return(invisible(directionUpper))
 }

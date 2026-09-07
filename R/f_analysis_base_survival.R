@@ -393,16 +393,14 @@ NULL
         thetaH0 = thetaH0
     )
     
-    if (userFunctionCallEnabled) {
-        directionUpper <- .setDirectionUpper(
-            stageResults,
-            design,
-            directionUpper,
-            objectType = "analysis",
-            endpoint = "survival",
-            userFunctionCallEnabled = userFunctionCallEnabled
-        )
-    }
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "survival",
+        userFunctionCallEnabled = userFunctionCallEnabled
+    )
 
     stageResults$overallEvents <- .fillWithNAs(
         dataInput$getOverallEventsUpTo(stage, group = 1), design$kMax

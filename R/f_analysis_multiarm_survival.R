@@ -342,15 +342,13 @@ NULL
         stage = stage
     )
     
-    if (userFunctionCallEnabled) {
-        directionUpper <- .setDirectionUpper(
-            stageResults,
-            design,
-            directionUpper,
-            objectType = "analysis",
-            endpoint = "survival",
-            userFunctionCallEnabled = userFunctionCallEnabled)
-    }
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "survival",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     effectSizes <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     testStatistics <- matrix(NA_real_, nrow = gMax, ncol = kMax)

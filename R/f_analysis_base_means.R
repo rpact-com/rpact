@@ -441,16 +441,14 @@ NULL
         equalVariances = equalVariances
     )
     
-    if (userFunctionCallEnabled) {
-        directionUpper <- .setDirectionUpper(
-            stageResults,
-            design,
-            directionUpper,
-            objectType = "analysis",
-            endpoint = "means",
-            userFunctionCallEnabled = userFunctionCallEnabled
-        )
-    }
+    directionUpper <- .setDirectionUpper( 
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "means",
+        userFunctionCallEnabled = userFunctionCallEnabled
+    )
     
     stageResults$effectSizes <- rep(NA_real_, design$kMax)
 
@@ -1184,7 +1182,9 @@ NULL
         (1 - informationRates[stage])
 
     if (design$sided == 2) {
-        decisionMatrix <- matrix(c(shiftedDecisionRegionLower, shiftedDecisionRegionUpper), nrow = 2, byrow = TRUE)
+        decisionMatrix <- matrix(
+            c(shiftedDecisionRegionLower, shiftedDecisionRegionUpper), 
+            nrow = 2, byrow = TRUE)
     } else {
         decisionMatrix <- matrix(
             c(

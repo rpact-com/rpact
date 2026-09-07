@@ -271,15 +271,13 @@ NULL
         stage = stage
     )
     
-    if (userFunctionCallEnabled) {
-        directionUpper <- .setDirectionUpper(
-            stageResults,
-            design,
-            directionUpper,
-            objectType = "analysis",
-            endpoint = "means",
-            userFunctionCallEnabled = userFunctionCallEnabled)
-    }
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "means",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         stageResults, "intersectionTest", intersectionTest,
