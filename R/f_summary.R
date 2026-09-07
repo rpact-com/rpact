@@ -144,7 +144,7 @@ NULL
         return("")
     }
 
-    if (.isTrialDesignPlan(object) && object$.objectType != "power") {
+    if (.isTrialDesignPlan(object) && !object$.isPowerObject()) {
         return("")
     }
 

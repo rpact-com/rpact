@@ -1572,7 +1572,7 @@ NULL
 
     assumedStDev <- .assertIsValidAssumedStDev(assumedStDev, stageResults, stage)
 
-    thetaRange <- .assertIsValidThetaRange(thetaRange = thetaRange)
+    thetaRange <- .assertIsValidThetaRange(theta = thetaRange)
 
     condPowerValues <- rep(NA, length(thetaRange))
     likelihoodValues <- rep(NA, length(thetaRange))

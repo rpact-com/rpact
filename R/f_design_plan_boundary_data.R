@@ -577,7 +577,7 @@
         followUpTime <- studyTime - max(accrualTime)
     }
 
-    nParameters <- ifelse(identical(designPlan$.objectType, "power"), 1, length(lambda1))
+    nParameters <- ifelse(designPlan$.isPowerObject(), 1, length(lambda1))
 
     criticalValuesEffectScaleUpper <- matrix(, nrow = design$kMax, ncol = nParameters)
     criticalValuesEffectScaleLower <- matrix(, nrow = design$kMax, ncol = nParameters)

@@ -1113,7 +1113,6 @@ NULL
     if (isFALSE(stageResults$directionUpper)) {
         thetaH1 <- -thetaH1
     }
-    
 
     criticalValues <- .getCriticalValues(design)
     weightsFisher <- stageResults$weightsFisher
@@ -1262,7 +1261,7 @@ NULL
         ))
     }
 
-    thetaRange <- .assertIsValidThetaRange(thetaRange = thetaRange, survivalDataEnabled = TRUE)
+    thetaRange <- .assertIsValidThetaRange(theta = thetaRange, survivalDataEnabled = TRUE)
 
     condPowerValues <- rep(NA, length(thetaRange))
     likelihoodValues <- rep(NA, length(thetaRange))

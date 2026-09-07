@@ -241,6 +241,7 @@ NULL
         directionUpper = directionUpper,
         normalApproximation = normalApproximation
     )
+    
     results$.setStageResults(stageResults)
     .logProgress("Stage results calculated", startTime = startTime)
 

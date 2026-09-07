@@ -17,6 +17,26 @@
 #' @include f_logger.R
 NULL
 
+.getStandardizedEffectRatesEnrichment <- function(
+        piTreatments,
+        piControls,
+        thetaH0,
+        allocationRatioPlanned,
+        directionUpper,
+        adjustment = 0) {
+    standardizedEffect <- (piTreatments - piControls - thetaH0) /
+        sqrt(
+            piTreatments * (1 - piTreatments) +
+                allocationRatioPlanned * piControls * (1 - piControls)
+        ) * sqrt(1 + allocationRatioPlanned)
+
+    if (isFALSE(directionUpper)) {
+        standardizedEffect <- -standardizedEffect
+    }
+
+    return(standardizedEffect + adjustment)
+}
+
 .calcRatesTestStatistics <- function(
         dataInput,
         subset,
@@ -1142,11 +1162,14 @@ NULL
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
 
-    standardizedEffect <- (piTreatments - piControls - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-        allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    if (isFALSE(stageResults$directionUpper)) {
-        standardizedEffect <- -standardizedEffect
-    }
+    standardizedEffect <- .getStandardizedEffectRatesEnrichment(
+        piTreatments = piTreatments,
+        piControls = piControls,
+        thetaH0 = stageResults$thetaH0,
+        allocationRatioPlanned = allocationRatioPlanned,
+        directionUpper = stageResults$directionUpper,
+        adjustment = adjustment
+    )
     
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
@@ -1268,11 +1291,14 @@ NULL
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
     
-    standardizedEffect <- (piTreatments - piControls) / sqrt(piTreatments * (1 - piTreatments) +
-        allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    if (isFALSE(stageResults$directionUpper)) {
-        standardizedEffect <- -standardizedEffect
-    }
+    standardizedEffect <- .getStandardizedEffectRatesEnrichment(
+        piTreatments = piTreatments,
+        piControls = piControls,
+        thetaH0 = stageResults$thetaH0,
+        allocationRatioPlanned = allocationRatioPlanned,
+        directionUpper = stageResults$directionUpper,
+        adjustment = adjustment
+    )
 
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 

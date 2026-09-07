@@ -1577,7 +1577,7 @@ NULL
         assumedStDevs <- rep(assumedStDevs, gMax)
     }
 
-    thetaRange <- .assertIsValidThetaRange(thetaRange = thetaRange)
+    thetaRange <- .assertIsValidThetaRange(theta = thetaRange)
 
     treatmentArms <- numeric(gMax * length(thetaRange))
     effectValues <- numeric(gMax * length(thetaRange))

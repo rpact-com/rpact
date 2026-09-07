@@ -105,8 +105,8 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
     public = list(
         .plotSettings = NULL,
         .design = NULL,
-        .objectType = NULL, # "sampleSize" or "power"
-        initialize = function(design, ..., objectType = c("sampleSize", "power")) {
+        .objectType = NULL, 
+        initialize = function(design, ..., objectType = c("undefined", "sampleSize", "power")) {
             self$.design <- design
             self$.objectType <- match.arg(objectType)
 
@@ -171,6 +171,9 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing trial plan objects"
             self$.resetCat()
+            if (identical(self$.objectType, "undefined")) {
+                showType <- 2
+            }           
             if (showType == 3) {
                 .createSummary(self, digits = digits)$.show(
                     showType = 1,

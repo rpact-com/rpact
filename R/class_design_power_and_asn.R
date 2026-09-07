@@ -68,7 +68,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             self$theta <- theta
             self$nMax <- nMax
 
-            self$theta <- .assertIsValidThetaRange(thetaRange = theta, thetaAutoSeqEnabled = FALSE)
+            self$theta <- .assertIsValidThetaRange(theta = theta, thetaAutoSeqEnabled = FALSE)
             self$.initPowerAndAverageSampleNumber()
         },
         show = function(showType = 1, digits = NA_integer_) {

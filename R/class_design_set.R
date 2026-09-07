@@ -854,7 +854,7 @@ as.data.frame.TrialDesignSet <- function(
     }
 
     fCall <- match.call(expand.dots = FALSE)
-    theta <- .assertIsValidThetaRange(thetaRange = theta, thetaAutoSeqEnabled = (as.character(fCall$theta)[1] != "seq"))
+    theta <- .assertIsValidThetaRange(theta = theta, thetaAutoSeqEnabled = (as.character(fCall$theta)[1] != "seq"))
 
     if (addPowerAndAverageSampleNumber) {
         .assertAssociatedArgumentsAreDefined(
@@ -1149,7 +1149,7 @@ plot.TrialDesignSet <- function(
     .assertIsSingleCharacter(xlab, "xlab", naAllowed = TRUE)
     .assertIsSingleCharacter(ylab, "ylab", naAllowed = TRUE)
     .assertIsSingleCharacter(palette, "palette", naAllowed = TRUE)
-    theta <- .assertIsValidThetaRange(thetaRange = theta)
+    theta <- .assertIsValidThetaRange(theta = theta)
     .assertIsSingleNumber(nMax, "nMax", naAllowed = TRUE)
     .assertIsInClosedInterval(nMax, "nMax", lower = 1L, upper = 1e10, naAllowed = TRUE)
     .assertIsSingleLogical(plotPointsEnabled, "plotPointsEnabled", naAllowed = TRUE)

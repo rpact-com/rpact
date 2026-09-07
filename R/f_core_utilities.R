@@ -1031,7 +1031,7 @@ getTestLabel <- function(x) {
     if (is.null(theta) || length(theta) == 0 || all(is.na(theta))) {
         theta <- seq(-1, 1, 0.02)
     }
-    theta <- .assertIsValidThetaRange(thetaRange = theta)
+    theta <- .assertIsValidThetaRange(theta = theta)
     return(theta)
 }
 

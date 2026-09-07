@@ -2173,7 +2173,7 @@ plot.AnalysisResults <- function(
             )
         } else {
             thetaRange <- .assertIsValidThetaRange(
-                thetaRange = thetaRange,
+                theta = thetaRange,
                 survivalDataEnabled = x$getDataInput()$isDatasetSurvival()
             )
         }

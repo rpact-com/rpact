@@ -654,6 +654,8 @@ getPowerRates <- function(
         )
     }
 
+    pi1 <- designPlan$pi1
+    pi2 <- designPlan$pi2
     allocationRatioPlanned <- designPlan$allocationRatioPlanned
 
     theta <- rep(NA_real_, length(pi1))

@@ -2246,38 +2246,38 @@ NULL
 
 .assertIsValidThetaRange <- function(
         ...,
-        thetaRange,
+        theta,
         thetaAutoSeqEnabled = TRUE,
         survivalDataEnabled = FALSE) {
-    if (is.null(thetaRange) || (thetaAutoSeqEnabled && length(thetaRange) <= 1) ||
-            anyNA(thetaRange)) {
-        stopIllegalArgument("'thetaRange' (", .arrayToString(thetaRange), ") must be a vector ",
+    if (is.null(theta) || (thetaAutoSeqEnabled && length(theta) <= 1) ||
+            anyNA(theta)) {
+        stopIllegalArgument("'theta' (", .arrayToString(theta), ") must be a vector ",
             "with two entries defining minimum and maximum ",
             "or a sequence of numeric values with length > 2",
             functionName = ".assertIsValidThetaRange",
-            parameter = "thetaRange",
-            value = thetaRange
+            parameter = "theta",
+            value = theta
         )
-    } else if (length(thetaRange) == 2 && thetaAutoSeqEnabled) {
-        minValue <- thetaRange[1]
-        maxValue <- thetaRange[2]
+    } else if (length(theta) == 2 && thetaAutoSeqEnabled) {
+        minValue <- theta[1]
+        maxValue <- theta[2]
         if (survivalDataEnabled) {
-            minValue <- .assertIsValidHazardRatio(minValue, "thetaRange[1]")
-            maxValue <- .assertIsValidHazardRatio(maxValue, "thetaRange[2]")
+            minValue <- .assertIsValidHazardRatio(minValue, "theta[1]")
+            maxValue <- .assertIsValidHazardRatio(maxValue, "theta[2]")
         }
         if (minValue >= maxValue) {
-            stopIllegalArgument("'thetaRange' with length 2 must contain ",
+            stopIllegalArgument("'theta' with length 2 must contain ",
                 "minimum < maximum (", minValue, " >= ", maxValue, ")",
                 functionName = ".assertIsValidThetaRange",
-                parameter = "thetaRange",
-                value = thetaRange
+                parameter = "theta",
+                value = theta
             )
         }
         by <- (maxValue - minValue) / C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT
-        thetaRange <- seq(minValue, maxValue, by)
+        theta <- seq(minValue, maxValue, by)
     }
 
-    invisible(thetaRange)
+    invisible(theta)
 }
 
 .assertIsValidPiTreatmentRange <- function(..., piTreatmentRange, piAutoSeqEnabled = TRUE) {

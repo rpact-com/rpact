@@ -208,7 +208,7 @@ NULL
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
     type <- .assertIsAvailablePlotType(simulationResults, type, 
         functionName = ".plotSimulationResults")
-    theta <- .assertIsValidThetaRange(thetaRange = theta)
+    theta <- .assertIsValidThetaRange(theta = theta)
 
     if (is.null(plotSettings)) {
         plotSettings <- simulationResults$.plotSettings

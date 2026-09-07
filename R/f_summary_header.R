@@ -758,7 +758,7 @@ NULL
     if (is.na(powerEnabled)) {
         powerEnabled <- .isTrialDesignGroupSequentialOrFixed(design) &&
             (is.null(designPlan) || (!.isSimulationResults(designPlan) &&
-                !identical("power", designPlan[[".objectType"]])))
+            designPlan$.isSampleSizeObject()))
     }
     header <- .concatenateSummaryText(header,
         paste0(

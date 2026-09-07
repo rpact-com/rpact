@@ -1198,6 +1198,22 @@ NULL
     )
 }
 
+.getStandardizedEffectMultiArmRates <- function(
+        piTreatments, piControl, allocationRatioPlanned, stageResults, 
+        adjustment) {
+    standardizedEffect <- (piTreatments - piControl - stageResults$thetaH0) /
+        sqrt(piTreatments * (1 - piTreatments) +
+                allocationRatioPlanned * piControl * (1 - piControl)) *
+        sqrt(1 + allocationRatioPlanned)
+
+    if (!stageResults$directionUpper) {
+        standardizedEffect <- -standardizedEffect
+    }
+
+    standardizedEffect <- standardizedEffect + adjustment
+    return(standardizedEffect)
+}
+
 #'
 #' Calculation of conditional power based on inverse normal method
 #'
@@ -1241,11 +1257,8 @@ NULL
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
 
-    standardizedEffect <- (piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-        allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    if (isFALSE(stageResults$directionUpper)) {
-        standardizedEffect <- -standardizedEffect
-    }
+    standardizedEffect <- .getStandardizedEffectMultiArmRates(
+        piTreatments, piControl, allocationRatioPlanned, stageResults, adjustment)
     
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
@@ -1368,11 +1381,8 @@ NULL
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
 
-    standardizedEffect <- (piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-        allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    if (isFALSE(stageResults$directionUpper)) {
-        standardizedEffect <- -standardizedEffect
-    }
+    standardizedEffect <- .getStandardizedEffectMultiArmRates(
+        piTreatments, piControl, allocationRatioPlanned, stageResults, adjustment)
 
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
@@ -1478,11 +1488,8 @@ NULL
 
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    standardizedEffect <- (piTreatments - piControl - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-        allocationRatioPlanned * piControl * (1 - piControl)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    if (isFALSE(stageResults$directionUpper)) {
-        standardizedEffect <- -standardizedEffect
-    }
+    standardizedEffect <- .getStandardizedEffectMultiArmRates(
+        piTreatments, piControl, allocationRatioPlanned, stageResults, adjustment)
     
     ctr <- .getClosedConditionalDunnettTestResults(stageResults = stageResults, design = design, stage = stage)
 
