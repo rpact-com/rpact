@@ -2647,13 +2647,14 @@ NULL
 .warnInCaseOfChangedDirectionUpperSurvivalDefault <- function(
         directionUpper,
         default,
-        sided,
+        design,
         ...,
         userFunctionCallEnabled = TRUE) {
     if (userFunctionCallEnabled &&
-            sided == 1 &&
+            design$sided == 1 &&
             identical(default, C_DIRECTION_UPPER_SURVIVAL_DEFAULT) &&
-            isTRUE(is.na(directionUpper))) {
+            isTRUE(is.na(directionUpper)) &&
+            isTRUE(is.na(design$directionUpper))) {
         warning(
             "The default value of 'directionUpper' for survival endpoints has changed ",
             "from TRUE to FALSE. Please specify 'directionUpper' explicitly to avoid this warning.",
@@ -2677,7 +2678,7 @@ NULL
         .warnInCaseOfChangedDirectionUpperSurvivalDefault(
             directionUpper,
             default,
-            design$sided,
+            design,
             userFunctionCallEnabled = userFunctionCallEnabled
         )
     }

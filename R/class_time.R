@@ -1014,7 +1014,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 } else {
                     .assertIsSingleNumber(self$pi2, "pi2")
                     self$.setParameterType("pi2", 
-                        ifelse(.isPi2Default(self$pi2, endpoint = "survival"),
+                        ifelse(isTRUE(.isPi2Default(self$pi2, endpoint = "survival")),
                         C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
                     ))
                     if (!anyNA(self$median2)) {
@@ -1351,11 +1351,11 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             if (!is.na(self$eventTime) && self$isUserDefinedParameter("eventTime")) {
                 warning("'eventTime' (", round(self$eventTime, 3), ") will be ignored", call. = FALSE)
             }
-            if (!.isPi1Default(self$pi1, type = "sampleSize", endpoint = "survival") &&
-                    !.isPi1Default(self$pi1, type = "power", endpoint = "survival")) {
+            if (isFALSE(.isPi1Default(self$pi1, type = "sampleSize", endpoint = "survival")) &&
+                    isFALSE(.isPi1Default(self$pi1, type = "power", endpoint = "survival"))) {
                 warning("'pi1' (", .arrayToString(self$pi1), ") will be ignored", call. = FALSE)
             }
-            if (!.isPi2Default(self$pi2, endpoint = "survival")) {
+            if (isFALSE(.isPi2Default(self$pi2, endpoint = "survival"))) {
                 warning("'pi2' (", self$pi2, ") will be ignored", call. = FALSE)
             }
 

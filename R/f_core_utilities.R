@@ -2407,6 +2407,10 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
 }
 
 .isPi1Default <- function(pi1, type = c("sampleSize", "power"), endpoint = c("rates", "survival")) {
+    if (all(is.na(pi1))) {
+        return(NA)
+    }
+    
     type <- match.arg(type)
     endpoint <- match.arg(endpoint)
     pi1Default <- .getPi1Default(type = type, endpoint = endpoint)
@@ -2414,6 +2418,10 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
 }
 
 .isPi2Default <- function(pi2, endpoint = c("rates", "survival")) {
+    if (all(is.na(pi2))) {
+        return(NA)
+    }
+    
     endpoint <- match.arg(endpoint)
     pi2Default <- .getPi2Default(endpoint = endpoint)
     return(identical(pi2, pi2Default))
