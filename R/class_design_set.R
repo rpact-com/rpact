@@ -854,7 +854,7 @@ as.data.frame.TrialDesignSet <- function(
     }
 
     fCall <- match.call(expand.dots = FALSE)
-    theta <- .assertIsValidThetaRange(thetaRange = theta, thetaAutoSeqEnabled = (as.character(fCall$theta)[1] != "seq"))
+    theta <- .assertIsValidThetaRange(theta = theta, thetaAutoSeqEnabled = (as.character(fCall$theta)[1] != "seq"))
 
     if (addPowerAndAverageSampleNumber) {
         .assertAssociatedArgumentsAreDefined(
@@ -1014,28 +1014,11 @@ plot.TrialDesignSet <- function(
         plotSettings = NULL) {
     .assertIsValidPlotType(type, naAllowed = TRUE)
     .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
+    type <- .assertIsAvailablePlotType(x, type, 
+        functionName = "plot.TrialDesignSet")
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
-    }
-
-    availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
-    if (length(availablePlotTypes) == 0) {
-        stopIllegalArgument("no plot type available for the specified design",
-            functionName = "plot.TrialDesignSet"
-        )
-    }
-    if (is.na(type)) {
-        type <- availablePlotTypes[1]
-    }
-    if (!(type %in% availablePlotTypes)) {
-        stopIllegalArgument(
-            "'type' (", type, ") is not available; 'type' can ",
-            ifelse(length(availablePlotTypes) == 1, "only ", ""), "be ",
-            .arrayToString(availablePlotTypes, mode = "or"),
-            functionName = "plot.TrialDesignSet",
-            parameter = "type", value = type
-        )
     }
 
     args <- list(
@@ -1166,13 +1149,15 @@ plot.TrialDesignSet <- function(
     .assertIsSingleCharacter(xlab, "xlab", naAllowed = TRUE)
     .assertIsSingleCharacter(ylab, "ylab", naAllowed = TRUE)
     .assertIsSingleCharacter(palette, "palette", naAllowed = TRUE)
-    theta <- .assertIsValidThetaRange(thetaRange = theta)
+    theta <- .assertIsValidThetaRange(theta = theta)
     .assertIsSingleNumber(nMax, "nMax", naAllowed = TRUE)
     .assertIsInClosedInterval(nMax, "nMax", lower = 1L, upper = 1e10, naAllowed = TRUE)
     .assertIsSingleLogical(plotPointsEnabled, "plotPointsEnabled", naAllowed = TRUE)
     .assertIsValidLegendPosition(legendPosition)
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-
+    type <- .assertIsAvailablePlotType(x, type, availablePlotTypes = c(1:9), 
+        functionName = ".plotTrialDesignSet")
+    
     parameterSet <- x
     designMaster <- parameterSet$getDesignMaster()
     .assertIsTrialDesign(designMaster)
@@ -1226,12 +1211,9 @@ plot.TrialDesignSet <- function(
         xParameterName <- "theta"
         yParameterNames <- "averageSampleNumber"
     } else {
-        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 9",
-            functionName = ".plotTrialDesignSet",
-            parameter = "type", value = type
-        )
+        .showPlotTypeNotImplementedError(type, ".plotTrialDesignSet", x)
     }
-
+    
     if (type >= 5 && type <= 9) {
         designSetName <- paste0(
             "getPowerAndAverageSampleNumber(", designSetName,

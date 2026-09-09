@@ -6,7 +6,7 @@
 \arguments{
 \item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
 default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
-\code{seq(0.4, 0.6, 0.1)} (sample size calculations).}
+\code{c(0.1, 0.2, 0.3)} (sample size calculations).}
 }
 \description{
 Parameter Description: Pi (1) for Survival Data

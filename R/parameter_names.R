@@ -16,12 +16,16 @@
 
 C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     iterations = "Iterations",
+    simulationType = "Simulation type",
     seed = "Seed",
     groups = "Treatment groups",
     stages = "Stages",
     sampleSizes = "Sample sizes",
     means = "Means",
     stDevs = "Standard deviations",
+    estimates = "Estimates",
+    degreesOfFreedom = "Degrees of freedom",
+    standardErrors = "Standard errors",
     overallEvents = "Cumulative events",
     overallEvents1 = "Cumulative events (1)",
     overallEvents2 = "Cumulative events (2)",
@@ -67,7 +71,6 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     probs = "Exit probabilities",
     power = "Power",
     theta = "Effect",
-    direction = "Direction",
     normalApproximation = "Normal approximation",
     conservative = "Conservative",
     equalVariances = "Equal variances",
@@ -88,9 +91,9 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     pi1 = "Assumed treatment rate",
     pi2 = "Assumed control rate",
     lambdaTreatment = "Lambda",
-    lambdaControl = "Lambda {control}",
+    lambdaControl = "Lambda (control)",
     medianTreatment = "Median",
-    medianControl = "Median {control}",
+    medianControl = "Median (control)",
     overallPi1 = "Cumulative treatment rate",
     overallPi2 = "Cumulative control rate",
     pi1H1 = "pi(1) under H1",
@@ -126,6 +129,9 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     overallSampleSizes2 = "Cumulative sample sizes (2)",
     overallTestStatistics = "Overall test statistics",
     overallPValues = "Overall p-values",
+    overallEstimates = "Cumulative estimates",
+    overallStandardErrors = "Cumulative standard errors",
+    overallDegreesOfFreedom = "Cumulative degrees of freedom",
     overallMeans = "Cumulative means",
     overallMeans1 = "Cumulative means (1)",
     overallMeans2 = "Cumulative means (2)",
@@ -184,7 +190,6 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     expectedEventsH0 = "Expected number of events under H0",
     expectedEventsH01 = "Expected number of events under H0/H1",
     expectedEventsH1 = "Expected number of events under H1",
-    studyDurationH1 = "Expected study duration under H1",
     twoSidedPower = "Two-sided power",
     plannedEvents = "Planned cumulative events",
     plannedSubjects = "Planned cumulative subjects", # per arm (multi-arm); overall (base)
@@ -200,7 +205,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     subjects = "Subjects",
     futilityStop = "Overall futility stop",
     studyDuration = "Expected study duration",
-    maxStudyDuration = "Maximal study duration",
+    maxStudyDuration = "Maximum study duration",
     directionUpper = "Direction upper",
     piecewiseSurvivalTime = "Piecewise survival times",
     lambda1 = "lambda(1)",
@@ -329,7 +334,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     calendarTime = "Calendar time",
     studyTime = "Study time",
     studySubjects = "Study subjects",
-    expectedStudyDurationH1 = "Expected study duration under H1",
+    expectedStudyDurationH1 = "Expected study duration under H1", # deprecated
     informationOverStages = "Information over stages",
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
@@ -423,6 +428,22 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     if (inherits(obj, "PlotSettings")) {
         return(C_PARAMETER_NAMES_PLOT_SETTINGS[[parameterName]])
     }
+    
+    if (identical(parameterName, "lambdaControl") && equals(obj$activeArms, 1L)) {
+        return("Lambda (2)")
+    }
+    
+    if (identical(parameterName, "medianControl") && equals(obj$activeArms, 1L)) {
+        return("Median (2)")
+    }
+    
+    if (identical(parameterName, "dropoutRate1") && !equals(obj$activeArms, 1L)) {
+        return("Drop-out rate (per arm)")
+    }
+    
+    if (identical(parameterName, "dropoutRate2") && !equals(obj$activeArms, 1L)) {
+        return("Drop-out rate (control)")
+    }
 
     pluralExt <- ifelse(tableOutputEnabled, "", "s")
 
@@ -469,7 +490,20 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
         return("Study duration")
     }
 
+    if (identical(parameterName, "futilityPerStage") && !is.null(obj$.design) && 
+            !is.null(obj$.design$kMax) && obj$.design$kMax <= 2L) {
+        return("Futility stop")
+    }
+
     if (inherits(obj, "AnalysisResults")) {
+        if (!is.null(obj[[".dataInput"]]) && obj$.dataInput$isDatasetGeneral()) {
+            if (identical(parameterName, "estimates")) {
+                return("Estimate")
+            }
+            if (identical(parameterName, "standardErrors")) {
+                return("Standard error")
+            }
+        }
         if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds") &&
                 .isTrialDesignConditionalDunnett(obj$.design)) {
             return(paste0("Overall confidence interval", pluralExt, " (lower)"))

@@ -373,11 +373,11 @@ SimulationResults <- R6::R6Class(
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
 
                     if (multiArmSurvivalEnabled) {
-                        self$.cat(
-                            "  (i): values of treatment arm i compared to control\n",
-                            consoleOutputEnabled = consoleOutputEnabled
-                        )
-                        self$.cat("  {j}: values of treatment arm j\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
+                        if (!identical(as.integer(self$activeArms), 1L)) {
+                            self$.cat("  {j}: values of treatment arm j compared to control\n",
+                                consoleOutputEnabled = consoleOutputEnabled)
+                        }
                     } else if (enrichmentEnabled) {
                         matrixName <- .getSimulationEnrichmentEffectMatrixName(self)
                         if (nrow(self$effectList[[matrixName]]) > 1) {
@@ -1097,6 +1097,8 @@ SimulationResultsBaseSurvival <- R6::R6Class(
         minNumberOfEventsPerStage = NULL,
         plannedEvents = NULL,
         thetaH1 = NULL,
+        studyDuration = NULL,
+        maxStudyDuration = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             generatedParams <- c(
@@ -1114,6 +1116,7 @@ SimulationResultsBaseSurvival <- R6::R6Class(
             for (generatedParam in generatedParams) {
                 self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
+            self$.setParameterType("maxStudyDuration", C_PARAM_NOT_APPLICABLE)
         }
     )
 )
@@ -1233,7 +1236,6 @@ SimulationResultsSurvival <- R6::R6Class(
         piecewiseSurvivalTime = NULL,
         rejectPerStage = NULL,
         singleEventsPerStage = NULL,
-        studyDuration = NULL,
         thetaH0 = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
@@ -1340,6 +1342,7 @@ SimulationResultsSurvival <- R6::R6Class(
 #' @template field_singleEventsPerArmAndStage
 #' @template field_singleEventsPerStage
 #' @template field_singleNumberOfEventsPerStage
+#' @template field_simulationType
 #' @template field_slope
 #' @template field_studyDuration
 #' @template field_successPerStage
@@ -1411,8 +1414,8 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         singleEventsPerArmAndStage = NULL,
         singleEventsPerStage = NULL, # only necessary for old simulation routine
         singleNumberOfEventsPerStage = NULL, # only necessary for old simulation routine
+        simulationType = NULL,
         slope = NULL,
-        studyDuration = NULL,
         successCriterion = NULL,
         successPerStage = NULL,
         threshold = NULL,
@@ -1693,6 +1696,7 @@ SimulationResultsEnrichmentRates <- R6::R6Class(
 #' @template field_selectedPopulations
 #' @template field_selectPopulationsFunction
 #' @template field_singleNumberOfEventsPerStage
+#' @template field_simulationType
 #' @template field_stratifiedAnalysis
 #' @template field_studyDuration
 #' @template field_successCriterion
@@ -1754,8 +1758,8 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
         rValue = NULL,
         selectedPopulations = NULL,
         selectPopulationsFunction = NULL,
+        simulationType = NULL,
         stratifiedAnalysis = NULL,
-        studyDuration = NULL,
         successCriterion = NULL,
         successPerStage = NULL,
         threshold = NULL,

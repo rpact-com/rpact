@@ -577,7 +577,7 @@
         followUpTime <- studyTime - max(accrualTime)
     }
 
-    nParameters <- ifelse(identical(designPlan$.objectType, "power"), 1, length(lambda1))
+    nParameters <- ifelse(designPlan$.isPowerObject(), 1, length(lambda1))
 
     criticalValuesEffectScaleUpper <- matrix(, nrow = design$kMax, ncol = nParameters)
     criticalValuesEffectScaleLower <- matrix(, nrow = design$kMax, ncol = nParameters)
@@ -739,10 +739,23 @@
             functionName = ".getDirectionUpperCalculated"
         )
     }
+    
+    if (length(unique(directionUpperCalculated)) > 1) {
+        stopRuntimeIssue("Cannot determine the direction of the test. ",
+            "The calculated 'directionUpper' values are inconsistent: ",
+            .arrayToString(directionUpperCalculated),
+            functionName = ".getDirectionUpperCalculated"
+        )
+    }
+    
+    if (length(unique(directionUpperCalculated)) == 1) {
+        directionUpperCalculated <- directionUpperCalculated[1]
+    }
+    
     return(directionUpperCalculated)
 }
 
-.setDirectionUpper <- function(designPlan) {
+.setDirectionUpperDesignPlan <- function(designPlan) {
     if (!designPlan$.isSampleSizeObject()) {
         if (is.null(designPlan$directionUpper) || all(is.na(designPlan$directionUpper))) {
             designPlan$directionUpper <- ifelse(.isTrialDesignPlanSurvival(designPlan), 
@@ -784,7 +797,7 @@
     .assertIsTrialDesignPlan(designPlan)
 
     design <- designPlan$.design
-    .setDirectionUpper(designPlan)
+    .setDirectionUpperDesignPlan(designPlan)
     if (.isTrialDesignPlanMeans(designPlan)) {
         if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
             designPlan$maxNumberOfSubjects <- designPlan$nFixed

@@ -265,18 +265,8 @@
     .assertIsTrialDesignPlan(designPlan)
     .assertIsValidLegendPosition(legendPosition)
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-
-    availablePlotTypes <- getAvailablePlotTypes(designPlan,
-        output = "numeric", numberInCaptionEnabled = FALSE
-    )
-    if (!(type %in% availablePlotTypes)) {
-        stopIllegalArgument("'type' (", type, ") is not available; 'type' can ", ifelse(length(availablePlotTypes) ==
-            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"),
-        functionName = ".plotTrialDesignPlan",
-        parameter = "type", value = type
-        )
-    }
-
+    type <- .assertIsAvailablePlotType(designPlan, type, functionName = ".plotTrialDesignPlan")
+    
     survivalDesignPlanEnabled <- .isTrialDesignPlanSurvival(designPlan)
 
     nMax <- NA_integer_
@@ -1079,16 +1069,10 @@
                 ...
             ))
         } else {
-            stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 14",
-                functionName = ".plotTrialDesignPlan",
-                parameter = "type", value = type
-            )
+            .showPlotTypeNotImplementedError(type, ".plotTrialDesignPlan", designPlan)
         }
     } else {
-        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 9",
-            functionName = ".plotTrialDesignPlan",
-            parameter = "type", value = type
-        )
+        .showPlotTypeNotImplementedError(type, ".plotTrialDesignPlan", designPlan)
     }
 
     if (!is.null(srcCmd)) {

@@ -37,6 +37,7 @@
 #' \code{StageResults} is the basic class for
 #' \itemize{
 #'   \item \code{\link{StageResultsMeans}},
+#'   \item \code{\link{StageResultsGeneral}},
 #'   \item \code{\link{StageResultsRates}},
 #'   \item \code{\link{StageResultsSurvival}},
 #'   \item \code{\link{StageResultsMultiArmMeans}},
@@ -70,7 +71,7 @@ StageResults <- R6::R6Class("StageResults",
         weightsFisher = NULL,
         weightsInverseNormal = NULL,
         thetaH0 = NULL,
-        direction = NULL,
+        directionUpper = NULL,
         initialize = function(
                 ...,
                 stage = NULL,
@@ -79,14 +80,15 @@ StageResults <- R6::R6Class("StageResults",
                 weightsFisher = NULL,
                 weightsInverseNormal = NULL,
                 thetaH0 = NULL,
-                direction = NULL) {
+                directionUpper = NULL
+                ) {
             self$stage <- stage
             self$stages <- stages
             self$pValues <- pValues
             self$weightsFisher <- weightsFisher
             self$weightsInverseNormal <- weightsInverseNormal
             self$thetaH0 <- thetaH0
-            self$direction <- direction
+            self$directionUpper <- directionUpper
             super$initialize(...)
         },
         init = function(design, dataInput) {
@@ -108,11 +110,13 @@ StageResults <- R6::R6Class("StageResults",
             self$.setParameterType("pValues", ifelse(
                 self$.isMultiArm(), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED
             ))
+            thetaH0Default <- ifelse(
+                self$isDatasetMeans(), C_THETA_H0_MEANS_DEFAULT,
+                ifelse(self$isDatasetRates(), C_THETA_H0_RATES_DEFAULT, C_THETA_H0_SURVIVAL_DEFAULT)
+            )
             self$.setParameterType("thetaH0", ifelse(
-                isTRUE(all.equal(self$thetaH0, C_THETA_H0_MEANS_DEFAULT)), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-            ))
-            self$.setParameterType("direction", ifelse(
-                identical(self$direction, C_DIRECTION_UPPER), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                equals(self$thetaH0, thetaH0Default), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         getPlotSettings = function() {
@@ -161,9 +165,6 @@ StageResults <- R6::R6Class("StageResults",
                 }
             }
         },
-        isDirectionUpper = function() {
-            return(self$direction == C_DIRECTION_UPPER)
-        },
         .isMultiArm = function() {
             return(grepl("multi", tolower(.getClassName(self))))
         },
@@ -193,7 +194,9 @@ StageResults <- R6::R6Class("StageResults",
                 s <- paste(s, "enrichment")
             }
 
-            if (grepl("Means", .getClassName(self))) {
+            if (grepl("General", .getClassName(self))) {
+                s <- paste(s, "general estimates")
+            } else if (grepl("Means", .getClassName(self))) {
                 s <- paste(s, "means")
             }
 
@@ -226,6 +229,9 @@ StageResults <- R6::R6Class("StageResults",
         isDatasetMeans = function() {
             return(self$.dataInput$isDatasetMeans())
         },
+        isDatasetGeneral = function() {
+            return(self$.dataInput$isDatasetGeneral())
+        },
         isDatasetRates = function() {
             return(self$.dataInput$isDatasetRates())
         },
@@ -254,6 +260,82 @@ StageResults <- R6::R6Class("StageResults",
 )
 
 #'
+#' @name StageResultsGeneral
+#'
+#' @title Stage Results of General Estimates
+#'
+#' @description
+#' Class for stage results calculated from endpoint-independent estimates,
+#' standard errors, and degrees of freedom.
+#'
+#' @keywords internal
+#'
+StageResultsGeneral <- R6::R6Class("StageResultsGeneral",
+    inherit = StageResults,
+    public = list(
+        combInverseNormal = NULL,
+        combFisher = NULL,
+        overallTestStatistics = NULL,
+        overallPValues = NULL,
+        effectSizes = NULL,
+        testStatistics = NULL,
+        overallEstimates = NULL,
+        overallStandardErrors = NULL,
+        overallDegreesOfFreedom = NULL,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
+                combInverseNormal = NULL,
+                combFisher = NULL,
+                overallTestStatistics = NULL,
+                overallPValues = NULL,
+                effectSizes = NULL,
+                testStatistics = NULL,
+                overallEstimates = NULL,
+                overallStandardErrors = NULL,
+                overallDegreesOfFreedom = NULL) {
+            super$initialize(.design = design, .dataInput = dataInput, ...)
+
+            self$combInverseNormal <- combInverseNormal
+            self$combFisher <- combFisher
+            self$overallTestStatistics <- overallTestStatistics
+            self$overallPValues <- overallPValues
+            self$effectSizes <- effectSizes
+            self$testStatistics <- testStatistics
+            self$overallEstimates <- overallEstimates
+            self$overallStandardErrors <- overallStandardErrors
+            self$overallDegreesOfFreedom <- overallDegreesOfFreedom
+
+            self$init(design = design, dataInput = dataInput)
+
+            for (parameterName in self$.getParametersToShow()) {
+                self$.setParameterType(parameterName, C_PARAM_GENERATED)
+            }
+        },
+        .getParametersToShow = function() {
+            parametersToShow <- c(
+                "stages",
+                "overallTestStatistics",
+                "overallPValues",
+                "overallEstimates",
+                "overallStandardErrors",
+                "overallDegreesOfFreedom",
+                "testStatistics",
+                "pValues",
+                "effectSizes"
+            )
+            if (.isTrialDesignInverseNormal(self$.design)) {
+                parametersToShow <- c(parametersToShow, "combInverseNormal", "weightsInverseNormal")
+            } else if (.isTrialDesignFisher(self$.design)) {
+                parametersToShow <- c(parametersToShow, "combFisher", "weightsFisher")
+            }
+            return(c(parametersToShow, "thetaH0", "directionUpper"))
+        }
+    )
+)
+
+#'
 #' @name StageResultsMeans
 #'
 #' @title
@@ -269,6 +351,7 @@ StageResults <- R6::R6Class("StageResults",
 #' @template field_overallPValues
 #' @template field_effectSizes
 #' @template field_testActions
+#' @template field_directionUpper
 #' @template field_direction
 #' @template field_normalApproximation
 #' @template field_equalVariances
@@ -423,7 +506,7 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation"
             )
             if (self$.dataInput$getNumberOfGroups() == 2) {
@@ -568,7 +651,7 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
             parametersToShow <- c(
                 "stages",
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation",
                 "directionUpper",
                 "varianceOption",
@@ -615,6 +698,7 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
 #' @template field_pValues
 #' @template field_overallPValues
 #' @template field_effectSizes
+#' @template field_directionUpper
 #' @template field_direction
 #' @template field_testActions
 #' @template field_thetaH0
@@ -765,7 +849,7 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation"
             )
             return(parametersToShow)
@@ -896,7 +980,7 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
             parametersToShow <- c(
                 "stages",
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation",
                 "directionUpper",
                 "overallPiControl",
@@ -1054,7 +1138,7 @@ StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
-                "direction"
+                "directionUpper"
             )
             return(parametersToShow)
         }
@@ -1170,7 +1254,6 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
             parametersToShow <- c(
                 "stages",
                 "thetaH0",
-                "direction",
                 "directionUpper",
                 "intersectionTest",
                 "overallTestStatistics",

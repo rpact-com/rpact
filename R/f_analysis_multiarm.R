@@ -342,10 +342,10 @@ NULL
                         diag(sigma) <- 1
                     }
 
-                    if (stageResults$directionUpper) {
-                        maxTestStatistic <- max(stageResults$testStatistics[indices[i, ] == 1, k], na.rm = TRUE)
-                    } else {
+                    if (isFALSE(stageResults$directionUpper)) {
                         maxTestStatistic <- max(-stageResults$testStatistics[indices[i, ] == 1, k], na.rm = TRUE)
+                    } else {
+                        maxTestStatistic <- max(stageResults$testStatistics[indices[i, ] == 1, k], na.rm = TRUE)
                     }
 
                     df <- NA_real_
@@ -813,17 +813,17 @@ getClosedConditionalDunnettTestResults <- function(
     colnames(secondStagePValues) <- paste("stage ", (1:2), sep = "")
     dimnames(rejected) <- list(paste("arm ", 1:gMax, sep = ""), paste("stage ", (1:2), sep = ""))
     rejectedIntersections <- matrix(rep(FALSE, stage * nrow(indices)), nrow(indices), stage)
-
-    if (stageResults$directionUpper) {
-        signedTestStatistics <- stageResults$testStatistics
-        signedOverallTestStatistics <- stageResults$overallTestStatistics
-        signedOverallTestStatistics[, 2] <- sqrt(informationAtInterim) *
-            stageResults$testStatistics[, 1] + sqrt(1 - informationAtInterim) * stageResults$testStatistics[, 2]
-    } else {
+    
+    if (isFALSE(stageResults$directionUpper)) {
         signedTestStatistics <- -stageResults$testStatistics
         signedOverallTestStatistics <- -stageResults$overallTestStatistics
         signedOverallTestStatistics[, 2] <- -(sqrt(informationAtInterim) *
             stageResults$testStatistics[, 1] + sqrt(1 - informationAtInterim) * stageResults$testStatistics[, 2])
+    } else {
+        signedTestStatistics <- stageResults$testStatistics
+        signedOverallTestStatistics <- stageResults$overallTestStatistics
+        signedOverallTestStatistics[, 2] <- sqrt(informationAtInterim) *
+            stageResults$testStatistics[, 1] + sqrt(1 - informationAtInterim) * stageResults$testStatistics[, 2]
     }
 
     for (i in 1:(2^gMax - 1)) {
@@ -950,16 +950,16 @@ getClosedConditionalDunnettTestResults <- function(
                     stageResults$.dataInput$groups == (gMax + 1)])
     }
 
-    if (stageResults$directionUpper) {
-        signedTestStatistics <- stageResults$testStatistics
-        signedOverallTestStatistics <- stageResults$overallTestStatistics
-        signedOverallTestStatistics[, 2] <- sqrt(informationAtInterim) *
-            stageResults$testStatistics[, 1] + sqrt(1 - informationAtInterim) * stageResults$testStatistics[, 2]
-    } else {
+    if (isFALSE(stageResults$directionUpper)) {
         signedTestStatistics <- -stageResults$testStatistics
         signedOverallTestStatistics <- -stageResults$overallTestStatistics
         signedOverallTestStatistics[, 2] <- -(sqrt(informationAtInterim) *
             stageResults$testStatistics[, 1] + sqrt(1 - informationAtInterim) * stageResults$testStatistics[, 2])
+    } else {
+        signedTestStatistics <- stageResults$testStatistics
+        signedOverallTestStatistics <- stageResults$overallTestStatistics
+        signedOverallTestStatistics[, 2] <- sqrt(informationAtInterim) *
+            stageResults$testStatistics[, 1] + sqrt(1 - informationAtInterim) * stageResults$testStatistics[, 2]
     }
 
     zeta <- sqrt(frac1)

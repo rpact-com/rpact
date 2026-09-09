@@ -57,6 +57,13 @@ log-rank statistic.
 }
 A subset of variables is provided for \code{\link[=getSimulationMeans]{getSimulationMeans()}}, \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr
 \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
+Multi-arm simulation data additionally contain \code{selectedForNextStage}. At
+non-final stages, this logical value indicates whether the adaptation selected
+the arm to continue, conditional on the trial not stopping; it is \code{NA} at
+the final stage. In contrast,
+\code{rejectPerStage} indicates rejection of the arm's null hypothesis, while
+\code{futilityPerStage} is a trial-level futility-stopping decision repeated for
+the arm rows of the stage.
 }
 \examples{
 \dontrun{

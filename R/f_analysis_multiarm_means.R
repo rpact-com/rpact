@@ -344,7 +344,7 @@ NULL
         design,
         dataInput,
         thetaH0 = NA_real_,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
@@ -401,12 +401,18 @@ NULL
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
-        direction = ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER),
         normalApproximation = normalApproximation,
-        directionUpper = directionUpper,
         varianceOption = varianceOption,
         stage = stage
     )
+    
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "means",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         stageResults, "intersectionTest",
@@ -1297,11 +1303,11 @@ NULL
     }
     results$.setParameterType("assumedStDevs", C_PARAM_DEFAULT_VALUE)
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
-    } else {
-        standardizedEffect <- -(thetaH1 - stageResults$thetaH0) / assumedStDevs
+    standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
+    
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
     criticalValues <- .getCriticalValues(design)
 
@@ -1404,11 +1410,11 @@ NULL
     }
     results$.setParameterType("assumedStDevs", C_PARAM_DEFAULT_VALUE)
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
-    } else {
-        standardizedEffect <- -(thetaH1 - stageResults$thetaH0) / assumedStDevs
+    standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
+    
     nPlanned <- c(rep(NA_real_, stage), nPlanned)
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
@@ -1512,11 +1518,11 @@ NULL
     }
     results$.setParameterType("assumedStDevs", C_PARAM_DEFAULT_VALUE)
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
-    } else {
-        standardizedEffect <- -(thetaH1 - stageResults$thetaH0) / assumedStDevs
+    standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
+    
     ctr <- .getClosedConditionalDunnettTestResults(stageResults = stageResults, design = design, stage = stage)
 
     for (treatmentArm in 1:gMax) {
@@ -1571,7 +1577,7 @@ NULL
         assumedStDevs <- rep(assumedStDevs, gMax)
     }
 
-    thetaRange <- .assertIsValidThetaRange(thetaRange = thetaRange)
+    thetaRange <- .assertIsValidThetaRange(theta = thetaRange)
 
     treatmentArms <- numeric(gMax * length(thetaRange))
     effectValues <- numeric(gMax * length(thetaRange))

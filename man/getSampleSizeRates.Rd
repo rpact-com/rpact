@@ -12,8 +12,8 @@ getSampleSizeRates(
   conservative = TRUE,
   riskRatio = FALSE,
   thetaH0 = ifelse(riskRatio, 1, 0),
-  pi1 = c(0.4, 0.5, 0.6),
-  pi2 = 0.2,
+  pi1 = NA_real_,
+  pi2 = NA_real_,
   directionUpper = NA,
   allocationRatioPlanned = NA_real_
 )
@@ -41,11 +41,12 @@ sample size, for which power exceeds 1 - beta is calculated, default is \code{TR
 testing of H0: \code{pi1 / pi2 = thetaH0} is calculated, default is \code{FALSE}.}
 
 \item{thetaH0}{The null hypothesis value,
-default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+default is \code{0} for general estimates, the normal case, and the binary case,
 it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
+\item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
 \item \emph{means}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the mean ratio) can be specified.
 \item \emph{rates}: a value \code{!= 0}

@@ -494,6 +494,7 @@ getSimulationMultiArmSurvivalBasic <- function(
     dataAlternative <- rep(NA_real_, len)
     dataEffect <- rep(NA_real_, len)
     dataNumberOfEvents <- rep(NA_real_, len)
+    dataSelectedForNextStage <- rep(NA, len)
     dataRejectPerStage <- rep(NA, len)
     dataFutilityStop <- rep(NA_real_, len)
     dataSuccessStop <- rep(NA, len)
@@ -621,6 +622,9 @@ getSimulationMultiArmSurvivalBasic <- function(
                     dataAlternative[index] <- omegaMaxVector[i]
                     dataEffect[index] <- effectMatrix[i, g]
                     dataNumberOfEvents[index] <- round(stageResults$cumulativeEventsPerStage[g, k], 1)
+                    if (k < kMax) {
+                        dataSelectedForNextStage[index] <- closedTest$selectedArms[g, k + 1]
+                    }
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -753,6 +757,7 @@ getSimulationMultiArmSurvivalBasic <- function(
         pValue = dataPValuesSeparate,
         conditionalCriticalValue = round(dataConditionalCriticalValue, 6),
         conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6),
+        selectedForNextStage = dataSelectedForNextStage,
         rejectPerStage = dataRejectPerStage,
         successStop = dataSuccessStop,
         futilityPerStage = dataFutilityStop

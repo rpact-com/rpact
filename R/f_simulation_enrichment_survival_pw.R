@@ -63,6 +63,7 @@ NULL
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
 #' @inheritParams param_showStatistics
+#' @inheritParams param_maxNumberOfRawDatasetsPerStage
 #' @inheritParams param_stratifiedAnalysis
 #'
 #' @details
@@ -131,6 +132,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         maxNumberOfIterations = NA_integer_,
+        maxNumberOfRawDatasetsPerStage = 0,
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
@@ -167,6 +169,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         maxNumberOfSubjects,
         naAllowed = TRUE
     )
+    maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
+        maxNumberOfRawDatasetsPerStage)
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
@@ -328,7 +332,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         intersectionTest = intersectionTest,
         successCriterion = successCriterion,
         gMax = gMax,
-        kMax = kMax
+        kMax = kMax,
+        maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage
     )
 
     # Extract results from the simulation
@@ -362,7 +367,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$populationEventsPerStage <- simulatedPopulationEventsPerStage
     simulationResults$analysisTime <- simulatedAnalysisTime
-    simulationResults$eventsNotAchieved <- simulatedNumberEventsNotAchieved / maxNumberOfIterations
+    .setEventsNotAchieved(simulationResults, accrualSetup, 
+        eventsNotAchieved = simulatedNumberEventsNotAchieved / maxNumberOfIterations)
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$selectedPopulations <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedPopulationsPerStage <- simulatedRejections / maxNumberOfIterations
@@ -400,25 +406,20 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         simulationResults$.setParameterType("conditionalPowerAchieved", C_PARAM_GENERATED)
     }
 
-    if (any(simulationResults$eventsNotAchieved > 0)) {
-        warning(
-            "Presumably due to small number of subjects in selected arms, ",
-            "required number of events were not achieved for at least one situation. ",
-            "Increase the maximum number of subjects (",
-            accrualSetup$maxNumberOfSubjects,
-            ") ",
-            "to avoid this situation",
-            call. = FALSE
-        )
-    }
-
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
         stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
             functionName = "getSimulationEnrichmentSurvivalPatientWise"
         )
     }
+    
+    .addStudyDurationToDesignPlan(simulationResults)
 
     simulationResults$.data <- loopResult$data
+    simulationResults$.rawData <- .createSimulationSurvivalRawData(
+        loopResult$rawData,
+        enrichment = TRUE
+    )
+    
     return(simulationResults)
 }
 
@@ -470,6 +471,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
 #' @inheritParams param_showStatistics
 #' @inheritParams param_stratifiedAnalysis
 #' @inheritParams param_simulationType_enrichment_survival
+#' @inheritParams param_maxNumberOfRawDatasetsPerStage
 #'
 #' @details
 #' At given design the function simulates the power, stopping probabilities,
@@ -543,11 +545,14 @@ getSimulationEnrichmentSurvival <- function(
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfRawDatasetsPerStage = 0,
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
         showStatistics = FALSE) {
     simulationType <- match.arg(simulationType)
+    maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
+        maxNumberOfRawDatasetsPerStage)
 
     callArgs <- names(as.list(match.call(expand.dots = FALSE)))
     hasArg <- function(arg) {
@@ -570,7 +575,7 @@ getSimulationEnrichmentSurvival <- function(
         patientWiseOnlyArgs,
         hasArg,
         logical(1)
-    ))
+    )) || maxNumberOfRawDatasetsPerStage > 0
 
     if (simulationType == "auto") {
         if (usesPatientWiseOnlyArgs) {
@@ -581,6 +586,16 @@ getSimulationEnrichmentSurvival <- function(
     }
 
     if (identical(simulationType, "testStatisticBased")) {
+        if (maxNumberOfRawDatasetsPerStage > 0) {
+            stopIllegalArgument(
+                "raw data are only available for patient-wise simulations",
+                functionName = "getSimulationEnrichmentSurvival",
+                parameter = "maxNumberOfRawDatasetsPerStage",
+                value = maxNumberOfRawDatasetsPerStage,
+                relatedParameter = "simulationType",
+                relatedValue = simulationType
+            )
+        }
         if (usesPatientWiseOnlyArgs) {
             stopIllegalArgument("patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"",
                 functionName = "getSimulationEnrichmentSurvival",
@@ -653,6 +668,7 @@ getSimulationEnrichmentSurvival <- function(
             conditionalPower = conditionalPower,
             thetaH1 = thetaH1,
             maxNumberOfIterations = maxNumberOfIterations,
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
             seed = seed,
             calcEventsFunction = calcEventsFunction,
             selectPopulationsFunction = selectPopulationsFunction,
@@ -699,6 +715,7 @@ getSimulationEnrichmentSurvival <- function(
             conditionalPower = conditionalPower,
             thetaH1 = thetaH1,
             maxNumberOfIterations = maxNumberOfIterations,
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
             seed = seed,
             calcEventsFunction = calcEventsFunction,
             selectPopulationsFunction = selectPopulationsFunction,

@@ -441,7 +441,7 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
             if (!identical(beta, self$beta)) {
                 return(self$.pasteComparisonResult("beta", beta, self$beta))
             }
-            if (!isTRUE(all.equal(sided, self$sided))) {
+            if (!equals(sided, self$sided)) {
                 return(self$.pasteComparisonResult("sided", sided, self$sided))
             }
             if (!identical(twoSidedPower, self$twoSidedPower)) {
@@ -558,13 +558,13 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             if (anyNA(alpha0VecTemp)) {
                 alpha0VecTemp <- rep(C_ALPHA_0_VEC_DEFAULT, kMax - 1)
             }
-            if (!isTRUE(all.equal(kMax, self$kMax))) {
+            if (!equals(kMax, self$kMax)) {
                 return(TRUE)
             }
             if (!identical(alpha, self$alpha)) {
                 return(TRUE)
             }
-            if (!isTRUE(all.equal(sided, self$sided))) {
+            if (!equals(sided, self$sided)) {
                 return(TRUE)
             }
             if (!identical(method, self$method)) {
@@ -776,7 +776,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             if (anyNA(futilityBoundsTemp)) {
                 futilityBoundsTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
             }
-            if (!isTRUE(all.equal(kMax, self$kMax))) {
+            if (!equals(kMax, self$kMax)) {
                 return(self$.pasteComparisonResult("kMax", kMax, self$kMax))
             }
             if (!identical(alpha, self$alpha)) {
@@ -785,7 +785,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             if (!identical(beta, self$beta)) {
                 return(self$.pasteComparisonResult("beta", beta, self$beta))
             }
-            if (!isTRUE(all.equal(sided, self$sided))) {
+            if (!equals(sided, self$sided)) {
                 return(self$.pasteComparisonResult("sided", sided, self$sided))
             }
             if (!identical(twoSidedPower, self$twoSidedPower)) {
@@ -1220,6 +1220,8 @@ plot.TrialDesign <- function(
         plotSettings = NULL) {
     .assertIsValidPlotType(type, naAllowed = TRUE)
     .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
+    type <- .assertIsAvailablePlotType(x, type, 
+        functionName = "plot.TrialDesign")
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
@@ -1232,26 +1234,6 @@ plot.TrialDesign <- function(
             "showFutilityBounds", "showAlphaSpent", "showBetaSpent"
         ), ...
     )
-
-    availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
-    if (length(availablePlotTypes) == 0) {
-        stopIllegalArgument("no plot type available for the specified design",
-            functionName = "plot.TrialDesign"
-        )
-    }
-    if (is.na(type)) {
-        type <- availablePlotTypes[1]
-    }
-    if (!(type %in% availablePlotTypes)) {
-        stopIllegalArgument(
-            "'type' (", type, ") is not available; 'type' can ",
-            ifelse(length(availablePlotTypes) == 1, "only ", ""), "be ",
-            .arrayToString(availablePlotTypes, mode = "or"),
-            functionName = "plot.TrialDesign",
-            parameter = "type",
-            value = type
-        )
-    }
 
     .showWarningIfPlotArgumentWillBeIgnored(type, ..., obj = x)
 
@@ -1401,13 +1383,9 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
     .assertGgplotIsInstalled()
 
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-    if (any(.isTrialDesignFisher(x)) && !(type %in% c(1, 3, 4))) {
-        stopIllegalArgument(
-            "'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4",
-            functionName = ".plotTrialDesign",
-            parameter = "type",
-            value = type
-        )
+    if (any(.isTrialDesignFisher(x))) {
+        type <- .assertIsAvailablePlotType(x, type, availablePlotTypes = c(1, 3, 4), 
+            functionName = ".plotTrialDesign")
     }
 
     if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {

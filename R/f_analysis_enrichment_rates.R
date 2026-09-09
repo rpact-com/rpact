@@ -17,6 +17,26 @@
 #' @include f_logger.R
 NULL
 
+.getStandardizedEffectRatesEnrichment <- function(
+        piTreatments,
+        piControls,
+        thetaH0,
+        allocationRatioPlanned,
+        directionUpper,
+        adjustment = 0) {
+    standardizedEffect <- (piTreatments - piControls - thetaH0) /
+        sqrt(
+            piTreatments * (1 - piTreatments) +
+                allocationRatioPlanned * piControls * (1 - piControls)
+        ) * sqrt(1 + allocationRatioPlanned)
+
+    if (isFALSE(directionUpper)) {
+        standardizedEffect <- -standardizedEffect
+    }
+
+    return(standardizedEffect + adjustment)
+}
+
 .calcRatesTestStatistics <- function(
         dataInput,
         subset,
@@ -180,7 +200,7 @@ NULL
         design,
         dataInput,
         thetaH0 = NA_real_,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
@@ -248,12 +268,18 @@ NULL
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
-        direction = ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER),
         normalApproximation = normalApproximation,
-        directionUpper = directionUpper,
         stratifiedAnalysis = stratifiedAnalysis,
         stage = stage
     )
+    
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "rates",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         stageResults, "stratifiedAnalysis",
@@ -1136,14 +1162,15 @@ NULL
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (piTreatments - piControls - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    } else {
-        standardizedEffect <- -(piTreatments - piControls - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    }
-
+    standardizedEffect <- .getStandardizedEffectRatesEnrichment(
+        piTreatments = piTreatments,
+        piControls = piControls,
+        thetaH0 = stageResults$thetaH0,
+        allocationRatioPlanned = allocationRatioPlanned,
+        directionUpper = stageResults$directionUpper,
+        adjustment = adjustment
+    )
+    
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
@@ -1263,14 +1290,15 @@ NULL
     } else {
         results$.setParameterType("piTreatments", C_PARAM_DEFAULT_VALUE)
     }
-
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (piTreatments - piControls) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    } else {
-        standardizedEffect <- -(piTreatments - piControls - stageResults$thetaH0) / sqrt(piTreatments * (1 - piTreatments) +
-            allocationRatioPlanned * piControls * (1 - piControls)) * sqrt(1 + allocationRatioPlanned) + adjustment
-    }
+    
+    standardizedEffect <- .getStandardizedEffectRatesEnrichment(
+        piTreatments = piTreatments,
+        piControls = piControls,
+        thetaH0 = stageResults$thetaH0,
+        allocationRatioPlanned = allocationRatioPlanned,
+        directionUpper = stageResults$directionUpper,
+        adjustment = adjustment
+    )
 
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 

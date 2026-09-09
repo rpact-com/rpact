@@ -190,7 +190,7 @@ NULL
         }
     }
 
-    .setDirectionUpper(designPlan)
+    .setDirectionUpperDesignPlan(designPlan)
     .addEffectScaleBoundaryDataToDesignPlan(designPlan)
 
     return(designPlan)

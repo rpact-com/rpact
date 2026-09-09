@@ -190,7 +190,7 @@ NULL
         design,
         dataInput,
         thetaH0 = NA_real_,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_ENRICHMENT_DEFAULT,
@@ -265,13 +265,19 @@ NULL
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
-        direction = ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER),
         normalApproximation = normalApproximation,
-        directionUpper = directionUpper,
         stratifiedAnalysis = stratifiedAnalysis,
         varianceOption = varianceOption,
         stage = stage
     )
+    
+    directionUpper <- .setDirectionUpper(
+        stageResults,
+        design,
+        directionUpper,
+        objectType = "analysis",
+        endpoint = "means",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         stageResults, "intersectionTest", intersectionTest,
@@ -1273,10 +1279,9 @@ NULL
     }
     results$.setParameterType("assumedStDevs", C_PARAM_DEFAULT_VALUE)
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
-    } else {
-        standardizedEffect <- -(thetaH1 - stageResults$thetaH0) / assumedStDevs
+    standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
     criticalValues <- .getCriticalValues(design)
@@ -1384,10 +1389,9 @@ NULL
     }
     results$.setParameterType("assumedStDevs", C_PARAM_DEFAULT_VALUE)
 
-    if (stageResults$directionUpper) {
-        standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
-    } else {
-        standardizedEffect <- -(thetaH1 - stageResults$thetaH0) / assumedStDevs
+    standardizedEffect <- (thetaH1 - stageResults$thetaH0) / assumedStDevs
+    if (isFALSE(stageResults$directionUpper)) {
+        standardizedEffect <- -standardizedEffect
     }
     nPlanned <- c(rep(NA_real_, stage), nPlanned)
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
@@ -1477,7 +1481,7 @@ NULL
         assumedStDevs <- rep(assumedStDevs, gMax)
     }
 
-    thetaRange <- .assertIsValidThetaRange(thetaRange = thetaRange)
+    thetaRange <- .assertIsValidThetaRange(theta = thetaRange)
 
     populations <- numeric(gMax * length(thetaRange))
     effectValues <- numeric(gMax * length(thetaRange))

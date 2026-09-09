@@ -180,7 +180,7 @@ NULL
 #' Parameter Description: Pi (1) for Survival Data
 #' @param pi1 A numeric value or vector that represents the assumed event rate in the treatment group,
 #'   default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
-#'   \code{seq(0.4, 0.6, 0.1)} (sample size calculations).
+#'   \code{c(0.1, 0.2, 0.3)} (sample size calculations).
 #' @name param_pi1_survival
 #' @keywords internal
 NULL
@@ -193,7 +193,7 @@ NULL
 NULL
 
 #' Parameter Description: Pi (2) for Survival Data
-#' @param pi2 A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.
+#' @param pi2 A numeric value that represents the assumed event rate in the control group, default is \code{0.5}.
 #' @name param_pi2_survival
 #' @keywords internal
 NULL
@@ -409,7 +409,8 @@ NULL
 
 #' Parameter Description: Data Input
 #' @param dataInput The summary data used for calculating the test results.
-#'   This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival}
+#'   This is an element of \code{DatasetGeneral}, \code{DatasetMeans},
+#'   \code{DatasetRates}, or \code{DatasetSurvival}
 #'   and should be created with the function \code{\link[=getDataset]{getDataset()}}.
 #'   For more information see \code{\link[=getDataset]{getDataset()}}.
 #' @name param_dataInput
@@ -428,11 +429,12 @@ NULL
 
 #' Parameter Description: Theta H0
 #' @param thetaH0 The null hypothesis value,
-#'   default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+#'   default is \code{0} for general estimates, the normal case, and the binary case,
 #'   it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 #'   For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 #'   That is, in case of (one-sided) testing of
 #'   \itemize{
+#'     \item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
 #'     \item \emph{means}: a value \code{!= 0}
 #'       (or a value \code{!= 1} for testing the mean ratio) can be specified.
 #'     \item \emph{rates}: a value \code{!= 0}
@@ -765,8 +767,8 @@ NULL
 NULL
 
 #' Parameter Description: Effect Matrix
-#' @param effectMatrix Matrix of effect sizes with \code{activeArms} columns and number of rows
-#'   reflecting the different situations to consider.
+#' @param effectMatrix Matrix of effect sizes with \code{activeArms} columns and one or more rows,
+#'   where each row represents a different situation to consider.
 #' @name param_effectMatrix
 #' @keywords internal
 NULL
@@ -994,6 +996,15 @@ NULL
 #' a patient-wise simulation approach is used; otherwise the test-statistic-based
 #' simulation is used for backward compatibility.
 #' @name param_simulationType_multiarm_survival
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum Number of Raw Datasets Per Stage
+#' @param maxNumberOfRawDatasetsPerStage The maximum number of patient-level datasets
+#'     to retain for each scenario and stopping stage. The default is \code{0}, which
+#'     retains no patient-level data. Use \code{\link[=getRawData]{getRawData()}} to
+#'     retrieve retained datasets.
+#' @name param_maxNumberOfRawDatasetsPerStage
 #' @keywords internal
 NULL
 

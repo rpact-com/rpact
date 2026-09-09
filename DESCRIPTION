@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.5.0.9315
-Date: 2026-08-20
+Version: 4.5.0.9317
+Date: 2026-09-09
 Authors@R: c(
 	person(
 		given = "Gernot",
@@ -11,45 +11,45 @@ Authors@R: c(
 		role = c("aut")
 	),
     person(
-	given = "Friedrich",
-	family = "Pahlke",
-	email = "friedrich.pahlke@rpact.com",
-	comment = c(ORCID = "0000-0003-2105-2582"),
-	role = c("aut", "cre")
+    	given = "Friedrich",
+    	family = "Pahlke",
+    	email = "friedrich.pahlke@rpact.com",
+    	comment = c(ORCID = "0000-0003-2105-2582"),
+    	role = c("aut", "cre")
     ),
     person(
-	given = "Till",
-	family = "Jensen",
-	email = "till.jensen@rpact.com",
-	role = c("ctb")
+    	given = "Till",
+    	family = "Jensen",
+    	email = "till.jensen@rpact.com",
+    	role = c("ctb")
 	),
     person(
-	given = "Daniel",
-	family = "Sabanes Bove",
-	email = "daniel.sabanes_bove@rpact.com",
-        comment = c(ORCID = "0000-0002-0176-9239"),
-	role = c("ctb")
+    	given = "Daniel",
+    	family = "Sabanes Bove",
+    	email = "daniel.sabanes_bove@rpact.com",
+            comment = c(ORCID = "0000-0002-0176-9239"),
+    	role = c("ctb")
 	),
     person(
-	given = "Stephen",
-	family = "Schueuerhuis",
-	email = "stephen.schueuerhuis@charite.de",
-        comment = c(ORCID = "0009-0006-3124-6056"),
-	role = c("ctb")
+    	given = "Stephen",
+    	family = "Schueuerhuis",
+    	email = "stephen.schueuerhuis@charite.de",
+            comment = c(ORCID = "0009-0006-3124-6056"),
+    	role = c("ctb")
 	),
     person(
-	given = "Tobias",
-	family = "Muetze",
-	email = "tobias.muetze@novartis.com",
-	comment = c(ORCID = "0000-0002-4111-1941"),
-	role = c("ctb")
+    	given = "Tobias",
+    	family = "Muetze",
+    	email = "tobias.muetze@novartis.com",
+    	comment = c(ORCID = "0000-0002-4111-1941"),
+    	role = c("ctb")
 	),
     person(
         "RPACT GmbH",
         role = c("cph", "fnd"),
         email = "info@rpact.com"
     ))
-Description: Design and analysis of confirmatory adaptive clinical trials with continuous, binary, and survival endpoints according to the methods described in the monograph by Wassmer and Brannath (2025) <doi:10.1007/978-3-031-89669-9>. This includes classical group sequential as well as multi-stage adaptive hypotheses tests that are based on the combination testing principle.
+Description: Design, simulation, and analysis of confirmatory clinical trials with continuous, binary, survival, and count data endpoints according to the methods described in the monograph by Wassmer and Brannath (2025) <doi:10.1007/978-3-031-89669-9>. This includes sample size and power calculations for standard fixed-sample and classical group sequential designs, as well as power simulations for innovative trial designs. The latter include multi-stage adaptive hypothesis tests based on the combination testing principle, adaptive procedures such as sample size reassessment, and methods for multi-arm multi-stage (MAMS) and population enrichment trials.
 License: LGPL-3
 Encoding: UTF-8
 LazyData: true
@@ -114,6 +114,7 @@ Collate:
     'class_performance_score.R'
     'class_summary.R'
     'data.R'
+    'f_analysis_base_general.R'
     'f_analysis_base_means.R'
     'f_analysis_base_rates.R'
     'f_analysis_base_survival.R'
@@ -161,6 +162,11 @@ Collate:
     'f_simulation_multiarm_survival_pw_basic.R'
     'f_simulation_performance_score.R'
     'f_simulation_plot.R'
+    'f_summary.R'
+    'f_summary_header.R'
+    'f_summary_parameters.R'
+    'f_summary_title.R'
+    'f_summary_utilities.R'
     'parameter_column_names.R'
     'parameter_descriptions.R'
     'parameter_formats.R'

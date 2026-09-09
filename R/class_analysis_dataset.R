@@ -31,6 +31,12 @@ C_KEY_WORDS_MEANS <- c("means", "mean")
 
 C_KEY_WORDS_ST_DEVS <- .getAllParameterNameVariants(c("stDevs", "stDev", "stds", "sd"))
 
+C_KEY_WORDS_DEGREES_OF_FREEDOM <- .getAllParameterNameVariants(c("df", "degreesOfFreedom"))
+
+C_KEY_WORDS_ESTIMATES <- c("est", "estimate", "estimates")
+
+C_KEY_WORDS_STANDARD_ERRORS <- .getAllParameterNameVariants(c("se", "standardError", "standardErrors"))
+
 C_KEY_WORDS_EVENTS <- c("event", "events")
 
 C_KEY_WORDS_OVERALL_EVENTS <- .getAllParameterNameVariants(c("overallEvents", "overallEvent"))
@@ -70,6 +76,9 @@ C_KEY_WORDS <- c(
     C_KEY_WORDS_SAMPLE_SIZES,
     C_KEY_WORDS_MEANS,
     C_KEY_WORDS_ST_DEVS,
+    C_KEY_WORDS_DEGREES_OF_FREEDOM,
+    C_KEY_WORDS_ESTIMATES,
+    C_KEY_WORDS_STANDARD_ERRORS,
     C_KEY_WORDS_EVENTS,
     C_KEY_WORDS_OVERALL_EVENTS,
     C_KEY_WORDS_OVERALL_SAMPLE_SIZES,
@@ -573,6 +582,15 @@ writeDatasets <- function(
 
     enrichmentEnabled <- .isDataObjectEnrichment(...)
 
+    if (.isDataObjectGeneral(...)) {
+        return(DatasetGeneral$new(
+            dataFrame = dataFrame,
+            floatingPointNumbersEnabled = TRUE,
+            enrichmentEnabled = FALSE,
+            .design = design
+        ))
+    }
+
     if (.isDataObjectMeans(...)) {
         return(DatasetMeans$new(
             dataFrame = dataFrame,
@@ -628,9 +646,13 @@ writeDatasets <- function(
 #'        samples sizes and event numbers defined as floating-point numbers will be truncated.
 #'
 #' @details
-#' The different dataset types \code{DatasetMeans}, of \code{DatasetRates}, or
+#' The different dataset types \code{DatasetGeneral}, \code{DatasetMeans}, \code{DatasetRates}, or
 #' \code{DatasetSurvival} can be created as follows:
 #' \itemize{
+#'   \item An element of \code{\link{DatasetGeneral}} for general estimates is created by \cr
+#'     \code{getDataset(est =, se =, df =)} where \code{est}, \code{se}, and optionally \code{df}
+#'     are vectors with stage-wise estimates, standard errors, and degrees of freedom. If \code{df}
+#'     is omitted, the degrees of freedom are set to \code{Inf}, corresponding to a normal approximation.
 #'   \item An element of \code{\link{DatasetMeans}} for one sample is created by \cr
 #'     \code{getDataset(sampleSizes =, means =, stDevs =)} where \cr
 #'     \code{sampleSizes}, \code{means}, \code{stDevs} are vectors with stage-wise sample sizes,
@@ -1382,7 +1404,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     for (s in subsets) {
         subsetStages <- as.integer(sort(unique(na.omit(as.character(dataFrame$stage[dataFrame$subset == s])))))
         kMax <- max(subsetStages)
-        if (!isTRUE(all.equal(1:kMax, subsetStages))) {
+        if (!equals(1:kMax, subsetStages)) {
             stopIllegalArgument(
                 gettextf(
                     "subset %s has incomplete stages (%s)",
@@ -1546,6 +1568,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #' @details
 #' \code{Dataset} is the basic class for
 #' \itemize{
+#'   \item \code{\link{DatasetGeneral}},
 #'   \item \code{\link{DatasetMeans}},
 #'   \item \code{\link{DatasetRates}},
 #'   \item \code{\link{DatasetSurvival}}, and
@@ -1994,6 +2017,9 @@ Dataset <- R6::R6Class("Dataset",
         },
         isDatasetMeans = function() {
             return(inherits(self, "DatasetMeans"))
+        },
+        isDatasetGeneral = function() {
+            return(inherits(self, "DatasetGeneral"))
         },
         isDatasetRates = function() {
             return(inherits(self, "DatasetRates"))
@@ -2495,6 +2521,210 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
     )
 )
 
+#'
+#' @name DatasetGeneral
+#'
+#' @title
+#' Dataset of General Estimates
+#'
+#' @description
+#' Class for a dataset of general estimates with optional degrees of freedom and standard errors.
+#'
+#' @template field_stages
+#' @field estimates Stage-wise estimates.
+#' @field degreesOfFreedom Stage-wise degrees of freedom. If omitted on input, these are set to \code{Inf}.
+#' @field standardErrors Stage-wise standard errors.
+#'
+#' @details
+#' This object cannot be created directly; use \code{\link{getDataset}} with
+#' \code{est}, \code{se}, and optionally \code{df} to create a dataset of general estimates.
+#' If \code{df} is omitted, it is internally set to \code{Inf} for every stage,
+#' corresponding to a normal approximation.
+#'
+#' The estimates are endpoint-independent. Test statistics and information are
+#' calculated directly from estimates, standard errors, and degrees of freedom.
+#' Stage-wise test statistics are calculated as \code{(estimate - thetaH0) / se}.
+#' Cumulative estimates use inverse-variance weighting, with cumulative standard
+#' errors and Satterthwaite degrees of freedom calculated on the same scale.
+#'
+#' @keywords internal
+#'
+DatasetGeneral <- R6::R6Class("DatasetGeneral",
+    inherit = Dataset,
+    public = list(
+        estimates = NULL,
+        degreesOfFreedom = NULL,
+        standardErrors = NULL,
+        getEstimate = function(stage) {
+            return(self$.data$estimate[self$.getIndices(stage = stage, group = 1)])
+        },
+        getEstimates = function(..., stage = NA_integer_) {
+            stage <- self$.getValidatedStage(stage)
+            return(self$.data$estimate[self$.getIndices(stage = stage, group = 1)])
+        },
+        getEstimatesUpTo = function(to) {
+            return(self$getEstimates(stage = seq_len(to)))
+        },
+        getDegreesOfFreedom = function(..., stage = NA_integer_) {
+            stage <- self$.getValidatedStage(stage)
+            return(self$.data$degreesOfFreedom[self$.getIndices(stage = stage, group = 1)])
+        },
+        getDegreesOfFreedomUpTo = function(to) {
+            return(self$getDegreesOfFreedom(stage = seq_len(to)))
+        },
+        getStandardError = function(stage) {
+            return(self$.data$standardError[self$.getIndices(stage = stage, group = 1)])
+        },
+        getStandardErrors = function(..., stage = NA_integer_) {
+            stage <- self$.getValidatedStage(stage)
+            return(self$.data$standardError[self$.getIndices(stage = stage, group = 1)])
+        },
+        getStandardErrorsUpTo = function(to) {
+            return(self$getStandardErrors(stage = seq_len(to)))
+        },
+        getInformations = function(..., stage = NA_integer_) {
+            return(1 / self$getStandardErrors(stage = stage)^2)
+        },
+        getInformationsUpTo = function(to) {
+            return(self$getInformations(stage = seq_len(to)))
+        },
+        .initByDataFrame = function(dataFrame) {
+            super$.initByDataFrame(dataFrame)
+
+            self$estimates <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_ESTIMATES)
+            self$standardErrors <- self$.getValuesByParameterName(
+                dataFrame, C_KEY_WORDS_STANDARD_ERRORS
+            )
+            degreesOfFreedomUserDefined <- any(vapply(
+                C_KEY_WORDS_DEGREES_OF_FREEDOM,
+                function(parameterName) self$.paramExists(dataFrame, parameterName),
+                logical(1)
+            ))
+            self$degreesOfFreedom <- self$.getValuesByParameterName(
+                dataFrame,
+                C_KEY_WORDS_DEGREES_OF_FREEDOM,
+                defaultValues = rep(Inf, length(self$estimates))
+            )
+
+            self$.validateValues(self$degreesOfFreedom, "df")
+            self$.validateValues(self$estimates, "est")
+            self$.validateValues(self$standardErrors, "se")
+
+            if (any(stats::na.omit(self$degreesOfFreedom) <= 0)) {
+                stopIllegalArgument("all degrees of freedom must be > 0",
+                    functionName = ".initByDataFrame",
+                    parameter = "df",
+                    value = self$degreesOfFreedom
+                )
+            }
+            if (any(stats::na.omit(self$standardErrors) <= 0)) {
+                stopIllegalArgument("all standard errors must be > 0",
+                    functionName = ".initByDataFrame",
+                    parameter = "se",
+                    value = self$standardErrors
+                )
+            }
+
+            self$.inputType <- "stagewise"
+            self$.recreateDataFrame()
+
+            self$.setParameterType("groups", C_PARAM_NOT_APPLICABLE)
+            for (parameterName in c("estimates", "standardErrors")) {
+                self$.setParameterType(parameterName, C_PARAM_USER_DEFINED)
+            }
+            self$.setParameterType("degreesOfFreedom", ifelse(
+                degreesOfFreedomUserDefined,
+                C_PARAM_USER_DEFINED,
+                C_PARAM_DEFAULT_VALUE
+            ))
+        },
+        .validateDataset = function() {
+            .assertIsValidKMax(kMax = self$getNumberOfStages())
+
+            for (var in names(self)) {
+                values <- self[[var]]
+                infiniteValuesAreInvalid <- var != "degreesOfFreedom" && any(is.infinite(values))
+                if (any(is.nan(values)) || infiniteValuesAreInvalid) {
+                    stopRuntimeIssue(.pQuote(var), " (", .arrayToString(values), ") ",
+                        "contains illegal values, i.e., something went wrong",
+                        functionName = ".validateDataset",
+                        parameter = "var",
+                        value = var,
+                        relatedParameter = "values",
+                        relatedValue = values
+                    )
+                }
+            }
+        },
+        .recreateDataFrame = function() {
+            super$.recreateDataFrame()
+            self$.data <- cbind(self$.data, data.frame(
+                estimate = self$estimates,
+                degreesOfFreedom = self$degreesOfFreedom,
+                standardError = self$standardErrors
+            ))
+            self$.orderDataByStageAndGroup()
+            self$.setDataToVariables()
+        },
+        .setDataToVariables = function() {
+            super$.setDataToVariables()
+            self$estimates <- self$.data$estimate
+            self$degreesOfFreedom <- self$.data$degreesOfFreedom
+            self$standardErrors <- self$.data$standardError
+        },
+        .fillWithNAs = function(kMax) {
+            super$.fillWithNAs(kMax)
+            n <- self$.getNumberOfNAsToAdd(kMax)
+            naRealsToAdd <- rep(NA_real_, n)
+            self$estimates <- c(self$estimates, naRealsToAdd)
+            self$degreesOfFreedom <- c(self$degreesOfFreedom, naRealsToAdd)
+            self$standardErrors <- c(self$standardErrors, naRealsToAdd)
+            self$.recreateDataFrame()
+        },
+        .trim = function(kMax = NA_integer_) {
+            indices <- super$.trim(kMax)
+            if (length(indices) == 0) {
+                return(invisible(FALSE))
+            }
+            self$estimates <- self$estimates[indices]
+            self$degreesOfFreedom <- self$degreesOfFreedom[indices]
+            self$standardErrors <- self$standardErrors[indices]
+            self$.recreateDataFrame()
+            return(invisible(TRUE))
+        },
+        .getVisibleFieldNames = function() {
+            return(c("stages", "groups", "estimates", "degreesOfFreedom", "standardErrors"))
+        },
+        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
+            if ((!is.null(showType) && length(showType) == 1 && !is.na(showType) &&
+                    is.character(showType) && showType == "rcmd") || showType == 2) {
+                return(super$.show(
+                    showType = showType,
+                    digits = digits,
+                    consoleOutputEnabled = consoleOutputEnabled
+                ))
+            }
+
+            self$.resetCat()
+            self$.showParametersOfOneGroup(
+                c("stages", "estimates", "degreesOfFreedom", "standardErrors"),
+                title = self$.toString(startWithUpperCase = TRUE),
+                orderByParameterName = FALSE,
+                consoleOutputEnabled = consoleOutputEnabled
+            )
+            if (!is.na(self$.description) && nchar(self$.description) > 0) {
+                self$.cat("Description: ", self$.description, "\n\n",
+                    consoleOutputEnabled = consoleOutputEnabled
+                )
+            }
+        },
+        .toString = function(startWithUpperCase = FALSE) {
+            value <- "dataset of general estimates"
+            return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(value), value))
+        }
+    )
+)
+
 #' @examples
 #' \dontrun{
 #' datasetExample <- getDataset(
@@ -2850,6 +3080,13 @@ plot.Dataset <- function(
     }
 
     .assertGgplotIsInstalled()
+
+    if (x$isDatasetGeneral()) {
+        stopRuntimeIssue(
+            "plotting endpoint-specific random data is not available for DatasetGeneral",
+            functionName = "plot.Dataset"
+        )
+    }
 
     if (x$isDatasetMeans()) {
         data <- x$getRandomData()
@@ -4380,6 +4617,34 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
 
     kMax <- object$getNumberOfStages()
     summaryFactory$title <- .firstCharacterToUpperCase(s)
+
+    if (object$isDatasetGeneral()) {
+        summaryFactory$header <- paste0(
+            "The dataset contains general estimates with degrees of freedom and standard errors",
+            ifelse(kMax > 1,
+                paste0(". The total number of looks is ", .integerToWrittenNumber(kMax)),
+                ""),
+            "."
+        )
+        digitSettings <- .getSummaryDigits(digits)
+        summaryFactory$addItem("Stage", object$stages)
+        summaryFactory$addParameter(object,
+            parameterName = "estimates",
+            parameterCaption = "Estimate",
+            roundDigits = digitSettings$digitsGeneral
+        )
+        summaryFactory$addParameter(object,
+            parameterName = "degreesOfFreedom",
+            parameterCaption = "Degrees of freedom",
+            roundDigits = digitSettings$digitsGeneral
+        )
+        summaryFactory$addParameter(object,
+            parameterName = "standardErrors",
+            parameterCaption = "Standard error",
+            roundDigits = digitSettings$digitsGeneral
+        )
+        return(summaryFactory)
+    }
 
     numberOfGroups <- object$getNumberOfGroups()
 

@@ -37,4 +37,3 @@ test_that("rpact unit test information", {
     message("For more information, please visit: www.rpact.org/iq")
     expect_true(TRUE)
 })
-

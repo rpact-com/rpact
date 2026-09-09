@@ -484,7 +484,10 @@ NULL
             }
         }
 
-        if (sum(is.infinite(argValues)) > 0) {
+        infiniteDegreesOfFreedom <-
+            tolower(argName) %in% tolower(C_KEY_WORDS_DEGREES_OF_FREEDOM) &&
+            all(argValues[is.infinite(argValues)] > 0)
+        if (sum(is.infinite(argValues)) > 0 && !infiniteDegreesOfFreedom) {
             stopIllegalArgument("all data values must be finite; ", .pQuote(argName), " contains infinite values",
                 functionName = ".createDataFrame",
                 parameter = argName
@@ -770,6 +773,16 @@ NULL
     )
     dataObjectkeyWords <- c(dataObjectkeyWords, paste0(dataObjectkeyWords, c(1, 2)))
     return(.isDataObject(..., dataObjectkeyWords = dataObjectkeyWords))
+}
+
+.isDataObjectGeneral <- function(...) {
+    return(.isDataObject(...,
+        dataObjectkeyWords = c(
+            C_KEY_WORDS_DEGREES_OF_FREEDOM,
+            C_KEY_WORDS_ESTIMATES,
+            C_KEY_WORDS_STANDARD_ERRORS
+        )
+    ))
 }
 
 .isDataObjectRates <- function(...) {
@@ -1078,6 +1091,10 @@ getLongFormat <- function(dataInput) {
 }
 
 .getDatasetEndpoint <- function(dataInput) {
+    if (.isDatasetGeneral(dataInput)) {
+        return("general")
+    }
+
     if (.isDatasetMeans(dataInput)) {
         return("means")
     }
@@ -1096,6 +1113,10 @@ getLongFormat <- function(dataInput) {
 .getDefaultThetaH0 <- function(dataInput, thetaH0) {
     if (!is.na(thetaH0)) {
         return(thetaH0)
+    }
+
+    if (.isDatasetGeneral(dataInput)) {
+        return(C_THETA_H0_GENERAL_DEFAULT)
     }
 
     if (.isDatasetMeans(dataInput)) {

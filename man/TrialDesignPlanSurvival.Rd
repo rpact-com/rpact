@@ -96,8 +96,6 @@ with suitable arguments to create a design plan for a dataset of survival data.
 
 \item{\code{analysisTime}}{The estimated time of analysis. Is a numeric matrix.}
 
-\item{\code{studyDurationH1}}{The study duration under the alternative hypothesis. Is a positive numeric vector.}
-
 \item{\code{studyDuration}}{The study duration for specified effect size. Is a positive numeric vector.}
 
 \item{\code{maxStudyDuration}}{The maximum study duration in survival designs. Is a numeric vector.}

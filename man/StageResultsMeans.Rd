@@ -27,6 +27,8 @@ with suitable arguments to create the stage results of a dataset of means.
 
 \item{\code{testActions}}{The test decisions at each stage of the trial. Is a character vector of length \code{kMax}.}
 
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
+
 \item{\code{direction}}{Specifies the direction of the alternative, is either "upper" or "lower". Only applicable for one-sided testing.}
 
 \item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a single logical value.}

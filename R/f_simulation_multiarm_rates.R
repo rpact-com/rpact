@@ -119,7 +119,6 @@ NULL
     }
 
     for (k in 1:kMax) {
-        # TODO @Gernot: is it right to truncate the number of subjects per stage? Shouldn't it be rounded instead?
         if (k == 1) {
             subjectsPerStage[gMax + 1, k] <- trunc(plannedSubjects[k] / allocationRatioPlanned[k])
         } else {
@@ -416,8 +415,8 @@ getSimulationMultiArmRates <- function(
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        piMaxVector = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
-        piControl = 0.2, # C_PI_2_DEFAULT
+        piMaxVector = NA_real_,
+        piControl = NA_real_,
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
@@ -560,6 +559,7 @@ getSimulationMultiArmRates <- function(
     dataSubjectsActiveArm <- rep(NA_real_, len)
     dataNumberOfSubjects <- rep(NA_real_, len)
     dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
+    dataSelectedForNextStage <- rep(NA, len)
     dataRejectPerStage <- rep(NA, len)
     dataFutilityStop <- rep(NA_real_, len)
     dataSuccessStop <- rep(NA, len)
@@ -655,6 +655,9 @@ getSimulationMultiArmRates <- function(
                     dataSubjectsActiveArm[index] <- round(stageResults$subjectsPerStage[g, k], 1)
                     dataNumberOfSubjects[index] <- round(sum(stageResults$subjectsPerStage[, k], na.rm = TRUE), 1)
                     dataNumberOfCumulatedSubjects[index] <- round(sum(stageResults$subjectsPerStage[, 1:k], na.rm = TRUE), 1)
+                    if (k < kMax) {
+                        dataSelectedForNextStage[index] <- closedTest$selectedArms[g, k + 1]
+                    }
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -770,6 +773,7 @@ getSimulationMultiArmRates <- function(
         pValue = dataPValuesSeparate,
         conditionalCriticalValue = round(dataConditionalCriticalValue, 6),
         conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6),
+        selectedForNextStage = dataSelectedForNextStage,
         rejectPerStage = dataRejectPerStage,
         successStop = dataSuccessStop,
         futilityPerStage = dataFutilityStop
