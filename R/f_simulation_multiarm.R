@@ -721,11 +721,11 @@ NULL
         )
 
         if (typeOfShape == "userDefined") {
-            piMaxVector <- effectMatrix[, gMax]
             if (!all(is.na(piMaxVector))) {
                 warning("'piMaxVector' (", .arrayToString(piMaxVector), ") will be ignored ",
                     "because 'typeOfShape' = \"userDefined\"", call. = FALSE)
             }
+            piMaxVector <- effectMatrix[, gMax]
         } else if (!all(is.na(piMaxVector))) {
             .assertIsInOpenInterval(piMaxVector, "piMaxVector", lower = 0, upper = 1, naAllowed = FALSE)
         } else { 
