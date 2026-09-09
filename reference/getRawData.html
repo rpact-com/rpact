@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9315</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,10 @@
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A <code><a href="SimulationResults.html">SimulationResults</a></code> object created by <code><a href="getSimulationSurvival.html">getSimulationSurvival()</a></code>.</p></dd>
+<dd><p>A survival <code><a href="SimulationResults.html">SimulationResults</a></code> object created by
+<code><a href="getSimulationSurvival.html">getSimulationSurvival()</a></code>,
+<code><a href="getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code>, or
+<code><a href="getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code>.</p></dd>
 
 
 <dt id="arg-aggregate">aggregate<a class="anchor" aria-label="anchor" href="#arg-aggregate"></a></dt>
@@ -64,11 +67,11 @@ the result of <code><a href="getData.html">getData()</a></code>, default is <cod
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function works only if <code><a href="getSimulationSurvival.html">getSimulationSurvival()</a></code> was called with a <br><code>maxNumberOfRawDatasetsPerStage</code> &gt; 0 (default is <code>0</code>).</p>
+    <p>This function works only if the simulation function was called with
+<code>maxNumberOfRawDatasetsPerStage</code> &gt; 0 (default is <code>0</code>). Multi-arm and
+enrichment simulations must use a patient-wise simulation type.</p>
 <p>This function can be used to get the simulated raw data from a simulation results
-object obtained by <code><a href="getSimulationSurvival.html">getSimulationSurvival()</a></code>.
-Note that <code><a href="getSimulationSurvival.html">getSimulationSurvival()</a></code>
-must called before with <code>maxNumberOfRawDatasetsPerStage</code> &gt; 0.
+object obtained from an ordinary, multi-arm, or enrichment survival simulation.
 The data frame contains the following columns:</p><ol><li><p><code>iterationNumber</code>: The number of the simulation iteration.</p></li>
 <li><p><code>stopStage</code>: The stage of stopping.</p></li>
 <li><p><code>subjectId</code>: The subject id (increasing number 1, 2, 3, ...)</p></li>
@@ -76,18 +79,23 @@ The data frame contains the following columns:</p><ol><li><p><code>iterationNumb
 <li><p><code>treatmentGroup</code>: The treatment group number (1 or 2).</p></li>
 <li><p><code>survivalTime</code>: The survival time of the subject.</p></li>
 <li><p><code>dropoutTime</code>: The dropout time of the subject (may be <code>NA</code>).</p></li>
-<li><p><code>lastObservationTime</code>: The specific observation time.</p></li>
 <li><p><code>timeUnderObservation</code>: The time under observation is defined as follows:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="cf">if</span> (event <span class="sc">==</span> <span class="cn">TRUE</span>) {</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>    timeUnderObservation <span class="ot">&lt;-</span> survivalTime</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>} <span class="cf">else</span> <span class="cf">if</span> (dropoutEvent <span class="sc">==</span> <span class="cn">TRUE</span>) {</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>    timeUnderObservation <span class="ot">&lt;-</span> dropoutTime</span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    timeUnderObservation <span class="ot">&lt;-</span> lastObservationTime <span class="sc">-</span> accrualTime</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>}</span></code></pre><p></p></div></li>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    timeUnderObservation <span class="ot">&lt;-</span> analysisTime <span class="sc">-</span> accrualTime</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>}</span></code></pre><p></p></div>
+<p>where <code>analysisTime</code> is available from the corresponding row of
+<code><a href="getData.html">getData()</a></code>.</p></li>
 <li><p><code>event</code>: <code>TRUE</code> if an event occurred; <code>FALSE</code> otherwise.</p></li>
 <li><p><code>dropoutEvent</code>: <code>TRUE</code> if an dropout event occurred; <code>FALSE</code> otherwise.</p></li>
-</ol></div>
+</ol><p>Multi-arm and enrichment raw data additionally contain a stable integer <code>scenario</code>
+identifier. Enrichment raw data also contain the subject's <code>subGroup</code>. For these
+simulation types, <code>aggregate = TRUE</code> aggregates multi-arm data by scenario and
+iteration and enrichment data by scenario, iteration, and subgroup.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

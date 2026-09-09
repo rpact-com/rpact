@@ -52,8 +52,16 @@ this result object:
 
 ## Details
 
-The different dataset types `DatasetMeans`, of `DatasetRates`, or
-`DatasetSurvival` can be created as follows:
+The different dataset types `DatasetGeneral`, `DatasetMeans`,
+`DatasetRates`, or `DatasetSurvival` can be created as follows:
+
+- An element of
+  [`DatasetGeneral`](https://docs.rpact.org/reference/DatasetGeneral.md)
+  for general estimates is created by  
+  `getDataset(est =, se =, df =)` where `est`, `se`, and optionally `df`
+  are vectors with stage-wise estimates, standard errors, and degrees of
+  freedom. If `df` is omitted, the degrees of freedom are set to `Inf`,
+  corresponding to a normal approximation.
 
 - An element of
   [`DatasetMeans`](https://docs.rpact.org/reference/DatasetMeans.md) for
@@ -156,6 +164,25 @@ and the independent increments are calculated.
 
 ``` r
 if (FALSE) { # \dontrun{
+# Create a Dataset of General Estimates without specifying degrees
+# of freedom (internally, df is set to Inf for all stages):
+datasetOfGeneralEstimates <- getDataset(
+    est = c(0.10, 0.25, 0.38),
+    se  = c(0.20, 0.18, 0.15)
+)
+datasetOfGeneralEstimates
+datasetOfGeneralEstimates$degreesOfFreedom
+
+# It is also possible to specify the degrees of freedom for each stage.
+# Typically these come from a linear model analysis, e.g. with repeated measures
+# using the [`mmrm`](https://cran.r-project.org/package=mmrm) package.
+datasetOfLeastSquareMeans <- getDataset(
+    est = c(0.10, 0.25, 0.38),
+    se  = c(0.20, 0.18, 0.15),
+    df  = c(10.3, 12.5, 15.1)
+)
+datasetOfLeastSquareMeans
+
 # Create a Dataset of Means (one group):
 datasetOfMeans <- getDataset(
     n      = c(22, 11, 22, 11),

@@ -6,8 +6,8 @@ Parameter Description: Data Input
 
 - dataInput:
 
-  The summary data used for calculating the test results. This is either
-  an element of `DatasetMeans`, of `DatasetRates`, or of
+  The summary data used for calculating the test results. This is an
+  element of `DatasetGeneral`, `DatasetMeans`, `DatasetRates`, or
   `DatasetSurvival` and should be created with the function
   [`getDataset()`](https://docs.rpact.org/reference/getDataset.md). For
   more information see

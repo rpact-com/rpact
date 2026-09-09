@@ -8,6 +8,8 @@ Basic class for stage results.
 
 - [`StageResultsMeans`](https://docs.rpact.org/reference/StageResultsMeans.md),
 
+- [`StageResultsGeneral`](https://docs.rpact.org/reference/StageResultsGeneral.md),
+
 - [`StageResultsRates`](https://docs.rpact.org/reference/StageResultsRates.md),
 
 - [`StageResultsSurvival`](https://docs.rpact.org/reference/StageResultsSurvival.md),

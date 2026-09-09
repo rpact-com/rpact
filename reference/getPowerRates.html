@@ -9,7 +9,7 @@ in one or two samples at given maximum sample size."><meta property="og:image" c
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9315</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,8 +51,8 @@ in one or two samples at given maximum sample size.</p>
 <span>  groups <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  riskRatio <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  thetaH0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">riskRatio</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
-<span>  pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
-<span>  pi2 <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  pi1 <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
+<span>  pi2 <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  directionUpper <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  maxNumberOfSubjects <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  allocationRatioPlanned <span class="op">=</span> <span class="cn">NA_real_</span></span>
@@ -85,10 +85,11 @@ testing of H0: <code>pi1 / pi2 = thetaH0</code> is calculated, default is <code>
 
 <dt id="arg-thetah-">thetaH0<a class="anchor" aria-label="anchor" href="#arg-thetah-"></a></dt>
 <dd><p>The null hypothesis value,
-default is <code>0</code> for the normal and the binary case (testing means and rates, respectively),
+default is <code>0</code> for general estimates, the normal case, and the binary case,
 it is <code>1</code> for the survival case (testing the hazard ratio).<br><br>
 For non-inferiority designs, <code>thetaH0</code> is the non-inferiority bound.
-That is, in case of (one-sided) testing of</p><ul><li><p><em>means</em>: a value <code>!= 0</code>
+That is, in case of (one-sided) testing of</p><ul><li><p><em>general estimates</em>: a value on the scale of the supplied estimates can be specified.</p></li>
+<li><p><em>means</em>: a value <code>!= 0</code>
 (or a value <code>!= 1</code> for testing the mean ratio) can be specified.</p></li>
 <li><p><em>rates</em>: a value <code>!= 0</code>
 (or a value <code>!= 1</code> for testing the risk ratio <code>pi1 / pi2</code>) can be specified.</p></li>

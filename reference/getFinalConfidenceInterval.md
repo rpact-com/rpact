@@ -26,8 +26,8 @@ getFinalConfidenceInterval(
 
 - dataInput:
 
-  The summary data used for calculating the test results. This is either
-  an element of `DatasetMeans`, of `DatasetRates`, or of
+  The summary data used for calculating the test results. This is an
+  element of `DatasetGeneral`, `DatasetMeans`, `DatasetRates`, or
   `DatasetSurvival` and should be created with the function
   [`getDataset()`](https://docs.rpact.org/reference/getDataset.md). For
   more information see
@@ -68,12 +68,15 @@ getFinalConfidenceInterval(
 
 - thetaH0:
 
-  The null hypothesis value, default is `0` for the normal and the
-  binary case (testing means and rates, respectively), it is `1` for the
-  survival case (testing the hazard ratio).  
+  The null hypothesis value, default is `0` for general estimates, the
+  normal case, and the binary case, it is `1` for the survival case
+  (testing the hazard ratio).  
     
   For non-inferiority designs, `thetaH0` is the non-inferiority bound.
   That is, in case of (one-sided) testing of
+
+  - *general estimates*: a value on the scale of the supplied estimates
+    can be specified.
 
   - *means*: a value `!= 0` (or a value `!= 1` for testing the mean
     ratio) can be specified.

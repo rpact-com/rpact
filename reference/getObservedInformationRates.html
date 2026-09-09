@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9315</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,7 +86,8 @@ Alternatively, a floating-point number &gt; 0 and &lt; 1 can be specified to def
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For means and rates the maximum information is the maximum number of subjects
+    <p>For general estimates, information is calculated as the cumulative inverse
+squared standard error. For means and rates the maximum information is the maximum number of subjects
 or the relative proportion if <code>informationEpsilon</code> &lt; 1;
 for survival data it is the maximum number of events
 or the relative proportion if <code>informationEpsilon</code> &lt; 1.</p>

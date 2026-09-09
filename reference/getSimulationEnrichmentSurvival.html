@@ -17,7 +17,7 @@ the explicitly specified arguments.'><meta property="og:image" content="https://
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9315</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,6 +88,7 @@ the explicitly specified arguments.</p>
 <span>  conditionalPower <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  thetaH1 <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  maxNumberOfIterations <span class="op">=</span> <span class="cn">NA_integer_</span>,</span>
+<span>  maxNumberOfRawDatasetsPerStage <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  calcEventsFunction <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  selectPopulationsFunction <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -293,6 +294,13 @@ the conditional power or sample size recalculation calculation is performed. Mus
 
 <dt id="arg-maxnumberofiterations">maxNumberOfIterations<a class="anchor" aria-label="anchor" href="#arg-maxnumberofiterations"></a></dt>
 <dd><p>The number of simulation iterations, default is <code>1000</code>. Must be a positive integer of length 1.</p></dd>
+
+
+<dt id="arg-maxnumberofrawdatasetsperstage">maxNumberOfRawDatasetsPerStage<a class="anchor" aria-label="anchor" href="#arg-maxnumberofrawdatasetsperstage"></a></dt>
+<dd><p>The maximum number of patient-level datasets
+to retain for each scenario and stopping stage. The default is <code>0</code>, which
+retains no patient-level data. Use <code><a href="getRawData.html">getRawData()</a></code> to
+retrieve retained datasets.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>

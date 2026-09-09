@@ -13,8 +13,8 @@ getSimulationMultiArmRates(
   activeArms = NA_integer_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
-  piMaxVector = seq(0.2, 0.5, 0.1),
-  piControl = 0.2,
+  piMaxVector = NA_real_,
+  piControl = NA_real_,
   gED50 = NA_real_,
   slope = 1,
   doseLevels = NA_real_,
@@ -63,8 +63,8 @@ getSimulationMultiArmRates(
 
 - effectMatrix:
 
-  Matrix of effect sizes with `activeArms` columns and number of rows
-  reflecting the different situations to consider.
+  Matrix of effect sizes with `activeArms` columns and one or more rows,
+  where each row represents a different situation to consider.
 
 - typeOfShape:
 

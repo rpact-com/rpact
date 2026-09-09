@@ -51,10 +51,11 @@ Returns a list that summarizes the observed information rates.
 
 ## Details
 
-For means and rates the maximum information is the maximum number of
-subjects or the relative proportion if `informationEpsilon` \< 1; for
-survival data it is the maximum number of events or the relative
-proportion if `informationEpsilon` \< 1.
+For general estimates, information is calculated as the cumulative
+inverse squared standard error. For means and rates the maximum
+information is the maximum number of subjects or the relative proportion
+if `informationEpsilon` \< 1; for survival data it is the maximum number
+of events or the relative proportion if `informationEpsilon` \< 1.
 
 ## See also
 

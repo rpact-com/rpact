@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9315</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,14 @@ user defined with <code>thetaH1</code> or <code>pi1H1</code> and <code>pi2H1</co
 <li><p><code>trialStop</code>: <code>TRUE</code> if study should be stopped for efficacy or futility or final stage, <code>FALSE</code> otherwise.</p></li>
 <li><p><code>hazardRatioEstimateLR</code>: The estimated hazard ratio, derived from the
 log-rank statistic.</p></li>
-</ol><p>A subset of variables is provided for <code><a href="getSimulationMeans.html">getSimulationMeans()</a></code>, <code><a href="getSimulationRates.html">getSimulationRates()</a></code>, <code><a href="getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>,<br><code><a href="getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, or <code><a href="getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code>.</p>
+</ol><p>A subset of variables is provided for <code><a href="getSimulationMeans.html">getSimulationMeans()</a></code>, <code><a href="getSimulationRates.html">getSimulationRates()</a></code>, <code><a href="getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>,<br><code><a href="getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, or <code><a href="getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code>.
+Multi-arm simulation data additionally contain <code>selectedForNextStage</code>. At
+non-final stages, this logical value indicates whether the adaptation selected
+the arm to continue, conditional on the trial not stopping; it is <code>NA</code> at
+the final stage. In contrast,
+<code>rejectPerStage</code> indicates rejection of the arm's null hypothesis, while
+<code>futilityPerStage</code> is a trial-level futility-stopping decision repeated for
+the arm rows of the stage.</p>
     </div>
 
     <div class="section level2">

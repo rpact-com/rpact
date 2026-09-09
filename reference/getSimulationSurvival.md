@@ -61,12 +61,15 @@ getSimulationSurvival(
 
 - thetaH0:
 
-  The null hypothesis value, default is `0` for the normal and the
-  binary case (testing means and rates, respectively), it is `1` for the
-  survival case (testing the hazard ratio).  
+  The null hypothesis value, default is `0` for general estimates, the
+  normal case, and the binary case, it is `1` for the survival case
+  (testing the hazard ratio).  
     
   For non-inferiority designs, `thetaH0` is the non-inferiority bound.
   That is, in case of (one-sided) testing of
+
+  - *general estimates*: a value on the scale of the supplied estimates
+    can be specified.
 
   - *means*: a value `!= 0` (or a value `!= 1` for testing the mean
     ratio) can be specified.
@@ -93,13 +96,13 @@ getSimulationSurvival(
 
   A numeric value or vector that represents the assumed event rate in
   the treatment group, default is `seq(0.2, 0.5, 0.1)` (power
-  calculations and simulations) or `seq(0.4, 0.6, 0.1)` (sample size
+  calculations and simulations) or `c(0.1, 0.2, 0.3)` (sample size
   calculations).
 
 - pi2:
 
   A numeric value that represents the assumed event rate in the control
-  group, default is `0.2`.
+  group, default is `0.5`.
 
 - lambda1:
 

@@ -37,6 +37,12 @@ suitable arguments to create the stage results of a dataset of rates.
 
   The stage-wise effect sizes. Is a numeric vector of length `kMax`.
 
+- `directionUpper`:
+
+  Specifies the direction of the alternative, only applicable for
+  one-sided testing. Default is `TRUE` which means that larger values of
+  the test statistics yield smaller p-values. Is a single logical value.
+
 - `direction`:
 
   Specifies the direction of the alternative, is either "upper" or

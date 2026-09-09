@@ -6,6 +6,8 @@ Basic class for datasets.
 
 `Dataset` is the basic class for
 
+- [`DatasetGeneral`](https://docs.rpact.org/reference/DatasetGeneral.md),
+
 - [`DatasetMeans`](https://docs.rpact.org/reference/DatasetMeans.md),
 
 - [`DatasetRates`](https://docs.rpact.org/reference/DatasetRates.md),

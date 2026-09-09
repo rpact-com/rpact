@@ -212,11 +212,6 @@ survival data.
 
   The estimated time of analysis. Is a numeric matrix.
 
-- `studyDurationH1`:
-
-  The study duration under the alternative hypothesis. Is a positive
-  numeric vector.
-
 - `studyDuration`:
 
   The study duration for specified effect size. Is a positive numeric

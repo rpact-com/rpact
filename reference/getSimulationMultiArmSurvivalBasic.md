@@ -65,8 +65,8 @@ getSimulationMultiArmSurvivalBasic(
 
 - effectMatrix:
 
-  Matrix of effect sizes with `activeArms` columns and number of rows
-  reflecting the different situations to consider.
+  Matrix of effect sizes with `activeArms` columns and one or more rows,
+  where each row represents a different situation to consider.
 
 - typeOfShape:
 

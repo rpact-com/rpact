@@ -42,6 +42,12 @@ suitable arguments to create the stage results of a dataset of means.
   The test decisions at each stage of the trial. Is a character vector
   of length `kMax`.
 
+- `directionUpper`:
+
+  Specifies the direction of the alternative, only applicable for
+  one-sided testing. Default is `TRUE` which means that larger values of
+  the test statistics yield smaller p-values. Is a single logical value.
+
 - `direction`:
 
   Specifies the direction of the alternative, is either "upper" or

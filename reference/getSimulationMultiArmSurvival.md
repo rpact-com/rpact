@@ -18,7 +18,7 @@ getSimulationMultiArmSurvival(
   ...,
   simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
   activeArms = NA_integer_,
-  piControl = 0.2,
+  piControl = NA_real_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
   omegaMaxVector = seq(1, 2.6, 0.4),
@@ -51,6 +51,7 @@ getSimulationMultiArmSurvival(
   conditionalPower = NA_real_,
   thetaH1 = NA_real_,
   maxNumberOfIterations = NA_integer_,
+  maxNumberOfRawDatasetsPerStage = 0,
   seed = NA_real_,
   calcEventsFunction = NULL,
   selectArmsFunction = NULL,
@@ -91,12 +92,12 @@ getSimulationMultiArmSurvival(
 
 - piControl:
 
-  The assumed probability in the control arm, default is `0.2`.
+  The assumed probability in the control arm, default is `0.5`.
 
 - effectMatrix:
 
-  Matrix of effect sizes with `activeArms` columns and number of rows
-  reflecting the different situations to consider.
+  Matrix of effect sizes with `activeArms` columns and one or more rows,
+  where each row represents a different situation to consider.
 
 - typeOfShape:
 
@@ -324,6 +325,14 @@ getSimulationMultiArmSurvival(
 
   The number of simulation iterations, default is `1000`. Must be a
   positive integer of length 1.
+
+- maxNumberOfRawDatasetsPerStage:
+
+  The maximum number of patient-level datasets to retain for each
+  scenario and stopping stage. The default is `0`, which retains no
+  patient-level data. Use
+  [`getRawData()`](https://docs.rpact.org/reference/getRawData.md) to
+  retrieve retained datasets.
 
 - seed:
 

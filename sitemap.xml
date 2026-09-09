@@ -27,6 +27,7 @@
 <url><loc>https://docs.rpact.org/reference/ConditionalPowerResultsRates.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/ConditionalPowerResultsSurvival.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/Dataset.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/DatasetGeneral.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/DatasetMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/DatasetRates.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/DatasetSurvival.html</loc></url>
@@ -55,6 +56,7 @@
 <url><loc>https://docs.rpact.org/reference/StageResultsEnrichmentMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/StageResultsEnrichmentRates.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/StageResultsEnrichmentSurvival.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/StageResultsGeneral.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/StageResultsMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/StageResultsMultiArmMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/StageResultsMultiArmRates.html</loc></url>
@@ -237,6 +239,7 @@
 <url><loc>https://docs.rpact.org/reference/param_maxInformation.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_maxNumberOfEventsPerStage.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_maxNumberOfIterations.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/param_maxNumberOfRawDatasetsPerStage.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_maxNumberOfSubjects.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_maxNumberOfSubjectsPerStage.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_maxNumberOfSubjects_survival.html</loc></url>

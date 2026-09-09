@@ -9,7 +9,7 @@ and expected sample size for testing rates in a multi-arm treatment groups testi
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9315</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,8 +51,8 @@ and expected sample size for testing rates in a multi-arm treatment groups testi
 <span>  activeArms <span class="op">=</span> <span class="cn">NA_integer_</span>,</span>
 <span>  effectMatrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  typeOfShape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"linear"</span>, <span class="st">"sigmoidEmax"</span>, <span class="st">"userDefined"</span><span class="op">)</span>,</span>
-<span>  piMaxVector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
-<span>  piControl <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  piMaxVector <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
+<span>  piControl <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  gED50 <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  slope <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  doseLevels <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
@@ -100,8 +100,8 @@ that a warning will be displayed if unknown arguments are passed.</p></dd>
 
 
 <dt id="arg-effectmatrix">effectMatrix<a class="anchor" aria-label="anchor" href="#arg-effectmatrix"></a></dt>
-<dd><p>Matrix of effect sizes with <code>activeArms</code> columns and number of rows
-reflecting the different situations to consider.</p></dd>
+<dd><p>Matrix of effect sizes with <code>activeArms</code> columns and one or more rows,
+where each row represents a different situation to consider.</p></dd>
 
 
 <dt id="arg-typeofshape">typeOfShape<a class="anchor" aria-label="anchor" href="#arg-typeofshape"></a></dt>

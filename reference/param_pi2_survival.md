@@ -7,4 +7,4 @@ Parameter Description: Pi (2) for Survival Data
 - pi2:
 
   A numeric value that represents the assumed event rate in the control
-  group, default is `0.2`.
+  group, default is `0.5`.

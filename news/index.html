@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9315</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,9 +42,12 @@
 <ul><li>The new function <code><a href="../reference/getDesignFixed.html">getDesignFixed()</a></code> can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class <code>TrialDesignFixed</code> with <code>kMax = 1</code>.</li>
 <li>
 <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> and <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code> now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument <code>simulationType</code> can be used to choose between the new C++ implementation (<code>"patientWise"</code>), the previous test-statistic-based approach (<code>"testStatisticBased"</code>), and a basic R reference implementation (<code>"patientWiseBasic"</code>) intended for validation and testing. The default <code>"auto"</code> setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.</li>
+<li>
+<code><a href="../reference/getDataset.html">getDataset()</a></code> now supports datasets of general, endpoint-independent estimates through the new <code>DatasetGeneral</code> class. Stage-wise estimates and standard errors can be provided using <code>est</code> and <code>se</code>; degrees of freedom (<code>df</code>) are optional and default internally to <code>Inf</code>, corresponding to a normal approximation.</li>
 <li>rpact options can now be configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles; see the new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_hidden_features/" class="external-link">Hidden rpact Features: Options and Environment Variables</a>.</li>
 <li>Optimized the display of <code>criticalValues</code> and <code>futilityBounds</code> for designs with <code>directionUpper = FALSE</code>. If the direction of the alternative is already specified when creating a design, e.g., with <code>getDesignGroupSequential(directionUpper = FALSE)</code>, the boundaries are now shown in the correct direction, typically as negative values. This also applies to futility bounds generated for beta-spending designs.</li>
 <li>The new function <code><a href="../reference/getFisherInformation.html">getFisherInformation()</a></code> can be used to calculate the Fisher information at the first planned analysis stage for a design plan for means, rates, or survival endpoints.</li>
+<li>For survival endpoints, the default value of <code>directionUpper</code> has changed from <code>TRUE</code> to <code>FALSE</code>. Accordingly, the default event rates have been adjusted to provide meaningful examples for an alternative in the lower direction: <code>pi2</code> (and <code>piControl</code>) now defaults to <code>0.5</code>, while the sample size default for <code>pi1</code> is now <code>c(0.1, 0.2, 0.3)</code>; the power and simulation default for <code>pi1</code> remains <code>seq(0.2, 0.5, 0.1)</code>. One-sided power calculations and simulations issue a warning if <code>directionUpper</code> is not specified explicitly, making users aware of the changed default. No warning is issued for sample size calculations because the <code>directionUpper</code> argument has only been added to these functions in this version. For sample size calculations, the direction is always derived from the specified alternative; the argument is provided solely to validate that this derived direction is consistent with a <code>directionUpper</code> value that may already have been set in the design.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-5-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-5-0"></a></h3>
@@ -56,6 +59,9 @@
 <li>Improved naming of variables and class fields: in <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code>, the field <code>numberOfActiveArms</code> has been replaced by <code>numberOfSelectedArms</code>.</li>
 <li>Refactored error handling in plotting functions to use more specific internal error functions (<code>stopIllegalArgument</code>, <code>stopMissingArgument</code>) for clearer and more consistent error messages.</li>
 <li>Standardized and clarified function signatures for R6 class initializers and S3 methods, improving readability and maintainability. This includes consistent formatting and argument ordering across multiple classes</li>
+<li>
+<code><a href="../reference/getSampleSizeCounts.html">getSampleSizeCounts()</a></code>: field ‘expectedStudyDurationH1’ in result object was replaced by ‘studyDuration’, i.e., ‘expectedStudyDurationH1’ is deprecated</li>
+<li>For consistency with other result objects, the <code>direction</code> field in <code><a href="../reference/getStageResults.html">getStageResults()</a></code> result objects was renamed to <code>directionUpper</code>.</li>
 </ul></div>
 </div>
     <div class="section level2">

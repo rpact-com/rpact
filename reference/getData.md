@@ -93,6 +93,13 @@ A subset of variables is provided for
 [`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md),
 or
 [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md).
+Multi-arm simulation data additionally contain `selectedForNextStage`.
+At non-final stages, this logical value indicates whether the adaptation
+selected the arm to continue, conditional on the trial not stopping; it
+is `NA` at the final stage. In contrast, `rejectPerStage` indicates
+rejection of the arm's null hypothesis, while `futilityPerStage` is a
+trial-level futility-stopping decision repeated for the arm rows of the
+stage.
 
 ## Examples
 

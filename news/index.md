@@ -24,6 +24,12 @@
   event, censoring, dropout, and maximum-subject constraints while
   preserving the previous test-statistic-based workflow for existing use
   cases.
+- [`getDataset()`](https://docs.rpact.org/reference/getDataset.md) now
+  supports datasets of general, endpoint-independent estimates through
+  the new `DatasetGeneral` class. Stage-wise estimates and standard
+  errors can be provided using `est` and `se`; degrees of freedom (`df`)
+  are optional and default internally to `Inf`, corresponding to a
+  normal approximation.
 - rpact options can now be configured through environment variables,
   which is useful for reproducible scripts, CI jobs, validation runs,
   and shared project profiles; see the new vignette [Hidden rpact
@@ -40,6 +46,21 @@
   can be used to calculate the Fisher information at the first planned
   analysis stage for a design plan for means, rates, or survival
   endpoints.
+- For survival endpoints, the default value of `directionUpper` has
+  changed from `TRUE` to `FALSE`. Accordingly, the default event rates
+  have been adjusted to provide meaningful examples for an alternative
+  in the lower direction: `pi2` (and `piControl`) now defaults to `0.5`,
+  while the sample size default for `pi1` is now `c(0.1, 0.2, 0.3)`; the
+  power and simulation default for `pi1` remains `seq(0.2, 0.5, 0.1)`.
+  One-sided power calculations and simulations issue a warning if
+  `directionUpper` is not specified explicitly, making users aware of
+  the changed default. No warning is issued for sample size calculations
+  because the `directionUpper` argument has only been added to these
+  functions in this version. For sample size calculations, the direction
+  is always derived from the specified alternative; the argument is
+  provided solely to validate that this derived direction is consistent
+  with a `directionUpper` value that may already have been set in the
+  design.
 
 ### Improvements, issues, and changes
 
@@ -71,6 +92,12 @@
   initializers and S3 methods, improving readability and
   maintainability. This includes consistent formatting and argument
   ordering across multiple classes
+- [`getSampleSizeCounts()`](https://docs.rpact.org/reference/getSampleSizeCounts.md):
+  field ‘expectedStudyDurationH1’ in result object was replaced by
+  ‘studyDuration’, i.e., ‘expectedStudyDurationH1’ is deprecated
+- For consistency with other result objects, the `direction` field in
+  [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md)
+  result objects was renamed to `directionUpper`.
 
 ## rpact 4.4.0
 

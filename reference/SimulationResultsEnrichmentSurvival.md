@@ -217,6 +217,11 @@ to create an object of this type.
   Deprecated: use `singleEventsPerArmAndStage` or
   `singleEventsPerSubsetAndStage` instead
 
+- `simulationType`:
+
+  The simulation approach used: `"patientWise"` or
+  `"testStatisticBased"`.
+
 - `stratifiedAnalysis`:
 
   For enrichment designs, typically a stratified analysis should be

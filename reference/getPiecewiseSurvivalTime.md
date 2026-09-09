@@ -62,13 +62,13 @@ getPiecewiseSurvivalTime(
 
   A numeric value or vector that represents the assumed event rate in
   the treatment group, default is `seq(0.2, 0.5, 0.1)` (power
-  calculations and simulations) or `seq(0.4, 0.6, 0.1)` (sample size
+  calculations and simulations) or `c(0.1, 0.2, 0.3)` (sample size
   calculations).
 
 - pi2:
 
   A numeric value that represents the assumed event rate in the control
-  group, default is `0.2`.
+  group, default is `0.5`.
 
 - median1:
 

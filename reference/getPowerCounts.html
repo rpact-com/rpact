@@ -9,7 +9,7 @@ for negative binomial distributed event numbers in two samples at given sample s
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9315</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,10 +112,11 @@ Poisson process, there is no default.</p></dd>
 
 <dt id="arg-thetah-">thetaH0<a class="anchor" aria-label="anchor" href="#arg-thetah-"></a></dt>
 <dd><p>The null hypothesis value,
-default is <code>0</code> for the normal and the binary case (testing means and rates, respectively),
+default is <code>0</code> for general estimates, the normal case, and the binary case,
 it is <code>1</code> for the survival case (testing the hazard ratio).<br><br>
 For non-inferiority designs, <code>thetaH0</code> is the non-inferiority bound.
-That is, in case of (one-sided) testing of</p><ul><li><p><em>means</em>: a value <code>!= 0</code>
+That is, in case of (one-sided) testing of</p><ul><li><p><em>general estimates</em>: a value on the scale of the supplied estimates can be specified.</p></li>
+<li><p><em>means</em>: a value <code>!= 0</code>
 (or a value <code>!= 1</code> for testing the mean ratio) can be specified.</p></li>
 <li><p><em>rates</em>: a value <code>!= 0</code>
 (or a value <code>!= 1</code> for testing the risk ratio <code>pi1 / pi2</code>) can be specified.</p></li>

@@ -137,9 +137,10 @@ with suitable arguments to create a design plan for a dataset of rates.
 
   The calendar time Is a numeric vector.
 
-- `expectedStudyDurationH1`:
+- `studyDuration`:
 
-  The expected study duration under H1 Is a numeric vector.
+  The study duration for specified effect size. Is a positive numeric
+  vector.
 
 - `studyTime`:
 

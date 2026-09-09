@@ -43,6 +43,7 @@ getSimulationEnrichmentSurvival(
   conditionalPower = NA_real_,
   thetaH1 = NA_real_,
   maxNumberOfIterations = NA_integer_,
+  maxNumberOfRawDatasetsPerStage = 0,
   seed = NA_real_,
   calcEventsFunction = NULL,
   selectPopulationsFunction = NULL,
@@ -274,6 +275,14 @@ getSimulationEnrichmentSurvival(
 
   The number of simulation iterations, default is `1000`. Must be a
   positive integer of length 1.
+
+- maxNumberOfRawDatasetsPerStage:
+
+  The maximum number of patient-level datasets to retain for each
+  scenario and stopping stage. The default is `0`, which retains no
+  patient-level data. Use
+  [`getRawData()`](https://docs.rpact.org/reference/getRawData.md) to
+  retrieve retained datasets.
 
 - seed:
 
