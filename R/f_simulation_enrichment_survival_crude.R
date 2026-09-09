@@ -37,6 +37,7 @@ NULL
         minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage,
         conditionalPower,
+        thetaH0,
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
@@ -116,7 +117,7 @@ NULL
         logRankStatistics[, k] <- (2 * directionUpper - 1) *
             stats::rnorm(
                 pMax,
-                log(hazardRatios) *
+                log(hazardRatios / thetaH0) *
                     sqrt(const * cumulativeEventsPerStage[, k]),
                 1
             )
@@ -128,7 +129,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE))
-            overallEffects[1, k] <- exp(
+            overallEffects[1, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[1, k] /
                     sqrt(const) /
@@ -143,7 +144,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE))
-            overallEffects[1, k] <- exp(
+            overallEffects[1, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[1, k] /
                     sqrt(const) /
@@ -162,7 +163,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
-            overallEffects[2, k] <- exp(
+            overallEffects[2, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[2, k] /
                     sqrt(const) /
@@ -181,7 +182,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE))
-            overallEffects[1, k] <- exp(
+            overallEffects[1, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[1, k] /
                     sqrt(const) /
@@ -199,7 +200,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
-            overallEffects[2, k] <- exp(
+            overallEffects[2, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[2, k] /
                     sqrt(const) /
@@ -217,7 +218,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE))
-            overallEffects[3, k] <- exp(
+            overallEffects[3, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[3, k] /
                     sqrt(const) /
@@ -236,7 +237,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE))
-            overallEffects[1, k] <- exp(
+            overallEffects[1, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[1, k] /
                     sqrt(const) /
@@ -254,7 +255,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
-            overallEffects[2, k] <- exp(
+            overallEffects[2, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[2, k] /
                     sqrt(const) /
@@ -272,7 +273,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE))
-            overallEffects[3, k] <- exp(
+            overallEffects[3, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[3, k] /
                     sqrt(const) /
@@ -290,7 +291,7 @@ NULL
                 na.rm = TRUE
             ) /
                 sqrt(sum(populationEventsPerStage[4, 1:k], na.rm = TRUE))
-            overallEffects[4, k] <- exp(
+            overallEffects[4, k] <- thetaH0 * exp(
                 (2 * directionUpper - 1) *
                     overallTestStatistics[4, k] /
                     sqrt(const) /
@@ -340,6 +341,7 @@ NULL
                     plannedEvents = plannedEvents,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedPopulations = selectedPopulations,
+                    thetaH0 = thetaH0,
                     thetaH1 = thetaH1,
                     overallEffects = overallEffects
                 )
@@ -375,6 +377,7 @@ NULL
                     plannedEvents = plannedEvents,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedPopulations = selectedPopulations,
+                    thetaH0 = thetaH0,
                     thetaH1 = thetaH1,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
@@ -404,9 +407,9 @@ NULL
                     directionUpper,
                     type = "minMax",
                     phase = "planning"
-                ))
+                ) / thetaH0)
             } else {
-                thetaStandardized <- log(thetaH1)
+                thetaStandardized <- log(thetaH1 / thetaH0)
             }
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
 
@@ -439,6 +442,8 @@ NULL
 #' @description
 #' Returns the simulated power, stopping and selection probabilities, conditional power,
 #' and expected sample size for testing hazard ratios in an enrichment design testing situation.
+#' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
+#' than 1 can be used, for example, to simulate non-inferiority designs.
 #' In contrast to \code{getSimulationSurvival()} (where survival times are simulated), normally
 #' distributed logrank test statistics are simulated.
 #'
@@ -451,6 +456,7 @@ NULL
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
+#' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_minNumberOfEventsPerStage
@@ -487,6 +493,7 @@ NULL
 #' \code{selectedPopulations},
 #' \code{plannedEvents},
 #' \code{directionUpper},
+#' \code{thetaH0},
 #' \code{allocationRatioPlanned},
 #' \code{minNumberOfEventsPerStage},
 #' \code{maxNumberOfEventsPerStage},
@@ -507,6 +514,7 @@ NULL
 getSimulationEnrichmentSurvivalBasic <- function(
         design = NULL,
         ...,
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
         stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
@@ -582,6 +590,7 @@ getSimulationEnrichmentSurvivalBasic <- function(
         minNumberOfEventsPerStage = minNumberOfEventsPerStage, # survival only
         maxNumberOfEventsPerStage = maxNumberOfEventsPerStage, # survival only
         conditionalPower = conditionalPower,
+        thetaH0 = thetaH0,
         thetaH1 = thetaH1, # means + survival only
         maxNumberOfIterations = maxNumberOfIterations,
         seed = seed,
@@ -604,6 +613,7 @@ getSimulationEnrichmentSurvivalBasic <- function(
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection
     effectList <- simulationResults$effectList
+    thetaH0 <- simulationResults$thetaH0
     thetaH1 <- simulationResults$thetaH1 # means + survival only
     plannedEvents <- simulationResults$plannedEvents # survival only
     conditionalPower <- simulationResults$conditionalPower
@@ -673,6 +683,7 @@ getSimulationEnrichmentSurvivalBasic <- function(
                 minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                 maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
                 conditionalPower = conditionalPower,
+                thetaH0 = thetaH0,
                 thetaH1 = thetaH1,
                 calcEventsFunction = calcEventsFunction,
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,

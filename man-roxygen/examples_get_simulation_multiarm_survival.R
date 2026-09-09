@@ -33,5 +33,15 @@
 #' 
 #' y1$selectedArms
 #' y2$selectedArms
+#'
+#' # Non-inferiority with one active arm (H0: hazard ratio = 1.2)
+#' simulationResultsNonInferiority <- getSimulationMultiArmSurvival(
+#'     design = getDesignFixed(sided = 1), thetaH0 = 1.2,
+#'     directionUpper = FALSE, activeArms = 1,
+#'     typeOfShape = "userDefined", effectMatrix = matrix(1),
+#'     piControl = 0.3, plannedEvents = 80,
+#'     allocationRatioPlanned = 1, maxNumberOfSubjects = 400,
+#'     accrualTime = c(0, 20), accrualIntensity = 20,
+#'     maxNumberOfIterations = 50, simulationType = "patientWise")
 #' }
 #' 

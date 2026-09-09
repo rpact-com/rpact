@@ -34,6 +34,7 @@
 #' @param allocationRatioPlanned Numeric vector of allocation ratios (active : control) per stage.
 #' @param selectedPopulations Logical matrix indicating selected populations per stage (rows = populations, cols = stages).
 #' @param estimatedTheta Numeric hypothesized effect (hazard ratio) used instead of observed effects when provided.
+#' @param thetaH0 Numeric null-hypothesis hazard ratio.
 #' @param overallEffects Numeric matrix of observed overall effect estimates (rows = alternatives/populations, cols = stages).
 #' @param minNumberOfEventsPerStage Numeric vector of minimum events allowed per stage.
 #' @param maxNumberOfEventsPerStage Numeric vector of maximum events allowed per stage.
@@ -64,6 +65,7 @@
 #'     eventsOverStages = c(100, 200),
 #'     allocationRatioPlanned = c(1, 1),
 #'     selectedPopulations = matrix(TRUE, nrow = 3, ncol = 2),
+#'     thetaH0 = 1,
 #'     estimatedTheta = NA_real_,
 #'     overallEffects = matrix(1, nrow = 3, ncol = 2),
 #'     minNumberOfEventsPerStage = c(0, 50),
@@ -84,6 +86,7 @@
         eventsOverStages,
         allocationRatioPlanned,
         selectedPopulations,
+        thetaH0,
         estimatedTheta,
         overallEffects,
         minNumberOfEventsPerStage,
@@ -100,28 +103,28 @@
                             overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
                             na.rm = TRUE
                         ),
-                        1 + 1e-07
-                    ))
+                        thetaH0 * (1 + 1e-07)
+                    ) / thetaH0)
                 } else {
                     thetaStandardized <- log(min(
                         max(
                             overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
                             na.rm = TRUE
                         ),
-                        1 - 1e-07
-                    ))
+                        thetaH0 * (1 - 1e-07)
+                    ) / thetaH0)
                 }
             } else {
                 thetaStandardized <- log(min(
                     estimatedTheta,
-                    1 +
+                    thetaH0 * (1 +
                         ifelse(
                             is.na(directionUpper) ||
                                 isTRUE(directionUpper),
                             1e-07,
                             -1e-07
-                        )
-                ))
+                        ))
+                ) / thetaH0)
             }
 
             if (conditionalCriticalValue[stage] > 8) {
@@ -159,6 +162,7 @@
         plannedEvents,
         allocationRatioPlanned,
         selectedPopulations,
+        thetaH0,
         thetaH1,
         overallEffects,
         minNumberOfEventsPerStage,
@@ -175,28 +179,28 @@
                             overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
                             na.rm = TRUE
                         ),
-                        1 + 1e-07
-                    ))
+                        thetaH0 * (1 + 1e-07)
+                    ) / thetaH0)
                 } else {
                     thetaStandardized <- log(min(
                         max(
                             overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
                             na.rm = TRUE
                         ),
-                        1 - 1e-07
-                    ))
+                        thetaH0 * (1 - 1e-07)
+                    ) / thetaH0)
                 }
             } else {
                 thetaStandardized <- log(min(
                     thetaH1,
-                    1 +
+                    thetaH0 * (1 +
                         ifelse(
                             is.na(directionUpper) ||
                                 isTRUE(directionUpper),
                             1e-07,
                             -1e-07
-                        )
-                ))
+                        ))
+                ) / thetaH0)
             }
 
             if (conditionalCriticalValue[stage] > 8) {

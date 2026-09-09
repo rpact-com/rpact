@@ -33,6 +33,8 @@ NULL
 #' a patient-wise basic approximation is used, or normally distributed log-rank test statistics
 #' are simulated. The default \code{simulationType = "auto"} chooses the simulation approach
 #' automatically based on the explicitly specified arguments.
+#' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
+#' than 1 can be used, for example, to simulate non-inferiority designs.
 #'
 #' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
 #'        \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.
@@ -47,6 +49,7 @@ NULL
 #' @inheritParams param_correlationComputation
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_design_with_default
+#' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_eventTime
@@ -108,6 +111,7 @@ NULL
 #' \code{selectedArms},
 #' \code{plannedEvents},
 #' \code{directionUpper},
+#' \code{thetaH0},
 #' \code{allocationRatioPlanned},
 #' \code{minNumberOfEventsPerStage},
 #' \code{maxNumberOfEventsPerStage},
@@ -126,6 +130,7 @@ NULL
 getSimulationMultiArmSurvival <- function(
         design = NULL,
         ...,
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
         activeArms = NA_integer_,
         piControl = NA_real_,
@@ -234,6 +239,7 @@ getSimulationMultiArmSurvival <- function(
         return(getSimulationMultiArmSurvivalBasic(
             design = design,
             ...,
+            thetaH0 = thetaH0,
             activeArms = activeArms,
             effectMatrix = effectMatrix,
             typeOfShape = typeOfShape,
@@ -277,6 +283,7 @@ getSimulationMultiArmSurvival <- function(
         return(getSimulationMultiArmSurvivalPatientWise(
             design = design,
             ...,
+            thetaH0 = thetaH0,
             activeArms = activeArms,
             piControl = piControl,
             effectMatrix = effectMatrix,
@@ -341,6 +348,7 @@ getSimulationMultiArmSurvival <- function(
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
+#' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_kappa
@@ -391,6 +399,7 @@ getSimulationMultiArmSurvival <- function(
 #' \code{selectedArms},
 #' \code{plannedEvents},
 #' \code{directionUpper},
+#' \code{thetaH0},
 #' \code{allocationRatioPlanned},
 #' \code{minNumberOfEventsPerStage},
 #' \code{maxNumberOfEventsPerStage},
@@ -411,6 +420,7 @@ getSimulationMultiArmSurvival <- function(
 getSimulationMultiArmSurvivalPatientWise <- function(
         design = NULL,
         ...,
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         activeArms = NA_integer_,
         piControl = NA_real_,
         effectMatrix = NULL,
@@ -546,6 +556,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         minNumberOfEventsPerStage = minNumberOfEventsPerStage, # survival only
         maxNumberOfEventsPerStage = maxNumberOfEventsPerStage, # survival only
         conditionalPower = conditionalPower,
+        thetaH0 = thetaH0,
         thetaH1 = thetaH1, # means + survival only
         maxNumberOfIterations = maxNumberOfIterations,
         seed = seed,
@@ -567,6 +578,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     effectMatrix <- t(simulationResults$effectMatrix)
     omegaMaxVector <- simulationResults$omegaMaxVector # survival only
     piControl <- simulationResults$piControl # rates + survival only
+    thetaH0 <- simulationResults$thetaH0
     thetaH1 <- simulationResults$thetaH1 # means + survival only
     plannedEvents <- simulationResults$plannedEvents # survival only
     maxNumberOfSubjects <- simulationResults$maxNumberOfSubjects # survival only
@@ -673,6 +685,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             minNumberOfEventsPerStage = minNumberOfEventsPerStage,
             maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
             conditionalPower = conditionalPower,
+            thetaH0 = thetaH0,
             thetaH1 = thetaH1,
             calcEventsFunction = calcEventsFunction,
             calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
@@ -714,6 +727,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             minNumberOfEventsPerStage = minNumberOfEventsPerStage,
             maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
             conditionalPower = conditionalPower,
+            thetaH0 = thetaH0,
             thetaH1 = thetaH1,
             calcEventsFunction = calcEventsFunction,
             calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,

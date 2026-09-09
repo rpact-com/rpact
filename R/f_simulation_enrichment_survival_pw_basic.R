@@ -78,6 +78,7 @@ updateSubGroupVector <- function(
         minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage,
         conditionalPower,
+        thetaH0,
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
@@ -169,7 +170,8 @@ updateSubGroupVector <- function(
                             time = analysisTime[k],
                             subPopulation = g,
                             stratifiedAnalysis = stratifiedAnalysis,
-                            directionUpper = directionUpper
+                            directionUpper = directionUpper,
+                            thetaH0 = thetaH0
                         )
                         testStatistics[g, k] <- logRank$logRank
                         overallTestStatistics[g, k] <- logRank$logRank
@@ -185,7 +187,8 @@ updateSubGroupVector <- function(
                     time = analysisTime[k],
                     subPopulation = 1,
                     stratifiedAnalysis = stratifiedAnalysis,
-                    directionUpper = directionUpper
+                    directionUpper = directionUpper,
+                    thetaH0 = thetaH0
                 )
                 overallEventsPerStage[k] <- sum(logRankOverall$events)
             }
@@ -259,7 +262,8 @@ updateSubGroupVector <- function(
                             time = analysisTime[k],
                             subPopulation = g,
                             stratifiedAnalysis = stratifiedAnalysis,
-                            directionUpper = directionUpper
+                            directionUpper = directionUpper,
+                            thetaH0 = thetaH0
                         )
                         overallTestStatistics[g, k] <- logRank$logRank
                         populationEventsPerStage[g, k] <- sum(logRank$events)
@@ -281,7 +285,8 @@ updateSubGroupVector <- function(
                     time = analysisTime[k],
                     subPopulation = 1,
                     stratifiedAnalysis = stratifiedAnalysis,
-                    directionUpper = directionUpper
+                    directionUpper = directionUpper,
+                    thetaH0 = thetaH0
                 )
                 overallEventsPerStage[k] <- sum(logRankOverall$events)
             }
@@ -292,7 +297,7 @@ updateSubGroupVector <- function(
 
         separatePValues[, k] <- 1 - stats::pnorm(testStatistics[, k])
 
-        overallEffects[, k] <- exp(
+        overallEffects[, k] <- thetaH0 * exp(
             (2 * directionUpper - 1) *
                 overallTestStatistics[, k] *
                 (1 + allocationFraction[1] / allocationFraction[2]) /
@@ -334,6 +339,7 @@ updateSubGroupVector <- function(
                     plannedEvents = plannedEvents,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedPopulations = selectedPopulations,
+                    thetaH0 = thetaH0,
                     thetaH1 = thetaH1,
                     overallEffects = overallEffects
                 )
@@ -365,7 +371,7 @@ updateSubGroupVector <- function(
                 }
 
                 if (!directionUpper) {
-                    estimatedTheta <- 1 / estimatedTheta
+                    estimatedTheta <- thetaH0^2 / estimatedTheta
                 }
 
                 conditionalCriticalValuePerStage <- conditionalCriticalValue
@@ -395,6 +401,7 @@ updateSubGroupVector <- function(
                     # We need to pass one allocation ratio for each stage:
                     allocationRatioPlanned = rep(allocationRatioPlanned, length.out = k + 1),
                     selectedPopulations = selectedPopulations,
+                    thetaH0 = thetaH0,
                     estimatedTheta = estimatedThetaForCalc,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
@@ -428,9 +435,9 @@ updateSubGroupVector <- function(
                     directionUpper,
                     type = "minMax",
                     phase = "planning"
-                ))
+                ) / thetaH0)
             } else {
-                thetaStandardized <- log(thetaH1)
+                thetaStandardized <- log(thetaH1 / thetaH0)
             }
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
 
@@ -473,6 +480,7 @@ updateSubGroupVector <- function(
 .getSimulationEnrichmentSurvivalPatientWiseBasic <- function(
         design = NULL,
         ...,
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         effectList = NULL,
         kappa = 1,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
@@ -587,6 +595,7 @@ updateSubGroupVector <- function(
         minNumberOfEventsPerStage = minNumberOfEventsPerStage, # survival only
         maxNumberOfEventsPerStage = maxNumberOfEventsPerStage, # survival only
         conditionalPower = conditionalPower,
+        thetaH0 = thetaH0,
         thetaH1 = thetaH1, # means + survival only
         maxNumberOfIterations = maxNumberOfIterations,
         seed = seed,
@@ -606,6 +615,7 @@ updateSubGroupVector <- function(
     kMax <- simulationResults$.design$kMax
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection
+    thetaH0 <- simulationResults$thetaH0
     thetaH1 <- simulationResults$thetaH1 # means + survival only
     plannedEvents <- simulationResults$plannedEvents # survival only
     conditionalPower <- simulationResults$conditionalPower
@@ -742,6 +752,7 @@ updateSubGroupVector <- function(
                 minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                 maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
                 conditionalPower = conditionalPower,
+                thetaH0 = thetaH0,
                 thetaH1 = thetaH1,
                 calcEventsFunction = calcEventsFunction,
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,

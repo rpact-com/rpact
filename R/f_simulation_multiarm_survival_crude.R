@@ -52,6 +52,7 @@ NULL
         minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage,
         conditionalPower,
+        thetaH0,
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
@@ -115,7 +116,8 @@ NULL
         for (treatmentArm in 1:gMax) {
             if (selectedArms[treatmentArm, k]) {
                 testStatistics[treatmentArm, k] <- testStatistics[treatmentArm, k] +
-                    (2 * directionUpper - 1) * log(omegaVector[treatmentArm]) * sqrt(cumulativeEventsPerStage[treatmentArm, k]) *
+                    (2 * directionUpper - 1) * log(omegaVector[treatmentArm] / thetaH0) *
+                        sqrt(cumulativeEventsPerStage[treatmentArm, k]) *
                         sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k])
 
                 separatePValues[treatmentArm, k] <- 1 - stats::pnorm(testStatistics[treatmentArm, k])
@@ -123,7 +125,7 @@ NULL
                 overallTestStatistics[treatmentArm, k] <- sqrt(cumulativeEventsPerStage[treatmentArm, 1:k]) %*%
                     testStatistics[treatmentArm, 1:k] / sqrt(sum(cumulativeEventsPerStage[treatmentArm, 1:k]))
 
-                overallEffects[treatmentArm, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[treatmentArm, k] *
+                overallEffects[treatmentArm, k] <- thetaH0 * exp((2 * directionUpper - 1) * overallTestStatistics[treatmentArm, k] *
                     (1 + allocationRatioPlanned[k]) / sqrt(allocationRatioPlanned[k]) /
                     sqrt(sum(cumulativeEventsPerStage[treatmentArm, 1:k])))
             }
@@ -163,6 +165,7 @@ NULL
                     plannedEvents = plannedEvents,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     thetaH1 = thetaH1,
                     overallEffects = overallEffects
                 )
@@ -200,6 +203,7 @@ NULL
                     plannedEvents = plannedEvents,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     thetaH1 = thetaH1,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
@@ -223,9 +227,9 @@ NULL
             }
 
             if (is.na(thetaH1)) {
-                thetaStandardized <- log(min(overallEffects[selectedArms[1:gMax, k], k], na.rm = TRUE))
+                thetaStandardized <- log(min(overallEffects[selectedArms[1:gMax, k], k], na.rm = TRUE) / thetaH0)
             } else {
-                thetaStandardized <- log(thetaH1)
+                thetaStandardized <- log(thetaH1 / thetaH0)
             }
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
 
@@ -257,6 +261,8 @@ NULL
 #' @description
 #' Returns the simulated power, stopping and selection probabilities, conditional power, and
 #' expected sample size for testing hazard ratios in a multi-arm treatment groups testing situation.
+#' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
+#' than 1 can be used, for example, to simulate non-inferiority designs.
 #' In contrast to \code{getSimulationSurvival()} (where survival times are simulated), normally
 #' distributed logrank test statistics are simulated.
 #'
@@ -274,6 +280,7 @@ NULL
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
+#' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_minNumberOfEventsPerStage
@@ -312,6 +319,7 @@ NULL
 #' \code{selectedArms},
 #' \code{plannedEvents},
 #' \code{directionUpper},
+#' \code{thetaH0},
 #' \code{allocationRatioPlanned},
 #' \code{minNumberOfEventsPerStage},
 #' \code{maxNumberOfEventsPerStage},
@@ -332,6 +340,7 @@ NULL
 getSimulationMultiArmSurvivalBasic <- function(
         design = NULL,
         ...,
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
@@ -411,6 +420,7 @@ getSimulationMultiArmSurvivalBasic <- function(
         minNumberOfEventsPerStage   = minNumberOfEventsPerStage, # survival only
         maxNumberOfEventsPerStage   = maxNumberOfEventsPerStage, # survival only
         conditionalPower            = conditionalPower,
+        thetaH0                     = thetaH0,
         thetaH1                     = thetaH1, # means + survival only
         maxNumberOfIterations       = maxNumberOfIterations,
         seed                        = seed,
@@ -445,6 +455,7 @@ getSimulationMultiArmSurvivalBasic <- function(
     typeOfSelection <- simulationResults$typeOfSelection
     effectMatrix <- t(simulationResults$effectMatrix)
     omegaMaxVector <- simulationResults$omegaMaxVector # survival only
+    thetaH0 <- simulationResults$thetaH0
     thetaH1 <- simulationResults$thetaH1 # means + survival only
     plannedEvents <- simulationResults$plannedEvents # survival only
     conditionalPower <- simulationResults$conditionalPower
@@ -534,6 +545,7 @@ getSimulationMultiArmSurvivalBasic <- function(
                 minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                 maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
                 conditionalPower = conditionalPower,
+                thetaH0 = thetaH0,
                 thetaH1 = thetaH1,
                 calcEventsFunction = calcEventsFunction,
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,

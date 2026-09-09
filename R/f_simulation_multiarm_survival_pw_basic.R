@@ -268,6 +268,7 @@ NULL
         minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage,
         conditionalPower,
+        thetaH0,
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
@@ -345,7 +346,8 @@ NULL
                         survivalDataSet = survivalDataSet,
                         time = analysisTime[1],
                         treatmentArms = c(g, gMax + 1),
-                        directionUpper = directionUpper
+                        directionUpper = directionUpper,
+                        thetaH0 = thetaH0
                     )
 
                     testStatistics[g, k] <- logRank$logRank
@@ -413,7 +415,8 @@ NULL
                             survivalDataSet = survivalDataSet,
                             time = analysisTime[k],
                             treatmentArms = c(g, gMax + 1),
-                            directionUpper = directionUpper
+                            directionUpper = directionUpper,
+                            thetaH0 = thetaH0
                         )
                         overallTestStatistics[g, k] <- logRank$logRank
                         singleEventsPerStage[g, k] <- logRank$events[1]
@@ -428,7 +431,7 @@ NULL
             }
         }
         separatePValues[, k] <- 1 - stats::pnorm(testStatistics[, k])
-        overallEffects[, k] <- exp(
+        overallEffects[, k] <- thetaH0 * exp(
             (2 * directionUpper - 1) *
                 overallTestStatistics[, k] *
                 (1 + allocationFraction[1] / allocationFraction[2]) /
@@ -476,6 +479,7 @@ NULL
                     plannedEvents = plannedEvents,
                     allocationRatioPlanned = allocationFraction[1] / allocationFraction[2],
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     thetaH1 = thetaH1,
                     overallEffects = overallEffects
                 )
@@ -508,7 +512,7 @@ NULL
                 }
 
                 if (!directionUpper) {
-                    estimatedTheta <- 1 / estimatedTheta
+                    estimatedTheta <- thetaH0^2 / estimatedTheta
                 }
 
                 conditionalCriticalValuePerStage <- conditionalCriticalValue
@@ -528,6 +532,7 @@ NULL
                     # necessary for use in .getSimulationSurvivalMultiArmStageEventsBasic():
                     allocationRatioPlanned = rep(allocationFraction[1] / allocationFraction[2], k + 1),
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     estimatedTheta = estimatedTheta,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
@@ -555,9 +560,9 @@ NULL
             }
 
             if (is.na(thetaH1)) {
-                thetaStandardized <- log(min(overallEffects[selectedArms[1:gMax, k], k], na.rm = TRUE))
+                thetaStandardized <- log(min(overallEffects[selectedArms[1:gMax, k], k], na.rm = TRUE) / thetaH0)
             } else {
-                thetaStandardized <- log(thetaH1)
+                thetaStandardized <- log(thetaH1 / thetaH0)
             }
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
 
@@ -619,6 +624,7 @@ NULL
         minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage,
         conditionalPower,
+        thetaH0,
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
@@ -697,6 +703,7 @@ NULL
                 minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                 maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
                 conditionalPower = conditionalPower,
+                thetaH0 = thetaH0,
                 thetaH1 = thetaH1,
                 calcEventsFunction = calcEventsFunction,
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,

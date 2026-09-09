@@ -374,6 +374,7 @@ NULL
         minNumberOfEventsPerStage = NA_real_, # survival only
         maxNumberOfEventsPerStage = NA_real_, # survival only
         conditionalPower,
+        thetaH0 = NA_real_, # survival only
         thetaH1 = NA_real_, # means + survival only
         stDevH1 = NA_real_, # means only
         piTreatmentH1 = NA_real_, # rates only
@@ -440,6 +441,10 @@ NULL
 
     if (endpoint %in% c("means", "survival")) {
         .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE) # means + survival only
+    }
+    if (endpoint == "survival") {
+        .assertIsSingleNumber(thetaH0, "thetaH0")
+        .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
     }
 
     if (endpoint == "means") {
@@ -943,6 +948,9 @@ NULL
     )
     if (endpoint %in% c("means", "survival")) {
         .setValueAndParameterType(simulationResults, "thetaH1", thetaH1, NA_real_, notApplicableIfNA = TRUE)
+    }
+    if (endpoint == "survival") {
+        .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, C_THETA_H0_SURVIVAL_DEFAULT)
     }
     if (endpoint == "means") {
         .setValueAndParameterType(simulationResults, "stDevH1", stDevH1, NA_real_, notApplicableIfNA = TRUE)

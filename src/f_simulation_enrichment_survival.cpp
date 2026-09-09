@@ -241,6 +241,7 @@ List logRankTestEnrichment(int gMax,
 // @param plannedEvents Planned events per stage
 // @param allocationRatioPlanned Allocation ratio planned per stage
 // @param selectedPopulations Whether populations are selected (rows: populations, columns: stages)
+// @param thetaH0 Null hypothesis hazard ratio
 // @param thetaH1 Alternative hypothesis hazard ratio
 // @param overallEffects Matrix of overall effects (rows: populations, columns: stages)
 // @param minNumberOfEventsPerStage Minimum number of events per stage
@@ -252,9 +253,10 @@ double getSimulationSurvivalEnrichmentStageEvents(int stage,
 												  double conditionalPower,
 												  NumericVector conditionalCriticalValue,
 												  NumericVector plannedEvents,
-												  NumericVector allocationRatioPlanned,
-												  LogicalMatrix selectedPopulations,
-												  double thetaH1,
+											  NumericVector allocationRatioPlanned,
+											  LogicalMatrix selectedPopulations,
+											  double thetaH0,
+											  double thetaH1,
 												  NumericMatrix overallEffects,
 												  NumericVector minNumberOfEventsPerStage,
 												  NumericVector maxNumberOfEventsPerStage) {
@@ -287,7 +289,7 @@ double getSimulationSurvivalEnrichmentStageEvents(int stage,
 							}
 						}
 					}
-					thetaStandardized = log(std::max(minEffect, 1.0 + 1e-07));
+					thetaStandardized = log(std::max(minEffect, thetaH0 * (1.0 + 1e-07)) / thetaH0);
 				} else {
 					// Find maximum of selected effects
 					double maxEffect = R_NegInf;
@@ -298,11 +300,11 @@ double getSimulationSurvivalEnrichmentStageEvents(int stage,
 							}
 						}
 					}
-					thetaStandardized = log(std::min(maxEffect, 1.0 - 1e-07));
+					thetaStandardized = log(std::min(maxEffect, thetaH0 * (1.0 - 1e-07)) / thetaH0);
 				}
 			} else {
 				double adjustment = (R_IsNA(directionUpper) || directionUpper) ? 1e-07 : -1e-07;
-				thetaStandardized = log(std::min(thetaH1, 1.0 + adjustment));
+				thetaStandardized = log(std::min(thetaH1, thetaH0 * (1.0 + adjustment)) / thetaH0);
 			}
 
 			if (conditionalCriticalValue[stage - 1] > 8.0) {
@@ -425,6 +427,7 @@ double getEstimatedThetaEnrichment(
 		int stage,
 		double thetaH1,
 		bool directionUpper,
+		double thetaH0,
 		NumericMatrix overallEffects) {
 
 	if (!R_IsNA(thetaH1)) {
@@ -434,9 +437,9 @@ double getEstimatedThetaEnrichment(
 	NumericVector overallEffectsAtStage = overallEffects(_, stage);
 	double estimatedTheta = min(overallEffectsAtStage);
 
-	if (!directionUpper){
-      estimatedTheta = 1 / estimatedTheta;
-    }
+	if (!directionUpper) {
+		estimatedTheta = thetaH0 * thetaH0 / estimatedTheta;
+	}
 
 	return estimatedTheta;
 }
@@ -468,6 +471,7 @@ double getEstimatedThetaEnrichment(
 // @param minNumberOfEventsPerStage Minimum events per stage
 // @param maxNumberOfEventsPerStage Maximum events per stage
 // @param conditionalPower Conditional power
+// @param thetaH0 Null hypothesis hazard ratio
 // @param thetaH1 Alternative hypothesis hazard ratio
 // @param calcEventsFunction Events calculation function
 // @param calcEventsFunctionIsUserDefined Whether calc function is user defined
@@ -498,6 +502,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		NumericVector minNumberOfEventsPerStage,
 		NumericVector maxNumberOfEventsPerStage,
 		double conditionalPower,
+		double thetaH0,
 		double thetaH1,
 		Nullable<Function> calcEventsFunction = R_NilValue,
 		bool calcEventsFunctionIsUserDefined = false,
@@ -606,8 +611,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 							survivalDataSet, 
 							analysisTime[k], 
 							g + 1, // need 1-based index here!
-							stratifiedAnalysis, 
-							directionUpper
+							stratifiedAnalysis,
+							directionUpper,
+							thetaH0
 						);
 						testStatistics(g, k) = logRank["logRank"];
 						overallTestStatistics(g, k) = testStatistics(g, k);
@@ -624,7 +630,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					analysisTime[k], 
 					1,
 					stratifiedAnalysis, 
-					directionUpper
+					directionUpper,
+					thetaH0
 				);
 				IntegerVector eventsOverall = logRankOverall["events"];
 				overallEventsPerStage[k] = sum(eventsOverall);
@@ -716,8 +723,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 							survivalDataSet, 
 							analysisTime[k], 
 							g + 1, // need 1-based index here!
-							stratifiedAnalysis, 
-							directionUpper
+							stratifiedAnalysis,
+							directionUpper,
+							thetaH0
 						);
 						overallTestStatistics(g, k) = logRank["logRank"];
 						IntegerVector events = logRank["events"];
@@ -740,7 +748,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					analysisTime[k], 
 					1,
 					stratifiedAnalysis, 
-					directionUpper
+					directionUpper,
+					thetaH0
 				);
 				IntegerVector eventsOverall = logRankOverall["events"];
 				overallEventsPerStage[k] = sum(eventsOverall);
@@ -771,7 +780,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				double direction = (2.0 * directionUpper - 1.0);
 				double numerator = direction * overallTestStatistics(g, k) * (1.0 + allocationRatioPlanned);
 				double denominator = sqrt(allocationRatioPlanned) * sqrt(populationEventsPerStage(g, k));
-				overallEffects(g, k) = exp(numerator / denominator);
+				overallEffects(g, k) = thetaH0 * exp(numerator / denominator);
 			}
 		}	
 
@@ -844,6 +853,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						_["plannedEvents"] = plannedEvents,
 						_["allocationRatioPlanned"] = allocationRatioPlanned,
 						_["selectedPopulations"] = selectedPopulations,
+						_["thetaH0"] = thetaH0,
 						_["thetaH1"] = thetaH1,
 						_["overallEffects"] = overallEffects
 					);
@@ -879,7 +889,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		    		break;
     			}
 
-				double estimatedTheta = getEstimatedThetaEnrichment(k, thetaH1, directionUpper, overallEffects);
+				double estimatedTheta = getEstimatedThetaEnrichment(k, thetaH1, directionUpper, thetaH0, overallEffects);
 
 				double newEventsValue = NA_REAL;
 
@@ -894,6 +904,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						Named("eventsOverStages") = overallEventsPerStage,
 						Named("allocationRatioPlanned") = allocationRatioPlanned,
 						Named("selectedPopulations") = selectedPopulations,
+						Named("thetaH0") = thetaH0,
 					    Named("estimatedTheta") = estimatedTheta,
 						Named("overallEffects") = overallEffects,
 						Named("minNumberOfEventsPerStage") = minNumberOfEventsPerStage,
@@ -910,6 +921,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						plannedEvents,
 						rep(allocationRatioPlanned, kMax),
 						selectedPopulations,
+						thetaH0,
 						thetaH1,
 						overallEffects,
 						minNumberOfEventsPerStage,
@@ -944,9 +956,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					"minMax",
 					"planning"
 				);
-				thetaStandardized = log(minMaxEffect[0]);
+				thetaStandardized = log(minMaxEffect[0] / thetaH0);
 			} else {
-				thetaStandardized = log(thetaH1);
+				thetaStandardized = log(thetaH1 / thetaH0);
 			}
 			thetaStandardized = (2.0 * directionUpper - 1.0) * thetaStandardized;	
 			double numerator = thetaStandardized * sqrt(plannedEvents[k + 1] - plannedEvents[k]) *
@@ -1005,6 +1017,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 // @param minNumberOfEventsPerStage Minimum events per stage
 // @param maxNumberOfEventsPerStage Maximum events per stage
 // @param conditionalPower Conditional power
+// @param thetaH0 Null hypothesis hazard ratio
 // @param thetaH1 Alternative hypothesis hazard ratio
 // @param calcEventsFunction Events calculation function
 // @param calcEventsFunctionIsUserDefined Whether calc function is user defined
@@ -1039,6 +1052,7 @@ List performSimulationEnrichmentSurvivalLoop(
 		NumericVector minNumberOfEventsPerStage,
 		NumericVector maxNumberOfEventsPerStage,
 		double conditionalPower,
+		double thetaH0,
 		double thetaH1,
 		Nullable<Function> calcEventsFunction,
 		bool calcEventsFunctionIsUserDefined,
@@ -1158,6 +1172,7 @@ List performSimulationEnrichmentSurvivalLoop(
 				minNumberOfEventsPerStage,
 				maxNumberOfEventsPerStage,
 				conditionalPower,
+				thetaH0,
 				thetaH1,
 				calcEventsFunction,
 				calcEventsFunctionIsUserDefined,
