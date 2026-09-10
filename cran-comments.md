@@ -9,7 +9,7 @@ There were no ERRORs or WARNINGs.
 
 ## Unit tests: testthat results (complete test)
 
-OK:       51816
+OK:       51926
 Failed:   0
 Warnings: 0
 Skipped:  0
