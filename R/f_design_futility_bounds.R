@@ -202,28 +202,97 @@ print.FutilityBounds <- function(x, ...) {
     print.default(as.numeric(x))
 }
 
-#' 
+.getFisherInformationValuesForPrinting <- function(x) {
+    attr(x, "type") <- NULL
+    attr(x, "stage") <- NULL
+    attr(x, "situations") <- NULL
+    attr(x, "designPlan") <- NULL
+    class(x) <- setdiff(class(x), "FisherInformation")
+    return(x)
+}
+
+#'
 #' @title
 #' Print Fisher Information
-#' 
+#'
 #' @description
-#' S3 print method for objects of class \code{FisherInformation}. 
-#' Prints the Fisher information as a numeric vector with an optional type description.
-#' 
+#' S3 print method for objects of class \code{FisherInformation}.
+#' Prints the Fisher information together with its type, analysis stage, and,
+#' if available, the situations to which the values apply.
+#'
 #' @param x An object of class \code{FisherInformation}.
-#' @param ... Additional arguments passed to \code{print.default}.
-#' 
+#' @param ... Additional arguments passed to the underlying print method.
+#'
 #' @keywords internal
-#' 
+#'
 #' @export
-#' 
+#'
 print.FisherInformation <- function(x, ...) {
-    type <- attr(x, "type")
-    if (!is.null(type) && !is.na(type)) {
-        cat(.firstCharacterToUpperCase(
-            .formatCamelCaseSingleWord(type, sep = "-")), "Fisher information:\n")
+    type <- attr(x, "type", exact = TRUE)
+    stage <- attr(x, "stage", exact = TRUE)
+    situations <- attr(x, "situations", exact = TRUE)
+    values <- .getFisherInformationValuesForPrinting(x)
+
+    typeDescription <- "Fisher information"
+    if (!is.null(type) && length(type) == 1L && !is.na(type)) {
+        typeDescription <- paste(
+            .firstCharacterToUpperCase(.formatCamelCaseSingleWord(type, sep = "-")),
+            typeDescription
+        )
     }
-    print.default(as.numeric(x))
+
+    if (!is.null(stage) && length(stage) == 1L) {
+        heading <- paste0(typeDescription, " at stage ", stage)
+        if (!is.null(situations) && length(situations) == 1L) {
+            heading <- paste0(heading, " (", situations, ")")
+        }
+        if (!is.null(situations) && length(situations) > 1L) {
+            heading <- paste0(heading, " by situation")
+        }
+    } else if (!is.null(stage) && length(stage) > 1L) {
+        heading <- paste0(typeDescription, " by stage")
+        if (!is.null(situations) && length(situations) == 1L) {
+            heading <- paste0(heading, " (", situations, ")")
+        }
+        if (!is.null(situations) && length(situations) > 1L) {
+            heading <- paste0(heading, " and situation")
+        }
+    } else {
+        heading <- typeDescription
+    }
+    cat(heading, ":\n", sep = "")
+
+    if (!is.null(stage) && length(stage) == 1L &&
+            is.null(dim(values)) && !is.null(situations) &&
+            length(situations) == length(values) && length(values) > 1L) {
+        output <- data.frame(
+            Situation = situations,
+            information = as.numeric(values),
+            check.names = FALSE
+        )
+        names(output)[2] <- "Fisher information"
+        print(output, row.names = FALSE, ...)
+    } else if (!is.null(stage) && length(stage) > 1L && is.null(dim(values))) {
+        output <- data.frame(
+            Stage = stage,
+            information = as.numeric(values),
+            check.names = FALSE
+        )
+        names(output)[2] <- "Fisher information"
+        print(output, row.names = FALSE, ...)
+    } else {
+        if (!is.null(dim(values))) {
+            if (!is.null(stage) && length(stage) == nrow(values)) {
+                rownames(values) <- paste0("Stage ", stage)
+            }
+            if (!is.null(situations) && length(situations) == ncol(values)) {
+                colnames(values) <- situations
+            }
+        }
+        print.default(values, ...)
+    }
+
+    return(invisible(x))
 }
 
 #'
@@ -649,7 +718,15 @@ getFutilityBounds <- function(
         exceptionEnabled = FALSE,
         ...
     )
-
+    
+    if (is(sourceValue, "FisherInformation")) {
+        designPlan <- attr(sourceValue, "designPlan", exact = TRUE)
+        information <- sourceValue
+        design <- designPlan$.design
+        sourceScale <- "zValue"
+        sourceValue <- design$futilityBounds
+    }
+    
     sourceValue <- .assertIsNumericVector(sourceValue, "sourceValue", naAllowed = naAllowed)
     if (is(sourceValue, "FutilityBounds")) {
         sourceValue <- as.numeric(sourceValue)
@@ -1467,6 +1544,76 @@ getFutilityBounds <- function(
     return(do.call(rbind, lapply(informationByStage, as.vector)))
 }
 
+.getFisherInformationSituationParameterNames <- function(designPlan) {
+    className <- .getClassName(designPlan)
+    if (grepl("Means", className)) {
+        return(c("alternative"))
+    } else if (grepl("Rates", className)) {
+        return(c("pi1", "theta"))
+    } else if (grepl("Survival", className)) {
+        return(c("hazardRatio", "pi1", "lambda1"))
+    } else if (grepl("CountData", className)) {
+        return(c("lambda1", "theta", "lambda", "lambda2"))
+    }
+    return(character())
+}
+
+.getFisherInformationSituationLabels <- function(designPlan, nSituations) {
+    parameterNames <- .getFisherInformationSituationParameterNames(designPlan)
+    parameterNames <- parameterNames[parameterNames %in% names(designPlan)]
+    if (length(parameterNames) == 0L) {
+        if (nSituations > 1L) {
+            return(paste0("situation ", seq_len(nSituations)))
+        }
+        return(NULL)
+    }
+
+    parameterValues <- lapply(parameterNames, function(parameterName) {
+        designPlan[[parameterName]]
+    })
+    valid <- vapply(parameterValues, function(values) {
+        !is.null(values) && length(values) > 0L && !all(is.na(values))
+    }, logical(1))
+    parameterNames <- parameterNames[valid]
+    parameterValues <- parameterValues[valid]
+    if (length(parameterNames) == 0L) {
+        if (nSituations > 1L) {
+            return(paste0("situation ", seq_len(nSituations)))
+        }
+        return(NULL)
+    }
+
+    matchingIndex <- which(vapply(parameterValues, length, integer(1)) == nSituations)[1]
+    if (!is.na(matchingIndex)) {
+        parameterName <- parameterNames[matchingIndex]
+        values <- as.vector(parameterValues[[matchingIndex]])
+        valueLabels <- format(values, trim = TRUE, digits = getOption("digits"))
+        return(paste0(parameterName, " = ", valueLabels))
+    }
+
+    if (nSituations == 1L) {
+        parameterName <- parameterNames[1]
+        values <- parameterValues[[1]]
+        if (length(values) == 1L) {
+            valueLabel <- format(values, trim = TRUE, digits = getOption("digits"))
+            return(paste0(parameterName, " = ", valueLabel))
+        }
+        return(paste0("common to all ", parameterName, " values"))
+    }
+
+    return(paste0("situation ", seq_len(nSituations)))
+}
+
+.getNumberOfFisherInformationSituations <- function(fisherInformation, stage) {
+    if (!is.null(dim(fisherInformation))) {
+        return(ncol(fisherInformation))
+    }
+    if (length(stage) > 1L) {
+        return(1L)
+    }
+    return(length(fisherInformation))
+}
+
 #'
 #' @title
 #' Get Fisher Information From a Design Plan or Simulation Results
@@ -1590,7 +1737,11 @@ getFutilityBounds <- function(
 #' vector or matrix can also be returned for a single stage if the object
 #' contains several planning alternatives, arms, or sample size values.
 #' \code{NA_real_} is returned if the endpoint type is not supported. The result
-#' always has a \code{"type"} attribute equal to the selected \code{type}.
+#' has class \code{FisherInformation} and always includes the attributes
+#' \code{"type"} and \code{"stage"}. If the values refer to distinguishable
+#' planning situations, the \code{"situations"} attribute contains descriptive
+#' labels such as the corresponding alternatives, event probabilities, hazard
+#' ratios, or count-data rates.
 #'
 #' @examples
 #' \dontrun{
@@ -1625,7 +1776,7 @@ getFisherInformation <- function(
     type <- match.arg(type)
 
     if (length(stage) == 1L && is.na(stage)) {
-        stage <- 1L
+        stage <- 1:designPlan$.design$kMax
     } else {
         stage <- .assertIsIntegerVector(stage, "stage", validateType = FALSE)
     }
@@ -1660,10 +1811,17 @@ getFisherInformation <- function(
 
     fisherInformation <- .combineFisherInformationStages(informationByStage)
     attr(fisherInformation, "type") <- type
+    attr(fisherInformation, "stage") <- stage
     if (length(stage) > 1L && !is.null(dim(fisherInformation))) {
         rownames(fisherInformation) <- paste0("stage ", stage)
     }
-    
+
+    nSituations <- .getNumberOfFisherInformationSituations(fisherInformation, stage)
+    attr(fisherInformation, "situations") <- .getFisherInformationSituationLabels(
+        designPlan,
+        nSituations
+    )
+    attr(fisherInformation, "designPlan") <- designPlan
     class(fisherInformation) <- c("FisherInformation", class(fisherInformation))
 
     return(fisherInformation)

@@ -43,7 +43,11 @@ in rows is returned for multiple planning alternatives or comparisons. A
 vector or matrix can also be returned for a single stage if the object
 contains several planning alternatives, arms, or sample size values.
 \code{NA_real_} is returned if the endpoint type is not supported. The result
-always has a \code{"type"} attribute equal to the selected \code{type}.
+has class \code{FisherInformation} and always includes the attributes
+\code{"type"} and \code{"stage"}. If the values refer to distinguishable
+planning situations, the \code{"situations"} attribute contains descriptive
+labels such as the corresponding alternatives, event probabilities, hazard
+ratios, or count-data rates.
 }
 \description{
 Calculates cumulative or stage-wise Fisher information at planned analyses for
