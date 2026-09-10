@@ -19,8 +19,10 @@ getFutilityBounds(
 )
 }
 \arguments{
-\item{sourceValue}{A numeric vector representing the
-futility bounds in the source scale.}
+\item{sourceValue}{A numeric vector representing the futility bounds in the
+source scale. Alternatively, a \code{FisherInformation} object returned by
+\code{\link[=getFisherInformation]{getFisherInformation()}} can be piped in;
+see Details.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
@@ -58,8 +60,12 @@ consistent with the requested conversion; see Details.}
 \item{naAllowed}{Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.}
 }
 \value{
-A numeric vector representing the futility bounds in the target scale, or
-\code{NULL} if the conversion is not implemented or yields no result.
+A numeric vector or matrix of class \code{FutilityBounds} representing the
+futility bounds in the target scale, or \code{NULL} if the conversion is not
+implemented or yields no result. For pipe-based input with multiple stages
+and situations, rows represent interim stages and columns represent planning
+situations. The corresponding labels and calculation context are retained as
+attributes and displayed by \code{print.FutilityBounds()}.
 }
 \description{
 This function converts futility bounds between different scales such as
@@ -70,6 +76,26 @@ power, and effect estimate.
 If the \code{sourceScale} and \code{targetScale} are the same, the function
 returns the input \code{sourceValue} without modification.
 Otherwise, the function is designed to convert between the specified scales.
+
+\strong{Piping Fisher information into getFutilityBounds}
+
+A complete result of
+\code{\link[=getFisherInformation]{getFisherInformation()}} can be supplied
+as \code{sourceValue}, most conveniently with the base R pipe. In this form,
+\code{getFutilityBounds()} obtains the design, its z-value futility bounds,
+the requested stages, the information type, and the planning-situation labels
+from the attributes of the \code{FisherInformation} object. If
+\code{targetScale} is omitted, the bounds are converted to
+\code{"effectEstimate"}; another target scale can be requested explicitly.
+
+The conversion is performed separately for every planning situation and for
+every supplied interim analysis. Information for the final analysis is used
+where a conversion requires future information, but no final-stage futility
+bound is returned. Consequently, cumulative information is appropriate for
+the default conversion to the effect-estimate scale. Stage-wise information
+is required for conversions involving conditional or predictive power. An
+informative error is issued if the \code{"type"} attribute is incompatible
+with the requested target scale.
 
 \strong{Interpretation of information}
 
@@ -170,6 +196,15 @@ getFutilityBounds(
     sourceScale = "condPowerAtObserved",
     targetScale = "pValue"
 )
+
+# Pipe all planning situations into an effect-estimate-scale conversion
+getDesignGroupSequential(
+    informationRates = c(0.2, 0.7, 1),
+    futilityBounds = c(-0.5, 0)
+) |>
+    getSampleSizeRates() |>
+    getFisherInformation() |>
+    getFutilityBounds()
 }
 
 }

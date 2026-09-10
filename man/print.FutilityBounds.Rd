@@ -9,9 +9,12 @@
 \arguments{
 \item{x}{An object of class \code{FutilityBounds}.}
 
-\item{...}{Additional arguments passed to \code{print.default}.}
+\item{...}{Additional arguments passed to the underlying print method.}
 }
 \description{
-S3 print method for objects of class \code{FutilityBounds}. Prints the futility bounds as a numeric vector.
+S3 print method for objects of class \code{FutilityBounds}. Prints the
+futility bounds together with their target scale and, if available, the
+analysis stages, planning situations, and Fisher information type used for
+their calculation.
 }
 \keyword{internal}

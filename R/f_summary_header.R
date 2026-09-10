@@ -464,7 +464,9 @@ NULL
     }
     header <- paste0(header, ".")
 
-    if ("effectMatrix" %in% names(designPlan) && !is.null(designPlan$effectMatrix)) {
+    if ("effectMatrix" %in% names(designPlan) && 
+            !is.null(designPlan$effectMatrix) && 
+            designPlan$isUserDefinedParameter("effectMatrix")) {
         effectMatrix <- designPlan$effectMatrix
         activeArms <- nrow(effectMatrix)
         if (activeArms == 1) {

@@ -189,17 +189,96 @@ NULL
 #' Print Futility Bounds
 #'
 #' @description
-#' S3 print method for objects of class \code{FutilityBounds}. Prints the futility bounds as a numeric vector.
+#' S3 print method for objects of class \code{FutilityBounds}. Prints the
+#' futility bounds together with their target scale and, if available, the
+#' analysis stages, planning situations, and Fisher information type used for
+#' their calculation.
 #'
 #' @param x An object of class \code{FutilityBounds}.
-#' @param ... Additional arguments passed to \code{print.default}.
+#' @param ... Additional arguments passed to the underlying print method.
 #'
 #' @keywords internal
 #'
 #' @export
 #'
 print.FutilityBounds <- function(x, ...) {
-    print.default(as.numeric(x))
+    stage <- attr(x, "stage", exact = TRUE)
+    situations <- attr(x, "situations", exact = TRUE)
+    informationType <- attr(x, "informationType", exact = TRUE)
+    targetScale <- attr(x, "targetScale", exact = TRUE)
+    if (is.list(targetScale)) {
+        targetScale <- targetScale$value
+    }
+    values <- .getFutilityBoundsValuesForPrinting(x)
+
+    scaleDescription <- "target"
+    if (!is.null(targetScale) && length(targetScale) == 1L && !is.na(targetScale)) {
+        scaleDescription <- .formatCamelCaseSingleWord(targetScale, sep = "-")
+    }
+    heading <- paste0("Futility bounds on the ", scaleDescription, " scale")
+    if (!is.null(informationType) && length(informationType) == 1L && !is.na(informationType)) {
+        informationDescription <- .formatCamelCaseSingleWord(informationType, sep = "-")
+        heading <- paste0(heading, " using ", informationDescription, " Fisher information")
+    }
+
+    if (!is.null(stage) && length(stage) == 1L) {
+        heading <- paste0(heading, " at stage ", stage)
+        if (!is.null(situations) && length(situations) == 1L) {
+            heading <- paste0(heading, " (", situations, ")")
+        } else if (!is.null(situations) && length(situations) > 1L) {
+            heading <- paste0(heading, " by situation")
+        }
+    } else if (!is.null(stage) && length(stage) > 1L) {
+        heading <- paste0(heading, " by stage")
+        if (!is.null(situations) && length(situations) == 1L) {
+            heading <- paste0(heading, " (", situations, ")")
+        } else if (!is.null(situations) && length(situations) > 1L) {
+            heading <- paste0(heading, " and situation")
+        }
+    }
+    cat(heading, ":\n", sep = "")
+
+    if (!is.null(stage) && length(stage) == 1L &&
+            is.null(dim(values)) && !is.null(situations) &&
+            length(situations) == length(values) && length(values) > 1L) {
+        output <- data.frame(
+            Situation = situations,
+            `Futility bound` = as.numeric(values),
+            check.names = FALSE
+        )
+        print(output, row.names = FALSE, ...)
+    } else if (!is.null(stage) && length(stage) > 1L && is.null(dim(values))) {
+        output <- data.frame(
+            Stage = stage,
+            `Futility bound` = as.numeric(values),
+            check.names = FALSE
+        )
+        print(output, row.names = FALSE, ...)
+    } else {
+        if (!is.null(dim(values))) {
+            if (!is.null(stage) && length(stage) == nrow(values)) {
+                rownames(values) <- paste0("Stage ", stage)
+            }
+            if (!is.null(situations) && length(situations) == ncol(values)) {
+                colnames(values) <- situations
+            }
+        }
+        print.default(values, ...)
+    }
+
+    return(invisible(x))
+}
+
+.getFutilityBoundsValuesForPrinting <- function(x) {
+    parameterAttributes <- c(
+        "sourceValue", "sourceScale", "targetScale", "theta", "information", "design",
+        "stage", "situations", "designPlan", "informationType"
+    )
+    for (attributeName in parameterAttributes) {
+        attr(x, attributeName) <- NULL
+    }
+    class(x) <- setdiff(class(x), "FutilityBounds")
+    return(x)
 }
 
 .getFisherInformationValuesForPrinting <- function(x) {
@@ -526,6 +605,203 @@ summary.FutilityBounds <- function(object, ...) {
     ))
 }
 
+.getFisherInformationAsMatrix <- function(fisherInformation) {
+    stage <- attr(fisherInformation, "stage", exact = TRUE)
+    situations <- attr(fisherInformation, "situations", exact = TRUE)
+    designPlan <- attr(fisherInformation, "designPlan", exact = TRUE)
+    informationType <- attr(fisherInformation, "type", exact = TRUE)
+    values <- .getFisherInformationValuesForPrinting(fisherInformation)
+
+    if (is.null(stage) || length(stage) == 0L) {
+        stopIllegalArgument(
+            .pQuote("information"), " does not contain the required ", sQuote("stage"), " attribute",
+            functionName = ".getFisherInformationAsMatrix",
+            parameter = "information",
+            value = fisherInformation
+        )
+    }
+
+    if (!is.null(dim(values))) {
+        if (nrow(values) != length(stage)) {
+            stopIllegalArgument(
+                "the number of rows in ", .pQuote("information"), " must equal the number of stages",
+                functionName = ".getFisherInformationAsMatrix",
+                parameter = "information",
+                value = fisherInformation,
+                relatedParameter = "stage",
+                relatedValue = stage
+            )
+        }
+        informationMatrix <- matrix(
+            as.numeric(values),
+            nrow = nrow(values),
+            ncol = ncol(values),
+            dimnames = dimnames(values)
+        )
+    } else if (length(stage) == 1L) {
+        informationMatrix <- matrix(as.numeric(values), nrow = 1L)
+    } else {
+        if (length(values) != length(stage)) {
+            stopIllegalArgument(
+                "the length of ", .pQuote("information"), " must equal the number of stages",
+                functionName = ".getFisherInformationAsMatrix",
+                parameter = "information",
+                value = fisherInformation,
+                relatedParameter = "stage",
+                relatedValue = stage
+            )
+        }
+        informationMatrix <- matrix(as.numeric(values), ncol = 1L)
+    }
+
+    nSituations <- ncol(informationMatrix)
+    if (is.null(situations) || length(situations) != nSituations) {
+        situations <- if (nSituations == 1L) NULL else paste0("situation ", seq_len(nSituations))
+    }
+
+    return(list(
+        values = informationMatrix,
+        stage = stage,
+        situations = situations,
+        type = informationType,
+        designPlan = designPlan
+    ))
+}
+
+.getFutilityBoundsFromFisherInformation <- function(
+        fisherInformation,
+        targetScale,
+        directionUpper,
+        theta,
+        naAllowed) {
+    informationData <- .getFisherInformationAsMatrix(fisherInformation)
+    designPlan <- informationData$designPlan
+    if (is.null(designPlan)) {
+        stopIllegalArgument(
+            .pQuote("information"), " does not contain the design plan required for pipe-based conversion",
+            functionName = ".getFutilityBoundsFromFisherInformation",
+            parameter = "information",
+            value = fisherInformation
+        )
+    }
+
+    design <- designPlan$.design
+    .assertIsValidFutilityBoundsInformationType(
+        fisherInformation,
+        sourceScale = "zValue",
+        targetScale = targetScale
+    )
+
+    interimStages <- informationData$stage[informationData$stage < design$kMax]
+    if (length(interimStages) == 0L) {
+        stopIllegalArgument(
+            .pQuote("information"), " must contain at least one interim analysis stage",
+            functionName = ".getFutilityBoundsFromFisherInformation",
+            parameter = "information",
+            value = fisherInformation,
+            relatedParameter = "stage",
+            relatedValue = informationData$stage
+        )
+    }
+
+    stageIndices <- match(interimStages, informationData$stage)
+    sourceValues <- .getFutilityBounds(design, interimStages)
+    nSituations <- ncol(informationData$values)
+    result <- matrix(
+        NA_real_,
+        nrow = length(interimStages),
+        ncol = nSituations
+    )
+
+    directionUpperCalculated <- directionUpper
+    if (is.na(directionUpperCalculated)) {
+        directionUpperCalculated <- if (is.na(design$directionUpper)) TRUE else design$directionUpper
+    }
+
+    powerScales <- c("conditionalPower", "condPowerAtObserved", "predictivePower")
+    if (targetScale %in% powerScales) {
+        requiredStages <- seq_len(design$kMax)
+        requiredStageIndices <- match(requiredStages, informationData$stage)
+        if (anyNA(requiredStageIndices)) {
+            stopIllegalArgument(
+                .pQuote("information"), " must contain all design stages for conversion to ",
+                .vQuote(targetScale),
+                functionName = ".getFutilityBoundsFromFisherInformation",
+                parameter = "information",
+                value = fisherInformation,
+                relatedParameter = "stage",
+                relatedValue = informationData$stage
+            )
+        }
+        for (situationIndex in seq_len(nSituations)) {
+            information <- informationData$values[requiredStageIndices, situationIndex]
+            if (targetScale == "conditionalPower") {
+                information[1] <- NA_real_
+            }
+            attr(information, "type") <- informationData$type
+            result[, situationIndex] <- as.numeric(getFutilityBounds(
+                sourceValue = sourceValues,
+                sourceScale = "zValue",
+                targetScale = targetScale,
+                design = design,
+                directionUpper = directionUpperCalculated,
+                theta = theta,
+                information = information,
+                naAllowed = naAllowed
+            ))
+        }
+    } else {
+        for (stageIndex in seq_along(interimStages)) {
+            for (situationIndex in seq_len(nSituations)) {
+                information <- NA_real_
+                if (targetScale == "effectEstimate") {
+                    information <- informationData$values[stageIndices[stageIndex], situationIndex]
+                    attr(information, "type") <- informationData$type
+                }
+                calculationDesign <- if (targetScale == "reverseCondPower") design else NULL
+                result[stageIndex, situationIndex] <- as.numeric(getFutilityBounds(
+                    sourceValue = sourceValues[stageIndex],
+                    sourceScale = "zValue",
+                    targetScale = targetScale,
+                    design = calculationDesign,
+                    directionUpper = directionUpperCalculated,
+                    information = information,
+                    naAllowed = naAllowed
+                ))
+            }
+        }
+    }
+
+    dimnames(result) <- list(
+        paste0("stage ", interimStages),
+        informationData$situations
+    )
+
+    if (nrow(result) == 1L) {
+        result <- as.numeric(result[1, ])
+    } else if (ncol(result) == 1L) {
+        result <- as.numeric(result[, 1])
+    }
+
+    args <- list(
+        sourceValue = list(value = sourceValues, type = C_PARAM_DERIVED),
+        sourceScale = list(value = "zValue", type = C_PARAM_DERIVED),
+        targetScale = list(value = targetScale, type = C_PARAM_USER_DEFINED),
+        theta = list(
+            value = theta,
+            type = ifelse(is.na(theta), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
+        ),
+        information = list(value = fisherInformation, type = C_PARAM_USER_DEFINED),
+        design = list(value = design, type = C_PARAM_DERIVED)
+    )
+    result <- .addFutilityBoundParameterTypes(result, args)
+    attr(result, "stage") <- interimStages
+    attr(result, "situations") <- informationData$situations
+    attr(result, "designPlan") <- designPlan
+    attr(result, "informationType") <- informationData$type
+    return(result)
+}
+
 #'
 #' @title
 #' Get Futility Bounds
@@ -535,8 +811,10 @@ summary.FutilityBounds <- function(object, ...) {
 #' z-value, p-value, conditional power, predictive power, reverse conditional
 #' power, and effect estimate.
 #'
-#' @param sourceValue A numeric vector representing the
-#' futility bounds in the source scale.
+#' @param sourceValue A numeric vector representing the futility bounds in the
+#' source scale. Alternatively, a \code{FisherInformation} object returned by
+#' \code{\link[=getFisherInformation]{getFisherInformation()}} can be piped in;
+#' see Details.
 #' @param sourceScale Character. The scale of the input futility bounds.
 #' Must be one of \code{"zValue"}, \code{"pValue"},
 #' \code{"conditionalPower"}, "condPowerAtObserved", \code{"predictivePower"},
@@ -566,6 +844,26 @@ summary.FutilityBounds <- function(object, ...) {
 #' If the \code{sourceScale} and \code{targetScale} are the same, the function
 #' returns the input \code{sourceValue} without modification.
 #' Otherwise, the function is designed to convert between the specified scales.
+#'
+#' \strong{Piping Fisher information into getFutilityBounds}
+#'
+#' A complete result of
+#' \code{\link[=getFisherInformation]{getFisherInformation()}} can be supplied
+#' as \code{sourceValue}, most conveniently with the base R pipe. In this form,
+#' \code{getFutilityBounds()} obtains the design, its z-value futility bounds,
+#' the requested stages, the information type, and the planning-situation labels
+#' from the attributes of the \code{FisherInformation} object. If
+#' \code{targetScale} is omitted, the bounds are converted to
+#' \code{"effectEstimate"}; another target scale can be requested explicitly.
+#'
+#' The conversion is performed separately for every planning situation and for
+#' every supplied interim analysis. Information for the final analysis is used
+#' where a conversion requires future information, but no final-stage futility
+#' bound is returned. Consequently, cumulative information is appropriate for
+#' the default conversion to the effect-estimate scale. Stage-wise information
+#' is required for conversions involving conditional or predictive power. An
+#' informative error is issued if the \code{"type"} attribute is incompatible
+#' with the requested target scale.
 #'
 #' \strong{Interpretation of information}
 #'
@@ -650,8 +948,12 @@ summary.FutilityBounds <- function(object, ...) {
 #' }
 #'
 #' @return
-#' A numeric vector representing the futility bounds in the target scale, or
-#' \code{NULL} if the conversion is not implemented or yields no result.
+#' A numeric vector or matrix of class \code{FutilityBounds} representing the
+#' futility bounds in the target scale, or \code{NULL} if the conversion is not
+#' implemented or yields no result. For pipe-based input with multiple stages
+#' and situations, rows represent interim stages and columns represent planning
+#' situations. The corresponding labels and calculation context are retained as
+#' attributes and displayed by \code{print.FutilityBounds()}.
 #'
 #' @examples
 #' \dontrun{
@@ -670,6 +972,15 @@ summary.FutilityBounds <- function(object, ...) {
 #'     sourceScale = "condPowerAtObserved",
 #'     targetScale = "pValue"
 #' )
+#'
+#' # Pipe all planning situations into an effect-estimate-scale conversion
+#' getDesignGroupSequential(
+#'     informationRates = c(0.2, 0.7, 1),
+#'     futilityBounds = c(-0.5, 0)
+#' ) |>
+#'     getSampleSizeRates() |>
+#'     getFisherInformation() |>
+#'     getFutilityBounds()
 #' }
 #'
 #' @seealso \code{\link[=getFisherInformation]{getFisherInformation()}} for
@@ -708,6 +1019,7 @@ getFutilityBounds <- function(
         theta = NA_real_,
         information = NA_real_,
         naAllowed = FALSE) {
+    targetScaleMissing <- missing(targetScale)
     sourceScale <- match.arg(sourceScale)
     targetScale <- match.arg(targetScale)
 
@@ -720,11 +1032,16 @@ getFutilityBounds <- function(
     )
     
     if (is(sourceValue, "FisherInformation")) {
-        designPlan <- attr(sourceValue, "designPlan", exact = TRUE)
-        information <- sourceValue
-        design <- designPlan$.design
-        sourceScale <- "zValue"
-        sourceValue <- design$futilityBounds
+        if (targetScaleMissing) {
+            targetScale <- "effectEstimate"
+        }
+        return(.getFutilityBoundsFromFisherInformation(
+            fisherInformation = sourceValue,
+            targetScale = targetScale,
+            directionUpper = directionUpper,
+            theta = theta,
+            naAllowed = naAllowed
+        ))
     }
     
     sourceValue <- .assertIsNumericVector(sourceValue, "sourceValue", naAllowed = naAllowed)
@@ -1640,8 +1957,8 @@ getFutilityBounds <- function(
 #' \code{\link[=getSimulationCounts]{getSimulationCounts()}}, or the
 #' corresponding multi-arm simulation functions.
 #' @param stage Integer vector. The analysis stage or stages for which Fisher
-#'        information is requested. If \code{NA} (default), the first stage is
-#'        used.
+#'        information is requested. If \code{NA} (default), all stages of the
+#'        design are used.
 #' @param type Character. Defines whether cumulative information through each
 #'        requested analysis (\code{"cumulative"}, the default) or the
 #'        information increment contributed by each requested stage
@@ -1725,9 +2042,15 @@ getFutilityBounds <- function(
 #' }
 #' The \code{"type"} attribute added to every result enables
 #' \code{getFutilityBounds()} to detect incompatible use.
-#' If multiple planning alternatives or treatment comparisons produce a matrix,
-#' select the column corresponding to the desired alternative or comparison
-#' before passing it to \code{getFutilityBounds()}.
+#' The complete result can also be piped into \code{getFutilityBounds()}. In
+#' that case, its stage and situation attributes are used to convert every
+#' applicable futility bound separately. With the default cumulative type, an
+#' omitted target scale means conversion to the effect-estimate scale:
+#' \preformatted{
+#' designPlan |>
+#'     getFisherInformation() |>
+#'     getFutilityBounds()
+#' }
 #'
 #' @return
 #' A numeric value, vector, or matrix containing cumulative or stage-wise Fisher
@@ -1753,7 +2076,7 @@ getFutilityBounds <- function(
 #'     alternative = c(0.3, 0.4), maxNumberOfSubjects = 100
 #' )
 #' getFisherInformation(designPlan)
-#' getFisherInformation(designPlan, stage = 1:3)
+#' getFisherInformation(designPlan, stage = 2)
 #' getFisherInformation(designPlan, stage = 1:3, type = "stageWise")
 #'
 #' simulationResults <- getSimulationMeans(design,
@@ -1908,7 +2231,7 @@ getFisherInformation <- function(
         return(.getFutilityBoundsTreatmentEffectScaleRatesTwoGroups(designPlan, boundary, nStages))
     }
 
-    fisherInformation <- getFisherInformation(designPlan)
+    fisherInformation <- getFisherInformation(designPlan, stage = 1)
     nParameters <- max(length(fisherInformation), 1)
 
     if (nStages == 0) {

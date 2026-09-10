@@ -27,8 +27,8 @@ getFisherInformation(
 corresponding multi-arm simulation functions.}
 
 \item{stage}{Integer vector. The analysis stage or stages for which Fisher
-information is requested. If \code{NA} (default), the first stage is
-used.}
+information is requested. If \code{NA} (default), all stages of the
+design are used.}
 
 \item{type}{Character. Defines whether cumulative information through each
 requested analysis (\code{"cumulative"}, the default) or the
@@ -134,9 +134,15 @@ information <- getFisherInformation(
 }
 The \code{"type"} attribute added to every result enables
 \code{getFutilityBounds()} to detect incompatible use.
-If multiple planning alternatives or treatment comparisons produce a matrix,
-select the column corresponding to the desired alternative or comparison
-before passing it to \code{getFutilityBounds()}.
+The complete result can also be piped into \code{getFutilityBounds()}. In
+that case, its stage and situation attributes are used to convert every
+applicable futility bound separately. With the default cumulative type, an
+omitted target scale means conversion to the effect-estimate scale:
+\preformatted{
+designPlan |>
+    getFisherInformation() |>
+    getFutilityBounds()
+}
 }
 \examples{
 \dontrun{
@@ -148,7 +154,7 @@ designPlan <- getPowerMeans(design,
     alternative = c(0.3, 0.4), maxNumberOfSubjects = 100
 )
 getFisherInformation(designPlan)
-getFisherInformation(designPlan, stage = 1:3)
+getFisherInformation(designPlan, stage = 2)
 getFisherInformation(designPlan, stage = 1:3, type = "stageWise")
 
 simulationResults <- getSimulationMeans(design,
