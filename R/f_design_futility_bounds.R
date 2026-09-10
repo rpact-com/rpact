@@ -566,30 +566,30 @@ summary.FutilityBounds <- function(object, ...) {
 }
 
 .assertIsValidDesignForFutilityBoundsConversion <- function(design, sourceScale, targetScale) {
-    if (design$sided == 1 && design$kMax == 2) {
-        return(invisible())
+    if (design$sided != 1 || design$kMax != 2) {
+        msg <- paste0(
+            "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale),
+            " is available only for one-sided two-stage designs; invalid user input: "
+        )
+
+        invalidInputs <- character()
+        if (design$sided != 1) {
+            invalidInputs <- c(invalidInputs, paste0("sided = ", design$sided))
+        }
+        if (design$kMax != 2) {
+            invalidInputs <- c(invalidInputs, paste0("kMax = ", design$kMax))
+        }
+        stopIllegalArgument(msg, paste(invalidInputs, collapse = ", "),
+            parameter = c("sided", "kMax"), value = list(
+                sided = design$sided,
+                kMax = design$kMax
+            ),
+            constraint = "one-sided two-stage design",
+            functionName = ".assertIsValidDesignForFutilityBoundsConversion"
+        )
     }
 
-    msg <- paste0(
-        "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale),
-        " is available only for one-sided two-stage designs; invalid user input: "
-    )
-
-    invalidInputs <- character()
-    if (design$sided != 1) {
-        invalidInputs <- c(invalidInputs, paste0("sided = ", design$sided))
-    }
-    if (design$kMax != 2) {
-        invalidInputs <- c(invalidInputs, paste0("kMax = ", design$kMax))
-    }
-    stopIllegalArgument(msg, paste(invalidInputs, collapse = ", "),
-        parameter = c("sided", "kMax"), value = list(
-            sided = design$sided,
-            kMax = design$kMax
-        ),
-        constraint = "one-sided two-stage design",
-        functionName = ".assertIsValidDesignForFutilityBoundsConversion"
-    )
+    return(invisible())
 }
 
 .futilityBoundsCalculationRequiresDesign <- function(scale) {
@@ -691,6 +691,13 @@ summary.FutilityBounds <- function(object, ...) {
         sourceScale = "zValue",
         targetScale = targetScale
     )
+    if (.futilityBoundsCalculationRequiresDesign(targetScale)) {
+        .assertIsValidDesignForFutilityBoundsConversion(
+            design,
+            sourceScale = "zValue",
+            targetScale = targetScale
+        )
+    }
 
     interimStages <- informationData$stage[informationData$stage < design$kMax]
     if (length(interimStages) == 0L) {
@@ -719,7 +726,14 @@ summary.FutilityBounds <- function(object, ...) {
     }
 
     powerScales <- c("conditionalPower", "condPowerAtObserved", "predictivePower")
-    if (targetScale %in% powerScales) {
+    probabilityScalesRequiringDesign <- c(powerScales, "reverseCondPower")
+    defaultFutilityBounds <-
+        .isTrialDesignInverseNormalOrGroupSequential(design) &&
+        !.anyFutilityBoundsAreInvalid(design$futilityBounds, design$directionUpper)
+
+    if (defaultFutilityBounds && targetScale %in% probabilityScalesRequiringDesign) {
+        result[,] <- 0
+    } else if (targetScale %in% powerScales) {
         requiredStages <- seq_len(design$kMax)
         requiredStageIndices <- match(requiredStages, informationData$stage)
         if (anyNA(requiredStageIndices)) {
@@ -812,7 +826,8 @@ summary.FutilityBounds <- function(object, ...) {
 #' power, and effect estimate.
 #'
 #' @param sourceValue A numeric vector representing the futility bounds in the
-#' source scale. Alternatively, a \code{FisherInformation} object returned by
+#' source scale. Alternatively, a trial design plan, simulation results, or a
+#' \code{FisherInformation} object returned by
 #' \code{\link[=getFisherInformation]{getFisherInformation()}} can be piped in;
 #' see Details.
 #' @param sourceScale Character. The scale of the input futility bounds.
@@ -845,7 +860,19 @@ summary.FutilityBounds <- function(object, ...) {
 #' returns the input \code{sourceValue} without modification.
 #' Otherwise, the function is designed to convert between the specified scales.
 #'
-#' \strong{Piping Fisher information into getFutilityBounds}
+#' \strong{Piping design plans or Fisher information into getFutilityBounds}
+#'
+#' A trial design plan or simulation results object can be supplied directly.
+#' In that case, \code{getFisherInformation()} is called internally with the
+#' information type required by \code{targetScale}: \code{"cumulative"} for
+#' an effect-estimate conversion and \code{"stageWise"} for conversions
+#' involving conditional or predictive power. This provides the short form
+#' \preformatted{
+#' designPlan |>
+#'     getFutilityBounds(targetScale = "condPowerAtObserved")
+#' }
+#' instead of explicitly inserting
+#' \code{getFisherInformation(type = "stageWise")} into the pipe.
 #'
 #' A complete result of
 #' \code{\link[=getFisherInformation]{getFisherInformation()}} can be supplied
@@ -864,6 +891,16 @@ summary.FutilityBounds <- function(object, ...) {
 #' is required for conversions involving conditional or predictive power. An
 #' informative error is issued if the \code{"type"} attribute is incompatible
 #' with the requested target scale.
+#' Conversions to conditional power, conditional power at the observed effect,
+#' predictive power, or reverse conditional power remain restricted to
+#' one-sided two-stage designs. For a design with more than two stages, the
+#' conditional probability would additionally require a precise definition of
+#' how all remaining analyses and their stopping boundaries are handled.
+#' If a group sequential or inverse normal design contains only the default
+#' futility bound, that bound represents the absence of futility stopping. Its
+#' conversion to a conditional- or predictive-probability scale is therefore
+#' returned as the exact boundary value \code{0}, without a numerical-range
+#' warning. This applies in both directions of the alternative.
 #'
 #' \strong{Interpretation of information}
 #'
@@ -981,6 +1018,11 @@ summary.FutilityBounds <- function(object, ...) {
 #'     getSampleSizeRates() |>
 #'     getFisherInformation() |>
 #'     getFutilityBounds()
+#'
+#' # Fisher information is calculated internally with type = "stageWise"
+#' getDesignGroupSequential(kMax = 2, futilityBounds = 0.3) |>
+#'     getSampleSizeRates() |>
+#'     getFutilityBounds(targetScale = "condPowerAtObserved")
 #' }
 #'
 #' @seealso \code{\link[=getFisherInformation]{getFisherInformation()}} for
@@ -1030,6 +1072,23 @@ getFutilityBounds <- function(
         exceptionEnabled = FALSE,
         ...
     )
+
+    if (is(sourceValue, "TrialDesignPlan") || is(sourceValue, "SimulationResults")) {
+        if (targetScaleMissing) {
+            targetScale <- "effectEstimate"
+        }
+        requiredInformationType <- .getRequiredFutilityBoundsInformationType(
+            sourceScale = "zValue",
+            targetScale = targetScale
+        )
+        if (is.null(requiredInformationType)) {
+            requiredInformationType <- "cumulative"
+        }
+        sourceValue <- getFisherInformation(
+            sourceValue,
+            type = requiredInformationType
+        )
+    }
     
     if (is(sourceValue, "FisherInformation")) {
         if (targetScaleMissing) {
@@ -2051,6 +2110,9 @@ getFutilityBounds <- function(
 #'     getFisherInformation() |>
 #'     getFutilityBounds()
 #' }
+#' Alternatively, pipe \code{designPlan} directly into
+#' \code{getFutilityBounds()}; the latter then calls this function internally
+#' with the information type required by the requested target scale.
 #'
 #' @return
 #' A numeric value, vector, or matrix containing cumulative or stage-wise Fisher

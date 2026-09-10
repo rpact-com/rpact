@@ -143,6 +143,9 @@ designPlan |>
     getFisherInformation() |>
     getFutilityBounds()
 }
+Alternatively, pipe \code{designPlan} directly into
+\code{getFutilityBounds()}; the latter then calls this function internally
+with the information type required by the requested target scale.
 }
 \examples{
 \dontrun{
