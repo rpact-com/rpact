@@ -1390,6 +1390,30 @@ getParameterName <- function(obj, parameterCaption) {
     return(array(data = subData, dim = dataDim))
 }
 
+.moveColumnToFirstPosition <- function(data, columnName) {
+    if (!is.data.frame(data)) {
+        stopIllegalArgument(sQuote("data"), " (", .getClassName(data), ") must be a data.frame",
+            parameter = "data",
+            value = .getClassName(data), 
+            constraint = "data.frame",
+            functionName = ".moveColumnToFirstPosition"
+        )
+    }
+    .assertIsSingleCharacter(columnName, "columnName", naAllowed = FALSE)
+    
+    if (!(columnName %in% colnames(data))) {
+        return(data)
+    }
+
+    colNames <- colnames(data)
+    if (which(colnames(data) == columnName) == 1) {
+        return(data)
+    }
+
+    data <- data[, c(columnName, colNames[colNames != columnName])]
+    return(data)
+}
+
 .moveColumn <- function(data, columnName, insertPositionColumnName) {
     if (!is.data.frame(data)) {
         stopIllegalArgument(sQuote("data"), " (", .getClassName(data), ") must be a data.frame",

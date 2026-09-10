@@ -674,7 +674,7 @@ getSimulationMultiArmMeans <- function(
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
-        armNumber = dataArmNumber,
+        activeArm = dataArmNumber,
         muMax = dataAlternative,
         effect = dataEffect,
         numberOfSubjects = dataNumberOfSubjects,

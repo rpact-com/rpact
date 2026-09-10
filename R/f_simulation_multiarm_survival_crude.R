@@ -760,7 +760,7 @@ getSimulationMultiArmSurvivalBasic <- function(
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
-        armNumber = dataArmNumber,
+        activeArm = dataArmNumber,
         omegaMax = dataAlternative,
         effect = dataEffect,
         numberOfEvents = dataNumberOfEvents,

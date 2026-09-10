@@ -825,13 +825,32 @@ getData <- function(x) {
         )
     }
 
-    return(x$.data)
+    return(.getTweakedSimulationData(x$.data))
 }
 
 #' @rdname getData
 #' @export
 getData.SimulationResults <- function(x) {
-    return(x$.data)
+    return(.getTweakedSimulationData(x$.data))
+}
+
+.getTweakedSimulationData <- function(df) {
+    # order by column pi1 if it exists
+    if (all(c("pi1", "iterationNumber", "stageNumber") %in% colnames(df))) {
+        df <- df[order(df$pi1, df$iterationNumber, df$stageNumber), ]
+    }
+    
+    # move columns p1 and p2 to first position if they exist
+    if (all(c("pi1", "pi2") %in% colnames(df))) {
+        df <- .moveColumnToFirstPosition(df, "pi2")
+        df <- .moveColumnToFirstPosition(df, "pi1")
+    }
+    
+    # move column omegaMax to first position if it exist
+    if ("omegaMax" %in% colnames(df)) {
+        df <- .moveColumnToFirstPosition(df, "omegaMax")
+    }
+    return(df)    
 }
 
 .assertIsValidMaxNumberOfRawDatasetsPerStage <- function(maxNumberOfRawDatasetsPerStage) {
@@ -1113,6 +1132,7 @@ getRawData <- function(x, aggregate = FALSE) {
             value = x
         )
     }
+    .assertIsSingleLogical(aggregate, "aggregate", naAllowed = FALSE)
 
     rawData <- x$.rawData
     if (is.null(rawData) || ncol(rawData) == 0 || nrow(rawData) == 0) {
@@ -1144,7 +1164,9 @@ getRawData <- function(x, aggregate = FALSE) {
     }
 
     if (!aggregate) {
-        return(rawData[, names(rawData) != "lastObservationTime", drop = FALSE])
+        rawData <- rawData[, !names(rawData) %in% c("lastObservationTime", "event", "dropoutEvent"), drop = FALSE]
+        rawData <- .getTweakedSimulationData(rawData)
+        return(rawData)
     }
 
     if (inherits(x, "SimulationResultsMultiArmSurvival")) {

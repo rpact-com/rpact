@@ -329,7 +329,7 @@ SimulationResults <- R6::R6Class(
                                     }
                                 }
                             }
-                            if (parameterName == "subjectsActiveArm" && variedParameterName2 == "armNumber") {
+                            if (parameterName == "subjectsActiveArm" && variedParameterName2 == "activeArm") {
                                 parameterName2 <- "subjectsControlArm"
                                 paramCaption2 <- .getParameterCaption(parameterName2, self)
                                 if (is.null(paramCaption2)) {
@@ -415,7 +415,7 @@ SimulationResults <- R6::R6Class(
                         !inherits(self, "SimulationResultsSurvival") &&
                         grepl("MultiArm", .getClassName(self))
                     ) {
-                    return("armNumber")
+                    return("activeArm")
                 }
                 return(NA_character_)
             }
@@ -456,7 +456,7 @@ SimulationResults <- R6::R6Class(
             return(parameterValues)
         },
         .getVariedParameterValueString = function(variedParameterName, parameterValue) {
-            if (variedParameterName %in% c("armNumber")) {
+            if (variedParameterName %in% c("activeArm")) {
                 return(paste0(" (", parameterValue[1], ")"))
             }
             variedParameterName <- sub("Max$", "_max", variedParameterName)

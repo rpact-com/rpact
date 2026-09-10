@@ -761,7 +761,7 @@ getSimulationMultiArmRates <- function(
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
-        armNumber = dataArmNumber,
+        activeArm = dataArmNumber,
         piMax = dataAlternative,
         effect = dataEffect,
         numberOfSubjects = dataNumberOfSubjects,

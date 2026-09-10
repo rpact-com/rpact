@@ -1284,7 +1284,7 @@ List performSimulationMultiArmSurvivalLoop(
 	DataFrame filteredData = DataFrame::create(
 		_["iterationNumber"] = dataIterationNumber[validRows],
 		_["stageNumber"] = dataStageNumber[validRows],
-		_["armNumber"] = dataArmNumber[validRows],
+		_["activeArm"] = dataArmNumber[validRows],
 		_["omegaMax"] = dataAlternative[validRows],
 		_["effect"] = dataEffect[validRows],
 		_["analysisTime"] = dataAnalysisTime[validRows],
