@@ -17,7 +17,61 @@
 #' @include f_core_utilities.R
 NULL
 
-.getFutilityBoundInformations <- function(..., information, sourceScale, targetScale, design, showWarnings = TRUE) {
+.getRequiredFutilityBoundsInformationType <- function(sourceScale, targetScale) {
+    scales <- c(sourceScale, targetScale)
+    if (any(scales %in% c("conditionalPower", "condPowerAtObserved", "predictivePower"))) {
+        return("stageWise")
+    }
+    if (any(scales == "effectEstimate")) {
+        return("cumulative")
+    }
+    return(NULL)
+}
+
+.assertIsValidFutilityBoundsInformationType <- function(information, sourceScale, targetScale) {
+    informationType <- attr(information, "type", exact = TRUE)
+    if (is.null(informationType)) {
+        return(invisible())
+    }
+
+    validTypes <- c("cumulative", "stageWise")
+    if (!is.character(informationType) || length(informationType) != 1L ||
+            is.na(informationType) || !informationType %in% validTypes) {
+        stopIllegalArgument(
+            "attribute ", .sQuote("type"), " of ", .pQuote("information"), " (",
+            .arrayToString(informationType), ") must be ", .arrayToString(validTypes, mode = "or"),
+            functionName = ".assertIsValidFutilityBoundsInformationType",
+            parameter = "information",
+            value = information
+        )
+    }
+
+    requiredType <- .getRequiredFutilityBoundsInformationType(sourceScale, targetScale)
+    if (!is.null(requiredType) && informationType != requiredType) {
+        stopIllegalArgument(
+            .pQuote("information"), " has type ", .vQuote(informationType),
+            ", but conversion from ", .vQuote(sourceScale), " to ", .vQuote(targetScale),
+            " requires information of type ", .vQuote(requiredType),
+            functionName = ".assertIsValidFutilityBoundsInformationType",
+            parameter = "information",
+            value = information,
+            relatedParameter = "type",
+            relatedValue = informationType
+        )
+    }
+
+    return(invisible())
+}
+
+.getFutilityBoundInformations <- function(
+        ...,
+        information,
+        sourceScale,
+        targetScale,
+        design,
+        showWarnings = TRUE) {
+    .assertIsValidFutilityBoundsInformationType(information, sourceScale, targetScale)
+
     args <- list(...)
     separateInformationArguments <- length(args) > 0 &&
         !is.null(names(args)) &&
@@ -145,6 +199,30 @@ NULL
 #' @export
 #'
 print.FutilityBounds <- function(x, ...) {
+    print.default(as.numeric(x))
+}
+
+#' 
+#' @title
+#' Print Fisher Information
+#' 
+#' @description
+#' S3 print method for objects of class \code{FisherInformation}. 
+#' Prints the Fisher information as a numeric vector with an optional type description.
+#' 
+#' @param x An object of class \code{FisherInformation}.
+#' @param ... Additional arguments passed to \code{print.default}.
+#' 
+#' @keywords internal
+#' 
+#' @export
+#' 
+print.FisherInformation <- function(x, ...) {
+    type <- attr(x, "type")
+    if (!is.null(type) && !is.na(type)) {
+        cat(.firstCharacterToUpperCase(
+            .formatCamelCaseSingleWord(type, sep = "-")), "Fisher information:\n")
+    }
     print.default(as.numeric(x))
 }
 
@@ -405,11 +483,13 @@ summary.FutilityBounds <- function(object, ...) {
 #' @inheritParams param_directionUpper
 #' @param theta Numeric. The assumed effect size under the alternative hypothesis on the scale of the
 #'   test statistic. For example, in a survival design, this would be the on the log hazard ratio scale.
-#' @param information Numeric vector of length 1 or 2. The stage-wise information levels
-#'   (i.e. this is *not* the cumulative information). Note that depending on which conversion is performed,
-#'   either the first or second stage information may not be needed. In this case, a warning will be issued
-#'   if the unused information is provided. The warning can be avoided by either passing a single number
-#'   (setting both informations to be equal to each other), or setting the unused information to \code{NA}.
+#' @param information Numeric vector of length 1 or 2 specifying the information
+#'   used in the conversion. In general, \code{information[1]} is the cumulative
+#'   information available at the analysis to which the futility bound refers,
+#'   whereas \code{information[2]} is the additional information planned after
+#'   that analysis. The exact requirements depend on \code{sourceScale} and
+#'   \code{targetScale}. If present, the \code{"type"} attribute must be
+#'   consistent with the requested conversion; see Details.
 #' @param naAllowed Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.
 #' @inheritParams param_three_dots
 #'
@@ -417,6 +497,88 @@ summary.FutilityBounds <- function(object, ...) {
 #' If the \code{sourceScale} and \code{targetScale} are the same, the function
 #' returns the input \code{sourceValue} without modification.
 #' Otherwise, the function is designed to convert between the specified scales.
+#'
+#' \strong{Interpretation of information}
+#'
+#' The elements of \code{information} have different interpretations:
+#' \itemize{
+#'   \item \code{information[1]} is the cumulative Fisher information underlying
+#'   the test statistic or effect estimate at the analysis where the futility
+#'   bound is evaluated. In a two-stage design this is also the information
+#'   contributed by the first stage.
+#'   \item \code{information[2]} is the additional, non-cumulative Fisher
+#'   information to be collected after that analysis. In a two-stage design this
+#'   is the information contributed by the second stage, not the cumulative
+#'   information at the second analysis.
+#' }
+#'
+#' Consequently, if \eqn{I_1} and \eqn{I_2} denote the cumulative information at
+#' the first and second analyses, respectively, specify
+#' \code{information = c(I1, I2 - I1)}. A single value is used for both elements.
+#'
+#' \strong{Information required by conversion type}
+#'
+#' The required elements are determined by all scales involved in the conversion:
+#' \describe{
+#'   \item{\code{"zValue"} and \code{"pValue"}}{Conversions between these two
+#'   scales do not require information.}
+#'   \item{\code{"effectEstimate"}}{Requires \code{information[1]}. The
+#'   standardized statistic and effect estimate are related by
+#'   \eqn{z = \widehat{\theta}\sqrt{I_1}}. Thus the cumulative information at the
+#'   analysis represented by the z-value or effect estimate must be supplied.}
+#'   \item{\code{"conditionalPower"}}{Requires \code{information[2]} together
+#'   with \code{theta}. Here \code{information[2]} is the additional information
+#'   available for the future stage over which conditional power is calculated.}
+#'   \item{\code{"condPowerAtObserved"}}{Requires both elements. The current
+#'   effect is estimated using the cumulative information \code{information[1]}
+#'   and projected over the additional future information
+#'   \code{information[2]}.}
+#'   \item{\code{"predictivePower"}}{Requires both elements. Predictive power
+#'   combines uncertainty based on the cumulative information already observed
+#'   with the additional information planned for the future stage.}
+#'   \item{\code{"reverseCondPower"}}{Does not require an explicit
+#'   \code{information} value; the required information fractions are taken from
+#'   the specified \code{design}.}
+#' }
+#'
+#' If \code{condPowerAtObserved} or \code{predictivePower} is involved and no
+#' complete information vector is supplied, the relative first- and second-stage
+#' information can be derived from an eligible two-stage \code{design} as
+#' \code{c(design$informationRates[1], 1 - design$informationRates[1])}. This
+#' normalization is sufficient for conversions that depend only on information
+#' ratios. An explicitly supplied vector is needed when absolute information is
+#' required, for example when conditional power is calculated under a specified
+#' value of \code{theta}.
+#'
+#' A warning is issued if a two-element vector contains an information value not
+#' needed for the requested conversion. Set the unused element to \code{NA}, or
+#' pass a single value when using the same value for both elements is intended.
+#' Information returned by
+#' \code{\link[=getFisherInformation]{getFisherInformation()}} has a
+#' \code{"type"} attribute. If that attribute is present,
+#' \code{getFutilityBounds()} verifies that it is either \code{"cumulative"} for
+#' an effect-estimate conversion or \code{"stageWise"} for a conditional- or
+#' predictive-power conversion, and stops with an error if the types do not
+#' match. Numeric input without this attribute remains supported for backward
+#' compatibility.
+#'
+#' \strong{Obtaining information from a design plan}
+#'
+#' Use \code{\link[=getFisherInformation]{getFisherInformation()}} to calculate
+#' cumulative information from a design plan or simulation results object. For
+#' an analysis at stage \code{j}, its result can be passed directly as
+#' \code{information[1]} when converting between an effect estimate and a
+#' standardized statistic. To construct the information vector for a two-stage
+#' conditional- or predictive-power conversion, calculate the cumulative
+#' information at both analyses and use:
+#' \preformatted{
+#' informationStage1 <- getFisherInformation(designPlan, stage = 1)
+#' informationCumulative2 <- getFisherInformation(designPlan, stage = 2)
+#' information <- c(
+#'     informationStage1,
+#'     informationCumulative2 - informationStage1
+#' )
+#' }
 #'
 #' @return
 #' A numeric vector representing the futility bounds in the target scale, or
@@ -441,11 +603,13 @@ summary.FutilityBounds <- function(object, ...) {
 #' )
 #' }
 #'
-#' @seealso \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
+#' @seealso \code{\link[=getFisherInformation]{getFisherInformation()}} for
+#'     calculating the value of the \code{information} argument;
+#'     \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
 #'     \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
 #'     \code{\link[=getDesignFisher]{getDesignFisher()}} for direct
 #'     specification of futility bounds on different scales using the
-#'     argument `futilityBoundsScale`.
+#'     argument \code{futilityBoundsScale}.
 #'
 #' @export
 #'
@@ -1077,7 +1241,7 @@ getFutilityBounds <- function(
             recruit2 = recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
         ))
     }
-    
+
     if (length(accrualTime) > 1) {
         stopIllegalArgument(
             "if no 'accrualIntensity' is specified, 'accrualTime' (", .arrayToString(accrualTime), ") ",
@@ -1093,7 +1257,7 @@ getFutilityBounds <- function(
 
     n <- .getNumberOfSubjectsTwoSample(maxNumberOfSubjects, allocationRatio)
     return(list(
-        recruit1 = seq(0, accrualTime, length.out = n$n1), 
+        recruit1 = seq(0, accrualTime, length.out = n$n1),
         recruit2 = seq(0, accrualTime, length.out = n$n2)
     ))
 }
@@ -1131,7 +1295,7 @@ getFutilityBounds <- function(
         lambda2 = lambda2,
         overdispersion = overdispersion,
         exposure1 = timeUnderObservation1,
-        exposure2 = timeUnderObservation2  
+        exposure2 = timeUnderObservation2
     ))
 }
 
@@ -1275,14 +1439,44 @@ getFutilityBounds <- function(
     return(.getFisherInformationByStage(informationOverStages, stage))
 }
 
+.getFisherInformationCumulative <- function(designPlan, stage) {
+    className <- .getClassName(designPlan)
+    if (grepl("Means", className)) {
+        return(.getFisherInformationMeans(designPlan, stage = stage))
+    } else if (grepl("Rates", className)) {
+        return(.getFisherInformationRates(designPlan, stage = stage))
+    } else if (grepl("Survival", className)) {
+        return(.getFisherInformationSurvival(designPlan, stage = stage))
+    } else if (grepl("CountData", className)) {
+        return(.getFisherInformationCountData(designPlan, stage = stage))
+    }
+
+    return(NA_real_)
+}
+
+.combineFisherInformationStages <- function(informationByStage) {
+    if (length(informationByStage) == 1L) {
+        return(informationByStage[[1]])
+    }
+
+    resultLengths <- vapply(informationByStage, length, integer(1))
+    if (all(resultLengths == 1L)) {
+        return(unlist(informationByStage, use.names = FALSE))
+    }
+
+    return(do.call(rbind, lapply(informationByStage, as.vector)))
+}
+
 #'
 #' @title
 #' Get Fisher Information From a Design Plan or Simulation Results
 #'
 #' @description
-#' Calculates the Fisher information at a planned analysis stage for
+#' Calculates cumulative or stage-wise Fisher information at planned analyses for
 #' a design plan or simulation results object for means, rates, survival, or
-#' count data endpoints.
+#' count data endpoints. This is particularly useful for calculating the
+#' \code{information} argument of
+#' \code{\link[=getFutilityBounds]{getFutilityBounds()}}.
 #'
 #' @param designPlan A trial design plan or simulation results object as returned by functions such as
 #' \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}},
@@ -1298,27 +1492,105 @@ getFutilityBounds <- function(
 #' \code{\link[=getSimulationSurvival]{getSimulationSurvival()}},
 #' \code{\link[=getSimulationCounts]{getSimulationCounts()}}, or the
 #' corresponding multi-arm simulation functions.
-#' @param stage Integer. The analysis stage for which the Fisher information is
-#'        requested. If \code{NA} (default), the first stage is used.
+#' @param stage Integer vector. The analysis stage or stages for which Fisher
+#'        information is requested. If \code{NA} (default), the first stage is
+#'        used.
+#' @param type Character. Defines whether cumulative information through each
+#'        requested analysis (\code{"cumulative"}, the default) or the
+#'        information increment contributed by each requested stage
+#'        (\code{"stageWise"}) is returned.
 #'
 #' @details
-#' The returned information is the Fisher information used at the requested
-#' analysis stage of the design plan or simulation setup. If \code{stage = NA},
-#' the first analysis stage is used.
+#' \strong{Cumulative information}
 #'
-#' For means, the information is based on the planned sample size, standard
-#' deviations, allocation ratio, and, if applicable, the mean-ratio null value.
-#' For rates, it is based on the planned sample size and the binomial variance
-#' under the corresponding planning assumptions. For survival endpoints, it is
-#' based on the planned number of events and the allocation ratio. For count data,
-#' it is based on the planned exposure times, event rates, allocation ratio, and
-#' overdispersion of the negative binomial model.
+#' With \code{type = "cumulative"}, the function returns the total Fisher
+#' information available at each requested analysis, including information
+#' accumulated during all preceding stages. With \code{type = "stageWise"}, it
+#' returns the increment contributed by each requested stage. The stage-wise
+#' value for stage \code{j > 1} is calculated by subtracting the cumulative
+#' information at stage \code{j - 1} from that at stage \code{j}, even if stage
+#' \code{j - 1} was not included in \code{stage}. At the first analysis,
+#' cumulative and stage-wise information are identical.
+#'
+#' To obtain stage-wise increments from cumulative values \eqn{I_1,\ldots,I_k},
+#' use \eqn{I_1, I_2-I_1,\ldots,I_k-I_{k-1}}. For example:
+#' \preformatted{
+#' informationCumulative <- c(
+#'     getFisherInformation(designPlan, stage = 1),
+#'     getFisherInformation(designPlan, stage = 2)
+#' )
+#' informationStageWise <- c(
+#'     informationCumulative[1],
+#'     diff(informationCumulative)
+#' )
+#' }
+#' If the result contains several planning alternatives or treatment comparisons,
+#' apply the differences separately to each corresponding series.
+#' The function performs this calculation directly when
+#' \code{type = "stageWise"}; the explicit calculation above illustrates its
+#' definition.
+#'
+#' \strong{Calculation by endpoint}
+#'
+#' \describe{
+#'   \item{Means}{For a one-sample comparison, information is the cumulative
+#'   sample size divided by the variance. For a two-sample comparison, it is the
+#'   inverse variance of the estimated treatment difference, based on cumulative
+#'   group sizes, standard deviations, and the planned allocation ratio. For a
+#'   mean-ratio analysis, the null value is additionally taken into account.}
+#'   \item{Rates}{Information is the inverse binomial variance of the estimated
+#'   rate or rate difference under the planning assumptions. It uses cumulative
+#'   planned sample sizes, event probabilities, and, for multiple groups, the
+#'   planned allocation ratio.}
+#'   \item{Survival}{Information is based on the cumulative number of events at
+#'   the requested analysis and the planned allocation ratio. For multi-arm
+#'   designs, the available events are apportioned to the relevant treatment
+#'   comparisons using the planning assumptions.}
+#'   \item{Count data}{Information is based on the negative binomial model and
+#'   includes all exposure accumulated up to the requested analysis time. It
+#'   accounts for recruitment, exposure or follow-up time, event rates,
+#'   allocation ratio, and overdispersion. If the design plan already contains
+#'   information by analysis, those stored cumulative values are used.}
+#' }
+#'
+#' \strong{Use with getFutilityBounds}
+#'
+#' For a conversion involving \code{"effectEstimate"}, pass the cumulative
+#' information returned for the relevant analysis as \code{information[1]}. For
+#' conditional- or predictive-power conversions in a two-stage setting,
+#' \code{getFutilityBounds()} interprets \code{information[1]} as the cumulative
+#' information at the first analysis and \code{information[2]} as the additional
+#' information after that analysis. It can therefore be populated directly with:
+#' \preformatted{
+#' information <- getFisherInformation(
+#'     designPlan,
+#'     stage = 1:2,
+#'     type = "stageWise"
+#' )
+#' }
+#' For an effect-estimate conversion at analysis \code{j}, use:
+#' \preformatted{
+#' information <- getFisherInformation(
+#'     designPlan,
+#'     stage = j,
+#'     type = "cumulative"
+#' )
+#' }
+#' The \code{"type"} attribute added to every result enables
+#' \code{getFutilityBounds()} to detect incompatible use.
+#' If multiple planning alternatives or treatment comparisons produce a matrix,
+#' select the column corresponding to the desired alternative or comparison
+#' before passing it to \code{getFutilityBounds()}.
 #'
 #' @return
-#' A numeric value, vector, or matrix containing the requested-stage Fisher
-#' information. A vector or matrix can be returned if the object contains
-#' several planning alternatives, arms, or sample size values. \code{NA_real_}
-#' is returned if the endpoint type is not supported by this helper.
+#' A numeric value, vector, or matrix containing cumulative or stage-wise Fisher
+#' information, as selected by \code{type}. If multiple stages are requested,
+#' a vector is returned for a single planning scenario and a matrix with stages
+#' in rows is returned for multiple planning alternatives or comparisons. A
+#' vector or matrix can also be returned for a single stage if the object
+#' contains several planning alternatives, arms, or sample size values.
+#' \code{NA_real_} is returned if the endpoint type is not supported. The result
+#' always has a \code{"type"} attribute equal to the selected \code{type}.
 #'
 #' @examples
 #' \dontrun{
@@ -1330,6 +1602,8 @@ getFutilityBounds <- function(
 #'     alternative = c(0.3, 0.4), maxNumberOfSubjects = 100
 #' )
 #' getFisherInformation(designPlan)
+#' getFisherInformation(designPlan, stage = 1:3)
+#' getFisherInformation(designPlan, stage = 1:3, type = "stageWise")
 #'
 #' simulationResults <- getSimulationMeans(design,
 #'     plannedSubjects = c(20, 40, 60), alternative = 0.4,
@@ -1338,26 +1612,61 @@ getFutilityBounds <- function(
 #' getFisherInformation(simulationResults)
 #' }
 #'
-#' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}}
+#' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}} for converting
+#'     futility bounds using the calculated information.
 #'
 #' @export
-getFisherInformation <- function(designPlan, stage = NA_integer_) {
+#'
+getFisherInformation <- function(
+        designPlan,
+        stage = NA_integer_,
+        type = c("cumulative", "stageWise")) {
     .assertIsTrialDesignPlanOrSimulationResults(designPlan)
-    className <- .getClassName(designPlan)
-    if (is.na(stage)) {
+    type <- match.arg(type)
+
+    if (length(stage) == 1L && is.na(stage)) {
         stage <- 1L
+    } else {
+        stage <- .assertIsIntegerVector(stage, "stage", validateType = FALSE)
     }
-    if (grepl("Means", className)) {
-        return(.getFisherInformationMeans(designPlan, stage = stage))
-    } else if (grepl("Rates", className)) {
-        return(.getFisherInformationRates(designPlan, stage = stage))
-    } else if (grepl("Survival", className)) {
-        return(.getFisherInformationSurvival(designPlan, stage = stage))
-    } else if (grepl("CountData", className)) {
-        return(.getFisherInformationCountData(designPlan, stage = stage))
+    .assertIsInClosedInterval(
+        stage,
+        "stage",
+        lower = 1L,
+        upper = designPlan$.design$kMax
+    )
+
+    informationCache <- new.env(parent = emptyenv())
+    getCumulativeInformation <- function(stageIndex) {
+        cacheKey <- as.character(stageIndex)
+        if (!exists(cacheKey, envir = informationCache, inherits = FALSE)) {
+            assign(
+                cacheKey,
+                .getFisherInformationCumulative(designPlan, stageIndex),
+                envir = informationCache
+            )
+        }
+        return(get(cacheKey, envir = informationCache, inherits = FALSE))
     }
 
-    return(NA_real_)
+    informationByStage <- lapply(stage, function(stageIndex) {
+        information <- getCumulativeInformation(stageIndex)
+        if (type == "stageWise" && stageIndex > 1L) {
+            informationPreviousStage <- getCumulativeInformation(stageIndex - 1L)
+            information <- information - informationPreviousStage
+        }
+        return(information)
+    })
+
+    fisherInformation <- .combineFisherInformationStages(informationByStage)
+    attr(fisherInformation, "type") <- type
+    if (length(stage) > 1L && !is.null(dim(fisherInformation))) {
+        rownames(fisherInformation) <- paste0("stage ", stage)
+    }
+    
+    class(fisherInformation) <- c("FisherInformation", class(fisherInformation))
+
+    return(fisherInformation)
 }
 
 .getFutilityBoundsTreatmentEffectScaleRatesTwoGroups <- function(designPlan, boundary, nStages) {
@@ -1457,7 +1766,7 @@ getFisherInformation <- function(designPlan, stage = NA_integer_) {
     if (length(futilityBounds) == 0) {
         return(result)
     }
-    
+
     futilityBounds[.getInvalidFutilityBoundsIndices(design)] <- NA_real_
     futilityBounds <- futilityBounds[seq_len(nStages)]
 
@@ -1467,10 +1776,10 @@ getFisherInformation <- function(designPlan, stage = NA_integer_) {
         for (stage in seq_len(nStages)) {
             stageInformation <- rbind(stageInformation, getFisherInformation(designPlan, stage = stage))
         }
-    } else { 
+    } else {
         stageInformation <- (informationRates / design$informationRates[1]) %*% t(fisherInformation)
     }
-    
+
     standardizedFutilityBounds <- matrix(futilityBounds, nrow = nStages, ncol = nParameters)
     if (.isTrialDesignPlanMeans(designPlan) && !designPlan$normalApproximation) {
         degreesOfFreedom <- pmax(

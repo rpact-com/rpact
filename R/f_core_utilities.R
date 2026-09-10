@@ -128,7 +128,7 @@ NULL
     return(s)
 }
 
-.formatCamelCaseSingleWord <- function(x, title = FALSE) {
+.formatCamelCaseSingleWord <- function(x, title = FALSE, ..., sep = " ") {
     if (length(x) == 0 || nchar(trimws(x)) == 0) {
         return(x)
     }
@@ -143,11 +143,12 @@ NULL
             y <- .firstCharacterToUpperCase(y)
         }
         value <- ifelse(title, .firstCharacterToUpperCase(parts[i]), parts[i])
-        result <- paste0(result, value, " ", y)
+        result <- paste0(result, value, sep, y)
     }
     if (length(parts) > length(indices)) {
         result <- paste0(result, parts[length(parts)])
     }
+    result <- gsub(paste0(sep, "$"), "", result)
     return(trimws(result))
 }
 

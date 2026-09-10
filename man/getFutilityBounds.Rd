@@ -47,11 +47,13 @@ which means that larger values of the test statistics yield smaller p-values.}
 \item{theta}{Numeric. The assumed effect size under the alternative hypothesis on the scale of the
 test statistic. For example, in a survival design, this would be the on the log hazard ratio scale.}
 
-\item{information}{Numeric vector of length 1 or 2. The stage-wise information levels
-(i.e. this is \emph{not} the cumulative information). Note that depending on which conversion is performed,
-either the first or second stage information may not be needed. In this case, a warning will be issued
-if the unused information is provided. The warning can be avoided by either passing a single number
-(setting both informations to be equal to each other), or setting the unused information to \code{NA}.}
+\item{information}{Numeric vector of length 1 or 2 specifying the information
+used in the conversion. In general, \code{information[1]} is the cumulative
+information available at the analysis to which the futility bound refers,
+whereas \code{information[2]} is the additional information planned after
+that analysis. The exact requirements depend on \code{sourceScale} and
+\code{targetScale}. If present, the \code{"type"} attribute must be
+consistent with the requested conversion; see Details.}
 
 \item{naAllowed}{Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.}
 }
@@ -68,6 +70,88 @@ power, and effect estimate.
 If the \code{sourceScale} and \code{targetScale} are the same, the function
 returns the input \code{sourceValue} without modification.
 Otherwise, the function is designed to convert between the specified scales.
+
+\strong{Interpretation of information}
+
+The elements of \code{information} have different interpretations:
+\itemize{
+\item \code{information[1]} is the cumulative Fisher information underlying
+the test statistic or effect estimate at the analysis where the futility
+bound is evaluated. In a two-stage design this is also the information
+contributed by the first stage.
+\item \code{information[2]} is the additional, non-cumulative Fisher
+information to be collected after that analysis. In a two-stage design this
+is the information contributed by the second stage, not the cumulative
+information at the second analysis.
+}
+
+Consequently, if \eqn{I_1} and \eqn{I_2} denote the cumulative information at
+the first and second analyses, respectively, specify
+\code{information = c(I1, I2 - I1)}. A single value is used for both elements.
+
+\strong{Information required by conversion type}
+
+The required elements are determined by all scales involved in the conversion:
+\describe{
+\item{\code{"zValue"} and \code{"pValue"}}{Conversions between these two
+scales do not require information.}
+\item{\code{"effectEstimate"}}{Requires \code{information[1]}. The
+standardized statistic and effect estimate are related by
+\eqn{z = \widehat{\theta}\sqrt{I_1}}. Thus the cumulative information at the
+analysis represented by the z-value or effect estimate must be supplied.}
+\item{\code{"conditionalPower"}}{Requires \code{information[2]} together
+with \code{theta}. Here \code{information[2]} is the additional information
+available for the future stage over which conditional power is calculated.}
+\item{\code{"condPowerAtObserved"}}{Requires both elements. The current
+effect is estimated using the cumulative information \code{information[1]}
+and projected over the additional future information
+\code{information[2]}.}
+\item{\code{"predictivePower"}}{Requires both elements. Predictive power
+combines uncertainty based on the cumulative information already observed
+with the additional information planned for the future stage.}
+\item{\code{"reverseCondPower"}}{Does not require an explicit
+\code{information} value; the required information fractions are taken from
+the specified \code{design}.}
+}
+
+If \code{condPowerAtObserved} or \code{predictivePower} is involved and no
+complete information vector is supplied, the relative first- and second-stage
+information can be derived from an eligible two-stage \code{design} as
+\code{c(design$informationRates[1], 1 - design$informationRates[1])}. This
+normalization is sufficient for conversions that depend only on information
+ratios. An explicitly supplied vector is needed when absolute information is
+required, for example when conditional power is calculated under a specified
+value of \code{theta}.
+
+A warning is issued if a two-element vector contains an information value not
+needed for the requested conversion. Set the unused element to \code{NA}, or
+pass a single value when using the same value for both elements is intended.
+Information returned by
+\code{\link[=getFisherInformation]{getFisherInformation()}} has a
+\code{"type"} attribute. If that attribute is present,
+\code{getFutilityBounds()} verifies that it is either \code{"cumulative"} for
+an effect-estimate conversion or \code{"stageWise"} for a conditional- or
+predictive-power conversion, and stops with an error if the types do not
+match. Numeric input without this attribute remains supported for backward
+compatibility.
+
+\strong{Obtaining information from a design plan}
+
+Use \code{\link[=getFisherInformation]{getFisherInformation()}} to calculate
+cumulative information from a design plan or simulation results object. For
+an analysis at stage \code{j}, its result can be passed directly as
+\code{information[1]} when converting between an effect estimate and a
+standardized statistic. To construct the information vector for a two-stage
+conditional- or predictive-power conversion, calculate the cumulative
+information at both analyses and use:
+\preformatted{
+informationStage1 <- getFisherInformation(designPlan, stage = 1)
+informationCumulative2 <- getFisherInformation(designPlan, stage = 2)
+information <- c(
+    informationStage1,
+    informationCumulative2 - informationStage1
+)
+}
 }
 \examples{
 \dontrun{
@@ -90,6 +174,8 @@ getFutilityBounds(
 
 }
 \seealso{
+\code{\link[=getFisherInformation]{getFisherInformation()}} for
+calculating the value of the \code{information} argument;
 \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
 \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
 \code{\link[=getDesignFisher]{getDesignFisher()}} for direct

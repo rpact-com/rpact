@@ -4,7 +4,11 @@
 \alias{getFisherInformation}
 \title{Get Fisher Information From a Design Plan or Simulation Results}
 \usage{
-getFisherInformation(designPlan, stage = NA_integer_)
+getFisherInformation(
+  designPlan,
+  stage = NA_integer_,
+  type = c("cumulative", "stageWise")
+)
 }
 \arguments{
 \item{designPlan}{A trial design plan or simulation results object as returned by functions such as
@@ -22,32 +26,113 @@ getFisherInformation(designPlan, stage = NA_integer_)
 \code{\link[=getSimulationCounts]{getSimulationCounts()}}, or the
 corresponding multi-arm simulation functions.}
 
-\item{stage}{Integer. The analysis stage for which the Fisher information is
-requested. If \code{NA} (default), the first stage is used.}
+\item{stage}{Integer vector. The analysis stage or stages for which Fisher
+information is requested. If \code{NA} (default), the first stage is
+used.}
+
+\item{type}{Character. Defines whether cumulative information through each
+requested analysis (\code{"cumulative"}, the default) or the
+information increment contributed by each requested stage
+(\code{"stageWise"}) is returned.}
 }
 \value{
-A numeric value, vector, or matrix containing the requested-stage Fisher
-information. A vector or matrix can be returned if the object contains
-several planning alternatives, arms, or sample size values. \code{NA_real_}
-is returned if the endpoint type is not supported by this helper.
+A numeric value, vector, or matrix containing cumulative or stage-wise Fisher
+information, as selected by \code{type}. If multiple stages are requested,
+a vector is returned for a single planning scenario and a matrix with stages
+in rows is returned for multiple planning alternatives or comparisons. A
+vector or matrix can also be returned for a single stage if the object
+contains several planning alternatives, arms, or sample size values.
+\code{NA_real_} is returned if the endpoint type is not supported. The result
+always has a \code{"type"} attribute equal to the selected \code{type}.
 }
 \description{
-Calculates the Fisher information at a planned analysis stage for
+Calculates cumulative or stage-wise Fisher information at planned analyses for
 a design plan or simulation results object for means, rates, survival, or
-count data endpoints.
+count data endpoints. This is particularly useful for calculating the
+\code{information} argument of
+\code{\link[=getFutilityBounds]{getFutilityBounds()}}.
 }
 \details{
-The returned information is the Fisher information used at the requested
-analysis stage of the design plan or simulation setup. If \code{stage = NA},
-the first analysis stage is used.
+\strong{Cumulative information}
 
-For means, the information is based on the planned sample size, standard
-deviations, allocation ratio, and, if applicable, the mean-ratio null value.
-For rates, it is based on the planned sample size and the binomial variance
-under the corresponding planning assumptions. For survival endpoints, it is
-based on the planned number of events and the allocation ratio. For count data,
-it is based on the planned exposure times, event rates, allocation ratio, and
-overdispersion of the negative binomial model.
+With \code{type = "cumulative"}, the function returns the total Fisher
+information available at each requested analysis, including information
+accumulated during all preceding stages. With \code{type = "stageWise"}, it
+returns the increment contributed by each requested stage. The stage-wise
+value for stage \code{j > 1} is calculated by subtracting the cumulative
+information at stage \code{j - 1} from that at stage \code{j}, even if stage
+\code{j - 1} was not included in \code{stage}. At the first analysis,
+cumulative and stage-wise information are identical.
+
+To obtain stage-wise increments from cumulative values \eqn{I_1,\ldots,I_k},
+use \eqn{I_1, I_2-I_1,\ldots,I_k-I_{k-1}}. For example:
+\preformatted{
+informationCumulative <- c(
+    getFisherInformation(designPlan, stage = 1),
+    getFisherInformation(designPlan, stage = 2)
+)
+informationStageWise <- c(
+    informationCumulative[1],
+    diff(informationCumulative)
+)
+}
+If the result contains several planning alternatives or treatment comparisons,
+apply the differences separately to each corresponding series.
+The function performs this calculation directly when
+\code{type = "stageWise"}; the explicit calculation above illustrates its
+definition.
+
+\strong{Calculation by endpoint}
+
+\describe{
+\item{Means}{For a one-sample comparison, information is the cumulative
+sample size divided by the variance. For a two-sample comparison, it is the
+inverse variance of the estimated treatment difference, based on cumulative
+group sizes, standard deviations, and the planned allocation ratio. For a
+mean-ratio analysis, the null value is additionally taken into account.}
+\item{Rates}{Information is the inverse binomial variance of the estimated
+rate or rate difference under the planning assumptions. It uses cumulative
+planned sample sizes, event probabilities, and, for multiple groups, the
+planned allocation ratio.}
+\item{Survival}{Information is based on the cumulative number of events at
+the requested analysis and the planned allocation ratio. For multi-arm
+designs, the available events are apportioned to the relevant treatment
+comparisons using the planning assumptions.}
+\item{Count data}{Information is based on the negative binomial model and
+includes all exposure accumulated up to the requested analysis time. It
+accounts for recruitment, exposure or follow-up time, event rates,
+allocation ratio, and overdispersion. If the design plan already contains
+information by analysis, those stored cumulative values are used.}
+}
+
+\strong{Use with getFutilityBounds}
+
+For a conversion involving \code{"effectEstimate"}, pass the cumulative
+information returned for the relevant analysis as \code{information[1]}. For
+conditional- or predictive-power conversions in a two-stage setting,
+\code{getFutilityBounds()} interprets \code{information[1]} as the cumulative
+information at the first analysis and \code{information[2]} as the additional
+information after that analysis. It can therefore be populated directly with:
+\preformatted{
+information <- getFisherInformation(
+    designPlan,
+    stage = 1:2,
+    type = "stageWise"
+)
+}
+For an effect-estimate conversion at analysis \code{j}, use:
+\preformatted{
+information <- getFisherInformation(
+    designPlan,
+    stage = j,
+    type = "cumulative"
+)
+}
+The \code{"type"} attribute added to every result enables
+\code{getFutilityBounds()} to detect incompatible use.
+If multiple planning alternatives or treatment comparisons produce a matrix,
+select the column corresponding to the desired alternative or comparison
+before passing it to \code{getFutilityBounds()}.
 }
 \examples{
 \dontrun{
@@ -59,6 +144,8 @@ designPlan <- getPowerMeans(design,
     alternative = c(0.3, 0.4), maxNumberOfSubjects = 100
 )
 getFisherInformation(designPlan)
+getFisherInformation(designPlan, stage = 1:3)
+getFisherInformation(designPlan, stage = 1:3, type = "stageWise")
 
 simulationResults <- getSimulationMeans(design,
     plannedSubjects = c(20, 40, 60), alternative = 0.4,
@@ -69,5 +156,6 @@ getFisherInformation(simulationResults)
 
 }
 \seealso{
-\code{\link[=getFutilityBounds]{getFutilityBounds()}}
+\code{\link[=getFutilityBounds]{getFutilityBounds()}} for converting
+futility bounds using the calculated information.
 }

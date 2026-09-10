@@ -7,7 +7,12 @@
 * `getDataset()` now supports datasets of general, endpoint-independent estimates through the new `DatasetGeneral` class. Stage-wise estimates and standard errors can be provided using `est` and `se`; degrees of freedom (`df`) are optional and default internally to `Inf`, corresponding to a normal approximation.
 * rpact options can now be configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles; see the new vignette [Hidden rpact Features: Options and Environment Variables](https://www.rpact.org/vignettes/utilities/rpact_hidden_features/).
 * Optimized the display of `criticalValues` and `futilityBounds` for designs with `directionUpper = FALSE`. If the direction of the alternative is already specified when creating a design, e.g., with `getDesignGroupSequential(directionUpper = FALSE)`, the boundaries are now shown in the correct direction, typically as negative values. This also applies to futility bounds generated for beta-spending designs.
-* The new function `getFisherInformation()` can be used to calculate the Fisher information at the first planned analysis stage for a design plan for means, rates, or survival endpoints.
+* The new function `getFisherInformation()` can be used to calculate cumulative
+  or stage-wise Fisher information at selected planned analyses for a design
+  plan or simulation results object for means, rates, survival, or count data
+  endpoints. Its typed output can be passed directly to `getFutilityBounds()`,
+  which validates that cumulative or stage-wise information is used as required
+  by the requested conversion.
 * For survival endpoints, the default value of `directionUpper` has changed from `TRUE` to `FALSE`. Accordingly, the default event rates have been adjusted to provide meaningful examples for an alternative in the lower direction: `pi2` (and `piControl`) now defaults to `0.5`, while the sample size default for `pi1` is now `c(0.1, 0.2, 0.3)`; the power and simulation default for `pi1` remains `seq(0.2, 0.5, 0.1)`. One-sided power calculations and simulations issue a warning if `directionUpper` is not specified explicitly, making users aware of the changed default. No warning is issued for sample size calculations because the `directionUpper` argument has only been added to these functions in this version. For sample size calculations, the direction is always derived from the specified alternative; the argument is provided solely to validate that this derived direction is consistent with a `directionUpper` value that may already have been set in the design.
 
 ## Improvements, issues, and changes
