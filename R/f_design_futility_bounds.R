@@ -860,6 +860,18 @@ summary.FutilityBounds <- function(object, ...) {
 #' returns the input \code{sourceValue} without modification.
 #' Otherwise, the function is designed to convert between the specified scales.
 #'
+#' \strong{Available scales}
+#' 
+#' - \code{"zValue"}: The standardized test statistic value.
+#' - \code{"pValue"}: The one-sided p-value corresponding to the z-value.
+#' - \code{"effectEstimate"}: The effect estimate on the scale of the test statistic.
+#' - \code{"conditionalPower"}: The conditional power given the current effect 
+#'   estimate \code{theta} and additional information.
+#' - \code{"condPowerAtObserved"}: The conditional power at the observed effect estimate.
+#' - \code{"predictivePower"}: The predictive power based on the current effect estimate and additional information.
+#' - \code{"reverseCondPower"}: The reverse conditional power, which is the probability 
+#'   of observing a significant result given the current effect estimate and additional information.
+#' 
 #' \strong{Piping design plans or Fisher information into getFutilityBounds}
 #'
 #' A trial design plan or simulation results object can be supplied directly.
