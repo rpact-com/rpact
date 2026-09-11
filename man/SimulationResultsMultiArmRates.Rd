@@ -88,6 +88,8 @@ to create an object of this type.
 \item{\code{typeOfSelection}}{The way the treatment arms or populations are selected at interim. Is a single character value.}
 
 \item{\code{typeOfShape}}{The shape of the dose-response relationship over the treatment groups. Is a single character value.}
+
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
 }}
 
 \keyword{internal}

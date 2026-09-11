@@ -824,6 +824,7 @@ SimulationResultsMultiArmMeans <- R6::R6Class(
         slope = NULL,
         successCriterion = NULL,
         successPerStage = NULL,
+        thetaH0 = NULL,
         threshold = NULL,
         typeOfSelection = NULL,
         typeOfShape = NULL,
@@ -1022,6 +1023,7 @@ SimulationResultsRates <- R6::R6Class(
 #' @template field_threshold
 #' @template field_typeOfSelection
 #' @template field_typeOfShape
+#' @template field_thetaH0
 #'
 #' @details
 #' Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}
@@ -1067,6 +1069,7 @@ SimulationResultsMultiArmRates <- R6::R6Class(
         slope = NULL,
         successCriterion = NULL,
         successPerStage = NULL,
+        thetaH0 = NULL,
         threshold = NULL,
         typeOfSelection = NULL,
         typeOfShape = NULL,
