@@ -107,6 +107,7 @@ Collate:
     'class_design_plan.R'
     'class_design_power_and_asn.R'
     'class_event_probabilities.R'
+    'class_fisher_information.R'
     'f_simulation_base_counts.R'
     'f_simulation_utilities.R'
     'f_simulation_base_survival.R'

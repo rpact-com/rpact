@@ -15,6 +15,7 @@
 ## |
 
 #' @include f_core_utilities.R
+#' @include class_fisher_information.R
 NULL
 
 .getRequiredFutilityBoundsInformationType <- function(sourceScale, targetScale) {
@@ -29,7 +30,11 @@ NULL
 }
 
 .assertIsValidFutilityBoundsInformationType <- function(information, sourceScale, targetScale) {
-    informationType <- attr(information, "type", exact = TRUE)
+    informationType <- if (is(information, "FisherInformation")) {
+        information$type
+    } else {
+        attr(information, "type", exact = TRUE)
+    }
     if (is.null(informationType)) {
         return(invisible())
     }
@@ -38,11 +43,11 @@ NULL
     if (!is.character(informationType) || length(informationType) != 1L ||
             is.na(informationType) || !informationType %in% validTypes) {
         stopIllegalArgument(
-            "attribute ", .sQuote("type"), " of ", .pQuote("information"), " (",
+            .sQuote("type"), " metadata of ", .pQuote("information"), " (",
             .arrayToString(informationType), ") must be ", .arrayToString(validTypes, mode = "or"),
             functionName = ".assertIsValidFutilityBoundsInformationType",
             parameter = "information",
-            value = information
+            value = if (is(information, "FisherInformation")) information$information else information
         )
     }
 
@@ -54,7 +59,7 @@ NULL
             " requires information of type ", .vQuote(requiredType),
             functionName = ".assertIsValidFutilityBoundsInformationType",
             parameter = "information",
-            value = information,
+            value = if (is(information, "FisherInformation")) information$information else information,
             relatedParameter = "type",
             relatedValue = informationType
         )
@@ -71,6 +76,20 @@ NULL
         design,
         showWarnings = TRUE) {
     .assertIsValidFutilityBoundsInformationType(information, sourceScale, targetScale)
+
+    if (is(information, "FisherInformation")) {
+        if (ncol(as.matrix(information)) > 1L) {
+            stopIllegalArgument(
+                .pQuote("information"), " contains multiple planning situations; pipe the object into ",
+                .pQuote("getFutilityBounds()"), " as ", .pQuote("sourceValue"),
+                " to convert every situation separately, or supply the numeric values for one situation",
+                functionName = ".getFutilityBoundInformations",
+                parameter = "information",
+                value = information$information
+            )
+        }
+        information <- as.numeric(information)
+    }
 
     args <- list(...)
     separateInformationArguments <- length(args) > 0 &&
@@ -213,12 +232,16 @@ print.FutilityBounds <- function(x, ...) {
 
     scaleDescription <- "target"
     if (!is.null(targetScale) && length(targetScale) == 1L && !is.na(targetScale)) {
-        scaleDescription <- .formatCamelCaseSingleWord(targetScale, sep = "-")
+        scaleDescription <- gsub("ondP", "onditionalP", targetScale)
+        scaleDescription <- gsub("AtObserved$", "AtObservedEffect", scaleDescription)
+        scaleDescription <- .formatCamelCaseSingleWord(scaleDescription, sep = "-")
     }
     heading <- paste0("Futility bounds on the ", scaleDescription, " scale")
     if (!is.null(informationType) && length(informationType) == 1L && !is.na(informationType)) {
         informationDescription <- .formatCamelCaseSingleWord(informationType, sep = "-")
-        heading <- paste0(heading, " using ", informationDescription, " Fisher information")
+        heading <- paste0(heading, " ",
+            "\n",
+            "using ", informationDescription, " Fisher information")
     }
 
     if (!is.null(stage) && length(stage) == 1L) {
@@ -279,99 +302,6 @@ print.FutilityBounds <- function(x, ...) {
     }
     class(x) <- setdiff(class(x), "FutilityBounds")
     return(x)
-}
-
-.getFisherInformationValuesForPrinting <- function(x) {
-    attr(x, "type") <- NULL
-    attr(x, "stage") <- NULL
-    attr(x, "situations") <- NULL
-    attr(x, "designPlan") <- NULL
-    class(x) <- setdiff(class(x), "FisherInformation")
-    return(x)
-}
-
-#'
-#' @title
-#' Print Fisher Information
-#'
-#' @description
-#' S3 print method for objects of class \code{FisherInformation}.
-#' Prints the Fisher information together with its type, analysis stage, and,
-#' if available, the situations to which the values apply.
-#'
-#' @param x An object of class \code{FisherInformation}.
-#' @param ... Additional arguments passed to the underlying print method.
-#'
-#' @keywords internal
-#'
-#' @export
-#'
-print.FisherInformation <- function(x, ...) {
-    type <- attr(x, "type", exact = TRUE)
-    stage <- attr(x, "stage", exact = TRUE)
-    situations <- attr(x, "situations", exact = TRUE)
-    values <- .getFisherInformationValuesForPrinting(x)
-
-    typeDescription <- "Fisher information"
-    if (!is.null(type) && length(type) == 1L && !is.na(type)) {
-        typeDescription <- paste(
-            .firstCharacterToUpperCase(.formatCamelCaseSingleWord(type, sep = "-")),
-            typeDescription
-        )
-    }
-
-    if (!is.null(stage) && length(stage) == 1L) {
-        heading <- paste0(typeDescription, " at stage ", stage)
-        if (!is.null(situations) && length(situations) == 1L) {
-            heading <- paste0(heading, " (", situations, ")")
-        }
-        if (!is.null(situations) && length(situations) > 1L) {
-            heading <- paste0(heading, " by situation")
-        }
-    } else if (!is.null(stage) && length(stage) > 1L) {
-        heading <- paste0(typeDescription, " by stage")
-        if (!is.null(situations) && length(situations) == 1L) {
-            heading <- paste0(heading, " (", situations, ")")
-        }
-        if (!is.null(situations) && length(situations) > 1L) {
-            heading <- paste0(heading, " and situation")
-        }
-    } else {
-        heading <- typeDescription
-    }
-    cat(heading, ":\n", sep = "")
-
-    if (!is.null(stage) && length(stage) == 1L &&
-            is.null(dim(values)) && !is.null(situations) &&
-            length(situations) == length(values) && length(values) > 1L) {
-        output <- data.frame(
-            Situation = situations,
-            information = as.numeric(values),
-            check.names = FALSE
-        )
-        names(output)[2] <- "Fisher information"
-        print(output, row.names = FALSE, ...)
-    } else if (!is.null(stage) && length(stage) > 1L && is.null(dim(values))) {
-        output <- data.frame(
-            Stage = stage,
-            information = as.numeric(values),
-            check.names = FALSE
-        )
-        names(output)[2] <- "Fisher information"
-        print(output, row.names = FALSE, ...)
-    } else {
-        if (!is.null(dim(values))) {
-            if (!is.null(stage) && length(stage) == nrow(values)) {
-                rownames(values) <- paste0("Stage ", stage)
-            }
-            if (!is.null(situations) && length(situations) == ncol(values)) {
-                colnames(values) <- situations
-            }
-        }
-        print.default(values, ...)
-    }
-
-    return(invisible(x))
 }
 
 #'
@@ -605,54 +535,64 @@ summary.FutilityBounds <- function(object, ...) {
     ))
 }
 
+.getFutilityBoundsFromDesignPlanWithoutFisherInformation <- function(
+        designPlan,
+        targetScale,
+        directionUpper,
+        theta,
+        naAllowed,
+        stage = NULL) {
+    design <- designPlan$.design
+    if (is.null(stage)) {
+        interimStages <- seq_len(max(design$kMax - 1L, 0L))
+    } else {
+        interimStages <- stage[stage < design$kMax]
+    }
+    if (length(interimStages) == 0L) {
+        stopIllegalArgument(
+            .pQuote("sourceValue"), " must contain a design with at least one interim analysis stage",
+            functionName = ".getFutilityBoundsFromDesignPlanWithoutFisherInformation",
+            parameter = "sourceValue",
+            value = design$kMax
+        )
+    }
+
+    directionUpperCalculated <- directionUpper
+    if (is.na(directionUpperCalculated)) {
+        directionUpperCalculated <- if (is.na(design$directionUpper)) TRUE else design$directionUpper
+    }
+    calculationDesign <- if (targetScale == "reverseCondPower") design else NULL
+    result <- getFutilityBounds(
+        sourceValue = .getFutilityBounds(design, interimStages),
+        sourceScale = "zValue",
+        targetScale = targetScale,
+        design = calculationDesign,
+        directionUpper = directionUpperCalculated,
+        theta = theta,
+        information = NA_real_,
+        naAllowed = naAllowed
+    )
+    attr(result, "stage") <- interimStages
+    attr(result, "designPlan") <- designPlan
+    return(result)
+}
+
 .getFisherInformationAsMatrix <- function(fisherInformation) {
-    stage <- attr(fisherInformation, "stage", exact = TRUE)
-    situations <- attr(fisherInformation, "situations", exact = TRUE)
-    designPlan <- attr(fisherInformation, "designPlan", exact = TRUE)
-    informationType <- attr(fisherInformation, "type", exact = TRUE)
-    values <- .getFisherInformationValuesForPrinting(fisherInformation)
+    stage <- fisherInformation$stage
+    situations <- fisherInformation$situations
+    designPlan <- fisherInformation$.getDesignPlan()
+    informationType <- fisherInformation$type
 
     if (is.null(stage) || length(stage) == 0L) {
         stopIllegalArgument(
-            .pQuote("information"), " does not contain the required ", sQuote("stage"), " attribute",
+            .pQuote("information"), " does not contain the required ", sQuote("stage"), " field",
             functionName = ".getFisherInformationAsMatrix",
             parameter = "information",
-            value = fisherInformation
+            value = fisherInformation$information
         )
     }
 
-    if (!is.null(dim(values))) {
-        if (nrow(values) != length(stage)) {
-            stopIllegalArgument(
-                "the number of rows in ", .pQuote("information"), " must equal the number of stages",
-                functionName = ".getFisherInformationAsMatrix",
-                parameter = "information",
-                value = fisherInformation,
-                relatedParameter = "stage",
-                relatedValue = stage
-            )
-        }
-        informationMatrix <- matrix(
-            as.numeric(values),
-            nrow = nrow(values),
-            ncol = ncol(values),
-            dimnames = dimnames(values)
-        )
-    } else if (length(stage) == 1L) {
-        informationMatrix <- matrix(as.numeric(values), nrow = 1L)
-    } else {
-        if (length(values) != length(stage)) {
-            stopIllegalArgument(
-                "the length of ", .pQuote("information"), " must equal the number of stages",
-                functionName = ".getFisherInformationAsMatrix",
-                parameter = "information",
-                value = fisherInformation,
-                relatedParameter = "stage",
-                relatedValue = stage
-            )
-        }
-        informationMatrix <- matrix(as.numeric(values), ncol = 1L)
-    }
+    informationMatrix <- as.matrix(fisherInformation)
 
     nSituations <- ncol(informationMatrix)
     if (is.null(situations) || length(situations) != nSituations) {
@@ -674,18 +614,37 @@ summary.FutilityBounds <- function(object, ...) {
         directionUpper,
         theta,
         naAllowed) {
-    informationData <- .getFisherInformationAsMatrix(fisherInformation)
-    designPlan <- informationData$designPlan
+    designPlan <- fisherInformation$.getDesignPlan()
     if (is.null(designPlan)) {
         stopIllegalArgument(
             .pQuote("information"), " does not contain the design plan required for pipe-based conversion",
             functionName = ".getFutilityBoundsFromFisherInformation",
             parameter = "information",
-            value = fisherInformation
+            value = fisherInformation$information
         )
     }
 
     design <- designPlan$.design
+    informationRequired <- !is.null(.getRequiredFutilityBoundsInformationType(
+        sourceScale = "zValue",
+        targetScale = targetScale
+    ))
+    if (!informationRequired) {
+        warning(
+            "Fisher information is not required for conversion from ",
+            .vQuote("zValue"), " to ", .vQuote(targetScale), " and will be ignored",
+            call. = FALSE
+        )
+        return(.getFutilityBoundsFromDesignPlanWithoutFisherInformation(
+            designPlan = designPlan,
+            targetScale = targetScale,
+            directionUpper = directionUpper,
+            theta = theta,
+            naAllowed = naAllowed,
+            stage = fisherInformation$stage
+        ))
+    }
+    informationData <- .getFisherInformationAsMatrix(fisherInformation)
     .assertIsValidFutilityBoundsInformationType(
         fisherInformation,
         sourceScale = "zValue",
@@ -705,7 +664,7 @@ summary.FutilityBounds <- function(object, ...) {
             .pQuote("information"), " must contain at least one interim analysis stage",
             functionName = ".getFutilityBoundsFromFisherInformation",
             parameter = "information",
-            value = fisherInformation,
+            value = fisherInformation$information,
             relatedParameter = "stage",
             relatedValue = informationData$stage
         )
@@ -742,7 +701,7 @@ summary.FutilityBounds <- function(object, ...) {
                 .vQuote(targetScale),
                 functionName = ".getFutilityBoundsFromFisherInformation",
                 parameter = "information",
-                value = fisherInformation,
+                value = fisherInformation$information,
                 relatedParameter = "stage",
                 relatedValue = informationData$stage
             )
@@ -805,7 +764,7 @@ summary.FutilityBounds <- function(object, ...) {
             value = theta,
             type = ifelse(is.na(theta), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
         ),
-        information = list(value = fisherInformation, type = C_PARAM_USER_DEFINED),
+        information = list(value = informationData$values, type = C_PARAM_USER_DEFINED),
         design = list(value = design, type = C_PARAM_DERIVED)
     )
     result <- .addFutilityBoundParameterTypes(result, args)
@@ -851,8 +810,10 @@ summary.FutilityBounds <- function(object, ...) {
 #'   information available at the analysis to which the futility bound refers,
 #'   whereas \code{information[2]} is the additional information planned after
 #'   that analysis. The exact requirements depend on \code{sourceScale} and
-#'   \code{targetScale}. If present, the \code{"type"} attribute must be
-#'   consistent with the requested conversion; see Details.
+#'   \code{targetScale}. A \code{FisherInformation} object can also be supplied;
+#'   its \code{type} field must be consistent with the requested conversion;
+#'   it must represent a single planning situation when used as this argument.
+#'   See Details.
 #' @param naAllowed Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.
 #' @inheritParams param_three_dots
 #'
@@ -868,10 +829,12 @@ summary.FutilityBounds <- function(object, ...) {
 #' \describe{
 #'   \item{\code{"zValue"}}{The standardized interim test statistic. For
 #'   \code{directionUpper = TRUE}, larger values favor the alternative;
-#'   \code{directionUpper = FALSE} reverses this direction.}
+#'   \code{directionUpper = FALSE} reverses this direction. Conversion between
+#'   this scale and \code{"pValue"} does not require Fisher information.}
 #'   \item{\code{"pValue"}}{The one-sided p-value corresponding to the
 #'   z-value and the selected direction. Smaller values indicate stronger
-#'   evidence in favor of the alternative.}
+#'   evidence in favor of the alternative. Conversion between this scale and
+#'   \code{"zValue"} does not require Fisher information.}
 #'   \item{\code{"effectEstimate"}}{The unstandardized, null-centered effect
 #'   estimate \eqn{\widehat{\delta}} on the analysis scale, related to the
 #'   z-value by \eqn{z = \widehat{\delta}\sqrt{I_1}}. Depending on the endpoint,
@@ -901,7 +864,9 @@ summary.FutilityBounds <- function(object, ...) {
 #'   given that the final combined test statistic is at its critical boundary.
 #'   It is independent of an assumed treatment effect and, for the supported
 #'   inverse normal or group sequential setting, coincides with the predictive
-#'   power based on a flat prior.}
+#'   power based on a flat prior. Conversion between this scale and
+#'   \code{"zValue"} or \code{"pValue"} uses the design's information rates,
+#'   but does not require endpoint-specific Fisher information.}
 #' }
 #' The four power-based scales take values between \code{0} and \code{1}. Their
 #' values describe a futility threshold at an interim analysis; they should not
@@ -910,10 +875,13 @@ summary.FutilityBounds <- function(object, ...) {
 #' \strong{Piping design plans or Fisher information into getFutilityBounds}
 #'
 #' A trial design plan or simulation results object can be supplied directly.
-#' In that case, \code{getFisherInformation()} is called internally with the
-#' information type required by \code{targetScale}: \code{"cumulative"} for
-#' an effect-estimate conversion and \code{"stageWise"} for conversions
-#' involving conditional or predictive power. This provides the short form
+#' If the requested conversion needs Fisher information,
+#' \code{getFisherInformation()} is called internally with the required type:
+#' \code{"cumulative"} for an effect-estimate conversion and \code{"stageWise"}
+#' for conversions involving conditional or predictive power. It is not called
+#' for conversion from the design's z-value bounds to \code{"zValue"},
+#' \code{"pValue"}, or \code{"reverseCondPower"}; the latter uses information
+#' rates from the design itself. This provides the short form
 #' \preformatted{
 #' designPlan |>
 #'     getFutilityBounds(targetScale = "condPowerAtObserved")
@@ -926,9 +894,13 @@ summary.FutilityBounds <- function(object, ...) {
 #' as \code{sourceValue}, most conveniently with the base R pipe. In this form,
 #' \code{getFutilityBounds()} obtains the design, its z-value futility bounds,
 #' the requested stages, the information type, and the planning-situation labels
-#' from the attributes of the \code{FisherInformation} object. If
+#' from the fields of the \code{FisherInformation} object. If
 #' \code{targetScale} is omitted, the bounds are converted to
 #' \code{"effectEstimate"}; another target scale can be requested explicitly.
+#' If Fisher information is not needed for that scale, the object remains a
+#' valid source of the design and its futility bounds, but its information
+#' values are ignored and a warning is issued. The printed result then does not
+#' claim that Fisher information was used.
 #'
 #' The conversion is performed separately for every planning situation and for
 #' every supplied interim analysis. Information for the final analysis is used
@@ -936,7 +908,7 @@ summary.FutilityBounds <- function(object, ...) {
 #' bound is returned. Consequently, cumulative information is appropriate for
 #' the default conversion to the effect-estimate scale. Stage-wise information
 #' is required for conversions involving conditional or predictive power. An
-#' informative error is issued if the \code{"type"} attribute is incompatible
+#' informative error is issued if its \code{type} field is incompatible
 #' with the requested target scale.
 #' Conversions to conditional power, conditional power at the observed effect,
 #' predictive power, or reverse conditional power remain restricted to
@@ -1004,14 +976,18 @@ summary.FutilityBounds <- function(object, ...) {
 #' A warning is issued if a two-element vector contains an information value not
 #' needed for the requested conversion. Set the unused element to \code{NA}, or
 #' pass a single value when using the same value for both elements is intended.
-#' Information returned by
+#' A \code{FisherInformation} object returned by
 #' \code{\link[=getFisherInformation]{getFisherInformation()}} has a
-#' \code{"type"} attribute. If that attribute is present,
-#' \code{getFutilityBounds()} verifies that it is either \code{"cumulative"} for
+#' \code{type} field. \code{getFutilityBounds()} verifies that it is
+#' \code{"cumulative"} for
 #' an effect-estimate conversion or \code{"stageWise"} for a conditional- or
 #' predictive-power conversion, and stops with an error if the types do not
-#' match. Numeric input without this attribute remains supported for backward
-#' compatibility.
+#' match. Plain numeric input without type metadata remains supported for
+#' backward compatibility.
+#' If a \code{FisherInformation} object contains multiple planning situations,
+#' pipe it into \code{getFutilityBounds()} as \code{sourceValue}; the conversion
+#' is then performed separately for every situation. The \code{information}
+#' argument itself accepts such an object only when it represents one situation.
 #'
 #' \strong{Obtaining information from a design plan}
 #'
@@ -1023,8 +999,8 @@ summary.FutilityBounds <- function(object, ...) {
 #' conditional- or predictive-power conversion, calculate the cumulative
 #' information at both analyses and use:
 #' \preformatted{
-#' informationStage1 <- getFisherInformation(designPlan, stage = 1)
-#' informationCumulative2 <- getFisherInformation(designPlan, stage = 2)
+#' informationStage1 <- as.numeric(getFisherInformation(designPlan, stage = 1))
+#' informationCumulative2 <- as.numeric(getFisherInformation(designPlan, stage = 2))
 #' information <- c(
 #'     informationStage1,
 #'     informationCumulative2 - informationStage1
@@ -1129,7 +1105,13 @@ getFutilityBounds <- function(
             targetScale = targetScale
         )
         if (is.null(requiredInformationType)) {
-            requiredInformationType <- "cumulative"
+            return(.getFutilityBoundsFromDesignPlanWithoutFisherInformation(
+                designPlan = sourceValue,
+                targetScale = targetScale,
+                directionUpper = directionUpper,
+                theta = theta,
+                naAllowed = naAllowed
+            ))
         }
         sourceValue <- getFisherInformation(
             sourceValue,
@@ -2085,10 +2067,10 @@ getFutilityBounds <- function(
 #' To obtain stage-wise increments from cumulative values \eqn{I_1,\ldots,I_k},
 #' use \eqn{I_1, I_2-I_1,\ldots,I_k-I_{k-1}}. For example:
 #' \preformatted{
-#' informationCumulative <- c(
-#'     getFisherInformation(designPlan, stage = 1),
-#'     getFisherInformation(designPlan, stage = 2)
-#' )
+#' informationCumulative <- as.numeric(getFisherInformation(
+#'     designPlan,
+#'     stage = 1:2
+#' ))
 #' informationStageWise <- c(
 #'     informationCumulative[1],
 #'     diff(informationCumulative)
@@ -2146,10 +2128,10 @@ getFutilityBounds <- function(
 #'     type = "cumulative"
 #' )
 #' }
-#' The \code{"type"} attribute added to every result enables
+#' The \code{type} field in every result enables
 #' \code{getFutilityBounds()} to detect incompatible use.
 #' The complete result can also be piped into \code{getFutilityBounds()}. In
-#' that case, its stage and situation attributes are used to convert every
+#' that case, its \code{stage} and \code{situations} fields are used to convert every
 #' applicable futility bound separately. With the default cumulative type, an
 #' omitted target scale means conversion to the effect-estimate scale:
 #' \preformatted{
@@ -2162,18 +2144,19 @@ getFutilityBounds <- function(
 #' with the information type required by the requested target scale.
 #'
 #' @return
-#' A numeric value, vector, or matrix containing cumulative or stage-wise Fisher
-#' information, as selected by \code{type}. If multiple stages are requested,
-#' a vector is returned for a single planning scenario and a matrix with stages
-#' in rows is returned for multiple planning alternatives or comparisons. A
-#' vector or matrix can also be returned for a single stage if the object
-#' contains several planning alternatives, arms, or sample size values.
-#' \code{NA_real_} is returned if the endpoint type is not supported. The result
-#' has class \code{FisherInformation} and always includes the attributes
-#' \code{"type"} and \code{"stage"}. If the values refer to distinguishable
-#' planning situations, the \code{"situations"} attribute contains descriptive
-#' labels such as the corresponding alternatives, event probabilities, hazard
-#' ratios, or count-data rates.
+#' A \code{FisherInformation} R6 object. Its public fields are
+#' \code{information} (the calculated numeric value, vector, or matrix),
+#' \code{type}, \code{stage}, and \code{situations}. The latter contains
+#' descriptive labels such as the corresponding alternatives, event
+#' probabilities, hazard ratios, or count-data rates where available. The
+#' originating design plan is stored privately for subsequent pipe-based
+#' conversion with \code{getFutilityBounds()}.
+#'
+#' Use \code{as.numeric()} to extract a plain numeric vector, \code{as.matrix()}
+#' to obtain a consistently arranged stage-by-situation matrix, and
+#' \code{as.data.frame()} to obtain a long-format data frame. Unsupported
+#' endpoint types are represented by \code{NA_real_} in the
+#' \code{information} field.
 #'
 #' @examples
 #' \dontrun{
@@ -2241,22 +2224,23 @@ getFisherInformation <- function(
         return(information)
     })
 
-    fisherInformation <- .combineFisherInformationStages(informationByStage)
-    attr(fisherInformation, "type") <- type
-    attr(fisherInformation, "stage") <- stage
-    if (length(stage) > 1L && !is.null(dim(fisherInformation))) {
-        rownames(fisherInformation) <- paste0("stage ", stage)
+    fisherInformationValues <- .combineFisherInformationStages(informationByStage)
+    if (length(stage) > 1L && !is.null(dim(fisherInformationValues))) {
+        rownames(fisherInformationValues) <- paste0("stage ", stage)
     }
 
-    nSituations <- .getNumberOfFisherInformationSituations(fisherInformation, stage)
-    attr(fisherInformation, "situations") <- .getFisherInformationSituationLabels(
+    nSituations <- .getNumberOfFisherInformationSituations(fisherInformationValues, stage)
+    situations <- .getFisherInformationSituationLabels(
         designPlan,
         nSituations
     )
-    attr(fisherInformation, "designPlan") <- designPlan
-    class(fisherInformation) <- c("FisherInformation", class(fisherInformation))
-
-    return(fisherInformation)
+    return(FisherInformation$new(
+        information = fisherInformationValues,
+        type = type,
+        stage = stage,
+        situations = situations,
+        designPlan = designPlan
+    ))
 }
 
 .getFutilityBoundsTreatmentEffectScaleRatesTwoGroups <- function(designPlan, boundary, nStages) {
@@ -2340,7 +2324,7 @@ getFisherInformation <- function(
         return(.getFutilityBoundsTreatmentEffectScaleRatesTwoGroups(designPlan, boundary, nStages))
     }
 
-    fisherInformation <- getFisherInformation(designPlan, stage = 1)
+    fisherInformation <- as.numeric(getFisherInformation(designPlan, stage = 1))
     nParameters <- max(length(fisherInformation), 1)
 
     if (nStages == 0) {
@@ -2364,7 +2348,10 @@ getFisherInformation <- function(
     if (grepl("CountData", .getClassName(designPlan))) {
         stageInformation <- NULL
         for (stage in seq_len(nStages)) {
-            stageInformation <- rbind(stageInformation, getFisherInformation(designPlan, stage = stage))
+            stageInformation <- rbind(
+                stageInformation,
+                as.numeric(getFisherInformation(designPlan, stage = stage))
+            )
         }
     } else {
         stageInformation <- (informationRates / design$informationRates[1]) %*% t(fisherInformation)

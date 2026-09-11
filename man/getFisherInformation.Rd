@@ -36,18 +36,19 @@ information increment contributed by each requested stage
 (\code{"stageWise"}) is returned.}
 }
 \value{
-A numeric value, vector, or matrix containing cumulative or stage-wise Fisher
-information, as selected by \code{type}. If multiple stages are requested,
-a vector is returned for a single planning scenario and a matrix with stages
-in rows is returned for multiple planning alternatives or comparisons. A
-vector or matrix can also be returned for a single stage if the object
-contains several planning alternatives, arms, or sample size values.
-\code{NA_real_} is returned if the endpoint type is not supported. The result
-has class \code{FisherInformation} and always includes the attributes
-\code{"type"} and \code{"stage"}. If the values refer to distinguishable
-planning situations, the \code{"situations"} attribute contains descriptive
-labels such as the corresponding alternatives, event probabilities, hazard
-ratios, or count-data rates.
+A \code{FisherInformation} R6 object. Its public fields are
+\code{information} (the calculated numeric value, vector, or matrix),
+\code{type}, \code{stage}, and \code{situations}. The latter contains
+descriptive labels such as the corresponding alternatives, event
+probabilities, hazard ratios, or count-data rates where available. The
+originating design plan is stored privately for subsequent pipe-based
+conversion with \code{getFutilityBounds()}.
+
+Use \code{as.numeric()} to extract a plain numeric vector, \code{as.matrix()}
+to obtain a consistently arranged stage-by-situation matrix, and
+\code{as.data.frame()} to obtain a long-format data frame. Unsupported
+endpoint types are represented by \code{NA_real_} in the
+\code{information} field.
 }
 \description{
 Calculates cumulative or stage-wise Fisher information at planned analyses for
@@ -71,10 +72,10 @@ cumulative and stage-wise information are identical.
 To obtain stage-wise increments from cumulative values \eqn{I_1,\ldots,I_k},
 use \eqn{I_1, I_2-I_1,\ldots,I_k-I_{k-1}}. For example:
 \preformatted{
-informationCumulative <- c(
-    getFisherInformation(designPlan, stage = 1),
-    getFisherInformation(designPlan, stage = 2)
-)
+informationCumulative <- as.numeric(getFisherInformation(
+    designPlan,
+    stage = 1:2
+))
 informationStageWise <- c(
     informationCumulative[1],
     diff(informationCumulative)
@@ -132,10 +133,10 @@ information <- getFisherInformation(
     type = "cumulative"
 )
 }
-The \code{"type"} attribute added to every result enables
+The \code{type} field in every result enables
 \code{getFutilityBounds()} to detect incompatible use.
 The complete result can also be piped into \code{getFutilityBounds()}. In
-that case, its stage and situation attributes are used to convert every
+that case, its \code{stage} and \code{situations} fields are used to convert every
 applicable futility bound separately. With the default cumulative type, an
 omitted target scale means conversion to the effect-estimate scale:
 \preformatted{

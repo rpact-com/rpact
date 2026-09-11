@@ -56,8 +56,10 @@ used in the conversion. In general, \code{information[1]} is the cumulative
 information available at the analysis to which the futility bound refers,
 whereas \code{information[2]} is the additional information planned after
 that analysis. The exact requirements depend on \code{sourceScale} and
-\code{targetScale}. If present, the \code{"type"} attribute must be
-consistent with the requested conversion; see Details.}
+\code{targetScale}. A \code{FisherInformation} object can also be supplied;
+its \code{type} field must be consistent with the requested conversion;
+it must represent a single planning situation when used as this argument.
+See Details.}
 
 \item{naAllowed}{Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.}
 }
@@ -86,10 +88,12 @@ perspective:
 \describe{
 \item{\code{"zValue"}}{The standardized interim test statistic. For
 \code{directionUpper = TRUE}, larger values favor the alternative;
-\code{directionUpper = FALSE} reverses this direction.}
+\code{directionUpper = FALSE} reverses this direction. Conversion between
+this scale and \code{"pValue"} does not require Fisher information.}
 \item{\code{"pValue"}}{The one-sided p-value corresponding to the
 z-value and the selected direction. Smaller values indicate stronger
-evidence in favor of the alternative.}
+evidence in favor of the alternative. Conversion between this scale and
+\code{"zValue"} does not require Fisher information.}
 \item{\code{"effectEstimate"}}{The unstandardized, null-centered effect
 estimate \eqn{\widehat{\delta}} on the analysis scale, related to the
 z-value by \eqn{z = \widehat{\delta}\sqrt{I_1}}. Depending on the endpoint,
@@ -119,7 +123,9 @@ interim result would be at least as unfavorable as the observed result,
 given that the final combined test statistic is at its critical boundary.
 It is independent of an assumed treatment effect and, for the supported
 inverse normal or group sequential setting, coincides with the predictive
-power based on a flat prior.}
+power based on a flat prior. Conversion between this scale and
+\code{"zValue"} or \code{"pValue"} uses the design's information rates,
+but does not require endpoint-specific Fisher information.}
 }
 The four power-based scales take values between \code{0} and \code{1}. Their
 values describe a futility threshold at an interim analysis; they should not
@@ -128,10 +134,13 @@ be confused with the unconditional power of the trial design.
 \strong{Piping design plans or Fisher information into getFutilityBounds}
 
 A trial design plan or simulation results object can be supplied directly.
-In that case, \code{getFisherInformation()} is called internally with the
-information type required by \code{targetScale}: \code{"cumulative"} for
-an effect-estimate conversion and \code{"stageWise"} for conversions
-involving conditional or predictive power. This provides the short form
+If the requested conversion needs Fisher information,
+\code{getFisherInformation()} is called internally with the required type:
+\code{"cumulative"} for an effect-estimate conversion and \code{"stageWise"}
+for conversions involving conditional or predictive power. It is not called
+for conversion from the design's z-value bounds to \code{"zValue"},
+\code{"pValue"}, or \code{"reverseCondPower"}; the latter uses information
+rates from the design itself. This provides the short form
 \preformatted{
 designPlan |>
     getFutilityBounds(targetScale = "condPowerAtObserved")
@@ -144,9 +153,13 @@ A complete result of
 as \code{sourceValue}, most conveniently with the base R pipe. In this form,
 \code{getFutilityBounds()} obtains the design, its z-value futility bounds,
 the requested stages, the information type, and the planning-situation labels
-from the attributes of the \code{FisherInformation} object. If
+from the fields of the \code{FisherInformation} object. If
 \code{targetScale} is omitted, the bounds are converted to
 \code{"effectEstimate"}; another target scale can be requested explicitly.
+If Fisher information is not needed for that scale, the object remains a
+valid source of the design and its futility bounds, but its information
+values are ignored and a warning is issued. The printed result then does not
+claim that Fisher information was used.
 
 The conversion is performed separately for every planning situation and for
 every supplied interim analysis. Information for the final analysis is used
@@ -154,7 +167,7 @@ where a conversion requires future information, but no final-stage futility
 bound is returned. Consequently, cumulative information is appropriate for
 the default conversion to the effect-estimate scale. Stage-wise information
 is required for conversions involving conditional or predictive power. An
-informative error is issued if the \code{"type"} attribute is incompatible
+informative error is issued if its \code{type} field is incompatible
 with the requested target scale.
 Conversions to conditional power, conditional power at the observed effect,
 predictive power, or reverse conditional power remain restricted to
@@ -222,14 +235,18 @@ value of \code{theta}.
 A warning is issued if a two-element vector contains an information value not
 needed for the requested conversion. Set the unused element to \code{NA}, or
 pass a single value when using the same value for both elements is intended.
-Information returned by
+A \code{FisherInformation} object returned by
 \code{\link[=getFisherInformation]{getFisherInformation()}} has a
-\code{"type"} attribute. If that attribute is present,
-\code{getFutilityBounds()} verifies that it is either \code{"cumulative"} for
+\code{type} field. \code{getFutilityBounds()} verifies that it is
+\code{"cumulative"} for
 an effect-estimate conversion or \code{"stageWise"} for a conditional- or
 predictive-power conversion, and stops with an error if the types do not
-match. Numeric input without this attribute remains supported for backward
-compatibility.
+match. Plain numeric input without type metadata remains supported for
+backward compatibility.
+If a \code{FisherInformation} object contains multiple planning situations,
+pipe it into \code{getFutilityBounds()} as \code{sourceValue}; the conversion
+is then performed separately for every situation. The \code{information}
+argument itself accepts such an object only when it represents one situation.
 
 \strong{Obtaining information from a design plan}
 
@@ -241,8 +258,8 @@ standardized statistic. To construct the information vector for a two-stage
 conditional- or predictive-power conversion, calculate the cumulative
 information at both analyses and use:
 \preformatted{
-informationStage1 <- getFisherInformation(designPlan, stage = 1)
-informationCumulative2 <- getFisherInformation(designPlan, stage = 2)
+informationStage1 <- as.numeric(getFisherInformation(designPlan, stage = 1))
+informationCumulative2 <- as.numeric(getFisherInformation(designPlan, stage = 2))
 information <- c(
     informationStage1,
     informationCumulative2 - informationStage1
