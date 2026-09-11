@@ -13,25 +13,22 @@ params:
   vignette_csv: null
 ---
 
-Design proposal, 11 September 2026. Scope: two-arm adjusted continuous-outcome
-analyses, with required extensions for multi-arm comparisons and longitudinal
-mixed models from the existing development vignettes. The first implementation
-step remains ordinary Gaussian linear models fitted separately to non-overlapping
-stages; that step alone does not complete the use cases below. No package
-implementation changes are made here.
+### Scope
 
-Source baseline: rpact Git commit `8c9302e4`, package version `4.5.0.9319`.
-Examples were executed with R 4.6.1 and emmeans 2.0.4, loading this checkout with
-`pkgload::load_all(..., compile = FALSE)`. The installed rpact version was older
-(`4.5.0.9314`) and was not used for the comparisons.
+- Two-arm adjusted continuous-outcome analyses, with required extensions for multi-arm comparisons and longitudinal mixed models from the existing development vignettes. 
+- The first implementation step remains ordinary Gaussian linear models fitted separately to non-overlapping stages; that step alone does not complete the use cases below.
 
+### Source baseline
+
+- rpact Git commit `8c9302e4`, package version `4.5.0.9319`.
+- Examples were executed with R 4.6.1 and `emmeans` 2.0.4.
 
 ## Rendering and reproducibility
 
 Render from the repository root with
 `quarto render misc/emmeans-interface-design.qmd`. This document loads the local
-rpact checkout and requires `pkgload` and `emmeans` (and an available compiled
-rpact library). All example and verification code is included below.
+`rpact` checkout and requires `pkgload` and `emmeans`. 
+All example and verification code is included below.
 
 The vignette CSV is external to this repository. Set the environment variable
 `RPACT_VIGNETTE_DATA` to its path, or pass
@@ -46,24 +43,28 @@ repo_root <- normalizePath("..", mustWork = TRUE)
 stopifnot(file.exists(file.path(repo_root, "DESCRIPTION")))
 suppressPackageStartupMessages(library(emmeans))
 document_dir <- getwd()
-pkgload::load_all(repo_root, quiet = TRUE, compile = FALSE)
+pkgload::load_all(repo_root, quiet = TRUE)
 setwd(document_dir)
 options(rpact.dataset.stdev.calc.mode = "auto")
 Sys.unsetenv("RPACT_DATASET_STDEV_CALC_MODE")
-vignette_csv <- params$vignette_csv
-if (is.null(vignette_csv)) {
+if (!exists("params")|| is.null(vignette_csv <- params$vignette_csv)) {
     vignette_csv <- Sys.getenv("RPACT_VIGNETTE_DATA", unset = path.expand(
         "~/svn/rpact/rpact-vignettes/inst/exclusive/qmd/data/data_two_arm_adjusted_means.csv"
     ))
 }
 ```
 
-The following helpers compare the legacy adapter with direct emmeans inference
+The following helpers compare the legacy adapter with direct `emmeans` inference
 and the existing general-estimates interface. Their assertions check the
 contrast variance and agreement of the corrected stage tests.
 
 ```{r}
 #| label: comparison-helpers
+
+# emm: emmeans object representing the estimated marginal means for the treatment and control groups.
+# treatment: name of the treatment group.
+# control: name of the control group.
+# Returns a data frame containing the contrast estimate, its standard error, and associated statistics.
 extract_contrast <- function(emm, treatment, control) {
     tab <- as.data.frame(summary(emm, type = "link"))
     stopifnot(nrow(tab) == 2L,
@@ -77,6 +78,8 @@ extract_contrast <- function(emm, treatment, control) {
     result
 }
 
+# Returns a data frame containing the comparison of the legacy adapter, general estimates interface, and direct `emmeans` inference for the specified contrast.
+# Fails if the results don't match between the legacy adapter, general estimates interface, and direct `emmeans` inference.
 compare_paths <- function(emm, treatment, control) {
     contrast_result <- extract_contrast(emm, treatment, control)
     design <- getDesignGroupSequential(kMax = 1)
@@ -133,7 +136,7 @@ The relevant implementation is:
 | `DatasetMeans` in the same file | R6 subclass of `Dataset`, storing stage/group means, SDs and sample sizes, and their cumulative versions. |
 | [Means analysis](../R/f_analysis_base_means.R) | Apply ordinary independent-sample formulas, producing `StageResultsMeans` and design-specific analysis results. |
 
-An `emmGrid` is an emmeans S4 object. It retains the linear functions of model
+An `emmGrid` is an `emmeans` S4 object. It retains the linear functions of model
 coefficients defining the EMMs, coefficient estimates and covariance, and a
 degrees-of-freedom calculation mechanism. `summary()` exposes marginal EMMs,
 SEs and df; `vcov()` exposes the covariance matrix of the EMM estimates on the
@@ -152,8 +155,8 @@ The adapter currently:
    from `as.list(object)`. Rows of `extras` are treated as sample sizes. These
    reference-grid weights are not a general contract for independent subject
    counts, particularly for weighted or repeated-measures models.
-4. Moves the first EMM level to the last rpact group position. For two arms,
-   EMM row 2 becomes rpact treatment group 1 and row 1 becomes control group 2.
+4. Moves the first EMM level to the last `rpact` group position. For two arms,
+   EMM row 2 becomes `rpact` treatment group 1 and row 1 becomes control group 2.
    This assumes that the first EMM level is the control. It does not identify
    treatment from a scientific label. Choosing the control as the regression
    reference is a convenience for this convention, not a statistical requirement
@@ -188,11 +191,13 @@ inverse-variance combination of independently estimated treatment contrasts.
 
 The reduction is appropriate for a conventional independent, homoscedastic
 Gaussian `lm(y ~ group)`: the EMMs are the group sample means, their covariance
-is zero, and the model df are `n_T + n_C - 2`. Covariate adjustment invalidates
+is zero, and the model df are `n_T + n_C - 2`. 
+
+However, covariate adjustment invalidates
 this reduction in general. Additional covariates do not *always* cause nonzero
 covariance: balanced/orthogonal designs can still give zero covariance. Shared
 coefficients alone are not a proof of correlation—the full covariance
-calculation decides. Even zero covariance does not justify discarding model df.
+calculation decides. On the other hand, even a zero covariance does not justify discarding the model degrees of freedom.
 
 ## 2. The statistical problem
 
@@ -217,7 +222,7 @@ diagonal-only SE too large; negative covariance makes it too small. In ANCOVA,
 adjusting imbalanced groups to a common covariate value can produce negative
 covariance. The problem is therefore not necessarily conservative.
 
-There is also an independent df problem: a full-rank ordinary linear model
+There is also an independent degrees of freedom (df) problem: a full-rank ordinary linear model
 uses `n - rank(X)` residual df. Mixed models may have contrast-specific df.
 These cannot in general be recovered from group counts or the marginal EMM df.
 Rescaling an SE by a selected t quantile does not preserve the original test
@@ -242,21 +247,28 @@ d$y <- 10 + 2 * (d$group == "Treatment") + 3 * d$x +
 fit <- lm(y ~ group + x, data = d)
 emm <- emmeans(fit, ~ group)
 summary(emm)
+```
+
+At the common covariate value 4, the control and treatment EMMs are `r summary(emm)$emmean[1]` and `r summary(emm)$emmean[2]`.
+Both marginal SEs are `r summary(emm)$SE[1]`, and model df are `r summary(emm)$df[1]`. The EMM covariance is
+
+```{r}
 vcov(emm)
 ```
 
-At the common covariate value 4, the control and treatment EMMs are 22 and 24.
-Both marginal SEs are 0.453091, and model df are 9. The EMM covariance is
+Thus the correct effect is 2 and its SE is 
 
-```text
-               Control     Treatment
-Control       0.20529101   -0.05714286
-Treatment    -0.05714286    0.20529101
+```{r}
+sqrt(vcov(emm)["Treatment","Treatment"] + vcov(emm)["Control","Control"] - 2 * vcov(emm)["Treatment","Control"])
 ```
 
-Thus the correct effect is 2 and its SE is
-`sqrt(0.20529101 + 0.20529101 - 2 * (-0.05714286)) = 0.724478`.
-The diagonal-only SE is 0.640767. Because the group sizes are equal, this is
+The diagonal-only SE is
+
+```{r}
+sqrt(vcov(emm)["Treatment","Treatment"] + vcov(emm)["Control","Control"])
+```
+
+Because the group sizes are equal, this is
 also the current adapter's default pooled SE in this example.
 
 ```{r}
@@ -264,11 +276,11 @@ also the current adapter's default pooled SE in this example.
 knitr::kable(compare_paths(emm, "Treatment", "Control"), digits = 6)
 ```
 
+Both the missing covariance and the wrong df affect inference. Simple solutions don't work here:
 
-Both the missing covariance and the wrong df affect inference. Changing
-`equalVariances` does not fix this balanced-size example; changing to normal
-approximation does not restore covariance either. Using residual `sigma`
-also fails: it omits the additional variance from covariate imbalance.
+- Changing `equalVariances` does not fix this balanced-size example.
+- Changing to normal approximation does not restore covariance either. 
+- Using residual `sigma` also fails: it omits the additional variance from covariate imbalance.
 
 ### The existing vignette is affected
 
@@ -299,7 +311,9 @@ if (file.exists(vignette_csv)) {
 
 The diagonal-only SEs are respectively 9.514934, 9.754200 and 8.237943;
 the small further difference from the current SEs is due to pooling synthetic
-SDs with unequal arm sizes. The larger discrepancy is the omitted covariance.
+SDs with unequal arm sizes. 
+
+The larger discrepancy is the omitted covariance.
 The vignette's stated stopping decisions and intervals must be regenerated
 after choosing the sequential analysis specification; this table alone does
 not determine those decisions.
@@ -327,7 +341,7 @@ separately at each of three stages, obtains `emmeans(model, "group")`, and
 passes successive stage grids to `getDataset()` for `getDesignInverseNormal()`
 and `getAnalysisResults()`. Its two treatment groups share a control. The
 random-effects term permits intercept–slope covariance, despite the source's
-wording “without interaction between random effects.” The final bulk-import
+wording "without interaction between random effects." The final bulk-import
 examples additionally cover group-only `lm`, adjusted `lm`, and a random-intercept
 model with `covariate * gender`.
 
@@ -340,6 +354,7 @@ C=\begin{pmatrix}-1&1&0\\-1&0&1\end{pmatrix},\qquad
 $$
 
 In particular, $S_{12}=V_{T_1T_2}-V_{T_1C}-V_{CT_2}+V_{CC}$.
+
 Two scalar SEs lose this dependence, even for independent unadjusted arm means
 because both contrasts contain the control. Model adjustment can change that
 dependence further. Store the joint covariance and contrast-specific df;
@@ -347,7 +362,8 @@ separate `DatasetGeneral` analyses cannot establish familywise error control.
 
 ```{r}
 #| label: multi-arm-longitudinal-extraction-sketch
-#| eval: false
+
+vignette_data_dir <- "/Users/daniel/svn/rpact/rpact-vignettes/inst/data"
 multi_data <- read.csv(file.path(vignette_data_dir,
     "data_multi_arm_means_repeated_measures.csv"))
 control <- "Control group"
@@ -356,15 +372,20 @@ multi_data$group <- factor(multi_data$group, levels = c(control, treatments))
 multi_stage_effects <- lapply(sort(unique(multi_data$stage)), function(k) {
     fit <- lme4::lmer(outcome ~ group + gender + covariate * visit +
         (1 + visit | subject), data = multi_data[multi_data$stage == k, ])
+
     # Explicit df policy; requires the corresponding optional backend.
     emm <- emmeans::emmeans(fit, "group", lmer.df = "kenward-roger")
     labels <- as.character(as.data.frame(summary(emm))$group)
+
     stopifnot(length(labels) == 3L, setequal(labels, c(control, treatments)))
+
     methods <- setNames(lapply(treatments, function(trt) {
         as.numeric(labels == trt) - as.numeric(labels == control)
     }), paste(treatments, "-", control))
+
     effects <- emmeans::contrast(emm, method = methods, adjust = "none")
     C <- do.call(rbind, methods)
+
     stopifnot(isTRUE(all.equal(unname(vcov(effects)),
         unname(C %*% vcov(emm) %*% t(C)), tolerance = 1e-10)))
     list(effects = effects, covariance = vcov(effects),
@@ -381,7 +402,7 @@ procedure, stage combination weights, and any treatment-selection or dropping
 rules before reporting familywise decisions or simultaneous repeated intervals.
 A covariance matrix plus marginal df does not by itself specify a joint finite-df
 test. The chosen engine must document its joint-distribution approximation or
-other justification and validate it. Applying an emmeans multiplicity adjustment
+other justification and validate it. Applying an `emmeans` multiplicity adjustment
 and then treating those p-values as ordinary scalar stage tests is not an
 implicit solution.
 
@@ -411,7 +432,7 @@ mixed-model extraction example based on the draft is:
 
 ```{r}
 #| label: two-arm-repeated-measures-extraction-sketch
-#| eval: false
+
 repeated_data <- read.csv(file.path(vignette_data_dir,
     "data_two_arm_means_repeated_measures.csv"))
 repeated_data$group <- factor(repeated_data$group,
@@ -511,8 +532,8 @@ upper_test
 ordinary_ci
 ```
 
-The contrast returns estimate 2, SE 0.724478, df 9, two-sided p approximately
-0.0221, and an ordinary 95% CI approximately `[0.361, 3.639]`. This is a
+The contrast returns estimate `r effect_table$estimate`, SE `r effect_table$SE`, df `r effect_table$df`, two-sided p approximately
+`r effect_table$p.value`, and an ordinary 95% CI approximately `[r ordinary_ci$lower.CL, r ordinary_ci$upper.CL]`. This is a
 single-analysis interval, not a repeated confidence interval.
 
 `contrast()` returns another `emmGrid`; its summary evaluates df for the
@@ -597,9 +618,9 @@ their estimates, SEs and df. Do not pass cumulative model fits as stage inputs.
 
 ### Direct emmeans p-value backend
 
-The minimal bridge above still recomputes p-values in rpact from the contrast
+The minimal bridge above still recomputes p-values in `rpact` from the contrast
 estimate, SE and df. For the supported scalar t/z tests, these equal the
-emmeans p-values. If the intended interface is to delegate *all within-stage
+`emmeans` p-values. If the intended interface is to delegate *all within-stage
 inference*, extend it with a model-test backend that retains each contrast
 `emmGrid` and implements an operation such as
 `evaluateStage(thetaH0, directionUpper)`. Internally it would call:
