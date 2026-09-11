@@ -30,12 +30,12 @@ that a warning will be displayed if unknown arguments are passed.}
 
 \item{sourceScale}{Character. The scale of the input futility bounds.
 Must be one of \code{"zValue"}, \code{"pValue"},
-\code{"conditionalPower"}, "condPowerAtObserved", \code{"predictivePower"},
+\code{"conditionalPower"}, \code{"condPowerAtObserved"}, \code{"predictivePower"},
 \code{"reverseCondPower"}, or \code{"effectEstimate"}.}
 
 \item{targetScale}{Character. The scale to which the futility bounds should
 be converted. Must be one of \code{"zValue"}, \code{"pValue"},
-\code{"conditionalPower"}, "condPowerAtObserved", \code{"predictivePower"},
+\code{"conditionalPower"}, \code{"condPowerAtObserved"}, \code{"predictivePower"},
 \code{"reverseCondPower"}, or \code{"effectEstimate"}.}
 
 \item{design}{The trial design. Required if either the \code{sourceScale} or
@@ -47,8 +47,9 @@ Must be a one-sided two-stage group sequential design or Fisher's combination te
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
-\item{theta}{Numeric. The assumed effect size under the alternative hypothesis on the scale of the
-test statistic. For example, in a survival design, this would be the on the log hazard ratio scale.}
+\item{theta}{Numeric. The assumed treatment effect under the alternative
+hypothesis on the unstandardized analysis scale. For example, in a
+survival design this is specified on the log hazard-ratio scale.}
 
 \item{information}{Numeric vector of length 1 or 2 specifying the information
 used in the conversion. In general, \code{information[1]} is the cumulative
@@ -79,17 +80,50 @@ returns the input \code{sourceValue} without modification.
 Otherwise, the function is designed to convert between the specified scales.
 
 \strong{Available scales}
-\itemize{
-\item \code{"zValue"}: The standardized test statistic value.
-\item \code{"pValue"}: The one-sided p-value corresponding to the z-value.
-\item \code{"effectEstimate"}: The effect estimate on the scale of the test statistic.
-\item \code{"conditionalPower"}: The conditional power given the current effect
-estimate \code{theta} and additional information.
-\item \code{"condPowerAtObserved"}: The conditional power at the observed effect estimate.
-\item \code{"predictivePower"}: The predictive power based on the current effect estimate and additional information.
-\item \code{"reverseCondPower"}: The reverse conditional power, which is the probability
-of observing a significant result given the current effect estimate and additional information.
+
+Each scale expresses the same interim futility threshold from a different
+perspective:
+\describe{
+\item{\code{"zValue"}}{The standardized interim test statistic. For
+\code{directionUpper = TRUE}, larger values favor the alternative;
+\code{directionUpper = FALSE} reverses this direction.}
+\item{\code{"pValue"}}{The one-sided p-value corresponding to the
+z-value and the selected direction. Smaller values indicate stronger
+evidence in favor of the alternative.}
+\item{\code{"effectEstimate"}}{The unstandardized, null-centered effect
+estimate \eqn{\widehat{\delta}} on the analysis scale, related to the
+z-value by \eqn{z = \widehat{\delta}\sqrt{I_1}}. Depending on the endpoint,
+this can be a mean or rate difference, or an effect on a transformed scale
+such as the log hazard-ratio scale. Adding the null value or applying a
+back-transformation may be necessary to obtain the endpoint's usual
+presentation scale.}
+\item{\code{"conditionalPower"}}{The probability of rejecting the null
+hypothesis at the final analysis, conditional on the interim result and
+assuming the user-specified treatment effect \code{theta} for the future
+observations. It requires \code{theta} and the additional second-stage
+information.}
+\item{\code{"condPowerAtObserved"}}{Conditional power calculated by
+using the interim effect estimate in place of a separately assumed effect.
+It treats the observed estimate as fixed when projecting the future data
+and, in the supported two-stage setting, depends on the information through
+the ratio of second-stage to first-stage information.}
+\item{\code{"predictivePower"}}{The Bayesian predictive probability of
+rejecting the null hypothesis at the final analysis under a flat
+(improper) prior for the treatment effect. Unlike conditional power at the
+observed effect, it integrates uncertainty about that effect. In the
+supported two-stage setting, it also depends only on the information
+ratio.}
+\item{\code{"reverseCondPower"}}{Reverse conditional power (also called
+reverse stochastic curtailment): the conditional probability that the
+interim result would be at least as unfavorable as the observed result,
+given that the final combined test statistic is at its critical boundary.
+It is independent of an assumed treatment effect and, for the supported
+inverse normal or group sequential setting, coincides with the predictive
+power based on a flat prior.}
 }
+The four power-based scales take values between \code{0} and \code{1}. Their
+values describe a futility threshold at an interim analysis; they should not
+be confused with the unconditional power of the trial design.
 
 \strong{Piping design plans or Fisher information into getFutilityBounds}
 
