@@ -1,0 +1,638 @@
+---
+title: "Correct covariance handling in the rpact–emmeans interface"
+date: 2026-09-11
+format:
+  html:
+    toc: true
+    code-fold: false
+    embed-resources: true
+execute:
+  echo: true
+  message: false
+params:
+  vignette_csv: null
+---
+
+Design proposal, 11 September 2026. Scope: two-arm adjusted continuous-outcome
+analyses, starting with ordinary Gaussian linear models fitted separately to
+non-overlapping stages. No package implementation changes are made here.
+
+Source baseline: rpact Git commit `8c9302e4`, package version `4.5.0.9319`.
+Examples were executed with R 4.6.1 and emmeans 2.0.4, loading this checkout with
+`pkgload::load_all(..., compile = FALSE)`. The installed rpact version was older
+(`4.5.0.9314`) and was not used for the comparisons.
+
+
+## Rendering and reproducibility
+
+Render from the repository root with
+`quarto render misc/emmeans-interface-design.qmd`. This document loads the local
+rpact checkout and requires `pkgload` and `emmeans` (and an available compiled
+rpact library). All example and verification code is included below.
+
+The vignette CSV is external to this repository. Set the environment variable
+`RPACT_VIGNETTE_DATA` to its path, or pass
+`-P vignette_csv:/path/to/data_two_arm_adjusted_means.csv` when rendering.
+The default also checks the original SVN location under the current user's home.
+If the CSV is unavailable, only the vignette reproduction is skipped, with a
+visible note; the self-contained example still runs.
+
+```{r}
+#| label: setup
+repo_root <- normalizePath("..", mustWork = TRUE)
+stopifnot(file.exists(file.path(repo_root, "DESCRIPTION")))
+suppressPackageStartupMessages(library(emmeans))
+document_dir <- getwd()
+pkgload::load_all(repo_root, quiet = TRUE, compile = FALSE)
+setwd(document_dir)
+options(rpact.dataset.stdev.calc.mode = "auto")
+Sys.unsetenv("RPACT_DATASET_STDEV_CALC_MODE")
+vignette_csv <- params$vignette_csv
+if (is.null(vignette_csv)) {
+    vignette_csv <- Sys.getenv("RPACT_VIGNETTE_DATA", unset = path.expand(
+        "~/svn/rpact/rpact-vignettes/inst/exclusive/qmd/data/data_two_arm_adjusted_means.csv"
+    ))
+}
+```
+
+The following helpers compare the legacy adapter with direct emmeans inference
+and the existing general-estimates interface. Their assertions check the
+contrast variance and agreement of the corrected stage tests.
+
+```{r}
+#| label: comparison-helpers
+extract_contrast <- function(emm, treatment, control) {
+    tab <- as.data.frame(summary(emm, type = "link"))
+    stopifnot(nrow(tab) == 2L,
+        setequal(as.character(tab$group), c(control, treatment)))
+    coefficients <- ifelse(tab$group == treatment, 1, -1)
+    effect <- contrast(emm, list("Treatment - Control" = coefficients), adjust = "none")
+    result <- as.data.frame(summary(effect, type = "link", infer = c(TRUE, TRUE),
+        null = 0, side = "two-sided", adjust = "none"))
+    manual_se <- sqrt(drop(t(coefficients) %*% vcov(emm) %*% coefficients))
+    stopifnot(isTRUE(all.equal(manual_se, result$SE, tolerance = 1e-12)))
+    result
+}
+
+compare_paths <- function(emm, treatment, control) {
+    contrast_result <- extract_contrast(emm, treatment, control)
+    design <- getDesignGroupSequential(kMax = 1)
+    legacy <- getStageResults(design,
+        dataInput = suppressWarnings(getDataset(emm)))
+    general <- getStageResults(design, dataInput = getDataset(
+        est = contrast_result$estimate, se = contrast_result$SE, df = contrast_result$df
+    ))
+    correct_p <- pt(contrast_result$estimate / contrast_result$SE,
+        df = contrast_result$df, lower.tail = FALSE)
+    emm_table <- as.data.frame(summary(emm, type = "link"))
+    effect <- contrast(emm, list("Treatment - Control" =
+        ifelse(emm_table$group == treatment, 1, -1)), adjust = "none")
+    direct_test <- as.data.frame(emmeans::test(effect,
+        null = 0, side = ">", adjust = "none"))
+    stopifnot(
+        isTRUE(all.equal(direct_test$p.value, correct_p, tolerance = 1e-12)),
+        isTRUE(all.equal(general$testStatistics[1],
+            contrast_result$estimate / contrast_result$SE, tolerance = 1e-12)),
+        isTRUE(all.equal(general$pValues[1], correct_p, tolerance = 1e-12))
+    )
+    data.frame(
+        estimate = contrast_result$estimate,
+        covariance = vcov(emm)[1, 2],
+        diagonal_only_se = sqrt(sum(diag(vcov(emm)))),
+        legacy_se = contrast_result$estimate / legacy$testStatistics[1],
+        correct_se = contrast_result$SE,
+        contrast_df = contrast_result$df,
+        legacy_p = legacy$pValues[1],
+        correct_p = correct_p
+    )
+}
+```
+
+## 1. Current interface and its assumptions
+
+### Entry points and conversion
+
+The vignette
+`rpact-vignettes/inst/exclusive/qmd/rpact_analysis_two_arm_adjusted_means_example.qmd`
+fits `lm(outcome ~ group + covariate + gender)` independently within each stage,
+calls `emmeans(model, "group")`, and passes one or several resulting objects to
+`getDataset()`. Thus stage 2 means new stage-2 observations, not all observations
+available at the second look.
+
+The relevant implementation is:
+
+| Component | Current responsibility |
+|---|---|
+| [`getDataset()` / `.getDataset()`](../R/class_analysis_dataset.R) | Accept an `emmGrid`, several such arguments, or a single list of stage objects; dispatch before ordinary numeric dataset parsing. |
+| `.getDatasetMeansModelObjectsList()` in the same file | Collect `emmGrid` arguments; warn and ignore other arguments when EMM objects are present. |
+| `.getDatasetMeansFromModelsByStage()` in the same file | Extract per-group summaries, construct synthetic means data, then call `getDataset()` again on a wide data frame. |
+| `.getStandardDeviationFromStandardError()` in the same file | Convert marginal SEs into quantities stored as group SDs. |
+| `DatasetMeans` in the same file | R6 subclass of `Dataset`, storing stage/group means, SDs and sample sizes, and their cumulative versions. |
+| [Means analysis](../R/f_analysis_base_means.R) | Apply ordinary independent-sample formulas, producing `StageResultsMeans` and design-specific analysis results. |
+
+An `emmGrid` is an emmeans S4 object. It retains the linear functions of model
+coefficients defining the EMMs, coefficient estimates and covariance, and a
+degrees-of-freedom calculation mechanism. `summary()` exposes marginal EMMs,
+SEs and df; `vcov()` exposes the covariance matrix of the EMM estimates on the
+linear-predictor scale. Covariance is available without refitting the model.
+See the [emmeans object methods](https://rvlenth.github.io/emmeans/reference/emmGrid-methods.html).
+
+The adapter currently:
+
+1. Requires `emmGrid` stage objects. It rejects objects with more than one entry
+   in their `levels` slot. The error says that models with covariates are not
+   supported, but the actual check concerns the *returned grid*: an adjusted
+   model summarized over `group` alone passes, as in the vignette.
+2. Determines whether the model call looks like `lm` from the first stage only.
+   It warns about imprecision for `lm` and experimental support for other models.
+3. Reads `emmean`, `SE`, `df` from `summary(object)`, and `sigma` and `extras`
+   from `as.list(object)`. Rows of `extras` are treated as sample sizes. These
+   reference-grid weights are not a general contract for independent subject
+   counts, particularly for weighted or repeated-measures models.
+4. Moves the first EMM level to the last rpact group position. For two arms,
+   EMM row 2 becomes rpact treatment group 1 and row 1 becomes control group 2.
+   This assumes that the first EMM level is the control. It does not identify
+   treatment from a scientific label. Choosing the control as the regression
+   reference is a convenience for this convention, not a statistical requirement
+   for calculating a treatment-minus-control contrast.
+5. Under the default `auto` mode for `lm`, sets
+   `stDev[g] = SE(EMM[g]) * sqrt(n[g])`. The environment variable
+   `RPACT_DATASET_STDEV_CALC_MODE` / option `rpact.dataset.stdev.calc.mode`
+   also permits `sigma`, `norm`, and `t` modes. `sigma` uses residual model SD;
+   `t` uses `SE * 2 / qt(0.975, df) * sqrt(n)`. For non-`lm` models with finite
+   positive df, the latter conversion also applies outside `sigma` mode.
+6. Returns `DatasetMeans`, retaining neither EMM covariance nor model/contrast
+   df. There is no model-aware dataset class in this conversion path.
+
+### Downstream assumptions
+
+For a two-arm dataset, the default is `equalVariances = TRUE` and
+`normalApproximation = FALSE`. At a single stage, the means path calculates
+
+$$
+s_p^2=\frac{(n_T-1)s_T^2+(n_C-1)s_C^2}{n_T+n_C-2},\qquad
+SE_{\mathrm{pooled}}=s_p\sqrt{1/n_T+1/n_C},
+$$
+
+and uses `n_T + n_C - 2` df. Setting `equalVariances = FALSE` instead uses
+`sqrt(s_T^2/n_T + s_C^2/n_C)` with Welch df. Neither path includes covariance.
+With synthetic SDs and unequal group sizes, even the pooled SE need not equal
+the square root of the sum of the marginal EMM variances.
+
+Cumulative means and SDs are constructed as ordinary sample summaries. This
+does not generally reconstruct either a pooled ANCOVA fit or an
+inverse-variance combination of independently estimated treatment contrasts.
+
+The reduction is appropriate for a conventional independent, homoscedastic
+Gaussian `lm(y ~ group)`: the EMMs are the group sample means, their covariance
+is zero, and the model df are `n_T + n_C - 2`. Covariate adjustment invalidates
+this reduction in general. Additional covariates do not *always* cause nonzero
+covariance: balanced/orthogonal designs can still give zero covariance. Shared
+coefficients alone are not a proof of correlation—the full covariance
+calculation decides. Even zero covariance does not justify discarding model df.
+
+## 2. The statistical problem
+
+Let the fitted coefficient vector be $\hat\beta$, and let the two rows of
+$L$ define the requested EMMs. Conditional on the model design,
+
+$$
+\hat\mu=L\hat\beta,\qquad V=L\widehat{\operatorname{Var}}(\hat\beta)L^\top.
+$$
+
+In EMM order `(Control, Treatment)`, set $c=(-1,1)^\top$. The desired
+treatment effect and its variance are
+
+$$
+\hat\theta=c^\top\hat\mu,\qquad
+\widehat{\operatorname{Var}}(\hat\theta)=c^\top Vc
+=V_{TT}+V_{CC}-2V_{TC}.
+$$
+
+Keeping marginal SEs alone loses $V_{TC}$. Positive covariance makes the
+diagonal-only SE too large; negative covariance makes it too small. In ANCOVA,
+adjusting imbalanced groups to a common covariate value can produce negative
+covariance. The problem is therefore not necessarily conservative.
+
+There is also an independent df problem: a full-rank ordinary linear model
+uses `n - rank(X)` residual df. Mixed models may have contrast-specific df.
+These cannot in general be recovered from group counts or the marginal EMM df.
+Rescaling an SE by a selected t quantile does not preserve the original test
+distribution across null values and significance levels.
+
+### A small reproducible ANCOVA example
+
+This deterministic example has six observations per arm and covariate
+imbalance. Its residual vector is orthogonal to all model columns, making the
+calculation especially easy to inspect.
+
+```{r}
+#| label: toy-ancova
+library(emmeans)
+d <- data.frame(
+    group = factor(rep(c("Control", "Treatment"), each = 6),
+                   levels = c("Control", "Treatment")),
+    x = c(0:5, 3:8)
+)
+d$y <- 10 + 2 * (d$group == "Treatment") + 3 * d$x +
+    rep(c(1, -1, 0, 0, -1, 1), 2)
+fit <- lm(y ~ group + x, data = d)
+emm <- emmeans(fit, ~ group)
+summary(emm)
+vcov(emm)
+```
+
+At the common covariate value 4, the control and treatment EMMs are 22 and 24.
+Both marginal SEs are 0.453091, and model df are 9. The EMM covariance is
+
+```text
+               Control     Treatment
+Control       0.20529101   -0.05714286
+Treatment    -0.05714286    0.20529101
+```
+
+Thus the correct effect is 2 and its SE is
+`sqrt(0.20529101 + 0.20529101 - 2 * (-0.05714286)) = 0.724478`.
+The diagonal-only SE is 0.640767. Because the group sizes are equal, this is
+also the current adapter's default pooled SE in this example.
+
+```{r}
+#| label: toy-comparison
+knitr::kable(compare_paths(emm, "Treatment", "Control"), digits = 6)
+```
+
+
+Both the missing covariance and the wrong df affect inference. Changing
+`equalVariances` does not fix this balanced-size example; changing to normal
+approximation does not restore covariance either. Using residual `sigma`
+also fails: it omits the additional variance from covariate imbalance.
+
+### The existing vignette is affected
+
+Using the QMD's own `data/data_two_arm_adjusted_means.csv`, its model formula,
+and its control-first level order gives the following *stage-wise*, upper-tail
+tests against zero. These are not sequentially adjusted p-values.
+
+```{r}
+#| label: vignette-comparison
+#| results: asis
+if (file.exists(vignette_csv)) {
+    raw <- read.csv(vignette_csv)
+    stage_table <- do.call(rbind, lapply(sort(unique(raw$stage)), function(k) {
+        stage_data <- raw[raw$stage == k, ]
+        stage_data$group <- relevel(factor(stage_data$group), "Control group")
+        model <- lm(outcome ~ group + covariate + gender, data = stage_data)
+        stage_emm <- emmeans(model, "group")
+        cbind(stage = k, n = nobs(model),
+            compare_paths(stage_emm, "Treatment group", "Control group"))
+    }))
+    print(knitr::kable(stage_table, digits = 6, row.names = FALSE))
+} else {
+    cat("Vignette reproduction skipped: CSV not found. Set `vignette_csv` or ",
+        "`RPACT_VIGNETTE_DATA` to reproduce this comparison.\n")
+}
+```
+
+
+The diagonal-only SEs are respectively 9.514934, 9.754200 and 8.237943;
+the small further difference from the current SEs is due to pooling synthetic
+SDs with unequal arm sizes. The larger discrepancy is the omitted covariance.
+The vignette's stated stopping decisions and intervals must be regenerated
+after choosing the sequential analysis specification; this table alone does
+not determine those decisions.
+
+## 3. Correct calculation in emmeans, without rpact
+
+For the `emm` object above, explicitly define the direction by group label,
+then let emmeans calculate the contrast and its df:
+
+```{r}
+#| label: emmeans-inference
+em_table <- as.data.frame(summary(emm, type = "link"))
+stopifnot(nrow(em_table) == 2L,
+          setequal(as.character(em_table$group), c("Control", "Treatment")))
+coef <- ifelse(em_table$group == "Treatment", 1, -1)
+effect <- contrast(emm, method = list("Treatment - Control" = coef),
+                   adjust = "none")
+effect_table <- as.data.frame(summary(
+    effect, type = "link", infer = c(TRUE, TRUE),
+    null = 0, side = "two-sided", adjust = "none"
+))
+effect_table
+
+# Independent check of the variance calculation, on the same scale/order.
+V <- vcov(emm)
+se_manual <- sqrt(drop(t(coef) %*% V %*% coef))
+stopifnot(isTRUE(all.equal(se_manual, effect_table$SE, tolerance = 1e-12)))
+
+# One prespecified upper-tail hypothesis H0: theta <= theta0.
+theta0 <- 0
+statistic <- (effect_table$estimate - theta0) / effect_table$SE
+p_upper <- pt(statistic, df = effect_table$df, lower.tail = FALSE)
+
+# Alternatively, let emmeans perform the test and interval calculation itself.
+upper_test <- as.data.frame(emmeans::test(
+    effect, null = theta0, side = ">", adjust = "none"
+))
+ordinary_ci <- as.data.frame(confint(
+    effect, level = 0.95, side = "two-sided", adjust = "none"
+))
+stopifnot(isTRUE(all.equal(upper_test$p.value, p_upper, tolerance = 1e-12)))
+upper_test
+ordinary_ci
+```
+
+The contrast returns estimate 2, SE 0.724478, df 9, two-sided p approximately
+0.0221, and an ordinary 95% CI approximately `[0.361, 3.639]`. This is a
+single-analysis interval, not a repeated confidence interval.
+
+`contrast()` returns another `emmGrid`; its summary evaluates df for the
+contrast rather than borrowing a marginal mean's df. A single prespecified
+contrast uses `adjust = "none"`; simultaneous pairwise multiplicity adjustment
+is a different issue from sequential multiplicity control. See the official
+[contrast documentation](https://rvlenth.github.io/emmeans/reference/contrast.html)
+and [summary/test documentation](https://rvlenth.github.io/emmeans/reference/summary.emmGrid.html).
+
+For this identity-link `lm`, link and response scales coincide. A general
+interface must not mix a response-scale summary with a link-scale covariance
+matrix. Ratios, transformed responses, regridded response contrasts and Bayesian
+summaries require separate contracts; they are not automatically validated by
+this example. The [emmeans reference-grid interface](https://rvlenth.github.io/emmeans/reference/emmeans.html)
+also allows different covariate settings and averaging weights. These define
+the estimand and must be consistent across stages. With treatment–covariate
+interactions, this choice directly affects the treatment contrast.
+
+## 4. Option A: delegate contrast inference to emmeans (recommended)
+
+In this option rpact literally uses emmeans functions rather than implementing
+EMM contrast algebra itself: `emmeans::contrast()` defines the treatment effect,
+`emmeans::test()` supplies the stage p-value for the requested null and direction,
+and `confint()` supplies an ordinary fixed-analysis interval. There are two
+integration depths: reuse `DatasetGeneral` immediately, or extend the analysis
+interface to consume the emmeans tests directly. They share the same contrast
+adapter and differ in who evaluates the stage test.
+
+### Reuse that already exists
+
+The checkout already has `DatasetGeneral`, an R6 subclass of `Dataset`, created
+by `getDataset(est = ..., se = ..., df = ...)`. It stores one estimate, SE and
+df per stage; omitted df default to infinity. It need not represent a physical
+single treatment arm: the estimate can be a two-arm contrast.
+
+[`f_analysis_base_general.R`](../R/f_analysis_base_general.R) implements:
+
+- `StageResultsGeneral`, with stage statistics `(estimate - thetaH0) / se` and
+  t-distribution p-values using the supplied df (normal for infinite df).
+- Stage information `I[k] = 1 / se[k]^2` and cumulative inverse-variance
+  estimates, SEs and Satterthwaite-style df:
+
+  $$
+  \hat\theta_{1:K}=\frac{\sum I_k\hat\theta_k}{\sum I_k},\quad
+  SE_{1:K}=\frac1{\sqrt{\sum I_k}},\quad
+  \nu_{1:K}=\frac{(\sum I_k)^2}{\sum I_k^2/\nu_k}.
+  $$
+
+- Inverse-normal and Fisher combinations using the design's weights, and a
+  group-sequential path using cumulative p-values.
+- Design-specific `AnalysisResultsGroupSequential`,
+  `AnalysisResultsInverseNormal` and `AnalysisResultsFisher` objects, including
+  repeated-inference calculations. Mean-specific assumptions and conditional
+  power/sample-size parameters are marked not applicable on this path.
+
+The existing information-rate helper in
+[`f_analysis_boundary_recalculation.R`](../R/f_analysis_boundary_recalculation.R)
+uses cumulative inverse SE squared for general datasets. Thus maximum
+information has precision units here, not patient-count units.
+
+The following bridge works already, with no change to rpact:
+
+```{r}
+#| label: general-estimates-bridge
+dataset <- rpact::getDataset(
+    est = effect_table$estimate,
+    se = effect_table$SE,
+    df = effect_table$df
+)
+stage_result <- rpact::getStageResults(
+    rpact::getDesignGroupSequential(kMax = 1),
+    dataInput = dataset, thetaH0 = 0, directionUpper = TRUE
+)
+stopifnot(isTRUE(all.equal(stage_result$pValues[1], upper_test$p.value,
+    tolerance = 1e-12)))
+stage_result
+```
+
+This reproduces the emmeans one-sided statistic and p-value. For multiple
+independent stages, construct one contrast table per stage and pass vectors of
+their estimates, SEs and df. Do not pass cumulative model fits as stage inputs.
+
+### Direct emmeans p-value backend
+
+The minimal bridge above still recomputes p-values in rpact from the contrast
+estimate, SE and df. For the supported scalar t/z tests, these equal the
+emmeans p-values. If the intended interface is to delegate *all within-stage
+inference*, extend it with a model-test backend that retains each contrast
+`emmGrid` and implements an operation such as
+`evaluateStage(thetaH0, directionUpper)`. Internally it would call:
+
+```{r}
+#| label: proposed-test-backend
+#| eval: false
+emmeans::test(
+    effect,
+    null = thetaH0,
+    side = if (directionUpper) ">" else "<",
+    adjust = "none"
+)
+```
+
+This backend would return the tested null, direction, estimate, SE, df,
+statistic and the *actual emmeans p-value*. A new dedicated dataset/backend
+type and corresponding dispatch would be needed: `DatasetGeneral` currently
+has no public field for supplied stage p-values or a null-dependent test
+function. Merely adding a `pValues` argument to `getDataset()` would not provide
+this functionality.
+
+For inverse-normal and Fisher designs, refactor stage combination into a
+shared helper accepting validated one-sided stage p-values and design weights.
+Both `.getStageResultsGeneral()` and the emmeans backend could call it. This
+keeps emmeans responsible for the model test and rpact responsible for
+sequential combination, boundaries and stopping decisions. P-values must be
+unadjusted for pairwise comparisons, calibrated for the prespecified hypothesis,
+and valid under the design's stage-dependence assumptions.
+
+A vector of p-values at zero is insufficient for repeated confidence intervals
+or nonzero-null tests. The backend must evaluate `emmeans::test()` again at
+each candidate null used by rpact's interval inversion. Cache the contrast
+object, not just the p-value. Its lifetime/serialization and emmeans version
+then become part of the dataset contract. Ordinary `confint(effect)` intervals
+must remain clearly separate from rpact's repeated/sequential intervals.
+
+For the group-sequential path, stage p-values alone do not define the cumulative
+model test. The implementation must still specify inverse-variance combination
+of independent stage estimates or a separately supported cumulative-fit
+analysis. Calling `test()` on cumulative fits does not justify treating those
+fits as independent stages. The sequential qualifications below apply equally
+to a direct emmeans backend.
+
+**Choice within Option A:** the estimate/SE/df bridge is sufficient for the
+initial ordinary-linear-model contract. The direct test backend is the explicit
+choice if keeping emmeans as the authoritative evaluator of within-stage
+p-values is a requirement. It adds backend/dispatch and interval-inversion work,
+but avoids duplicating emmeans test evaluation in rpact. It does not by itself
+extend validation to every model supported by emmeans.
+
+### Proposed public interface and implementation changes
+
+Introduce a dedicated constructor, provisionally
+`getDatasetFromEmmeans(..., treatment, control, group = "group")`. This is a
+proposal, not an existing function. For the initial release, accept one
+two-row EMM grid per stage, or a list of those grids, for supported ordinary
+Gaussian linear models. Explicit arm labels remove the dependence on reference
+level ordering. A separate explicitly selected contrast-input mode could later
+accept one already constructed contrast per stage; since both means and
+contrasts have class `emmGrid`, class alone cannot distinguish them.
+
+The new constructor should:
+
+1. Validate the number of rows, group labels, stage ordering, absence of `by`
+   strata, supported model/scale, and consistent estimand across stages.
+   Check every stage rather than using the first stage's model call.
+2. Build label-matched treatment-minus-control coefficients; call
+   `emmeans::contrast()` and summarize on the declared scale with no pairwise
+   multiplicity adjustment. Use the returned estimate, SE and contrast df;
+   with the direct backend, retain the contrast for `emmeans::test()` as well.
+3. Reject non-estimable contrasts, missing/nonfinite estimates, nonpositive or
+   nonfinite SEs, and invalid df; allow `Inf` df when the supported inference
+   method supplies them. Never silently replace unavailable df with `Inf`.
+4. Return `getDataset(est = ..., se = ..., df = ...)`. Covariance is already
+   incorporated in the SE; retaining the full matrix is not necessary for
+   inference on this one prespecified scalar contrast.
+5. Preserve arm labels, contrast direction, scale, model/df method, and
+   reference-grid settings as supported provenance metadata if a small
+   extension to `DatasetGeneral` is needed. Sample sizes and arm EMMs may be
+   descriptive metadata, not synthetic inputs to the means engine.
+
+Code changes would be concentrated in the constructor and its dispatch,
+documentation and tests. Add emmeans to `Suggests` with an appropriate tested
+minimum version, use `requireNamespace()` with an actionable message, and
+export/document the new function. emmeans is currently absent from both
+`Imports` and `Suggests`. Prefer its public methods over the current
+`sigma`/`extras` extraction. Do not add a new argument inside the present
+`getDataset(..., treatment = ...)` convention without fixing its parser:
+non-`emmGrid` arguments are currently ignored with a warning.
+
+Deprecate the lossy `getDataset(emmGrid, ...)` conversion with a specific
+migration message and update the vignette to the new constructor (or the
+explicit bridge first). Avoid silently changing its result from `DatasetMeans`
+to `DatasetGeneral` in a patch release: existing callers may access arm means,
+SDs and sample sizes. A later documented breaking change could make the old
+entry point delegate to the new contract. Ordinary numeric means datasets need
+no change. Existing multi-arm and one-arm EMM calls need an explicit migration
+policy rather than being routed through a two-arm-only adapter.
+
+### Sequential inference is a separate validation requirement
+
+Correct contrast extraction fixes the within-stage input. It does not prove
+that every downstream sequential procedure is exact for every fitted model.
+
+For independent stage data and separately fitted ordinary Gaussian linear
+models, the null stage p-values are valid conditional on the model designs.
+An inverse-normal or Fisher combination with appropriately prespecified weights
+is a natural route. Shared participants, pooled nuisance estimation across
+stages, or cumulative refits do not automatically give independent stage tests.
+
+For group-sequential monitoring, canonical joint-distribution assumptions and
+the information-time rule must also hold. Inverse-variance pooling with
+estimated stage variances and the displayed Satterthwaite df is generally an
+approximation, not the exact t-test from refitting ANCOVA to all observations.
+Converting each cumulative t p-value to a normal score does not itself establish
+the required joint distribution. A corrected group-sequential vignette needs
+an explicit analysis specification and operating-characteristic validation;
+it must not inherit an exactness claim from agreement at one stage.
+
+Also audit the existing general path's final-inference outputs before claiming
+full equivalence with the means path: it currently populates final confidence
+limits from repeated confidence limits and labels their midpoint as a
+median-unbiased estimate. These constructions are not generally sufficient to
+establish stagewise-ordering confidence limits or median unbiasedness. This is
+an existing downstream issue, separate from importing covariance correctly.
+
+**Tradeoff:** this is the smallest statistically coherent change for one
+two-arm contrast and retains contrast-specific df. It intentionally changes
+the dataset representation and does not provide covariance among several
+treatment contrasts or retain means-specific planning functionality.
+
+## 5. Option B: introduce a covariance-aware model-means dataset
+
+Introduce a distinct R6 class, provisionally `DatasetModelMeans`, inheriting
+from `Dataset` rather than letting an unmodified means analysis consume it.
+Store for each stage:
+
+- Named EMM vector and its full covariance matrix, on one declared scale.
+- Explicit contrast matrix and resulting contrast estimates, covariance and df.
+- Arm/reference-grid labels, model and df method, and optional descriptive n.
+
+For a contrast matrix $C$, calculate $C\hat\mu$ and $CVC^\top$.
+Obtain df from emmeans for the requested contrasts: `V` by itself does not
+encode contrast-specific df. Either freeze the supported contrasts at import,
+or retain sufficient model machinery for later df evaluation; freezing avoids
+making ordinary dataset use depend on a serialized live model object.
+
+Required changes compared with today:
+
+| Area | Change |
+|---|---|
+| Import | Replace synthetic SD extraction with named EMM vectors, `vcov()` and explicit emmeans contrasts. |
+| Dataset model | Add stage-indexed matrix storage, validation, subsetting, cloning/serialization, getters and print/summary support. |
+| Dispatch | Add model-means detection in dataset/stage/analysis utilities; prevent fallback to independent-arm formulas. |
+| Two-arm inference | Project the specified contrast to `DatasetGeneral` and reuse its scalar analysis, or implement a separate engine with equivalent validation. |
+| Cumulative summaries | Define model-aware summaries; do not pool EMMs and synthetic SDs as raw sample moments. |
+| Multiple contrasts | Pass `C V C'` to an explicitly supported multiplicity/sequential engine; retaining covariance alone does not make existing multi-arm procedures valid for adjusted means. |
+| Information and planning | Define information for the target contrast; separate descriptive subject counts from precision. |
+
+Validation must check matrix dimensions, row/column names and order, symmetry,
+finite entries and positive semidefiniteness within numerical tolerance. A
+singular full covariance may still yield an estimable contrast with positive
+variance; blanket positive-definiteness rejection would be too strong.
+
+**Tradeoff:** this retains the scientific arm summaries and supports future
+correlated multi-arm contrasts. It requires substantially more class,
+dispatch and output work. For the current two-arm vignette, its inferential
+projection is the same scalar estimate/SE/df produced by Option A, so it does
+not solve an additional immediate statistical problem.
+
+## 6. Recommendation and acceptance criteria
+
+Implement Option A first, restricting advertised support to a clearly specified
+model/estimand/stage contract. Use the manual `DatasetGeneral` bridge to develop
+the corrected vignette now. Choose Option B if retaining and analysing several
+correlated EMM contrasts becomes an actual requirement.
+
+The implementation should be accepted only after these checks:
+
+1. The deterministic example reproduces emmeans estimate, SE, contrast df,
+   upper/lower-tail p-values and ordinary fixed-analysis interval. Include a
+   nonzero null value and reversed factor ordering to catch sign errors.
+2. A group-only model agrees with its ordinary independent-arm analysis; an
+   adjusted balanced/orthogonal model verifies that zero covariance still
+   preserves the proper model df. Include negative and positive covariance
+   examples, unequal sample sizes, and a reference-grid permutation.
+3. All three vignette stages reproduce the contrast calculations above. Check
+   both directions, selected sequential design weights, information rates,
+   repeated intervals and decisions against the chosen sequential specification.
+4. Invalid grids, absent/ambiguous labels, `by` groups, non-estimable contrasts,
+   unsupported scales/models and malformed stage lists give specific errors.
+   Document that subject overlap and scientific estimand consistency cannot
+   always be inferred from an `emmGrid` and remain part of the input contract.
+5. Validate finite-sample sequential operating characteristics where an
+   approximation is used, and audit final-inference labels/calculations before
+   advertising them for this interface. Extraction agreement is necessary but
+   is not a substitute for these checks.
+
+## Execution environment
+
+```{r}
+#| label: session-info
+sessionInfo()
+```
