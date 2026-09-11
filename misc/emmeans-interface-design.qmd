@@ -14,8 +14,11 @@ params:
 ---
 
 Design proposal, 11 September 2026. Scope: two-arm adjusted continuous-outcome
-analyses, starting with ordinary Gaussian linear models fitted separately to
-non-overlapping stages. No package implementation changes are made here.
+analyses, with required extensions for multi-arm comparisons and longitudinal
+mixed models from the existing development vignettes. The first implementation
+step remains ordinary Gaussian linear models fitted separately to non-overlapping
+stages; that step alone does not complete the use cases below. No package
+implementation changes are made here.
 
 Source baseline: rpact Git commit `8c9302e4`, package version `4.5.0.9319`.
 Examples were executed with R 4.6.1 and emmeans 2.0.4, loading this checkout with
@@ -300,6 +303,172 @@ SDs with unequal arm sizes. The larger discrepancy is the omitted covariance.
 The vignette's stated stopping decisions and intervals must be regenerated
 after choosing the sequential analysis specification; this table alone does
 not determine those decisions.
+
+### Additional development vignettes: required coverage
+
+The following sources were reviewed in the `rpact-vignettes` SVN checkout,
+under `inst/exclusive/dev/`:
+
+- `rpact_multi_arm_analysis_adjusted_means_example.Rmd`, using
+  `inst/data/data_multi_arm_means_repeated_measures.csv`.
+- `rpact_analysis_two_arm_means_repeated_measures_example.Rmd`, using
+  `inst/data/data_two_arm_means_repeated_measures.csv`.
+
+These are existing workflows to migrate, not evidence that the current adapter
+provides valid model-based sequential inference. The examples below are
+non-executing extraction sketches using those CSVs; they do not add rendering
+dependencies or claim reproduced stopping decisions.
+
+#### Multi-arm adjusted means with repeated measures
+
+Despite its filename, the multi-arm example is longitudinal. It fits
+`outcome ~ group + gender + covariate * visit + (1 + visit | subject)`
+separately at each of three stages, obtains `emmeans(model, "group")`, and
+passes successive stage grids to `getDataset()` for `getDesignInverseNormal()`
+and `getAnalysisResults()`. Its two treatment groups share a control. The
+random-effects term permits intercept–slope covariance, despite the source's
+wording “without interaction between random effects.” The final bulk-import
+examples additionally cover group-only `lm`, adjusted `lm`, and a random-intercept
+model with `covariate * gender`.
+
+The corrected interface must form both named treatment-minus-control contrasts
+jointly. For EMM order `(Control, Treatment 1, Treatment 2)`, use
+
+$$
+C=\begin{pmatrix}-1&1&0\\-1&0&1\end{pmatrix},\qquad
+\hat\theta=C\hat\mu,\qquad S=CVC^\top.
+$$
+
+In particular, $S_{12}=V_{T_1T_2}-V_{T_1C}-V_{CT_2}+V_{CC}$.
+Two scalar SEs lose this dependence, even for independent unadjusted arm means
+because both contrasts contain the control. Model adjustment can change that
+dependence further. Store the joint covariance and contrast-specific df;
+separate `DatasetGeneral` analyses cannot establish familywise error control.
+
+```{r}
+#| label: multi-arm-longitudinal-extraction-sketch
+#| eval: false
+multi_data <- read.csv(file.path(vignette_data_dir,
+    "data_multi_arm_means_repeated_measures.csv"))
+control <- "Control group"
+treatments <- c("Treatment group 1", "Treatment group 2")
+multi_data$group <- factor(multi_data$group, levels = c(control, treatments))
+multi_stage_effects <- lapply(sort(unique(multi_data$stage)), function(k) {
+    fit <- lme4::lmer(outcome ~ group + gender + covariate * visit +
+        (1 + visit | subject), data = multi_data[multi_data$stage == k, ])
+    # Explicit df policy; requires the corresponding optional backend.
+    emm <- emmeans::emmeans(fit, "group", lmer.df = "kenward-roger")
+    labels <- as.character(as.data.frame(summary(emm))$group)
+    stopifnot(length(labels) == 3L, setequal(labels, c(control, treatments)))
+    methods <- setNames(lapply(treatments, function(trt) {
+        as.numeric(labels == trt) - as.numeric(labels == control)
+    }), paste(treatments, "-", control))
+    effects <- emmeans::contrast(emm, method = methods, adjust = "none")
+    C <- do.call(rbind, methods)
+    stopifnot(isTRUE(all.equal(unname(vcov(effects)),
+        unname(C %*% vcov(emm) %*% t(C)), tolerance = 1e-10)))
+    list(effects = effects, covariance = vcov(effects),
+        table = as.data.frame(summary(effects, type = "link")),
+        tests = as.data.frame(emmeans::test(effects, null = 0,
+            side = ">", adjust = "none")))
+})
+```
+
+Here `vignette_data_dir` denotes the SVN checkout's `inst/data` directory.
+These are unadjusted within-stage component tests. The multi-arm analysis must
+explicitly specify its family of hypotheses, intersection tests/multiplicity
+procedure, stage combination weights, and any treatment-selection or dropping
+rules before reporting familywise decisions or simultaneous repeated intervals.
+A covariance matrix plus marginal df does not by itself specify a joint finite-df
+test. The chosen engine must document its joint-distribution approximation or
+other justification and validate it. Applying an emmeans multiplicity adjustment
+and then treating those p-values as ordinary scalar stage tests is not an
+implicit solution.
+
+The vignette's factor-reordering experiment and unresolved
+`directionUpper = FALSE` TODO must be replaced by label-based assertions:
+permuting rows leaves each named contrast unchanged; reversing a contrast
+negates its estimate and swaps/negates its interval endpoints, with the null
+and test direction transformed accordingly. Changing the regression reference
+level alone must not change the scientific control. Its stated continue/continue/
+reject decisions for both comparisons require regeneration under the corrected
+multi-arm sequential specification.
+
+#### Two-arm repeated-measures model comparisons
+
+The two-arm development draft makes `visit`, `baseline`, and `gender` factors
+and explores random-intercept models with visit, `gender:visit`, and
+`baseline:visit`, followed by simpler adjusted models. However, it repeatedly
+assigns to `lmResult`, finally replacing it with `lm(outcome ~ group)` before
+calling emmeans. Its displayed single-look comparison therefore tests that last
+ordinary model, **not** any of the preceding mixed models. The final three-stage
+bulk import also uses adjusted `lm`, not `lmer`. Those row-wise `lm` fits are
+useful adapter regression checks but do not account for within-subject dependence
+in longitudinal data.
+
+The design must retain each intended model as a distinct test case. A minimal
+mixed-model extraction example based on the draft is:
+
+```{r}
+#| label: two-arm-repeated-measures-extraction-sketch
+#| eval: false
+repeated_data <- read.csv(file.path(vignette_data_dir,
+    "data_two_arm_means_repeated_measures.csv"))
+repeated_data$group <- factor(repeated_data$group,
+    levels = c("Control group", "Treatment group"))
+repeated_data$visit <- factor(repeated_data$visit)
+repeated_data$gender <- factor(repeated_data$gender)
+repeated_stage_tables <- lapply(sort(unique(repeated_data$stage)), function(k) {
+    fit <- lme4::lmer(outcome ~ group + covariate + gender + visit +
+        (1 | subject), data = repeated_data[repeated_data$stage == k, ])
+    emm <- emmeans::emmeans(fit, "group", weights = "equal",
+        lmer.df = "kenward-roger")
+    extract_contrast(emm, "Treatment group", "Control group")
+})
+# A scalar extraction bridge, not validation of a sequential mixed-model design.
+contrast_rows <- do.call(rbind, repeated_stage_tables)
+repeated_dataset <- rpact::getDataset(est = contrast_rows$estimate,
+    se = contrast_rows$SE, df = contrast_rows$df)
+```
+
+The source compares a two-sided, single-look rpact result with
+`normalApproximation = TRUE` against a model coefficient's t p-value. Corrected
+checks must match the null, sidedness, scale, and df method and compare directly
+with the emmeans **contrast** test. A normal approximation need not equal a
+finite-df t test, and a regression coefficient need not represent an averaged
+EMM contrast when treatment interactions are present.
+
+#### Shared longitudinal requirements
+
+- Preserve the selected mixed-model df method (e.g. Kenward–Roger,
+  Satterthwaite, or explicitly chosen asymptotic inference), including any
+  covariance adjustment. Missing optional backends must produce an actionable
+  error or an explicitly acknowledged method change; do not silently turn a
+  requested finite-df analysis into asymptotic inference.
+- Distinguish observation rows, unique subjects per arm, and contrast information.
+  `table(group)` counts visits in these files; neither it nor reference-grid
+  weights supplies independent subject counts. Keep supplied subject counts
+  descriptive and calculate scalar information from the contrast SE.
+- Define whether the estimand is a group difference at a specified visit or
+  averaged over visits, including numeric versus factor coding of visit,
+  covariate settings, and equal/proportional averaging weights. The source
+  formulas have no treatment-by-visit interaction and thus specify a common
+  treatment shift; an endpoint-specific treatment effect with such an interaction
+  is a separate test case. Never flatten a `group | visit` grid into extra arms.
+  Explicit visit selection/contrast construction must precede scalar import.
+- Require independent subject cohorts across stage inputs for the independent-stage
+  route. Splitting rows by `stage` is insufficient if subjects return at later
+  looks. Audit subject identifiers in source data, allowing for locally reused
+  IDs only with documented cohort identity. Overlapping subjects, shared nuisance
+  fits, and cumulative longitudinal refits need a separately validated dependence
+  model and must not silently enter this route. An `emmGrid` alone cannot verify
+  the cohort contract.
+- Exercise missing visits, unequal follow-up, convergence/singularity diagnostics,
+  and rank-deficient fixed effects. The draft's baseline-by-visit terms may be
+  redundant because baseline is defined from visit. Check estimability of the
+  requested contrast rather than accepting every fit or rejecting every singular
+  covariance matrix. Mixed-model t tests can be approximate even within a stage;
+  sequential operating-characteristic checks must include that approximation.
 
 ## 3. Correct calculation in emmeans, without rpact
 
@@ -600,14 +769,24 @@ variance; blanket positive-definiteness rejection would be too strong.
 correlated multi-arm contrasts. It requires substantially more class,
 dispatch and output work. For the current two-arm vignette, its inferential
 projection is the same scalar estimate/SE/df produced by Option A, so it does
-not solve an additional immediate statistical problem.
+not solve an additional scalar statistical problem. For the multi-arm development
+vignette, however, joint contrast storage and a compatible analysis engine are
+required; this is now a concrete requirement rather than a hypothetical extension.
 
 ## 6. Recommendation and acceptance criteria
 
 Implement Option A first, restricting advertised support to a clearly specified
 model/estimand/stage contract. Use the manual `DatasetGeneral` bridge to develop
-the corrected vignette now. Choose Option B if retaining and analysing several
-correlated EMM contrasts becomes an actual requirement.
+the corrected two-arm ordinary-model vignette now. Treat this as the first
+milestone, not completion of the interface redesign. The multi-arm development
+vignette makes joint contrast support an actual requirement: implement Option B
+or an equivalent covariance-aware contrast dataset, while continuing to delegate
+contrast construction and df to emmeans. A second milestone must validate scalar
+mixed-model extraction; a third must supply the joint multi-arm sequential engine.
+Until those milestones pass, give explicit unsupported-use errors on the new
+interface and targeted migration guidance for legacy longitudinal/multi-arm calls;
+do not silently fall back to synthetic SDs or advertise all emmeans models as
+supported. Deprecation documentation must cover all three source vignettes.
 
 The implementation should be accepted only after these checks:
 
@@ -625,7 +804,22 @@ The implementation should be accepted only after these checks:
    unsupported scales/models and malformed stage lists give specific errors.
    Document that subject overlap and scientific estimand consistency cannot
    always be inferred from an `emmGrid` and remain part of the input contract.
-5. Validate finite-sample sequential operating characteristics where an
+5. For the multi-arm source, test all three stage fits and both treatment-versus-
+   control contrasts: reproduce emmeans estimates, full `C V C'`, contrast df and
+   unadjusted component tests. Cover row permutations, control labels, sign/null
+   reversal, stage-list versus separate-argument imports, and the source's `lm`
+   and random-intercept alternatives. Validate the chosen multiplicity/selection
+   procedure under global and partial null configurations, including familywise
+   error, repeated intervals, and regenerated stopping decisions.
+6. For the two-arm repeated-measures source, keep each model variant separate;
+   check finite-df and explicit asymptotic contrast inference, equal/proportional
+   weights, visit-specific estimands, missing visits, unbalanced subject counts,
+   and estimability of redundant baseline terms. Record actual df backends and
+   fitting diagnostics. Test rejection of unsupported visit grids and stage
+   overlap with supplied cohort metadata; document what grids alone cannot check.
+   Verify that repeated observations never become synthetic independent sample
+   sizes. Do not use the draft's final overwritten `lm` as mixed-model evidence.
+7. Validate finite-sample sequential operating characteristics where an
    approximation is used, and audit final-inference labels/calculations before
    advertising them for this interface. Extraction agreement is necessary but
    is not a substitute for these checks.
