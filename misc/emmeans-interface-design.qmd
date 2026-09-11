@@ -1,6 +1,8 @@
 ---
 title: "Correct covariance handling in the rpact–emmeans interface"
 date: 2026-09-11
+bibliography: emmeans-interface-design.bib
+link-citations: true
 format:
   html:
     toc: true
@@ -28,7 +30,9 @@ params:
 Render from the repository root with
 `quarto render misc/emmeans-interface-design.qmd`. This document loads the local
 `rpact` checkout and requires `pkgload`, `emmeans`, `lme4`, `pbkrtest`, and `mvtnorm`.
-All example and verification code is included below.
+All example and verification code is included below. Methodological citations
+use the accompanying [BibTeX file](emmeans-interface-design.bib); Quarto generates
+the reference list when rendering.
 
 The vignette CSV is external to this repository. Set the environment variable
 `RPACT_VIGNETTE_DATA` to its path, or pass
@@ -347,7 +351,7 @@ under `inst/exclusive/dev/`:
 
 These are existing workflows to migrate, not evidence that the current adapter
 provides valid model-based sequential inference. The examples below are
-executable extractions using those CSVs. Section 5 extends them into a joint
+executable extractions using those CSVs. Section 6 extends them into a joint
 dataset and closed-testing prototype, with its analysis assumptions stated explicitly.
 
 #### Multi-arm adjusted means with repeated measures
@@ -576,7 +580,145 @@ also allows different covariate settings and averaging weights. These define
 the estimand and must be consistent across stages. With treatment–covariate
 interactions, this choice directly affects the treatment contrast.
 
-## 4. Option A: scalar bridge for comparison
+## 4. Statistical literature and limits of methodological support {#sec-literature}
+
+**Covariate-adjusted and longitudinal group-sequential analyses have an established
+statistical foundation, but an arbitrary `emmeans` result is not automatically a
+valid input to conventional sequential boundaries.** Correct contrast extraction
+and valid repeated monitoring are separate requirements. The papers below support
+specific analysis frameworks; they do not collectively validate every proposed
+combination of model, df approximation, estimand and design in this document.
+
+### 4.1 Cumulative adjusted estimates and independent increments
+
+@jennison1997covariate develops a unified treatment of sequential estimates with
+covariate information. @scharfstein1997efficiency establishes an asymptotic
+independent-increments result for efficient tests of a fixed parameter in
+parametric or semiparametric models under suitable regularity conditions. These
+results provide a foundation for appropriately specified adjusted analyses;
+covariate adjustment does not itself invalidate group-sequential monitoring.
+
+For cumulative standardized statistics $Z_k$ testing the same scalar effect,
+the familiar canonical Gaussian structure is
+
+$$
+\operatorname{Corr}(Z_i,Z_j)=\sqrt{\mathcal I_i/\mathcal I_j},\qquad i\leq j,
+$$
+
+where $\mathcal I_k$ denotes information for that effect at look $k$. Independence
+concerns increments of the corresponding score/information process, not the
+cumulative estimates themselves. Reusing earlier participants in cumulative
+analyses therefore does **not** by itself violate independent increments.
+What matters is the joint limiting distribution of the selected estimator
+sequence [@vanlancker2025covariate].
+
+**Implication for rpact:** identify the fixed estimand, estimator and model,
+observation/missingness process, variance estimator, and monitoring-time rule,
+then establish that they satisfy an applicable result. Do not infer this from
+the class `lm`, `lmerMod`, or `emmGrid` alone. In particular, a marginally valid
+test at each look does not establish the canonical correlation across looks.
+
+### 4.2 Longitudinal mixed models and least-squares means
+
+@kittelson2005longitudinal directly addresses group-sequential monitoring with
+longitudinal outcomes. The treatment effect is a prespecified contrast across
+measurement times; the paper derives interim distributions and information and
+provides mixed-model implementations. It also explains how incomplete follow-up
+and nonconstant treatment trajectories can distort interim comparisons based on
+inappropriate summaries.
+
+This is relevant to both development vignettes: a specified contrast of adjusted
+means can represent the target effect, but the visit target or averaging rule
+must remain scientifically consistent across looks. A model with a common
+treatment shift and a model with treatment-by-visit interactions need separate
+estimand specifications. Simply averaging whatever visits are available at each
+look can change the target. The paper supports a particular longitudinal
+framework, not all possible `lmer()` formulas or reference grids.
+
+@kenward1997small provides small-sample fixed-effect inference using an adjusted
+covariance estimator and an approximate reference distribution. This supports
+preserving the selected covariance adjustment and contrast df at each look.
+It is **not a theorem establishing the cross-look distribution** of a sequence
+of Kenward–Roger tests, nor an automatic justification for applying canonical
+boundaries to their normal-score transforms.
+
+### 4.3 When independent increments fail, and available remedies
+
+@vanlancker2025covariate shows that some covariate-adjusted estimators fail to
+have independent increments, including working-model estimators incorporating
+participants whose primary outcomes are not yet observed. The paper constructs
+an orthogonalized sequence with the required structure asymptotically for regular,
+asymptotically linear estimators. Thus failure of independent increments is a
+real possibility, and established remedies exist, but they require additional
+estimation and assumptions.
+
+**Implication for Option B:** a stage's `vcov(emm)` provides covariance among
+contrasts at that look. It does not provide
+$\operatorname{Cov}(\hat\theta_i,\hat\theta_j)$ between different looks.
+An independent-stage dataset can declare zero cross-stage covariance under its
+cohort/model contract. A general cumulative-fit interface instead needs either
+a justified canonical structure or additional cross-look covariance/influence-
+function information and a corresponding monitoring method. Orthogonalization
+is a possible future backend, not a property acquired by storing EMM covariance.
+
+### 4.4 Independent-stage combination tests and multiple arms
+
+A different foundation applies when each stage contains a distinct subject cohort
+and models are fitted separately. @bauerkohne1994adaptive develops combination
+testing using disjoint subsamples and Fisher's product criterion;
+@lehmacher1999adaptive develops the inverse-normal combination approach.
+These references support combining appropriate stage p-values under the specified
+stage-validity, combination-weight and adaptation rules. They do not require the
+cumulative mixed-model estimator to have the canonical structure above.
+
+For the fixed-cohort, fixed-weight prototype, the required conditions are
+independence across stage data/model fits and valid p-values for the prespecified
+hypotheses. Repeated observations within a subject are handled inside that
+subject's stage model. Approximate mixed-model stage tests yield an approximate
+procedure; a combination function does not make those tests exact. Adaptive
+extensions need the corresponding conditional-validity conditions, rather than
+an informal assertion that all stage p-values remain independent.
+
+For multiple arms, @marcus1976closed supplies the closed-testing principle:
+valid level-$\alpha$ tests of all required intersection hypotheses permit strong
+familywise error control. Applying this to sequential intersection tests is the
+basis for the proposed closure layer. Closure does not establish validity of
+the local tests. Bonferroni intersection tests avoid a joint t assumption, while
+finite-df mixed-model max-T needs a separately justified joint distribution;
+contrast-specific df and within-look covariance alone do not determine one.
+
+### 4.5 Consequences for the implementation plan
+
+The following is this document's assessment of the proposed implementation,
+not a claim that any cited paper validates the exact prototype code.
+
+| Proposed component | Literature support and remaining obligation |
+|---|---|
+| EMM contrast extraction with full covariance and model-specific df | Necessary within-look calculation. KR supplies a small-sample approximation [@kenward1997small]; no sequential conclusion follows from extraction agreement alone. |
+| Cumulative adjusted-effect monitoring | Established asymptotic theory for appropriate estimators and fixed targets [@jennison1997covariate; @scharfstein1997efficiency]. Map the actual fitting and information-time procedure to that theory. |
+| Longitudinal mixed-model monitoring | A directly relevant framework exists [@kittelson2005longitudinal]. Verify the visit contrast, observation process and information calculation for each supported use case. |
+| Independent-stage inverse-normal/Fisher combination | Established combination-test foundation [@bauerkohne1994adaptive; @lehmacher1999adaptive]. Validate stage tests, cohort separation and the selected design/weight rules. |
+| Multi-arm closed combination | Closure is established [@marcus1976closed], conditional on valid sequential intersection tests. General finite-df mixed-model max-T remains unvalidated in this proposal. |
+| Automatic general-estimates projection with estimated precision, Satterthwaite-style cumulative df and canonical boundaries | **Candidate approximation only.** The cited results do not by themselves establish this particular procedure; theoretical justification must precede a support claim. |
+| Arbitrary cumulative EMM grids, including returning subjects | A generic import is insufficient. Establish the cross-look structure or implement an appropriate alternative, such as a validated orthogonalization backend [@vanlancker2025covariate]. |
+
+For every advertised model/df/intersection/design combination, the implementation
+must include a short methodological justification identifying the applicable
+result, its assumptions, how the code satisfies them, and any remaining
+approximation. Then use simulation to assess finite-sample error control,
+coverage and sensitivity to those assumptions. Simulation complements that
+argument; it does not prove general validity.
+
+Option B remains the recommended **data representation**. Its initial
+independent-cohort combination route and any cumulative group-sequential route
+must be treated as distinct statistical contracts. A cumulative route may be
+supported without an explicit cross-look covariance matrix when the canonical
+structure is justified; participant reuse alone is not a reason to rule it out.
+Until that justification is complete, the proposed general-estimates projection
+must remain experimental rather than being presented as an established
+mixed-model group-sequential method.
+
+## 5. Option A: scalar bridge for comparison
 
 Option A reduces one prespecified contrast per stage to `DatasetGeneral`.
 It remains useful as a reference implementation, but is not the architecture
@@ -602,9 +744,9 @@ df do not reconstruct a pooled mixed-model fit. Keep this bridge for extraction
 checks and explicitly validated scalar analyses; do not run it independently
 for multiple arms and label the results familywise adjusted.
 
-## 5. Option B: model-means dataset and analysis engine (recommended)
+## 6. Option B: model-means dataset and analysis engine (recommended)
 
-### 5.1 Decisions and supported analysis contracts
+### 6.1 Decisions and supported analysis contracts
 
 Implement `DatasetModelMeans` as a distinct `Dataset` subclass. Freeze the
 requested EMMs, named contrasts, covariance matrices, and contrast-specific df
@@ -638,7 +780,7 @@ check it against the requested method at grid construction. See the
 An existing arbitrary `emmGrid` does not carry a complete auditable record of all
 user intentions; require explicit provenance when it cannot be recovered.
 
-### 5.2 Public constructors and R6 object contract
+### 6.2 Public constructors and R6 object contract
 
 All names in this subsection are proposed API, not existing exported functions.
 Use separate constructors for means grids and precomputed contrast grids, because
@@ -706,7 +848,7 @@ for diagnostics is useful, but it is not authoritative after import. New linear
 contrasts require re-import through emmeans, because `S` alone cannot supply their
 df. Unsupported non-t/z inference needs a separate backend contract.
 
-### 5.3 Executable stage-record prototype
+### 6.3 Executable stage-record prototype
 
 The following document-local functions implement the numeric core using ordinary
 lists rather than integrating R6 dispatch prematurely. They accept already
@@ -819,7 +961,7 @@ a property of these files, not proof of independent nuisance estimation in arbit
 user models. Fits above are separate by stage. The table also demonstrates why
 observation rows cannot be used as independent subject counts.
 
-### 5.4 Intersection tests that consume model inference
+### 6.4 Intersection tests that consume model inference
 
 For upper-tail hypotheses $H_j:\theta_j\leq\theta_{0j}$, let
 $t_j=(\hat\theta_j-\theta_{0j})/\sqrt{S_{jj}}$. For lower-tail tests, negate the
@@ -902,7 +1044,7 @@ multivariate-t adjustment and its treatment of varying df in its
 [summary/test reference](https://rvlenth.github.io/emmeans/reference/summary.emmGrid.html).
 The new interface must make the selected joint method visible in output.
 
-### 5.5 Sequential combination and closed testing
+### 6.5 Sequential combination and closed testing
 
 For each fixed nonempty intersection $J$, calculate $p_{Jk}$ from stage $k$.
 For an inverse-normal design with prespecified positive stage weights $w_k$, use
@@ -1021,7 +1163,7 @@ reallocate combination weights merely because later arm data are absent. The
 current vignettes keep both treatments through all stages, so this restriction
 does not block their illustrated multi-arm workflow.
 
-### 5.6 Repeated inference, cumulative summaries and planning
+### 6.6 Repeated inference, cumulative summaries and planning
 
 `StageResultsModelMeans` should expose contrast-by-stage estimates, SEs, df,
 statistics and component p-values, the stage covariance matrices, and an
@@ -1061,16 +1203,18 @@ No scalar “overall information fraction” exists for arbitrary changing covar
 matrices. Inverse-normal weights are design inputs, not recalculated from observed
 subject counts or realized significance.
 
-The two-arm source also requires a group-sequential route. Implement it explicitly
-as an **approximate** independent-stage scalar contrast path: project to the
-general engine, use its cumulative inverse-variance estimates and
-Satterthwaite-style df, and record the information schedule/maximum precision.
-Test the cumulative formulas and simulate the resulting monitoring procedure on
-the longitudinal model before enabling this design/model combination. It is not
-a pooled longitudinal refit, and transforming cumulative t p-values to normal
-scores does not establish a canonical joint distribution. Keep cumulative refits
-with returning subjects and multi-arm group-sequential/conditional-Dunnett designs
-outside this contract until a cross-look covariance backend is implemented.
+The two-arm source also requires a group-sequential route. The projection to the
+general engine, using cumulative inverse-variance estimates and Satterthwaite-style
+df, is a **candidate approximation**, not an established consequence of the
+literature. First justify the selected estimator sequence and information-time
+rule against the results in [Section 4](#sec-literature); then verify the formulas
+and assess finite-sample performance by simulation before enabling support.
+This projection is not a pooled longitudinal refit, and transforming cumulative
+t p-values to normal scores does not establish a canonical joint distribution.
+Cumulative refits with returning subjects require a separate contract supported
+by canonical-distribution theory or an appropriate cross-look covariance backend.
+Multi-arm group-sequential/conditional-Dunnett designs likewise require a separate
+methodological justification before implementation is advertised as supported.
 
 Mean-specific sample-size recalculation, `equalVariances`, `varianceOption`, and
 synthetic `stDev` inputs are inapplicable: reject conflicting explicit arguments.
@@ -1080,7 +1224,7 @@ a model-specific mapping to precision. Audit the existing general engine's final
 confidence limits and “median-unbiased” labels before exposing them; a midpoint
 of repeated confidence limits is not automatically a median-unbiased estimator.
 
-### 5.7 Repository changes and implementation order
+### 6.7 Repository changes and implementation order
 
 The current `.getStageResultsMeansMultiArm()` in
 [`f_analysis_multiarm_means.R`](../R/f_analysis_multiarm_means.R) computes statistics
@@ -1097,7 +1241,7 @@ be bypassed or refactored**; replacing only the import is insufficient.
 | Intersection inference | Add `f_analysis_multiarm_model_means.R`: finite-df Bonferroni and eligible covariance-based max-T; return fixed-family intersection matrices, numerical integration diagnostics and method labels. |
 | Sequential core | Extract the combination/boundary/closure portion of `.performClosedCombinationTest()` into an endpoint-independent helper accepting intersection p-values. Keep legacy intersection construction as a caller. Add a model caller that never queries counts or SDs. Regress existing numeric datasets against unchanged outputs. |
 | Repeated inference/output | Route alpha/null inversion through the same new helper; implement conservative rectangular intervals first with explicit labels, print/summary/plots, and errors for unsupported planning/selection. Validate coverage and interpretation. |
-| Group-sequential scalar path | Add an explicitly approximate model-means projection using general-estimates cumulative inference, information metadata and operating-characteristic validation for the two-arm mixed-model example. |
+| Group-sequential scalar path | Establish a literature-based justification for the chosen estimator/information process first; retain the general-estimates projection as a candidate approximation until justified, then assess finite-sample performance for the two-arm mixed-model example. |
 | Vignette migration | Replace legacy `getDataset(emmGrid, ...)` in all three workflows, name treatment/control labels, record df/estimand/cohort specifications, regenerate result tables and narrative from executable objects. |
 
 Deliver these as Option B milestones: (1) dataset plus all `lm`/`lmer` extractions;
@@ -1108,7 +1252,7 @@ deprecation message for legacy lossy EMM conversion; avoid a silent patch-releas
 change of its class. One-arm EMM callers need a separate migration statement,
 and ordinary numeric means datasets retain their existing behavior.
 
-## 6. Recommendation and acceptance criteria
+## 7. Recommendation and acceptance criteria
 
 Implement Option B as the shared representation for two-arm and multi-arm model
 inference. Option A remains a scalar verification bridge. Release support by
@@ -1118,7 +1262,9 @@ above establish extraction and a bounded closed-combination workflow; they do
 not replace production validation, repeated-interval implementation or operating-
 characteristic studies.
 
-The implementation should be accepted only after these checks. For simulation,
+Each supported analysis contract first needs the methodological justification
+specified in [Section 4](#sec-literature). The implementation should then be
+accepted only after these checks. For simulation,
 prespecify the scenario grid, replicate count, Monte Carlo error target and
 acceptance tolerance before execution. Include global and partial nulls, covariance
 and visit-pattern variation, small cohort sizes, missingness consistent with the
@@ -1167,3 +1313,8 @@ unit checks separate from these operating-characteristic studies.
 #| label: session-info
 sessionInfo()
 ```
+
+## References {.unnumbered}
+
+::: {#refs}
+:::
