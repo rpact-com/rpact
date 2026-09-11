@@ -14,7 +14,7 @@
 \description{
 S3 print method for objects of class \code{FutilityBounds}. Prints the
 futility bounds together with their target scale and, if available, the
-analysis stages, planning situations, and Fisher information type used for
-their calculation.
+analysis stages, planning situations, Fisher information type, and
+design-specific conversion method used for their calculation.
 }
 \keyword{internal}

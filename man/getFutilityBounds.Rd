@@ -8,18 +8,19 @@ getFutilityBounds(
   sourceValue,
   ...,
   sourceScale = c("zValue", "pValue", "conditionalPower", "condPowerAtObserved",
-    "predictivePower", "reverseCondPower", "effectEstimate"),
+    "predictivePower", "reverseCondPower", "effectEstimate", "treatmentEffect"),
   targetScale = c("zValue", "pValue", "conditionalPower", "condPowerAtObserved",
-    "predictivePower", "reverseCondPower", "effectEstimate"),
+    "predictivePower", "reverseCondPower", "effectEstimate", "treatmentEffect"),
   design = NULL,
   directionUpper = NA,
   theta = NA_real_,
   information = NA_real_,
+  stage = NA_integer_,
   naAllowed = FALSE
 )
 }
 \arguments{
-\item{sourceValue}{A numeric vector representing the futility bounds in the
+\item{sourceValue}{A numeric vector or matrix representing the futility bounds in the
 source scale. Alternatively, a trial design plan, simulation results, or a
 \code{FisherInformation} object returned by
 \code{\link[=getFisherInformation]{getFisherInformation()}} can be piped in;
@@ -31,17 +32,22 @@ that a warning will be displayed if unknown arguments are passed.}
 \item{sourceScale}{Character. The scale of the input futility bounds.
 Must be one of \code{"zValue"}, \code{"pValue"},
 \code{"conditionalPower"}, \code{"condPowerAtObserved"}, \code{"predictivePower"},
-\code{"reverseCondPower"}, or \code{"effectEstimate"}.}
+\code{"reverseCondPower"}, \code{"effectEstimate"}, or
+\code{"treatmentEffect"}.}
 
 \item{targetScale}{Character. The scale to which the futility bounds should
 be converted. Must be one of \code{"zValue"}, \code{"pValue"},
 \code{"conditionalPower"}, \code{"condPowerAtObserved"}, \code{"predictivePower"},
-\code{"reverseCondPower"}, or \code{"effectEstimate"}.}
+\code{"reverseCondPower"}, \code{"effectEstimate"}, or
+\code{"treatmentEffect"}.}
 
 \item{design}{The trial design. Required if either the \code{sourceScale} or
 \code{targetScale} is \code{"reverseCondPower"} or if the conversion
-involves conditional or predictive power in a group sequential or Fisher design.
-Must be a one-sided two-stage group sequential design or Fisher's combination test design.}
+involves conditional or predictive power in a group sequential or Fisher
+design; these conversions require a supported one-sided two-stage design.
+Conversion from or to \code{"treatmentEffect"} requires a trial design plan,
+rather than only its contained trial design, because endpoint-specific
+planning parameters are needed.}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
 only applicable for one-sided testing; default is \code{TRUE}
@@ -61,6 +67,12 @@ its \code{type} field must be consistent with the requested conversion;
 it must represent a single planning situation when used as this argument.
 See Details.}
 
+\item{stage}{Integer vector identifying the analysis stages represented by
+numeric \code{sourceValue} when converting from or to the
+\code{"treatmentEffect"} scale. It is inferred automatically from piped
+\code{FutilityBounds} or \code{FisherInformation} objects. If omitted
+otherwise, all interim stages are used.}
+
 \item{naAllowed}{Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.}
 }
 \value{
@@ -74,7 +86,7 @@ attributes and displayed by \code{print.FutilityBounds()}.
 \description{
 This function converts futility bounds between different scales such as
 z-value, p-value, conditional power, predictive power, reverse conditional
-power, and effect estimate.
+power, Wald effect estimate, and design-specific treatment effect.
 }
 \details{
 If the \code{sourceScale} and \code{targetScale} are the same, the function
@@ -95,12 +107,21 @@ z-value and the selected direction. Smaller values indicate stronger
 evidence in favor of the alternative. Conversion between this scale and
 \code{"zValue"} does not require Fisher information.}
 \item{\code{"effectEstimate"}}{The unstandardized, null-centered effect
-estimate \eqn{\widehat{\delta}} on the analysis scale, related to the
+estimate \eqn{\widehat{\delta}} on the Wald analysis scale, related to the
 z-value by \eqn{z = \widehat{\delta}\sqrt{I_1}}. Depending on the endpoint,
 this can be a mean or rate difference, or an effect on a transformed scale
 such as the log hazard-ratio scale. Adding the null value or applying a
 back-transformation may be necessary to obtain the endpoint's usual
-presentation scale.}
+presentation scale. Fisher information is evaluated under the planning
+assumptions.}
+\item{\code{"treatmentEffect"}}{The endpoint's natural treatment-effect
+scale, calculated with the same endpoint- and test-specific transformation
+used for \code{futilityBoundsEffectScale} in the design plan. For two-group
+binary rates this inverts the Farrington--Manning score statistic; for
+survival data it returns the hazard-ratio scale; and other endpoints retain
+their existing design-specific transformations. This scale requires a
+trial design plan, either supplied as
+\code{design} or retained in a piped result.}
 \item{\code{"conditionalPower"}}{The probability of rejecting the null
 hypothesis at the final analysis, conditional on the interim result and
 assuming the user-specified treatment effect \code{theta} for the future
@@ -161,6 +182,20 @@ valid source of the design and its futility bounds, but its information
 values are ignored and a warning is issued. The printed result then does not
 claim that Fisher information was used.
 
+Conversion to \code{"treatmentEffect"} uses
+\code{.getFutilityBoundsTreatmentEffectScale()} and therefore reproduces its
+validated endpoint-specific values exactly (up to the eight-digit rounding
+used for \code{futilityBoundsEffectScale}). For endpoints whose design-plan
+field is generated through this helper, this also reproduces that field.
+Conversely, a result
+on this scale can be piped back into \code{getFutilityBounds()}; its retained
+design plan and stage metadata are used to recover the corresponding
+standardized bounds before conversion to the requested target scale.
+For two-group rates the output explicitly identifies the design-specific
+Farrington--Manning inversion. The distinct \code{"effectEstimate"} scale
+continues to report the null-centered Wald transformation based on cumulative
+Fisher information under the planning assumptions.
+
 The conversion is performed separately for every planning situation and for
 every supplied interim analysis. Information for the final analysis is used
 where a conversion requires future information, but no final-stage futility
@@ -208,6 +243,10 @@ scales do not require information.}
 standardized statistic and effect estimate are related by
 \eqn{z = \widehat{\theta}\sqrt{I_1}}. Thus the cumulative information at the
 analysis represented by the z-value or effect estimate must be supplied.}
+\item{\code{"treatmentEffect"}}{Does not use the separately supplied
+\code{information} argument. Instead, it requires a trial design plan and
+applies the endpoint- and test-specific transformation used by
+\code{futilityBoundsEffectScale}.}
 \item{\code{"conditionalPower"}}{Requires \code{information[2]} together
 with \code{theta}. Here \code{information[2]} is the additional information
 available for the future stage over which conditional power is calculated.}
@@ -297,6 +336,18 @@ getDesignGroupSequential(
 getDesignGroupSequential(kMax = 2, futilityBounds = 0.3) |>
     getSampleSizeRates() |>
     getFutilityBounds(targetScale = "condPowerAtObserved")
+
+# Reproduce the design-specific futility bounds on the treatment-effect scale
+treatmentEffectBounds <- getDesignGroupSequential(
+    informationRates = c(0.2, 0.7, 1),
+    futilityBounds = c(0.3, 0.2)
+) |>
+    getSampleSizeRates() |>
+    getFutilityBounds(targetScale = "treatmentEffect")
+
+# Use treatmentEffect as a source scale; sourceScale is inferred here
+treatmentEffectBounds |>
+    getFutilityBounds(targetScale = "pValue")
 }
 
 }
