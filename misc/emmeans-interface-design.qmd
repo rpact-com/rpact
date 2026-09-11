@@ -15,27 +15,29 @@ params:
 
 ### Scope
 
-- Two-arm adjusted continuous-outcome analyses, with required extensions for multi-arm comparisons and longitudinal mixed models from the existing development vignettes. 
-- The first implementation step remains ordinary Gaussian linear models fitted separately to non-overlapping stages; that step alone does not complete the use cases below.
+- Two-arm adjusted continuous-outcome analyses, with required extensions for multi-arm comparisons and longitudinal mixed models from the existing development vignettes.
+- Option B is the implementation target: preserve model means and joint contrasts for ordinary Gaussian linear models and the longitudinal `lmer` models in both development vignettes, fitted separately to independent subject cohorts.
 
 ### Source baseline
 
 - rpact Git commit `8c9302e4`, package version `4.5.0.9319`.
-- Examples were executed with R 4.6.1 and `emmeans` 2.0.4.
+- The execution environment used for this render is recorded below; the commit above identifies the original investigation baseline.
 
 ## Rendering and reproducibility
 
 Render from the repository root with
 `quarto render misc/emmeans-interface-design.qmd`. This document loads the local
-`rpact` checkout and requires `pkgload` and `emmeans`. 
+`rpact` checkout and requires `pkgload`, `emmeans`, `lme4`, `pbkrtest`, and `mvtnorm`.
 All example and verification code is included below.
 
 The vignette CSV is external to this repository. Set the environment variable
 `RPACT_VIGNETTE_DATA` to its path, or pass
 `-P vignette_csv:/path/to/data_two_arm_adjusted_means.csv` when rendering.
 The default also checks the original SVN location under the current user's home.
-If the CSV is unavailable, only the vignette reproduction is skipped, with a
-visible note; the self-contained example still runs.
+If the adjusted-means CSV is unavailable, its reproduction is skipped with a
+visible note. The longitudinal examples require both CSVs in `RPACT_VIGNETTE_DATA_DIR`
+(default: the SVN checkout's `inst/data` directory under the current user's home);
+missing files or mixed-model dependencies produce an actionable error.
 
 ```{r}
 #| label: setup
@@ -45,6 +47,19 @@ suppressPackageStartupMessages(library(emmeans))
 document_dir <- getwd()
 pkgload::load_all(repo_root, quiet = TRUE)
 setwd(document_dir)
+for (package in c("lme4", "pbkrtest", "mvtnorm")) {
+    if (!requireNamespace(package, quietly = TRUE)) {
+        stop("Install package '", package, "' to run the longitudinal prototypes.")
+    }
+}
+vignette_data_dir <- Sys.getenv("RPACT_VIGNETTE_DATA_DIR", unset = path.expand(
+    "~/svn/rpact/rpact-vignettes/inst/data"))
+for (filename in c("data_multi_arm_means_repeated_measures.csv",
+                   "data_two_arm_means_repeated_measures.csv")) {
+    if (!file.exists(file.path(vignette_data_dir, filename))) {
+        stop("Set RPACT_VIGNETTE_DATA_DIR to the SVN inst/data directory: missing ", filename)
+    }
+}
 options(rpact.dataset.stdev.calc.mode = "auto")
 Sys.unsetenv("RPACT_DATASET_STDEV_CALC_MODE")
 if (!exists("params")|| is.null(vignette_csv <- params$vignette_csv)) {
@@ -53,6 +68,8 @@ if (!exists("params")|| is.null(vignette_csv <- params$vignette_csv)) {
     ))
 }
 ```
+
+This render uses R `r getRversion()` and `emmeans` `r packageVersion("emmeans")`.
 
 The following helpers compare the legacy adapter with direct `emmeans` inference
 and the existing general-estimates interface. Their assertions check the
@@ -79,7 +96,7 @@ extract_contrast <- function(emm, treatment, control) {
 }
 
 # Returns a data frame containing the comparison of the legacy adapter, general estimates interface, and direct `emmeans` inference for the specified contrast.
-# Fails if the results don't match between the legacy adapter, general estimates interface, and direct `emmeans` inference.
+# Checks corrected general-estimates inference against emmeans; the legacy result may differ.
 compare_paths <- function(emm, treatment, control) {
     contrast_result <- extract_contrast(emm, treatment, control)
     design <- getDesignGroupSequential(kMax = 1)
@@ -191,7 +208,7 @@ inverse-variance combination of independently estimated treatment contrasts.
 
 The reduction is appropriate for a conventional independent, homoscedastic
 Gaussian `lm(y ~ group)`: the EMMs are the group sample means, their covariance
-is zero, and the model df are `n_T + n_C - 2`. 
+is zero, and the model df are `n_T + n_C - 2`.
 
 However, covariate adjustment invalidates
 this reduction in general. Additional covariates do not *always* cause nonzero
@@ -249,14 +266,14 @@ emm <- emmeans(fit, ~ group)
 summary(emm)
 ```
 
-At the common covariate value 4, the control and treatment EMMs are `r summary(emm)$emmean[1]` and `r summary(emm)$emmean[2]`.
+At the common covariate value `r mean(d$x)`, the control and treatment EMMs are `r summary(emm)$emmean[1]` and `r summary(emm)$emmean[2]`.
 Both marginal SEs are `r summary(emm)$SE[1]`, and model df are `r summary(emm)$df[1]`. The EMM covariance is
 
 ```{r}
 vcov(emm)
 ```
 
-Thus the correct effect is 2 and its SE is 
+Thus the correct effect is `r diff(summary(emm)$emmean)` and its SE is
 
 ```{r}
 sqrt(vcov(emm)["Treatment","Treatment"] + vcov(emm)["Control","Control"] - 2 * vcov(emm)["Treatment","Control"])
@@ -279,7 +296,7 @@ knitr::kable(compare_paths(emm, "Treatment", "Control"), digits = 6)
 Both the missing covariance and the wrong df affect inference. Simple solutions don't work here:
 
 - Changing `equalVariances` does not fix this balanced-size example.
-- Changing to normal approximation does not restore covariance either. 
+- Changing to normal approximation does not restore covariance either.
 - Using residual `sigma` also fails: it omits the additional variance from covariate imbalance.
 
 ### The existing vignette is affected
@@ -309,9 +326,9 @@ if (file.exists(vignette_csv)) {
 ```
 
 
-The diagonal-only SEs are respectively 9.514934, 9.754200 and 8.237943;
+The diagonal-only SEs are `r if (exists("stage_table")) paste(formatC(stage_table$diagonal_only_se, digits = 6, format = "f"), collapse = ", ") else "unavailable (CSV missing)"`;
 the small further difference from the current SEs is due to pooling synthetic
-SDs with unequal arm sizes. 
+SDs with unequal arm sizes.
 
 The larger discrepancy is the omitted covariance.
 The vignette's stated stopping decisions and intervals must be regenerated
@@ -330,8 +347,8 @@ under `inst/exclusive/dev/`:
 
 These are existing workflows to migrate, not evidence that the current adapter
 provides valid model-based sequential inference. The examples below are
-non-executing extraction sketches using those CSVs; they do not add rendering
-dependencies or claim reproduced stopping decisions.
+executable extractions using those CSVs. Section 5 extends them into a joint
+dataset and closed-testing prototype, with its analysis assumptions stated explicitly.
 
 #### Multi-arm adjusted means with repeated measures
 
@@ -361,9 +378,8 @@ dependence further. Store the joint covariance and contrast-specific df;
 separate `DatasetGeneral` analyses cannot establish familywise error control.
 
 ```{r}
-#| label: multi-arm-longitudinal-extraction-sketch
+#| label: multi-arm-longitudinal-extraction
 
-vignette_data_dir <- "/Users/daniel/svn/rpact/rpact-vignettes/inst/data"
 multi_data <- read.csv(file.path(vignette_data_dir,
     "data_multi_arm_means_repeated_measures.csv"))
 control <- "Control group"
@@ -374,7 +390,8 @@ multi_stage_effects <- lapply(sort(unique(multi_data$stage)), function(k) {
         (1 + visit | subject), data = multi_data[multi_data$stage == k, ])
 
     # Explicit df policy; requires the corresponding optional backend.
-    emm <- emmeans::emmeans(fit, "group", lmer.df = "kenward-roger")
+    emm <- emmeans::emmeans(fit, "group", lmer.df = "kenward-roger", disable.pbkrtest = FALSE,
+        pbkrtest.limit = Inf)
     labels <- as.character(as.data.frame(summary(emm))$group)
 
     stopifnot(length(labels) == 3L, setequal(labels, c(control, treatments)))
@@ -388,7 +405,9 @@ multi_stage_effects <- lapply(sort(unique(multi_data$stage)), function(k) {
 
     stopifnot(isTRUE(all.equal(unname(vcov(effects)),
         unname(C %*% vcov(emm) %*% t(C)), tolerance = 1e-10)))
-    list(effects = effects, covariance = vcov(effects),
+    stopifnot(any(grepl("kenward-roger",
+        attr(summary(emm), "mesg"), ignore.case = TRUE)))
+    list(model = fit, emm = emm, effects = effects, covariance = vcov(effects),
         table = as.data.frame(summary(effects, type = "link")),
         tests = as.data.frame(emmeans::test(effects, null = 0,
             side = ">", adjust = "none")))
@@ -431,7 +450,7 @@ The design must retain each intended model as a distinct test case. A minimal
 mixed-model extraction example based on the draft is:
 
 ```{r}
-#| label: two-arm-repeated-measures-extraction-sketch
+#| label: two-arm-repeated-measures-extraction
 
 repeated_data <- read.csv(file.path(vignette_data_dir,
     "data_two_arm_means_repeated_measures.csv"))
@@ -439,13 +458,18 @@ repeated_data$group <- factor(repeated_data$group,
     levels = c("Control group", "Treatment group"))
 repeated_data$visit <- factor(repeated_data$visit)
 repeated_data$gender <- factor(repeated_data$gender)
-repeated_stage_tables <- lapply(sort(unique(repeated_data$stage)), function(k) {
+repeated_stage_grids <- lapply(sort(unique(repeated_data$stage)), function(k) {
     fit <- lme4::lmer(outcome ~ group + covariate + gender + visit +
         (1 | subject), data = repeated_data[repeated_data$stage == k, ])
     emm <- emmeans::emmeans(fit, "group", weights = "equal",
-        lmer.df = "kenward-roger")
-    extract_contrast(emm, "Treatment group", "Control group")
+        lmer.df = "kenward-roger", disable.pbkrtest = FALSE,
+        pbkrtest.limit = Inf)
+    stopifnot(any(grepl("kenward-roger",
+        attr(summary(emm), "mesg"), ignore.case = TRUE)))
+    emm
 })
+repeated_stage_tables <- lapply(repeated_stage_grids, extract_contrast,
+    treatment = "Treatment group", control = "Control group")
 # A scalar extraction bridge, not validation of a sequential mixed-model design.
 contrast_rows <- do.call(rbind, repeated_stage_tables)
 repeated_dataset <- rpact::getDataset(est = contrast_rows$estimate,
@@ -533,7 +557,7 @@ ordinary_ci
 ```
 
 The contrast returns estimate `r effect_table$estimate`, SE `r effect_table$SE`, df `r effect_table$df`, two-sided p approximately
-`r effect_table$p.value`, and an ordinary 95% CI approximately `[r ordinary_ci$lower.CL, r ordinary_ci$upper.CL]`. This is a
+`r effect_table$p.value`, and an ordinary 95% CI approximately [`r ordinary_ci$lower.CL`, `r ordinary_ci$upper.CL`]. This is a
 single-analysis interval, not a repeated confidence interval.
 
 `contrast()` returns another `emmGrid`; its summary evaluates df for the
@@ -552,264 +576,556 @@ also allows different covariate settings and averaging weights. These define
 the estimand and must be consistent across stages. With treatment–covariate
 interactions, this choice directly affects the treatment contrast.
 
-## 4. Option A: delegate contrast inference to emmeans (recommended)
+## 4. Option A: scalar bridge for comparison
 
-In this option rpact literally uses emmeans functions rather than implementing
-EMM contrast algebra itself: `emmeans::contrast()` defines the treatment effect,
-`emmeans::test()` supplies the stage p-value for the requested null and direction,
-and `confint()` supplies an ordinary fixed-analysis interval. There are two
-integration depths: reuse `DatasetGeneral` immediately, or extend the analysis
-interface to consume the emmeans tests directly. They share the same contrast
-adapter and differ in who evaluates the stage test.
-
-### Reuse that already exists
-
-The checkout already has `DatasetGeneral`, an R6 subclass of `Dataset`, created
-by `getDataset(est = ..., se = ..., df = ...)`. It stores one estimate, SE and
-df per stage; omitted df default to infinity. It need not represent a physical
-single treatment arm: the estimate can be a two-arm contrast.
-
-[`f_analysis_base_general.R`](../R/f_analysis_base_general.R) implements:
-
-- `StageResultsGeneral`, with stage statistics `(estimate - thetaH0) / se` and
-  t-distribution p-values using the supplied df (normal for infinite df).
-- Stage information `I[k] = 1 / se[k]^2` and cumulative inverse-variance
-  estimates, SEs and Satterthwaite-style df:
-
-  $$
-  \hat\theta_{1:K}=\frac{\sum I_k\hat\theta_k}{\sum I_k},\quad
-  SE_{1:K}=\frac1{\sqrt{\sum I_k}},\quad
-  \nu_{1:K}=\frac{(\sum I_k)^2}{\sum I_k^2/\nu_k}.
-  $$
-
-- Inverse-normal and Fisher combinations using the design's weights, and a
-  group-sequential path using cumulative p-values.
-- Design-specific `AnalysisResultsGroupSequential`,
-  `AnalysisResultsInverseNormal` and `AnalysisResultsFisher` objects, including
-  repeated-inference calculations. Mean-specific assumptions and conditional
-  power/sample-size parameters are marked not applicable on this path.
-
-The existing information-rate helper in
-[`f_analysis_boundary_recalculation.R`](../R/f_analysis_boundary_recalculation.R)
-uses cumulative inverse SE squared for general datasets. Thus maximum
-information has precision units here, not patient-count units.
-
-The following bridge works already, with no change to rpact:
+Option A reduces one prespecified contrast per stage to `DatasetGeneral`.
+It remains useful as a reference implementation, but is not the architecture
+for the full interface: it loses joint contrast covariance and arm summaries.
+Option B below still delegates contrasts and df to emmeans; the choice concerns
+storage and downstream analysis, not whether to use emmeans.
 
 ```{r}
 #| label: general-estimates-bridge
 dataset <- rpact::getDataset(
-    est = effect_table$estimate,
-    se = effect_table$SE,
-    df = effect_table$df
-)
+    est = effect_table$estimate, se = effect_table$SE, df = effect_table$df)
 stage_result <- rpact::getStageResults(
     rpact::getDesignGroupSequential(kMax = 1),
-    dataInput = dataset, thetaH0 = 0, directionUpper = TRUE
-)
+    dataInput = dataset, thetaH0 = 0, directionUpper = TRUE)
 stopifnot(isTRUE(all.equal(stage_result$pValues[1], upper_test$p.value,
     tolerance = 1e-12)))
 stage_result
 ```
 
-This reproduces the emmeans one-sided statistic and p-value. For multiple
-independent stages, construct one contrast table per stage and pass vectors of
-their estimates, SEs and df. Do not pass cumulative model fits as stage inputs.
+The existing general engine evaluates scalar t/z tests and supports sequential
+combination. Its inverse-variance cumulative estimates and Satterthwaite-style
+df do not reconstruct a pooled mixed-model fit. Keep this bridge for extraction
+checks and explicitly validated scalar analyses; do not run it independently
+for multiple arms and label the results familywise adjusted.
 
-### Direct emmeans p-value backend
+## 5. Option B: model-means dataset and analysis engine (recommended)
 
-The minimal bridge above still recomputes p-values in `rpact` from the contrast
-estimate, SE and df. For the supported scalar t/z tests, these equal the
-`emmeans` p-values. If the intended interface is to delegate *all within-stage
-inference*, extend it with a model-test backend that retains each contrast
-`emmGrid` and implements an operation such as
-`evaluateStage(thetaH0, directionUpper)`. Internally it would call:
+### 5.1 Decisions and supported analysis contracts
+
+Implement `DatasetModelMeans` as a distinct `Dataset` subclass. Freeze the
+requested EMMs, named contrasts, covariance matrices, and contrast-specific df
+at construction. The initial production scope covers identity-scale Gaussian
+`lm` and `lmerMod` models with independently fitted stages, including the two
+longitudinal examples above. Preserve correlated random intercepts/slopes;
+no conversion to independent-arm SDs is involved.
+
+Separate three operations: import model inference, calculate intersection tests
+within each stage, then apply sequential combination and closure. Select the
+intersection method explicitly for multi-arm data:
+
+| Method | Within-stage calculation | Support contract |
+|---|---|---|
+| `"Bonferroni"` | `min(1, length(J) * min(p[J]))` for each intersection `J` | Initial finite-df mixed-model route. Requires valid marginal p-values, but no assumed joint t distribution; inherits approximation from KR/Satterthwaite tests. |
+| `"modelMaxT"` | Upper tail of the maximum statistic using the submatrix of `cov2cor(S)` | Exact within-stage multivariate t for a conventional Gaussian `lm` with common residual variance and df; asymptotic multivariate normal for explicitly selected asymptotic mixed-model inference. |
+
+Both methods retain full covariance in the dataset. Bonferroni supplies a
+concrete finite-df route for the vignette's mixed models; `modelMaxT` uses that
+covariance to gain power where its joint distribution is justified. Do not
+invent a joint t distribution from unequal KR/Satterthwaite df, use their
+minimum as an “exact” common df, or combine KR SEs with an unrelated covariance.
+For finite-df mixed-model max-T, require a separately specified and validated
+joint approximation/calibration backend before enabling it. Equal numerical df
+alone do not establish a common-scale multivariate t model.
+
+The emmeans mixed-model methods can adjust covariance as well as df, and backend
+availability/options can change the method used. Capture the actual method and
+check it against the requested method at grid construction. See the
+[emmeans model support documentation](https://rvlenth.github.io/emmeans/articles/models.html).
+An existing arbitrary `emmGrid` does not carry a complete auditable record of all
+user intentions; require explicit provenance when it cannot be recovered.
+
+### 5.2 Public constructors and R6 object contract
+
+All names in this subsection are proposed API, not existing exported functions.
+Use separate constructors for means grids and precomputed contrast grids, because
+both have class `emmGrid` and must not be guessed from their row labels.
+
+| Function | Arguments and responsibility |
+|---|---|
+| `getDatasetFromEmmeans()` | `...`, `treatments`, `control`, `group = "group"`, `stageIds`, `estimand`, `modelInfo`, `cohortInfo`; accept separate stage grids or one list; generate label-matched treatment-minus-control contrasts. Return `DatasetModelMeans` even for two arms. |
+| `getDatasetFromEmmeansContrasts()` | `...`, `contrastIds`, `stageIds`, `estimand`, `modelInfo`, `cohortInfo`; explicit contrast-input route; preserve joint covariance from each supplied contrast grid. Arm means may be absent. Do not fabricate them. |
+| `.extractModelMeansStage()` | Validate one grid and provenance; use `summary(type = "link")`, `vcov()`, and `emmeans::contrast()`; return a validated stage record. |
+| `.validateModelMeansDataset()` | Validate all records jointly, stable hypothesis IDs, scale/estimand, stage order and cohort declarations. |
+| `.evaluateModelContrasts()` | Given a stage, named null vector and direction vector, return t/z statistics, unadjusted p-values and ordinary intervals. |
+| `.getModelIntersectionPValues()` | Given stage results and the fixed hypothesis family, return one p-value per nonempty intersection using the selected method. |
+| `.combineIntersectionPValues()` | Given that matrix, design, stage weights and activity mask, calculate intersection crossing history and closed elementary decisions. No arm sample-size access. |
+
+`estimand` records outcome/units, identity scale, treatment contrast definitions,
+visit target or averaging rule, covariate reference values and weighting policy.
+Distinguish a fixed reference population from stage-specific empirical averaging;
+permit the latter only with an explicit justification for a common target effect.
+`modelInfo` is stage-indexed: model class/formula, fit method, df method requested
+and used, covariance method, package versions, convergence and singularity
+messages. A future model-to-grid convenience helper can collect these directly.
+It must not silently refit supplied models.
+
+`cohortInfo` contains independent-cohort confirmation, optional globally scoped
+subject IDs per stage, and separately named observation/subject counts per arm.
+With IDs, reject overlap; without IDs, record that independence is user-declared
+and unverified. Never “fix” genuine overlap by prefixing IDs with stage. Stage-local
+ID reuse requires source metadata establishing distinct cohorts.
+
+| R6 field | Shape and invariant |
+|---|---|
+| `stageIds`, `contrastIds`, `armLabels` | Ordered unique identifiers. Contrast IDs refer to scientific hypotheses, independent of row/factor order. |
+| `stageData` | Private list of stage records; expose copies through getters. No public independent replacement of an estimate or covariance. |
+| Stage `meanTable`, `meanCovariance` | EMM labels/estimates and named `q[k] × q[k]` matrix on the same scale; optional only in contrast-input mode. Marginal EMM df are descriptive. |
+| Stage `contrastMatrix` | Named `m[k] × q[k]` coefficients, aligned to EMM rows; null in contrast-input mode if not supplied. |
+| Stage `contrastTable`, `contrastCovariance` | Named estimate, SE, df for each active contrast and named `m[k] × m[k]` matrix. Require `SE^2 = diag(S)`. |
+| Stage `modelInfo`, `estimand`, `cohortInfo` | Provenance and diagnostic records. No use of `extras` as sample sizes. |
+| `schemaVersion`, `activeContrasts` | Serialization version and stage-by-hypothesis presence. Missing future data differs from planned arm dropping. |
+
+Call the base `Dataset` initializer without a synthetic data frame, then initialize
+stage metadata through the new subclass's methods. Add
+`isDatasetModelMeans()`, `getNumberOfContrasts()`, `getStageData(stage)`,
+`getContrastCovariance(stage, contrastIds)`, `getContrastResults(stage)`, and
+`asDatasetGeneral(contrastId)`. The last is an explicitly scalar projection for
+checks; it must not erase the original object or imply a multi-arm analysis.
+Override validation, stage trimming/subsetting, deep cloning, `show()`, summary,
+and data-frame export; inherited means/count methods must not operate on these
+records. Contrast subsetting must use principal covariance submatrices and must
+not silently redefine the original testing family after looking at results.
+
+Validate dimensions, names, symmetry and positive semidefiniteness with a
+scale-relative numerical tolerance. Allow singular EMM covariance when requested
+contrasts remain estimable with positive variance. Reject non-estimable requested
+contrasts, nonfinite estimates/SEs, nonpositive SEs, and missing/nonpositive df;
+`Inf` is allowed only for explicitly supported asymptotic inference. Reject
+unselected `by` grids, unsupported transformations, and incompatible estimands.
+A visit-specific grid must first select a prespecified visit or construct the
+prespecified contrast; visit rows must never become extra treatment arms.
+
+Freeze numeric summaries for supported t/z inference: at a new null, only the
+numerator changes. This permits interval inversion and RDS round trips without
+serializing a live model environment. Retaining an optional contrast `emmGrid`
+for diagnostics is useful, but it is not authoritative after import. New linear
+contrasts require re-import through emmeans, because `S` alone cannot supply their
+df. Unsupported non-t/z inference needs a separate backend contract.
+
+### 5.3 Executable stage-record prototype
+
+The following document-local functions implement the numeric core using ordinary
+lists rather than integrating R6 dispatch prematurely. They accept already
+prepared identity-scale, one-row-per-arm grids; production validation and
+provenance requirements are specified above. They preserve full covariance and
+check the scalar tests against emmeans at a nonzero null in both directions.
 
 ```{r}
-#| label: proposed-test-backend
-#| eval: false
-emmeans::test(
-    effect,
-    null = thetaH0,
-    side = if (directionUpper) ">" else "<",
-    adjust = "none"
-)
+#| label: model-means-stage-prototype
+prototype_stage <- function(emm, treatments, control, group = "group") {
+    means <- as.data.frame(summary(emm, type = "link"))
+    stopifnot(group %in% names(means), "emmean" %in% names(means),
+        is.null(attr(means, "by.vars")))
+    labels <- as.character(means[[group]])
+    stopifnot(!anyNA(labels), !anyDuplicated(labels),
+        !anyDuplicated(treatments), !control %in% treatments,
+        setequal(labels, c(control, treatments)))
+    C <- t(vapply(treatments, function(trt) {
+        as.numeric(labels == trt) - as.numeric(labels == control)
+    }, numeric(length(labels))))
+    dimnames(C) <- list(paste(treatments, "-", control), labels)
+    methods <- setNames(lapply(seq_len(nrow(C)), function(j) C[j, ]), rownames(C))
+    effects <- emmeans::contrast(emm, methods, adjust = "none")
+    tab <- as.data.frame(summary(effects, type = "link"))
+    V <- unname(vcov(emm))
+    S <- unname(vcov(effects))
+    dimnames(V) <- list(labels, labels)
+    dimnames(S) <- list(rownames(C), rownames(C))
+    stopifnot(all(is.finite(tab$estimate)), all(is.finite(tab$SE)),
+        all(tab$SE > 0), !anyNA(tab$df), all(tab$df > 0),
+        all(is.finite(V)), all(is.finite(S)),
+        isTRUE(all.equal(S, C %*% V %*% t(C), tolerance = 1e-10)),
+        isTRUE(all.equal(unname(diag(S)), tab$SE^2, tolerance = 1e-10)))
+    for (M in list(V, S)) {
+        tol <- 1e-10 * max(abs(M))
+        stopifnot(max(abs(M - t(M))) <= tol,
+            min(eigen(M, symmetric = TRUE, only.values = TRUE)$values) >= -tol)
+    }
+    list(meanTable = means, meanCovariance = V, contrastMatrix = C,
+        contrastTable = tab, contrastCovariance = S,
+        # Retained only for the prototype's independent emmeans checks.
+        effects = effects)
+}
+
+prototype_test <- function(stage, null = 0, directionUpper = TRUE) {
+    tab <- stage$contrastTable
+    stopifnot(length(null) %in% c(1L, nrow(tab)), all(is.finite(null)),
+        length(directionUpper) == 1L, is.logical(directionUpper), !is.na(directionUpper))
+    statistic <- (tab$estimate - null) / tab$SE
+    p <- pt(if (directionUpper) statistic else -statistic,
+        df = tab$df, lower.tail = FALSE)
+    data.frame(contrast = tab$contrast, estimate = tab$estimate, SE = tab$SE,
+        df = tab$df, statistic = statistic, p.value = p)
+}
+
+multi_model_stages <- lapply(multi_stage_effects, function(x) {
+    prototype_stage(x$emm, treatments, control)
+})
+repeated_model_stages <- lapply(repeated_stage_grids, prototype_stage,
+    treatments = "Treatment group", control = "Control group")
+for (stage in c(multi_model_stages, repeated_model_stages)) {
+    for (upper in c(TRUE, FALSE)) {
+        observed <- prototype_test(stage, null = 0.5, directionUpper = upper)
+        expected <- as.data.frame(emmeans::test(stage$effects, null = 0.5,
+            side = if (upper) ">" else "<", adjust = "none"))
+        stopifnot(isTRUE(all.equal(observed$p.value, expected$p.value,
+            tolerance = 1e-10)))
+    }
+}
+knitr::kable(do.call(rbind, lapply(seq_along(multi_model_stages), function(k) {
+    cbind(stage = k, prototype_test(multi_model_stages[[k]]))
+})), digits = 6, row.names = FALSE)
 ```
 
-This backend would return the tested null, direction, estimate, SE, df,
-statistic and the *actual emmeans p-value*. A new dedicated dataset/backend
-type and corresponding dispatch would be needed: `DatasetGeneral` currently
-has no public field for supplied stage p-values or a null-dependent test
-function. Merely adding a `pValues` argument to `getDataset()` would not provide
-this functionality.
+The multi-arm extraction retains `r nrow(multi_model_stages[[1]]$contrastMatrix)`
+contrasts at each of `r length(multi_model_stages)` stages. Its stage-1 contrast
+correlation is `r round(cov2cor(multi_model_stages[[1]]$contrastCovariance)[1, 2], 6)`.
+This quantity is imported from the fitted model, not reconstructed from allocation.
 
-For inverse-normal and Fisher designs, refactor stage combination into a
-shared helper accepting validated one-sided stage p-values and design weights.
-Both `.getStageResultsGeneral()` and the emmeans backend could call it. This
-keeps emmeans responsible for the model test and rpact responsible for
-sequential combination, boundaries and stopping decisions. P-values must be
-unadjusted for pairwise comparisons, calibrated for the prespecified hypothesis,
-and valid under the design's stage-dependence assumptions.
+```{r}
+#| label: cohort-and-storage-checks
+cohort_summary <- function(data, source) {
+    cohorts <- split(as.character(data$subject), data$stage)
+    unique_ids <- lapply(cohorts, unique)
+    stopifnot(!anyNA(data$subject), !anyDuplicated(unlist(unique_ids)))
+    data.frame(source = source, stage = names(cohorts),
+        observations = lengths(cohorts), subjects = lengths(unique_ids))
+}
+cohort_counts <- rbind(cohort_summary(multi_data, "multi-arm"),
+    cohort_summary(repeated_data, "two-arm"))
+knitr::kable(cohort_counts, row.names = FALSE)
+# Permuting a grid changes its storage order, not the named scientific contrasts.
+permuted_stage <- prototype_stage(multi_stage_effects[[1]]$emm[c(3, 1, 2)],
+    treatments, control)
+stopifnot(isTRUE(all.equal(permuted_stage$contrastCovariance,
+    multi_model_stages[[1]]$contrastCovariance, tolerance = 1e-10)),
+    isTRUE(all.equal(permuted_stage$contrastTable$estimate,
+    multi_model_stages[[1]]$contrastTable$estimate, tolerance = 1e-10)))
+frozen_stages <- lapply(multi_model_stages, function(x) {
+    x$effects <- NULL
+    x
+})
+restored_stages <- unserialize(serialize(frozen_stages, NULL))
+stopifnot(identical(prototype_test(restored_stages[[1]]),
+    prototype_test(multi_model_stages[[1]])))
+```
 
-A vector of p-values at zero is insufficient for repeated confidence intervals
-or nonzero-null tests. The backend must evaluate `emmeans::test()` again at
-each candidate null used by rpact's interval inversion. Cache the contrast
-object, not just the p-value. Its lifetime/serialization and emmeans version
-then become part of the dataset contract. Ordinary `confint(effect)` intervals
-must remain clearly separate from rpact's repeated/sequential intervals.
+The supplied CSVs pass the no-overlap check on their subject IDs. That establishes
+a property of these files, not proof of independent nuisance estimation in arbitrary
+user models. Fits above are separate by stage. The table also demonstrates why
+observation rows cannot be used as independent subject counts.
 
-For the group-sequential path, stage p-values alone do not define the cumulative
-model test. The implementation must still specify inverse-variance combination
-of independent stage estimates or a separately supported cumulative-fit
-analysis. Calling `test()` on cumulative fits does not justify treating those
-fits as independent stages. The sequential qualifications below apply equally
-to a direct emmeans backend.
+### 5.4 Intersection tests that consume model inference
 
-**Choice within Option A:** the estimate/SE/df bridge is sufficient for the
-initial ordinary-linear-model contract. The direct test backend is the explicit
-choice if keeping emmeans as the authoritative evaluator of within-stage
-p-values is a requirement. It adds backend/dispatch and interval-inversion work,
-but avoids duplicating emmeans test evaluation in rpact. It does not by itself
-extend validation to every model supported by emmeans.
+For upper-tail hypotheses $H_j:\theta_j\leq\theta_{0j}$, let
+$t_j=(\hat\theta_j-\theta_{0j})/\sqrt{S_{jj}}$. For lower-tail tests, negate the
+statistic. Mixed directions require transforming correlation as $D R D$ with
+$D_{jj}=+1$ or $-1$ before a maximum test. The prototype uses one common direction;
+production nulls/directions must be matched by contrast ID without recycling.
 
-### Proposed public interface and implementation changes
+For `modelMaxT`, the stage intersection p-value is
 
-Introduce a dedicated constructor, provisionally
-`getDatasetFromEmmeans(..., treatment, control, group = "group")`. This is a
-proposal, not an existing function. For the initial release, accept one
-two-row EMM grid per stage, or a list of those grids, for supported ordinary
-Gaussian linear models. Explicit arm labels remove the dependence on reference
-level ordering. A separate explicitly selected contrast-input mode could later
-accept one already constructed contrast per stage; since both means and
-contrasts have class `emmGrid`, class alone cannot distinguish them.
+$$
+p_J=1-F_J\!\left(\max_{j\in J} t_j\,\mathbf{1}; R_J,\nu\right),
+\qquad R=\operatorname{cov2cor}(S).
+$$
 
-The new constructor should:
+Here $F_J$ is the multivariate t CDF under the supported common-variance `lm`
+contract, or the multivariate normal CDF under the asymptotic contract. A singleton
+must reproduce its component test. Numerical integration must return its error
+estimate; production code must increase accuracy or error if the decision is
+unresolved at the boundary. The existing sample-size-based Dunnett correlation
+is never substituted for $R_J$.
 
-1. Validate the number of rows, group labels, stage ordering, absence of `by`
-   strata, supported model/scale, and consistent estimand across stages.
-   Check every stage rather than using the first stage's model call.
-2. Build label-matched treatment-minus-control coefficients; call
-   `emmeans::contrast()` and summarize on the declared scale with no pairwise
-   multiplicity adjustment. Use the returned estimate, SE and contrast df;
-   with the direct backend, retain the contrast for `emmeans::test()` as well.
-3. Reject non-estimable contrasts, missing/nonfinite estimates, nonpositive or
-   nonfinite SEs, and invalid df; allow `Inf` df when the supported inference
-   method supplies them. Never silently replace unavailable df with `Inf`.
-4. Return `getDataset(est = ..., se = ..., df = ...)`. Covariance is already
-   incorporated in the SE; retaining the full matrix is not necessary for
-   inference on this one prespecified scalar contrast.
-5. Preserve arm labels, contrast direction, scale, model/df method, and
-   reference-grid settings as supported provenance metadata if a small
-   extension to `DatasetGeneral` is needed. Sample sizes and arm EMMs may be
-   descriptive metadata, not synthetic inputs to the means engine.
+```{r}
+#| label: model-intersection-prototype
+prototype_intersections <- function(stage, method = c("Bonferroni", "modelMaxT"),
+                                   joint = NULL, null = 0, directionUpper = TRUE) {
+    method <- match.arg(method)
+    tab <- prototype_test(stage, null, directionUpper)
+    m <- nrow(tab)
+    sets <- unlist(lapply(seq_len(m), function(size) {
+        combn(seq_len(m), size, simplify = FALSE)
+    }), recursive = FALSE)
+    p <- vapply(sets, function(J) {
+        if (method == "Bonferroni") return(min(1, length(J) * min(tab$p.value[J])))
+        # joint is an explicit prototype assertion; production derives eligibility
+        # from validated model provenance, not equality of reported df alone.
+        stopifnot(length(joint) == 1L, joint %in% c("lm-common-t", "asymptotic"))
+        if (joint == "lm-common-t") {
+            stopifnot(all(is.finite(tab$df)), max(abs(tab$df - tab$df[1])) < 1e-8)
+        } else stopifnot(all(is.infinite(tab$df)))
+        if (length(J) == 1L) return(tab$p.value[J])
+        R <- cov2cor(stage$contrastCovariance)[J, J, drop = FALSE]
+        threshold <- max(if (directionUpper) tab$statistic[J] else -tab$statistic[J])
+        upper <- rep(threshold, length(J))
+        probability <- if (joint == "lm-common-t") {
+            mvtnorm::pmvt(upper = upper, corr = R, df = tab$df[1],
+                algorithm = mvtnorm::GenzBretz(maxpts = 100000, abseps = 1e-7))
+        } else {
+            mvtnorm::pmvnorm(upper = upper, corr = R,
+                algorithm = mvtnorm::GenzBretz(maxpts = 100000, abseps = 1e-7))
+        }
+        stopifnot(attr(probability, "error") < 1e-5)
+        max(0, min(1, 1 - as.numeric(probability)))
+    }, numeric(1))
+    list(sets = sets, p.value = p)
+}
 
-Code changes would be concentrated in the constructor and its dispatch,
-documentation and tests. Add emmeans to `Suggests` with an appropriate tested
-minimum version, use `requireNamespace()` with an actionable message, and
-export/document the new function. emmeans is currently absent from both
-`Imports` and `Suggests`. Prefer its public methods over the current
-`sigma`/`extras` extraction. Do not add a new argument inside the present
-`getDataset(..., treatment = ...)` convention without fixing its parser:
-non-`emmGrid` arguments are currently ignored with a warning.
+# Exercise covariance-aware common-t inference on independent Gaussian lm data.
+# This synthetic model is not a row-wise analysis of the longitudinal CSV.
+set.seed(20260911)
+max_t_data <- data.frame(group = factor(rep(c("C", "T1", "T2"), each = 20)),
+    x = rnorm(60))
+max_t_data$y <- 2 + as.numeric(max_t_data$group) / 4 +
+    max_t_data$x + rnorm(nrow(max_t_data))
+max_t_fit <- lm(y ~ group + x, data = max_t_data)
+max_t_stage <- prototype_stage(emmeans(max_t_fit, "group"), c("T1", "T2"), "C")
+max_t_checks <- prototype_intersections(max_t_stage, "modelMaxT", "lm-common-t")
+stopifnot(isTRUE(all.equal(max_t_checks$p.value[1:2],
+    prototype_test(max_t_stage)$p.value, tolerance = 1e-10)))
+# Compare the full-family maximum test with emmeans' multivariate-t adjustment.
+max_t_reference <- as.data.frame(emmeans::test(max_t_stage$effects,
+    side = ">", adjust = "mvt"))
+stopifnot(abs(tail(max_t_checks$p.value, 1) - min(max_t_reference$p.value)) < 1e-4)
+knitr::kable(data.frame(intersection = c("T1", "T2", "T1 & T2"),
+    p.value = max_t_checks$p.value), digits = 6)
+```
 
-Deprecate the lossy `getDataset(emmGrid, ...)` conversion with a specific
-migration message and update the vignette to the new constructor (or the
-explicit bridge first). Avoid silently changing its result from `DatasetMeans`
-to `DatasetGeneral` in a patch release: existing callers may access arm means,
-SDs and sample sizes. A later documented breaking change could make the old
-entry point delegate to the new contract. Ordinary numeric means datasets need
-no change. Existing multi-arm and one-arm EMM calls need an explicit migration
-policy rather than being routed through a two-arm-only adapter.
+The `mvt` comparison above uses a model with a justified common residual df;
+it does not validate a finite-df mixed-model maximum test. emmeans documents
+multivariate-t adjustment and its treatment of varying df in its
+[summary/test reference](https://rvlenth.github.io/emmeans/reference/summary.emmGrid.html).
+The new interface must make the selected joint method visible in output.
 
-### Sequential inference is a separate validation requirement
+### 5.5 Sequential combination and closed testing
 
-Correct contrast extraction fixes the within-stage input. It does not prove
-that every downstream sequential procedure is exact for every fitted model.
+For each fixed nonempty intersection $J$, calculate $p_{Jk}$ from stage $k$.
+For an inverse-normal design with prespecified positive stage weights $w_k$, use
 
-For independent stage data and separately fitted ordinary Gaussian linear
-models, the null stage p-values are valid conditional on the model designs.
-An inverse-normal or Fisher combination with appropriately prespecified weights
-is a natural route. Shared participants, pooled nuisance estimation across
-stages, or cumulative refits do not automatically give independent stage tests.
+$$
+Z_{J,1:k}=\frac{\sum_{i=1}^k w_i\Phi^{-1}(1-p_{Ji})}
+                  {\sqrt{\sum_{i=1}^k w_i^2}}.
+$$
 
-For group-sequential monitoring, canonical joint-distribution assumptions and
-the information-time rule must also hold. Inverse-variance pooling with
-estimated stage variances and the displayed Satterthwaite df is generally an
-approximation, not the exact t-test from refitting ANCOVA to all observations.
-Converting each cumulative t p-value to a normal score does not itself establish
-the required joint distribution. A corrected group-sequential vignette needs
-an explicit analysis specification and operating-characteristic validation;
-it must not inherit an exactness claim from agreement at one stage.
+The design's information schedule must correspond to these weight increments.
+Record whether each intersection has crossed its sequential efficacy boundary
+at any look up to $k$. Reject elementary $H_j$ only when **every** intersection
+containing $j$ has crossed. This is closure across hypotheses and monitoring
+across looks, not per-look Holm testing of marginal sequential p-values.
+For Fisher designs, reuse rpact's weighted product and design-specific boundaries
+through the same intersection-p-value input contract.
 
-Also audit the existing general path's final-inference outputs before claiming
-full equivalence with the means path: it currently populates final confidence
-limits from repeated confidence limits and labels their midpoint as a
-median-unbiased estimate. These constructions are not generally sufficient to
-establish stagewise-ordering confidence limits or median unbiasedness. This is
-an existing downstream issue, separate from importing covariance correctly.
+Bonferroni intersection p-values can be conservative; independent, super-uniform
+stage p-values with fixed positive combination weights give conservative rejection
+calibration under the corresponding monotone test. Mixed-model p-values are
+approximate, so simulation remains a release requirement. Covariance between
+contrasts within a stage does not violate independence between stage cohorts.
 
-**Tradeoff:** this is the smallest statistically coherent change for one
-two-arm contrast and retains contrast-specific df. It intentionally changes
-the dataset representation and does not provide covariance among several
-treatment contrasts or retain means-specific planning functionality.
+```{r}
+#| label: closed-inverse-normal-prototype
+prototype_closed_inverse_normal <- function(stages, design,
+                                            method = "Bonferroni", joint = NULL) {
+    # Bounded prototype: complete family, one-sided efficacy monitoring, no
+    # binding futility or adaptation; weights derive from the fixed design schedule.
+    stopifnot(inherits(design, "TrialDesignInverseNormal"), design$sided == 1,
+        length(stages) == design$kMax)
+    labels <- stages[[1]]$contrastTable$contrast
+    stopifnot(all(vapply(stages, function(x) {
+        identical(x$contrastTable$contrast, labels)
+    }, logical(1))))
+    intersections <- lapply(stages, prototype_intersections, method = method, joint = joint)
+    sets <- intersections[[1]]$sets
+    p <- do.call(cbind, lapply(intersections, `[[`, "p.value"))
+    weights <- sqrt(diff(c(0, design$informationRates)))
+    stopifnot(all(weights > 0), all(p >= 0 & p <= 1))
+    # Exact p = 1 maps to -Inf; no arbitrary clipping that increases evidence.
+    scores <- qnorm(p, lower.tail = FALSE)
+    if (any(is.infinite(scores) & scores > 0)) {
+        stop("Prototype requires non-underflowing upper-tail p-values.")
+    }
+    z <- vapply(seq_along(stages), function(k) {
+        drop(scores[, seq_len(k), drop = FALSE] %*% weights[seq_len(k)]) /
+            sqrt(sum(weights[seq_len(k)]^2))
+    }, numeric(length(sets)))
+    z <- matrix(z, nrow = length(sets))
+    crossing <- sweep(z, 2, design$criticalValues, `>=`)
+    crossed <- t(vapply(seq_along(sets), function(i) {
+        cummax(crossing[i, ]) > 0
+    }, logical(length(stages))))
+    rejected <- t(vapply(seq_along(labels), function(j) {
+        colSums(!crossed[vapply(sets, function(J) j %in% J, logical(1)), ,
+            drop = FALSE]) == 0
+    }, logical(length(stages))))
+    dimnames(rejected) <- list(labels, paste("stage", seq_along(stages)))
+    list(intersectionPValues = p, combinedStatistics = z,
+        crossedIntersections = crossed, rejected = rejected)
+}
 
-## 5. Option B: introduce a covariance-aware model-means dataset
+prototype_design <- getDesignInverseNormal(kMax = length(multi_model_stages),
+    sided = 1, alpha = 0.025, informationRates = c(1/3, 2/3, 1))
+multi_closed <- prototype_closed_inverse_normal(multi_model_stages, prototype_design)
+knitr::kable(multi_closed$rejected)
+# With one contrast, closure reduces to the existing scalar stage-combination path.
+repeated_closed <- prototype_closed_inverse_normal(repeated_model_stages, prototype_design)
+scalar_check <- getStageResults(prototype_design, dataInput = repeated_dataset)
+stopifnot(isTRUE(all.equal(as.numeric(repeated_closed$combinedStatistics),
+    as.numeric(scalar_check$combInverseNormal), tolerance = 1e-10)))
+knitr::kable(repeated_closed$rejected)
+```
 
-Introduce a distinct R6 class, provisionally `DatasetModelMeans`, inheriting
-from `Dataset` rather than letting an unmodified means analysis consume it.
-Store for each stage:
+These tables regenerate decisions for the explicitly chosen finite-df Bonferroni
+intersection/inverse-normal specification. They do not reproduce the legacy
+multi-arm default Dunnett calculation, or the two-arm draft's group-sequential
+analysis. Production code must consume the actual design's weights/boundary
+helpers, retain stable intersection IDs, implement numerical tail handling in
+log probability space, and test all design-specific stopping rules.
 
-- Named EMM vector and its full covariance matrix, on one declared scale.
-- Explicit contrast matrix and resulting contrast estimates, covariance and df.
-- Arm/reference-grid labels, model and df method, and optional descriptive n.
+The stage-1 full-family Bonferroni p-value here is
+`r multi_closed$intersectionPValues[nrow(multi_closed$intersectionPValues), 1]`.
+An intersection p-value equal to one maps to negative infinity and prevents
+later inverse-normal rejection of that intersection. This is a real power
+limitation of this conservative combination, not a numerical error to hide by
+clipping. For finite-df mixed models, implement Fisher combination as well (a
+factor of one does not have this absorbing effect), and document this tradeoff
+when selecting the intersection/design pair. Any truncated-p inverse-normal
+alternative needs separately calibrated boundaries.
 
-For a contrast matrix $C$, calculate $C\hat\mu$ and $CVC^\top$.
-Obtain df from emmeans for the requested contrasts: `V` by itself does not
-encode contrast-specific df. Either freeze the supported contrasts at import,
-or retain sufficient model machinery for later df evaluation; freezing avoids
-making ordinary dataset use depend on a serialized live model object.
+For the same multi-arm mixed-model fits, the following executable alternative
+uses asymptotic covariance-based max-T. It explicitly rebuilds the grids with
+asymptotic inference, so it does not quietly reinterpret the KR results above.
+The finite-sample accuracy of this route remains subject to simulation.
 
-Required changes compared with today:
+```{r}
+#| label: mixed-model-asymptotic-max-t
+multi_asymptotic_stages <- lapply(multi_stage_effects, function(x) {
+    asymptotic_emm <- emmeans::emmeans(x$model, "group", lmer.df = "asymptotic")
+    prototype_stage(asymptotic_emm, treatments, control)
+})
+set.seed(20260912)
+multi_max_t_closed <- prototype_closed_inverse_normal(
+    multi_asymptotic_stages, prototype_design,
+    method = "modelMaxT", joint = "asymptotic")
+knitr::kable(multi_max_t_closed$rejected)
+```
 
-| Area | Change |
+Keep the original hypothesis family fixed. The first implementation rejects
+missing active contrasts and adaptive arm dropping. To support dropping later,
+retain earlier intersection history and implement an explicit prespecified or
+conditional-error-valid activity rule. Do not reduce Bonferroni denominators or
+reallocate combination weights merely because later arm data are absent. The
+current vignettes keep both treatments through all stages, so this restriction
+does not block their illustrated multi-arm workflow.
+
+### 5.6 Repeated inference, cumulative summaries and planning
+
+`StageResultsModelMeans` should expose contrast-by-stage estimates, SEs, df,
+statistics and component p-values, the stage covariance matrices, and an
+intersection-by-stage p-value matrix. `AnalysisResultsModelMeans` should expose
+the selected method, combined statistics, crossing history, closed decisions,
+repeated p-values and clearly typed intervals, with existing design/result objects
+composed internally where appropriate. Preserve scientific labels in printing
+and plotting; show covariance/correlation on request. Do not present synthetic
+SDs or label an EMM average as an observed mean.
+
+Implement repeated p-values by rerunning the specified boundary procedure as
+alpha varies, retaining the same hypothesis family, stage weights and null.
+Invert the same null-dependent tests for repeated confidence sets. Closed tests
+of a joint null vector do not automatically give separate rectangular intervals:
+project a validated joint confidence set, or initially offer a conservative
+rectangular construction by allocating family alpha across contrasts and
+inverting each scalar sequential test. The latter can use fixed Bonferroni
+allocation over arms (and tails for two-sided intervals); it must be labelled as
+such and may not agree with closed-test decisions. Never derive a multi-arm
+repeated interval from `confint(emm)` or by fixing other unknown effects at zero.
+
+For scalar inverse-variance summaries, define $I_{jk}=1/S_{k,jj}$ and
+$\hat\theta_{j,1:K}=\sum_k I_{jk}\hat\theta_{jk}/\sum_k I_{jk}$. These are
+precision-weighted summaries of independent stage contrasts. A multivariate GLS
+summary, if offered for a stable common effect vector and invertible $S_k$, is
+
+$$
+\hat\theta_{1:K}=\left(\sum_k S_k^{-1}\right)^{-1}
+                 \sum_k S_k^{-1}\hat\theta_k,\qquad
+S_{1:K}=\left(\sum_k S_k^{-1}\right)^{-1}.
+$$
+
+These covariance formulas condition on estimated stage covariance; they do not
+supply exact cumulative df. Do not automatically invert singular matrices with
+a generalized inverse or use these descriptive summaries as a sequential test.
+No scalar “overall information fraction” exists for arbitrary changing covariance
+matrices. Inverse-normal weights are design inputs, not recalculated from observed
+subject counts or realized significance.
+
+The two-arm source also requires a group-sequential route. Implement it explicitly
+as an **approximate** independent-stage scalar contrast path: project to the
+general engine, use its cumulative inverse-variance estimates and
+Satterthwaite-style df, and record the information schedule/maximum precision.
+Test the cumulative formulas and simulate the resulting monitoring procedure on
+the longitudinal model before enabling this design/model combination. It is not
+a pooled longitudinal refit, and transforming cumulative t p-values to normal
+scores does not establish a canonical joint distribution. Keep cumulative refits
+with returning subjects and multi-arm group-sequential/conditional-Dunnett designs
+outside this contract until a cross-look covariance backend is implemented.
+
+Mean-specific sample-size recalculation, `equalVariances`, `varianceOption`, and
+synthetic `stDev` inputs are inapplicable: reject conflicting explicit arguments.
+Conditional power, when added, must take planned contrast effects and future
+information/covariance with declared df assumptions. A subject-count target needs
+a model-specific mapping to precision. Audit the existing general engine's final
+confidence limits and “median-unbiased” labels before exposing them; a midpoint
+of repeated confidence limits is not automatically a median-unbiased estimator.
+
+### 5.7 Repository changes and implementation order
+
+The current `.getStageResultsMeansMultiArm()` in
+[`f_analysis_multiarm_means.R`](../R/f_analysis_multiarm_means.R) computes statistics
+from means/SDs. `.performClosedCombinationTest()` in
+[`f_analysis_multiarm.R`](../R/f_analysis_multiarm.R) also reconstructs Dunnett
+correlation from sample sizes and supplies count-derived df. **Both layers must
+be bypassed or refactored**; replacing only the import is insufficient.
+
+| Change | Concrete implementation and completion evidence |
 |---|---|
-| Import | Replace synthetic SD extraction with named EMM vectors, `vcov()` and explicit emmeans contrasts. |
-| Dataset model | Add stage-indexed matrix storage, validation, subsetting, cloning/serialization, getters and print/summary support. |
-| Dispatch | Add model-means detection in dataset/stage/analysis utilities; prevent fallback to independent-arm formulas. |
-| Two-arm inference | Project the specified contrast to `DatasetGeneral` and reuse its scalar analysis, or implement a separate engine with equivalent validation. |
-| Cumulative summaries | Define model-aware summaries; do not pool EMMs and synthetic SDs as raw sample moments. |
-| Multiple contrasts | Pass `C V C'` to an explicitly supported multiplicity/sequential engine; retaining covariance alone does not make existing multi-arm procedures valid for adjusted means. |
-| Information and planning | Define information for the target contrast; separate descriptive subject counts from precision. |
+| Dataset/import | Add `class_analysis_dataset_model_means.R`, the R6 contract, both constructors and assertions. Register/export/document constructors. Add tested `emmeans` dependency in `Suggests` and actionable optional-backend errors. Pass stage extraction, malformed input, deep-clone and serialization checks. |
+| Dispatch | In `f_analysis_base.R`, dataset utilities/assertions and stage-result construction, detect model-means **before** existing generic multi-arm/means routes. Add `StageResultsModelMeans` and result integration without masquerading as `DatasetMeans`. |
+| Component inference | Add `f_analysis_model_means.R`: named null/direction handling, frozen t/z tests, ordinary intervals, scalar projection and provenance output. Reproduce all longitudinal stage contrasts directly against emmeans, including requested-versus-actual df checks. |
+| Intersection inference | Add `f_analysis_multiarm_model_means.R`: finite-df Bonferroni and eligible covariance-based max-T; return fixed-family intersection matrices, numerical integration diagnostics and method labels. |
+| Sequential core | Extract the combination/boundary/closure portion of `.performClosedCombinationTest()` into an endpoint-independent helper accepting intersection p-values. Keep legacy intersection construction as a caller. Add a model caller that never queries counts or SDs. Regress existing numeric datasets against unchanged outputs. |
+| Repeated inference/output | Route alpha/null inversion through the same new helper; implement conservative rectangular intervals first with explicit labels, print/summary/plots, and errors for unsupported planning/selection. Validate coverage and interpretation. |
+| Group-sequential scalar path | Add an explicitly approximate model-means projection using general-estimates cumulative inference, information metadata and operating-characteristic validation for the two-arm mixed-model example. |
+| Vignette migration | Replace legacy `getDataset(emmGrid, ...)` in all three workflows, name treatment/control labels, record df/estimand/cohort specifications, regenerate result tables and narrative from executable objects. |
 
-Validation must check matrix dimensions, row/column names and order, symmetry,
-finite entries and positive semidefiniteness within numerical tolerance. A
-singular full covariance may still yield an estimable contrast with positive
-variance; blanket positive-definiteness rejection would be too strong.
-
-**Tradeoff:** this retains the scientific arm summaries and supports future
-correlated multi-arm contrasts. It requires substantially more class,
-dispatch and output work. For the current two-arm vignette, its inferential
-projection is the same scalar estimate/SE/df produced by Option A, so it does
-not solve an additional scalar statistical problem. For the multi-arm development
-vignette, however, joint contrast storage and a compatible analysis engine are
-required; this is now a concrete requirement rather than a hypothetical extension.
+Deliver these as Option B milestones: (1) dataset plus all `lm`/`lmer` extractions;
+(2) mixed-model finite-df closed combination and eligible max-T, including repeated
+inference; (3) validated scalar group-sequential integration and migration.
+Milestone 1 alone is not a complete analysis release. Introduce a targeted
+deprecation message for legacy lossy EMM conversion; avoid a silent patch-release
+change of its class. One-arm EMM callers need a separate migration statement,
+and ordinary numeric means datasets retain their existing behavior.
 
 ## 6. Recommendation and acceptance criteria
 
-Implement Option A first, restricting advertised support to a clearly specified
-model/estimand/stage contract. Use the manual `DatasetGeneral` bridge to develop
-the corrected two-arm ordinary-model vignette now. Treat this as the first
-milestone, not completion of the interface redesign. The multi-arm development
-vignette makes joint contrast support an actual requirement: implement Option B
-or an equivalent covariance-aware contrast dataset, while continuing to delegate
-contrast construction and df to emmeans. A second milestone must validate scalar
-mixed-model extraction; a third must supply the joint multi-arm sequential engine.
-Until those milestones pass, give explicit unsupported-use errors on the new
-interface and targeted migration guidance for legacy longitudinal/multi-arm calls;
-do not silently fall back to synthetic SDs or advertise all emmeans models as
-supported. Deprecation documentation must cover all three source vignettes.
+Implement Option B as the shared representation for two-arm and multi-arm model
+inference. Option A remains a scalar verification bridge. Release support by
+explicit model/df/intersection/design combinations, with both development
+vignettes included in the required acceptance suite. The executable prototypes
+above establish extraction and a bounded closed-combination workflow; they do
+not replace production validation, repeated-interval implementation or operating-
+characteristic studies.
 
-The implementation should be accepted only after these checks:
+The implementation should be accepted only after these checks. For simulation,
+prespecify the scenario grid, replicate count, Monte Carlo error target and
+acceptance tolerance before execution. Include global and partial nulls, covariance
+and visit-pattern variation, small cohort sizes, missingness consistent with the
+fitted model, and alternative effects; report familywise error, interval coverage,
+power and stopping probabilities with Monte Carlo uncertainty. Keep extraction
+unit checks separate from these operating-characteristic studies.
+
 
 1. The deterministic example reproduces emmeans estimate, SE, contrast df,
    upper/lower-tail p-values and ordinary fixed-analysis interval. Include a
