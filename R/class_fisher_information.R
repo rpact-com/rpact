@@ -28,7 +28,10 @@
 #' Use \code{as.numeric()} to obtain the information values as a plain numeric
 #' vector (column by column, i.e., all stages within each situation),
 #' \code{as.matrix()} to obtain a stage-by-situation matrix, and
-#' \code{as.data.frame()} to obtain a long-format data frame.
+#' \code{as.data.frame()} to obtain a long-format data frame;
+#' \code{is.finite()}, \code{is.infinite()}, \code{is.nan()}, and \code{is.na()} 
+#' to check the information values for finiteness, infiniteness, NaN, and NA,
+#' respectively, and \code{length()} to obtain the number of information values.
 #'
 #' @field information A numeric value, vector, or matrix with the calculated
 #'   Fisher information.
@@ -167,6 +170,30 @@ as.matrix.FisherInformation <- function(x, ...) {
 as.double.FisherInformation <- function(x, ...) {
     .warnInCaseOfUnknownArguments(functionName = "as.numeric", ...)
     return(as.numeric(x$information))
+}
+
+#' @rdname FisherInformation
+#' @export
+is.finite.FisherInformation <- function(x) {
+    return(is.finite(x$information))
+}
+
+#' @rdname FisherInformation
+#' @export
+is.infinite.FisherInformation <- function(x) {
+    return(is.infinite(x$information))
+}
+
+#' @rdname FisherInformation
+#' @export
+is.nan.FisherInformation <- function(x) {
+    return(is.nan(x$information))
+}
+
+#' @rdname FisherInformation
+#' @export
+is.na.FisherInformation <- function(x) {
+    return(is.na(x$information))
 }
 
 #' @rdname FisherInformation

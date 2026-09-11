@@ -4,6 +4,10 @@
 \alias{FisherInformation}
 \alias{as.matrix.FisherInformation}
 \alias{as.double.FisherInformation}
+\alias{is.finite.FisherInformation}
+\alias{is.infinite.FisherInformation}
+\alias{is.nan.FisherInformation}
+\alias{is.na.FisherInformation}
 \alias{as.data.frame.FisherInformation}
 \alias{length.FisherInformation}
 \alias{print.FisherInformation}
@@ -12,6 +16,14 @@
 \method{as.matrix}{FisherInformation}(x, ...)
 
 \method{as.double}{FisherInformation}(x, ...)
+
+\method{is.finite}{FisherInformation}(x)
+
+\method{is.infinite}{FisherInformation}(x)
+
+\method{is.nan}{FisherInformation}(x)
+
+\method{is.na}{FisherInformation}(x)
 
 \method{as.data.frame}{FisherInformation}(x, row.names = NULL, optional = FALSE, ...)
 
@@ -46,7 +58,10 @@ duplicating that potentially large object in the printed result.
 Use \code{as.numeric()} to obtain the information values as a plain numeric
 vector (column by column, i.e., all stages within each situation),
 \code{as.matrix()} to obtain a stage-by-situation matrix, and
-\code{as.data.frame()} to obtain a long-format data frame.
+\code{as.data.frame()} to obtain a long-format data frame;
+\code{is.finite()}, \code{is.infinite()}, \code{is.nan()}, and \code{is.na()}
+to check the information values for finiteness, infiniteness, NaN, and NA,
+respectively, and \code{length()} to obtain the number of information values.
 }
 \section{Fields}{
 
