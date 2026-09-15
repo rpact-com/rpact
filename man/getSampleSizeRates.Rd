@@ -133,9 +133,9 @@ getSampleSizeRates(getDesignGroupSequential(kMax = 3, alpha = 0.025,
 
 }
 \seealso{
-Other sample size functions:
-\code{\link[=getSampleSizeCounts]{getSampleSizeCounts()}},
-\code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}},
-\code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
+Other sample size functions: 
+\code{\link{getSampleSizeCounts}()},
+\code{\link{getSampleSizeMeans}()},
+\code{\link{getSampleSizeSurvival}()}
 }
 \concept{sample size functions}

@@ -134,9 +134,9 @@ getPowerMeans(getDesignGroupSequential(alpha = 0.025,
 
 }
 \seealso{
-Other power functions:
-\code{\link[=getPowerCounts]{getPowerCounts()}},
-\code{\link[=getPowerRates]{getPowerRates()}},
-\code{\link[=getPowerSurvival]{getPowerSurvival()}}
+Other power functions: 
+\code{\link{getPowerCounts}()},
+\code{\link{getPowerRates}()},
+\code{\link{getPowerSurvival}()}
 }
 \concept{power functions}

@@ -156,9 +156,9 @@ getSampleSizeCounts(design = getDesignGroupSequential(
 
 }
 \seealso{
-Other sample size functions:
-\code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}},
-\code{\link[=getSampleSizeRates]{getSampleSizeRates()}},
-\code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
+Other sample size functions: 
+\code{\link{getSampleSizeMeans}()},
+\code{\link{getSampleSizeRates}()},
+\code{\link{getSampleSizeSurvival}()}
 }
 \concept{sample size functions}

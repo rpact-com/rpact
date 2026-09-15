@@ -508,6 +508,8 @@ NULL
 #' @template examples_get_simulation_enrichment_survival
 #'
 #' @keywords internal
+#' 
+#' @noRd 
 #'
 getSimulationEnrichmentSurvivalBasic <- function( # TODO add "."
         design = NULL,

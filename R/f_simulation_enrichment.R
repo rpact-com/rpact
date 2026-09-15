@@ -348,11 +348,11 @@ NULL
         ...,
         design,
         effectList,
-        kappa = NA_real_, # survival only
+        kappa = 1, # survival only
         dropoutRate1 = NA_real_, # survival only
         dropoutRate2 = NA_real_, # survival only
         dropoutTime = NA_real_, # survival only
-        eventTime = NA_real_, # survival only
+        eventTime = 12, # survival only
         intersectionTest,
         stratifiedAnalysis = NA,
         directionUpper = NA, # rates + survival only
@@ -474,7 +474,20 @@ NULL
     .validateAndSetSeed(simulationResults, seed)
 
     effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
-    if (endpoint == "survival" && is.null(effectList$hazardRatios) && !is.null(effectList$piTreatments)) {
+    if (endpoint == "survival" &&
+            simulationType %in% c("patientWise", "patientWiseBasic") &&
+            is.null(effectList$piControls)) {
+        stopMissingArgument(
+            sQuote("effectList$piControls"),
+            " must be specified for patient-wise survival simulations",
+            functionName = ".createSimulationResultsEnrichmentObject",
+            parameter = "effectList$piControls", value = effectList$piControls,
+            relatedParameter = "simulationType", relatedValue = simulationType
+        )
+    }
+    if (endpoint == "survival" && 
+            is.null(effectList$hazardRatios) && 
+            !is.null(effectList$piTreatments)) {
         if (is.null(effectList$piControls)) {
             stopMissingArgument(
                 sQuote("effectList$piControls"),

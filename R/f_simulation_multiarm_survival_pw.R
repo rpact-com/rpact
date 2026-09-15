@@ -45,6 +45,7 @@ NULL
 #' @inheritParams param_threshold
 #' @inheritParams param_effectMatrix
 #' @inheritParams param_activeArms
+#' @inheritParams param_piControl
 #' @inheritParams param_successCriterion
 #' @inheritParams param_correlationComputation
 #' @inheritParams param_typeOfShapeSurvival
@@ -351,7 +352,7 @@ getSimulationMultiArmSurvival <- function(
 #' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
-#' @inheritParams param_kappa
+#' @inheritParams param_piControl
 #' @inheritParams param_eventTime
 #' @inheritParams param_accrualTime
 #' @inheritParams param_accrualIntensity
@@ -415,6 +416,8 @@ getSimulationMultiArmSurvival <- function(
 #'
 #' @keywords internal
 #'
+#' @noRd
+#'  
 getSimulationMultiArmSurvivalPatientWise <- function( # TODO add "."
         design = NULL,
         ...,

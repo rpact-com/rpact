@@ -334,6 +334,8 @@ NULL
 #' @template examples_get_simulation_multiarm_survival
 #'
 #' @keywords internal
+#' 
+#' @noRd 
 #'
 getSimulationMultiArmSurvivalBasic <- function( # TODO add "."
         design = NULL,

@@ -199,13 +199,13 @@ specification of futility bounds on scales other than the z-value scale.
 
 \href{https://www.rpact.org/vignettes/planning/rpact_futility_bounds/}{Vignette: Enhanced Futility Bounds Specification}
 
-Other design functions:
-\code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}},
-\code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}},
-\code{\link[=getDesignFisher]{getDesignFisher()}},
-\code{\link[=getDesignFixed]{getDesignFixed()}},
-\code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
-\code{\link[=getGroupSequentialProbabilities]{getGroupSequentialProbabilities()}},
-\code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
+Other design functions: 
+\code{\link{getDesignCharacteristics}()},
+\code{\link{getDesignConditionalDunnett}()},
+\code{\link{getDesignFisher}()},
+\code{\link{getDesignFixed}()},
+\code{\link{getDesignInverseNormal}()},
+\code{\link{getGroupSequentialProbabilities}()},
+\code{\link{getPowerAndAverageSampleNumber}()}
 }
 \concept{design functions}

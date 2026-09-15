@@ -7,8 +7,8 @@
 getSimulationMultiArmSurvival(
   design = NULL,
   ...,
-  thetaH0 = 1,
   simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+  thetaH0 = 1,
   activeArms = NA_integer_,
   piControl = NA_real_,
   effectMatrix = NULL,
@@ -58,6 +58,17 @@ and \code{sided} can be directly entered as argument where necessary.}
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
+\item{simulationType}{Character value specifying the simulation approach:
+\code{"auto"}, \code{"patientWise"}, \code{"testStatisticBased"}, or
+\code{"patientWiseBasic"}.
+If \code{"auto"} is specified, the simulation type is selected automatically based on
+the explicitly specified arguments. If patient-wise-specific arguments such as
+\code{piControl}, \code{eventTime}, \code{accrualTime}, \code{accrualIntensity},
+\code{accrualIntensityType}, \code{dropoutRate1}, \code{dropoutRate2},
+\code{dropoutTime}, \code{maxNumberOfSubjects}, or \code{kappa} are provided,
+a patient-wise simulation approach is used; otherwise the test-statistic-based
+simulation is used for backward compatibility.}
+
 \item{thetaH0}{The null hypothesis value,
 default is \code{0} for general estimates, the normal case, and the binary case,
 it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
@@ -74,17 +85,6 @@ That is, in case of (one-sided) testing of
 }
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
-
-\item{simulationType}{Character value specifying the simulation approach:
-\code{"auto"}, \code{"patientWise"}, \code{"testStatisticBased"}, or
-\code{"patientWiseBasic"}.
-If \code{"auto"} is specified, the simulation type is selected automatically based on
-the explicitly specified arguments. If patient-wise-specific arguments such as
-\code{piControl}, \code{eventTime}, \code{accrualTime}, \code{accrualIntensity},
-\code{accrualIntensityType}, \code{dropoutRate1}, \code{dropoutRate2},
-\code{dropoutTime}, \code{maxNumberOfSubjects}, or \code{kappa} are provided,
-a patient-wise simulation approach is used; otherwise the test-statistic-based
-simulation is used for backward compatibility.}
 
 \item{activeArms}{The number of active treatment arms to be compared with control, default is \code{3}.}
 

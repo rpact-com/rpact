@@ -64,13 +64,13 @@ design2
 
 }
 \seealso{
-Other design functions:
-\code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}},
-\code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}},
-\code{\link[=getDesignFisher]{getDesignFisher()}},
-\code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
-\code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
-\code{\link[=getGroupSequentialProbabilities]{getGroupSequentialProbabilities()}},
-\code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
+Other design functions: 
+\code{\link{getDesignCharacteristics}()},
+\code{\link{getDesignConditionalDunnett}()},
+\code{\link{getDesignFisher}()},
+\code{\link{getDesignGroupSequential}()},
+\code{\link{getDesignInverseNormal}()},
+\code{\link{getGroupSequentialProbabilities}()},
+\code{\link{getPowerAndAverageSampleNumber}()}
 }
 \concept{design functions}

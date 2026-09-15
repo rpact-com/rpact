@@ -93,13 +93,13 @@ sum(probs[5, ] - probs[4, ] + probs[1, ])
 
 }
 \seealso{
-Other design functions:
-\code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}},
-\code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}},
-\code{\link[=getDesignFisher]{getDesignFisher()}},
-\code{\link[=getDesignFixed]{getDesignFixed()}},
-\code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
-\code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
-\code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
+Other design functions: 
+\code{\link{getDesignCharacteristics}()},
+\code{\link{getDesignConditionalDunnett}()},
+\code{\link{getDesignFisher}()},
+\code{\link{getDesignFixed}()},
+\code{\link{getDesignGroupSequential}()},
+\code{\link{getDesignInverseNormal}()},
+\code{\link{getPowerAndAverageSampleNumber}()}
 }
 \concept{design functions}

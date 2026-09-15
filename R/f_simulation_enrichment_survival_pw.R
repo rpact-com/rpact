@@ -102,6 +102,8 @@ NULL
 #'
 #' @keywords internal
 #'
+#' @noRd 
+#' 
 getSimulationEnrichmentSurvivalPatientWise <- function( # TODO add "."
         design = NULL,
         ...,
