@@ -3723,6 +3723,57 @@ NULL
     }
 }
 
+# Validate the normalized enrichment effect list after list/data.frame conversion.
+.assertIsValidEffectList <- function(effectList, ..., endpoint, simulationType = "auto") {
+    requiredNames <- c("subGroups", "prevalences")
+    if (endpoint == "means") {
+        requiredNames <- c(requiredNames, "effects", "stDevs")
+    } else if (endpoint == "rates") {
+        requiredNames <- c(requiredNames, "piTreatments", "piControls")
+    } else if (endpoint == "survival") {
+        if (is.null(effectList$hazardRatios)) {
+            requiredNames <- c(requiredNames, "piTreatments", "piControls")
+        }
+        if (simulationType %in% c("patientWise", "patientWiseBasic")) {
+            requiredNames <- c(requiredNames, "piControls")
+        }
+    }
+    for (name in unique(requiredNames)) {
+        if (is.null(effectList[[name]]) || length(effectList[[name]]) == 0) {
+            patientWiseControls <- name == "piControls" && endpoint == "survival" &&
+                simulationType %in% c("patientWise", "patientWiseBasic")
+            stopMissingArgument(
+                sQuote(paste0("effectList$", name)),
+                if (patientWiseControls) {
+                    " must be specified for patient-wise survival simulations"
+                } else {
+                    " must be specified"
+                },
+                functionName = ".assertIsValidEffectList",
+                parameter = paste0("effectList$", name), value = effectList[[name]]
+            )
+        }
+    }
+    for (name in intersect(names(effectList), c(
+        "prevalences", "effects", "stDevs", "piControls", "piTreatments", "hazardRatios"
+    ))) {
+        .assertIsNumericVector(effectList[[name]], paste0("effectList$", name), matrixAllowed = TRUE)
+        .assertArgumentFitsWithSubGroups(effectList[[name]], name, effectList$subGroups)
+    }
+    .assertIsInClosedInterval(effectList$prevalences, "effectList$prevalences", lower = 0, upper = 1)
+    for (name in intersect(names(effectList), c("effects", "piTreatments", "hazardRatios"))) {
+        .assertIsValidMatrix(effectList[[name]], paste0("effectList$", name))
+    }
+    for (name in intersect(names(effectList), c("piControls", "piTreatments"))) {
+        .assertIsInOpenInterval(effectList[[name]], paste0("effectList$", name),
+            lower = 0, upper = 1, matrixAllowed = TRUE)
+    }
+    for (name in intersect(names(effectList), c("hazardRatios", "stDevs"))) {
+        .assertIsInOpenInterval(effectList[[name]], paste0("effectList$", name),
+            lower = 0, upper = NULL, matrixAllowed = TRUE)
+    }
+}
+
 .assertIsValidEffectMatrix <- function(
         ...,
         simulationResults,

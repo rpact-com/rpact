@@ -235,7 +235,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     }
 
     effectListNames <- names(effectList)
-    if (is.null(effectListNames) || any(nchar(trimws(effectListNames)) == 0)) {
+    if (is.null(effectListNames) || anyNA(effectListNames) || any(nchar(trimws(effectListNames)) == 0)) {
         stopIllegalArgument(
             sQuote("effectList"), " must be named. Current names are ",
             .arrayToString(effectListNames, encapsulate = TRUE),
@@ -252,6 +252,10 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         names(effectList)[names(effectList) == singularName] <- paste0(singularName, "s")
     }
     effectListNames <- names(effectList)
+    if (anyDuplicated(effectListNames)) {
+        stopIllegalArgument("'effectList' must not contain duplicate entry names",
+            functionName = ".getEffectData", parameter = "effectList", value = effectListNames)
+    }
 
     if (!("subGroups" %in% effectListNames)) {
         stopIllegalArgument(
@@ -274,6 +278,11 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     }
     if (is.factor(subGroups)) {
         subGroups <- as.character(subGroups)
+    }
+
+    if (anyNA(subGroups) || anyDuplicated(subGroups)) {
+        stopIllegalArgument("'effectList$subGroups' must not contain missing or duplicate values",
+            functionName = ".getEffectData", parameter = "effectList$subGroups", value = subGroups)
     }
 
     expectedSubGroups <- "F"
@@ -659,42 +668,11 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             )
         }
     }
-
-    if (!is.null(effectList[["prevalences"]])) {
-        .assertIsInClosedInterval(effectList$prevalences, "effectList$prevalences",
-            lower = 0, upper = 1
-        )
-    }
-    if (!is.null(effectList[["effects"]])) {
-        .assertIsValidMatrix(effectList$effects, "effectList$effects")
-    }
-    for (piParam in c("piControls", "piTreatments")) {
-        if (piParam %in% names(effectList) && !is.null(effectList[[piParam]])) {
-            if (piParam == matrixNameNew && is.matrix(effectList[[piParam]])) {
-                for (i in 1:nrow(effectList[[piParam]])) {
-                    .assertIsInOpenInterval(effectList[[piParam]][i, ], paste0("effectList$", piParam),
-                        lower = 0, upper = 1, matrixAllowed = TRUE
-                    )
-                }
-            } else {
-                .assertIsInOpenInterval(effectList[[piParam]], paste0("effectList$", piParam),
-                    lower = 0, upper = 1, matrixAllowed = TRUE
-                )
-            }
-        }
-    }
-    for (ratioParam in c("hazardRatios", "stDevs")) {
-        if (ratioParam %in% names(effectList) && !is.null(effectList[[ratioParam]])) {
-            .assertIsInOpenInterval(effectList[[ratioParam]], paste0("effectList$", ratioParam),
-                lower = 0, upper = NULL, matrixAllowed = TRUE
-            )
-        }
-    }
-
     return(effectList)
 }
 
-.getValidatedEffectList <- function(effectList, ..., endpoint, gMax = NA_integer_, nullAllowed = TRUE) {
+.getValidatedEffectList <- function(effectList, ..., endpoint, gMax = NA_integer_, nullAllowed = TRUE,
+        simulationType = "auto") {
     if (is.null(endpoint) || !(endpoint %in% c("means", "rates", "survival"))) {
         stopRuntimeIssue(
             "'endpoint' (", endpoint, ") must be one of 'means', 'rates', or 'survival'",
@@ -713,11 +691,13 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     }
 
     if (is.data.frame(effectList)) {
-        return(.getEffectList(effectList, parameterName = "effectList", endpoint = endpoint))
+        effectList <- .getEffectList(effectList, parameterName = "effectList", endpoint = endpoint)
     }
 
     effectData <- .getEffectData(effectList, endpoint = endpoint, gMax = gMax, nullAllowed = nullAllowed)
-    return(.getEffectList(effectData))
+    effectList <- .getEffectList(effectData)
+    .assertIsValidEffectList(effectList, endpoint = endpoint, simulationType = simulationType)
+    return(effectList)
 }
 
 .getVariedParameterSimulationMultiArm <- function(designPlan) {

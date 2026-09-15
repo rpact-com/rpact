@@ -473,32 +473,10 @@ NULL
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
     .validateAndSetSeed(simulationResults, seed)
 
-    effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
+    effectList <- .getValidatedEffectList(effectList, endpoint = endpoint, simulationType = simulationType)
     if (endpoint == "survival" &&
-            simulationType %in% c("patientWise", "patientWiseBasic") &&
-            is.null(effectList$piControls)) {
-        stopMissingArgument(
-            sQuote("effectList$piControls"),
-            " must be specified for patient-wise survival simulations",
-            functionName = ".createSimulationResultsEnrichmentObject",
-            parameter = "effectList$piControls", value = effectList$piControls,
-            relatedParameter = "simulationType", relatedValue = simulationType
-        )
-    }
-    if (endpoint == "survival" && 
-            is.null(effectList$hazardRatios) && 
+            is.null(effectList$hazardRatios) &&
             !is.null(effectList$piTreatments)) {
-        if (is.null(effectList$piControls)) {
-            stopMissingArgument(
-                sQuote("effectList$piControls"),
-                " must be specified when 'effectList$piTreatments' is used",
-                functionName = ".createSimulationResultsEnrichmentObject",
-                parameter = "effectList$piControls", value = effectList$piControls,
-                relatedParameter = "effectList$piTreatments",
-                relatedValue = effectList$piTreatments
-            )
-        }
-
         effectList$hazardRatios <- t(apply(effectList$piTreatments, 1, function(piTreatments) {
             getHazardRatioByPi(piTreatments, effectList$piControls, eventTime = eventTime, kappa = kappa)
         }))
