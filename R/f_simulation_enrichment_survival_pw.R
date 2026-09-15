@@ -100,11 +100,9 @@ NULL
 #'
 #' @template examples_get_simulation_enrichment_survival
 #'
-#' @export
-#'
 #' @keywords internal
 #'
-getSimulationEnrichmentSurvivalPatientWise <- function(
+getSimulationEnrichmentSurvivalPatientWise <- function( # TODO add "."
         design = NULL,
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT

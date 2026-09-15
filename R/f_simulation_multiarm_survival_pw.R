@@ -130,8 +130,8 @@ NULL
 getSimulationMultiArmSurvival <- function(
         design = NULL,
         ...,
-        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         activeArms = NA_integer_,
         piControl = NA_real_,
         effectMatrix = NULL,
@@ -413,11 +413,9 @@ getSimulationMultiArmSurvival <- function(
 #'
 #' @template examples_get_simulation_multiarm_survival
 #'
-#' @export
-#'
 #' @keywords internal
 #'
-getSimulationMultiArmSurvivalPatientWise <- function(
+getSimulationMultiArmSurvivalPatientWise <- function( # TODO add "."
         design = NULL,
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT

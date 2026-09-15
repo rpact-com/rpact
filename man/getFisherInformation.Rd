@@ -147,6 +147,20 @@ designPlan |>
 Alternatively, pipe \code{designPlan} directly into
 \code{getFutilityBounds()}; the latter then calls this function internally
 with the information type required by the requested target scale.
+Cumulative information can also be piped into a conversion to the
+design-specific treatment-effect scale:
+\preformatted{
+designPlan |>
+    getFisherInformation(type = "cumulative") |>
+    getFutilityBounds(targetScale = "treatmentEffect")
+}
+In this case, the information object's type, stages, and originating design
+plan are validated before the endpoint-specific transformation is applied.
+For two-group rates, the Farrington--Manning inversion uses the design plan's
+group sizes and null-restricted rates directly. For Count Data, the design and
+stages are reused without recalculating Fisher information, while the exact
+negative-binomial inversion evaluates its variance at each candidate rate
+ratio from the design-specific sample-size and exposure assumptions.
 }
 \examples{
 \dontrun{

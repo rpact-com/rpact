@@ -333,11 +333,9 @@ NULL
 #'
 #' @template examples_get_simulation_multiarm_survival
 #'
-#' @export
-#'
 #' @keywords internal
 #'
-getSimulationMultiArmSurvivalBasic <- function(
+getSimulationMultiArmSurvivalBasic <- function( # TODO add "."
         design = NULL,
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT

@@ -10,7 +10,10 @@
 \alias{is.na.FisherInformation}
 \alias{as.data.frame.FisherInformation}
 \alias{length.FisherInformation}
+\alias{dim.FisherInformation}
+\alias{rownames.FisherInformation}
 \alias{print.FisherInformation}
+\alias{[.FisherInformation}
 \title{Fisher Information}
 \usage{
 \method{as.matrix}{FisherInformation}(x, ...)
@@ -29,7 +32,13 @@
 
 \method{length}{FisherInformation}(x)
 
+\method{dim}{FisherInformation}(x)
+
+rownames.FisherInformation(x)
+
 \method{print}{FisherInformation}(x, ...)
+
+\method{[}{FisherInformation}(x, i, j, ..., drop = TRUE)
 }
 \arguments{
 \item{x}{A \code{FisherInformation} object.}

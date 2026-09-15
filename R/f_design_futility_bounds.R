@@ -618,10 +618,85 @@ summary.FutilityBounds <- function(object, ...) {
     ))
 }
 
+.getFisherInformationForTreatmentEffectScale <- function(
+        fisherInformation,
+        designPlan,
+        stages) {
+    if (is.null(fisherInformation)) {
+        return(NULL)
+    }
+    if (!is(fisherInformation, "FisherInformation")) {
+        stopIllegalArgument(
+            .pQuote("fisherInformation"), " must be a FisherInformation object",
+            functionName = ".getFisherInformationForTreatmentEffectScale",
+            parameter = "fisherInformation",
+            value = fisherInformation
+        )
+    }
+    if (!identical(fisherInformation$type, "cumulative")) {
+        stopIllegalArgument(
+            .pQuote("fisherInformation"), " must have type ", .vQuote("cumulative"),
+            " for conversion to the treatment-effect scale",
+            functionName = ".getFisherInformationForTreatmentEffectScale",
+            parameter = "fisherInformation",
+            value = fisherInformation$information,
+            relatedParameter = "type",
+            relatedValue = fisherInformation$type
+        )
+    }
+
+    informationDesignPlan <- fisherInformation$.getDesignPlan()
+    if (is.null(informationDesignPlan)) {
+        stopIllegalArgument(
+            .pQuote("fisherInformation"), " does not contain its originating design plan",
+            functionName = ".getFisherInformationForTreatmentEffectScale",
+            parameter = "fisherInformation",
+            value = fisherInformation$information
+        )
+    }
+    if (!identical(informationDesignPlan, designPlan)) {
+        stopConflictingArguments(
+            .pQuote("fisherInformation"), " and ", .pQuote("designPlan"),
+            " must refer to the same trial design plan",
+            functionName = ".getFisherInformationForTreatmentEffectScale",
+            parameter = "fisherInformation",
+            value = fisherInformation$information
+        )
+    }
+
+    informationData <- .getFisherInformationAsMatrix(fisherInformation)
+    stageIndices <- match(stages, informationData$stage)
+    if (anyNA(stageIndices)) {
+        stopIllegalArgument(
+            .pQuote("fisherInformation"), " must contain cumulative information for ",
+            ifelse(length(stages) == 1L, "stage ", "stages "),
+            .arrayToString(stages),
+            functionName = ".getFisherInformationForTreatmentEffectScale",
+            parameter = "fisherInformation",
+            value = fisherInformation$information,
+            relatedParameter = "stage",
+            relatedValue = informationData$stage
+        )
+    }
+
+    result <- informationData$values[stageIndices, , drop = FALSE]
+    invalidValues <- !is.na(result) & (!is.finite(result) | result <= 0)
+    if (any(invalidValues)) {
+        stopIllegalArgument(
+            .pQuote("fisherInformation"), " must contain positive finite values or ", .vQuote("NA"),
+            functionName = ".getFisherInformationForTreatmentEffectScale",
+            parameter = "fisherInformation",
+            value = fisherInformation$information
+        )
+    }
+    return(result)
+}
+
 .getFutilityBoundsOnTreatmentEffectScale <- function(
         designPlan,
         stages = NULL,
-        zValues = NULL) {
+        zValues = NULL,
+        fisherInformation = NULL) {
     .assertIsTrialDesignPlan(designPlan)
     design <- designPlan$.design
     if (is.null(stages)) {
@@ -641,7 +716,8 @@ summary.FutilityBounds <- function(object, ...) {
     result <- round(.getFutilityBoundsTreatmentEffectMatrix(
         designPlan,
         stages = stages,
-        zValues = zValues
+        zValues = zValues,
+        fisherInformation = fisherInformation
     ), 8L)
     nSituations <- ncol(result)
     situations <- .getFisherInformationSituationLabels(designPlan, nSituations)
@@ -657,13 +733,19 @@ summary.FutilityBounds <- function(object, ...) {
         sourceScale = list(value = "zValue", type = C_PARAM_DERIVED),
         targetScale = list(value = "treatmentEffect", type = C_PARAM_USER_DEFINED),
         theta = list(value = NA_real_, type = C_PARAM_NOT_APPLICABLE),
-        information = list(value = NA_real_, type = C_PARAM_NOT_APPLICABLE),
+        information = list(
+            value = if (is.null(fisherInformation)) NA_real_ else fisherInformation$information,
+            type = if (is.null(fisherInformation)) C_PARAM_NOT_APPLICABLE else C_PARAM_USER_DEFINED
+        ),
         design = list(value = design, type = C_PARAM_DERIVED)
     )
     result <- .addFutilityBoundParameterTypes(result, args)
     attr(result, "stage") <- stages
     attr(result, "situations") <- situations
     attr(result, "designPlan") <- designPlan
+    if (!is.null(fisherInformation)) {
+        attr(result, "informationType") <- fisherInformation$type
+    }
     attr(result, "conversionDescription") <-
         .getFutilityBoundsTreatmentEffectConversionDescription(designPlan)
     return(result)
@@ -921,10 +1003,16 @@ summary.FutilityBounds <- function(object, ...) {
 #'   scale, calculated with the same endpoint- and test-specific transformation
 #'   used for \code{futilityBoundsEffectScale} in the design plan. For two-group
 #'   binary rates this inverts the Farrington--Manning score statistic; for
-#'   survival data it returns the hazard-ratio scale; and other endpoints retain
-#'   their existing design-specific transformations. This scale requires a
+#'   count data it uses the validated negative-binomial inversion with a
+#'   candidate-dependent variance estimate; for survival data it returns the
+#'   hazard-ratio scale; and other endpoints retain their existing
+#'   design-specific transformations. This scale requires a
 #'   trial design plan, either supplied as
-#'   \code{design} or retained in a piped result.}
+#'   \code{design} or retained in a piped result. Cumulative Fisher information
+#'   is calculated internally where the endpoint-specific transformation needs
+#'   it, or taken from a piped \code{FisherInformation} object after validation.
+#'   The Count Data inversion additionally uses the stage-specific sample size,
+#'   exposure, recruitment, allocation, and overdispersion from the design plan.}
 #'   \item{\code{"conditionalPower"}}{The probability of rejecting the null
 #'   hypothesis at the final analysis, conditional on the interim result and
 #'   assuming the user-specified treatment effect \code{theta} for the future
@@ -983,13 +1071,19 @@ summary.FutilityBounds <- function(object, ...) {
 #' If Fisher information is not needed for that scale, the object remains a
 #' valid source of the design and its futility bounds, but its information
 #' values are ignored and a warning is issued. The printed result then does not
-#' claim that Fisher information was used.
+#' claim that Fisher information was used. An exception is
+#' \code{targetScale = "treatmentEffect"}: the cumulative information object is
+#' passed to and validated by the endpoint-specific transformation instead of
+#' being discarded. For Count Data, its originating design and requested stages
+#' are reused without recalculating Fisher information; the actual nonlinear
+#' inversion uses the corresponding design-specific sample sizes and a variance
+#' estimate evaluated at each candidate rate ratio.
 #'
 #' Conversion to \code{"treatmentEffect"} uses
 #' \code{.getFutilityBoundsTreatmentEffectScale()} and therefore reproduces its
 #' validated endpoint-specific values exactly (up to the eight-digit rounding
-#' used for \code{futilityBoundsEffectScale}). For endpoints whose design-plan
-#' field is generated through this helper, this also reproduces that field.
+#' used for \code{futilityBoundsEffectScale}). This includes the nonlinear
+#' Count Data calculation and reproduces the corresponding design-plan field.
 #' Conversely, a result
 #' on this scale can be piped back into \code{getFutilityBounds()}; its retained
 #' design plan and stage metadata are used to recover the corresponding
@@ -1047,9 +1141,20 @@ summary.FutilityBounds <- function(object, ...) {
 #'   \eqn{z = \widehat{\theta}\sqrt{I_1}}. Thus the cumulative information at the
 #'   analysis represented by the z-value or effect estimate must be supplied.}
 #'   \item{\code{"treatmentEffect"}}{Does not use the separately supplied
-#'   \code{information} argument. Instead, it requires a trial design plan and
-#'   applies the endpoint- and test-specific transformation used by
-#'   \code{futilityBoundsEffectScale}.}
+#'   numeric \code{information} argument. Instead, it requires a trial design
+#'   plan and applies the endpoint- and test-specific transformation used by
+#'   \code{futilityBoundsEffectScale}. Cumulative information is calculated
+#'   internally when needed. Alternatively, a piped \code{FisherInformation}
+#'   object of type \code{"cumulative"} is validated and used. For two-group
+#'   rates, the validated Farrington--Manning calculation is based directly on
+#'   the planned group sizes and null-restricted rates rather than on a generic
+#'   Wald-information substitution. For Count Data, the validated
+#'   negative-binomial inversion evaluates the variance at each candidate rate
+#'   ratio and uses the planned stage sample size, recruitment, exposure,
+#'   allocation ratio, and overdispersion. A piped cumulative
+#'   \code{FisherInformation} object supplies and validates the design/stage
+#'   context, but its stored numeric values do not replace that
+#'   candidate-dependent variance calculation.}
 #'   \item{\code{"conditionalPower"}}{Requires \code{information[2]} together
 #'   with \code{theta}. Here \code{information[2]} is the additional information
 #'   available for the future stage over which conditional power is calculated.}
@@ -1246,14 +1351,10 @@ getFutilityBounds <- function(
             targetScale <- "effectEstimate"
         }
         if (targetScale == "treatmentEffect") {
-            warning(
-                "Fisher information is not required for conversion from ",
-                .vQuote("zValue"), " to ", .vQuote(targetScale), " and will be ignored",
-                call. = FALSE
-            )
             return(.getFutilityBoundsOnTreatmentEffectScale(
                 designPlan = sourceValue$.getDesignPlan(),
-                stages = sourceValue$stage
+                stages = sourceValue$stage,
+                fisherInformation = sourceValue
             ))
         }
         return(.getFutilityBoundsFromFisherInformation(
@@ -2409,6 +2510,20 @@ getFutilityBounds <- function(
 #' Alternatively, pipe \code{designPlan} directly into
 #' \code{getFutilityBounds()}; the latter then calls this function internally
 #' with the information type required by the requested target scale.
+#' Cumulative information can also be piped into a conversion to the
+#' design-specific treatment-effect scale:
+#' \preformatted{
+#' designPlan |>
+#'     getFisherInformation(type = "cumulative") |>
+#'     getFutilityBounds(targetScale = "treatmentEffect")
+#' }
+#' In this case, the information object's type, stages, and originating design
+#' plan are validated before the endpoint-specific transformation is applied.
+#' For two-group rates, the Farrington--Manning inversion uses the design plan's
+#' group sizes and null-restricted rates directly. For Count Data, the design and
+#' stages are reused without recalculating Fisher information, while the exact
+#' negative-binomial inversion evaluates its variance at each candidate rate
+#' ratio from the design-specific sample-size and exposure assumptions.
 #'
 #' @return
 #' A \code{FisherInformation} R6 object. Its public fields are
@@ -2589,11 +2704,153 @@ getFisherInformation <- function(
     return(result)
 }
 
+.getCountDataTreatmentEffectScaleParameters <- function(designPlan, stages) {
+    design <- designPlan$.design
+    nSituations <- ifelse(designPlan$.isPowerObject(), 1L, length(designPlan$lambda1))
+    allocationRatio <- designPlan$allocationRatioPlanned
+    followUpTime <- designPlan$followUpTime
+    maxNumberOfSubjects <- designPlan$maxNumberOfSubjects
+    if (length(allocationRatio) == 1L) {
+        allocationRatio <- rep(allocationRatio, nSituations)
+    }
+    if (length(followUpTime) == 1L) {
+        followUpTime <- rep(followUpTime, nSituations)
+    }
+    if (length(maxNumberOfSubjects) == 1L) {
+        maxNumberOfSubjects <- rep(maxNumberOfSubjects, nSituations)
+    }
+
+    accrualTime <- designPlan$accrualTime
+    if (length(accrualTime) > 1L) {
+        accrualTime <- accrualTime[-1L]
+    }
+    if (all(is.na(followUpTime)) && is.na(designPlan$fixedExposureTime)) {
+        followUpTime <- rep(designPlan$studyTime - max(accrualTime), nSituations)
+    }
+
+    parameters <- vector("list", nSituations)
+    directionUpper <- .getDirectionUpper(designPlan, nSituations)
+    for (situationIndex in seq_len(nSituations)) {
+        if (!anyNA(designPlan$accrualIntensity)) {
+            recruitmentTimes <- .generateRecruitmentTimes(
+                allocationRatio[situationIndex],
+                accrualTime,
+                designPlan$accrualIntensity
+            )
+            recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1L]
+            recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2L]
+        } else if (!anyNA(accrualTime)) {
+            recruit1 <- seq(
+                0,
+                accrualTime,
+                length.out = maxNumberOfSubjects[situationIndex] *
+                    allocationRatio[situationIndex] / (1 + allocationRatio[situationIndex])
+            )
+            recruit2 <- seq(
+                0,
+                accrualTime,
+                length.out = maxNumberOfSubjects[situationIndex] / (1 + allocationRatio[situationIndex])
+            )
+        } else {
+            recruit1 <- NA_real_
+            recruit2 <- NA_real_
+        }
+
+        parameters[[situationIndex]] <- lapply(stages, function(stage) {
+            numberOfSubjects <- if (all(is.na(designPlan$numberOfSubjects[, situationIndex]))) {
+                maxNumberOfSubjects[situationIndex]
+            } else {
+                designPlan$numberOfSubjects[stage, situationIndex]
+            }
+            list(
+                informationRate = design$informationRates[stage],
+                lambda2 = designPlan$lambda2,
+                thetaH0 = designPlan$thetaH0,
+                directionUpper = directionUpper[situationIndex],
+                allocationRatio = allocationRatio[situationIndex],
+                overdispersion = designPlan$overdispersion,
+                accrualTime = accrualTime,
+                followUpTime = followUpTime[situationIndex],
+                fixedExposureTime = designPlan$fixedExposureTime,
+                numberOfSubjects = numberOfSubjects,
+                recruit1 = recruit1[1:(allocationRatio[situationIndex] * numberOfSubjects /
+                    (1 + allocationRatio[situationIndex]))],
+                recruit2 = recruit2[1:(numberOfSubjects / (1 + allocationRatio[situationIndex]))]
+            )
+        })
+    }
+    return(parameters)
+}
+
+.getFutilityBoundsTreatmentEffectScaleCountData <- function(
+        designPlan,
+        boundary,
+        futilityBounds = NULL,
+        stages) {
+    nStages <- length(stages)
+    nSituations <- ifelse(designPlan$.isPowerObject(), 1L, length(designPlan$lambda1))
+    result <- matrix(NA_real_, nrow = nStages, ncol = nSituations)
+    if (nStages == 0L) {
+        return(result)
+    }
+
+    # Reuse the values generated by the validated Count Data boundary calculation
+    # for the design's own directed bounds.
+    if (is.null(futilityBounds) && identical(boundary, "directed") &&
+            designPlan$.design$sided == 1L && !is.null(designPlan$futilityBoundsEffectScale)) {
+        storedBounds <- matrix(
+            designPlan$futilityBoundsEffectScale,
+            nrow = max(designPlan$.design$kMax - 1L, 0L)
+        )
+        return(storedBounds[stages, , drop = FALSE])
+    }
+
+    if (is.null(futilityBounds)) {
+        futilityBounds <- .getFutilityBounds(designPlan$.design)
+        if (length(futilityBounds) == 0L) {
+            return(result)
+        }
+        futilityBounds[.getInvalidFutilityBoundsIndices(designPlan$.design)] <- NA_real_
+        futilityBounds <- futilityBounds[stages]
+    }
+    futilityBounds <- .getFutilityBoundsValuesMatrix(
+        futilityBounds,
+        nStages = nStages,
+        nSituations = nSituations,
+        parameterName = "futilityBounds"
+    )
+    parameters <- .getCountDataTreatmentEffectScaleParameters(designPlan, stages)
+
+    for (situationIndex in seq_len(nSituations)) {
+        for (stageIndex in seq_len(nStages)) {
+            zValue <- futilityBounds[stageIndex, situationIndex]
+            if (is.na(zValue)) {
+                next
+            }
+            args <- parameters[[situationIndex]][[stageIndex]]
+            if (identical(boundary, "upper")) {
+                args$directionUpper <- TRUE
+            } else if (identical(boundary, "lower")) {
+                zValue <- -zValue
+                args$directionUpper <- TRUE
+            }
+            args$boundary <- zValue
+            result[stageIndex, situationIndex] <- do.call(
+                .getEffectScaleBoundaryCountDataTheta,
+                args
+            )
+        }
+    }
+    result[!is.na(result) & result <= 0] <- NA_real_
+    return(result)
+}
+
 .getFutilityBoundsTreatmentEffectScale <- function(
         designPlan,
         boundary = c("directed", "upper", "lower"),
         futilityBounds = NULL,
-        stages = NULL) {
+        stages = NULL,
+        fisherInformation = NULL) {
     .assertIsTrialDesignPlan(designPlan)
     boundary <- match.arg(boundary)
 
@@ -2602,6 +2859,34 @@ getFisherInformation <- function(
         stages <- seq_len(max(design$kMax - 1, 0))
     }
     nStages <- length(stages)
+    suppliedInformation <- .getFisherInformationForTreatmentEffectScale(
+        fisherInformation,
+        designPlan = designPlan,
+        stages = stages
+    )
+    if (.isTrialDesignPlanCountData(designPlan)) {
+        expectedSituations <- ifelse(
+            designPlan$.isPowerObject(),
+            1L,
+            length(designPlan$lambda1)
+        )
+        if (!is.null(suppliedInformation) &&
+                ncol(suppliedInformation) != expectedSituations) {
+            stopIllegalArgument(
+                .pQuote("fisherInformation"), " must contain information for ",
+                expectedSituations, " planning situation(s)",
+                functionName = ".getFutilityBoundsTreatmentEffectScale",
+                parameter = "fisherInformation",
+                value = fisherInformation$information
+            )
+        }
+        return(.getFutilityBoundsTreatmentEffectScaleCountData(
+            designPlan,
+            boundary,
+            futilityBounds = futilityBounds,
+            stages = stages
+        ))
+    }
     if (.isTrialDesignPlanRates(designPlan) && designPlan$groups == 2) {
         return(.getFutilityBoundsTreatmentEffectScaleRatesTwoGroups(
             designPlan,
@@ -2612,15 +2897,19 @@ getFisherInformation <- function(
         ))
     }
 
-    fisherInformation <- as.numeric(getFisherInformation(designPlan, stage = 1))
-    nParameters <- max(length(fisherInformation), 1)
+    informationStage1 <- if (is.null(suppliedInformation)) {
+        as.numeric(getFisherInformation(designPlan, stage = 1))
+    } else {
+        as.numeric(suppliedInformation[1L, ])
+    }
+    nParameters <- max(length(informationStage1), 1)
 
     if (nStages == 0) {
         return(matrix(numeric(0), nrow = 0, ncol = nParameters))
     }
 
     result <- matrix(NA_real_, nrow = nStages, ncol = nParameters)
-    if ((is.null(futilityBounds) && !.hasApplicableFutilityBounds(design)) || all(is.na(fisherInformation))) {
+    if ((is.null(futilityBounds) && !.hasApplicableFutilityBounds(design)) || all(is.na(informationStage1))) {
         return(result)
     }
 
@@ -2634,7 +2923,10 @@ getFisherInformation <- function(
     }
 
     informationRates <- design$informationRates[stages]
-    if (grepl("CountData", .getClassName(designPlan))) {
+    if (!is.null(suppliedInformation)) {
+        # Reuse the validated cumulative values for the requested stages.
+        stageInformation <- suppliedInformation
+    } else if (grepl("CountData", .getClassName(designPlan))) {
         stageInformation <- NULL
         for (stage in stages) {
             stageInformation <- rbind(
@@ -2643,7 +2935,7 @@ getFisherInformation <- function(
             )
         }
     } else {
-        stageInformation <- (informationRates / design$informationRates[1]) %*% t(fisherInformation)
+        stageInformation <- (informationRates / design$informationRates[1]) %*% t(informationStage1)
     }
 
     standardizedFutilityBounds <- matrix(futilityBounds, nrow = nStages, ncol = nParameters)
@@ -2715,16 +3007,27 @@ getFisherInformation <- function(
             "inverse design-specific Student t transformation"
         ))
     }
+    if (.isTrialDesignPlanCountData(designPlan)) {
+        return(ifelse(
+            direction == "toTreatmentEffect",
+            "design-specific negative-binomial inversion",
+            "design-specific negative-binomial standardization"
+        ))
+    }
     return("design-specific endpoint transformation")
 }
 
 .getFutilityBoundsTreatmentEffectMatrix <- function(
         designPlan,
         stages,
-        zValues = NULL) {
+        zValues = NULL,
+        fisherInformation = NULL) {
     if (is.null(zValues)) {
-        result <- .getFutilityBoundsTreatmentEffectScale(designPlan)
-        return(result[stages, , drop = FALSE])
+        return(.getFutilityBoundsTreatmentEffectScale(
+            designPlan,
+            stages = stages,
+            fisherInformation = fisherInformation
+        ))
     }
 
     reference <- .getFutilityBoundsTreatmentEffectScale(designPlan)
@@ -2826,6 +3129,36 @@ getFisherInformation <- function(
                 )
                 result[stageIndex, situationIndex] <-
                     directionSign[situationIndex] * numerator / standardError
+            }
+        }
+        return(result)
+    }
+
+    if (.isTrialDesignPlanCountData(designPlan)) {
+        parameters <- .getCountDataTreatmentEffectScaleParameters(designPlan, stages)
+        result <- matrix(NA_real_, nrow = nStages, ncol = nSituations)
+        for (situationIndex in seq_len(nSituations)) {
+            for (stageIndex in seq_len(nStages)) {
+                treatmentEffect <- treatmentEffects[stageIndex, situationIndex]
+                if (is.na(treatmentEffect)) {
+                    next
+                }
+                args <- parameters[[situationIndex]][[stageIndex]]
+                vHat <- .getVarianceEstimate(
+                    lambda1 = treatmentEffect * args$lambda2,
+                    lambda2 = args$lambda2,
+                    allocation = args$allocationRatio,
+                    overdispersion = args$overdispersion,
+                    accrualTime = args$accrualTime,
+                    followUpTime = args$followUpTime,
+                    fixedExposureTime = args$fixedExposureTime,
+                    recruit1 = args$recruit1,
+                    recruit2 = args$recruit2
+                )
+                result[stageIndex, situationIndex] <-
+                    (args$directionUpper * 2 - 1) *
+                    (log(treatmentEffect) - log(args$thetaH0)) /
+                    sqrt(vHat) * sqrt(args$informationRate * args$numberOfSubjects)
             }
         }
         return(result)

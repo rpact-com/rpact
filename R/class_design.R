@@ -1120,6 +1120,7 @@ getDesignConditionalDunnett <- function(
     .assertIsSingleNumber(informationAtInterim, "informationAtInterim")
     .assertIsInOpenInterval(informationAtInterim, "informationAtInterim", lower = 0, upper = 1)
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
+    .warnInCaseOfUnknownArguments(..., functionName = "getDesignConditionalDunnett")
     design <- TrialDesignConditionalDunnett$new(
         alpha = alpha,
         informationAtInterim = informationAtInterim,
