@@ -225,6 +225,18 @@ length.FisherInformation <- function(x) {
 
 #' @rdname FisherInformation
 #' @export
+dim.FisherInformation <- function(x) {
+    return(dim(x$information))
+}
+
+#' @rdname FisherInformation
+#' @export
+rownames.FisherInformation <- function(x) {
+    return(rownames(x$information))
+}
+
+#' @rdname FisherInformation
+#' @export
 print.FisherInformation <- function(x, ...) {
     typeDescription <- paste(
         .firstCharacterToUpperCase(.formatCamelCaseSingleWord(x$type, sep = "-")),
@@ -272,4 +284,23 @@ print.FisherInformation <- function(x, ...) {
     }
 
     return(invisible(x))
+}
+
+#' @rdname FisherInformation
+#' @export
+`[.FisherInformation` <- function(x, i, j, ..., drop = TRUE) {
+    values <- as.matrix(x)
+
+    if (missing(j)) {
+        if (missing(i)) {
+            return(values[])
+        }
+        return(values[i])
+    }
+
+    if (missing(i)) {
+        return(values[, j, drop = drop])
+    }
+
+    return(values[i, j, drop = drop])
 }
