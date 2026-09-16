@@ -342,7 +342,7 @@ NULL
         maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage
     )
 
-    # Extract results from the simulation
+    # extract results from the simulation
     simulatedNumberEventsNotAchieved <- loopResult$simulatedNumberEventsNotAchieved
     simulatedAnalysisTime <- loopResult$simulatedAnalysisTime
     simulatedNumberOfSubjects <- loopResult$simulatedNumberOfSubjects
@@ -395,7 +395,7 @@ NULL
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
 
-    ## set parameter types in simulationResults
+    # set parameter types in simulationResults
     if (kMax > 1) {
         simulationResults$.setParameterType("expectedNumberOfSubjects", C_PARAM_GENERATED)
         simulationResults$.setParameterType("expectedNumberOfEvents", C_PARAM_GENERATED)
