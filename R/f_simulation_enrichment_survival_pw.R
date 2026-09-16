@@ -104,7 +104,7 @@ NULL
 #'
 #' @noRd 
 #' 
-getSimulationEnrichmentSurvivalPatientWise <- function( # TODO add "."
+.getSimulationEnrichmentSurvivalPatientWise <- function(
         design = NULL,
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
@@ -189,7 +189,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function( # TODO add "."
         stopIllegalArgument(
             "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
             "must have length 1",
-            functionName = "getSimulationEnrichmentSurvivalPatientWise",
+            functionName = ".getSimulationEnrichmentSurvivalPatientWise",
             parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
         )
@@ -264,13 +264,13 @@ getSimulationEnrichmentSurvivalPatientWise <- function( # TODO add "."
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (identical(accrualIntensity, 1L)) {
             stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
-                functionName = "getSimulationEnrichmentSurvivalPatientWise",
+                functionName = ".getSimulationEnrichmentSurvivalPatientWise",
                 parameter = "accrualIntensity",
                 relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
         stopIllegalArgument("'maxNumberOfSubjects' must be defined",
-            functionName = "getSimulationEnrichmentSurvivalPatientWise",
+            functionName = ".getSimulationEnrichmentSurvivalPatientWise",
             parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects
         )
     }
@@ -414,7 +414,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function( # TODO add "."
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
         stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
-            functionName = "getSimulationEnrichmentSurvivalPatientWise"
+            functionName = ".getSimulationEnrichmentSurvivalPatientWise"
         )
     }
     
@@ -621,7 +621,7 @@ getSimulationEnrichmentSurvival <- function(
             "and the corresponding arguments."
         )
 
-        return(getSimulationEnrichmentSurvivalBasic(
+        return(.getSimulationEnrichmentSurvivalBasic(
             design = design,
             thetaH0 = thetaH0,
             effectList = effectList,
@@ -651,7 +651,7 @@ getSimulationEnrichmentSurvival <- function(
     }
 
     if (identical(simulationType, "patientWise")) {
-        return(getSimulationEnrichmentSurvivalPatientWise(
+        return(.getSimulationEnrichmentSurvivalPatientWise(
             design = design,
             thetaH0 = thetaH0,
             effectList = effectList,

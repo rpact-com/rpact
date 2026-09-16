@@ -511,7 +511,7 @@ NULL
 #' 
 #' @noRd 
 #'
-getSimulationEnrichmentSurvivalBasic <- function( # TODO add "."
+.getSimulationEnrichmentSurvivalBasic <- function(
         design = NULL,
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
@@ -852,7 +852,7 @@ getSimulationEnrichmentSurvivalBasic <- function( # TODO add "."
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
         stopRuntimeIssue(
             "internal error, simulation not possible due to numerical overflow",
-            functionName = "getSimulationEnrichmentSurvivalBasic"
+            functionName = ".getSimulationEnrichmentSurvivalBasic"
         )
     }
 

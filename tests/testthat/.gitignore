@@ -6,3 +6,4 @@
 !test-fisher-information.R
 !test-effect-list-validation.R
 !test-simulation-enrichment-survival.R
+!test-summary-effect-matrix.R

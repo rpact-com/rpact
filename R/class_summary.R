@@ -79,6 +79,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         object = NULL,
         title = NULL,
         header = NULL,
+        .headerConsoleOutputEnabled = NULL,
         summaryItems = NULL,
         intervalFormat = NULL,
         justify = NULL,
@@ -122,8 +123,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             }
 
             if (self$output %in% c("all", "overview")) {
-                if (is.null(self$header) || length(self$header) == 0) {
-                    self$header <- .createSummaryHeaderObject(self$object, self, digits)
+                if (is.null(self$header) || length(self$header) == 0 ||
+                        (!is.null(self$.headerConsoleOutputEnabled) &&
+                            self$.headerConsoleOutputEnabled != consoleOutputEnabled)) {
+                    self$header <- .createSummaryHeaderObject(self$object, self, digits, consoleOutputEnabled)
+                    self$.headerConsoleOutputEnabled <- consoleOutputEnabled
                 }
                 if (!is.null(self$header) &&
                         length(self$header) == 1 &&

@@ -337,7 +337,7 @@ NULL
 #' 
 #' @noRd 
 #'
-getSimulationMultiArmSurvivalBasic <- function( # TODO add "."
+.getSimulationMultiArmSurvivalBasic <- function( 
         design = NULL,
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
@@ -468,10 +468,7 @@ getSimulationMultiArmSurvivalBasic <- function( # TODO add "."
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
     }
 
-    simulationResults$correlationComputation <- correlationComputation
-    if (correlationComputation != "alternative") {
-        simulationResults$.setParameterType("correlationComputation", C_PARAM_USER_DEFINED)
-    }
+    .setValueAndParameterType(simulationResults, "correlationComputation", correlationComputation, "alternative")
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
@@ -753,7 +750,7 @@ getSimulationMultiArmSurvivalBasic <- function( # TODO add "."
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
         stopRuntimeIssue(
             "internal error, simulation not possible due to numerical overflow",
-            functionName = "getSimulationMultiArmSurvivalBasic"
+            functionName = ".getSimulationMultiArmSurvivalBasic"
         )
     }
 

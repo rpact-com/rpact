@@ -237,7 +237,7 @@ getSimulationMultiArmSurvival <- function(
             "'simulationType' = \"patientWise\" and the corresponding arguments."
         )
 
-        return(getSimulationMultiArmSurvivalBasic(
+        return(.getSimulationMultiArmSurvivalBasic(
             design = design,
             ...,
             thetaH0 = thetaH0,
@@ -274,14 +274,16 @@ getSimulationMultiArmSurvival <- function(
 
     if (simulationType %in% c("patientWise", "patientWiseBasic")) {
         if (usesBasicOnlyArgs) {
-            stopIllegalArgument("'correlationComputation' cannot be specified if 'simulationType' = \"patientWise\" or \"patientWiseBasic\"",
+            stopIllegalArgument(
+                "'correlationComputation' cannot be specified if ",
+                "'simulationType' = \"patientWise\" or \"patientWiseBasic\"",
                 functionName = "getSimulationMultiArmSurvival",
                 parameter = "correlationComputation",
                 relatedParameter = "simulationType",
                 value = correlationComputation
             )
         }
-        return(getSimulationMultiArmSurvivalPatientWise(
+        return(.getSimulationMultiArmSurvivalPatientWise(
             design = design,
             ...,
             thetaH0 = thetaH0,
@@ -418,7 +420,7 @@ getSimulationMultiArmSurvival <- function(
 #'
 #' @noRd
 #'  
-getSimulationMultiArmSurvivalPatientWise <- function( # TODO add "."
+.getSimulationMultiArmSurvivalPatientWise <- function(
         design = NULL,
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
@@ -519,7 +521,7 @@ getSimulationMultiArmSurvivalPatientWise <- function( # TODO add "."
         stopIllegalArgument(
             "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
             "must have length 1",
-            functionName = "getSimulationMultiArmSurvivalPatientWise",
+            functionName = ".getSimulationMultiArmSurvivalPatientWise",
             parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
         )
@@ -614,13 +616,13 @@ getSimulationMultiArmSurvivalPatientWise <- function( # TODO add "."
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (accrualIntensity < 1L) {
             stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
-                functionName = "getSimulationMultiArmSurvivalPatientWise",
+                functionName = ".getSimulationMultiArmSurvivalPatientWise",
                 parameter = "accrualIntensity",
                 relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
         stopIllegalArgument("'maxNumberOfSubjects' must be defined",
-            functionName = "getSimulationMultiArmSurvivalPatientWise",
+            functionName = ".getSimulationMultiArmSurvivalPatientWise",
             parameter = "maxNumberOfSubjects",
             value = maxNumberOfSubjects
         )
@@ -819,7 +821,7 @@ getSimulationMultiArmSurvivalPatientWise <- function( # TODO add "."
 
     if (kMax > 1 && any(simulationResults$rejectedArmsPerStage < 0)) {
         stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
-            functionName = "getSimulationMultiArmSurvivalPatientWise"
+            functionName = ".getSimulationMultiArmSurvivalPatientWise"
         )
     }
     
