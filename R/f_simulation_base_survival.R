@@ -301,7 +301,7 @@ getSimulationSurvival <- function(
             ), "showStatistics"), ...
         )
     } else {
-        .assertIsTrialDesign(design)
+        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design) 
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationSurvival",
             ignore = "showStatistics", ...
@@ -705,6 +705,12 @@ getSimulationSurvival <- function(
         designNumber <- 2L
     } else if (.isTrialDesignFisher(design)) {
         designNumber <- 3L
+    } else {
+        stopRuntimeIssue("unknown design type", 
+            functionName = "getSimulationSurvival",
+            parameter = "design",
+            value = .getClassName(design)
+        )
     }
 
     calcSubjectsFunctionList <- .getCalcSubjectsFunction(

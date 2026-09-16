@@ -202,7 +202,7 @@ getSimulationRates <- function(
             ), ...
         )
     } else {
-        .assertIsTrialDesign(design)
+        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design) 
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationRates",
             ignore = c("showStatistics"), ...
