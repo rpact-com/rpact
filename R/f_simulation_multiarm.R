@@ -286,7 +286,7 @@ NULL
         alpha,
         indices,
         allocationRatioPlanned) {
-    if (allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
+    if (length(allocationRatioPlanned) > 1 && allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
         stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages",
             functionName = ".getCriticalValuesDunnettForSimulation"
         )
