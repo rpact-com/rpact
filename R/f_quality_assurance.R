@@ -1715,6 +1715,10 @@ print.InstallationQualificationResult <- function(x, ...) {
     return(isTRUE(completeUnitTestSetEnabled))
 }
 
+.enableCompleteUnitTestSet <- function() {
+    Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
+}
+
 #'
 #' @title
 #' Test Plan Section
