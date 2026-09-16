@@ -488,11 +488,6 @@ getSimulationMultiArmRates <- function(
 
     calcSubjectsFunctionIsUserDefined <- !is.null(calcSubjectsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design,
-        objectType = "power", userFunctionCallEnabled = TRUE
-    )
-
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,
@@ -546,8 +541,10 @@ getSimulationMultiArmRates <- function(
     conditionalPower <- simulationResults$conditionalPower
     minNumberOfSubjectsPerStage <- simulationResults$minNumberOfSubjectsPerStage
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
+    directionUpper <- simulationResults$directionUpper
 
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)

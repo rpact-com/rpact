@@ -1059,13 +1059,6 @@ getSimulationEnrichmentRates <- function(
 
     calcSubjectsFunctionIsUserDefined <- !is.null(calcSubjectsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE
-    )
-
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design = design,
         effectList = effectList,
@@ -1112,6 +1105,7 @@ getSimulationEnrichmentRates <- function(
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
     maxNumberOfIterations <- simulationResults$maxNumberOfIterations
+    directionUpper <- simulationResults$directionUpper
 
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)

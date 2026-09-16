@@ -344,7 +344,7 @@ NULL
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+        omegaMaxVector = NA_real_, # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
@@ -388,14 +388,6 @@ NULL
     correlationComputation <- match.arg(correlationComputation)
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
-
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power", 
-        userFunctionCallEnabled = TRUE,
-        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-    )
 
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
@@ -463,6 +455,7 @@ NULL
     maxNumberOfEventsPerStage <- simulationResults$maxNumberOfEventsPerStage # survival only
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
+    directionUpper <- simulationResults$directionUpper
 
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)

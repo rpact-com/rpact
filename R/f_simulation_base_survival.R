@@ -310,13 +310,6 @@ getSimulationSurvival <- function(
         design <- .resetPipeOperatorQueue(design)
     }
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power", 
-        userFunctionCallEnabled = TRUE,
-        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-    )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
     minNumberOfEventsPerStage <- .assertIsNumericVector(
@@ -414,6 +407,15 @@ getSimulationSurvival <- function(
     )
 
     simulationResults <- SimulationResultsSurvival$new(design, showStatistics = showStatistics)
+    
+    directionUpper <- .setDirectionUpper(
+        simulationResults,
+        design,
+        directionUpper,
+        objectType = "power",
+        endpoint = "survival",
+        userFunctionCallEnabled = TRUE)
+    
     if (!is.na(conditionalPower)) {
         if (design$kMax > 1) {
             if (any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0) &&
@@ -625,7 +627,6 @@ getSimulationSurvival <- function(
         )
     }
 
-    .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, C_DROP_OUT_RATE_1_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, C_DROP_OUT_RATE_2_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, C_DROP_OUT_TIME_DEFAULT)

@@ -2673,7 +2673,7 @@ NULL
     objectType <- match.arg(objectType)
 
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
-
+    
     if (!identical(objectType, "sampleSize")) {
         .warnInCaseOfChangedDirectionUpperSurvivalDefault(
             directionUpper,
@@ -2716,7 +2716,7 @@ NULL
             directionUpper <- default
         }
     }
-
+    
     return(directionUpper)
 }
 

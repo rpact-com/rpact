@@ -551,14 +551,6 @@ updateSubGroupVector <- function(
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE,
-        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-    )
-
     if (length(allocationRatioPlanned) != 1) {
         stopIllegalArgument(
             "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
@@ -624,6 +616,7 @@ updateSubGroupVector <- function(
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
     maxNumberOfIterations <- simulationResults$maxNumberOfIterations
+    directionUpper <- simulationResults$directionUpper
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 

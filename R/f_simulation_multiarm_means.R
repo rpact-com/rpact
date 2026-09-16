@@ -443,6 +443,7 @@ getSimulationMultiArmMeans <- function(
     conditionalPower <- simulationResults$conditionalPower
     minNumberOfSubjectsPerStage <- simulationResults$minNumberOfSubjectsPerStage
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
 

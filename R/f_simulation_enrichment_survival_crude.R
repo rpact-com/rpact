@@ -564,14 +564,6 @@ NULL
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE,
-        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-    )
-
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design = design,
         effectList = effectList,
@@ -622,6 +614,7 @@ NULL
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
     maxNumberOfIterations <- simulationResults$maxNumberOfIterations
+    directionUpper <- simulationResults$directionUpper
 
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)

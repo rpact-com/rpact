@@ -137,7 +137,7 @@ getSimulationMultiArmSurvival <- function(
         piControl = NA_real_,
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
-        omegaMaxVector = seq(1, 2.6, 0.4),
+        omegaMaxVector = NA_real_,
         kappa = 1,
         gED50 = NA_real_,
         slope = 1,
@@ -509,14 +509,6 @@ getSimulationMultiArmSurvival <- function(
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE,
-        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-    )
-
     if (length(allocationRatioPlanned) != 1) {
         stopIllegalArgument(
             "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
@@ -594,6 +586,7 @@ getSimulationMultiArmSurvival <- function(
     dropoutRate1 <- simulationResults$dropoutRate1
     dropoutRate2 <- simulationResults$dropoutRate2
     dropoutTime <- simulationResults$dropoutTime
+    directionUpper <- simulationResults$directionUpper
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 

@@ -435,10 +435,6 @@ NULL
 
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
 
-    if (endpoint %in% c("rates", "survival")) {
-        .assertIsSingleLogical(directionUpper, "directionUpper")
-    }
-
     if (endpoint %in% c("means", "survival")) {
         .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE) # means + survival only
     }
@@ -529,8 +525,13 @@ NULL
     }
 
     if (endpoint %in% c("rates", "survival")) {
-        .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, 
-            ifelse(identical(endpoint, "survival"), C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT))
+        directionUpper <- .setDirectionUpper(
+            simulationResults,
+            design,
+            directionUpper,
+            objectType = "power",
+            endpoint = endpoint,
+            userFunctionCallEnabled = TRUE)
     }
 
     if (!stratifiedAnalysis && endpoint %in% c("means")) {

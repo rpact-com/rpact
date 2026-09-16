@@ -484,13 +484,16 @@ NULL
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic")) {
     endpoint <- match.arg(endpoint)
     simulationType <- match.arg(simulationType)
-
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
-    piMaxVector <- .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = TRUE)
     
     if (endpoint == "means") {
         simulationResults <- SimulationResultsMultiArmMeans$new(design, showStatistics = showStatistics)
     } else if (endpoint == "rates") {
+        piMaxVector <- .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = TRUE)
+        if (all(is.na(piMaxVector))) {
+            piMaxVector <- .getPi1Default(type = "power", endpoint = endpoint)
+        }
+        
         simulationResults <- SimulationResultsMultiArmRates$new(design, showStatistics = showStatistics)
     } else if (endpoint == "survival") {
         simulationResults <- SimulationResultsMultiArmSurvival$new(design, showStatistics = showStatistics)
@@ -500,7 +503,8 @@ NULL
             "testStatisticBased",
             "patientWise"
         )
-        simulationResults$.setParameterType("simulationType", C_PARAM_DERIVED)
+        simulationResults$.setParameterType("simulationType", 
+            ifelse(identical(simulationType, "auto"), C_PARAM_DERIVED, C_PARAM_USER_DEFINED))
     }
 
     if (is.na(activeArms)) {
@@ -602,7 +606,13 @@ NULL
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
 
     if (endpoint %in% c("rates", "survival")) {
-        .assertIsSingleLogical(directionUpper, "directionUpper")
+        directionUpper <- .setDirectionUpper(
+            simulationResults,
+            design,
+            directionUpper,
+            objectType = "power",
+            endpoint = endpoint,
+            userFunctionCallEnabled = TRUE)
     }
 
     if (endpoint %in% c("means", "survival")) {
@@ -650,11 +660,6 @@ NULL
         warning("'selectArmsFunction' will be ignored because 'typeOfSelection' is not \"userDefined\"", call. = FALSE)
     } else if (!is.null(selectArmsFunction) && is.function(selectArmsFunction)) {
         simulationResults$selectArmsFunction <- selectArmsFunction
-    }
-
-    if (endpoint %in% c("rates", "survival")) {
-        .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, 
-            ifelse(identical(endpoint, "survival"), C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT))
     }
 
     if (endpoint == "means") {
@@ -738,6 +743,10 @@ NULL
             simulationResults$.setParameterType("piMaxVector", C_PARAM_DERIVED)
         }
     } else if (endpoint == "survival") {
+        .assertIsNumericVector(omegaMaxVector, "omegaMaxVector", naAllowed = TRUE)
+        if (!identical(typeOfShape, "userDefined") && all(is.na(omegaMaxVector))) {
+            omegaMaxVector <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+        }
         effectMatrix <- .assertIsValidEffectMatrixSurvival(
             simulationResults = simulationResults,
             activeArms = activeArms,
