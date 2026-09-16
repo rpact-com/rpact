@@ -469,7 +469,7 @@ NULL
         minNumberOfEventsPerStage = NA_real_, # survival only
         maxNumberOfEventsPerStage = NA_real_, # survival only
         conditionalPower,
-        thetaH0 = NA_real_, # survival only
+        thetaH0 = NA_real_, # means + rates + survival only
         thetaH1 = NA_real_, # means + survival only
         stDevH1 = NA_real_, # means only
         piTreatmentsH1 = NA_real_, # rates only
@@ -608,10 +608,7 @@ NULL
     if (endpoint %in% c("means", "survival")) {
         .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE) # means + survival only
     }
-    if (endpoint == "survival") {
-        .assertIsSingleNumber(thetaH0, "thetaH0")
-        .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
-    }
+    .assertIsValidThetaH0(thetaH0, endpoint = endpoint, groups = 2)
 
     if (endpoint == "means") {
         stDev <- .assertIsValidStandardDeviation(stDev) # means only
@@ -1167,8 +1164,14 @@ NULL
     if (endpoint %in% c("means", "survival")) {
         .setValueAndParameterType(simulationResults, "thetaH1", thetaH1, NA_real_, notApplicableIfNA = TRUE)
     }
-    if (endpoint == "survival") {
-        .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, C_THETA_H0_SURVIVAL_DEFAULT)
+    if (endpoint %in% c("means", "rates", "survival")) {
+        thetaH0Default <- switch(
+            endpoint,
+            "means" = C_THETA_H0_MEANS_DEFAULT,
+            "rates" = C_THETA_H0_RATES_DEFAULT,
+            "survival" = C_THETA_H0_SURVIVAL_DEFAULT
+        )
+        .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, thetaH0Default)
     }
     if (endpoint == "means") {
         .setValueAndParameterType(simulationResults, "stDevH1", stDevH1, NA_real_, notApplicableIfNA = TRUE)
