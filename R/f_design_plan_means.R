@@ -444,24 +444,6 @@ NULL
         )
         
         if (!anyNA(alternative)) {
-            if (!is.na(directionUpper)) {
-                effect <- alternative - thetaH0
-                effect <- .applyDirectionOfAlternative(effect, directionUpper,
-                    type = "negateIfLower", phase = "planning"
-                )
-                if (design$sided == 1 && any(effect <= 0)) {
-                    stopIllegalArgument(
-                        "any 'alternative' (", .arrayToString(alternative), ") must be ",
-                        ifelse(isFALSE(directionUpper), "<", ">"), " 'thetaH0' (", thetaH0, ")",
-                        functionName = ".createDesignPlanMeans",
-                        parameter = "alternative",
-                        value = alternative,
-                        relatedParameter = "thetaH0",
-                        relatedValue = thetaH0
-                    )
-                }
-            }
-    
             if (any(alternative - thetaH0 == 0)) {
                 stopIllegalArgument("any 'alternative' (", .arrayToString(alternative), ") ",
                     "must be != 'thetaH0' (", thetaH0, ")",
