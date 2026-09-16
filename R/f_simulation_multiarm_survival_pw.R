@@ -755,7 +755,6 @@ getSimulationMultiArmSurvivalPatientWise <- function( # TODO add "."
     simulatedRejections <- loopResult$simulatedRejections
     simulatedNumberOfActiveArms <- loopResult$simulatedNumberOfActiveArms
     simulatedSingleEventsPerStage <- loopResult$simulatedSingleEventsPerStage
-    simulatedPlannedEvents <- loopResult$simulatedPlannedEvents
     simulatedSuccessStopping <- loopResult$simulatedSuccessStopping
     simulatedFutilityStopping <- loopResult$simulatedFutilityStopping
     simulatedConditionalPower <- loopResult$simulatedConditionalPower
@@ -793,7 +792,17 @@ getSimulationMultiArmSurvivalPatientWise <- function( # TODO add "."
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
-    simulationResults$cumulativeEventsPerStage <- simulatedPlannedEvents
+    simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
+    simulationResults$cumulativeEventsPerStage <- .convertStageWiseToOverallValues(simulatedSingleEventsPerStage)
+    for (g in 1:gMax) {
+        simulationResults$singleEventsPerStage[, , g] <- simulationResults$singleEventsPerStage[, , g] +
+            simulationResults$singleEventsPerStage[, , gMax + 1]
+        simulationResults$cumulativeEventsPerStage[, , g] <- simulationResults$cumulativeEventsPerStage[, , g] +
+            simulationResults$cumulativeEventsPerStage[, , gMax + 1]
+    }
+    simulationResults$singleEventsPerStage <- .removeLastEntryFromArray(simulationResults$singleEventsPerStage)
+    simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
+
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
     simulationResults$expectedNumberOfSubjects <- expectedNumberOfSubjects
     simulationResults$studyDuration <- expectedStudyDuration
