@@ -536,7 +536,8 @@ NULL
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
-        showStatistics = FALSE) {
+        showStatistics = FALSE,
+        simulationTypeIsUserDefined = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
@@ -593,7 +594,8 @@ NULL
         dropoutRate2 = 0,
         dropoutTime = 12,
         endpoint = "survival",
-        simulationType = "testStatisticBased"
+        simulationType = "testStatisticBased",
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined
     )
 
     design <- simulationResults$.design

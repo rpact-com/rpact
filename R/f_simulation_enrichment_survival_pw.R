@@ -139,7 +139,8 @@ NULL
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
-        showStatistics = FALSE) {
+        showStatistics = FALSE,
+        simulationTypeIsUserDefined = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
@@ -221,7 +222,8 @@ NULL
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
         endpoint = "survival",
-        simulationType = "patientWise"
+        simulationType = "patientWise",
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined
     )
 
     design <- simulationResults$.design
@@ -581,6 +583,8 @@ getSimulationEnrichmentSurvival <- function(
         logical(1)
     )) || maxNumberOfRawDatasetsPerStage > 0
 
+    simulationTypeIsUserDefined <- !identical(simulationType, "auto")
+
     if (simulationType == "auto") {
         if (usesPatientWiseOnlyArgs) {
             simulationType <- "patientWise"
@@ -639,6 +643,7 @@ getSimulationEnrichmentSurvival <- function(
             calcEventsFunction = calcEventsFunction,
             selectPopulationsFunction = selectPopulationsFunction,
             showStatistics = showStatistics,
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined,
             ...
         ))
     }
@@ -679,6 +684,7 @@ getSimulationEnrichmentSurvival <- function(
             calcEventsFunction = calcEventsFunction,
             selectPopulationsFunction = selectPopulationsFunction,
             showStatistics = showStatistics,
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined,
             ...
         ))
     }

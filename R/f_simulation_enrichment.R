@@ -386,7 +386,8 @@ NULL
         selectPopulationsFunction,
         showStatistics,
         endpoint = c("means", "rates", "survival"),
-        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic")) {
+        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+        simulationTypeIsUserDefined = FALSE) {
     endpoint <- match.arg(endpoint)
     simulationType <- match.arg(simulationType)
 
@@ -463,7 +464,14 @@ NULL
             "testStatisticBased",
             "patientWise"
         )
-        simulationResults$.setParameterType("simulationType", C_PARAM_DERIVED)
+        simulationResults$.setParameterType("simulationType", 
+            ifelse(isFALSE(simulationTypeIsUserDefined) || identical(simulationType, "auto"), 
+                ifelse(
+                    identical(simulationType, "testStatisticBased"),
+                    C_PARAM_DERIVED,
+                    C_PARAM_DEFAULT_VALUE
+                ), 
+                C_PARAM_USER_DEFINED))
     }
 
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
