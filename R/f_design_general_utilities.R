@@ -1229,7 +1229,8 @@ getMedianByPi <- function(
     }
 
     designParametersToShow <- c(".design$stages")
-    if (grepl("Dunnett", .getClassName(parameterSet))) {
+    design <- parameterSet$.design
+    if (grepl("Dunnett", .getClassName(design))) {
         designParametersToShow <- c(
             designParametersToShow,
             ".design$alpha",
@@ -1238,7 +1239,6 @@ getMedianByPi <- function(
             ".design$sided"
         )
     } else {
-        design <- parameterSet$.design
         designParametersToShow <- c()
         if (design$kMax > 1) {
             if (is.null(parameterSet[[".stageResults"]]) || .isTrialDesignGroupSequential(design)) {

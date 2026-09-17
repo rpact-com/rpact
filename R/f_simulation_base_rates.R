@@ -202,7 +202,7 @@ getSimulationRates <- function(
             ), ...
         )
     } else {
-        .assertIsTrialDesign(design)
+        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design) 
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationRates",
             ignore = c("showStatistics"), ...
@@ -210,10 +210,6 @@ getSimulationRates <- function(
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
     }
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design,
-        objectType = "power", userFunctionCallEnabled = TRUE
-    )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsValidGroupsParameter(groups)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
@@ -274,6 +270,14 @@ getSimulationRates <- function(
     }
 
     simulationResults <- SimulationResultsRates$new(design, showStatistics = showStatistics)
+    
+    directionUpper <- .setDirectionUpper(
+        simulationResults,
+        design,
+        directionUpper,
+        objectType = "power",
+        endpoint = "rates",
+        userFunctionCallEnabled = TRUE)
 
     pi1 <- .setPi1(simulationResults, pi1, type = "power", endpoint = "rates")
     pi2 <- .setPi2(simulationResults, pi2, endpoint = "rates", applyToObject = (groups == 2L))
@@ -438,10 +442,6 @@ getSimulationRates <- function(
     .setValueAndParameterType(
         simulationResults, "plannedSubjects",
         plannedSubjects, NA_real_
-    )
-    .setValueAndParameterType(
-        simulationResults, "directionUpper",
-        directionUpper, C_DIRECTION_UPPER_DEFAULT
     )
     .setValueAndParameterType(simulationResults, "minNumberOfSubjectsPerStage",
         minNumberOfSubjectsPerStage, NA_real_,

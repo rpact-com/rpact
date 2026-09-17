@@ -191,10 +191,6 @@ getSimulationMeans <- function(
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
     }
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design,
-        objectType = "power", userFunctionCallEnabled = TRUE
-    )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     if (meanRatio) {
         .assertIsInOpenInterval(thetaH0, "thetaH0",
@@ -236,6 +232,14 @@ getSimulationMeans <- function(
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
     simulationResults <- SimulationResultsMeans$new(design, showStatistics = showStatistics)
+    
+    directionUpper <- .setDirectionUpper(
+        simulationResults,
+        design,
+        directionUpper,
+        objectType = "power",
+        endpoint = "means",
+        userFunctionCallEnabled = TRUE)
 
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
     .validateAndSetSeed(simulationResults, seed)
@@ -416,10 +420,6 @@ getSimulationMeans <- function(
     .setValueAndParameterType(
         simulationResults, "plannedSubjects",
         plannedSubjects, NA_real_
-    )
-    .setValueAndParameterType(
-        simulationResults, "directionUpper",
-        directionUpper, C_DIRECTION_UPPER_DEFAULT
     )
     .setValueAndParameterType(simulationResults, "minNumberOfSubjectsPerStage",
         minNumberOfSubjectsPerStage, NA_real_,

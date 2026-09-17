@@ -423,13 +423,13 @@
     )
     sampleSizeEnabled <- identical(objectType, "sampleSize")
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
+    directionUpper <- .setDirectionUpper(
+        designPlan,
         design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE,
-        default = NA
-    )
+        directionUpper,
+        objectType = objectType,
+        endpoint = "counts",
+        userFunctionCallEnabled = !identical(objectType, "sampleSize"))
 
     if (sampleSizeEnabled || design$kMax == 1) {
         designPlan$.setParameterType("overallReject", C_PARAM_NOT_APPLICABLE)
@@ -1205,6 +1205,7 @@ getPowerCounts <- function(
         allocationRatioPlanned,
         directionUpper
     )
+
     designPlan$directionUpper <- directionUpper
     directionUpper <- .getDirectionUpper(designPlan)
     .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)

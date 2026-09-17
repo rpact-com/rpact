@@ -33,9 +33,10 @@ NULL
 #' a patient-wise basic approximation is used, or normally distributed log-rank test statistics
 #' are simulated. The default \code{simulationType = "auto"} chooses the simulation approach
 #' automatically based on the explicitly specified arguments.
+#' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
+#' than 1 can be used, for example, to simulate non-inferiority designs.
 #'
-#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
-#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.
+#' @inheritParams param_omegaMaxVector
 #' @inheritParams param_intersectionTest_MultiArm
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_effectMeasure
@@ -43,10 +44,12 @@ NULL
 #' @inheritParams param_threshold
 #' @inheritParams param_effectMatrix
 #' @inheritParams param_activeArms
+#' @inheritParams param_piControl
 #' @inheritParams param_successCriterion
 #' @inheritParams param_correlationComputation
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_design_with_default
+#' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_eventTime
@@ -77,7 +80,7 @@ NULL
 #' @inheritParams param_showStatistics
 #' @inheritParams param_maxNumberOfRawDatasetsPerStage
 #' @inheritParams param_simulationType_multiarm_survival
-#' @param piControl The assumed probability in the control arm, default is \code{0.5}.
+#' @inheritParams param_piControl
 #'
 #' @details
 #' At given design the function simulates the analysis times, power, stopping
@@ -108,6 +111,7 @@ NULL
 #' \code{selectedArms},
 #' \code{plannedEvents},
 #' \code{directionUpper},
+#' \code{thetaH0},
 #' \code{allocationRatioPlanned},
 #' \code{minNumberOfEventsPerStage},
 #' \code{maxNumberOfEventsPerStage},
@@ -127,11 +131,12 @@ getSimulationMultiArmSurvival <- function(
         design = NULL,
         ...,
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         activeArms = NA_integer_,
         piControl = NA_real_,
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
-        omegaMaxVector = seq(1, 2.6, 0.4),
+        omegaMaxVector = NA_real_,
         kappa = 1,
         gED50 = NA_real_,
         slope = 1,
@@ -184,6 +189,8 @@ getSimulationMultiArmSurvival <- function(
         FALSE
     )) || maxNumberOfRawDatasetsPerStage > 0
 
+    simulationTypeIsUserDefined <- !identical(simulationType, "auto")
+
     if (simulationType == "auto") {
         if (usesBasicOnlyArgs && usesPatientWiseOnlyArgs) {
             stopConflictingArguments(
@@ -231,9 +238,10 @@ getSimulationMultiArmSurvival <- function(
             "'simulationType' = \"patientWise\" and the corresponding arguments."
         )
 
-        return(getSimulationMultiArmSurvivalBasic(
+        return(.getSimulationMultiArmSurvivalBasic(
             design = design,
             ...,
+            thetaH0 = thetaH0,
             activeArms = activeArms,
             effectMatrix = effectMatrix,
             typeOfShape = typeOfShape,
@@ -261,22 +269,26 @@ getSimulationMultiArmSurvival <- function(
             seed = seed,
             calcEventsFunction = calcEventsFunction,
             selectArmsFunction = selectArmsFunction,
-            showStatistics = showStatistics
+            showStatistics = showStatistics,
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined
         ))
     }
 
     if (simulationType %in% c("patientWise", "patientWiseBasic")) {
         if (usesBasicOnlyArgs) {
-            stopIllegalArgument("'correlationComputation' cannot be specified if 'simulationType' = \"patientWise\" or \"patientWiseBasic\"",
+            stopIllegalArgument(
+                "'correlationComputation' cannot be specified if ",
+                "'simulationType' = \"patientWise\" or \"patientWiseBasic\"",
                 functionName = "getSimulationMultiArmSurvival",
                 parameter = "correlationComputation",
                 relatedParameter = "simulationType",
                 value = correlationComputation
             )
         }
-        return(getSimulationMultiArmSurvivalPatientWise(
+        return(.getSimulationMultiArmSurvivalPatientWise(
             design = design,
             ...,
+            thetaH0 = thetaH0,
             activeArms = activeArms,
             piControl = piControl,
             effectMatrix = effectMatrix,
@@ -315,7 +327,8 @@ getSimulationMultiArmSurvival <- function(
             calcEventsFunction = calcEventsFunction,
             selectArmsFunction = selectArmsFunction,
             showStatistics = showStatistics,
-            cppEnabled = ifelse(identical(simulationType, "patientWiseBasic"), FALSE, TRUE)
+            cppEnabled = ifelse(identical(simulationType, "patientWiseBasic"), FALSE, TRUE),
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined
         ))
     }
 }
@@ -328,8 +341,7 @@ getSimulationMultiArmSurvival <- function(
 #' Returns the simulated power, stopping and selection probabilities, conditional power, and
 #' expected sample size for testing hazard ratios in a multi-arm treatment groups testing situation.
 #'
-#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
-#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.
+#' @inheritParams param_omegaMaxVector
 #' @inheritParams param_intersectionTest_MultiArm
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_effectMeasure
@@ -341,9 +353,10 @@ getSimulationMultiArmSurvival <- function(
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
+#' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
-#' @inheritParams param_kappa
+#' @inheritParams param_piControl
 #' @inheritParams param_eventTime
 #' @inheritParams param_accrualTime
 #' @inheritParams param_accrualIntensity
@@ -391,6 +404,7 @@ getSimulationMultiArmSurvival <- function(
 #' \code{selectedArms},
 #' \code{plannedEvents},
 #' \code{directionUpper},
+#' \code{thetaH0},
 #' \code{allocationRatioPlanned},
 #' \code{minNumberOfEventsPerStage},
 #' \code{maxNumberOfEventsPerStage},
@@ -404,18 +418,19 @@ getSimulationMultiArmSurvival <- function(
 #'
 #' @template examples_get_simulation_multiarm_survival
 #'
-#' @export
-#'
 #' @keywords internal
 #'
-getSimulationMultiArmSurvivalPatientWise <- function(
+#' @noRd
+#'  
+.getSimulationMultiArmSurvivalPatientWise <- function(
         design = NULL,
         ...,
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         activeArms = NA_integer_,
         piControl = NA_real_,
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
-        omegaMaxVector = seq(1, 2.6, 0.4),
+        omegaMaxVector = NA_real_,
         kappa = 1,
         gED50 = NA_real_,
         slope = 1,
@@ -449,7 +464,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
         showStatistics = FALSE,
-        cppEnabled = TRUE) {
+        cppEnabled = TRUE,
+        simulationTypeIsUserDefined = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
@@ -496,19 +512,11 @@ getSimulationMultiArmSurvivalPatientWise <- function(
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE,
-        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-    )
-
     if (length(allocationRatioPlanned) != 1) {
         stopIllegalArgument(
             "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
             "must have length 1",
-            functionName = "getSimulationMultiArmSurvivalPatientWise",
+            functionName = ".getSimulationMultiArmSurvivalPatientWise",
             parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
         )
@@ -546,6 +554,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         minNumberOfEventsPerStage = minNumberOfEventsPerStage, # survival only
         maxNumberOfEventsPerStage = maxNumberOfEventsPerStage, # survival only
         conditionalPower = conditionalPower,
+        thetaH0 = thetaH0,
         thetaH1 = thetaH1, # means + survival only
         maxNumberOfIterations = maxNumberOfIterations,
         seed = seed,
@@ -553,7 +562,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         selectArmsFunction = selectArmsFunction,
         showStatistics = showStatistics,
         endpoint = "survival",
-        simulationType = "patientWise"
+        simulationType = "patientWise",
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined
     )
 
     design <- simulationResults$.design
@@ -567,6 +577,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     effectMatrix <- t(simulationResults$effectMatrix)
     omegaMaxVector <- simulationResults$omegaMaxVector # survival only
     piControl <- simulationResults$piControl # rates + survival only
+    thetaH0 <- simulationResults$thetaH0
     thetaH1 <- simulationResults$thetaH1 # means + survival only
     plannedEvents <- simulationResults$plannedEvents # survival only
     maxNumberOfSubjects <- simulationResults$maxNumberOfSubjects # survival only
@@ -579,6 +590,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     dropoutRate1 <- simulationResults$dropoutRate1
     dropoutRate2 <- simulationResults$dropoutRate2
     dropoutTime <- simulationResults$dropoutTime
+    directionUpper <- simulationResults$directionUpper
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
@@ -601,13 +613,13 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (accrualIntensity < 1L) {
             stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
-                functionName = "getSimulationMultiArmSurvivalPatientWise",
+                functionName = ".getSimulationMultiArmSurvivalPatientWise",
                 parameter = "accrualIntensity",
                 relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
         stopIllegalArgument("'maxNumberOfSubjects' must be defined",
-            functionName = "getSimulationMultiArmSurvivalPatientWise",
+            functionName = ".getSimulationMultiArmSurvivalPatientWise",
             parameter = "maxNumberOfSubjects",
             value = maxNumberOfSubjects
         )
@@ -673,6 +685,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             minNumberOfEventsPerStage = minNumberOfEventsPerStage,
             maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
             conditionalPower = conditionalPower,
+            thetaH0 = thetaH0,
             thetaH1 = thetaH1,
             calcEventsFunction = calcEventsFunction,
             calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
@@ -714,6 +727,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             minNumberOfEventsPerStage = minNumberOfEventsPerStage,
             maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
             conditionalPower = conditionalPower,
+            thetaH0 = thetaH0,
             thetaH1 = thetaH1,
             calcEventsFunction = calcEventsFunction,
             calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
@@ -732,7 +746,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         )
     }
 
-    # Extract results from the simulation
+    # extract results from the simulation
     simulatedNumberEventsNotAchieved <- loopResult$simulatedNumberEventsNotAchieved
     simulatedAnalysisTime <- loopResult$simulatedAnalysisTime
     simulatedNumberOfSubjects <- loopResult$simulatedNumberOfSubjects
@@ -740,7 +754,6 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     simulatedRejections <- loopResult$simulatedRejections
     simulatedNumberOfActiveArms <- loopResult$simulatedNumberOfActiveArms
     simulatedSingleEventsPerStage <- loopResult$simulatedSingleEventsPerStage
-    simulatedPlannedEvents <- loopResult$simulatedPlannedEvents
     simulatedSuccessStopping <- loopResult$simulatedSuccessStopping
     simulatedFutilityStopping <- loopResult$simulatedFutilityStopping
     simulatedConditionalPower <- loopResult$simulatedConditionalPower
@@ -778,7 +791,17 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
-    simulationResults$cumulativeEventsPerStage <- simulatedPlannedEvents
+    simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
+    simulationResults$cumulativeEventsPerStage <- .convertStageWiseToOverallValues(simulatedSingleEventsPerStage)
+    for (g in 1:gMax) {
+        simulationResults$singleEventsPerStage[, , g] <- simulationResults$singleEventsPerStage[, , g] +
+            simulationResults$singleEventsPerStage[, , gMax + 1]
+        simulationResults$cumulativeEventsPerStage[, , g] <- simulationResults$cumulativeEventsPerStage[, , g] +
+            simulationResults$cumulativeEventsPerStage[, , gMax + 1]
+    }
+    simulationResults$singleEventsPerStage <- .removeLastEntryFromArray(simulationResults$singleEventsPerStage)
+    simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
+
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
     simulationResults$expectedNumberOfSubjects <- expectedNumberOfSubjects
     simulationResults$studyDuration <- expectedStudyDuration
@@ -789,7 +812,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
 
-    ## set parameter types in simulationResults
+    # set parameter types in simulationResults
     if (kMax > 1) {
         simulationResults$.setParameterType("expectedNumberOfSubjects", C_PARAM_GENERATED)
         simulationResults$.setParameterType("expectedNumberOfEvents", C_PARAM_GENERATED)
@@ -804,7 +827,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
 
     if (kMax > 1 && any(simulationResults$rejectedArmsPerStage < 0)) {
         stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
-            functionName = "getSimulationMultiArmSurvivalPatientWise"
+            functionName = ".getSimulationMultiArmSurvivalPatientWise"
         )
     }
     

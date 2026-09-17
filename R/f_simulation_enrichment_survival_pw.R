@@ -28,8 +28,8 @@ NULL
 #' @description
 #' Returns the simulated power, stopping and selection probabilities, conditional power,
 #' and expected sample size for testing hazard ratios in an enrichment design testing situation.
-#' In contrast to \code{getSimulationSurvival()} (where survival times are simulated), normally
-#' distributed logrank test statistics are simulated.
+#' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
+#' than 1 can be used, for example, to simulate non-inferiority designs.
 #'
 #' @inheritParams param_intersectionTest_Enrichment
 #' @inheritParams param_typeOfSelection
@@ -39,6 +39,7 @@ NULL
 #' @inheritParams param_effectList
 #' @inheritParams param_successCriterion
 #' @inheritParams param_design_with_default
+#' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_kappa
@@ -85,6 +86,7 @@ NULL
 #' \code{selectedPopulations},
 #' \code{plannedEvents},
 #' \code{directionUpper},
+#' \code{thetaH0},
 #' \code{allocationRatioPlanned},
 #' \code{minNumberOfEventsPerStage},
 #' \code{maxNumberOfEventsPerStage},
@@ -98,13 +100,14 @@ NULL
 #'
 #' @template examples_get_simulation_enrichment_survival
 #'
-#' @export
-#'
 #' @keywords internal
 #'
-getSimulationEnrichmentSurvivalPatientWise <- function(
+#' @noRd 
+#' 
+.getSimulationEnrichmentSurvivalPatientWise <- function(
         design = NULL,
         ...,
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         effectList = NULL,
         kappa = 1,
         eventTime = 12,
@@ -136,7 +139,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
-        showStatistics = FALSE) {
+        showStatistics = FALSE,
+        simulationTypeIsUserDefined = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
@@ -174,19 +178,11 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE,
-        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-    )
-
     if (length(allocationRatioPlanned) != 1) {
         stopIllegalArgument(
             "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
             "must have length 1",
-            functionName = "getSimulationEnrichmentSurvivalPatientWise",
+            functionName = ".getSimulationEnrichmentSurvivalPatientWise",
             parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned
         )
@@ -218,6 +214,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         minNumberOfEventsPerStage = minNumberOfEventsPerStage, # survival only
         maxNumberOfEventsPerStage = maxNumberOfEventsPerStage, # survival only
         conditionalPower = conditionalPower,
+        thetaH0 = thetaH0,
         thetaH1 = thetaH1, # means + survival only
         maxNumberOfIterations = maxNumberOfIterations,
         seed = seed,
@@ -225,7 +222,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
         endpoint = "survival",
-        simulationType = "patientWise"
+        simulationType = "patientWise",
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined
     )
 
     design <- simulationResults$.design
@@ -237,6 +235,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     kMax <- simulationResults$.design$kMax
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection
+    thetaH0 <- simulationResults$thetaH0
     thetaH1 <- simulationResults$thetaH1 # means + survival only
     plannedEvents <- simulationResults$plannedEvents # survival only
     conditionalPower <- simulationResults$conditionalPower
@@ -245,6 +244,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
     maxNumberOfIterations <- simulationResults$maxNumberOfIterations
+    directionUpper <- simulationResults$directionUpper
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
@@ -259,13 +259,13 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (identical(accrualIntensity, 1L)) {
             stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
-                functionName = "getSimulationEnrichmentSurvivalPatientWise",
+                functionName = ".getSimulationEnrichmentSurvivalPatientWise",
                 parameter = "accrualIntensity",
                 relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
             )
         }
         stopIllegalArgument("'maxNumberOfSubjects' must be defined",
-            functionName = "getSimulationEnrichmentSurvivalPatientWise",
+            functionName = ".getSimulationEnrichmentSurvivalPatientWise",
             parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects
         )
     }
@@ -324,6 +324,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         minNumberOfEventsPerStage = minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
         conditionalPower = conditionalPower,
+        thetaH0 = thetaH0,
         thetaH1 = thetaH1,
         calcEventsFunction = calcEventsFunction,
         calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
@@ -336,7 +337,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage
     )
 
-    # Extract results from the simulation
+    # extract results from the simulation
     simulatedNumberEventsNotAchieved <- loopResult$simulatedNumberEventsNotAchieved
     simulatedAnalysisTime <- loopResult$simulatedAnalysisTime
     simulatedNumberOfSubjects <- loopResult$simulatedNumberOfSubjects
@@ -389,7 +390,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
 
-    ## set parameter types in simulationResults
+    # set parameter types in simulationResults
     if (kMax > 1) {
         simulationResults$.setParameterType("expectedNumberOfSubjects", C_PARAM_GENERATED)
         simulationResults$.setParameterType("expectedNumberOfEvents", C_PARAM_GENERATED)
@@ -408,7 +409,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
         stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
-            functionName = "getSimulationEnrichmentSurvivalPatientWise"
+            functionName = ".getSimulationEnrichmentSurvivalPatientWise"
         )
     }
     
@@ -435,6 +436,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
 #' or normally distributed log-rank test statistics are simulated. The default
 #' \code{simulationType = "auto"} chooses the simulation approach automatically based on
 #' the explicitly specified arguments.
+#' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
+#' than 1 can be used, for example, to simulate non-inferiority designs.
 #'
 #' @inheritParams param_intersectionTest_Enrichment
 #' @inheritParams param_typeOfSelection
@@ -445,6 +448,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
+#' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_kappa
@@ -499,6 +503,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
 #' \code{selectedPopulations},
 #' \code{plannedEvents},
 #' \code{directionUpper},
+#' \code{thetaH0},
 #' \code{allocationRatioPlanned},
 #' \code{minNumberOfEventsPerStage},
 #' \code{maxNumberOfEventsPerStage},
@@ -517,6 +522,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
 getSimulationEnrichmentSurvival <- function(
         design = NULL,
         ...,
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
         effectList = NULL,
         kappa = 1,
@@ -577,6 +583,8 @@ getSimulationEnrichmentSurvival <- function(
         logical(1)
     )) || maxNumberOfRawDatasetsPerStage > 0
 
+    simulationTypeIsUserDefined <- !identical(simulationType, "auto")
+
     if (simulationType == "auto") {
         if (usesPatientWiseOnlyArgs) {
             simulationType <- "patientWise"
@@ -610,8 +618,9 @@ getSimulationEnrichmentSurvival <- function(
             "and the corresponding arguments."
         )
 
-        return(getSimulationEnrichmentSurvivalBasic(
+        return(.getSimulationEnrichmentSurvivalBasic(
             design = design,
+            thetaH0 = thetaH0,
             effectList = effectList,
             intersectionTest = intersectionTest,
             stratifiedAnalysis = stratifiedAnalysis,
@@ -634,13 +643,15 @@ getSimulationEnrichmentSurvival <- function(
             calcEventsFunction = calcEventsFunction,
             selectPopulationsFunction = selectPopulationsFunction,
             showStatistics = showStatistics,
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined,
             ...
         ))
     }
 
     if (identical(simulationType, "patientWise")) {
-        return(getSimulationEnrichmentSurvivalPatientWise(
+        return(.getSimulationEnrichmentSurvivalPatientWise(
             design = design,
+            thetaH0 = thetaH0,
             effectList = effectList,
             kappa = kappa,
             eventTime = eventTime,
@@ -673,6 +684,7 @@ getSimulationEnrichmentSurvival <- function(
             calcEventsFunction = calcEventsFunction,
             selectPopulationsFunction = selectPopulationsFunction,
             showStatistics = showStatistics,
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined,
             ...
         ))
     }
@@ -688,6 +700,7 @@ getSimulationEnrichmentSurvival <- function(
 
         return(.getSimulationEnrichmentSurvivalPatientWiseBasic(
             design = design,
+            thetaH0 = thetaH0,
             effectList = effectList,
             kappa = kappa,
             eventTime = eventTime,

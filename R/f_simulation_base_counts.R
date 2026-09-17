@@ -278,11 +278,6 @@ getSimulationCounts <- function(
         .warnInCaseOfTwoSidedPowerIsDisabled(design)
     }
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design,
-        objectType = "power", userFunctionCallEnabled = TRUE
-    )
-
     if (!anyNA(theta)) {
         totalCases <- length(theta)
         lambda1 <- rep(NA_real_, totalCases)
@@ -352,6 +347,14 @@ getSimulationCounts <- function(
     }
 
     simulationResults <- SimulationResultsCountData$new(design = design)
+    
+    directionUpper <- .setDirectionUpper(
+        simulationResults,
+        design,
+        directionUpper,
+        objectType = "power",
+        endpoint = "counts",
+        userFunctionCallEnabled = TRUE)
 
     if (length(accrualTime) > 1 && accrualTime[1] == 0) {
         accrualTime <- accrualTime[-1]

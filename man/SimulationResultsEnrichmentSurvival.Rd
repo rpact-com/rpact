@@ -104,6 +104,8 @@ to create an object of this type.
 
 \item{\code{successPerStage}}{The simulated success probabilities per stage where success is defined by user. Is a numeric matrix.}
 
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
+
 \item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio. Is a numeric vector.}
 
 \item{\code{threshold}}{The selection criterion: treatment arm/population is only selected if \code{effectMeasure} exceeds \code{threshold}. Either a single numeric value or a numeric vector of length \code{activeArms} referring to a separate threshold condition for each treatment arm.}

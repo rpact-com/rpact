@@ -35,6 +35,17 @@
 #'     maxNumberOfEventsPerStage = c(NA, 150, 30), thetaH1 = 4 / 3,
 #'     maxNumberOfIterations = 100)
 #' print(simResultsPE)
+#'
+#' # Non-inferiority in the full population (H0: hazard ratio = 1.2)
+#' effectListNonInferiority <- list(
+#'     subGroups = "F", prevalences = 1,
+#'     hazardRatios = matrix(1), piControls = 0.3)
+#' simulationResultsNonInferiority <- getSimulationEnrichmentSurvival(
+#'     design = getDesignFixed(sided = 1), thetaH0 = 1.2,
+#'     directionUpper = FALSE, effectList = effectListNonInferiority,
+#'     plannedEvents = 80, allocationRatioPlanned = 1,
+#'     maxNumberOfSubjects = 400, accrualTime = c(0, 20),
+#'     accrualIntensity = 20, maxNumberOfIterations = 50,
+#'     simulationType = "patientWise")
 #' }
 #' 
-

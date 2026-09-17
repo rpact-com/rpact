@@ -687,7 +687,10 @@ List performClosedCombinationTestForSimulationMultiArm(
                 rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) >= criticalValues[k];
                 if (k < kMax - 1) {
                     NumericVector futilityBounds = design.get("futilityBounds");
-                    futilityIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= futilityBounds[k];
+                    // Match .getFutilityBounds(): test statistics use the favorable-direction scale.
+                    bool directionUpper = Rcpp::as<bool>(design.get("directionUpper"));
+                    double futilityBound = directionUpper ? futilityBounds[k] : -futilityBounds[k];
+                    futilityIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= futilityBound;
                 }
             }
             

@@ -39,17 +39,18 @@ simulation, and analysis:
 - Standard fixed-sample designs without interim analyses
 - Classical group sequential designs with planned interim analyses
 - Sample size and power calculations for
-    - means (continuous endpoints)
-    - rates (binary endpoints)
-    - survival endpoints with flexible recruitment and survival-time
-      options
-    - count data endpoints
+  - means (continuous endpoints)
+  - rates (binary endpoints)
+  - survival endpoints with flexible recruitment and survival-time
+    options
+  - count data endpoints
 
 ### Simulation and adaptive trial design
 
 - Power and operating-characteristic simulations for means, rates,
   survival data, and count data
-- Assessment of sample size or event-number recalculations based on conditional power
+- Assessment of adaptive sample size or event-number reassessment based
+  on conditional power
 - Multi-stage adaptive hypothesis testing based on the combination
   testing principle
 - Assessment of treatment selection strategies in multi-arm trials,
@@ -59,8 +60,11 @@ simulation, and analysis:
 
 ### Analysis and trial conduct
 
-- Confirmatory analysis for means, rates, and survival endpoints in one-arm, two-arm, and multi-arm trials
-- Support for fixed-sample designs, classical group sequential designs, and adaptive multi-arm multi-stage (MAMS) designs based on the inverse normal or Fisher combination test
+- Confirmatory analysis for means, rates, and survival endpoints in
+  one-arm, two-arm, and multi-arm trials
+- Support for fixed-sample designs, classical group sequential designs,
+  and adaptive multi-arm multi-stage (MAMS) designs based on the inverse
+  normal or Fisher combination test
 - Automatic boundary recalculation during a trial using alpha-spending
   approaches, including under- and over-running
 

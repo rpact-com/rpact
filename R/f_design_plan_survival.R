@@ -621,13 +621,6 @@ NULL
         .assertIsSingleLogical(accountForObservationTimes, "accountForObservationTimes", naAllowed = TRUE)
         .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
         .assertIsValidKappa(kappa)
-        directionUpper <- .assertIsValidDirectionUpper(
-            directionUpper,
-            design,
-            objectType = objectType, 
-            userFunctionCallEnabled = TRUE, 
-            default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-        )
 
         if (objectType == "power") {
             .assertIsSingleNumber(maxNumberOfEvents, "maxNumberOfEvents")
@@ -688,7 +681,8 @@ NULL
     }
 
     if (userFunctionCallEnabled) {
-        allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
+        allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(
+            allocationRatioPlanned, maxNumberOfSubjects)
     }
 
     designPlan <- TrialDesignPlanSurvival$new(
@@ -709,6 +703,14 @@ NULL
         hazardRatio = hazardRatio,
         objectType = objectType
     )
+    
+    directionUpper <- .setDirectionUpper(
+        designPlan,
+        design,
+        directionUpper,
+        objectType = objectType,
+        endpoint = "survival",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         designPlan, "allocationRatioPlanned",
@@ -867,7 +869,6 @@ NULL
         }
     }
 
-    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT)
     if (objectType == "power") {
         .setValueAndParameterType(designPlan, "maxNumberOfEvents", maxNumberOfEvents, NA_real_)
         designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)

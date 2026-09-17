@@ -39,6 +39,7 @@ using namespace Rcpp;
 // @param plannedEvents Planned events per stage (length kMax)
 // @param allocationRatioPlanned Allocation ratio planned per stage (length kMax)
 // @param selectedArms Whether arms are selected (rows: arms, columns: stages)
+// @param thetaH0 Null hypothesis hazard ratio
 // @param thetaH1 Alternative hypothesis hazard ratio (NA if not specified)
 // @param overallEffects Matrix of overall effects (rows: arms, columns: stages)
 // @param minNumberOfEventsPerStage Minimum number of events per stage (length kMax)
@@ -53,6 +54,7 @@ double getSimulationSurvivalMultiArmStageEvents(
 		NumericVector plannedEvents,
 		NumericVector allocationRatioPlanned,
 		LogicalMatrix selectedArms,
+		double thetaH0,
 		double thetaH1,
 		NumericMatrix overallEffects,
 		NumericVector minNumberOfEventsPerStage,
@@ -76,14 +78,14 @@ double getSimulationSurvivalMultiArmStageEvents(
 
                 if (R_IsNA(directionUpper) || directionUpper) {
                     double minStageOverallEffect = min(stageOverallEffects);
-                    thetaStandardized = std::log(std::max(1.0 + 1e-07, minStageOverallEffect));
+                    thetaStandardized = std::log(std::max(thetaH0 * (1.0 + 1e-07), minStageOverallEffect) / thetaH0);
                 } else {
                     double maxStageOverallEffect = max(stageOverallEffects);
-                    thetaStandardized = std::log(std::min(1.0 - 1e-07, maxStageOverallEffect));
+                    thetaStandardized = std::log(std::min(thetaH0 * (1.0 - 1e-07), maxStageOverallEffect) / thetaH0);
                 }
             } else {
                 double adjustment = (R_IsNA(directionUpper) || directionUpper) ? 1e-07 : -1e-07;
-                thetaStandardized = std::log(std::min(thetaH1, 1.0 + adjustment));
+                thetaStandardized = std::log(std::min(thetaH1, thetaH0 * (1.0 + adjustment)) / thetaH0);
             }
             if (conditionalCriticalValue[stage - 1] > 8.0) {
                 newEvents = maxNumberOfEventsPerStage[stage];
@@ -326,6 +328,7 @@ double getEstimatedThetaMultiArm(
 		int stage,
 		double thetaH1,
 		bool directionUpper,
+		double thetaH0,
 		NumericMatrix overallEffects) {
 
 	if (!R_IsNA(thetaH1)) {
@@ -335,9 +338,9 @@ double getEstimatedThetaMultiArm(
 	NumericVector overallEffectsAtStage = overallEffects(_, stage);
 	double estimatedTheta = min(overallEffectsAtStage);
 
-	if (!directionUpper){
-      estimatedTheta = 1 / estimatedTheta;
-    }
+	if (!directionUpper) {
+		estimatedTheta = thetaH0 * thetaH0 / estimatedTheta;
+	}
 
 	return estimatedTheta;
 }
@@ -369,6 +372,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         NumericVector minNumberOfEventsPerStage,
         NumericVector maxNumberOfEventsPerStage,
         double conditionalPower,
+        double thetaH0,
         double thetaH1,
         Nullable<Function> calcEventsFunction = R_NilValue,
         bool calcEventsFunctionIsUserDefined = false,
@@ -389,6 +393,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
     // Initialize matrices and vectors
     NumericMatrix singleEventsPerStage(gMax + 1, kMax);
     std::fill(singleEventsPerStage.begin(), singleEventsPerStage.end(), NA_REAL);
+    NumericMatrix cumulativeEventsPerArmAndStage(gMax + 1, kMax);
+    std::fill(cumulativeEventsPerArmAndStage.begin(), cumulativeEventsPerArmAndStage.end(), NA_REAL);
     NumericMatrix cumulativeEventsPerStage(gMax, kMax);
     std::fill(cumulativeEventsPerStage.begin(), cumulativeEventsPerStage.end(), NA_REAL);
     NumericMatrix simSurvival(gMax, kMax);
@@ -475,17 +481,18 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                         survivalDataSet,
                         analysisTime[k],
                         comparedArms,
-                        directionUpper
+                        directionUpper,
+                        thetaH0
                     );
                     
                     testStatistics(g, k) = logRankResult["logRank"];
                     overallTestStatistics(g, k) = logRankResult["logRank"];
                     IntegerVector events = logRankResult["events"];
                     cumulativeEventsPerStage(g, k) = sum(events);
-                    singleEventsPerStage(g, k) = events[0];
+                    cumulativeEventsPerArmAndStage(g, k) = events[0];
                     lastControlEvents = events[1];
                 }
-                singleEventsPerStage(gMax, k) = lastControlEvents;
+                cumulativeEventsPerArmAndStage(gMax, k) = lastControlEvents;
             }
         } else {
             // Subsequent stages
@@ -511,7 +518,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                 survivalDataSet["treatmentArm"] = treatments;
                 
                 // Generate new survival times for new subjects (matching R loop order)
-                for (int i = numberOfSubjects[k - 1] - 1; i < maxNumberOfSubjects; i++) {
+                for (int i = numberOfSubjects[k - 1]; i < maxNumberOfSubjects; i++) {
                     int treatmentArm = treatments[i] - 1; // 0-based
                     for (int g = 0; g < gMax; g++) {
                         if (treatmentArm == g && selectedArms(g, k)) {
@@ -551,11 +558,19 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                 _["dropoutTime"] = as<NumericVector>(survivalDataSet["dropoutTime"])[inSelectedArms]
             );
             
+            // Add the stage increment to the previous count in retained arms only.
+            double eventTarget = cumulativeEventsPerArmAndStage(gMax, k - 1) +
+                plannedEvents[k] - plannedEvents[k - 1];
+            for (int g = 0; g < gMax; g++) {
+                if (selectedArms(g, k)) {
+                    eventTarget += cumulativeEventsPerArmAndStage(g, k - 1);
+                }
+            }
             analysisTime[k] = findObservationTime(
                 survivalDataSetSelected["accrualTime"],
                 survivalDataSetSelected["survivalTime"],
                 survivalDataSetSelected["dropoutTime"],
-                plannedEvents[k]
+                eventTarget
             );
             
             if (R_IsNA(analysisTime[k])) {
@@ -575,12 +590,13 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                             survivalDataSet,
                             analysisTime[k],
                             comparedArms,
-                            directionUpper
+                            directionUpper,
+                            thetaH0
                         );
                         
                         overallTestStatistics(g, k) = logRankResult["logRank"];
                         IntegerVector events = logRankResult["events"];
-                        singleEventsPerStage(g, k) = events[0];
+                        cumulativeEventsPerArmAndStage(g, k) = events[0];
                         cumulativeEventsPerStage(g, k) = sum(events);
                         lastControlEvents = events[1];
                         
@@ -592,11 +608,21 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                     }
                 }
                 if (lastControlEvents != NA_INTEGER) {
-                    singleEventsPerStage(gMax, k) = lastControlEvents;
+                    cumulativeEventsPerArmAndStage(gMax, k) = lastControlEvents;
                 }
             }
         }
         
+        // Store increments before averaging; selection differs between iterations.
+        for (int g = 0; g <= gMax; g++) {
+            if (g == gMax || selectedArms(g, k)) {
+                singleEventsPerStage(g, k) = cumulativeEventsPerArmAndStage(g, k);
+                if (k > 0) {
+                    singleEventsPerStage(g, k) -= cumulativeEventsPerArmAndStage(g, k - 1);
+                }
+            }
+        }
+
         // Calculate separate p-values
         for (int g = 0; g < gMax; g++) {
             if (!R_IsNA(testStatistics(g, k))) {
@@ -612,7 +638,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                                 (1.0 + allocationRatio) /
                                 std::sqrt(allocationRatio) /
                                 std::sqrt(cumulativeEventsPerStage(g, k));
-                overallEffects(g, k) = std::exp(exponent);
+                overallEffects(g, k) = thetaH0 * std::exp(exponent);
             }
         }
         
@@ -676,10 +702,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
 
                 // Select arms
                 LogicalVector selectedNow;
-                NumericVector eventsOverStages = Rcpp::colSums(singleEventsPerStage, true);
+                NumericVector eventsOverStages = cumsum(Rcpp::colSums(singleEventsPerStage, true));
                 if (typeOfSelection == "userDefined") {
-
-                	//eventsOverStages = Rcpp::colSums(singleEventsPerStage, true);
 
                     List selectArmsFunctionArgs = List::create(
                         _["effectVector"] = effectVector,
@@ -691,6 +715,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                         _["eventsOverStages"] = eventsOverStages,
                         _["allocationRatioPlanned"] = allocationRatioPlanned,
                         _["selectedArms"] = selectedArms,
+                        _["thetaH0"] = thetaH0,
                         _["thetaH1"] = thetaH1,
                         _["overallEffects"] = overallEffects
                     );
@@ -722,7 +747,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                 }
                 selectedArms(_, k + 1) = selectedArms(_, k) & selectedNow;
                 
-        		double estimatedTheta = getEstimatedThetaMultiArm(k, thetaH1, directionUpper, overallEffects);
+				double estimatedTheta = getEstimatedThetaMultiArm(k, thetaH1, directionUpper, thetaH0, overallEffects);
 
                 // Calculate new events
                 double newEventsValue = NA_REAL;
@@ -737,6 +762,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
 						_["eventsOverStages"] = eventsOverStages,
                         _["allocationRatioPlanned"] = rep(allocationRatio, k + 2),
                         _["selectedArms"] = selectedArms,
+                        _["thetaH0"] = thetaH0,
                         _["estimatedTheta"] = estimatedTheta,
                         _["overallEffects"] = overallEffects,
                         _["minNumberOfEventsPerStage"] = minNumberOfEventsPerStage,
@@ -752,6 +778,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                         plannedEvents,
                         rep(allocationRatio, k + 2),
                         selectedArms,
+                        thetaH0,
                         thetaH1,
                         overallEffects,
                         minNumberOfEventsPerStage,
@@ -787,9 +814,9 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
 					"minMax",
 					"planning"
 				);
-                thetaStandardized = std::log(minMaxEffect[0]);
+                thetaStandardized = std::log(minMaxEffect[0] / thetaH0);
             } else {
-                thetaStandardized = std::log(thetaH1);
+                thetaStandardized = std::log(thetaH1 / thetaH0);
             }
             thetaStandardized = (2.0 * directionUpper - 1.0) * thetaStandardized;
             double numerator = thetaStandardized * sqrt(plannedEvents[k + 1] - plannedEvents[k]) *
@@ -853,6 +880,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
 // @param minNumberOfEventsPerStage Minimum events per stage
 // @param maxNumberOfEventsPerStage Maximum events per stage
 // @param conditionalPower Conditional power
+// @param thetaH0 Null hypothesis hazard ratio
 // @param thetaH1 Alternative hypothesis hazard ratio
 // @param calcEventsFunction Events calculation function
 // @param calcEventsFunctionIsUserDefined Whether calc function is user defined
@@ -890,6 +918,7 @@ List performSimulationMultiArmSurvivalLoop(
 		NumericVector minNumberOfEventsPerStage,
 		NumericVector maxNumberOfEventsPerStage,
 		double conditionalPower,
+		double thetaH0,
 		double thetaH1,
 		Nullable<Function> calcEventsFunction,
 		bool calcEventsFunctionIsUserDefined,
@@ -914,7 +943,7 @@ List performSimulationMultiArmSurvivalLoop(
 	NumericMatrix simulatedNumberOfActiveArms(kMax, cols);
 	NumericVector simulatedSingleEventsPerStage(kMax * cols * (gMax + 1));
 	simulatedSingleEventsPerStage.attr("dim") = IntegerVector::create(kMax, cols, gMax + 1);
-	NumericMatrix simulatedPlannedEvents(kMax, cols);
+	NumericMatrix simulatedOverallEventsPerStage(kMax, cols);
 	NumericMatrix simulatedSuccessStopping(kMax, cols);
 	NumericMatrix simulatedFutilityStopping(kMax - 1, cols);
 	NumericMatrix simulatedConditionalPower(kMax, cols);
@@ -934,7 +963,7 @@ List performSimulationMultiArmSurvivalLoop(
 	std::fill(simulatedRejections.begin(), simulatedRejections.end(), 0.0);
 	std::fill(simulatedNumberOfActiveArms.begin(), simulatedNumberOfActiveArms.end(), 0.0);
 	std::fill(simulatedSingleEventsPerStage.begin(), simulatedSingleEventsPerStage.end(), 0.0);
-	std::fill(simulatedPlannedEvents.begin(), simulatedPlannedEvents.end(), 0.0);
+	std::fill(simulatedOverallEventsPerStage.begin(), simulatedOverallEventsPerStage.end(), 0.0);
 	std::fill(simulatedSuccessStopping.begin(), simulatedSuccessStopping.end(), 0.0);
 	std::fill(simulatedFutilityStopping.begin(), simulatedFutilityStopping.end(), 0.0);
 	std::fill(simulatedConditionalPower.begin(), simulatedConditionalPower.end(), 0.0);
@@ -1006,6 +1035,7 @@ List performSimulationMultiArmSurvivalLoop(
 				minNumberOfEventsPerStage,
 				maxNumberOfEventsPerStage,
 				conditionalPower,
+				thetaH0,
 				thetaH1,
 				calcEventsFunction,
 				calcEventsFunctionIsUserDefined,
@@ -1124,7 +1154,7 @@ List performSimulationMultiArmSurvivalLoop(
 					}
 					simulatedSingleEventsPerStage[k + i * kMax + gMax * kMax * cols] += 
 						singleEventsPerStage(gMax, k);					
-					simulatedPlannedEvents(k, i) += sum(na_omit(singleEventsPerStage(_, k)));
+					simulatedOverallEventsPerStage(k, i) += sum(na_omit(singleEventsPerStage(_, k)));
 
 					iterations(k, i)++;
 					
@@ -1203,7 +1233,7 @@ List performSimulationMultiArmSurvivalLoop(
 		
 		for (int k = 0; k < kMax; k++) {
 			if (iterations(k, i) > 0) {
-				simulatedPlannedEvents(k, i) /= iterations(k, i);
+				simulatedOverallEventsPerStage(k, i) /= iterations(k, i);
 				simulatedNumberOfSubjects(k, i) /= iterations(k, i);
 				simulatedAnalysisTime(k, i) /= iterations(k, i);
 				simulatedNumberOfActiveArms(k, i) /= iterations(k, i);
@@ -1228,21 +1258,21 @@ List performSimulationMultiArmSurvivalLoop(
 			}
 			NumericVector cumStopping = cumsum(stopping);
 			
-			expectedNumberOfEvents[i] = simulatedPlannedEvents(0, i);
+			expectedNumberOfEvents[i] = simulatedOverallEventsPerStage(0, i);
 			expectedNumberOfSubjects[i] = simulatedNumberOfSubjects(0, i);
 			expectedStudyDuration[i] = simulatedAnalysisTime(0, i);
 			
 			for (int k = 1; k < kMax; k++) {
 				double factor = 1.0 - cumStopping[k - 1];
 				expectedNumberOfEvents[i] += factor * 
-					(simulatedPlannedEvents(k, i) - simulatedPlannedEvents(k - 1, i));
+					simulatedOverallEventsPerStage(k, i);
 				expectedNumberOfSubjects[i] += factor * 
 					(simulatedNumberOfSubjects(k, i) - simulatedNumberOfSubjects(k - 1, i));
 				expectedStudyDuration[i] += factor * 
 					(simulatedAnalysisTime(k, i) - simulatedAnalysisTime(k - 1, i));
 			}
 		} else {
-			expectedNumberOfEvents[i] = simulatedPlannedEvents(0, i);
+			expectedNumberOfEvents[i] = simulatedOverallEventsPerStage(0, i);
 			expectedNumberOfSubjects[i] = simulatedNumberOfSubjects(0, i);
 			expectedStudyDuration[i] = simulatedAnalysisTime(0, i);
 		}
@@ -1272,7 +1302,7 @@ List performSimulationMultiArmSurvivalLoop(
 	DataFrame filteredData = DataFrame::create(
 		_["iterationNumber"] = dataIterationNumber[validRows],
 		_["stageNumber"] = dataStageNumber[validRows],
-		_["armNumber"] = dataArmNumber[validRows],
+		_["activeArm"] = dataArmNumber[validRows],
 		_["omegaMax"] = dataAlternative[validRows],
 		_["effect"] = dataEffect[validRows],
 		_["analysisTime"] = dataAnalysisTime[validRows],
@@ -1297,7 +1327,7 @@ List performSimulationMultiArmSurvivalLoop(
 		_["simulatedRejections"] = simulatedRejections,
 		_["simulatedNumberOfActiveArms"] = simulatedNumberOfActiveArms,
 		_["simulatedSingleEventsPerStage"] = simulatedSingleEventsPerStage,
-		_["simulatedPlannedEvents"] = simulatedPlannedEvents,
+		_["simulatedOverallEventsPerStage"] = simulatedOverallEventsPerStage,
 		_["simulatedSuccessStopping"] = simulatedSuccessStopping,
 		_["simulatedFutilityStopping"] = simulatedFutilityStopping,
 		_["simulatedConditionalPower"] = simulatedConditionalPower,

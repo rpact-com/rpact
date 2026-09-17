@@ -348,11 +348,11 @@ NULL
         ...,
         design,
         effectList,
-        kappa = NA_real_, # survival only
+        kappa = 1, # survival only
         dropoutRate1 = NA_real_, # survival only
         dropoutRate2 = NA_real_, # survival only
         dropoutTime = NA_real_, # survival only
-        eventTime = NA_real_, # survival only
+        eventTime = 12, # survival only
         intersectionTest,
         stratifiedAnalysis = NA,
         directionUpper = NA, # rates + survival only
@@ -374,6 +374,7 @@ NULL
         minNumberOfEventsPerStage = NA_real_, # survival only
         maxNumberOfEventsPerStage = NA_real_, # survival only
         conditionalPower,
+        thetaH0 = NA_real_, # survival only
         thetaH1 = NA_real_, # means + survival only
         stDevH1 = NA_real_, # means only
         piTreatmentH1 = NA_real_, # rates only
@@ -385,7 +386,8 @@ NULL
         selectPopulationsFunction,
         showStatistics,
         endpoint = c("means", "rates", "survival"),
-        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic")) {
+        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+        simulationTypeIsUserDefined = FALSE) {
     endpoint <- match.arg(endpoint)
     simulationType <- match.arg(simulationType)
 
@@ -434,12 +436,12 @@ NULL
 
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
 
-    if (endpoint %in% c("rates", "survival")) {
-        .assertIsSingleLogical(directionUpper, "directionUpper")
-    }
-
     if (endpoint %in% c("means", "survival")) {
         .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE) # means + survival only
+    }
+    if (endpoint == "survival") {
+        .assertIsSingleNumber(thetaH0, "thetaH0")
+        .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
     }
 
     if (endpoint == "means") {
@@ -462,25 +464,23 @@ NULL
             "testStatisticBased",
             "patientWise"
         )
-        simulationResults$.setParameterType("simulationType", C_PARAM_DERIVED)
+        simulationResults$.setParameterType("simulationType", 
+            ifelse(isFALSE(simulationTypeIsUserDefined) || identical(simulationType, "auto"), 
+                ifelse(
+                    identical(simulationType, "testStatisticBased"),
+                    C_PARAM_DERIVED,
+                    C_PARAM_DEFAULT_VALUE
+                ), 
+                C_PARAM_USER_DEFINED))
     }
 
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
     .validateAndSetSeed(simulationResults, seed)
 
-    effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
-    if (endpoint == "survival" && is.null(effectList$hazardRatios) && !is.null(effectList$piTreatments)) {
-        if (is.null(effectList$piControls)) {
-            stopMissingArgument(
-                sQuote("effectList$piControls"),
-                " must be specified when 'effectList$piTreatments' is used",
-                functionName = ".createSimulationResultsEnrichmentObject",
-                parameter = "effectList$piControls", value = effectList$piControls,
-                relatedParameter = "effectList$piTreatments",
-                relatedValue = effectList$piTreatments
-            )
-        }
-
+    effectList <- .getValidatedEffectList(effectList, endpoint = endpoint, simulationType = simulationType)
+    if (endpoint == "survival" &&
+            is.null(effectList$hazardRatios) &&
+            !is.null(effectList$piTreatments)) {
         effectList$hazardRatios <- t(apply(effectList$piTreatments, 1, function(piTreatments) {
             getHazardRatioByPi(piTreatments, effectList$piControls, eventTime = eventTime, kappa = kappa)
         }))
@@ -533,8 +533,13 @@ NULL
     }
 
     if (endpoint %in% c("rates", "survival")) {
-        .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, 
-            ifelse(identical(endpoint, "survival"), C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT))
+        directionUpper <- .setDirectionUpper(
+            simulationResults,
+            design,
+            directionUpper,
+            objectType = "power",
+            endpoint = endpoint,
+            userFunctionCallEnabled = TRUE)
     }
 
     if (!stratifiedAnalysis && endpoint %in% c("means")) {
@@ -943,6 +948,9 @@ NULL
     )
     if (endpoint %in% c("means", "survival")) {
         .setValueAndParameterType(simulationResults, "thetaH1", thetaH1, NA_real_, notApplicableIfNA = TRUE)
+    }
+    if (endpoint == "survival") {
+        .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, C_THETA_H0_SURVIVAL_DEFAULT)
     }
     if (endpoint == "means") {
         .setValueAndParameterType(simulationResults, "stDevH1", stDevH1, NA_real_, notApplicableIfNA = TRUE)
