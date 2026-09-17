@@ -101,7 +101,7 @@ getOutputFormat("sample size")
 \code{\link[base]{format}} for details on the
 function used internally to format the values.
 
-Other output formats: 
-\code{\link{getOutputFormat}()}
+Other output formats:
+\code{\link[=getOutputFormat]{getOutputFormat()}}
 }
 \concept{output formats}

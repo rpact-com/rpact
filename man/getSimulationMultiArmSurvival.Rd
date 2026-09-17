@@ -13,7 +13,7 @@ getSimulationMultiArmSurvival(
   piControl = NA_real_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
-  omegaMaxVector = seq(1, 2.6, 0.4),
+  omegaMaxVector = NA_real_,
   kappa = 1,
   gED50 = NA_real_,
   slope = 1,

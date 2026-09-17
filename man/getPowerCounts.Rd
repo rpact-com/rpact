@@ -158,9 +158,9 @@ getPowerCounts(design = getDesignGroupSequential(
 
 }
 \seealso{
-Other power functions: 
-\code{\link{getPowerMeans}()},
-\code{\link{getPowerRates}()},
-\code{\link{getPowerSurvival}()}
+Other power functions:
+\code{\link[=getPowerMeans]{getPowerMeans()}},
+\code{\link[=getPowerRates]{getPowerRates()}},
+\code{\link[=getPowerSurvival]{getPowerSurvival()}}
 }
 \concept{power functions}

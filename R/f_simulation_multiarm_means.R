@@ -424,7 +424,8 @@ getSimulationMultiArmMeans <- function(
         selectArmsFunction          = selectArmsFunction,
         showStatistics              = showStatistics,
         endpoint                    = "means",
-        simulationType              = "testStatisticBased"
+        simulationType              = "testStatisticBased",
+        simulationTypeIsUserDefined = FALSE
     )
 
     design <- simulationResults$.design

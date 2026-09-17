@@ -481,7 +481,8 @@ NULL
         selectArmsFunction,
         showStatistics,
         endpoint = c("means", "rates", "survival"),
-        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic")) {
+        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+        simulationTypeIsUserDefined = FALSE) {
     endpoint <- match.arg(endpoint)
     simulationType <- match.arg(simulationType)
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
@@ -504,7 +505,13 @@ NULL
             "patientWise"
         )
         simulationResults$.setParameterType("simulationType", 
-            ifelse(identical(simulationType, "auto"), C_PARAM_DERIVED, C_PARAM_USER_DEFINED))
+            ifelse(isFALSE(simulationTypeIsUserDefined) || identical(simulationType, "auto"), 
+                ifelse(
+                    identical(simulationType, "testStatisticBased"),
+                    C_PARAM_DERIVED,
+                    C_PARAM_DEFAULT_VALUE
+                ), 
+                C_PARAM_USER_DEFINED))
     }
 
     if (is.na(activeArms)) {

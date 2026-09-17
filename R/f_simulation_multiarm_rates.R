@@ -521,7 +521,8 @@ getSimulationMultiArmRates <- function(
         selectArmsFunction          = selectArmsFunction,
         showStatistics              = showStatistics,
         endpoint                    = "rates",
-        simulationType              = "testStatisticBased"
+        simulationType              = "testStatisticBased",
+        simulationTypeIsUserDefined = FALSE
     )
 
     design <- simulationResults$.design

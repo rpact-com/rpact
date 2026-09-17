@@ -190,6 +190,8 @@ getSimulationMultiArmSurvival <- function(
         FALSE
     )) || maxNumberOfRawDatasetsPerStage > 0
 
+    simulationTypeIsUserDefined <- !identical(simulationType, "auto")
+
     if (simulationType == "auto") {
         if (usesBasicOnlyArgs && usesPatientWiseOnlyArgs) {
             stopConflictingArguments(
@@ -268,7 +270,8 @@ getSimulationMultiArmSurvival <- function(
             seed = seed,
             calcEventsFunction = calcEventsFunction,
             selectArmsFunction = selectArmsFunction,
-            showStatistics = showStatistics
+            showStatistics = showStatistics,
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined
         ))
     }
 
@@ -325,7 +328,8 @@ getSimulationMultiArmSurvival <- function(
             calcEventsFunction = calcEventsFunction,
             selectArmsFunction = selectArmsFunction,
             showStatistics = showStatistics,
-            cppEnabled = ifelse(identical(simulationType, "patientWiseBasic"), FALSE, TRUE)
+            cppEnabled = ifelse(identical(simulationType, "patientWiseBasic"), FALSE, TRUE),
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined
         ))
     }
 }
@@ -462,7 +466,8 @@ getSimulationMultiArmSurvival <- function(
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
         showStatistics = FALSE,
-        cppEnabled = TRUE) {
+        cppEnabled = TRUE,
+        simulationTypeIsUserDefined = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
@@ -559,7 +564,8 @@ getSimulationMultiArmSurvival <- function(
         selectArmsFunction = selectArmsFunction,
         showStatistics = showStatistics,
         endpoint = "survival",
-        simulationType = "patientWise"
+        simulationType = "patientWise",
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined
     )
 
     design <- simulationResults$.design

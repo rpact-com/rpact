@@ -368,7 +368,8 @@ NULL
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectArmsFunction = NULL,
-        showStatistics = FALSE) {
+        showStatistics = FALSE,
+        simulationTypeIsUserDefined = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
@@ -420,7 +421,8 @@ NULL
         selectArmsFunction          = selectArmsFunction,
         showStatistics              = showStatistics,
         endpoint                    = "survival",
-        simulationType              = "testStatisticBased"
+        simulationType              = "testStatisticBased",
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined
     )
     for (notApplicableParam in c(
         "accrualIntensity",

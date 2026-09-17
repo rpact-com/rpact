@@ -80,16 +80,16 @@ getClosedConditionalDunnettTestResults(stageResults)
 
 }
 \seealso{
-Other analysis functions: 
-\code{\link{getAnalysisResults}()},
-\code{\link{getClosedCombinationTestResults}()},
-\code{\link{getConditionalPower}()},
-\code{\link{getConditionalRejectionProbabilities}()},
-\code{\link{getFinalConfidenceInterval}()},
-\code{\link{getFinalPValue}()},
-\code{\link{getRepeatedConfidenceIntervals}()},
-\code{\link{getRepeatedPValues}()},
-\code{\link{getStageResults}()},
-\code{\link{getTestActions}()}
+Other analysis functions:
+\code{\link[=getAnalysisResults]{getAnalysisResults()}},
+\code{\link[=getClosedCombinationTestResults]{getClosedCombinationTestResults()}},
+\code{\link[=getConditionalPower]{getConditionalPower()}},
+\code{\link[=getConditionalRejectionProbabilities]{getConditionalRejectionProbabilities()}},
+\code{\link[=getFinalConfidenceInterval]{getFinalConfidenceInterval()}},
+\code{\link[=getFinalPValue]{getFinalPValue()}},
+\code{\link[=getRepeatedConfidenceIntervals]{getRepeatedConfidenceIntervals()}},
+\code{\link[=getRepeatedPValues]{getRepeatedPValues()}},
+\code{\link[=getStageResults]{getStageResults()}},
+\code{\link[=getTestActions]{getTestActions()}}
 }
 \concept{analysis functions}
