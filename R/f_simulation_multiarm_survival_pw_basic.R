@@ -560,7 +560,12 @@ NULL
             }
 
             if (is.na(thetaH1)) {
-                thetaStandardized <- log(min(overallEffects[selectedArms[1:gMax, k], k], na.rm = TRUE) / thetaH0)
+                thetaStandardized <- log(.applyDirectionOfAlternative(
+                    overallEffects[selectedArms[1:gMax, k], k],
+                    directionUpper,
+                    type = "minMax",
+                    phase = "planning"
+                ) / thetaH0)
             } else {
                 thetaStandardized <- log(thetaH1 / thetaH0)
             }
