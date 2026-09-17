@@ -74,7 +74,6 @@ Suggests:
 	rmarkdown (>= 1.10),
     rappdirs (>= 0.3.3)
 VignetteBuilder: knitr, rmarkdown
-RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
@@ -97,6 +96,7 @@ Collate:
     'class_analysis_dataset.R'
     'class_analysis_stage_results.R'
     'class_analysis_results.R'
+    'class_design_optimal.R'
     'f_design_general_utilities.R'
     'class_time.R'
     'class_design_set.R'
@@ -126,6 +126,10 @@ Collate:
     'f_core_output_formats.R'
     'f_design_fisher_combination_test.R'
     'f_design_group_sequential.R'
+    'parameter_descriptions.R'
+    'f_design_optimal_background.R'
+    'f_design_optimal_user.R'
+    'f_design_optimal_utilities.R'
     'f_design_plan_counts.R'
     'f_design_plan_means.R'
     'f_design_plan_plot.R'
@@ -146,5 +150,5 @@ Collate:
     'f_simulation_multiarm_survival.R'
     'f_simulation_performance_score.R'
     'f_simulation_plot.R'
-    'parameter_descriptions.R'
     'pkgname.R'
+Config/roxygen2/version: 8.1.0

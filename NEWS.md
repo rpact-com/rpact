@@ -1,3 +1,17 @@
+# Development version
+
+* Added optimal conditional error designs for adaptive two-stage trials, including
+  conditional error, second-stage information, expected information, overall power,
+  and diagnostic plots.
+* Integrated the new design class with rpact parameter metadata and output methods.
+  Added input validation and regression tests for conditional power callbacks,
+  information constraints, endpoint limits, and high conditional power optimisation.
+* Increased the accuracy of level calibration, including designs with very high
+  conditional power.
+* Clarified the exponential likelihood-ratio rate parameterisation and the need
+  for an explicit probability distribution when evaluating expected information
+  for a maximum-likelihood-ratio design.
+
 # rpact 4.2.1
 
 ## New features

@@ -1,3 +1,25 @@
+## |
+## |  *Optimal conditional error design class*
+## |
+## |  This file is part of the R package rpact:
+## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |
+## |  Original contribution: Morten Dreher
+## |  Licensed under "GNU Lesser General Public License" version 3
+## |  License text: https://www.r-project.org/Licenses/LGPL-3
+## |
+
+#' Optimal Conditional Error Design
+#'
+#' @description R6 parameter set for an adaptive two-stage design based on an
+#' optimal conditional error function.
+#' @details Create objects with [getDesignOptimalConditionalErrorFunction()].
+#' This class inherits from `ParameterSet`, not `TrialDesign`: its second-stage
+#' information depends on the interim result. Functions accepting conventional
+#' group sequential or combination-test designs cannot use this object.
+#' @include class_core_parameter_set.R
+#' @keywords internal
+#' @seealso [getDesignOptimalConditionalErrorFunction()]
 TrialDesignOptimalConditionalError <- R6::R6Class(
     "TrialDesignOptimalConditionalError",
     inherit = ParameterSet,
@@ -47,8 +69,6 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             tauLR = NA_real_,
             kappaLR = NA_real_,
             deltaMaxLR = NA_real_,
-            levelConstant = NA_real_,
-            monotonisationConstants = NULL,
             minimumSecondStageInformation = 0,
             maximumSecondStageInformation = Inf,
             minimumConditionalError = 0,
@@ -58,6 +78,16 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             enforceMonotonicity = TRUE,
             ...
         ) {
+            super$initialize()
+            .assertIsSingleLogical(useInterimEstimate, "useInterimEstimate")
+            .assertIsSingleLogical(enforceMonotonicity, "enforceMonotonicity")
+            for (parameterName in c("conditionalPower", "delta1", "delta1Min", "delta1Max")) {
+                .assertIsSingleNumber(get(parameterName), parameterName, naAllowed = TRUE)
+            }
+            .warnInCaseOfUnknownArguments(
+                functionName = "getDesignOptimalConditionalErrorFunction",
+                ..., ignore = c("ncp1", "ncp1Min", "ncp1Max")
+            )
             # Range assertions for alpha, alpha1, alpha0
             # General range assertions
             .assertIsSingleNumber(x = alpha, argumentName = "alpha")
@@ -72,48 +102,27 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             .assertIsInClosedInterval(x = alpha1, xName = "alpha1", lower = 0, upper = alpha)
             .assertIsInClosedInterval(x = alpha0, xName = "alpha0", lower = alpha1, upper = 1)
 
-            if (is.na(conditionalPower) && is.null(suppressWarnings(body(conditionalPowerFunction)))) {
-                stop(paste0(
-                    C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                    "Must specify either conditionalPower or a valid conditionalPowerFunction."
-                ))
+            if (!is.na(conditionalPower)) {
+                .assertIsInOpenInterval(conditionalPower, "conditionalPower", lower = 0, upper = 1)
+                if (!is.null(conditionalPowerFunction) && !identical(conditionalPowerFunction, NA)) {
+                    warning("Both conditionalPower and conditionalPowerFunction are provided. Using conditionalPower.",
+                        call. = FALSE
+                    )
+                }
             } else {
-                if (!is.na(conditionalPower)) {
-                    .assertIsSingleNumber(x = conditionalPower, argumentName = "conditionalPower")
-                    .assertIsInOpenInterval(x = conditionalPower, xName = "conditionalPower", lower = 0, upper = 1)
-
-                    if (!is.null(suppressWarnings(body(conditionalPowerFunction)))) {
-                        warning(
-                            "Both conditionalPower and conditionalPowerFunction are provided. Using conditionalPower and ignoring conditionalPowerFunction."
-                        )
-                    }
-                } else if (!is.null(suppressWarnings(body(conditionalPowerFunction)))) {
-                    .assertIsFunction(fun = conditionalPowerFunction)
-
-                    # Check if function is increasing
-                    # Grid of values
-                    pValueGrid <- seq(from = alpha1, to = alpha0, length.out = 50)
-                    conditionalPowerValues <- conditionalPowerFunction(pValueGrid)
-
-                    # Any function value larger than previous?
-                    if (
-                        any(
-                            conditionalPowerValues[2:(length(conditionalPowerValues))] >
-                                conditionalPowerValues[1:(length(conditionalPowerValues) - 1)]
-                        )
-                    ) {
-                        warning("Conditional power function should not be increasing in the first-stage p-value.")
-                    }
-
-                    if (
-                        useInterimEstimate && (minimumSecondStageInformation > 0 || maximumSecondStageInformation < Inf)
-                    ) {
-                        warning(
-                            "Use of conditional power function, interim estimate and information constraints may lead to non-monotone conditional error function."
-                        )
-                    }
-
-                    self$conditionalPowerFunction <- conditionalPowerFunction
+                if (!is.function(conditionalPowerFunction)) {
+                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+                        "Specify 'conditionalPower' or a valid 'conditionalPowerFunction'.",
+                        call. = FALSE
+                    )
+                }
+                self$conditionalPowerFunction <- conditionalPowerFunction
+                pValueGrid <- seq(alpha1, alpha0, length.out = 50)
+                conditionalPowerValues <- .getOptimalConditionalPower(pValueGrid, self)
+                if (any(diff(conditionalPowerValues) > 0)) {
+                    warning("Conditional power function should not be increasing in the first-stage p-value.",
+                        call. = FALSE
+                    )
                 }
             }
 
@@ -133,7 +142,8 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             .assertIsSingleNumber(x = levelConstantMinimum, argumentName = "levelConstantMinimum")
             .assertIsSingleNumber(x = levelConstantMaximum, argumentName = "levelConstantMaximum")
 
-            if (levelConstantMinimum >= levelConstantMaximum) {
+            if (!is.finite(levelConstantMinimum) || !is.finite(levelConstantMaximum) ||
+                levelConstantMinimum >= levelConstantMaximum) {
                 stop(paste0(
                     C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                     "levelConstantMinimum must be smaller than levelConstantMaximum."
@@ -150,6 +160,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                 # Extract hidden arguments from ...
                 ncp1Min <- list(...)$ncp1Min
                 ncp1Max <- list(...)$ncp1Max
+                if (is.null(ncp1Max)) ncp1Max <- Inf
 
                 if (is.na(delta1Min) && is.null(ncp1Min)) {
                     stop(paste0(
@@ -289,6 +300,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
 
             .assertIsSingleCharacter(x = likelihoodRatioDistribution, argumentName = "likelihoodRatioDistribution")
 
+            for (parameterName in c("deltaLR", "tauLR", "kappaLR", "deltaMaxLR")) {
+                value <- get(parameterName)
+                if (is.numeric(value) && any(is.infinite(value))) {
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                        "'", parameterName, "' must contain finite values.",
+                        call. = FALSE
+                    )
+                }
+            }
             # Identify specific distribution parameters
             if (likelihoodRatioDistribution == "fixed") {
                 if (any(is.na(deltaLR))) {
@@ -319,13 +339,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                             ))
                         }
                         # Verify that weightsDeltaLR sums to 1
-                        if (sum(weightsDeltaLR) != 1) {
+                        if (abs(sum(weightsDeltaLR) - 1) > sqrt(.Machine$double.eps)) {
                             stop(paste0(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "Weights in weightsDeltaLR must sum to 1."))
                         }
-                        self$weightsDeltaLR <- weightsDeltaLR
+                        self$weightsDeltaLR <- weightsDeltaLR / sum(weightsDeltaLR)
                     }
                 }
             } else if (likelihoodRatioDistribution == "normal") {
+                .assertIsSingleNumber(deltaLR, "deltaLR", naAllowed = TRUE)
+                .assertIsSingleNumber(tauLR, "tauLR", naAllowed = TRUE)
                 if (is.na(deltaLR) || is.na(tauLR)) {
                     stop(paste0(
                         C_EXCEPTION_TYPE_MISSING_ARGUMENT,
@@ -341,6 +363,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     self$tauLR <- tauLR
                 }
             } else if (likelihoodRatioDistribution == "exp") {
+                .assertIsSingleNumber(kappaLR, "kappaLR", naAllowed = TRUE)
                 if (is.na(kappaLR)) {
                     stop(paste0(
                         C_EXCEPTION_TYPE_MISSING_ARGUMENT,
@@ -352,6 +375,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     self$kappaLR <- kappaLR
                 }
             } else if (likelihoodRatioDistribution == "unif") {
+                .assertIsSingleNumber(deltaMaxLR, "deltaMaxLR", naAllowed = TRUE)
                 if (is.na(deltaMaxLR)) {
                     stop(paste0(
                         C_EXCEPTION_TYPE_MISSING_ARGUMENT,
@@ -369,9 +393,16 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                 ))
             }
 
+            if (is.function(self$conditionalPowerFunction) && useInterimEstimate &&
+                (minimumSecondStageInformation > 0 || maximumSecondStageInformation < Inf)) {
+                warning("Conditional power functions with interim estimates and information constraints may be non-monotone.",
+                    call. = FALSE
+                )
+            }
+
             # Calculate monotonisation constants
             self$monotonisationConstants <- .getMonotonisationConstants(
-                fun = ".getQ",
+                fun = .getQ,
                 lower = alpha1,
                 upper = alpha0,
                 argument = "firstStagePValue",
@@ -382,9 +413,49 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             self$levelConstant <- .getLevelConstant(
                 design = self
             )$root
+            self$.initParameterTypes()
+            for (parameterName in self$.getVisibleFieldNames()) {
+                self$.setParameterType(parameterName, if (is.null(self[[parameterName]]) ||
+                    (is.numeric(self[[parameterName]]) && all(is.na(self[[parameterName]])))) {
+                    C_PARAM_NOT_APPLICABLE
+                } else {
+                    C_PARAM_USER_DEFINED
+                })
+            }
+            for (parameterName in c("ncp1", "ncp1Min", "ncp1Max")) {
+                if (!is.null(self[[parameterName]])) self$.setParameterType(parameterName, C_PARAM_DERIVED)
+            }
+            if (!useInterimEstimate && is.na(delta1)) {
+                self$.setParameterType("ncp1", C_PARAM_USER_DEFINED)
+                self$.setParameterType("delta1", C_PARAM_DERIVED)
+            } else if (useInterimEstimate && is.na(delta1Min)) {
+                self$.setParameterType("ncp1Min", C_PARAM_USER_DEFINED)
+                self$.setParameterType("delta1Min", C_PARAM_DERIVED)
+                self$.setParameterType("ncp1Max", if (is.null(list(...)$ncp1Max)) {
+                    C_PARAM_DEFAULT_VALUE
+                } else {
+                    C_PARAM_USER_DEFINED
+                })
+                self$.setParameterType("delta1Max", C_PARAM_DERIVED)
+            }
+            if (likelihoodRatioDistribution == "fixed" && any(is.na(weightsDeltaLR))) {
+                self$.setParameterType("weightsDeltaLR", C_PARAM_DEFAULT_VALUE)
+            }
+            for (parameterName in c("levelConstant", "monotonisationConstants")) {
+                self$.setParameterType(parameterName, C_PARAM_GENERATED)
+            }
         },
-        show = function() {
-            print.TrialDesignOptimalConditionalError(self)
+        show = function(showType = 1, digits = NA_integer_) {
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            invisible(self)
+        },
+        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
+            self$.resetCat()
+            if (showType == 2) {
+                super$.show(showType = showType, consoleOutputEnabled = consoleOutputEnabled)
+            } else {
+                .showOptimalConditionalErrorDesign(self, consoleOutputEnabled = consoleOutputEnabled)
+            }
         }
     )
 )

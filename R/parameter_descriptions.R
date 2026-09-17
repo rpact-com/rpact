@@ -702,6 +702,7 @@ NULL
 ## Multi-Arm and Enrichment Designs
 ##
 
+
 #' Parameter Description: Intersection Test
 #' @param intersectionTest Defines the multiple test for the intersection
 #'   hypotheses in the closed system of hypotheses.
@@ -980,7 +981,7 @@ NULL
 
 #' Parameter Description: Futility boundary (optimal conditional error design)
 #' @param alpha0
-#' Binding stage 1 futility boundary \eqn{\alpha_0} (p-value scale). Must be a numeric value between 0 and 1. Should be greater than \code{alpha1}. For use of a non-binding futility boundary, specify \code{alpha0=1}.
+#' Binding stage 1 futility boundary \eqn{\alpha_0} (p-value scale). Must be a numeric value between 0 and 1. Should be greater than \code{alpha1}. Specify \code{alpha0=1} to disable early stopping for futility.
 #' @name param_alpha0OCEF
 #' @keywords internal
 NULL
@@ -994,7 +995,7 @@ NULL
 
 #' Parameter Description: Alternative (optimal conditional error design)
 #' @param alternative
-#' Assumed relative effect size.
+#' Finite numeric vector of assumed treatment effects on the mean difference scale.
 #' @name param_alternativeOCEF
 #' @keywords internal
 NULL
@@ -1008,14 +1009,14 @@ NULL
 
 #' Parameter Description: Conditional Power (optimal conditional error design)
 #' @param conditionalPower
-#' The target conditional power \eqn{CP} of the design. Must be a numeric value.
+#' The target conditional power \eqn{CP} of the design. Must be a numeric scalar strictly between 0 and 1. Takes precedence over \code{conditionalPowerFunction}.
 #' @name param_conditionalPowerOCEF
 #' @keywords internal
 NULL
 
 #' Parameter Description: Conditional Power Function (optimal conditional error design)
 #' @param conditionalPowerFunction
-#' A user-specified function which calculates the conditional power from the first-stage p-value. This function should not be increasing in the first-stage p-value, otherwise monotonicity issues may occur.
+#' A function accepting a single first-stage p-value and returning a numeric scalar strictly between 0 and 1. The function is evaluated separately for each p-value. This function should not be increasing in the first-stage p-value, otherwise monotonicity issues may occur.
 #' @name param_conditionalPowerFunctionOCEF
 #' @keywords internal
 NULL
@@ -1113,20 +1114,20 @@ NULL
 
 #' Parameter Description: Likelihood ratio distribution for expected information (optimal conditional error design)
 #' @param likelihoodRatioDistribution
-#' The distribution to be used for the effect size of the likelihood ratio in the calculation of the expected second-stage information. Options are \code{"fixed", "normal", "exp", "unif", "maxlr"} for fixed effect size, normally distributed, exponentially distributed, uniformly distributed prior of the effect size and maximum likelihood ratio, respectively.
+#' The distribution to be used for the effect size of the likelihood ratio in the calculation of the expected second-stage information. Options are \code{"fixed", "normal", "exp", "unif"} for fixed effect size, normally distributed, exponentially distributed, and uniformly distributed prior of the effect size, respectively.
 #' Each case requires different additional specifications: \cr
 #' \itemize{
 #' \item \code{likelihoodRatioDistribution="fixed"} uses one (or more) fixed effect sizes for the likelihood ratio and requires the parameter \code{deltaLR} which provides the mean difference under which to calculate the likelihood ratio. If \code{deltaLR} contains multiple values, they may be weighted using an additional argument \code{weightsDeltaLR}. Omitting \code{weightsDeltaLR} automatically leads to equal weighting.
 #' \item \code{likelihoodRatioDistribution="normal"} uses a normal prior for the effect size and requires parameters \code{deltaLR} and \code{tauLR} for the mean and standard deviation of the normal distribution (both on mean difference scale).
-#' \item \code{likelihoodRatioDistribution="exp"} uses an exponential prior for the effect size and requires the parameter \code{kappaLR} which is the mean of the exponential distribution (on the mean difference scale).
+#' \item \code{likelihoodRatioDistribution="exp"} uses an exponential prior for the effect size and requires the parameter \code{kappaLR} which specifies the rate on the non-centrality scale divided by \code{sqrt(firstStageInformation)}. The mean effect on the mean difference scale is \code{1 / (kappaLR * firstStageInformation)}.
 #' \item \code{likelihoodRatioDistribution="unif"} uses a uniform prior for the effect size and requires the specification of \code{deltaMaxLR}, which is the maximum of the support for the uniform likelihood ratio distribution (on the mean difference scale).
-#' \item \code{likelihoodRatioDistribution="maxlr"} estimates the non-centrality parameter to be used for the likelihood ratio from the data. No additional parameters must be specified.
 #' }
 #' The default is \code{likelihoodRatioDistribution=NULL}.
 #' In this case, the likelihood ratio distribution under which the expected second-stage information is calculated is taken directly from the design object.
 #' @name param_likelihoodRatioDistributionExpectedOCEF
 #' @keywords internal
 NULL
+
 
 #' Parameter Description: Likelihood ratio distribution for minimisation (optimal conditional error design)
 #' @param likelihoodRatioDistribution
@@ -1135,7 +1136,7 @@ NULL
 #' \itemize{
 #' \item \code{likelihoodRatioDistribution="fixed"} uses one (or more) fixed effect sizes for the likelihood ratio and requires the parameter \code{deltaLR} which provides the mean difference under which to calculate the likelihood ratio. If \code{deltaLR} contains multiple values, they may be weighted using an additional argument \code{weightsDeltaLR}. Omitting \code{weightsDeltaLR} automatically leads to equal weighting.
 #' \item \code{likelihoodRatioDistribution="normal"} uses a normal prior for the effect size and requires parameters \code{deltaLR} and \code{tauLR} for the mean and standard deviation of the normal distribution (both on mean difference scale).
-#' \item \code{likelihoodRatioDistribution="exp"} uses an exponential prior for the effect size and requires the parameter \code{kappaLR} which is the mean of the exponential distribution (on the mean difference scale).
+#' \item \code{likelihoodRatioDistribution="exp"} uses an exponential prior for the effect size and requires the parameter \code{kappaLR} which specifies the rate on the non-centrality scale divided by \code{sqrt(firstStageInformation)}. The mean effect on the mean difference scale is \code{1 / (kappaLR * firstStageInformation)}.
 #' \item \code{likelihoodRatioDistribution="unif"} uses a uniform prior for the effect size and requires the specification of \code{deltaMaxLR}, which is the maximum of the support for the uniform likelihood ratio distribution (on the mean difference scale).
 #' \item \code{likelihoodRatioDistribution="maxlr"} estimates the non-centrality parameter to be used for the likelihood ratio from the data. No additional parameters must be specified.
 #' }
