@@ -429,7 +429,7 @@
         directionUpper,
         objectType = objectType,
         endpoint = "counts",
-        userFunctionCallEnabled = TRUE)
+        userFunctionCallEnabled = !identical(objectType, "sampleSize"))
 
     if (sampleSizeEnabled || design$kMax == 1) {
         designPlan$.setParameterType("overallReject", C_PARAM_NOT_APPLICABLE)

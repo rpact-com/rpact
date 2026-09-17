@@ -462,7 +462,7 @@ NULL
             directionUpper,
             objectType = objectType,
             endpoint = "means",
-            userFunctionCallEnabled = TRUE)
+            userFunctionCallEnabled = !identical(objectType, "sampleSize"))
     }
 
 

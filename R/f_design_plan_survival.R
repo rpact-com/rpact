@@ -681,7 +681,8 @@ NULL
     }
 
     if (userFunctionCallEnabled) {
-        allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
+        allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(
+            allocationRatioPlanned, maxNumberOfSubjects)
     }
 
     designPlan <- TrialDesignPlanSurvival$new(

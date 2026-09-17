@@ -2568,6 +2568,9 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
     if (userFunctionCallEnabled && forceUserDefinedDirectionUpper) {
         parameterSet$.setParameterType("directionUpper", C_PARAM_USER_DEFINED)
     }
+    else if (identical(objectType, "sampleSize")) {
+        parameterSet$.setParameterType("directionUpper", C_PARAM_DERIVED)
+    }
     
     return(invisible(directionUpper))
 }

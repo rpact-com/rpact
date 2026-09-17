@@ -32,6 +32,7 @@
     if (length(directionUpper) == 1 && nParameters > 1) {
         directionUpper <- rep(directionUpper, nParameters)
     }
+    
     return(directionUpper)
 }
 

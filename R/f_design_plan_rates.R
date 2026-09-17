@@ -381,7 +381,7 @@ NULL
         directionUpper,
         objectType = objectType,
         endpoint = "rates",
-        userFunctionCallEnabled = TRUE)
+        userFunctionCallEnabled = !identical(objectType, "sampleSize"))
     
     pi1 <- .setPi1(designPlan, pi1,
         type = objectType, endpoint = "rates", closedInterval = (groups == 2L))
