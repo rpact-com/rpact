@@ -3010,8 +3010,8 @@ getFisherInformation <- function(
     if (.isTrialDesignPlanRates(designPlan) && designPlan$groups == 2) {
         return(ifelse(
             direction == "toTreatmentEffect",
-            "design-specific Farrington–Manning inversion",
-            "design-specific Farrington–Manning standardization"
+            "design-specific Farrington-Manning inversion",
+            "design-specific Farrington-Manning standardization"
         ))
     }
     if (.isTrialDesignPlanMeans(designPlan) && !designPlan$normalApproximation) {
