@@ -223,9 +223,10 @@ conditional probability would additionally require a precise definition of
 how all remaining analyses and their stopping boundaries are handled.
 If a group sequential or inverse normal design contains only the default
 futility bound, that bound represents the absence of futility stopping. Its
-conversion to a conditional- or predictive-probability scale is therefore
-returned as the exact boundary value \code{0}, without a numerical-range
-warning. This applies in both directions of the alternative.
+conversion to a conditional-power, predictive-power, or reverse-conditional-
+power scale is therefore returned as the exact boundary value \code{0},
+without a numerical-range warning. This applies in both directions of the
+alternative.
 
 \strong{Interpretation of information}
 

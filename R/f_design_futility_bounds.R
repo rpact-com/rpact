@@ -572,16 +572,36 @@ summary.FutilityBounds <- function(object, ...) {
         directionUpperCalculated <- if (is.na(design$directionUpper)) TRUE else design$directionUpper
     }
     calculationDesign <- if (targetScale == "reverseCondPower") design else NULL
-    result <- getFutilityBounds(
-        sourceValue = .getFutilityBounds(design, interimStages),
-        sourceScale = "zValue",
-        targetScale = targetScale,
-        design = calculationDesign,
-        directionUpper = directionUpperCalculated,
-        theta = theta,
-        information = NA_real_,
-        naAllowed = naAllowed
-    )
+    calculateBounds <- function() {
+        getFutilityBounds(
+            sourceValue = .getFutilityBounds(design, interimStages),
+            sourceScale = "zValue",
+            targetScale = targetScale,
+            design = calculationDesign,
+            directionUpper = directionUpperCalculated,
+            theta = theta,
+            information = NA_real_,
+            naAllowed = naAllowed
+        )
+    }
+    defaultFutilityBounds <- targetScale == "reverseCondPower" &&
+        .isTrialDesignInverseNormalOrGroupSequential(design) &&
+        !.anyFutilityBoundsAreInvalid(design$futilityBounds, design$directionUpper)
+    if (defaultFutilityBounds) {
+        result <- withCallingHandlers(
+            calculateBounds(),
+            warning = function(warningCondition) {
+                if (identical(
+                        conditionMessage(warningCondition),
+                        "At least one calculated futility bound outside acceptable range")) {
+                    invokeRestart("muffleWarning")
+                }
+            }
+        )
+        result[] <- 0
+    } else {
+        result <- calculateBounds()
+    }
     attr(result, "stage") <- interimStages
     attr(result, "designPlan") <- designPlan
     return(result)
@@ -1108,9 +1128,10 @@ summary.FutilityBounds <- function(object, ...) {
 #' how all remaining analyses and their stopping boundaries are handled.
 #' If a group sequential or inverse normal design contains only the default
 #' futility bound, that bound represents the absence of futility stopping. Its
-#' conversion to a conditional- or predictive-probability scale is therefore
-#' returned as the exact boundary value \code{0}, without a numerical-range
-#' warning. This applies in both directions of the alternative.
+#' conversion to a conditional-power, predictive-power, or reverse-conditional-
+#' power scale is therefore returned as the exact boundary value \code{0},
+#' without a numerical-range warning. This applies in both directions of the
+#' alternative.
 #'
 #' \strong{Interpretation of information}
 #'
@@ -1306,7 +1327,6 @@ getFutilityBounds <- function(
         stage = NA_integer_,
         naAllowed = FALSE) {
     sourceScaleMissing <- missing(sourceScale)
-    targetScaleMissing <- missing(targetScale)
     sourceScale <- match.arg(sourceScale)
     targetScale <- match.arg(targetScale)
 
@@ -1319,9 +1339,6 @@ getFutilityBounds <- function(
     )
 
     if (is(sourceValue, "TrialDesignPlan") || is(sourceValue, "SimulationResults")) {
-        if (targetScaleMissing) {
-            targetScale <- "effectEstimate"
-        }
         if (targetScale == "treatmentEffect") {
             return(.getFutilityBoundsOnTreatmentEffectScale(
                 designPlan = sourceValue
@@ -1347,9 +1364,6 @@ getFutilityBounds <- function(
     }
     
     if (is(sourceValue, "FisherInformation")) {
-        if (targetScaleMissing) {
-            targetScale <- "effectEstimate"
-        }
         if (targetScale == "treatmentEffect") {
             return(.getFutilityBoundsOnTreatmentEffectScale(
                 designPlan = sourceValue$.getDesignPlan(),
