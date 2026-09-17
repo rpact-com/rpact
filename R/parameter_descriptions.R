@@ -1029,6 +1029,19 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Pi Control
+#' @param piControl The assumed probability in the control arm, default is \code{0.5}.
+#' @name param_piControl
+#' @keywords internal
+NULL
+
+#' Parameter Description: Omega Max Vector
+#' #' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
+#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 0.4, -0.2)}.
+#' @name param_omegaMaxVector
+#' @keywords internal
+NULL
+
 ##
 ## Optimal Conditional Error Function
 ##

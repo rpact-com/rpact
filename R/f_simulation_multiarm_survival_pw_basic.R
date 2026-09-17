@@ -372,7 +372,12 @@ NULL
                         allocationFraction
                     )
                     survivalDataSet$treatmentArm <- treatments[1:maxNumberOfSubjects]
-
+                    
+                    # guard the loop so it runs only when new subjects exist
+                    if (numberOfSubjects[k - 1] >= maxNumberOfSubjects) {
+                        next
+                    }
+                    
                     for (i in seq.int(numberOfSubjects[k - 1] + 1, maxNumberOfSubjects)) {
                         for (g in 1:gMax) {
                             if (survivalDataSet$treatmentArm[i] == g && selectedArms[g, k]) {

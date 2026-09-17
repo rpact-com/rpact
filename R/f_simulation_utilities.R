@@ -820,7 +820,7 @@ getData.SimulationResults <- function(x) {
         df <- df[order(df$pi1, df$iterationNumber, df$stageNumber), ]
     }
     
-    # move columns p1 and p2 to first position if they exist
+    # move columns pi1 and pi2 to first position if they exist
     if (all(c("pi1", "pi2") %in% colnames(df))) {
         df <- .moveColumnToFirstPosition(df, "pi2")
         df <- .moveColumnToFirstPosition(df, "pi1")

@@ -36,8 +36,7 @@ NULL
 #' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
 #' than 1 can be used, for example, to simulate non-inferiority designs.
 #'
-#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
-#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.
+#' @inheritParams param_omegaMaxVector
 #' @inheritParams param_intersectionTest_MultiArm
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_effectMeasure
@@ -81,7 +80,7 @@ NULL
 #' @inheritParams param_showStatistics
 #' @inheritParams param_maxNumberOfRawDatasetsPerStage
 #' @inheritParams param_simulationType_multiarm_survival
-#' @param piControl The assumed probability in the control arm, default is \code{0.5}.
+#' @inheritParams param_piControl
 #'
 #' @details
 #' At given design the function simulates the analysis times, power, stopping
@@ -342,8 +341,7 @@ getSimulationMultiArmSurvival <- function(
 #' Returns the simulated power, stopping and selection probabilities, conditional power, and
 #' expected sample size for testing hazard ratios in a multi-arm treatment groups testing situation.
 #'
-#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
-#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.
+#' @inheritParams param_omegaMaxVector
 #' @inheritParams param_intersectionTest_MultiArm
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_effectMeasure
