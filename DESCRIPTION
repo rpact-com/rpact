@@ -114,6 +114,7 @@ Collate:
     'f_simulation_base_survival.R'
     'class_simulation_results.R'
     'class_performance_score.R'
+    'class_piecewise_multiarm_survival_time.R'
     'class_summary.R'
     'data.R'
     'f_analysis_base_general.R'

@@ -36,7 +36,7 @@ NULL
 #' @inheritParams param_effectMeasure
 #' @inheritParams param_adaptations
 #' @inheritParams param_threshold
-#' @inheritParams param_effectList
+#' @inheritParams param_effectList_enrichment_survival
 #' @inheritParams param_successCriterion
 #' @inheritParams param_design_with_default
 #' @inheritParams param_thetaH0
@@ -444,7 +444,7 @@ NULL
 #' @inheritParams param_effectMeasure
 #' @inheritParams param_adaptations
 #' @inheritParams param_threshold
-#' @inheritParams param_effectList
+#' @inheritParams param_effectList_enrichment_survival
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
@@ -490,6 +490,14 @@ NULL
 #' are simulated instead. The default \code{simulationType = "auto"} selects the patient-wise
 #' approach if patient-wise-specific arguments were explicitly specified; otherwise the
 #' test-statistic-based approach is used for backward compatibility.
+#'
+#' For piecewise exponential event times, include a
+#' \code{PiecewiseEnrichmentSurvivalTime} object in
+#' \code{effectList$piecewiseSurvivalTime}. Its hazard ratios are represented
+#' as a subgroup-by-interval-by-situation array; equivalently, they can be
+#' supplied to the constructor as a named list of subgroup-by-interval matrices.
+#' The situation dimension changes slowest, so printing the object displays one
+#' subgroup-by-interval matrix for each situation.
 #'
 #' The definition of \code{thetaH1} makes only sense if \code{kMax} > 1
 #' and if \code{conditionalPower}, \code{minNumberOfEventsPerStage}, and
@@ -556,6 +564,34 @@ getSimulationEnrichmentSurvival <- function(
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
         showStatistics = FALSE) {
+    piecewiseSurvivalTime <- if (is.list(effectList)) effectList$piecewiseSurvivalTime else NULL
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseEnrichmentSurvivalTime")
+    if (!is.null(piecewiseSurvivalTime) && !piecewiseEnabled) {
+        stopIllegalArgument("'effectList$piecewiseSurvivalTime' must be a PiecewiseEnrichmentSurvivalTime object",
+            functionName = "getSimulationEnrichmentSurvival", parameter = "effectList$piecewiseSurvivalTime")
+    }
+    if (piecewiseEnabled) {
+        if (!is.na(kappa) && kappa != 1) {
+            stopIllegalArgument("'kappa' must be 1 for piecewise exponential survival times",
+                functionName = "getSimulationEnrichmentSurvival", parameter = "kappa")
+        }
+        conflicting <- intersect(names(effectList), c("piControls", "piTreatments", "hazardRatios"))
+        if (length(conflicting) > 0) {
+            stopConflictingArguments("piecewise survival cannot be combined with ",
+                .arrayToString(paste0("effectList$", conflicting), encapsulate = TRUE),
+                functionName = "getSimulationEnrichmentSurvival",
+                parameter = "effectList$piecewiseSurvivalTime")
+        }
+        if (!identical(as.character(effectList$subGroups),
+                dimnames(piecewiseSurvivalTime$hazardRatios)[[1]])) {
+            stopIllegalArgument("the subgroup names in 'effectList' and the piecewise specification must agree",
+                functionName = "getSimulationEnrichmentSurvival", parameter = "effectList$subGroups")
+        }
+        effectList$piecewiseSurvivalTime <- NULL
+        effectList$piControls <- 1 - exp(-piecewiseSurvivalTime$lambdaControls[, 1] * eventTime)
+        effectList$hazardRatios <- t(piecewiseSurvivalTime$hazardRatios[, 1, , drop = FALSE][, 1, ])
+        kappa <- 1
+    }
     simulationType <- match.arg(simulationType)
     maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
         maxNumberOfRawDatasetsPerStage)
@@ -577,7 +613,7 @@ getSimulationEnrichmentSurvival <- function(
         "maxNumberOfSubjects"
     )
 
-    usesPatientWiseOnlyArgs <- any(vapply(
+    usesPatientWiseOnlyArgs <- piecewiseEnabled || any(vapply(
         patientWiseOnlyArgs,
         hasArg,
         logical(1)
@@ -648,8 +684,24 @@ getSimulationEnrichmentSurvival <- function(
         ))
     }
 
-    if (identical(simulationType, "patientWise")) {
-        return(.getSimulationEnrichmentSurvivalPatientWise(
+    if (simulationType %in% c("patientWise", "patientWiseBasic")) {
+        basicSimulationEnabled <- identical(simulationType, "patientWiseBasic") || piecewiseEnabled
+        if (identical(simulationType, "patientWiseBasic")) {
+            message(
+                "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise ",
+                "survival data using R code instead of C++ code. ",
+                "This approach is less efficient and should only be used for testing purposes. ",
+                "To perform a more efficient patient-wise simulation, ",
+                "specify 'simulationType' = \"patientWise\"."
+            )
+        }
+
+        patientWiseFunction <- if (basicSimulationEnabled) {
+            .getSimulationEnrichmentSurvivalPatientWiseBasic
+        } else {
+            .getSimulationEnrichmentSurvivalPatientWise
+        }
+        patientWiseArguments <- list(
             design = design,
             thetaH0 = thetaH0,
             effectList = effectList,
@@ -683,58 +735,14 @@ getSimulationEnrichmentSurvival <- function(
             seed = seed,
             calcEventsFunction = calcEventsFunction,
             selectPopulationsFunction = selectPopulationsFunction,
-            showStatistics = showStatistics,
-            simulationTypeIsUserDefined = simulationTypeIsUserDefined,
-            ...
-        ))
-    }
-
-    if (identical(simulationType, "patientWiseBasic")) {
-        message(
-            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise ",
-            "survival data using R code instead of C++ code. ",
-            "This approach is less efficient and should only be used for testing purposes. ",
-            "To perform a more efficient patient-wise simulation, ",
-            "specify 'simulationType' = \"patientWise\"."
+            showStatistics = showStatistics
         )
-
-        return(.getSimulationEnrichmentSurvivalPatientWiseBasic(
-            design = design,
-            thetaH0 = thetaH0,
-            effectList = effectList,
-            kappa = kappa,
-            eventTime = eventTime,
-            accrualTime = accrualTime,
-            accrualIntensity = accrualIntensity,
-            accrualIntensityType = accrualIntensityType,
-            dropoutRate1 = dropoutRate1,
-            dropoutRate2 = dropoutRate2,
-            dropoutTime = dropoutTime,
-            maxNumberOfSubjects = maxNumberOfSubjects,
-            intersectionTest = intersectionTest,
-            stratifiedAnalysis = stratifiedAnalysis,
-            directionUpper = directionUpper,
-            adaptations = adaptations,
-            typeOfSelection = typeOfSelection,
-            effectMeasure = effectMeasure,
-            successCriterion = successCriterion,
-            epsilonValue = epsilonValue,
-            rValue = rValue,
-            threshold = threshold,
-            plannedEvents = plannedEvents,
-            allocationRatioPlanned = allocationRatioPlanned,
-            minNumberOfEventsPerStage = minNumberOfEventsPerStage,
-            maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
-            conditionalPower = conditionalPower,
-            thetaH1 = thetaH1,
-            maxNumberOfIterations = maxNumberOfIterations,
-            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
-            seed = seed,
-            calcEventsFunction = calcEventsFunction,
-            selectPopulationsFunction = selectPopulationsFunction,
-            showStatistics = showStatistics,
-            ...
-        ))
+        if (basicSimulationEnabled) {
+            patientWiseArguments$piecewiseSurvivalTime <- piecewiseSurvivalTime
+        } else {
+            patientWiseArguments$simulationTypeIsUserDefined <- simulationTypeIsUserDefined
+        }
+        return(do.call(patientWiseFunction, c(patientWiseArguments, list(...))))
     }
 
     stopRuntimeIssue("unknown simulation type: ", dQuote(simulationType),

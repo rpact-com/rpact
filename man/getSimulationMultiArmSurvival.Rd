@@ -11,6 +11,7 @@ getSimulationMultiArmSurvival(
   thetaH0 = 1,
   activeArms = NA_integer_,
   piControl = NA_real_,
+  piecewiseSurvivalTime = NULL,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
   omegaMaxVector = NA_real_,
@@ -90,6 +91,13 @@ defining the null hypothesis H0: \code{pi = thetaH0}.}
 
 \item{piControl}{The assumed probability in the control arm, default is \code{0.5}.}
 
+\item{piecewiseSurvivalTime}{A \code{PiecewiseMultiArmSurvivalTime} object
+created by \code{getPiecewiseMultiArmSurvivalTime()}. It specifies common
+interval start times, the control hazard in every interval, and an
+active-arm-by-interval hazard-ratio matrix for every situation. It can
+only be used for patient-wise simulation with \code{kappa = 1}, and cannot
+be combined with \code{piControl} or \code{effectMatrix}.}
+
 \item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and one or more rows,
 where each row represents a different situation to consider.}
 
@@ -105,7 +113,7 @@ of effect sizes for the treatment group with response according to infinite dose
 If \code{"userDefined"} is selected, \code{effectMatrix} has to be entered.}
 
 \item{omegaMaxVector}{Range of hazard ratios with highest response for \code{"linear"} and
-\code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.}
+\code{"sigmoidEmax"} model, default is \code{seq(1, 0.4, -0.2)}.}
 
 \item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
 of the shape of the Weibull distribution.
@@ -297,6 +305,13 @@ simulation approach automatically based on the explicitly specified arguments an
 legacy test-statistic-based approach for backward compatibility if no patient-wise-specific
 arguments are provided.
 
+For piecewise exponential event times, create \code{piecewiseSurvivalTime}
+with \code{getPiecewiseMultiArmSurvivalTime()}. Hazard ratios are represented
+as an active-arm-by-interval-by-situation array; equivalently, they can be
+supplied to the constructor as a named list of active-arm-by-interval
+matrices. The situation dimension changes slowest, so printing the object
+displays one active-arm-by-interval matrix for each situation.
+
 The definition of \code{thetaH1} makes only sense if \code{kMax} > 1
 and if \code{conditionalPower}, \code{minNumberOfEventsPerStage}, and
 \code{maxNumberOfEventsPerStage} (or \code{calcEventsFunction}) are defined.
@@ -374,6 +389,22 @@ simulationResultsNonInferiority <- getSimulationMultiArmSurvival(
     allocationRatioPlanned = 1, maxNumberOfSubjects = 400,
     accrualTime = c(0, 20), accrualIntensity = 20,
     maxNumberOfIterations = 50, simulationType = "patientWise")
+
+# Piecewise exponential event times for two active arms and two situations
+piecewiseTime <- getPiecewiseMultiArmSurvivalTime(
+    piecewiseSurvivalTime = c(0, 6),
+    lambdaControl = c(0.08, 0.12),
+    hazardRatios = list(
+        favorable = rbind(lowDose = c(0.9, 0.8), highDose = c(0.8, 0.6)),
+        conservative = rbind(lowDose = c(1, 0.9), highDose = c(0.9, 0.75))
+    )
+)
+simulationResultsPiecewise <- getSimulationMultiArmSurvival(
+    design = getDesignFixed(), simulationType = "patientWise",
+    piecewiseSurvivalTime = piecewiseTime, directionUpper = FALSE,
+    plannedEvents = 80, maxNumberOfSubjects = 300,
+    accrualTime = c(0, 12), accrualIntensity = 25,
+    maxNumberOfIterations = 50)
 }
 
 }

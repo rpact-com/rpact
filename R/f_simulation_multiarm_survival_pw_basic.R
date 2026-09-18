@@ -241,6 +241,20 @@ NULL
     treatments
 }
 
+.getPiecewiseMultiArmSurvivalTimeRandom <- function(treatmentArm, piecewiseSurvivalTime,
+        activeHazards, controlHazards) {
+    hazards <- if (treatmentArm <= nrow(activeHazards)) {
+        activeHazards[treatmentArm, ]
+    } else {
+        controlHazards
+    }
+    getPiecewiseExponentialRandomNumbers(
+        1,
+        piecewiseSurvivalTime = piecewiseSurvivalTime,
+        piecewiseLambda = hazards
+    )
+}
+
 #'
 #' Calculates stage results for each simulation iteration step (R Based)
 #'
@@ -273,6 +287,8 @@ NULL
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
         selectArmsFunction,
+        piecewiseSurvivalTime = NULL,
+        piecewiseActiveHazards = NULL,
         returnRawData = FALSE) {
     kMax <- length(plannedEvents)
     gMax <- length(omegaVector)
@@ -309,14 +325,26 @@ NULL
         treatmentArm = treatments
     )
 
-    lambdaControl <- getLambdaByPi(piControl, eventTime, kappa)
-    lambdaVector <- c(omegaVector * lambdaControl, lambdaControl)
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseMultiArmSurvivalTime")
+    if (piecewiseEnabled) {
+        controlHazards <- piecewiseSurvivalTime$lambdaControls[1, ]
+        activeHazards <- piecewiseActiveHazards
+    } else {
+        lambdaControl <- getLambdaByPi(piControl, eventTime, kappa)
+        lambdaVector <- c(omegaVector * lambdaControl, lambdaControl)
+    }
 
     for (i in 1:maxNumberOfSubjects) {
         for (g in 1:(gMax + 1)) {
             if (survivalDataSet$treatmentArm[i] == g) {
-                survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
-                    lambdaVector[g]
+                survivalDataSet$survivalTime[i] <- if (piecewiseEnabled) {
+                    .getPiecewiseMultiArmSurvivalTimeRandom(
+                        g, piecewiseSurvivalTime$piecewiseSurvivalTime,
+                        activeHazards, controlHazards
+                    )
+                } else {
+                    (-log(1 - runif(1, 0, 1)))^(1 / kappa) / lambdaVector[g]
+                }
             }
         }
         survivalDataSet$dropoutTime[i] <- NA_real_
@@ -381,13 +409,25 @@ NULL
                     for (i in seq.int(numberOfSubjects[k - 1] + 1, maxNumberOfSubjects)) {
                         for (g in 1:gMax) {
                             if (survivalDataSet$treatmentArm[i] == g && selectedArms[g, k]) {
-                                survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
-                                    lambdaVector[g]
+                                survivalDataSet$survivalTime[i] <- if (piecewiseEnabled) {
+                                    .getPiecewiseMultiArmSurvivalTimeRandom(
+                                        g, piecewiseSurvivalTime$piecewiseSurvivalTime,
+                                        activeHazards, controlHazards
+                                    )
+                                } else {
+                                    (-log(1 - runif(1, 0, 1)))^(1 / kappa) / lambdaVector[g]
+                                }
                             }
                         }
                         if (survivalDataSet$treatmentArm[i] == (gMax + 1)) {
-                            survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
-                                lambdaVector[gMax + 1]
+                            survivalDataSet$survivalTime[i] <- if (piecewiseEnabled) {
+                                .getPiecewiseMultiArmSurvivalTimeRandom(
+                                    gMax + 1, piecewiseSurvivalTime$piecewiseSurvivalTime,
+                                    activeHazards, controlHazards
+                                )
+                            } else {
+                                (-log(1 - runif(1, 0, 1)))^(1 / kappa) / lambdaVector[gMax + 1]
+                            }
                         }
                         survivalDataSet$dropoutTime[i] <- NA_real_
                         for (g in 1:gMax) {
@@ -657,6 +697,7 @@ NULL
         successCriterion,
         gMax,
         kMax,
+        piecewiseSurvivalTime = NULL,
         maxNumberOfRawDatasetsPerStage = 0) {
     # Initialize simulation result matrices
     simulatedNumberEventsNotAchieved <- matrix(0, nrow = kMax, ncol = cols)
@@ -700,7 +741,22 @@ NULL
     dataPValuesSeparate <- rep(NA_real_, len)
 
     index <- 1
+    allPiecewiseActiveHazards <- if (inherits(
+            piecewiseSurvivalTime, "PiecewiseMultiArmSurvivalTime")) {
+        piecewiseSurvivalTime$getActiveHazards()
+    } else {
+        NULL
+    }
     for (i in seq_len(cols)) {
+        piecewiseActiveHazards <- if (!is.null(allPiecewiseActiveHazards)) {
+            matrix(
+                allPiecewiseActiveHazards[, , i, drop = FALSE],
+                nrow = gMax,
+                dimnames = dimnames(piecewiseSurvivalTime$hazardRatios)[1:2]
+            )
+        } else {
+            NULL
+        }
         for (j in seq_len(maxNumberOfIterations)) {
             returnRawData <- maxNumberOfRawDatasetsPerStage > 0 &&
                 any(rawDataPerStage[i, ] < maxNumberOfRawDatasetsPerStage)
@@ -730,6 +786,8 @@ NULL
                 calcEventsFunction = calcEventsFunction,
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
                 selectArmsFunction = selectArmsFunction,
+                piecewiseSurvivalTime = piecewiseSurvivalTime,
+                piecewiseActiveHazards = piecewiseActiveHazards,
                 returnRawData = returnRawData
             )
             closedTest <- if (.isTrialDesignConditionalDunnett(design)) {

@@ -1410,6 +1410,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         numberOfSubjects = NULL,
         omegaMaxVector = NULL,
         piControl = NULL,
+        piecewiseSurvivalTime = NULL,
         rejectAtLeastOne = NULL,
         rejectedArmsPerStage = NULL,
         rValue = NULL,
@@ -1754,6 +1755,7 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
         maxNumberOfSubjects = NULL,
         numberOfPopulations = NULL,
         numberOfSubjects = NULL,
+        piecewiseSurvivalTime = NULL,
         populations = NULL,
         populationEventsPerStage = NULL,
         singleEventsPerSubsetAndStage = NULL, # deprecated

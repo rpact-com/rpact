@@ -773,10 +773,35 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Piecewise Multi-Arm Survival Time
+#' @param piecewiseSurvivalTime A \code{PiecewiseMultiArmSurvivalTime} object
+#'   created by \code{getPiecewiseMultiArmSurvivalTime()}. It specifies common
+#'   interval start times, the control hazard in every interval, and an
+#'   active-arm-by-interval hazard-ratio matrix for every situation. It can
+#'   only be used for patient-wise simulation with \code{kappa = 1}, and cannot
+#'   be combined with \code{piControl} or \code{effectMatrix}.
+#' @name param_piecewiseSurvivalTime_multiarm
+#' @keywords internal
+NULL
+
 #' Parameter Description: Effect List
 #' @param effectList List of subsets, prevalences, and effect sizes with columns and number of rows
 #'   reflecting the different situations to consider (see examples).
 #' @name param_effectList
+#' @keywords internal
+NULL
+
+#' Parameter Description: Effect List for Enrichment Survival
+#' @param effectList List of subsets, prevalences, and effect sizes with columns
+#'   and number of rows reflecting the different situations to consider (see
+#'   examples). For a piecewise exponential patient-wise survival simulation,
+#'   specify
+#'   \code{subGroups}, \code{prevalences}, and \code{piecewiseSurvivalTime},
+#'   where the latter is a \code{PiecewiseEnrichmentSurvivalTime} object created
+#'   by \code{getPiecewiseEnrichmentSurvivalTime()}. Its subgroup names and the
+#'   order of \code{subGroups} must agree. In this case, do not also specify
+#'   \code{piControls}, \code{piTreatments}, or \code{hazardRatios}.
+#' @name param_effectList_enrichment_survival
 #' @keywords internal
 NULL
 
@@ -1036,8 +1061,8 @@ NULL
 NULL
 
 #' Parameter Description: Omega Max Vector
-#' #' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
-#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 0.4, -0.2)}.
+#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
+#'   \code{"sigmoidEmax"} model, default is \code{seq(1, 0.4, -0.2)}.
 #' @name param_omegaMaxVector
 #' @keywords internal
 NULL

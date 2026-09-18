@@ -1,0 +1,45 @@
+---
+title: "Piecewise Patient-Wise Survival Simulation"
+format: gfm
+---
+
+## Objective
+
+Extend the patient-wise multi-arm and population-enrichment survival simulations to generate piecewise exponentially distributed survival times. Existing exponential and Weibull behavior remains unchanged. Piecewise survival uses a common set of intervals, requires `kappa = 1`, and permits interval-specific hazard ratios.
+
+## User interface
+
+Two constructors provide complete, validated survival specifications:
+
+- `getPiecewiseMultiArmSurvivalTime()` for active arms compared with a common control.
+- `getPiecewiseEnrichmentSurvivalTime()` for active treatment compared with control within disjoint subsets.
+
+Hazard ratios may be supplied as one group-by-interval matrix, a named list of such matrices (one per situation), or an equivalent three-dimensional array. The normalized array dimension order is:
+
+```text
+group x interval x situation
+```
+
+The situation dimension is slowest-changing. Printing therefore shows one readily readable group-by-interval matrix for every situation. `getPiecewiseHazardRatioArray()` is provided as a small helper for constructing and validating this array.
+
+For multi-arm simulations, the control hazards form one vector over intervals. For enrichment simulations, control hazards form a subset-by-interval matrix. Active hazards are calculated as the corresponding control hazard multiplied by the interval-specific hazard ratio.
+
+The resulting object is supplied through `piecewiseSurvivalTime`. It replaces the ordinary survival-effect inputs (`piControl` and `effectMatrix` for multi-arm simulations; `piControls`, `piTreatments`, and `hazardRatios` inside an enrichment `effectList`). Piecewise inputs imply `typeOfShape = "userDefined"` and patient-wise simulation.
+
+## Simulation implementation
+
+The constructors validate interval boundaries, dimensions, names, positivity, and the relationship between control hazards and hazard ratios. Simulation code normalizes both specifications into interval boundaries and group-, interval-, and situation-specific hazards.
+
+Random survival times reuse the piecewise exponential random-number implementation used by `getSimulationSurvival()`. Piecewise requests currently run through the existing R patient-wise simulation engine; the unchanged C++ engine remains in use for ordinary exponential and Weibull requests. Drop-out remains independent and exponentially distributed with the currently specified treatment-group rates. Piecewise survival cannot be combined with `kappa != 1`.
+
+The existing non-piecewise code path remains separate so its random-number sequence and seeded regression results do not change.
+
+## Results and presentation
+
+The piecewise specification is retained in the simulation result. Its print method displays interval labels and control hazards followed by one hazard-ratio matrix for every situation. A long-form `as.data.frame()` representation contains the situation, group, interval boundaries, control hazard, hazard ratio, and resulting active hazard.
+
+Stage-wise effect estimates remain scalar log-rank-based estimates. The interval-specific hazard ratios describe the data-generating distribution, not separate interval-specific analysis estimands.
+
+## Verification
+
+Tests cover input validation, printing and conversion, constant and delayed effects, distinct enrichment-subset hazards, drop-out, and multiple situations. Special-case tests compare one-active-arm and one-subset simulations with `getSimulationSurvival()` using sufficiently many iterations and tolerances appropriate for independently generated Monte Carlo results.
