@@ -25,6 +25,38 @@ using namespace Rcpp;
 #ifndef PKG_RPACT_H2
 #define PKG_RPACT_H2
 
+// Validated once in R, then reused for all patients in a simulation iteration.
+// Use the same exponential draws as the R reference implementation.
+class PiecewiseSurvivalSampler {
+private:
+	NumericVector intervalStarts;
+	NumericMatrix activeHazards;
+	NumericMatrix controlHazards;
+public:
+	bool enabled;
+	explicit PiecewiseSurvivalSampler(Nullable<List> specification) :
+		intervalStarts(0), activeHazards(0, 0), controlHazards(0, 0),
+		enabled(specification.isNotNull()) {
+		if (enabled) {
+			List settings(specification.get());
+			intervalStarts = as<NumericVector>(settings["intervalStarts"]);
+			activeHazards = as<NumericMatrix>(settings["activeHazards"]);
+			controlHazards = as<NumericMatrix>(settings["controlHazards"]);
+		}
+	}
+	double draw(int group, bool active) const {
+		const NumericMatrix& hazards = active ? activeHazards : controlHazards;
+		double time = R::rexp(1.0 / hazards(group, 0));
+		for (int interval = 1; interval < intervalStarts.size(); ++interval) {
+			if (time < intervalStarts[interval]) {
+				break;
+			}
+			time = intervalStarts[interval] + R::rexp(1.0 / hazards(group, interval));
+		}
+		return time;
+	}
+};
+
 double findObservationTime(
 	NumericVector accrualTime,
 	NumericVector survivalTime,
@@ -57,4 +89,3 @@ double getPiByLambda(double lambda, double eventTime, double kappa);
 double getHazardRatio(double pi1, double pi2, double eventTime, double kappa);
 
 #endif
-

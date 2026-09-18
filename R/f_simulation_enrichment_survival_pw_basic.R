@@ -59,7 +59,9 @@ updateSubGroupVector <- function(
     } else {
         controlHazards[subGroupIndex, ]
     }
-    getPiecewiseExponentialRandomNumbers(
+    # The piecewise specification is already validated; avoid constructing and
+    # validating a PiecewiseSurvivalTime object for every patient.
+    .getPiecewiseExponentialRandomNumbersFast(
         1,
         piecewiseSurvivalTime = piecewiseSurvivalTime$piecewiseSurvivalTime,
         piecewiseLambda = hazards

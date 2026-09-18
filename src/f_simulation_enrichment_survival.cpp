@@ -357,7 +357,8 @@ List getSurvDropoutTimes(int numberOfSubjects,
 						NumericVector lambdaControl,
 						NumericVector lambdaActive,
 						double kappa,
-						NumericVector phi) {
+						NumericVector phi,
+                        const PiecewiseSurvivalSampler& piecewise) {
 	// This is important to ensure that R's random number generator state is properly managed.
 	Rcpp::RNGScope scope; 
 
@@ -370,7 +371,8 @@ List getSurvDropoutTimes(int numberOfSubjects,
 
 		// Generate survival time
 		double thisLambda = treatments[i] == 1 ? lambdaActive[subGroupIndex] : lambdaControl[subGroupIndex];
-		survivalTime[i] = pow(-log(1 - R::runif(0.0, 1.0)), 1.0 / kappa) / thisLambda;
+		survivalTime[i] = piecewise.enabled ? piecewise.draw(subGroupIndex, treatments[i] == 1) :
+            pow(-log(1 - R::runif(0.0, 1.0)), 1.0 / kappa) / thisLambda;
 		
 		// Generate dropout time
 		bool anyPhiPositive = Rcpp::as<bool>(any(phi > 0));		
@@ -507,7 +509,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		Nullable<Function> calcEventsFunction = R_NilValue,
 		bool calcEventsFunctionIsUserDefined = false,
 		Nullable<Function> selectPopulationsFunction = R_NilValue,
-		bool returnRawData = false) {
+		bool returnRawData = false,
+        Nullable<List> piecewiseSurvival = R_NilValue) {
+    const PiecewiseSurvivalSampler piecewise(piecewiseSurvival);
 	
 	// Clone plannedEvents to avoid modifying the input parameter
 	NumericVector plannedEvents = clone(plannedEvents_);
@@ -574,7 +578,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		lambdaControl,
 		lambdaActive,
 		kappa,
-		phi
+		phi,
+        piecewise
 	);
 	NumericVector survivalTime = clone(as<NumericVector>(tmp["survivalTime"]));
 	NumericVector dropoutTime = clone(as<NumericVector>(tmp["dropoutTime"]));
@@ -676,7 +681,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					lambdaControl,
 					lambdaActive,
 					kappa,
-					phi
+					phi,
+                    piecewise
 				);
 				NumericVector newSurvivalTime = tmp["survivalTime"];
 				NumericVector newDropoutTime = tmp["dropoutTime"];
@@ -1062,7 +1068,10 @@ List performSimulationEnrichmentSurvivalLoop(
 		std::string successCriterion,
 		int gMax,
 		int kMax,
-		int maxNumberOfRawDatasetsPerStage = 0) {
+		int maxNumberOfRawDatasetsPerStage = 0,
+        Nullable<List> piecewiseSurvivalScenarios = R_NilValue) {
+    List piecewiseScenarios = piecewiseSurvivalScenarios.isNotNull() ?
+        List(piecewiseSurvivalScenarios.get()) : List();
 	// Initialize simulation result matrices
 	IntegerMatrix simulatedNumberEventsNotAchieved(kMax, cols);
 	NumericMatrix simulatedAnalysisTime(kMax, cols);
@@ -1134,6 +1143,10 @@ List performSimulationEnrichmentSurvivalLoop(
 	
 	// Main simulation loop
 	for (int i = 0; i < cols; i++) {
+        Nullable<List> piecewiseSurvival = R_NilValue;
+        if (piecewiseSurvivalScenarios.isNotNull()) {
+            piecewiseSurvival = Nullable<List>(piecewiseScenarios[i]);
+        }
 		for (int j = 0; j < maxNumberOfIterations; j++) {
 			bool returnRawData = false;
 			if (maxNumberOfRawDatasetsPerStage > 0) {
@@ -1177,7 +1190,8 @@ List performSimulationEnrichmentSurvivalLoop(
 				calcEventsFunction,
 				calcEventsFunctionIsUserDefined,
 				selectPopulationsFunction,
-				returnRawData
+				returnRawData,
+                piecewiseSurvival
 			);
 			
 			List closedTest = performClosedCombinationTestForSimulationEnrichment(

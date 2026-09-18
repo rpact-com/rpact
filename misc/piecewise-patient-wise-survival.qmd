@@ -30,7 +30,7 @@ The resulting object is supplied through `piecewiseSurvivalTime`. It replaces th
 
 The constructors validate interval boundaries, dimensions, names, positivity, and the relationship between control hazards and hazard ratios. Simulation code normalizes both specifications into interval boundaries and group-, interval-, and situation-specific hazards.
 
-Random survival times reuse the piecewise exponential random-number implementation used by `getSimulationSurvival()`. Piecewise requests currently run through the existing R patient-wise simulation engine; the unchanged C++ engine remains in use for ordinary exponential and Weibull requests. Drop-out remains independent and exponentially distributed with the currently specified treatment-group rates. Piecewise survival cannot be combined with `kappa != 1`.
+Piecewise requests use the C++ patient-wise simulation engine by default. The validated interval starts and situation-specific hazard matrices are passed to C++ once per simulation call, and event times are generated in C++ both initially and after arm or population selection. The sampler uses the same exponential draws as the R reference implementation, which remains available through `simulationType = "patientWiseBasic"`. The R reference sampler also reuses the validated specification rather than validating it again for every patient. Drop-out remains independent and exponentially distributed with the currently specified treatment-group rates. Piecewise survival cannot be combined with `kappa != 1`.
 
 The existing non-piecewise code path remains separate so its random-number sequence and seeded regression results do not change.
 

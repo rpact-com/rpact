@@ -2,6 +2,21 @@
 ## |  *Piecewise survival specifications for patient-wise simulations*
 ## |
 
+.getPiecewiseSurvivalScenarios <- function(piecewiseSurvivalTime) {
+    if (is.null(piecewiseSurvivalTime)) {
+        return(NULL)
+    }
+    activeHazards <- piecewiseSurvivalTime$getActiveHazards()
+    lapply(seq_len(dim(activeHazards)[3]), function(i) {
+        list(
+            intervalStarts = piecewiseSurvivalTime$piecewiseSurvivalTime,
+            controlHazards = piecewiseSurvivalTime$lambdaControls,
+            activeHazards = matrix(activeHazards[, , i],
+                nrow = dim(activeHazards)[1], ncol = dim(activeHazards)[2])
+        )
+    })
+}
+
 .getPiecewiseIntervalNames <- function(piecewiseSurvivalTime) {
     n <- length(piecewiseSurvivalTime)
     vapply(seq_len(n), function(i) {

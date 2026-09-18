@@ -140,7 +140,8 @@ NULL
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
         showStatistics = FALSE,
-        simulationTypeIsUserDefined = FALSE) {
+        simulationTypeIsUserDefined = FALSE,
+        piecewiseSurvivalTime = NULL) {
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
@@ -226,6 +227,7 @@ NULL
         simulationTypeIsUserDefined = simulationTypeIsUserDefined
     )
 
+    simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
     design <- simulationResults$.design
     effectList <- simulationResults$effectList
     successCriterion <- simulationResults$successCriterion
@@ -334,7 +336,8 @@ NULL
         successCriterion = successCriterion,
         gMax = gMax,
         kMax = kMax,
-        maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage
+        maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
+        piecewiseSurvivalScenarios = .getPiecewiseSurvivalScenarios(piecewiseSurvivalTime)
     )
 
     # extract results from the simulation
@@ -685,7 +688,7 @@ getSimulationEnrichmentSurvival <- function(
     }
 
     if (simulationType %in% c("patientWise", "patientWiseBasic")) {
-        basicSimulationEnabled <- identical(simulationType, "patientWiseBasic") || piecewiseEnabled
+        basicSimulationEnabled <- identical(simulationType, "patientWiseBasic")
         if (identical(simulationType, "patientWiseBasic")) {
             message(
                 "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise ",
@@ -737,9 +740,8 @@ getSimulationEnrichmentSurvival <- function(
             selectPopulationsFunction = selectPopulationsFunction,
             showStatistics = showStatistics
         )
-        if (basicSimulationEnabled) {
-            patientWiseArguments$piecewiseSurvivalTime <- piecewiseSurvivalTime
-        } else {
+        patientWiseArguments$piecewiseSurvivalTime <- piecewiseSurvivalTime
+        if (!basicSimulationEnabled) {
             patientWiseArguments$simulationTypeIsUserDefined <- simulationTypeIsUserDefined
         }
         return(do.call(patientWiseFunction, c(patientWiseArguments, list(...))))

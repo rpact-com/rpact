@@ -248,7 +248,9 @@ NULL
     } else {
         controlHazards
     }
-    getPiecewiseExponentialRandomNumbers(
+    # The piecewise specification is already validated; avoid constructing and
+    # validating a PiecewiseSurvivalTime object for every patient.
+    .getPiecewiseExponentialRandomNumbersFast(
         1,
         piecewiseSurvivalTime = piecewiseSurvivalTime,
         piecewiseLambda = hazards

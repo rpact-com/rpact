@@ -694,7 +694,7 @@ getSimulationMultiArmSurvival <- function(
     # to force last value to be last accrualTime
     recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
 
-    loopResult <- if (isTRUE(cppEnabled) && !piecewiseEnabled) {
+    loopResult <- if (isTRUE(cppEnabled)) {
         weights <- if (.isTrialDesignFixed(design) || .isTrialDesignInverseNormal(design)) {
             .getWeightsInverseNormal(design)
         } else if (.isTrialDesignFisher(design)) {
@@ -743,7 +743,8 @@ getSimulationMultiArmSurvival <- function(
             successCriterion = successCriterion,
             gMax = gMax,
             kMax = kMax,
-            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
+            piecewiseSurvivalScenarios = .getPiecewiseSurvivalScenarios(piecewiseSurvivalTime)
         )
     } else {
         .performSimulationMultiArmSurvivalLoop(
