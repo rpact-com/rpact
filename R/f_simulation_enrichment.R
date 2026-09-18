@@ -387,7 +387,8 @@ NULL
         showStatistics,
         endpoint = c("means", "rates", "survival"),
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
-        simulationTypeIsUserDefined = FALSE) {
+        simulationTypeIsUserDefined = FALSE,
+        piecewiseSurvivalTime = NULL) {
     endpoint <- match.arg(endpoint)
     simulationType <- match.arg(simulationType)
 
@@ -477,7 +478,10 @@ NULL
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
     .validateAndSetSeed(simulationResults, seed)
 
-    effectList <- .getValidatedEffectList(effectList, endpoint = endpoint, simulationType = simulationType)
+    effectList <- .getValidatedEffectList(effectList, endpoint = endpoint,
+        simulationType = simulationType,
+        requirePiControls = is.null(piecewiseSurvivalTime) &&
+            simulationType %in% c("patientWise", "patientWiseBasic"))
     if (endpoint == "survival" &&
             is.null(effectList$hazardRatios) &&
             !is.null(effectList$piTreatments)) {

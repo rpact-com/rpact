@@ -180,6 +180,10 @@ SimulationResults <- R6::R6Class(
                         orderByParameterName = FALSE,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
+                    if (inherits(self[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+                        self$.cat(paste(capture.output(self$piecewiseSurvivalTime$show()), collapse = "\n"),
+                            "\n\n", consoleOutputEnabled = consoleOutputEnabled)
+                    }
                     self$.showParametersOfOneGroup(
                         self$.getDefaultParameters(),
                         "Default parameters",

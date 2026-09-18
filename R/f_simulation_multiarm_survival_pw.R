@@ -504,8 +504,7 @@ getSimulationMultiArmSurvival <- function(
         }
         activeArms <- piecewiseSurvivalTime$getNumberOfGroups()
         typeOfShape <- "userDefined"
-        effectMatrix <- t(piecewiseSurvivalTime$hazardRatios[, 1, , drop = FALSE][, 1, ])
-        piControl <- 0.5 # placeholder required only by the unchanged setup path
+        effectMatrix <- .getPiecewiseInitialHazardRatios(piecewiseSurvivalTime)
         kappa <- 1
     }
     if (is.null(design)) {
@@ -605,9 +604,9 @@ getSimulationMultiArmSurvival <- function(
         showStatistics = showStatistics,
         endpoint = "survival",
         simulationType = "patientWise",
-        simulationTypeIsUserDefined = simulationTypeIsUserDefined
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined,
+        piecewiseSurvivalTime = piecewiseSurvivalTime
     )
-    simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
 
     design <- simulationResults$.design
     successCriterion <- simulationResults$successCriterion

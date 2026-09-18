@@ -672,7 +672,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 }
 
 .getValidatedEffectList <- function(effectList, ..., endpoint, gMax = NA_integer_, nullAllowed = TRUE,
-        simulationType = "auto") {
+        simulationType = "auto",
+        requirePiControls = simulationType %in% c("patientWise", "patientWiseBasic")) {
     if (is.null(endpoint) || !(endpoint %in% c("means", "rates", "survival"))) {
         stopRuntimeIssue(
             "'endpoint' (", endpoint, ") must be one of 'means', 'rates', or 'survival'",
@@ -696,7 +697,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     effectData <- .getEffectData(effectList, endpoint = endpoint, gMax = gMax, nullAllowed = nullAllowed)
     effectList <- .getEffectList(effectData)
-    .assertIsValidEffectList(effectList, endpoint = endpoint, simulationType = simulationType)
+    .assertIsValidEffectList(effectList, endpoint = endpoint, simulationType = simulationType,
+        requirePiControls = requirePiControls)
     return(effectList)
 }
 
@@ -779,6 +781,11 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 #' \code{rejectPerStage} indicates rejection of the arm's null hypothesis, while
 #' \code{futilityPerStage} is a trial-level futility-stopping decision repeated for
 #' the arm rows of the stage.
+#' For piecewise multi-arm survival simulations, \code{scenario} identifies the
+#' situation by its one-based position in \code{piecewiseSurvivalTime$hazardRatios}.
+#' It matches \code{scenario} in \code{getRawData()} and remains distinct when
+#' situations have identical first-interval effects. The \code{effect} and
+#' \code{omegaMax} columns describe the first interval only.
 #'
 #' @template return_dataframe
 #'

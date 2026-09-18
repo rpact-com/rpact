@@ -723,6 +723,7 @@ NULL
 
     len <- maxNumberOfIterations * kMax * gMax * cols
 
+    dataScenario <- rep(NA_integer_, len)
     dataIterationNumber <- rep(NA_real_, len)
     dataStageNumber <- rep(NA_real_, len)
     dataArmNumber <- rep(NA_real_, len)
@@ -879,6 +880,7 @@ NULL
                         dataStageNumber[index] <- k
                         dataArmNumber[index] <- g
                         dataAlternative[index] <- omegaMaxVector[i]
+                        dataScenario[index] <- i
                         dataEffect[index] <- effectMatrix[i, g]
                         dataAnalysisTime[index] <- stageResults$analysisTime[k]
                         dataNumberOfSubjects[index] <- stageResults$numberOfSubjects[k]
@@ -988,6 +990,9 @@ NULL
         futilityPerStage = dataFutilityStop
     )
 
+    if (!is.null(piecewiseSurvivalTime)) {
+        data$scenario <- dataScenario
+    }
     data <- data[!is.na(data$effectEstimate), ]
 
     list(

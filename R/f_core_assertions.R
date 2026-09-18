@@ -3724,7 +3724,8 @@ NULL
 }
 
 # Validate the normalized enrichment effect list after list/data.frame conversion.
-.assertIsValidEffectList <- function(effectList, ..., endpoint, simulationType = "auto") {
+.assertIsValidEffectList <- function(effectList, ..., endpoint, simulationType = "auto",
+        requirePiControls = simulationType %in% c("patientWise", "patientWiseBasic")) {
     requiredNames <- c("subGroups", "prevalences")
     if (endpoint == "means") {
         requiredNames <- c(requiredNames, "effects", "stDevs")
@@ -3734,14 +3735,13 @@ NULL
         if (is.null(effectList$hazardRatios)) {
             requiredNames <- c(requiredNames, "piTreatments", "piControls")
         }
-        if (simulationType %in% c("patientWise", "patientWiseBasic")) {
+        if (requirePiControls) {
             requiredNames <- c(requiredNames, "piControls")
         }
     }
     for (name in unique(requiredNames)) {
         if (is.null(effectList[[name]]) || length(effectList[[name]]) == 0) {
-            patientWiseControls <- name == "piControls" && endpoint == "survival" &&
-                simulationType %in% c("patientWise", "patientWiseBasic")
+            patientWiseControls <- name == "piControls" && endpoint == "survival" && requirePiControls
             stopMissingArgument(
                 sQuote(paste0("effectList$", name)),
                 if (patientWiseControls) {

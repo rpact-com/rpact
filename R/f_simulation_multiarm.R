@@ -482,7 +482,8 @@ NULL
         showStatistics,
         endpoint = c("means", "rates", "survival"),
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
-        simulationTypeIsUserDefined = FALSE) {
+        simulationTypeIsUserDefined = FALSE,
+        piecewiseSurvivalTime = NULL) {
     endpoint <- match.arg(endpoint)
     simulationType <- match.arg(simulationType)
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
@@ -783,7 +784,13 @@ NULL
             )
         }
 
-        piControl <- .setPi2(simulationResults, piControl, parameterName = "piControl", endpoint = endpoint)
+        if (is.null(piecewiseSurvivalTime)) {
+            piControl <- .setPi2(simulationResults, piControl, parameterName = "piControl", endpoint = endpoint)
+        } else {
+            simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
+            simulationResults$piControl <- NA_real_
+            simulationResults$.setParameterType("piControl", C_PARAM_NOT_APPLICABLE)
+        }
         .setValueAndParameterType(simulationResults, "eventTime", eventTime, 12)
 
         if (!is.na(eventTime) && eventTime <= 0) {
@@ -1291,6 +1298,11 @@ NULL
         simulationResults$.setParameterType("medianControl", C_PARAM_NOT_APPLICABLE)
     }
 
+    if (!is.null(piecewiseSurvivalTime)) {
+        for (parameter in c("effectMatrix", "omegaMaxVector", "eventTime")) {
+            simulationResults$.setParameterType(parameter, C_PARAM_NOT_APPLICABLE)
+        }
+    }
     if (design$kMax == 1) {
         simulationResults$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
     }

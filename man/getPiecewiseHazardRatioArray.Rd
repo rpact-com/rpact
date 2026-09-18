@@ -10,7 +10,9 @@ getPiecewiseHazardRatioArray(..., groupNames = NULL, intervalNames = NULL)
 \item{...}{Matrices, or one named list of matrices. Each matrix contains groups
 in rows and piecewise survival intervals in columns.}
 
-\item{groupNames}{Optional group names.}
+\item{groupNames}{Optional group names. Existing row names must agree in all
+matrices and with these names, including their order. Unnamed matrices are
+interpreted positionally.}
 
 \item{intervalNames}{Optional interval names.}
 }

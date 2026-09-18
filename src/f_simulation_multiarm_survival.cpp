@@ -434,12 +434,14 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
     IntegerVector treatments = getTreatmentsMultiArm(gMax, maxNumberOfSubjects, allocationFraction);
     
     // Calculate hazards
-    double lambdaControl = getLambdaByPi(piControl, eventTime, kappa);
     NumericVector lambdaVector(gMax + 1);
-    for (int g = 0; g < gMax; g++) {
-        lambdaVector[g] = omegaVector[g] * lambdaControl;
+    if (!piecewise.enabled) {
+        double lambdaControl = getLambdaByPi(piControl, eventTime, kappa);
+        for (int g = 0; g < gMax; g++) {
+            lambdaVector[g] = omegaVector[g] * lambdaControl;
+        }
+        lambdaVector[gMax] = lambdaControl;
     }
-    lambdaVector[gMax] = lambdaControl;
 
     // Generate survival and dropout times
     List tmp = getSurvDropoutTimesMultiArm(
@@ -994,6 +996,7 @@ List performSimulationMultiArmSurvivalLoop(
 	
 	// Initialize data collection vectors
 	int len = maxNumberOfIterations * kMax * gMax * cols;
+	IntegerVector dataScenario(len, NA_INTEGER);
 	NumericVector dataIterationNumber(len, NA_REAL);
 	NumericVector dataStageNumber(len, NA_REAL);
 	NumericVector dataArmNumber(len, NA_REAL);
@@ -1188,6 +1191,7 @@ List performSimulationMultiArmSurvivalLoop(
 						dataStageNumber[index] = k + 1;
 						dataArmNumber[index] = g + 1;
 						dataAlternative[index] = omegaMaxVector[i];
+						dataScenario[index] = i + 1;
 						dataEffect[index] = effectMatrix(i, g);
 						dataAnalysisTime[index] = analysisTime[k];
 						dataNumberOfSubjects[index] = numberOfSubjects[k];
@@ -1343,6 +1347,10 @@ List performSimulationMultiArmSurvivalLoop(
 		_["futilityPerStage"] = dataFutilityStop[validRows]
 	);
 	
+    if (piecewiseSurvivalScenarios.isNotNull()) {
+        filteredData.push_back(dataScenario[validRows], "scenario");
+    }
+
 	return List::create(
 		_["simulatedNumberEventsNotAchieved"] = simulatedNumberEventsNotAchieved,
 		_["simulatedAnalysisTime"] = simulatedAnalysisTime,

@@ -370,9 +370,12 @@ List getSurvDropoutTimes(int numberOfSubjects,
 		int subGroupIndex = firstMatch(subGroups, Rcpp::as<std::string>(subGroupVector[i]));
 
 		// Generate survival time
-		double thisLambda = treatments[i] == 1 ? lambdaActive[subGroupIndex] : lambdaControl[subGroupIndex];
-		survivalTime[i] = piecewise.enabled ? piecewise.draw(subGroupIndex, treatments[i] == 1) :
-            pow(-log(1 - R::runif(0.0, 1.0)), 1.0 / kappa) / thisLambda;
+        if (piecewise.enabled) {
+            survivalTime[i] = piecewise.draw(subGroupIndex, treatments[i] == 1);
+        } else {
+            double thisLambda = treatments[i] == 1 ? lambdaActive[subGroupIndex] : lambdaControl[subGroupIndex];
+            survivalTime[i] = pow(-log(1 - R::runif(0.0, 1.0)), 1.0 / kappa) / thisLambda;
+        }
 		
 		// Generate dropout time
 		bool anyPhiPositive = Rcpp::as<bool>(any(phi > 0));		
@@ -566,8 +569,12 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	CharacterVector subGroupVector = tmp["subGroups"];
 
 	// Calculate hazards for control and active treatment
-	NumericVector lambdaControl = getLambdasByPis(piControls, eventTime, kappa);
-	NumericVector lambdaActive = hazardRatios * lambdaControl;
+    NumericVector lambdaControl;
+    NumericVector lambdaActive;
+    if (!piecewise.enabled) {
+        lambdaControl = getLambdasByPis(piControls, eventTime, kappa);
+        lambdaActive = hazardRatios * lambdaControl;
+    }
 
 	// Generate random survival and dropout times
 	tmp = getSurvDropoutTimes(
@@ -1136,7 +1143,8 @@ List performSimulationEnrichmentSurvivalLoop(
 	// Extract effect list components
 	CharacterVector subGroups = effectList["subGroups"];
 	NumericVector prevalences = effectList["prevalences"];
-	NumericVector piControls = effectList["piControls"];
+    NumericVector piControls = piecewiseSurvivalScenarios.isNotNull() ?
+        NumericVector(0) : as<NumericVector>(effectList["piControls"]);
 	NumericMatrix hazardRatios = effectList["hazardRatios"];
 	
 	int index = 0;

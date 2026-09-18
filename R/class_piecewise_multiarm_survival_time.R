@@ -2,6 +2,34 @@
 ## |  *Piecewise survival specifications for patient-wise simulations*
 ## |
 
+.getPiecewiseInitialHazardRatios <- function(piecewiseSurvivalTime) {
+    hazardRatios <- piecewiseSurvivalTime$hazardRatios
+    t(matrix(hazardRatios[, 1, , drop = FALSE],
+        nrow = dim(hazardRatios)[1], ncol = dim(hazardRatios)[3],
+        dimnames = dimnames(hazardRatios)[c(1, 3)]))
+}
+
+.alignPiecewiseSurvivalGroups <- function(piecewiseSurvivalTime, groups) {
+    if (is.null(piecewiseSurvivalTime) ||
+            identical(dimnames(piecewiseSurvivalTime$hazardRatios)[[1]], groups)) {
+        return(piecewiseSurvivalTime)
+    }
+    # Effect-list validation orders subgroups; keep the hazards in that same order
+    # without changing the specification supplied by the caller.
+    aligned <- piecewiseSurvivalTime$clone()
+    indices <- match(groups, dimnames(aligned$hazardRatios)[[1]])
+    aligned$lambdaControls <- aligned$lambdaControls[indices, , drop = FALSE]
+    aligned$hazardRatios <- aligned$hazardRatios[indices, , , drop = FALSE]
+    aligned
+}
+
+.assertPiecewiseGroupNames <- function(actual, expected) {
+    if (!is.null(actual) && !is.null(expected) && !identical(actual, expected)) {
+        stopIllegalArgument("group names and their order must agree across all piecewise hazard matrices",
+            functionName = "getPiecewiseHazardRatioArray", parameter = "groupNames")
+    }
+}
+
 .getPiecewiseSurvivalScenarios <- function(piecewiseSurvivalTime) {
     if (is.null(piecewiseSurvivalTime)) {
         return(NULL)
@@ -51,7 +79,9 @@
 #'
 #' @param ... Matrices, or one named list of matrices. Each matrix contains groups
 #'   in rows and piecewise survival intervals in columns.
-#' @param groupNames Optional group names.
+#' @param groupNames Optional group names. Existing row names must agree in all
+#'   matrices and with these names, including their order. Unnamed matrices are
+#'   interpreted positionally.
 #' @param intervalNames Optional interval names.
 #' @return A numeric array with dimensions group by interval by situation.
 #' @export
@@ -74,6 +104,7 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
         }
         dn <- dimnames(ans)
         if (is.null(dn)) dn <- vector("list", 3)
+        .assertPiecewiseGroupNames(dn[[1]], groupNames)
         if (!is.null(groupNames)) dn[[1]] <- groupNames
         if (!is.null(intervalNames)) dn[[2]] <- intervalNames
         if (is.null(dn[[1]])) dn[[1]] <- paste("Group", seq_len(dim(ans)[1]))
@@ -108,7 +139,10 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
     if (is.null(situationNames) || any(!nzchar(situationNames))) {
         situationNames <- paste("Situation", seq_along(situations))
     }
-    if (is.null(groupNames)) groupNames <- rownames(situations[[1]])
+    for (situation in situations) {
+        if (is.null(groupNames)) groupNames <- rownames(situation)
+        .assertPiecewiseGroupNames(rownames(situation), groupNames)
+    }
     if (is.null(groupNames)) groupNames <- paste("Group", seq_len(referenceDim[1]))
     if (is.null(intervalNames)) intervalNames <- colnames(situations[[1]])
     if (is.null(intervalNames)) intervalNames <- paste("Interval", seq_len(referenceDim[2]))
@@ -131,10 +165,10 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
         initialize = function(piecewiseSurvivalTime, lambdaControls, hazardRatios, groupType) {
             self$piecewiseSurvivalTime <- .validatePiecewiseStartTimes(piecewiseSurvivalTime)
             intervalNames <- .getPiecewiseIntervalNames(self$piecewiseSurvivalTime)
-            self$hazardRatios <- getPiecewiseHazardRatioArray(
-                hazardRatios, intervalNames = intervalNames
-            )
             self$lambdaControls <- as.matrix(lambdaControls)
+            self$hazardRatios <- getPiecewiseHazardRatioArray(
+                hazardRatios, groupNames = rownames(self$lambdaControls), intervalNames = intervalNames
+            )
             storage.mode(self$lambdaControls) <- "double"
             if (ncol(self$lambdaControls) != length(self$piecewiseSurvivalTime)) {
                 stopIllegalArgument("the number of control-hazard columns must equal the number of intervals",
@@ -239,6 +273,8 @@ getPiecewiseMultiArmSurvivalTime <- function(piecewiseSurvivalTime, lambdaContro
 #'
 #' @param piecewiseSurvivalTime Numeric interval start times beginning with 0.
 #' @param lambdaControls Positive subset-by-interval control-hazard matrix.
+#'   If both control hazards and hazard ratios have row names, their names and
+#'   order must agree.
 #' @param hazardRatios One subset-by-interval matrix, a named list of such
 #'   matrices (one per situation), or a subset-by-interval-by-situation array.
 #'   In the array, situation is the slowest-changing dimension.

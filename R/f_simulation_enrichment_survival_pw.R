@@ -224,9 +224,12 @@ NULL
         showStatistics = showStatistics,
         endpoint = "survival",
         simulationType = "patientWise",
-        simulationTypeIsUserDefined = simulationTypeIsUserDefined
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined,
+        piecewiseSurvivalTime = piecewiseSurvivalTime
     )
 
+    piecewiseSurvivalTime <- .alignPiecewiseSurvivalGroups(
+        piecewiseSurvivalTime, simulationResults$effectList$subGroups)
     simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
     design <- simulationResults$.design
     effectList <- simulationResults$effectList
@@ -591,8 +594,7 @@ getSimulationEnrichmentSurvival <- function(
                 functionName = "getSimulationEnrichmentSurvival", parameter = "effectList$subGroups")
         }
         effectList$piecewiseSurvivalTime <- NULL
-        effectList$piControls <- 1 - exp(-piecewiseSurvivalTime$lambdaControls[, 1] * eventTime)
-        effectList$hazardRatios <- t(piecewiseSurvivalTime$hazardRatios[, 1, , drop = FALSE][, 1, ])
+        effectList$hazardRatios <- .getPiecewiseInitialHazardRatios(piecewiseSurvivalTime)
         kappa <- 1
     }
     simulationType <- match.arg(simulationType)

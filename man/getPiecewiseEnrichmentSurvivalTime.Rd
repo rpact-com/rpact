@@ -13,7 +13,9 @@ getPiecewiseEnrichmentSurvivalTime(
 \arguments{
 \item{piecewiseSurvivalTime}{Numeric interval start times beginning with 0.}
 
-\item{lambdaControls}{Positive subset-by-interval control-hazard matrix.}
+\item{lambdaControls}{Positive subset-by-interval control-hazard matrix.
+If both control hazards and hazard ratios have row names, their names and
+order must agree.}
 
 \item{hazardRatios}{One subset-by-interval matrix, a named list of such
 matrices (one per situation), or a subset-by-interval-by-situation array.

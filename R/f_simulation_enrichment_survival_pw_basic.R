@@ -636,8 +636,11 @@ updateSubGroupVector <- function(
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
         endpoint = "survival",
-        simulationType = "patientWiseBasic"
+        simulationType = "patientWiseBasic",
+        piecewiseSurvivalTime = piecewiseSurvivalTime
     )
+    piecewiseSurvivalTime <- .alignPiecewiseSurvivalGroups(
+        piecewiseSurvivalTime, simulationResults$effectList$subGroups)
     simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
 
     design <- simulationResults$.design
