@@ -571,12 +571,18 @@ NumericMatrix getExtendedSurvivalDataSet(IntegerVector treatmentGroup,
 		if (treatmentGroup[i] == 1) {
 			survivalTime[i] = getRandomPiecewiseExponentialDistribution(cdfValues1, lambdaVec1, piecewiseSurvivalTime);
 			if (phi1 > 0) {
+				// Although the survival CDF boundaries are passed here, rep(phi1, ...)
+				// makes every interval hazard identical, so the inverse reduces exactly
+				// to an exponential dropout time with rate phi1 in every branch.
 				dropoutTime[i] = getRandomPiecewiseExponentialDistribution(
 					cdfValues1, rep(phi1, lambdaVec1.size()), piecewiseSurvivalTime);
 			}
 		} else {
 			survivalTime[i] = getRandomPiecewiseExponentialDistribution(cdfValues2, lambdaVec2, piecewiseSurvivalTime);
 			if (phi2 > 0) {
+				// Although the survival CDF boundaries are passed here, rep(phi2, ...)
+				// makes every interval hazard identical, so the inverse reduces exactly
+				// to an exponential dropout time with rate phi2 in every branch.
 				dropoutTime[i] = getRandomPiecewiseExponentialDistribution(
 					cdfValues2, rep(phi2, lambdaVec2.size()), piecewiseSurvivalTime);
 			}
@@ -992,5 +998,4 @@ List getSimulationSurvivalCpp(
 		_["data"] = data
 	);
 }
-
 
