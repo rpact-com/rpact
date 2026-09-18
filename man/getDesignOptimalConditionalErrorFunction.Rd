@@ -93,6 +93,23 @@ The returned object is of class \code{TrialDesignOptimalConditionalError} and ca
 The design object contains the information required to determine the specific setting of the optimal conditional error function and can be passed to other package functions.
 From the given user specifications, the constant to achieve level condition for control of the overall type I error rate as well as the constants to ensure a non-increasing optimal CEF (if required) are automatically calculated.
 }
+\section{Hypotheses and trial decisions}{
+
+The one-sided hypotheses are \eqn{H_0: \Delta \leq 0} versus
+\eqn{H_1: \Delta > 0}. With a first-stage p-value \eqn{p_1}, stop for
+efficacy if \eqn{p_1 \leq \alpha_1} and \eqn{\alpha_1 > 0}; stop for
+futility if \eqn{p_1 > \alpha_0}. Futility is binding: continuing beyond
+this boundary is not part of the calibrated design. In the continuation
+region, reject at stage two if its p-value is no larger than
+\code{\link[=getOptimalConditionalError]{getOptimalConditionalError()}}. The second-stage p-value must be based on
+the new, independent second-stage data, not the cumulative data.
+Setting \code{alpha1 = 0} disables early efficacy and \code{alpha0 = 1} disables early futility.
+The calibration satisfies
+\deqn{\alpha = \alpha_1 + \int_{\alpha_1}^{\alpha_0} \alpha_2(p_1) \, dp_1.}
+Target conditional power refers to a specified planning effect after
+continuation; it is not the overall power returned by \code{\link[=getOverallPower]{getOverallPower()}}.
+}
+
 \section{Likelihood ratio distribution}{
 
 To calculate the optimal conditional error function, an assumption about the true parameter under which the second-stage information is to be minimised is required.
@@ -115,6 +132,9 @@ The maximum likelihood ratio is always restricted to effect sizes \eqn{\vartheta
 \section{Effect for conditional power}{
 
 For the treatment effect at which the target conditional power should be achieved, either a fixed effect or an interim estimate can be used.
+The planning effect \code{delta1} need not equal \code{deltaLR}: the former sets the
+conditional power target, whereas the latter specifies the effect or mixture
+under which expected second-stage information is minimised.
 The usage of a fixed effect is indicated by setting \code{useInterimEstimate=FALSE}, in which case the fixed effect is provided by \code{delta1} on the mean difference scale.
 For an interim estimate, specified by \code{useInterimEstimate=TRUE}, a lower cut-off for the interim estimate must be provided, by \code{delta1Min} on the mean difference scale.
 In addition, an upper limit of the estimate may be analogously provided by \code{delta1Max}. These effects may alternatively be specified on the non-centrality parameter scale as
@@ -155,6 +175,14 @@ By default, \code{minimumConditionalError=0} and \code{maximumConditionalError=1
 The constraints may also be specified on the second-stage information via \code{minimumSecondStageInformation} and \code{maximumSecondStageInformation}.
 If both \code{minimumConditionalError} and \code{maximumSecondStageInformation} respectively \code{maximumConditionalError} and \code{minimumSecondStageInformation}
 are provided, both constraints will be applied.
+Set these constraints when creating the design, so that calibration accounts
+for them. For fixed \eqn{\Delta_1} and conditional power \eqn{CP},
+an upper information bound corresponds to the lower conditional error bound
+\eqn{\Phi(\Phi^{-1}(CP) - \Delta_1 \sqrt{I_{2,\max}})}; a lower information
+bound analogously corresponds to an upper conditional error bound.
+Information bounds apply only when the trial continues: information is zero
+after early stopping. They refer to additional stage-two information, not
+cumulative information.
 In the continuation region, conditional error cannot exceed the conditional power;
 an upper bound above it has no additional effect. Before calibration, the integrated
 lower and upper bounds are checked for compatibility with the overall alpha level.
@@ -200,9 +228,33 @@ getDesignOptimalConditionalErrorFunction(
     firstStageInformation = 80, useInterimEstimate = TRUE
 )
 
+# Weight several effects for the optimisation; retain a separate power target.
+weightedDesign <- getDesignOptimalConditionalErrorFunction(
+    alpha = 0.025, alpha1 = 0.001, alpha0 = 0.5, conditionalPower = 0.9,
+    delta1 = 0.25, useInterimEstimate = FALSE, firstStageInformation = 80,
+    likelihoodRatioDistribution = "fixed", deltaLR = c(0, 0.25, 0.5),
+    weightsDeltaLR = c(0.25, 0.5, 0.25)
+)
+getSecondStageInformation(c(0.05, 0.1, 0.3), weightedDesign)
+
+# Allow a lower conditional power target for less promising interim results.
+# Leave conditionalPower unspecified when supplying a callback.
+flexibleDesign <- getDesignOptimalConditionalErrorFunction(
+    alpha = 0.025, alpha1 = 0.001, alpha0 = 0.5,
+    conditionalPowerFunction = function(p) pnorm(1 - p),
+    delta1 = 0.25, useInterimEstimate = FALSE, firstStageInformation = 80,
+    likelihoodRatioDistribution = "maxlr"
+)
+getOptimalConditionalError(c(0.05, 0.1, 0.3), flexibleDesign)
+
 }
 \references{
-Brannath, W. & Bauer, P. (2004). Optimal conditional error functions for the control of conditional power. Biometrics. https://www.jstor.org/stable/3695393
+Brannath, W. & Bauer, P. (2004). Optimal conditional error functions for the control of conditional power. Biometrics, 60(3), 715-723. \doi{10.1111/j.0006-341X.2004.00221.x}
 
-Brannath, W., Dreher, M., zur Verth, J., Scharpenberg, M. (2024). Optimal monotone conditional error functions. https://arxiv.org/abs/2402.00814
+Brannath, W., zur Verth, J., Dreher, M. & Scharpenberg, M. (2024; revised 2026). Optimal monotone conditional error functions. \doi{10.48550/arXiv.2402.00814}
+
+The related R package \href{https://CRAN.R-project.org/package=optconerrf}{optconerrf: Optimal Monotone Conditional Error Functions} provides a standalone implementation of this methodology. The rpact implementation uses rpact design objects and interfaces; optconerrf is not required to run these functions.
+}
+\seealso{
+\code{vignette("rpact_optimal_conditional_error", package = "rpact")} for a worked example with stopping rules, information constraints, interim estimates, and conditional power functions.
 }

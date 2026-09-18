@@ -44,8 +44,14 @@ getSecondStageInformation(
 
 }
 \references{
-Brannath, W. & Bauer, P. (2004). Optimal conditional error functions for the control of conditional power. Biometrics. https://www.jstor.org/stable/3695393
+Brannath, W. & Bauer, P. (2004). Optimal conditional error functions for the control of conditional power. Biometrics, 60(3), 715-723. \doi{10.1111/j.0006-341X.2004.00221.x}
+
+Brannath, W., zur Verth, J., Dreher, M. & Scharpenberg, M. (2024; revised 2026). Optimal monotone conditional error functions. \doi{10.48550/arXiv.2402.00814}
+
+The related R package \href{https://CRAN.R-project.org/package=optconerrf}{optconerrf: Optimal Monotone Conditional Error Functions} provides a standalone implementation of this methodology. The rpact implementation uses rpact design objects and interfaces; optconerrf is not required to run these functions.
 }
 \seealso{
 \code{\link[=getDesignOptimalConditionalErrorFunction]{getDesignOptimalConditionalErrorFunction()}}, \code{\link[=getExpectedSecondStageInformation]{getExpectedSecondStageInformation()}}, \code{\link[=getOptimalConditionalError]{getOptimalConditionalError()}}
+
+\code{vignette("rpact_optimal_conditional_error", package = "rpact")} for a worked example with stopping rules, information constraints, interim estimates, and conditional power functions.
 }

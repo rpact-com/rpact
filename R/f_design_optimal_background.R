@@ -280,9 +280,14 @@ NULL
     )
 
     if (any(conditionalErrorConstraintLower > pmin(conditionalErrorConstraintUpper, conditionalPower))) {
-        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+        stopConflictingArguments(
             "Conditional error and second-stage information constraints are incompatible.",
-            call. = FALSE
+            parameter = c("minimumConditionalError", "maximumSecondStageInformation"),
+            value = list(minimumConditionalError = design$minimumConditionalError, maximumSecondStageInformation = design$maximumSecondStageInformation),
+            constraint = "effective lower conditional error bound must not exceed the upper bound or conditional power",
+            relatedParameter = c("maximumConditionalError", "minimumSecondStageInformation", "conditionalPower", "firstStagePValue"),
+            relatedValue = list(maximumConditionalError = design$maximumConditionalError, minimumSecondStageInformation = design$minimumSecondStageInformation, conditionalPower = conditionalPower, firstStagePValue = firstStagePValue),
+            functionName = ".getOptimalConditionalErrorConstraints"
         )
     }
 
@@ -324,8 +329,14 @@ NULL
     # Fixed conditional power
     if (!is.na(design$conditionalPower)) {
         if (design$alpha1 + design$conditionalPower * (design$alpha0 - design$alpha1) <= design$alpha) {
-            stop(
-                "(alpha1 + conditionalPower*(alpha0-alpha1)) must exceed alpha, otherwise no level constant fully exhausting alpha can be found."
+            stopConflictingArguments(
+                "(alpha1 + conditionalPower*(alpha0-alpha1)) must exceed alpha, otherwise no level constant fully exhausting alpha can be found.",
+                parameter = "conditionalPower",
+                value = design$conditionalPower,
+                constraint = "alpha1 + conditionalPower * (alpha0 - alpha1) > alpha",
+                relatedParameter = c("alpha", "alpha1", "alpha0"),
+                relatedValue = c(alpha = design$alpha, alpha1 = design$alpha1, alpha0 = design$alpha0),
+                functionName = ".getLevelConstant"
             )
         }
     } else if (is.function(design$conditionalPowerFunction)) {
@@ -334,13 +345,27 @@ NULL
             stats::integrate(f = .getOptimalConditionalPower, lower = design$alpha1, upper = design$alpha0, design = design)$value <=
                 design$alpha - design$alpha1
         ) {
-            stop(
-                "Integral over conditional power function from alpha1 to alpha0 must exceed (alpha-alpha1), otherwise no level constant fully exhausting alpha can be found."
+            stopConflictingArguments(
+                "Integral over conditional power function from alpha1 to alpha0 must exceed (alpha-alpha1), otherwise no level constant fully exhausting alpha can be found.",
+                parameter = "conditionalPowerFunction",
+                value = design$conditionalPowerFunction,
+                constraint = "integral of conditionalPowerFunction over (alpha1, alpha0) > alpha - alpha1",
+                relatedParameter = c("alpha", "alpha1", "alpha0"),
+                relatedValue = c(alpha = design$alpha, alpha1 = design$alpha1, alpha0 = design$alpha0),
+                functionName = ".getLevelConstant"
             )
         }
     } else {
         # Unexpected issue
-        stop("Unexpected error: both conditionalPower and conditionalPowerFunction are specified inappropriately.")
+        stopRuntimeIssue(
+            "Unexpected error: both conditionalPower and conditionalPowerFunction are specified inappropriately.",
+            parameter = "conditionalPower",
+            value = design$conditionalPower,
+            constraint = "design must specify conditional power or a valid callback",
+            relatedParameter = "conditionalPowerFunction",
+            relatedValue = design$conditionalPowerFunction,
+            functionName = ".getLevelConstant"
+        )
     }
 
     # Feasibility depends on the integrated bounds, not just their pointwise order.
@@ -361,22 +386,32 @@ NULL
             )$value + design$alpha1
         }
         if (integrateBound(TRUE) < design$alpha - 1e-10) {
-            stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+            stopConflictingArguments(
                 "The upper conditional error constraint (maximumConditionalError or minimumSecondStageInformation) is too strict to attain alpha.",
-                call. = FALSE
+                parameter = c("maximumConditionalError", "minimumSecondStageInformation"),
+                value = list(maximumConditionalError = design$maximumConditionalError, minimumSecondStageInformation = design$minimumSecondStageInformation),
+                constraint = "integrated upper bound + alpha1 >= alpha",
+                relatedParameter = c("alpha", "alpha1", "alpha0"),
+                relatedValue = c(alpha = design$alpha, alpha1 = design$alpha1, alpha0 = design$alpha0),
+                functionName = ".getLevelConstant"
             )
         }
         if (integrateBound(FALSE) > design$alpha + 1e-10) {
-            stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+            stopConflictingArguments(
                 "The lower conditional error constraint (minimumConditionalError or maximumSecondStageInformation) is too strict to attain alpha.",
-                call. = FALSE
+                parameter = c("minimumConditionalError", "maximumSecondStageInformation"),
+                value = list(minimumConditionalError = design$minimumConditionalError, maximumSecondStageInformation = design$maximumSecondStageInformation),
+                constraint = "integrated lower bound + alpha1 <= alpha",
+                relatedParameter = c("alpha", "alpha1", "alpha0"),
+                relatedValue = c(alpha = design$alpha, alpha1 = design$alpha1, alpha0 = design$alpha0),
+                functionName = ".getLevelConstant"
             )
         }
     }
 
     # Find the level constant.
     # Expects an error if specified non-centrality parameter is very large or very small
-    tryCatch(
+    withCallingHandlers(
         expr = {
             stats::uniroot(
                 f = .getIntegral,
@@ -390,12 +425,15 @@ NULL
             # This specific error may occur if the given non-centrality parameter is too small or too large or if the
             # provided constraints are not suitable and is handled separately
             if (e$message == "f() values at end points not of opposite sign") {
-                stop(
-                    "Root finding for level constant failed. Try changing the search interval via arguments levelConstantMinimum and levelConstantMaximum. \n Alternatively, the constraints on the optimal conditional error function or second-stage information may not be appropriate."
+                stopRuntimeIssue(
+                    "Root finding for level constant failed. Try changing the search interval via arguments levelConstantMinimum and levelConstantMaximum. \n Alternatively, the constraints on the optimal conditional error function or second-stage information may not be appropriate.",
+                    parameter = c("levelConstantMinimum", "levelConstantMaximum"),
+                    value = c(design$levelConstantMinimum, design$levelConstantMaximum),
+                    constraint = "search interval must bracket a root of the level equation",
+                    relatedParameter = "alpha",
+                    relatedValue = design$alpha,
+                    functionName = ".getLevelConstant"
                 )
-            } else {
-                # Print all other errors directly
-                stop(e)
             }
         }
     )
@@ -441,7 +479,15 @@ NULL
         # Ensure that ncp argument is provided
         # This is a fallback protection, as the design function should already ensure this
         if (is.null(design$deltaLR)) {
-            stop("Argument deltaLR required for fixed likelihood case, but not found in design object.")
+            stopMissingArgument(
+                "Argument deltaLR required for fixed likelihood case, but not found in design object.",
+                parameter = "deltaLR",
+                value = design$deltaLR,
+                constraint = "required for the selected likelihood ratio distribution",
+                relatedParameter = "likelihoodRatioDistribution",
+                relatedValue = design$likelihoodRatioDistribution,
+                functionName = ".getLikelihoodRatio"
+            )
         }
 
         nonCentralityParameter <- design$deltaLR * sqrt(design$firstStageInformation)
@@ -456,7 +502,15 @@ NULL
         # This is a fallback protection, as the design function should already ensure this
         if (length(weights) != length(nonCentralityParameter) || any(!is.finite(weights)) ||
             abs(sum(weights) - 1) > sqrt(.Machine$double.eps) || any(weights < 0)) {
-            stop("weightsDeltaLR must be positive and sum up to 1")
+            stopIllegalArgument(
+                "weightsDeltaLR must be finite, nonnegative, have one entry per deltaLR and sum up to 1",
+                parameter = "weightsDeltaLR",
+                value = weights,
+                constraint = "finite nonnegative weights, one per deltaLR entry, summing to one",
+                relatedParameter = "deltaLR",
+                relatedValue = design$deltaLR,
+                functionName = ".getLikelihoodRatio"
+            )
         }
 
         if (firstStagePValue %in% c(0, 1)) {
@@ -478,7 +532,15 @@ NULL
         # Ensure that arguments were specified
         # This is a fallback protection, as the design function should already ensure this
         if (is.null(design$deltaLR) || is.null(design$tauLR)) {
-            stop("Arguments deltaLR and tauLR required for normal likelihood case, but not found in design object.")
+            stopMissingArgument(
+                "Arguments deltaLR and tauLR required for normal likelihood case, but not found in design object.",
+                parameter = c("deltaLR", "tauLR"),
+                value = list(deltaLR = design$deltaLR, tauLR = design$tauLR),
+                constraint = "required for the selected likelihood ratio distribution",
+                relatedParameter = "likelihoodRatioDistribution",
+                relatedValue = design$likelihoodRatioDistribution,
+                functionName = ".getLikelihoodRatio"
+            )
         }
 
         nonCentralityParameter <- design$deltaLR * sqrt(design$firstStageInformation)
@@ -501,7 +563,15 @@ NULL
         # Ensure that argument was specified
         # This is a fallback protection, as the design function should already ensure this
         if (is.null(design$kappaLR)) {
-            stop("Argument kappaLR required for exponential likelihood case, but not found in design object.")
+            stopMissingArgument(
+                "Argument kappaLR required for exponential likelihood case, but not found in design object.",
+                parameter = "kappaLR",
+                value = design$kappaLR,
+                constraint = "required for the selected likelihood ratio distribution",
+                relatedParameter = "likelihoodRatioDistribution",
+                relatedValue = design$likelihoodRatioDistribution,
+                functionName = ".getLikelihoodRatio"
+            )
         }
 
         nonCentralityParameter <- design$kappaLR * sqrt(design$firstStageInformation)
@@ -523,7 +593,15 @@ NULL
         # Ensure that argument was specified
         # This is a fallback protection, as the design function should already ensure this
         if (is.null(design$deltaMaxLR)) {
-            stop("Argument deltaMaxLR required for uniform likelihood case, but not found in design object.")
+            stopMissingArgument(
+                "Argument deltaMaxLR required for uniform likelihood case, but not found in design object.",
+                parameter = "deltaMaxLR",
+                value = design$deltaMaxLR,
+                constraint = "required for the selected likelihood ratio distribution",
+                relatedParameter = "likelihoodRatioDistribution",
+                relatedValue = design$likelihoodRatioDistribution,
+                functionName = ".getLikelihoodRatio"
+            )
         }
 
         nonCentralityParameter <- design$deltaMaxLR * sqrt(design$firstStageInformation)
@@ -550,7 +628,13 @@ NULL
         # Calculate likelihood ratio
         likelihoodRatio <- exp(max(0, stats::qnorm(firstStagePValue, lower.tail = FALSE))^2 / 2)
     } else {
-        stop("Distribution not matched.")
+        stopIllegalArgument(
+            "Distribution not matched.",
+            parameter = "likelihoodRatioDistribution",
+            value = design$likelihoodRatioDistribution,
+            constraint = "one of fixed, normal, exp, unif or maxlr",
+            functionName = ".getLikelihoodRatio"
+        )
     }
 
     # Return likelihood ratio
@@ -1047,7 +1131,15 @@ NULL
 
         # Ensure argument specified
         if (is.null(deltaLR)) {
-            stop("Argument deltaLR must be provided for fixed likelihood ratio case.")
+            stopMissingArgument(
+                "Argument deltaLR must be provided for fixed likelihood ratio case.",
+                parameter = "deltaLR",
+                value = deltaLR,
+                constraint = "required for the selected likelihood ratio distribution",
+                relatedParameter = "likelihoodRatioDistribution",
+                relatedValue = likelihoodRatioDistribution,
+                functionName = ".integrateExpectedInformation"
+            )
         }
         .assertIsNumericVector(x = deltaLR, argumentName = "deltaLR")
         if (is.null(weights)) {
@@ -1074,7 +1166,15 @@ NULL
 
         # Ensure arguments specified
         if (is.null(deltaLR) || is.null(tauLR)) {
-            stop("Arguments deltaLR and tauLR must be provided for normally distributed likelihood ratio case.")
+            stopMissingArgument(
+                "Arguments deltaLR and tauLR must be provided for normally distributed likelihood ratio case.",
+                parameter = c("deltaLR", "tauLR"),
+                value = list(deltaLR = deltaLR, tauLR = tauLR),
+                constraint = "required for the selected likelihood ratio distribution",
+                relatedParameter = "likelihoodRatioDistribution",
+                relatedValue = likelihoodRatioDistribution,
+                functionName = ".integrateExpectedInformation"
+            )
         }
         .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
         .assertIsSingleNumber(x = tauLR, argumentName = "tauLR")
@@ -1100,7 +1200,15 @@ NULL
 
         # Ensure argument specified
         if (is.null(kappaLR)) {
-            stop("Argument kappaLR must be specified for exponential likelihood case.")
+            stopMissingArgument(
+                "Argument kappaLR must be specified for exponential likelihood case.",
+                parameter = "kappaLR",
+                value = kappaLR,
+                constraint = "required for the selected likelihood ratio distribution",
+                relatedParameter = "likelihoodRatioDistribution",
+                relatedValue = likelihoodRatioDistribution,
+                functionName = ".integrateExpectedInformation"
+            )
         }
         .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
         .assertIsInOpenInterval(x = kappaLR, xName = "kappaLR", lower = 0, upper = Inf)
@@ -1123,7 +1231,15 @@ NULL
 
         # Ensure argument specified
         if (is.null(deltaMaxLR)) {
-            stop("Argument deltaMaxLR must be specified for uniform likelihood case.")
+            stopMissingArgument(
+                "Argument deltaMaxLR must be specified for uniform likelihood case.",
+                parameter = "deltaMaxLR",
+                value = deltaMaxLR,
+                constraint = "required for the selected likelihood ratio distribution",
+                relatedParameter = "likelihoodRatioDistribution",
+                relatedValue = likelihoodRatioDistribution,
+                functionName = ".integrateExpectedInformation"
+            )
         }
 
         .assertIsSingleNumber(x = deltaMaxLR, argumentName = "deltaMaxLR")
@@ -1153,7 +1269,13 @@ NULL
         )
     } else {
         # Unknown distribution specified
-        stop("Distribution not matched.")
+        stopIllegalArgument(
+            "Distribution not matched.",
+            parameter = "likelihoodRatioDistribution",
+            value = likelihoodRatioDistribution,
+            constraint = "one of fixed, normal, exp, unif or maxlr",
+            functionName = ".integrateExpectedInformation"
+        )
     }
 
     # Identify effect size to calculate second-stage information
@@ -1187,9 +1309,12 @@ NULL
 
 .assertIsOptimalConditionalErrorDesign <- function(design) {
     if (!inherits(design, "TrialDesignOptimalConditionalError")) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        stopIllegalArgument(
             "'design' must be a TrialDesignOptimalConditionalError object.",
-            call. = FALSE
+            parameter = "design",
+            value = design,
+            constraint = "must inherit from TrialDesignOptimalConditionalError",
+            functionName = ".assertIsOptimalConditionalErrorDesign"
         )
     }
     invisible(design)

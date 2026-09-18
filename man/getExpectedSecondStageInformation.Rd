@@ -46,6 +46,10 @@ where
 \item \eqn{\Delta_1} is the assumed treatment effect to power for, expressed as a mean difference. It may depend on the interim data (i.e., \eqn{p_1}) in case \code{useInterimEstimate = TRUE} was specified for the design object.
 \item \eqn{\nu(\alpha_2(p_1)) = (\Phi^{-1}(1-\alpha_2(p_1))+\Phi^{-1}(CP))^2} is a factor calculated for the specific assumptions about the optimal conditional error function and the target conditional power \eqn{CP}.
 }}
+
+Add \code{design$firstStageInformation} to obtain expected total information.
+This expectation is unconditional, not conditional on reaching stage two.
+Changing the evaluation distribution here does not recalibrate the design.
 }
 \examples{
 # Get a design
@@ -57,6 +61,9 @@ design <- getDesignOptimalConditionalErrorFunction(
 # Calculate expected information under correct specification
 getExpectedSecondStageInformation(design)
 
+# Compare operating characteristics under a different true effect.
+getExpectedSecondStageInformation(design, "fixed", deltaLR = 0.15)
+
 # Calculate expected information under the null hypothesis
 getExpectedSecondStageInformation(
     design = design, likelihoodRatioDistribution = "fixed", deltaLR = 0
@@ -64,8 +71,14 @@ getExpectedSecondStageInformation(
 
 }
 \references{
-Brannath, W. & Bauer, P. (2004). Optimal conditional error functions for the control of conditional power. Biometrics. https://www.jstor.org/stable/3695393
+Brannath, W. & Bauer, P. (2004). Optimal conditional error functions for the control of conditional power. Biometrics, 60(3), 715-723. \doi{10.1111/j.0006-341X.2004.00221.x}
+
+Brannath, W., zur Verth, J., Dreher, M. & Scharpenberg, M. (2024; revised 2026). Optimal monotone conditional error functions. \doi{10.48550/arXiv.2402.00814}
+
+The related R package \href{https://CRAN.R-project.org/package=optconerrf}{optconerrf: Optimal Monotone Conditional Error Functions} provides a standalone implementation of this methodology. The rpact implementation uses rpact design objects and interfaces; optconerrf is not required to run these functions.
 }
 \seealso{
 \code{\link[=getDesignOptimalConditionalErrorFunction]{getDesignOptimalConditionalErrorFunction()}}, \code{\link[=getSecondStageInformation]{getSecondStageInformation()}}
+
+\code{vignette("rpact_optimal_conditional_error", package = "rpact")} for a worked example with stopping rules, information constraints, interim estimates, and conditional power functions.
 }

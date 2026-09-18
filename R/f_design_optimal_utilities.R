@@ -166,22 +166,40 @@ plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), 
     .assertIsNumericVector(range, "range", len = 2)
     .assertIsInClosedInterval(range, "range", lower = 0, upper = 1)
     if (range[1] >= range[2]) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'range' must be increasing.", call. = FALSE)
+        stopIllegalArgument(
+            "'range' must be increasing.",
+            parameter = "range",
+            value = range,
+            constraint = "range[1] < range[2]",
+            functionName = "plot.TrialDesignOptimalConditionalError"
+        )
     }
     .assertIsSingleInteger(type, "type", validateType = FALSE)
     .assertIsInClosedInterval(type, "type", lower = 1, upper = 4)
     .assertIsSingleLogical(plotNonMonotoneFunction, "plotNonMonotoneFunction")
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
-        stop("Package 'ggplot2' is required for plotting.", call. = FALSE)
+        stopRuntimeIssue(
+            "Package 'ggplot2' is required for plotting.",
+            parameter = "package",
+            value = "ggplot2",
+            constraint = "ggplot2 must be installed for plotting",
+            functionName = "plot.TrialDesignOptimalConditionalError"
+        )
     }
     if (type == 4) {
-        range <- c(max(range[1], x$alpha1), min(range[2], x$alpha0))
-        if (range[1] >= range[2]) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        continuationRange <- c(max(range[1], x$alpha1), min(range[2], x$alpha0))
+        if (continuationRange[1] >= continuationRange[2]) {
+            stopConflictingArguments(
                 "'range' must overlap the continuation region for plot type 4.",
-                call. = FALSE
+                parameter = "range",
+                value = range,
+                constraint = "must overlap the continuation region for type 4",
+                relatedParameter = c("type", "alpha1", "alpha0"),
+                relatedValue = list(type = type, alpha1 = x$alpha1, alpha0 = x$alpha0),
+                functionName = "plot.TrialDesignOptimalConditionalError"
             )
         }
+        range <- continuationRange
     }
     # Open endpoints avoid infinite likelihood ratios in diagnostic plots.
     firstStagePValues <- seq(range[1], range[2], length.out = 1000)

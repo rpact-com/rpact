@@ -45,6 +45,12 @@ Authors@R: c(
     	role = c("ctb")
 	),
     person(
+    	given = "Morton",
+    	family = "Dreher",
+    	email = "morten.dreher@outlook.de",
+    	role = c("ctb")
+	),
+    person(
         "RPACT GmbH",
         role = c("cph", "fnd"),
         email = "info@rpact.com"

@@ -1,0 +1,2 @@
+#' @references The related R package \href{https://CRAN.R-project.org/package=optconerrf}{optconerrf: Optimal Monotone Conditional Error Functions} provides a standalone implementation of this methodology. The rpact implementation uses rpact design objects and interfaces; optconerrf is not required to run these functions.
+#' @seealso \code{vignette("rpact_optimal_conditional_error", package = "rpact")} for a worked example with stopping rules, information constraints, interim estimates, and conditional power functions.

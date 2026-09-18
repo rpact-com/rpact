@@ -19,6 +19,21 @@
 #' The design object contains the information required to determine the specific setting of the optimal conditional error function and can be passed to other package functions.
 #' From the given user specifications, the constant to achieve level condition for control of the overall type I error rate as well as the constants to ensure a non-increasing optimal CEF (if required) are automatically calculated.
 #'
+#' @section Hypotheses and trial decisions:
+#' The one-sided hypotheses are \eqn{H_0: \Delta \leq 0} versus
+#' \eqn{H_1: \Delta > 0}. With a first-stage p-value \eqn{p_1}, stop for
+#' efficacy if \eqn{p_1 \leq \alpha_1} and \eqn{\alpha_1 > 0}; stop for
+#' futility if \eqn{p_1 > \alpha_0}. Futility is binding: continuing beyond
+#' this boundary is not part of the calibrated design. In the continuation
+#' region, reject at stage two if its p-value is no larger than
+#' [getOptimalConditionalError()]. The second-stage p-value must be based on
+#' the new, independent second-stage data, not the cumulative data.
+#' Setting `alpha1 = 0` disables early efficacy and `alpha0 = 1` disables early futility.
+#' The calibration satisfies
+#' \deqn{\alpha = \alpha_1 + \int_{\alpha_1}^{\alpha_0} \alpha_2(p_1) \, dp_1.}
+#' Target conditional power refers to a specified planning effect after
+#' continuation; it is not the overall power returned by [getOverallPower()].
+#'
 #' @section Likelihood ratio distribution:
 #' To calculate the optimal conditional error function, an assumption about the true parameter under which the second-stage information is to be minimised is required.
 #' Various options are available and can be specified via the argument \code{likelihoodRatioDistribution}:
@@ -38,6 +53,9 @@
 #'
 #' @section Effect for conditional power:
 #' For the treatment effect at which the target conditional power should be achieved, either a fixed effect or an interim estimate can be used.
+#' The planning effect `delta1` need not equal `deltaLR`: the former sets the
+#' conditional power target, whereas the latter specifies the effect or mixture
+#' under which expected second-stage information is minimised.
 #' The usage of a fixed effect is indicated by setting \code{useInterimEstimate=FALSE}, in which case the fixed effect is provided by \code{delta1} on the mean difference scale.
 #' For an interim estimate, specified by \code{useInterimEstimate=TRUE}, a lower cut-off for the interim estimate must be provided, by \code{delta1Min} on the mean difference scale.
 #' In addition, an upper limit of the estimate may be analogously provided by \code{delta1Max}. These effects may alternatively be specified on the non-centrality parameter scale as
@@ -72,6 +90,14 @@
 #' The constraints may also be specified on the second-stage information via \code{minimumSecondStageInformation} and \code{maximumSecondStageInformation}.
 #' If both \code{minimumConditionalError} and \code{maximumSecondStageInformation} respectively \code{maximumConditionalError} and \code{minimumSecondStageInformation}
 #' are provided, both constraints will be applied.
+#' Set these constraints when creating the design, so that calibration accounts
+#' for them. For fixed \eqn{\Delta_1} and conditional power \eqn{CP},
+#' an upper information bound corresponds to the lower conditional error bound
+#' \eqn{\Phi(\Phi^{-1}(CP) - \Delta_1 \sqrt{I_{2,\max}})}; a lower information
+#' bound analogously corresponds to an upper conditional error bound.
+#' Information bounds apply only when the trial continues: information is zero
+#' after early stopping. They refer to additional stage-two information, not
+#' cumulative information.
 #' In the continuation region, conditional error cannot exceed the conditional power;
 #' an upper bound above it has no additional effect. Before calibration, the integrated
 #' lower and upper bounds are checked for compatibility with the overall alpha level.
@@ -141,10 +167,30 @@
 #'     firstStageInformation = 80, useInterimEstimate = TRUE
 #' )
 #'
+#' # Weight several effects for the optimisation; retain a separate power target.
+#' weightedDesign <- getDesignOptimalConditionalErrorFunction(
+#'     alpha = 0.025, alpha1 = 0.001, alpha0 = 0.5, conditionalPower = 0.9,
+#'     delta1 = 0.25, useInterimEstimate = FALSE, firstStageInformation = 80,
+#'     likelihoodRatioDistribution = "fixed", deltaLR = c(0, 0.25, 0.5),
+#'     weightsDeltaLR = c(0.25, 0.5, 0.25)
+#' )
+#' getSecondStageInformation(c(0.05, 0.1, 0.3), weightedDesign)
+#'
+#' # Allow a lower conditional power target for less promising interim results.
+#' # Leave conditionalPower unspecified when supplying a callback.
+#' flexibleDesign <- getDesignOptimalConditionalErrorFunction(
+#'     alpha = 0.025, alpha1 = 0.001, alpha0 = 0.5,
+#'     conditionalPowerFunction = function(p) pnorm(1 - p),
+#'     delta1 = 0.25, useInterimEstimate = FALSE, firstStageInformation = 80,
+#'     likelihoodRatioDistribution = "maxlr"
+#' )
+#' getOptimalConditionalError(c(0.05, 0.1, 0.3), flexibleDesign)
+#'
 #' @export
 #'
 #' @template reference_optimal
 #' @template reference_monotone
+#' @template reference_optconerrf
 #'
 getDesignOptimalConditionalErrorFunction <- function(
     alpha,
@@ -215,6 +261,10 @@ getDesignOptimalConditionalErrorFunction <- function(
 #'        \item \eqn{\nu(\alpha_2(p_1)) = (\Phi^{-1}(1-\alpha_2(p_1))+\Phi^{-1}(CP))^2} is a factor calculated for the specific assumptions about the optimal conditional error function and the target conditional power \eqn{CP}.
 #' }}
 #'
+#' Add `design$firstStageInformation` to obtain expected total information.
+#' This expectation is unconditional, not conditional on reaching stage two.
+#' Changing the evaluation distribution here does not recalibrate the design.
+#'
 #' @inheritParams param_designOCEF
 #' @inheritParams param_likelihoodRatioDistributionExpectedOCEF
 #' @param ... {Additional parameters required for the specification of \code{likelihoodRatioDistribution}}.
@@ -234,6 +284,9 @@ getDesignOptimalConditionalErrorFunction <- function(
 #' # Calculate expected information under correct specification
 #' getExpectedSecondStageInformation(design)
 #'
+#' # Compare operating characteristics under a different true effect.
+#' getExpectedSecondStageInformation(design, "fixed", deltaLR = 0.15)
+#'
 #' # Calculate expected information under the null hypothesis
 #' getExpectedSecondStageInformation(
 #'     design = design, likelihoodRatioDistribution = "fixed", deltaLR = 0
@@ -242,14 +295,19 @@ getDesignOptimalConditionalErrorFunction <- function(
 #' @export
 #' @seealso [getDesignOptimalConditionalErrorFunction()], [getSecondStageInformation()]
 #' @template reference_optimal
+#' @template reference_monotone
+#' @template reference_optconerrf
 
 getExpectedSecondStageInformation <- function(design, likelihoodRatioDistribution = NULL, ...) {
     .assertIsOptimalConditionalErrorDesign(design)
     distribution <- if (is.null(likelihoodRatioDistribution)) design$likelihoodRatioDistribution else likelihoodRatioDistribution
     if (identical(distribution, "maxlr")) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        stopIllegalArgument(
             "Expected information requires a probability distribution; specify 'fixed', 'normal', 'exp', or 'unif'.",
-            call. = FALSE
+            parameter = "likelihoodRatioDistribution",
+            value = distribution,
+            constraint = "a probability distribution: fixed, normal, exp or unif",
+            functionName = "getExpectedSecondStageInformation"
         )
     }
     # Integrate over a helper function from alpha1 to alpha0
@@ -282,6 +340,8 @@ getExpectedSecondStageInformation <- function(design, likelihoodRatioDistributio
 #' @export
 #'
 #' @template reference_optimal
+#' @template reference_monotone
+#' @template reference_optconerrf
 #'
 #' @seealso [getDesignOptimalConditionalErrorFunction()]
 #'
@@ -293,9 +353,10 @@ getExpectedSecondStageInformation <- function(design, likelihoodRatioDistributio
 #'     likelihoodRatioDistribution = "fixed", deltaLR = 0.5
 #' )
 #'
-#' # Calculate optimal conditional error
+#' # Early efficacy gives 1, continuation gives the stage-two threshold,
+#' # and binding futility gives 0.
 #' getOptimalConditionalError(
-#'     firstStagePValue = c(0.1, 0.2, 0.3), design = design
+#'     firstStagePValue = c(0.0005, 0.1, 0.3, 0.8), design = design
 #' )
 #'
 
@@ -319,6 +380,9 @@ getOptimalConditionalError <- function(firstStagePValue, design) {
 #' @inheritParams param_designOCEF
 #' @inheritParams param_alternativeOCEF
 #'
+#' @template reference_optimal
+#' @template reference_monotone
+#' @template reference_optconerrf
 #' @seealso [getDesignOptimalConditionalErrorFunction()]
 #'
 #' @examples
@@ -338,7 +402,13 @@ getOverallPower <- function(design, alternative) {
     .assertIsNumericVector(x = alternative, argumentName = "alternative")
 
     if (any(!is.finite(alternative))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'alternative' must contain finite values.", call. = FALSE)
+        stopIllegalArgument(
+            "'alternative' must contain finite values.",
+            parameter = "alternative",
+            value = alternative,
+            constraint = "must contain finite values",
+            functionName = "getOverallPower"
+        )
     }
     alternativeNonCentralityParameterScale <- alternative * base::sqrt(design$firstStageInformation)
 
@@ -421,6 +491,8 @@ getOverallPower <- function(design, alternative) {
 #' )
 #'
 #' @template reference_optimal
+#' @template reference_monotone
+#' @template reference_optconerrf
 #' @rdname getSecondStageInformation
 #' @export
 getSecondStageInformation <- function(firstStagePValue, design) {

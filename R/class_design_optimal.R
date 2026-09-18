@@ -116,9 +116,14 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                 }
             } else {
                 if (!is.function(conditionalPowerFunction)) {
-                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+                    stopMissingArgument(
                         "Specify 'conditionalPower' or a valid 'conditionalPowerFunction'.",
-                        call. = FALSE
+                        parameter = "conditionalPower",
+                        value = conditionalPower,
+                        constraint = "provide conditionalPower or a conditionalPowerFunction",
+                        relatedParameter = "conditionalPowerFunction",
+                        relatedValue = conditionalPowerFunction,
+                        functionName = "getDesignOptimalConditionalErrorFunction"
                     )
                 }
                 self$conditionalPowerFunction <- conditionalPowerFunction
@@ -149,10 +154,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
 
             if (!is.finite(levelConstantMinimum) || !is.finite(levelConstantMaximum) ||
                     levelConstantMinimum >= levelConstantMaximum) {
-                stop(paste0(
-                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                    "levelConstantMinimum must be smaller than levelConstantMaximum."
-                ))
+                stopConflictingArguments(
+                    "levelConstantMinimum must be smaller than levelConstantMaximum.",
+                    parameter = "levelConstantMinimum",
+                    value = levelConstantMinimum,
+                    constraint = "finite bounds with levelConstantMinimum < levelConstantMaximum",
+                    relatedParameter = "levelConstantMaximum",
+                    relatedValue = levelConstantMaximum,
+                    functionName = "getDesignOptimalConditionalErrorFunction"
+                )
             }
 
             self$levelConstantMinimum <- levelConstantMinimum
@@ -168,10 +178,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                 if (is.null(ncp1Max)) ncp1Max <- Inf
 
                 if (is.na(delta1Min) && is.null(ncp1Min)) {
-                    stop(paste0(
-                        C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                        "Must provide a lower limit for the interim estimate by using delta1Min."
-                    ))
+                    stopMissingArgument(
+                        "Must provide a lower limit for the interim estimate by using delta1Min.",
+                        parameter = "delta1Min",
+                        value = delta1Min,
+                        constraint = "provide delta1Min or ncp1Min when useInterimEstimate is TRUE",
+                        relatedParameter = "ncp1Min",
+                        relatedValue = ncp1Min,
+                        functionName = "getDesignOptimalConditionalErrorFunction"
+                    )
                 } else if (!is.na(delta1Min)) {
                     .assertIsSingleNumber(x = delta1Min, argumentName = "delta1Min")
                     .assertIsInOpenInterval(x = delta1Min, xName = "delta1Min", lower = 0, upper = Inf)
@@ -201,10 +216,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     self$delta1Min <- ncp1Min / sqrt(firstStageInformation)
                     self$delta1Max <- ifelse(ncp1Max == Inf, Inf, ncp1Max / sqrt(firstStageInformation))
                 } else {
-                    stop(paste0(
-                        C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                        "Unexpected error occured during determination of restrictions for interim estimate."
-                    ))
+                    stopRuntimeIssue(
+                        "Unexpected error occurred during determination of restrictions for interim estimate.",
+                        parameter = c("delta1Min", "delta1Max"),
+                        value = list(delta1Min = delta1Min, delta1Max = delta1Max),
+                        constraint = "interim estimate restrictions must be derivable",
+                        relatedParameter = c("ncp1Min", "ncp1Max"),
+                        relatedValue = list(ncp1Min = ncp1Min, ncp1Max = ncp1Max),
+                        functionName = "getDesignOptimalConditionalErrorFunction"
+                    )
                 }
             } else {
                 # When not using an interim estimate, derive fixed effects
@@ -231,10 +251,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     self$delta1 <- ncp1 / sqrt(firstStageInformation)
                 } else {
                     # Else, none of ncp1 and delta1 were specified
-                    stop(paste0(
-                        C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                        "Must specify delta1 when using a fixed effect for conditional power."
-                    ))
+                    stopMissingArgument(
+                        "Must specify delta1 when using a fixed effect for conditional power.",
+                        parameter = "delta1",
+                        value = delta1,
+                        constraint = "provide delta1 or ncp1 when useInterimEstimate is FALSE",
+                        relatedParameter = "ncp1",
+                        relatedValue = ncp1,
+                        functionName = "getDesignOptimalConditionalErrorFunction"
+                    )
                 }
             }
 
@@ -271,10 +296,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             )
 
             if (maximumSecondStageInformation == 0) {
-                stop(paste0(
-                    C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                    "Maximum second-stage information must be larger than 0."
-                ))
+                stopArgumentOutOfRange(
+                    "Maximum second-stage information must be larger than 0.",
+                    parameter = "maximumSecondStageInformation",
+                    value = maximumSecondStageInformation,
+                    constraint = "must be greater than zero",
+                    lowerBound = 0,
+                    upperBound = Inf,
+                    functionName = "getDesignOptimalConditionalErrorFunction"
+                )
             }
 
             # Context-related range assertions
@@ -308,19 +338,27 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             for (parameterName in c("deltaLR", "tauLR", "kappaLR", "deltaMaxLR")) {
                 value <- get(parameterName)
                 if (is.numeric(value) && any(is.infinite(value))) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                    stopIllegalArgument(
                         "'", parameterName, "' must contain finite values.",
-                        call. = FALSE
+                        parameter = parameterName,
+                        value = value,
+                        constraint = "must contain finite values",
+                        functionName = "getDesignOptimalConditionalErrorFunction"
                     )
                 }
             }
             # Identify specific distribution parameters
             if (likelihoodRatioDistribution == "fixed") {
                 if (any(is.na(deltaLR))) {
-                    stop(paste0(
-                        C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                        "Must provide deltaLR for fixed effect in likelihood ratio."
-                    ))
+                    stopMissingArgument(
+                        "Must provide deltaLR for fixed effect in likelihood ratio.",
+                        parameter = "deltaLR",
+                        value = deltaLR,
+                        constraint = "required for the selected likelihood ratio distribution",
+                        relatedParameter = "likelihoodRatioDistribution",
+                        relatedValue = likelihoodRatioDistribution,
+                        functionName = "getDesignOptimalConditionalErrorFunction"
+                    )
                 } else {
                     .assertIsNumericVector(x = deltaLR, argumentName = "deltaLR")
                     self$deltaLR <- deltaLR
@@ -338,14 +376,27 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         .assertIsInClosedInterval(x = weightsDeltaLR, xName = "weightsDeltaLR", lower = 0, upper = 1)
                         # Check if weightsDeltaLR and deltaLR are of equal length
                         if (length(weightsDeltaLR) != length(deltaLR)) {
-                            stop(paste0(
-                                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                                "Must provide exactly one weight in weightsDeltaLR per entry of deltaLR."
-                            ))
+                            stopArgumentLengthOutOfBounds(
+                                "Must provide exactly one weight in weightsDeltaLR per entry of deltaLR.",
+                                parameter = "weightsDeltaLR",
+                                value = weightsDeltaLR,
+                                constraint = "one weight per deltaLR entry",
+                                relatedParameter = "deltaLR",
+                                relatedValue = deltaLR,
+                                expectedLength = length(deltaLR),
+                                actualLength = length(weightsDeltaLR),
+                                functionName = "getDesignOptimalConditionalErrorFunction"
+                            )
                         }
                         # Verify that weightsDeltaLR sums to 1
                         if (abs(sum(weightsDeltaLR) - 1) > sqrt(.Machine$double.eps)) {
-                            stop(paste0(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "Weights in weightsDeltaLR must sum to 1."))
+                            stopIllegalArgument(
+                                "Weights in weightsDeltaLR must sum to 1.",
+                                parameter = "weightsDeltaLR",
+                                value = weightsDeltaLR,
+                                constraint = "weights must sum to one within sqrt(.Machine$double.eps)",
+                                functionName = "getDesignOptimalConditionalErrorFunction"
+                            )
                         }
                         self$weightsDeltaLR <- weightsDeltaLR / sum(weightsDeltaLR)
                     }
@@ -354,10 +405,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                 .assertIsSingleNumber(deltaLR, "deltaLR", naAllowed = TRUE)
                 .assertIsSingleNumber(tauLR, "tauLR", naAllowed = TRUE)
                 if (is.na(deltaLR) || is.na(tauLR)) {
-                    stop(paste0(
-                        C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                        "Must provide deltaLR and tauLR for normal prior in likelihood ratio."
-                    ))
+                    stopMissingArgument(
+                        "Must provide deltaLR and tauLR for normal prior in likelihood ratio.",
+                        parameter = c("deltaLR", "tauLR"),
+                        value = list(deltaLR = deltaLR, tauLR = tauLR),
+                        constraint = "required for the selected likelihood ratio distribution",
+                        relatedParameter = "likelihoodRatioDistribution",
+                        relatedValue = likelihoodRatioDistribution,
+                        functionName = "getDesignOptimalConditionalErrorFunction"
+                    )
                 } else {
                     .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
                     self$deltaLR <- deltaLR
@@ -370,10 +426,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             } else if (likelihoodRatioDistribution == "exp") {
                 .assertIsSingleNumber(kappaLR, "kappaLR", naAllowed = TRUE)
                 if (is.na(kappaLR)) {
-                    stop(paste0(
-                        C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                        "Must provide kappaLR for exponential prior in likelihood ratio."
-                    ))
+                    stopMissingArgument(
+                        "Must provide kappaLR for exponential prior in likelihood ratio.",
+                        parameter = "kappaLR",
+                        value = kappaLR,
+                        constraint = "required for the selected likelihood ratio distribution",
+                        relatedParameter = "likelihoodRatioDistribution",
+                        relatedValue = likelihoodRatioDistribution,
+                        functionName = "getDesignOptimalConditionalErrorFunction"
+                    )
                 } else {
                     .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
                     .assertIsInOpenInterval(x = kappaLR, xName = "kappaLR", lower = 0, upper = Inf)
@@ -382,20 +443,28 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             } else if (likelihoodRatioDistribution == "unif") {
                 .assertIsSingleNumber(deltaMaxLR, "deltaMaxLR", naAllowed = TRUE)
                 if (is.na(deltaMaxLR)) {
-                    stop(paste0(
-                        C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                        "Must provide deltaMaxLR for uniform prior in likelihood ratio."
-                    ))
+                    stopMissingArgument(
+                        "Must provide deltaMaxLR for uniform prior in likelihood ratio.",
+                        parameter = "deltaMaxLR",
+                        value = deltaMaxLR,
+                        constraint = "required for the selected likelihood ratio distribution",
+                        relatedParameter = "likelihoodRatioDistribution",
+                        relatedValue = likelihoodRatioDistribution,
+                        functionName = "getDesignOptimalConditionalErrorFunction"
+                    )
                 } else {
                     .assertIsSingleNumber(x = deltaMaxLR, argumentName = "deltaMaxLR")
                     .assertIsInOpenInterval(x = deltaMaxLR, xName = "deltaMaxLR", lower = 0, upper = Inf)
                     self$deltaMaxLR <- deltaMaxLR
                 }
             } else if (likelihoodRatioDistribution == "maxlr") {} else {
-                stop(paste0(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "Distribution not matched. likelihoodRatioDistribution should be one of 'fixed', 'normal', 'exp', 'unif' or 'maxlr'."
-                ))
+                stopIllegalArgument(
+                    "Distribution not matched. likelihoodRatioDistribution should be one of 'fixed', 'normal', 'exp', 'unif' or 'maxlr'.",
+                    parameter = "likelihoodRatioDistribution",
+                    value = likelihoodRatioDistribution,
+                    constraint = "one of fixed, normal, exp, unif or maxlr",
+                    functionName = "getDesignOptimalConditionalErrorFunction"
+                )
             }
 
             if (is.function(self$conditionalPowerFunction) && useInterimEstimate &&
