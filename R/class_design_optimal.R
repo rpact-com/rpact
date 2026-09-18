@@ -9,17 +9,23 @@
 ## |  License text: https://www.r-project.org/Licenses/LGPL-3
 ## |
 
+#'
 #' Optimal Conditional Error Design
 #'
 #' @description R6 parameter set for an adaptive two-stage design based on an
 #' optimal conditional error function.
+#'
 #' @details Create objects with [getDesignOptimalConditionalErrorFunction()].
 #' This class inherits from `ParameterSet`, not `TrialDesign`: its second-stage
 #' information depends on the interim result. Functions accepting conventional
 #' group sequential or combination-test designs cannot use this object.
+#'
 #' @include class_core_parameter_set.R
+#'
 #' @keywords internal
+#'
 #' @seealso [getDesignOptimalConditionalErrorFunction()]
+#'
 TrialDesignOptimalConditionalError <- R6::R6Class(
     "TrialDesignOptimalConditionalError",
     inherit = ParameterSet,
@@ -53,31 +59,30 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
         levelConstantMaximum = NULL,
         enforceMonotonicity = NULL,
         initialize = function(
-            alpha = NA_real_,
-            alpha1 = NA_real_,
-            alpha0 = NA_real_,
-            conditionalPower = NA_real_,
-            conditionalPowerFunction = NULL,
-            delta1 = NA_real_,
-            delta1Min = NA_real_,
-            delta1Max = NA_real_,
-            firstStageInformation = NA_real_,
-            useInterimEstimate = TRUE,
-            likelihoodRatioDistribution = "",
-            deltaLR = NA_real_,
-            weightsDeltaLR = NA_real_,
-            tauLR = NA_real_,
-            kappaLR = NA_real_,
-            deltaMaxLR = NA_real_,
-            minimumSecondStageInformation = 0,
-            maximumSecondStageInformation = Inf,
-            minimumConditionalError = 0,
-            maximumConditionalError = 1,
-            levelConstantMinimum = 0,
-            levelConstantMaximum = 10,
-            enforceMonotonicity = TRUE,
-            ...
-        ) {
+                alpha = NA_real_,
+                alpha1 = NA_real_,
+                alpha0 = NA_real_,
+                conditionalPower = NA_real_,
+                conditionalPowerFunction = NULL,
+                delta1 = NA_real_,
+                delta1Min = NA_real_,
+                delta1Max = NA_real_,
+                firstStageInformation = NA_real_,
+                useInterimEstimate = TRUE,
+                likelihoodRatioDistribution = "",
+                deltaLR = NA_real_,
+                weightsDeltaLR = NA_real_,
+                tauLR = NA_real_,
+                kappaLR = NA_real_,
+                deltaMaxLR = NA_real_,
+                minimumSecondStageInformation = 0,
+                maximumSecondStageInformation = Inf,
+                minimumConditionalError = 0,
+                maximumConditionalError = 1,
+                levelConstantMinimum = 0,
+                levelConstantMaximum = 10,
+                enforceMonotonicity = TRUE,
+                ...) {
             super$initialize()
             .assertIsSingleLogical(useInterimEstimate, "useInterimEstimate")
             .assertIsSingleLogical(enforceMonotonicity, "enforceMonotonicity")
@@ -143,7 +148,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             .assertIsSingleNumber(x = levelConstantMaximum, argumentName = "levelConstantMaximum")
 
             if (!is.finite(levelConstantMinimum) || !is.finite(levelConstantMaximum) ||
-                levelConstantMinimum >= levelConstantMaximum) {
+                    levelConstantMinimum >= levelConstantMaximum) {
                 stop(paste0(
                     C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                     "levelConstantMinimum must be smaller than levelConstantMaximum."
@@ -394,7 +399,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             }
 
             if (is.function(self$conditionalPowerFunction) && useInterimEstimate &&
-                (minimumSecondStageInformation > 0 || maximumSecondStageInformation < Inf)) {
+                    (minimumSecondStageInformation > 0 || maximumSecondStageInformation < Inf)) {
                 warning("Conditional power functions with interim estimates and information constraints may be non-monotone.",
                     call. = FALSE
                 )
@@ -416,7 +421,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             self$.initParameterTypes()
             for (parameterName in self$.getVisibleFieldNames()) {
                 self$.setParameterType(parameterName, if (is.null(self[[parameterName]]) ||
-                    (is.numeric(self[[parameterName]]) && all(is.na(self[[parameterName]])))) {
+                        (is.numeric(self[[parameterName]]) && all(is.na(self[[parameterName]])))) {
                     C_PARAM_NOT_APPLICABLE
                 } else {
                     C_PARAM_USER_DEFINED

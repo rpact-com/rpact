@@ -65,7 +65,7 @@ Each case requires different additional specifications: \cr
 
 \item{maximumConditionalError}{Upper boundary for the optimal conditional error function. Default value is 1, however, the optimal conditional error function is inherently bounded by the conditional power.}
 
-\item{conditionalPowerFunction}{A function accepting a single first-stage p-value and returning a numeric scalar strictly between 0 and 1. The function is evaluated separately for each p-value. This function should not be increasing in the first-stage p-value, otherwise monotonicity issues may occur.}
+\item{conditionalPowerFunction}{A function accepting a single first-stage p-value and returning a numeric scalar strictly between 0 and 1. The function is evaluated separately for each p-value. This function should not be increasing in the first-stage p-value, otherwise monotonicity issues may occur. With a conditional power function, the resulting conditional error function is not necessarily optimal for expected second-stage information.}
 
 \item{levelConstantMinimum}{The minimum of the interval on which the value for the level constant should be searched. Default value is 0.}
 
@@ -155,6 +155,9 @@ By default, \code{minimumConditionalError=0} and \code{maximumConditionalError=1
 The constraints may also be specified on the second-stage information via \code{minimumSecondStageInformation} and \code{maximumSecondStageInformation}.
 If both \code{minimumConditionalError} and \code{maximumSecondStageInformation} respectively \code{maximumConditionalError} and \code{minimumSecondStageInformation}
 are provided, both constraints will be applied.
+In the continuation region, conditional error cannot exceed the conditional power;
+an upper bound above it has no additional effect. Before calibration, the integrated
+lower and upper bounds are checked for compatibility with the overall alpha level.
 }
 
 \section{Level constant}{

@@ -50,7 +50,10 @@ NULL
     conditionalPower <- constraintList$conditionalPower
 
     conditionalErrorWithConstraints <- pmin(
-        pmax(.getPsi(nuPrime = inner, conditionalPower = conditionalPower), conditionalErrorConstraintLower),
+        pmax(.getPsi(
+            nuPrime = inner, conditionalPower = conditionalPower,
+            lower = conditionalErrorConstraintLower, upper = conditionalErrorConstraintUpper
+        ), conditionalErrorConstraintLower),
         conditionalErrorConstraintUpper
     )
 
@@ -338,6 +341,37 @@ NULL
     } else {
         # Unexpected issue
         stop("Unexpected error: both conditionalPower and conditionalPowerFunction are specified inappropriately.")
+    }
+
+    # Feasibility depends on the integrated bounds, not just their pointwise order.
+    if (design$minimumConditionalError > 0 || design$maximumConditionalError < 1 ||
+            design$minimumSecondStageInformation > 0 || design$maximumSecondStageInformation < Inf) {
+        integrateBound <- function(upper) {
+            stats::integrate(function(pValue) {
+                constraints <- .getOptimalConditionalErrorConstraints(design, pValue)
+                if (upper) {
+                    return(rep_len(
+                        pmin(constraints$conditionalErrorConstraintUpper, constraints$conditionalPower),
+                        length(pValue)
+                    ))
+                }
+                rep_len(constraints$conditionalErrorConstraintLower, length(pValue))
+            }, lower = design$alpha1, upper = design$alpha0,
+                rel.tol = 1e-8, abs.tol = 1e-10, subdivisions = 1000L
+            )$value + design$alpha1
+        }
+        if (integrateBound(TRUE) < design$alpha - 1e-10) {
+            stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+                "The upper conditional error constraint (maximumConditionalError or minimumSecondStageInformation) is too strict to attain alpha.",
+                call. = FALSE
+            )
+        }
+        if (integrateBound(FALSE) > design$alpha + 1e-10) {
+            stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+                "The lower conditional error constraint (minimumConditionalError or maximumSecondStageInformation) is too strict to attain alpha.",
+                call. = FALSE
+            )
+        }
     }
 
     # Find the level constant.
@@ -823,6 +857,8 @@ NULL
 #' @description Get point-wise values of psi (inverse of nu prime)
 #'
 #' @param nuPrime The function value to be inverted.
+#' @param lower,upper Effective conditional error bounds. Competing minima are
+#' compared after applying these bounds; the upper bound is capped at conditional power.
 #' @inheritParams param_conditionalPowerOCEF
 #'
 #' @return The value of alpha which corresponds to nuPrime and lies between 0 and \code{conditionalPower}.
@@ -837,12 +873,17 @@ NULL
 #' @examples
 #' # Returns 0.05
 #' .getPsi(.getNuPrime(alpha = 0.05, conditionalPower = 0.9), conditionalPower = 0.9)
-.getPsi <- function(nuPrime, conditionalPower) {
+.getPsi <- function(nuPrime, conditionalPower, lower = 0, upper = conditionalPower) {
+    upper <- min(upper, conditionalPower)
+    constrain <- function(alpha) max(lower, min(upper, alpha))
+    if (lower == upper) {
+        return(lower)
+    }
     if (identical(as.numeric(nuPrime), -Inf)) {
-        return(0)
+        return(lower)
     }
     if (nuPrime == 0) {
-        return(conditionalPower)
+        return(upper)
     }
     # If the conditional power is between 1-pnorm(2) and pnorm(2) nu prime is monotone and we can build the inverse directly
     if ((stats::pnorm(-2) <= conditionalPower && conditionalPower <= stats::pnorm(2))) {
@@ -854,7 +895,7 @@ NULL
             upper = conditionalPower,
             tol = 1e-16
         )
-        return(rootlist$root)
+        return(constrain(rootlist$root))
 
         # If the conditional power is not between 1-pnorm(2) and pnorm(2) nu prime is not monotone and we need to build the inverse differently
     } else {
@@ -875,7 +916,7 @@ NULL
                 upper = conditionalPower,
                 tol = 1e-16
             )
-            return(rootlist$root)
+            return(constrain(rootlist$root))
         } else if (nuPrime < nuPrimeAtMin) {
             rootlist <- uniroot(
                 f = function(alpha) {
@@ -885,7 +926,7 @@ NULL
                 upper = maximumValue,
                 tol = 1e-16
             )
-            return(rootlist$root)
+            return(constrain(rootlist$root))
         } else {
             # Calculate psiLower and psiUpper
             rootlistLower <- uniroot(
@@ -896,7 +937,7 @@ NULL
                 upper = maximumValue,
                 tol = 1e-16
             )
-            psiLower <- rootlistLower$root
+            psiLower <- constrain(rootlistLower$root)
             rootlistUpper <- uniroot(
                 f = function(alpha) {
                     .getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
@@ -905,12 +946,12 @@ NULL
                 upper = conditionalPower,
                 tol = 1e-16
             )
-            psiUpper <- rootlistUpper$root
-            # Calculate the quotient that is needed to decide if psiLower or psiUpper is used
-            quotient <- (.getNu(alpha = min(conditionalPower, psiUpper), conditionalPower = conditionalPower) -
-                .getNu(alpha = psiLower, conditionalPower = conditionalPower)) /
-                (min(psiUpper, conditionalPower) - psiLower)
-            if (quotient <= nuPrime) {
+            psiUpper <- constrain(rootlistUpper$root)
+            # Compare feasible candidates before selecting a branch. Clipping only
+            # the unconstrained optimum can select the wrong local minimum.
+            objectiveLower <- .getNu(psiLower, conditionalPower) - nuPrime * psiLower
+            objectiveUpper <- .getNu(psiUpper, conditionalPower) - nuPrime * psiUpper
+            if (objectiveUpper <= objectiveLower) {
                 return(psiUpper)
             } else {
                 return(psiLower)
@@ -919,7 +960,7 @@ NULL
     }
 }
 
-.getPsi <- Vectorize(FUN = .getPsi, vectorize.args = c("nuPrime", "conditionalPower"))
+.getPsi <- Vectorize(FUN = .getPsi, vectorize.args = c("nuPrime", "conditionalPower", "lower", "upper"))
 
 #' Calculate Q
 #'
@@ -1204,7 +1245,8 @@ NULL
                 conditionalErrorConstraintUpper,
                 .getPsi(
                     nuPrime = (-exp(design$levelConstant) / likelihoodRatioOverEffect),
-                    conditionalPower = conditionalPower
+                    conditionalPower = conditionalPower,
+                    lower = conditionalErrorConstraintLower, upper = conditionalErrorConstraintUpper
                 )
             )
         )

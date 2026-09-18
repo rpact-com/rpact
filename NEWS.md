@@ -579,3 +579,11 @@ note that this is a novel implementation, hence experimental
 # rpact 1.0.0
 
 * First release of rpact
+
+## Optimal conditional error updates
+
+* Applied the constraint-related fixes from optconerrf 1.0.3: bounds now enter
+  the selection between competing conditional error solutions at high conditional
+  power, and infeasible integrated bounds are detected before calibration.
+* Clarified that conditional power functions do not guarantee optimality and
+  that conditional power also limits the conditional error in the continuation region.

@@ -72,6 +72,9 @@
 #' The constraints may also be specified on the second-stage information via \code{minimumSecondStageInformation} and \code{maximumSecondStageInformation}.
 #' If both \code{minimumConditionalError} and \code{maximumSecondStageInformation} respectively \code{maximumConditionalError} and \code{minimumSecondStageInformation}
 #' are provided, both constraints will be applied.
+#' In the continuation region, conditional error cannot exceed the conditional power;
+#' an upper bound above it has no additional effect. Before calibration, the integrated
+#' lower and upper bounds are checked for compatibility with the overall alpha level.
 #'
 #' @section Level constant:
 #' The level constant is determined by an internal root-finding routine. It is identified using the \code{uniroot()} function and by default, the interval between 0 and 10 is searched for the level constant.
