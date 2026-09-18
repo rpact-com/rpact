@@ -104,9 +104,6 @@ For \code{"sigmoidEmax"}, \code{omegaMaxVector} specifies the range
 of effect sizes for the treatment group with response according to infinite dose.
 If \code{"userDefined"} is selected, \code{effectMatrix} has to be entered.}
 
-\item{omegaMaxVector}{Range of hazard ratios with highest response for \code{"linear"} and
-\code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.}
-
 \item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
 of the shape of the Weibull distribution.
 Default is \code{1}, i.e., the exponential survival distribution is used instead of the Weibull distribution.
