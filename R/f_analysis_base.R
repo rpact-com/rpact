@@ -468,9 +468,12 @@ getStageResults <- function(
         if (showWarnings) {
             .assertIsDataset(dataInput)
             if (stage > dataInput$getNumberOfStages()) {
-                warning("'stage' (", stage, ") will be ignored because 'dataInput' ",
+                warnArgumentIgnored("'stage' (", stage, ") will be ignored because 'dataInput' ",
                     "has only ", dataInput$getNumberOfStages(), " stages defined",
-                    call. = FALSE
+                    call. = FALSE,
+                    parameter = "stage",
+                    value = stage,
+                    userInstructions = "Choose an available stage, or supply data for the intended later stage."
                 )
             }
         }
@@ -1102,9 +1105,13 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
             type = "logical"
         )
         if (showWarnings) {
-            warning("Repeated p-values not available for 'typeOfDesign' = '",
+            warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = '",
                 design$typeOfDesign, "'",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Use a design/method supporting repeated p-values if these are required; do not interpret ",
+                    "missing repeated p-values as calculated results."
+                )
             )
         }
         return(rep(NA_real_, design$kMax))
@@ -1124,9 +1131,13 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
 
     if (.isTrialDesignFisher(design)) {
         if (design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
-            warning("Repeated p-values not available for 'method' = ",
+            warnResultUnavailable("Repeated p-values not available for 'method' = ",
                 .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Use a design/method supporting repeated p-values if these are required; do not interpret ",
+                    "missing repeated p-values as calculated results."
+                )
             )
             return(rep(NA_real_, design$kMax))
         }
@@ -1517,7 +1528,12 @@ getFinalPValue <- function(stageResults, ...) {
     .assertIsStageResultsNonMultiHypotheses(stageResults)
 
     if (stageResults$.design$kMax == 1) {
-        warning("Final p-value is not available for fixed designs", call. = FALSE)
+        warnResultUnavailable("Final p-value is not available for fixed designs", call. = FALSE,
+            userInstructions = paste0(
+                "Use the fixed-design inference available for this design; choose a sequential design only if ",
+                "it matches the intended trial."
+            )
+        )
         return(list(finalStage = NA_integer_, pFinal = NA_real_))
     }
 
@@ -1537,7 +1553,12 @@ getFinalPValue <- function(stageResults, ...) {
     if (stageResults$.design$kMax > 1 && is.na(finalPValue$finalStage) &&
             (length(finalPValue$pFinal) == 0 || all(is.na(finalPValue$pFinal)))) {
         if (.getOptionalArgument("showWarnings", optionalArgumentDefaultValue = TRUE, ...)) {
-            warning("Final p-value not calculated because final stage not reached", call. = FALSE)
+            warnResultUnavailable("Final p-value not calculated because final stage not reached", call. = FALSE,
+                userInstructions = paste0(
+                    "Provide data through the final stage to calculate final inference; use interim inference ",
+                    "for the current stage."
+                )
+            )
         }
     }
 
@@ -1632,13 +1653,19 @@ getFinalConfidenceInterval <- function(
     on.exit(dataInput$.trim())
 
     if (design$kMax == 1) {
-        warning("Final confidence interval is not available for fixed sample designs", call. = FALSE)
+        warnResultUnavailable("Final confidence interval is not available for fixed sample designs", call. = FALSE,
+            userInstructions = paste0(
+                "Use the fixed-design inference available for this design; choose a sequential design only if ",
+                "it matches the intended trial."
+            )
+        )
     }
 
     if (design$kMax > 1 && design$bindingFutility && !.isTrialDesignFisher(design)) {
-        warning("Two-sided final confidence bounds are not appropriate for binding futility case, ",
+        warnNotValidated("Two-sided final confidence bounds are not appropriate for binding futility case, ",
             "use one-sided version (i.e., one bound) only",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = "Use only the appropriate one-sided final confidence bound when futility is binding."
         )
     }
 
@@ -1708,7 +1735,12 @@ getFinalConfidenceInterval <- function(
     if (design$kMax > 1 && is.na(finalConfidenceInterval$finalStage) &&
             (length(finalConfidenceInterval$finalConfidenceInterval) == 0 ||
                 all(is.na(finalConfidenceInterval$finalConfidenceInterval)))) {
-        warning("Final confidence interval not calculated because final stage not reached", call. = FALSE)
+        warnResultUnavailable("Final confidence interval not calculated because final stage not reached", call. = FALSE,
+            userInstructions = paste0(
+                "Provide data through the final stage to calculate final inference; use interim inference for ",
+                "the current stage."
+            )
+        )
     }
 
     return(finalConfidenceInterval)
@@ -2301,7 +2333,12 @@ getFinalConfidenceInterval <- function(
                 crpFisherSimulated[k] <- reject / iterations
             }
         } else {
-            warning("Simulation of CRP Fisher stopped: 'kMax' must be >= 2", call. = FALSE)
+            warnResultUnavailable("Simulation of CRP Fisher stopped: 'kMax' must be >= 2", call. = FALSE,
+                userInstructions = paste0(
+                    "Use a Fisher combination design with at least two stages for this conditional rejection ",
+                    "probability simulation."
+                )
+            )
         }
     }
 

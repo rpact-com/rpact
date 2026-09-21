@@ -106,22 +106,30 @@ NULL
             information2 <- information[2]
             if (!any(indices == 1) && !is.na(information1)) {
                 if (isTRUE(showWarnings)) {
-                    warning(
+                    warnArgumentIgnored(
                         "'information[1]' (", information1, ") will be ignored ",
                         "because it is not required for the conversion from ",
                         .vQuote(sourceScale), " to ", .vQuote(targetScale),
-                        call. = FALSE
+                        call. = FALSE,
+                        userInstructions = paste0(
+                            "Remove the unneeded conversion input only after verifying sourceScale and ",
+                            "targetScale; choose the intended scales if they are incorrect."
+                        )
                     )
                 }
                 information1 <- NA_real_
             }
             if (!any(indices == 2) && !is.na(information2)) {
                 if (isTRUE(showWarnings)) {
-                    warning(
+                    warnArgumentIgnored(
                         "'information[2]' (", information2, ") will be ignored ",
                         "because it is not required for the conversion from ",
                         .vQuote(sourceScale), " to ", .vQuote(targetScale),
-                        call. = FALSE
+                        call. = FALSE,
+                        userInstructions = paste0(
+                            "Remove the unneeded conversion input only after verifying sourceScale and ",
+                            "targetScale; choose the intended scales if they are incorrect."
+                        )
                     )
                 }
                 information2 <- NA_real_
@@ -157,17 +165,29 @@ NULL
         .assertIsValidDesignForFutilityBoundsConversion(design, sourceScale, targetScale)
 
         if (isTRUE(showWarnings) && !is.na(information1)) {
-            warning(
+            warnArgumentIgnored(
                 "'information1' (", information1, ") will be ignored ",
                 "because it will only be taken into account if the information is provided for both stages",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "information1",
+                value = information1,
+                userInstructions = paste0(
+                    "Provide information for both stages, or omit both information inputs if information-based ",
+                    "conversion is not intended."
+                )
             )
         }
         if (isTRUE(showWarnings) && !is.na(information2)) {
-            warning(
+            warnArgumentIgnored(
                 "'information2' (", information2, ") will be ignored ",
                 "because it will only be taken into account if the information is provided for both stages",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "information2",
+                value = information2,
+                userInstructions = paste0(
+                    "Provide information for both stages, or omit both information inputs if information-based ",
+                    "conversion is not intended."
+                )
             )
         }
 
@@ -793,10 +813,14 @@ summary.FutilityBounds <- function(object, ...) {
         targetScale = targetScale
     ))
     if (!informationRequired) {
-        warning(
+        warnArgumentIgnored(
             "Fisher information is not required for conversion from ",
             .vQuote("zValue"), " to ", .vQuote(targetScale), " and will be ignored",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Remove the unneeded conversion input only after verifying sourceScale and targetScale; choose ",
+                "the intended scales if they are incorrect."
+            )
         )
         return(.getFutilityBoundsFromDesignPlanWithoutFisherInformation(
             designPlan = designPlan,
@@ -1779,23 +1803,35 @@ getFutilityBounds <- function(
                     tol = .Machine$double.eps^0.5
                 )$root)
             } else {
-                warning(
+                warnResultUnavailable(
                     "Source scale ", .vQuote(sourceScale), " not implemented for Fisher's combination test design",
-                    call. = FALSE
+                    call. = FALSE,
+                    userInstructions = paste0(
+                        "Choose a source scale supported for Fisher combination designs, or a different design ",
+                        "if scientifically appropriate."
+                    )
                 )
                 return(NA_real_)
             }
         },
         warning = function(w) {
-            warning("Failed to calculate ", sQuote(sourceScale), " source value from ",
+            warnNumericalIssue("Failed to calculate ", sQuote(sourceScale), " source value from ",
                 sourceValue, ": ", w$message,
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Check sourceScale and sourceValue and resolve the reported conversion problem before using ",
+                    "the converted bounds."
+                )
             )
         },
         error = function(e) {
-            warning("Failed to calculate ", sQuote(sourceScale), " source value from ",
+            warnNumericalIssue("Failed to calculate ", sQuote(sourceScale), " source value from ",
                 sourceValue, ": ", e$message,
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Check sourceScale and sourceValue and resolve the reported conversion problem before using ",
+                    "the converted bounds."
+                )
             )
         }
     )

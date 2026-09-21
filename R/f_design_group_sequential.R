@@ -76,14 +76,19 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         return(TRUE)
     }
 
-    warning(sprintf(
+    warnNumericalIssue(sprintf(
         paste0(
             C_EXCEPTION_TYPE_RUNTIME_ISSUE,
             "in .getGroupSequentialProbabilities(): ",
             "variable '%s' contains %s NA's (%.1f%%)"
         ),
         variableName, numberOfNAs, 100 * numberOfNAs / length(results)
-    ), call. = FALSE)
+    ), call. = FALSE,
+        userInstructions = paste0(
+            "Inspect the missing group-sequential probabilities and design inputs before using the resulting ",
+            "operating characteristics."
+        )
+    )
     return(FALSE)
 }
 
@@ -238,9 +243,17 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         }
     } else {
         if (.designParameterExists(design, "typeBetaSpending") && design$typeBetaSpending != C_TYPE_OF_DESIGN_BS_NONE) {
-            warning("'typeBetaSpending' (", design$typeBetaSpending, ") will be ignored ",
+            warnArgumentIgnored("'typeBetaSpending' (", design$typeBetaSpending, ") will be ignored ",
                 "because 'typeOfDesign' (", design$typeOfDesign, ") is not an alpha spending design",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "typeBetaSpending",
+                value = design$typeBetaSpending,
+                relatedParameter = "Available alpha-spending types of design",
+                relatedValue = .getAlphaSpendingDesignTypeList(),
+                userInstructions = paste0(
+                    "Choose an alpha-spending typeOfDesign to use beta spending, or remove the beta-spending ",
+                    "arguments after confirming the chosen design."
+                )
             )
             design$typeBetaSpending <- C_TYPE_OF_DESIGN_BS_NONE
             design$.setParameterType("typeBetaSpending", C_PARAM_DEFAULT_VALUE)
@@ -248,9 +261,17 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
         if (.designParameterExists(design, "userBetaSpending")) {
             userBetaSpending <- NA_real_
-            warning("'userBetaSpending' (", .arrayToString(design$userBetaSpending), ") will be ignored ",
+            warnArgumentIgnored("'userBetaSpending' (", .arrayToString(design$userBetaSpending), ") will be ignored ",
                 "because 'typeOfDesign' (", design$typeOfDesign, ") is not an alpha spending design",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "userBetaSpending",
+                value = design$userBetaSpending,
+                relatedParameter = "Available alpha-spending types of design",
+                relatedValue = .getAlphaSpendingDesignTypeList(),
+                userInstructions = paste0(
+                    "Choose an alpha-spending typeOfDesign to use beta spending, or remove the beta-spending ",
+                    "arguments after confirming the chosen design."
+                )
             )
         }
     }
@@ -424,11 +445,17 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     if (design$typeOfDesign != C_TYPE_OF_DESIGN_WT_OPTIMUM &&
             optimizationCriterion != C_OPTIMIZATION_CRITERION_DEFAULT) {
-        warning(
+        warnArgumentIgnored(
             "'optimizationCriterion' (", optimizationCriterion,
             ") will be ignored because it is only applicable for ",
             "'typeOfDesign' = \"", C_TYPE_OF_DESIGN_WT_OPTIMUM, "\"",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "optimizationCriterion",
+            value = optimizationCriterion,
+            userInstructions = paste0(
+                "Set typeOfDesign = \"WToptimum\" to use optimizationCriterion, or remove it after confirming the ",
+                "chosen design."
+            )
         )
     }
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_HP) {
@@ -436,20 +463,32 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         .assertIsInClosedInterval(constantBoundsHP, "constantBoundsHP", lower = 2, upper = NULL)
         design$constantBoundsHP <- constantBoundsHP
     } else if (constantBoundsHP != C_CONST_BOUND_HP_DEFAULT) {
-        warning(
+        warnArgumentIgnored(
             "'constantBoundsHP' (", constantBoundsHP,
             ") will be ignored because it is only applicable for ",
             "'typeOfDesign' = \"", C_TYPE_OF_DESIGN_HP, "\"",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "constantBoundsHP",
+            value = constantBoundsHP,
+            userInstructions = paste0(
+                "Set typeOfDesign = \"HP\" to use constantBoundsHP, or remove it after confirming the chosen ",
+                "design."
+            )
         )
     }
     if (design$sided == 1) {
         design$twoSidedPower <- C_TWO_SIDED_POWER_DEFAULT
         design$.setParameterType("twoSidedPower", C_PARAM_NOT_APPLICABLE)
         if (!is.na(twoSidedPower)) {
-            warning("'twoSidedPower' (", twoSidedPower, ") will be ignored because it is ",
+            warnArgumentIgnored("'twoSidedPower' (", twoSidedPower, ") will be ignored because it is ",
                 "only applicable for two-sided testing",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "twoSidedPower",
+                value = twoSidedPower,
+                userInstructions = paste0(
+                    "Set sided = 2 if two-sided testing and twoSidedPower are intended; otherwise remove ",
+                    "twoSidedPower."
+                )
             )
         }
     } else {
@@ -476,11 +515,17 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             ))
         }
     } else if (!is.na(betaAdjustment)) {
-        warning(
+        warnArgumentIgnored(
             "'betaAdjustment' (", betaAdjustment,
             ") will be ignored because it is only applicable ",
             "for two-sided beta-spending designs",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "betaAdjustment",
+            value = betaAdjustment,
+            userInstructions = paste0(
+                "Use a two-sided beta-spending design to apply betaAdjustment, or remove it after confirming ",
+                "the chosen design."
+            )
         )
     }
 
@@ -494,9 +539,15 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     design$alphaSpent[1] <- design$alpha
     design$.setParameterType("typeOfDesign", C_PARAM_NOT_APPLICABLE)
     if (!identical(design$typeOfDesign, C_DEFAULT_TYPE_OF_DESIGN)) {
-        warning("'typeOfDesign' (", design$typeOfDesign, ") will be ignored ",
+        warnArgumentIgnored("'typeOfDesign' (", design$typeOfDesign, ") will be ignored ",
             "because design is fixed",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "typeOfDesign",
+            value = design$typeOfDesign,
+            userInstructions = paste0(
+                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                "after confirming the fixed-sample design."
+            )
         )
     }
     return(invisible(design))
@@ -622,7 +673,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             design$.setParameterType("alphaSpent", C_PARAM_GENERATED)
         },
         error = function(e) {
-            warning("Failed to calculate 'alphaSpent': ", e, call. = FALSE)
+            warnNumericalIssue("Failed to calculate 'alphaSpent': ", e, call. = FALSE,
+                userInstructions = paste0(
+                    "Check the critical values and information rates and resolve the reported error before ",
+                    "relying on alphaSpent."
+                )
+            )
         }
     )
 }
@@ -1266,11 +1322,17 @@ getDesignInverseNormal <- function(
         futilityStops) {
     if (.isBoundaryStoppingActivated(efficacyStops) || .isBoundaryStoppingActivated(futilityStops)) {
         if (!all(is.na(delayedInformation))) {
-            warning(
+            warnArgumentIgnored(
                 "'delayedInformation' (", .arrayToString(delayedInformation), ") ",
                 "will be ignored because it is not applicable ",
                 "when 'efficacyStops' or 'futilityStops' are specified",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "delayedInformation",
+                value = delayedInformation,
+                userInstructions = paste0(
+                    "Omit efficacyStops and futilityStops if delayed information is intended, or remove ",
+                    "delayedInformation after confirming the stopping specification."
+                )
             )
         }
 
@@ -1659,7 +1721,12 @@ getDesignInverseNormal <- function(
         }
     } else if (.isDefinedArgument(informationRates, argumentExistsValidationEnabled = userFunctionCallEnabled) &&
             length(informationRates) > 10) {
-        warning("The usage of 'kMax' (", length(informationRates), ") > 10 is not validated", call. = FALSE)
+        warnNotValidated("The usage of 'kMax' (", length(informationRates), ") > 10 is not validated", call. = FALSE,
+            userInstructions = paste0(
+                "Use at most 10 stages within the validated scope, or independently validate the design with ",
+                "more stages."
+            )
+        )
     }
 
     if (is.na(bindingFutility)) {
@@ -1668,20 +1735,38 @@ getDesignInverseNormal <- function(
             !identical(typeOfDesign, C_TYPE_OF_DESIGN_PT) &&
             !grepl("^bs", typeBetaSpending)) {
         if (!is.na(kMax) && kMax == 1) {
-            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because kMax = 1",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "bindingFutility",
+                value = bindingFutility,
+                userInstructions = paste0(
+                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                    "after confirming the fixed-sample design."
+                )
             )
         } else if (anyNA(futilityBounds)) {
-            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'futilityBounds' is not defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "bindingFutility",
+                value = bindingFutility,
+                userInstructions = paste0(
+                    "Specify non-default futilityBounds if binding futility is intended; otherwise remove ",
+                    "bindingFutility."
+                )
             )
         } else if (!.anyFutilityBoundsAreInvalid(futilityBounds, directionUpper)) {
-            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'futilityBounds' (", .arrayToString(futilityBounds), ") ",
                 "is set to default values",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "bindingFutility",
+                value = bindingFutility,
+                userInstructions = paste0(
+                    "Specify non-default futilityBounds if binding futility is intended; otherwise remove ",
+                    "bindingFutility."
+                )
             )
         }
     }
@@ -1733,51 +1818,136 @@ getDesignInverseNormal <- function(
 
         if (typeOfDesign != C_TYPE_OF_DESIGN_PT) {
             if (!is.na(deltaPT1)) {
-                warning("'deltaPT1' (", deltaPT1, ") will be ignored", call. = FALSE)
+                warnArgumentIgnored("'deltaPT1' (", deltaPT1, ") will be ignored", call. = FALSE,
+                    parameter = "deltaPT1",
+                    value = deltaPT1,
+                    relatedParameter = "typeOfDesign",
+                    relatedValue = typeOfDesign,
+                    constraint = 'typeOfDesign must be "PT"',
+                    reason = 'deltaPT1 is used only when typeOfDesign is "PT".',
+                    userInstructions = paste0(
+                        'Change typeOfDesign to "PT", or remove deltaPT1 only if you are sure the chosen ',
+                        'typeOfDesign is correct.'
+                    )
+                )
             }
             if (!is.na(deltaPT0)) {
-                warning("'deltaPT0' (", deltaPT0, ") will be ignored", call. = FALSE)
+                warnArgumentIgnored("'deltaPT0' (", deltaPT0, ") will be ignored", call. = FALSE,
+                    parameter = "deltaPT0",
+                    value = deltaPT0,
+                    relatedParameter = "typeOfDesign",
+                    relatedValue = typeOfDesign,
+                    constraint = 'typeOfDesign must be "PT"',
+                    reason = 'deltaPT0 is used only when typeOfDesign is "PT".',
+                    userInstructions = paste0(
+                        'Change typeOfDesign to "PT", or remove deltaPT0 only if you are sure the chosen ',
+                        'typeOfDesign is correct.'
+                    )
+                )
             }
         }
         if (typeOfDesign != C_TYPE_OF_DESIGN_WT && !is.na(deltaWT)) {
-            warning("'deltaWT' (", deltaWT, ") will be ignored", call. = FALSE)
+            warnArgumentIgnored("'deltaWT' (", deltaWT, ") will be ignored", call. = FALSE,
+                parameter = "deltaWT",
+                value = deltaWT,
+                relatedParameter = "typeOfDesign",
+                relatedValue = typeOfDesign,
+                constraint = 'typeOfDesign must be "WT"',
+                reason = 'deltaWT is used only when typeOfDesign is "WT".',
+                userInstructions = paste0(
+                    'Change typeOfDesign to "WT", or remove deltaWT only if you are sure the chosen typeOfDesign ',
+                    'is correct.'
+                )
+            )
         }
         if (typeOfDesign != C_TYPE_OF_DESIGN_AS_KD &&
                 typeOfDesign != C_TYPE_OF_DESIGN_AS_HSD && !is.na(gammaA)) {
-            warning("'gammaA' (", gammaA, ") will be ignored", call. = FALSE)
+            warnArgumentIgnored("'gammaA' (", gammaA, ") will be ignored", call. = FALSE,
+                parameter = "gammaA",
+                value = gammaA,
+                relatedParameter = "typeOfDesign",
+                relatedValue = typeOfDesign,
+                constraint = 'typeOfDesign must be "asKD" or "asHSD"',
+                reason = 'gammaA is used only when typeOfDesign is "asKD" or "asHSD".',
+                userInstructions = paste0(
+                    'Change typeOfDesign to "asKD" or "asHSD", or remove gammaA only if you are sure the chosen ',
+                    'typeOfDesign is correct.'
+                )
+            )
         }
         if (typeBetaSpending != C_TYPE_OF_DESIGN_BS_KD &&
                 typeBetaSpending != C_TYPE_OF_DESIGN_BS_HSD && !is.na(gammaB)) {
-            warning("'gammaB' (", gammaB, ") will be ignored", call. = FALSE)
+            warnArgumentIgnored("'gammaB' (", gammaB, ") will be ignored", call. = FALSE,
+                parameter = "gammaB",
+                value = gammaB,
+                relatedParameter = "typeBetaSpending",
+                relatedValue = typeBetaSpending,
+                constraint = 'typeBetaSpending must be "bsKD" or "bsHSD"',
+                reason = 'gammaB is used only when typeBetaSpending is "bsKD" or "bsHSD".',
+                userInstructions = paste0(
+                    'Change typeBetaSpending to "bsKD" or "bsHSD", or remove gammaB only if you are sure the chosen ',
+                    "typeBetaSpending is correct."
+                )
+            )
         }
         if (typeBetaSpending != C_TYPE_OF_DESIGN_BS_USER && !all(is.na(userBetaSpending))) {
-            warning("'userBetaSpending' (", .arrayToString(userBetaSpending), ") ",
+            warnArgumentIgnored("'userBetaSpending' (", .arrayToString(userBetaSpending), ") ",
                 "will be ignored",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "userBetaSpending",
+                value = userBetaSpending,
+                relatedParameter = "typeBetaSpending",
+                relatedValue = typeBetaSpending,
+                constraint = 'typeBetaSpending must be "bsUser"',
+                reason = 'userBetaSpending is used only when typeBetaSpending is "bsUser".',
+                userInstructions = paste0(
+                    'Change typeBetaSpending to "bsUser", or remove userBetaSpending only if you are sure the ',
+                    'chosen typeBetaSpending is correct.'
+                )
             )
         }
         if (!(typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER)) &&
                 !all(is.na(userAlphaSpending))) {
-            warning("'userAlphaSpending' (", .arrayToString(userAlphaSpending), ") ",
+            warnArgumentIgnored("'userAlphaSpending' (", .arrayToString(userAlphaSpending), ") ",
                 "will be ignored",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "userAlphaSpending",
+                value = userAlphaSpending,
+                relatedParameter = "typeOfDesign",
+                relatedValue = typeOfDesign,
+                constraint = 'typeOfDesign must be "asUser"',
+                reason = 'userAlphaSpending is used only when typeOfDesign is "asUser".',
+                userInstructions = paste0(
+                    'Change typeOfDesign to "asUser", or remove userAlphaSpending only if you are sure the chosen ',
+                    'typeOfDesign is correct.'
+                )
             )
         }
     }
 
     if (design$sided == 2 && design$bindingFutility && design$typeOfDesign != C_TYPE_OF_DESIGN_PT &&
             !.isBetaSpendingDesignType(design$typeBetaSpending)) {
-        warning("'bindingFutility' will be ignored because ",
+        warnArgumentIgnored("'bindingFutility' will be ignored because ",
             "the test is defined as two-sided",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "bindingFutility",
+            userInstructions = paste0(
+                "Use a supported one-sided design if binding futility is intended here; otherwise remove ",
+                "bindingFutility after confirming two-sided testing."
+            )
         )
         design$bindingFutility <- FALSE
     }
 
     if (design$sided == 1 && design$twoSidedPower) {
-        warning("'twoSidedPower' will be ignored because ",
+        warnArgumentIgnored("'twoSidedPower' will be ignored because ",
             "the test is defined as one-sided",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "twoSidedPower",
+            userInstructions = paste0(
+                "Set sided = 2 if two-sided testing and twoSidedPower are intended; otherwise remove ",
+                "twoSidedPower."
+            )
         )
         design$twoSidedPower <- FALSE
     }
@@ -1880,10 +2050,19 @@ getDesignInverseNormal <- function(
     if (design$kMax == 1) {
         if (!identical(design$informationRates, 1)) {
             if (!is.na(design$informationRates)) {
-                warning("Information rate", ifelse(length(design$informationRates) != 1, "s", ""), " ",
+                warnArgumentAdjusted("Information rate", ifelse(length(design$informationRates) != 1, "s", ""), " ",
                     .arrayToString(design$informationRates, vectorLookAndFeelEnabled = TRUE),
                     " will be ignored",
-                    call. = FALSE
+                    call. = FALSE,
+                    parameter = "informationRates",
+                    value = design$informationRates,
+                    relatedParameter = "kMax",
+                    relatedValue = design$kMax,
+                    reason = "A fixed design has one analysis at the full information.",
+                    userInstructions = paste0(
+                        "Use informationRates = 1 for a fixed design; choose multiple stages only if a ",
+                        "sequential design is intended."
+                    )
                 )
             }
             design$informationRates <- 1
@@ -1906,11 +2085,17 @@ getDesignInverseNormal <- function(
     }
 
     if (all(!is.na(delayedInformation)) && all(delayedInformation < 1e-03)) {
-        warning("At least one delayed information value must ",
+        warnArgumentIgnored("At least one delayed information value must ",
             "be >= 1e-03 to enable delayed response. ",
             "'delayedInformation' (", .arrayToString(delayedInformation), ") ",
             "will be ignored",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "delayedInformation",
+            value = delayedInformation,
+            userInstructions = paste0(
+                "Supply at least one delayedInformation value >= 0.001 if delayed response is intended; ",
+                "otherwise omit delayedInformation."
+            )
         )
 
         return(design)
@@ -1956,11 +2141,15 @@ getDesignInverseNormal <- function(
     indices <- which(delayedInformation > 0 & delayedInformation < 1e-03)
     n <- length(indices)
     if (n > 0) {
-        warning("The", ifelse(n == 1, "", paste0(" ", n)),
+        warnArgumentAdjusted("The", ifelse(n == 1, "", paste0(" ", n)),
             " delayed information value", ifelse(n == 1, "", "s"), " ",
             .arrayToString(delayedInformation[indices], mode = "and"),
             " will be replaced by 1e-03 to achieve reasonable results",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Check the delayed information assumptions; use values >= 0.001 to avoid replacement by the ",
+                "numerical minimum."
+            )
         )
         delayedInformation[indices] <- 1e-03
     }
@@ -2086,9 +2275,13 @@ getDesignInverseNormal <- function(
     design$.setParameterType("decisionCriticalValues", C_PARAM_GENERATED)
     design$.setParameterType("reversalProbabilities", C_PARAM_GENERATED)
     
-    warning("The delayed information design feature is experimental and ",
+    warnNotValidated("The delayed information design feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
-        call. = FALSE
+        call. = FALSE,
+        userInstructions = paste0(
+            "Validate this experimental feature independently for the intended use before relying on its ",
+            "results."
+        )
     )
 
     return(design)

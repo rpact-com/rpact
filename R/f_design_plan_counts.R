@@ -45,13 +45,17 @@
 #'
 .warnInCaseOfExtremeAllocationRatios <- function(allocation1, allocation2) {
     if (abs(allocation1 - allocation2) > 4) {
-        warning(
+        warnNotValidated(
             "Choice of allocation scheme ('allocation1' = ",
             allocation1,
             ", 'allocation2' = ",
             allocation2,
             ") might yield unreliable results",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Review allocation1 and allocation2 and validate the allocation scheme before relying on ",
+                "count-data results."
+            )
         )
     }
 }
@@ -331,10 +335,14 @@
             )
         },
         error = function(e) {
-            warning(
+            warnNumericalIssue(
                 "Failed to calculate the calendar time. ",
                 "Fisher information might be bounded, e.g., due to overdispersion > 0",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Check whether the required information can be reached under the overdispersion and accrual ",
+                    "assumptions; revise those assumptions if scientifically justified."
+                )
             )
         }
     )

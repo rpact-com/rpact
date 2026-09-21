@@ -363,9 +363,14 @@ NULL
     if (.isTrialDesignConditionalDunnett(design)) {
         if (!normalApproximation) {
             if (userFunctionCallEnabled) {
-                warning("'normalApproximation' was set to TRUE ",
+                warnArgumentAdjusted("'normalApproximation' was set to TRUE ",
                     "because conditional Dunnett test was specified as design",
-                    call. = FALSE
+                    call. = FALSE,
+                    parameter = "normalApproximation",
+                    userInstructions = paste0(
+                        "Use normalApproximation = TRUE for a conditional Dunnett design, or select a different ",
+                        "design if a non-normal method is intended."
+                    )
                 )
             }
             normalApproximation <- TRUE
@@ -785,9 +790,14 @@ NULL
         # Repeated onfidence intervals when using combination tests
 
         if (intersectionTest == "Hierarchical") {
-            warning("Repeated confidence intervals not available for ",
+            warnResultUnavailable("Repeated confidence intervals not available for ",
                 "'intersectionTest' = \"Hierarchical\"",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "intersectionTest",
+                userInstructions = paste0(
+                    "Choose a supported intersection test if repeated confidence intervals are required; retain ",
+                    "Hierarchical only if this limitation is acceptable."
+                )
             )
             return(repeatedConfidenceIntervals)
         }
@@ -1057,9 +1067,14 @@ NULL
     piTreatmentsH1 <- .getOptionalArgument("piTreatmentsH1", ...)
     if (!is.null(piTreatmentsH1) && !is.na(piTreatmentsH1)) {
         if (!is.na(piTreatments)) {
-            warning(sQuote("piTreatments"), " will be ignored because ",
+            warnArgumentIgnored(sQuote("piTreatments"), " will be ignored because ",
                 sQuote("piTreatmentsH1"), " is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "piTreatments",
+                userInstructions = paste0(
+                    "Use piTreatmentsH1 for the alternative treatment probabilities, or remove piTreatmentsH1 ",
+                    "if piTreatments is intended."
+                )
             )
         }
         piTreatments <- piTreatmentsH1
@@ -1068,9 +1083,14 @@ NULL
     piControlH1 <- .getOptionalArgument("piControlH1", ...)
     if (!is.null(piControlH1) && !is.na(piControlH1)) {
         if (!is.na(piControl)) {
-            warning(sQuote("piControl"), " will be ignored because ",
+            warnArgumentIgnored(sQuote("piControl"), " will be ignored because ",
                 sQuote("piControlH1"), " is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "piControl",
+                userInstructions = paste0(
+                    "Use piControlH1 for the alternative control probability, or remove piControlH1 if ",
+                    "piControl is intended."
+                )
             )
         }
         piControl <- piControlH1
@@ -1416,7 +1436,12 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warning("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE)
+                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE,
+                        userInstructions = paste0(
+                            "Check the stage data, design boundaries and planned future sample sizes/events; ",
+                            "conditional power for the reported stage could not be calculated."
+                        )
+                    )
                     results$conditionalPower[treatmentArm, kMax] <- NA_real_
                 } else {
                     results$conditionalPower[treatmentArm, kMax] <- 1 - stats::pnorm(.getQNorm(result) -
@@ -1467,7 +1492,12 @@ NULL
     )
 
     if (stage > 1) {
-        warning("Conditional power is only calculated for the first (interim) stage", call. = FALSE)
+        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage", call. = FALSE,
+            userInstructions = paste0(
+                "Request conditional power for the first interim stage; later-stage conditional power is not ",
+                "implemented by this method."
+            )
+        )
     }
 
     gMax <- stageResults$getGMax()

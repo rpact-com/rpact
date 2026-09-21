@@ -267,12 +267,18 @@ NULL
         }
     } else {
         if (!all(is.na(pi2))) {
-            warning(
+            warnArgumentIgnored(
                 "'pi2' (",
                 .arrayToString(pi2),
                 ") will be ignored ",
                 "because the specified data has only one group",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "pi2",
+                value = pi2,
+                userInstructions = paste0(
+                    "Supply two-group data if a two-group analysis is intended; otherwise remove the ",
+                    "inapplicable two-group argument."
+                )
             )
         }
         results$pi2 <- NA_real_
@@ -1504,7 +1510,12 @@ NULL
         divisor <- prod(pValues[1:(kMax - 1)]^weightsFisher[1:(kMax - 1)])
         result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
         if (result <= 0 || result >= 1) {
-            warning("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE)
+            warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE,
+                userInstructions = paste0(
+                    "Check the stage data, design boundaries and planned future sample sizes/events; ",
+                    "conditional power for the reported stage could not be calculated."
+                )
+            )
             conditionalPower[kMax] <- NA_real_
         } else {
             conditionalPower[kMax] <- 1 - stats::pnorm(.getQNorm(result) - thetaH1 * sqrt(nPlanned[kMax]))
@@ -1534,7 +1545,12 @@ NULL
     pi1H1 <- .getOptionalArgument("pi1H1", ...)
     if (!is.null(pi1H1) && !is.na(pi1H1)) {
         if (!is.na(pi1)) {
-            warning(sQuote("pi1"), " will be ignored because ", sQuote("pi1H1"), " is defined", call. = FALSE)
+            warnArgumentIgnored(sQuote("pi1"), " will be ignored because ", sQuote("pi1H1"), " is defined", call. = FALSE,
+                parameter = "pi1",
+                userInstructions = paste0(
+                    "Use pi1H1 for the assumed treatment probability, or remove pi1H1 if pi1 is intended."
+                )
+            )
         }
         pi1 <- pi1H1
     }
@@ -1542,7 +1558,10 @@ NULL
     pi2H1 <- .getOptionalArgument("pi2H1", ...)
     if (!is.null(pi2H1) && !is.na(pi2H1)) {
         if (!is.na(pi2)) {
-            warning(sQuote("pi2"), " will be ignored because ", sQuote("pi2H1"), " is defined", call. = FALSE)
+            warnArgumentIgnored(sQuote("pi2"), " will be ignored because ", sQuote("pi2H1"), " is defined", call. = FALSE,
+                parameter = "pi2",
+                userInstructions = "Use pi2H1 for the assumed control probability, or remove pi2H1 if pi2 is intended."
+            )
         }
         pi2 <- pi2H1
     }
@@ -1765,7 +1784,13 @@ NULL
 
     if (length(warningMessages) > 0) {
         for (m in warningMessages) {
-            warning(m, call. = FALSE)
+            warnNumericalIssue(m, call. = FALSE,
+                reason = "A warning was raised while calculating conditional power or likelihood values for the plot.",
+                userInstructions = paste0(
+                    "Inspect the reported warning and the effect range, stage data and planned information used ",
+                    "for the conditional-power plot."
+                )
+            )
         }
     }
 

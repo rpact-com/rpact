@@ -430,9 +430,13 @@ NULL
             totalNumberOfGroups <- designPlan$activeArms
         }
         if (is.null(totalNumberOfGroups) || is.na(totalNumberOfGroups)) {
-            warning("Unable to identify 'totalNumberOfGroups' from ",
+            warnResultUnavailable("Unable to identify 'totalNumberOfGroups' from ",
                 .pQuote(parameterName), "in ", .getClassName(designPlan),
-                call = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Check the design plan and group-defining parameters before using a summary that depends on ",
+                    "totalNumberOfGroups."
+                )
             )
         }
 

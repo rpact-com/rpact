@@ -223,7 +223,11 @@ NULL
 
     .assertIsSingleCharacter(packageSource, "packageSource")
     if (!file.exists(packageSource)) {
-        warning(sQuote("packageSource"), " (", packageSource, ") does not exist")
+        warnRuntimeIssue(sQuote("packageSource"), " (", packageSource, ") does not exist",
+            parameter = "packageSource",
+            value = packageSource,
+            userInstructions = "Provide an existing packageSource path."
+        )
     }
 
     if (!grepl("\\.tar\\.gz$", packageSource)) {
@@ -309,7 +313,13 @@ NULL
                     method = "auto", mode = "wb"
                 )
                 if (result != 0) {
-                    warning("'testthat.R' download result in ", result, call. = FALSE)
+                    warnRuntimeIssue("'testthat.R' download result in ", result, call. = FALSE,
+                        parameter = "testthat.R",
+                        userInstructions = paste0(
+                            "Check network access and the test download source, then retry and verify that all ",
+                            "required test files are available."
+                        )
+                    )
                 }
             }
 
@@ -320,7 +330,12 @@ NULL
                 method = "auto", mode = "wb"
             )
             if (result != 0) {
-                warning("Unit test index file download result in ", result, call. = FALSE)
+                warnRuntimeIssue("Unit test index file download result in ", result, call. = FALSE,
+                    userInstructions = paste0(
+                        "Check network access and the test download source, then retry and verify that all ",
+                        "required test files are available."
+                    )
+                )
             }
 
             lines <- .readLinesFromFile(indexFile)
@@ -349,11 +364,15 @@ NULL
                 }
             }
             if (counter < length(testFiles)) {
-                warning(
+                warnRuntimeIssue(
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
                     .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
-                    call. = FALSE
+                    call. = FALSE,
+                    userInstructions = paste0(
+                        "Check network access and the test download source, then retry and verify that all ",
+                        "required test files are available."
+                    )
                 )
             } else {
                 message(
@@ -391,7 +410,12 @@ NULL
                         file.remove(indexFile)
                     },
                     error = function(e) {
-                        warning("Failed to remove unit test index file: ", e$message, call. = FALSE)
+                        warnRuntimeIssue("Failed to remove unit test index file: ", e$message, call. = FALSE,
+                            userInstructions = paste0(
+                                "Check file access permissions and remove the temporary unit-test index file if ",
+                                "it remains."
+                            )
+                        )
                     }
                 )
             }
@@ -426,7 +450,13 @@ NULL
                     cacheOK = cacheOK, extra = extra, headers = NULL
                 )
                 if (result != 0) {
-                    warning("'testthat.R' download result in ", result)
+                    warnRuntimeIssue("'testthat.R' download result in ", result,
+                        parameter = "testthat.R",
+                        userInstructions = paste0(
+                            "Check network access and the test download source, then retry and verify that all ",
+                            "required test files are available."
+                        )
+                    )
                 }
             }
 
@@ -437,7 +467,12 @@ NULL
                 cacheOK = cacheOK, extra = extra, headers = NULL
             )
             if (result != 0) {
-                warning("Unit test index file download result in ", result)
+                warnRuntimeIssue("Unit test index file download result in ", result,
+                    userInstructions = paste0(
+                        "Check network access and the test download source, then retry and verify that all ",
+                        "required test files are available."
+                    )
+                )
             }
 
             lines <- .readLinesFromFile(indexFile)
@@ -467,11 +502,15 @@ NULL
                 }
             }
             if (counter < length(testFiles)) {
-                warning(
+                warnRuntimeIssue(
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
                     .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
-                    call. = FALSE
+                    call. = FALSE,
+                    userInstructions = paste0(
+                        "Check network access and the test download source, then retry and verify that all ",
+                        "required test files are available."
+                    )
                 )
             } else {
                 message(
@@ -496,7 +535,12 @@ NULL
                         file.remove(indexFile)
                     },
                     error = function(e) {
-                        warning("Failed to remove unit test index file: ", e$message, call. = FALSE)
+                        warnRuntimeIssue("Failed to remove unit test index file: ", e$message, call. = FALSE,
+                            userInstructions = paste0(
+                                "Check file access permissions and remove the temporary unit-test index file if ",
+                                "it remains."
+                            )
+                        )
                     }
                 )
             }
@@ -1256,9 +1300,15 @@ testPackage <- function(
     startTime <- Sys.time()
 
     if (!is.na(testFileDirectory) && !dir.exists(file.path(testFileDirectory, "testthat"))) {
-        warning("'testFileDirectory' (", testFileDirectory, ") will be ignored ",
+        warnArgumentIgnored("'testFileDirectory' (", testFileDirectory, ") will be ignored ",
             "because it does not contain a 'testthat' subfolder",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "testFileDirectory",
+            value = testFileDirectory,
+            userInstructions = paste0(
+                "Point testFileDirectory to a directory containing a testthat subfolder, or omit it to use the ",
+                "configured download source."
+            )
         )
         testFileDirectory <- NA_character_
     }
@@ -1294,9 +1344,13 @@ testPackage <- function(
 
     if (!is.na(testFileDirectory)) {
         if (credentialsAvailable) {
-            warning("The connection token and secret will be ignored ",
+            warnArgumentIgnored("The connection token and secret will be ignored ",
                 "because 'testFileDirectory' is defined",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Use the local testFileDirectory without connection credentials, or omit testFileDirectory ",
+                    "if tests should be downloaded."
+                )
             )
         }
         credentialsAvailable <- TRUE
@@ -1304,7 +1358,9 @@ testPackage <- function(
 
     if (executionMode == "downloadOnly") {
         if (testInstalledBasicPackages) {
-            warning("The test of installed R basic packages is not supported in 'downloadOnly' mode")
+            warnResultUnavailable("The test of installed R basic packages is not supported in 'downloadOnly' mode",
+                userInstructions = "Disable downloadOnly to run tests of installed R basic packages."
+            )
         }
         testInstalledBasicPackages <- FALSE
     }
@@ -1784,7 +1840,12 @@ test_plan_section <- function(section) {
             }
         },
         error = function(e) {
-            warning("Failed to get the minimum number of expected tests: ", e$message)
+            warnRuntimeIssue("Failed to get the minimum number of expected tests: ", e$message,
+                userInstructions = paste0(
+                    "Resolve the reported test-metadata error before interpreting completeness of the ",
+                    "quality-assurance run."
+                )
+            )
         }
     )
     return(minNumberOfExpectedTestsDefault)
@@ -2230,9 +2291,13 @@ MarkdownReporter <- R6::R6Class(
             sourcePath <- file.path(outputPath, "src")
             if (self$keepSourceFiles && !dir.exists(sourcePath)) {
                 if (!dir.create(sourcePath)) {
-                    warning("Failed to create directory ", sQuote(sourcePath), ". ",
+                    warnRuntimeIssue("Failed to create directory ", sQuote(sourcePath), ". ",
                         "Source files will be saved to ", sQuote(outputPath), ".",
-                        call. = FALSE
+                        call. = FALSE,
+                        userInstructions = paste0(
+                            "Check directory permissions; retrieve source files from the reported fallback ",
+                            "outputPath."
+                        )
                     )
                     sourcePath <- outputPath
                 }
@@ -2256,9 +2321,13 @@ MarkdownReporter <- R6::R6Class(
                     }
                 },
                 error = function(e) {
-                    warning("Failed to render ", sQuote(self$outputFile),
+                    warnRuntimeIssue("Failed to render ", sQuote(self$outputFile),
                         " to html: ", e$message,
-                        call. = FALSE
+                        call. = FALSE,
+                        userInstructions = paste0(
+                            "Resolve the reported rendering error and check the rendering dependencies before ",
+                            "regenerating the report."
+                        )
                     )
                 }
             )
@@ -2290,7 +2359,12 @@ MarkdownReporter <- R6::R6Class(
                     }
                 },
                 error = function(e) {
-                    warning("Failed to render ", sQuote(mdFileForTex), " to pdf: ", e$message, call. = FALSE)
+                    warnRuntimeIssue("Failed to render ", sQuote(mdFileForTex), " to pdf: ", e$message, call. = FALSE,
+                        userInstructions = paste0(
+                            "Resolve the reported rendering error and check the rendering dependencies before ",
+                            "regenerating the report."
+                        )
+                    )
                 }
             )
         }

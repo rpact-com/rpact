@@ -514,19 +514,34 @@ NULL
             length(threshold) == 1 &&
             threshold != -Inf
         ) {
-        warning(
+        warnArgumentIgnored(
             "'threshold' (",
             threshold,
             ") will be ignored because 'typeOfSelection' = \"userDefined\"",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "threshold",
+            value = threshold,
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            userInstructions = paste0(
+                "Implement the threshold inside the custom selection function, or choose a built-in selection ",
+                "rule supporting threshold."
+            )
         )
         threshold <- -Inf
     }
 
     if (length(typeOfSelection) == 1 && typeOfSelection != "userDefined" && !is.null(selectPopulationsFunction)) {
-        warning(
+        warnArgumentIgnored(
             "'selectPopulationsFunction' will be ignored because 'typeOfSelection' is not \"userDefined\"",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "selectPopulationsFunction",
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            userInstructions = paste0(
+                "Set typeOfSelection = \"userDefined\" to use selectPopulationsFunction, or remove the function ",
+                "after confirming the selection rule."
+            )
         )
     } else if (!is.null(selectPopulationsFunction) && is.function(selectPopulationsFunction)) {
         simulationResults$selectPopulationsFunction <- selectPopulationsFunction
@@ -758,33 +773,63 @@ NULL
     }
 
     if (kMax == 1 && !is.na(conditionalPower)) {
-        warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnored("'conditionalPower' will be ignored for fixed sample design", call. = FALSE,
+            parameter = "conditionalPower",
+            userInstructions = paste0(
+                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                "after confirming the fixed-sample design."
+            )
+        )
     }
     if (endpoint %in% c("means", "rates") && kMax == 1 && !is.null(calcSubjectsFunction)) {
-        warning("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnored("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE,
+            parameter = "calcSubjectsFunction",
+            userInstructions = paste0(
+                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                "after confirming the fixed-sample design."
+            )
+        )
     }
     if (endpoint == "survival" && kMax == 1 && !is.null(calcEventsFunction)) {
-        warning("'calcEventsFunction' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnored("'calcEventsFunction' will be ignored for fixed sample design", call. = FALSE,
+            parameter = "calcEventsFunction",
+            userInstructions = paste0(
+                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                "after confirming the fixed-sample design."
+            )
+        )
     }
 
     if (endpoint %in% c("means", "rates") && is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(minNumberOfSubjectsPerStage) != 1 || !is.na(minNumberOfSubjectsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage),
                 ") will be ignored because ",
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "minNumberOfSubjectsPerStage",
+                value = minNumberOfSubjectsPerStage,
+                userInstructions = paste0(
+                    "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or ",
+                    "remove this argument after confirming reassessment is not intended."
+                )
             )
             simulationResults$minNumberOfSubjectsPerStage <- NA_real_
         }
         if (length(maxNumberOfSubjectsPerStage) != 1 || !is.na(maxNumberOfSubjectsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'maxNumberOfSubjectsPerStage' (",
                 .arrayToString(maxNumberOfSubjectsPerStage),
                 ") will be ignored because ",
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage,
+                userInstructions = paste0(
+                    "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or ",
+                    "remove this argument after confirming reassessment is not intended."
+                )
             )
             simulationResults$maxNumberOfSubjectsPerStage <- NA_real_
         }
@@ -792,22 +837,34 @@ NULL
 
     if (endpoint == "survival" && is.na(conditionalPower) && is.null(calcEventsFunction)) {
         if (length(minNumberOfEventsPerStage) != 1 || !is.na(minNumberOfEventsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'minNumberOfEventsPerStage' (",
                 .arrayToString(minNumberOfEventsPerStage),
                 ") ",
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "minNumberOfEventsPerStage",
+                value = minNumberOfEventsPerStage,
+                userInstructions = paste0(
+                    "Define conditionalPower or calcEventsFunction to enable event-number reassessment, or ",
+                    "remove this argument after confirming reassessment is not intended."
+                )
             )
             simulationResults$minNumberOfEventsPerStage <- NA_real_
         }
         if (length(maxNumberOfEventsPerStage) != 1 || !is.na(maxNumberOfEventsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'maxNumberOfEventsPerStage' (",
                 .arrayToString(maxNumberOfEventsPerStage),
                 ") ",
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "maxNumberOfEventsPerStage",
+                value = maxNumberOfEventsPerStage,
+                userInstructions = paste0(
+                    "Define conditionalPower or calcEventsFunction to enable event-number reassessment, or ",
+                    "remove this argument after confirming reassessment is not intended."
+                )
             )
             simulationResults$maxNumberOfEventsPerStage <- NA_real_
         }

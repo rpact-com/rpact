@@ -170,9 +170,15 @@ NULL
             ) &&
             (twoSidedWarningForDefaultValues && !all(is.na(parameterValues)) ||
                 (!twoSidedWarningForDefaultValues && any(na.omit(parameterValues) != defaultValue)))) {
-        warning(.pQuote(parameterName), " (", .arrayToString(parameterValues),
+        warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues),
             ") will be ignored because the design is two-sided",
-            call. = FALSE
+            call. = FALSE,
+            parameter = parameterName,
+            value = parameterValues,
+            userInstructions = paste0(
+                "Use a one-sided design if a directional alternative is intended; otherwise remove this ",
+                "argument after confirming two-sided testing."
+            )
         )
         parameterValues <- rep(defaultValue, design$kMax - 1)
     }
@@ -267,9 +273,15 @@ NULL
     }
 
     if (design$isUserDefinedParameter(parameterName)) {
-        warning(.pQuote(parameterName), " (", .arrayToString(design[[parameterName]]),
+        warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(design[[parameterName]]),
             ") will be ignored because it will be calculated",
-            call. = FALSE
+            call. = FALSE,
+            parameter = parameterName,
+            value = design[[parameterName]],
+            userInstructions = paste0(
+                "Specify the spending/design inputs that determine these bounds; remove explicit bounds only ",
+                "after confirming the intended beta-spending or Pampallona-Tsiatis design."
+            )
         )
     } else if (design$isGeneratedParameter(parameterName)) {
         return(FALSE)
@@ -437,9 +449,13 @@ NULL
     }
 
     if (design$kMax > 2 && (any(design$userAlphaSpending[2:design$kMax] - design$userAlphaSpending[1:(design$kMax - 1)] < design$tolerance))) {
-        warning("Chosen 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = FALSE),
+        warnNumericalIssue("Chosen 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = FALSE),
             ") might yield imprecise critical values due to numerical inaccuracy",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Review the spending increments and verify numerical stability of the resulting boundaries ",
+                "before using this spending specification."
+            )
         )
     }
 }
@@ -521,9 +537,13 @@ NULL
     }
 
     if (design$kMax > 2 && (any(design$userBetaSpending[2:design$kMax] - design$userBetaSpending[1:(design$kMax - 1)] < design$tolerance))) {
-        warning("Chosen 'userBetaSpending' (", .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = FALSE),
+        warnNumericalIssue("Chosen 'userBetaSpending' (", .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = FALSE),
             ") might yield imprecise futility bounds due to numerical inaccuracy",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Review the spending increments and verify numerical stability of the resulting boundaries ",
+                "before using this spending specification."
+            )
         )
     }
 }
@@ -732,9 +752,14 @@ NULL
 
     if (length(piecewiseLambda) == 1 && !is.na(piecewiseLambda) &&
             length(piecewiseSurvivalTime) > 0 && !all(is.na(piecewiseSurvivalTime))) {
-        warning("Argument 'piecewiseSurvivalTime' will be ignored because ",
+        warnArgumentIgnored("Argument 'piecewiseSurvivalTime' will be ignored because ",
             "length of 'piecewiseLambda' is 1",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "piecewiseSurvivalTime",
+            userInstructions = paste0(
+                "Supply multiple piecewiseLambda values for piecewise hazards, or remove piecewiseSurvivalTime ",
+                "for a constant hazard."
+            )
         )
     }
 
@@ -1148,10 +1173,14 @@ getPiByLambda <- function(
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
     x <- exp(-(lambda * eventTime)^kappa)
     if (any(x < 1e-15, na.rm = TRUE)) {
-        warning("Calculation of pi (1) by lambda (", .arrayToString(round(lambda, 4)),
+        warnNumericalIssue("Calculation of pi (1) by lambda (", .arrayToString(round(lambda, 4)),
             ") results in a possible loss of precision ",
             "because pi = 1 was returned but pi is not exactly 1",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Check lambda and eventTime; the event probability rounds to 1, so avoid treating it as an ",
+                "exact probability of 1 in downstream calculations."
+            )
         )
     }
     return(1 - x)

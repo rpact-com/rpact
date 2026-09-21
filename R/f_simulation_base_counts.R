@@ -340,9 +340,16 @@ getSimulationCounts <- function(
             }
         }
     } else if (!all(is.na(plannedCalendarTime))) {
-        warning("'plannedCalendarTime' (", .arrayToString(plannedCalendarTime), ") ",
+        warnArgumentIgnored("'plannedCalendarTime' (", .arrayToString(plannedCalendarTime), ") ",
             "has no influence on simulation",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "plannedCalendarTime",
+            value = plannedCalendarTime,
+            reason = "The fixed design has no interim analyses, so plannedCalendarTime does not affect the simulation.",
+            userInstructions = paste0(
+                "Use a multi-stage design if planned calendar interim analyses are intended; otherwise remove ",
+                "plannedCalendarTime."
+            )
         )
     }
 
@@ -804,9 +811,13 @@ getSimulationCounts <- function(
     data <- data[!is.na(data$iterationNumber), ]
     simulationResults$.data <- data
 
-    warning("The simulation count data feature is experimental and ",
+    warnNotValidated("The simulation count data feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
-        call. = FALSE
+        call. = FALSE,
+        userInstructions = paste0(
+            "Validate this experimental feature independently for the intended use before relying on its ",
+            "results."
+        )
     )
 
     return(simulationResults)

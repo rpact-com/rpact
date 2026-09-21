@@ -358,7 +358,13 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
 
     if (design$kMax == 1) {
         if (!is.null(calcFunction)) {
-            warning(.pQuote(functionFieldName), " will be ignored for fixed sample design", call. = FALSE)
+            warnArgumentIgnored(.pQuote(functionFieldName), " will be ignored for fixed sample design", call. = FALSE,
+                parameter = functionFieldName,
+                userInstructions = paste0(
+                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                    "after confirming the fixed-sample design."
+                )
+            )
         }
         simulationResults$.setParameterType(functionFieldName, C_PARAM_NOT_APPLICABLE)
         return(list(

@@ -252,15 +252,33 @@ getSimulationMeans <- function(
 
     if (groups == 1L) {
         if (isTRUE(meanRatio)) {
-            warning("'meanRatio' (", meanRatio, ") will be ignored ",
+            warnArgumentIgnored("'meanRatio' (", meanRatio, ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "meanRatio",
+                value = meanRatio,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                userInstructions = paste0(
+                    "Set groups = 2 if a two-group comparison is intended, or remove this argument after ",
+                    "confirming the one-group design."
+                )
             )
         }
         if (!is.na(allocationRatioPlanned)) {
-            warning("'allocationRatioPlanned' (", allocationRatioPlanned,
+            warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                userInstructions = paste0(
+                    "Set groups = 2 if a two-group comparison is intended, or remove this argument after ",
+                    "confirming the one-group design."
+                )
             )
             simulationResults$allocationRatioPlanned <- NA_real_
         }
@@ -307,10 +325,16 @@ getSimulationMeans <- function(
         "design is fixed ('kMax' = 1)", "Assumed effect"
     )
     if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !all(is.na(stDevH1))) {
-        warning("'stDevH1' (", .arrayToString(stDevH1), ") will be ignored ",
+        warnArgumentIgnored("'stDevH1' (", .arrayToString(stDevH1), ") will be ignored ",
             "because neither 'conditionalPower' nor ",
             "'calcSubjectsFunction' is defined",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "stDevH1",
+            value = stDevH1,
+            userInstructions = paste0(
+                "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or remove ",
+                "this argument after confirming reassessment is not intended."
+            )
         )
     }
     conditionalPower <- .ignoreParameterIfNotUsed(
@@ -363,30 +387,54 @@ getSimulationMeans <- function(
         )
     }
     if (!is.na(conditionalPower) && design$kMax == 1) {
-        warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnored("'conditionalPower' will be ignored for fixed sample design", call. = FALSE,
+            parameter = "conditionalPower",
+            userInstructions = paste0(
+                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                "after confirming the fixed-sample design."
+            )
+        )
     }
     if (!is.null(calcSubjectsFunction) && design$kMax == 1) {
-        warning("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnored("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE,
+            parameter = "calcSubjectsFunction",
+            userInstructions = paste0(
+                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                "after confirming the fixed-sample design."
+            )
+        )
     }
 
     if (is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(minNumberOfSubjectsPerStage) != 1 ||
                 !is.na(minNumberOfSubjectsPerStage)) {
-            warning("'minNumberOfSubjectsPerStage' (",
+            warnArgumentIgnored("'minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "minNumberOfSubjectsPerStage",
+                value = minNumberOfSubjectsPerStage,
+                userInstructions = paste0(
+                    "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or ",
+                    "remove this argument after confirming reassessment is not intended."
+                )
             )
             simulationResults$minNumberOfSubjectsPerStage <- NA_real_
         }
         if (length(maxNumberOfSubjectsPerStage) != 1 ||
                 !is.na(maxNumberOfSubjectsPerStage)) {
-            warning("'maxNumberOfSubjectsPerStage' (",
+            warnArgumentIgnored("'maxNumberOfSubjectsPerStage' (",
                 .arrayToString(maxNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage,
+                userInstructions = paste0(
+                    "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or ",
+                    "remove this argument after confirming reassessment is not intended."
+                )
             )
             simulationResults$maxNumberOfSubjectsPerStage <- NA_real_
         }

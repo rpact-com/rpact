@@ -973,9 +973,14 @@ NULL
     piTreatmentsH1 <- .getOptionalArgument("piTreatmentsH1", ...)
     if (!is.null(piTreatmentsH1) && !is.na(piTreatmentsH1)) {
         if (!is.na(piTreatments)) {
-            warning(sQuote("piTreatments"), " will be ignored because ",
+            warnArgumentIgnored(sQuote("piTreatments"), " will be ignored because ",
                 sQuote("piTreatmentsH1"), " is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "piTreatments",
+                userInstructions = paste0(
+                    "Use piTreatmentsH1 for the alternative treatment probabilities, or remove piTreatmentsH1 ",
+                    "if piTreatments is intended."
+                )
             )
         }
         piTreatments <- piTreatmentsH1
@@ -988,9 +993,14 @@ NULL
     piControlH1 <- .getOptionalArgument("piControlH1", ...)
     if (!is.null(piControlH1) && !is.na(piControlH1)) {
         if (!is.na(piControl)) {
-            warning(sQuote("piControl"), " will be ignored because ",
+            warnArgumentIgnored(sQuote("piControl"), " will be ignored because ",
                 sQuote("piControlH1"), " is defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "piControl",
+                userInstructions = paste0(
+                    "Use piControlH1 for the alternative control probability, or remove piControlH1 if ",
+                    "piControl is intended."
+                )
             )
         }
         piControl <- piControlH1
@@ -1337,9 +1347,13 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warning("Calculation not possible: could not calculate conditional power for stage ",
+                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ",
                         kMax,
-                        call. = FALSE
+                        call. = FALSE,
+                        userInstructions = paste0(
+                            "Check the stage data, design boundaries and planned future sample sizes/events; ",
+                            "conditional power for the reported stage could not be calculated."
+                        )
                     )
                     results$conditionalPower[population, kMax] <- NA_real_
                 } else {

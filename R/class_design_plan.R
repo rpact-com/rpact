@@ -907,10 +907,21 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
         },
         .warnInCaseArgumentExists = function(argument, argumentName) {
             if (!all(is.na(argument)) && any(argument > 0)) {
-                warning(sprintf(
+                warnArgumentIgnored(sprintf(
                     "Specified '%s' (%s) not taken into account",
                     argumentName, .arrayToString(argument)
-                ), call. = FALSE)
+                ), call. = FALSE,
+                    parameter = argumentName,
+                    value = argument,
+                    reason = paste0(
+                        "Observation times are not accounted for, so accrual, dropout and follow-up inputs are ",
+                        "not used."
+                    ),
+                    userInstructions = paste0(
+                        "Set accountForObservationTimes = TRUE if accrual, dropout or follow-up should enter ",
+                        "the calculation; otherwise remove these arguments."
+                    )
+                )
             }
         },
         recreate = function(..., hazardRatio = NA_real_, pi1 = NA_real_, maxNumberOfSubjects = NA_integer_) {

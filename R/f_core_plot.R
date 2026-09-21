@@ -276,7 +276,12 @@ NULL
                 return(eval(parse(text = plotCmd)))
             },
             error = function(e) {
-                warning("Failed to create grid plot using command ", .sQuote(plotCmd), ": ", e$message)
+                warnRuntimeIssue("Failed to create grid plot using command ", .sQuote(plotCmd), ": ", e$message,
+                    userInstructions = paste0(
+                        "Check the reported plotting command and error, including the plot objects being ",
+                        "combined, before retrying the grid plot."
+                    )
+                )
             }
         )
     }
@@ -614,7 +619,13 @@ getAvailablePlotTypes <- function(
         }
 
         if (!(showSource %in% C_PLOT_SHOW_SOURCE_ARGUMENTS)) {
-            warning("'showSource' (", showSource, ") is not allowed and will be ignored", call. = FALSE)
+            warnArgumentIgnored("'showSource' (", showSource, ") is not allowed and will be ignored", call. = FALSE,
+                parameter = "showSource",
+                value = showSource,
+                userInstructions = paste0(
+                    "Use a supported showSource value from the plot documentation, or set showSource = FALSE."
+                )
+            )
             return(invisible())
         }
     } else if (!isTRUE(showSource)) {
@@ -1132,7 +1143,9 @@ getAvailablePlotTypes <- function(
                 data$xValues <- as.numeric(.formatSampleSizes(data$xValues))
             },
             error = function(e) {
-                warning("Failed to format sample sizes on x-axis: ", e$message)
+                warnRuntimeIssue("Failed to format sample sizes on x-axis: ", e$message,
+                    userInstructions = "Inspect the axis values and reported formatting error before using the plot."
+                )
             }
         )
     }
@@ -1401,10 +1414,15 @@ getAvailablePlotTypes <- function(
     removedRows2 <- nRow - nrow(data)
 
     if (getLogLevel() == C_LOG_LEVEL_WARN && (removedRows1 > 0 || removedRows2 > 0)) {
-        warning(sprintf(
+        warnDataIssue(sprintf(
             "Removed %s rows containing (0, 0)-points and %s rows containing missing values",
             removedRows1, removedRows2
-        ), call. = FALSE)
+        ), call. = FALSE,
+            userInstructions = paste0(
+                "Inspect omitted zero/zero and missing-value rows; provide valid coordinates if those ",
+                "observations should appear in the plot."
+            )
+        )
     }
 
     categoryEnabled <- !is.null(data[["categories"]]) && !all(is.na(data$categories))
@@ -1844,9 +1862,15 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     showFutilityBounds <- .getOptionalArgument("showFutilityBounds", ...)
     if ((all(type != 3, na.rm = TRUE) || (!is.null(obj) && !inherits(obj, "TrialDesignPlan"))) && !is.null(showFutilityBounds)) {
         objTypeInfo <- ifelse(!is.null(obj) && !inherits(obj, "TrialDesignPlan"), " design plan", "")
-        warning("Argument 'showFutilityBounds' (", showFutilityBounds, ") is only available for", objTypeInfo, " plot type 3; ",
+        warnArgumentIgnored("Argument 'showFutilityBounds' (", showFutilityBounds, ") is only available for", objTypeInfo, " plot type 3; ",
             "it will be ignored",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "showFutilityBounds",
+            value = showFutilityBounds,
+            userInstructions = paste0(
+                "Use plot type 3 for a supported object to show futility bounds, or remove showFutilityBounds ",
+                "after confirming the plot type."
+            )
         )
     }
 
@@ -1855,19 +1879,35 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     if (all(type != 4, na.rm = TRUE) && all(type != "all", na.rm = TRUE) &&
             (!is.null(showAlphaSpent) || !is.null(showBetaSpent))) {
         if (!is.null(showAlphaSpent) && !is.null(showBetaSpent)) {
-            warning("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
+            warnArgumentIgnored("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
                 "are only available for plot type 4; they will be ignored",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Use plot type 4 to display alpha/beta spending, or remove the spending-display arguments ",
+                    "after confirming the plot type."
+                )
             )
         } else if (!is.null(showAlphaSpent)) {
-            warning("Argument 'showAlphaSpent' (", showAlphaSpent, ") is only available for plot type 4; ",
+            warnArgumentIgnored("Argument 'showAlphaSpent' (", showAlphaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "showAlphaSpent",
+                value = showAlphaSpent,
+                userInstructions = paste0(
+                    "Use plot type 4 to display alpha/beta spending, or remove the spending-display arguments ",
+                    "after confirming the plot type."
+                )
             )
         } else {
-            warning("Argument 'showBetaSpent' (", showBetaSpent, ") is only available for plot type 4; ",
+            warnArgumentIgnored("Argument 'showBetaSpent' (", showBetaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "showBetaSpent",
+                value = showBetaSpent,
+                userInstructions = paste0(
+                    "Use plot type 4 to display alpha/beta spending, or remove the spending-display arguments ",
+                    "after confirming the plot type."
+                )
             )
         }
     }

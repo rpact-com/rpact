@@ -944,13 +944,28 @@ setOutputFormat <- function(
                         if (grepl("digits|nsmall|trimSingleZeros|futilityProbabilityEnabled|roundFunction", value)) {
                             args[[key]] <- value
                         } else {
-                            warning('Line "', line, '" contains an invalid value: ', value)
+                            warnInvalidInput('Line "', line, '" contains an invalid value: ', value,
+                                userInstructions = paste0(
+                                    "Correct the output-format definition to use supported keys and values in ",
+                                    "valid key-value pairs."
+                                )
+                            )
                         }
                     } else {
-                        warning('Line "', line, '" contains an invalid key: ', keyValuePair[1])
+                        warnInvalidInput('Line "', line, '" contains an invalid key: ', keyValuePair[1],
+                            userInstructions = paste0(
+                                "Correct the output-format definition to use supported keys and values in valid ",
+                                "key-value pairs."
+                            )
+                        )
                     }
                 } else if (nchar(trimws(line)) > 0) {
-                    warning('Line "', line, '" does not contain a valid key-value-pair')
+                    warnInvalidInput('Line "', line, '" does not contain a valid key-value-pair',
+                        userInstructions = paste0(
+                            "Correct the output-format definition to use supported keys and values in valid ",
+                            "key-value pairs."
+                        )
+                    )
                 }
                 if (nchar(trimws(line)) > 0) {
                     counter <- counter + 1
@@ -1011,7 +1026,12 @@ setOutputFormat <- function(
                     )
                 }
             } else {
-                warning("The output format ", key, " affects no parameters", call. = FALSE)
+                warnArgumentIgnored("The output format ", key, " affects no parameters", call. = FALSE,
+                    userInstructions = paste0(
+                        "Use an output-format key matching a parameter to be formatted, or remove the unused ",
+                        "format entry."
+                    )
+                )
             }
         }
     }

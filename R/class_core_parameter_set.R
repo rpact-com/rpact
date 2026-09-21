@@ -120,16 +120,26 @@ FieldSet <- R6::R6Class("FieldSet",
                         headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
                     if (headingBaseNumber < -2) {
-                        warning(
+                        warnArgumentAdjusted(
                             "Illegal option ", sQuote("rpact.print.heading.base.number"),
-                            " (", headingBaseNumber, ") was set to ", C_HEADING_BASE_NUMBER_DEFAULT
+                            " (", headingBaseNumber, ") was set to ", C_HEADING_BASE_NUMBER_DEFAULT,
+                            parameter = "rpact.print.heading.base.number",
+                            userInstructions = paste0(
+                                "Set option rpact.print.heading.base.number to a supported heading level from 1 ",
+                                "to 4."
+                            )
                         )
                         headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
                     if (headingBaseNumber > 4) {
-                        warning(
+                        warnArgumentAdjusted(
                             "Illgeal option ", sQuote("rpact.print.heading.base.number"),
-                            " (", headingBaseNumber, ") was set to 4 because it was too large"
+                            " (", headingBaseNumber, ") was set to 4 because it was too large",
+                            parameter = "rpact.print.heading.base.number",
+                            userInstructions = paste0(
+                                "Set option rpact.print.heading.base.number to a supported heading level from 1 ",
+                                "to 4."
+                            )
                         )
                         headingBaseNumber <- 4L
                     }
@@ -511,7 +521,12 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 },
                 error = function(e) {
                     if (consoleOutputEnabled) {
-                        warning("Failed to show parameter ", .pQuote(parameterName), ": ", e$message)
+                        warnRuntimeIssue("Failed to show parameter ", .pQuote(parameterName), ": ", e$message,
+                            userInstructions = paste0(
+                                "Inspect the affected parameter and its format or dimensions; correct the ",
+                                "reported formatting or extraction problem before using the incomplete output."
+                            )
+                        )
                     }
                 }
             )
@@ -596,7 +611,12 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 },
                 error = function(e) {
                     if (consoleOutputEnabled) {
-                        warning("Failed to show single parameter ", .pQuote(parameterName), " (", param$type, "): ", e$message)
+                        warnRuntimeIssue("Failed to show single parameter ", .pQuote(parameterName), " (", param$type, "): ", e$message,
+                            userInstructions = paste0(
+                                "Inspect the affected parameter and its format or dimensions; correct the ",
+                                "reported formatting or extraction problem before using the incomplete output."
+                            )
+                        )
                     }
                 }
             )
@@ -630,9 +650,13 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 },
                 error = function(e) {
                     if (consoleOutputEnabled) {
-                        warning(
+                        warnRuntimeIssue(
                             "Failed to extract parameter name and value from ",
-                            sQuote(parameterName), ": ", e$message
+                            sQuote(parameterName), ": ", e$message,
+                            userInstructions = paste0(
+                                "Inspect the affected parameter and its format or dimensions; correct the ",
+                                "reported formatting or extraction problem before using the incomplete output."
+                            )
                         )
                     }
                     return(list(parameterName = parameterName, paramValue = ""))
@@ -1166,9 +1190,13 @@ ParameterSet <- R6::R6Class("ParameterSet",
             }
         },
         error = function(e) {
-            warning(
+            warnRuntimeIssue(
                 ".getAsDataFrameMultidimensional: ",
-                "failed to add 'variedParameterCaption' to data.frame; ", e$message
+                "failed to add 'variedParameterCaption' to data.frame; ", e$message,
+                userInstructions = paste0(
+                    "Inspect the affected parameter and its format or dimensions; correct the reported ",
+                    "formatting or extraction problem before using the incomplete output."
+                )
             )
         }
     )
@@ -1226,9 +1254,13 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 }
             },
             error = function(e) {
-                warning(
+                warnRuntimeIssue(
                     ".getAsDataFrameMultidimensional: failed to add parameter ",
-                    sQuote(parameterName), " to data.frame; ", e$message
+                    sQuote(parameterName), " to data.frame; ", e$message,
+                    userInstructions = paste0(
+                        "Inspect the affected parameter and its format or dimensions; correct the reported ",
+                        "formatting or extraction problem before using the incomplete output."
+                    )
                 )
             }
         )
@@ -1260,9 +1292,13 @@ ParameterSet <- R6::R6Class("ParameterSet",
                     }
                 },
                 error = function(e) {
-                    warning(
+                    warnRuntimeIssue(
                         ".getAsDataFrameMultidimensional: failed to add extra parameter ",
-                        sQuote(parameterName), " to data.frame; ", e$message
+                        sQuote(parameterName), " to data.frame; ", e$message,
+                        userInstructions = paste0(
+                            "Inspect the affected parameter and its format or dimensions; correct the reported ",
+                            "formatting or extraction problem before using the incomplete output."
+                        )
                     )
                 }
             )

@@ -673,13 +673,18 @@ NULL
         if (numberOfStages > kMax) {
             s <- numberOfStages - kMax
             plural <- ifelse(s == 1, "", "s")
-            warning(sprintf(
+            warnDataIssue(sprintf(
                 paste0(
                     "The data of the last %s in the dataset will be ",
                     "ignored because the design has specified kMax = %s"
                 ),
                 ifelse(s == 1, "stage", paste0(s, " stages")), kMax
-            ), call. = FALSE)
+            ), call. = FALSE,
+                userInstructions = paste0(
+                    "Match the number of dataset stages to the design kMax; remove extra stages only after ",
+                    "confirming the intended design."
+                )
+            )
         } else if (numberOfStages < kMax) {
             dataInput$.fillWithNAs(kMax)
         }
@@ -1299,10 +1304,16 @@ NULL
             type = "character"
         )
         if (identical(type, "warning")) {
-            warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
+            warnNotValidated("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
                 spendingFunctionName, "is out of validated bounds ",
                 bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix,
-                call. = FALSE
+                call. = FALSE,
+                parameter = parameterName,
+                value = parameterValue,
+                userInstructions = paste0(
+                    "Choose values within the documented validated range, or independently validate the design ",
+                    "for the chosen values."
+                )
             )
         } else if (identical(type, "message")) {
             message(
@@ -1545,7 +1556,12 @@ NULL
     .assertIsSingleInteger(kMax, "kMax", validateType = FALSE)
     .assertIsInClosedInterval(kMax, "kMax", lower = kMaxLowerBound, upper = kMaxUpperBound)
     if (showWarnings && kMax > 10) {
-        warning("The usage of 'kMax' (", kMax, ") > 10 is not validated", call. = FALSE)
+        warnNotValidated("The usage of 'kMax' (", kMax, ") > 10 is not validated", call. = FALSE,
+            userInstructions = paste0(
+                "Use at most 10 stages within the validated scope, or independently validate the design with ",
+                "more stages."
+            )
+        )
     }
 }
 
@@ -1612,10 +1628,14 @@ NULL
     }
 
     if (kMax > 1 && kMax <= 10 && (any(informationRates[2:kMax] - informationRates[1:(kMax - 1)] < 0.05 - 1e-10))) {
-        warning("Chosen 'informationRates' (",
+        warnNotValidated("Chosen 'informationRates' (",
             .arrayToString(informationRates, vectorLookAndFeelEnabled = FALSE),
             ") outside validated range",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Choose values within the documented validated range, or independently validate the design for ",
+                "the chosen values."
+            )
         )
     }
 }
@@ -1928,7 +1948,13 @@ NULL
             ifelse(length(definedArguments) > 1, " are", " is"), " defined"
         )
         if (warningOnlyEnabled) {
-            warning(C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS, message, call. = FALSE)
+            warnInvalidInput(C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS, message, call. = FALSE,
+                parameter = undefinedArguments,
+                userInstructions = paste0(
+                    "Provide all associated arguments listed as undefined, or remove the defined arguments if ",
+                    "that calculation is not intended."
+                )
+            )
             return(FALSE)
         } else {
             stopMissingArgument(message,
@@ -1984,7 +2010,13 @@ NULL
 
 .isValidNPlanned <- function(nPlanned, kMax, stage) {
     if (missing(nPlanned)) {
-        warning("'nPlanned' is missing", call. = FALSE)
+        warnInvalidInput("'nPlanned' is missing", call. = FALSE,
+            parameter = "nPlanned",
+            userInstructions = paste0(
+                "Provide nPlanned for the remaining stages if conditional power or future-stage inference is ",
+                "required."
+            )
+        )
         return(FALSE)
     }
 
@@ -1993,24 +2025,32 @@ NULL
     }
 
     if (length(nPlanned) != kMax - stage) {
-        warning(sprintf(
+        warnArgumentIgnored(sprintf(
             paste0(
                 "'nPlanned' (%s) will be ignored: ",
                 "length must be equal to %s (kMax - stage = %s - %s)"
             ),
             .arrayToString(nPlanned), kMax - stage, kMax, stage
-        ), call. = FALSE)
+        ), call. = FALSE,
+            parameter = "nPlanned",
+            value = nPlanned,
+            userInstructions = "Supply nPlanned with exactly kMax - stage entries for the remaining stages."
+        )
         return(FALSE)
     }
 
     if (sum(nPlanned <= 0, na.rm = TRUE) > 0) {
-        warning(sprintf(
+        warnArgumentIgnored(sprintf(
             paste0(
                 "'nPlanned' (%s) will be ignored: ",
                 "all values must be > 0"
             ),
             .arrayToString(nPlanned)
-        ), call. = FALSE)
+        ), call. = FALSE,
+            parameter = "nPlanned",
+            value = nPlanned,
+            userInstructions = "Supply strictly positive nPlanned values for every remaining stage."
+        )
         return(FALSE)
     }
 
@@ -2089,9 +2129,15 @@ NULL
                     relatedValue = functionName
                 )
             } else {
-                warning("Argument unknown in ", functionName, "(...): ",
+                warnArgumentIgnored("Argument unknown in ", functionName, "(...): ",
                     .pQuote(argName), " = ", argValue, " will be ignored",
-                    call. = FALSE
+                    call. = FALSE,
+                    parameter = argName,
+                    value = arg,
+                    userInstructions = paste0(
+                        "Correct the argument name or pass it to the function that supports it; remove it only ",
+                        "after confirming it is unnecessary."
+                    )
                 )
             }
         }
@@ -2100,7 +2146,7 @@ NULL
 
 .warnInCaseOfUnusedArgument <- function(arg, argName, defaultValue, functionName) {
     if (!identical(arg, defaultValue)) {
-        warning(
+        warnArgumentIgnored(
             "Unused argument in ", functionName, "(...): ", .pQuote(argName), " = ", .arrayToString(
                 arg,
                 vectorLookAndFeelEnabled = (length(arg) > 1),
@@ -2108,7 +2154,13 @@ NULL
                 encapsulate = !is.null(arg) && any(is.character(arg))
             ),
             " will be ignored",
-            call. = FALSE
+            call. = FALSE,
+            parameter = argName,
+            value = arg,
+            userInstructions = paste0(
+                "Correct the argument name or pass it to the function that supports it; remove it only after ",
+                "confirming it is unnecessary."
+            )
         )
     }
 }
@@ -2117,14 +2169,24 @@ NULL
     args <- list(...)
     argNames <- names(args)
     if ("twoSidedPower" %in% argNames) {
-        warning("'twoSidedPower' can only be defined in 'design'", call. = FALSE)
+        warnArgumentIgnored("'twoSidedPower' can only be defined in 'design'", call. = FALSE,
+            parameter = "twoSidedPower",
+            userInstructions = paste0(
+                "Set twoSidedPower when constructing the design, and pass that design to the calculation."
+            )
+        )
     }
 }
 
 .warnInCaseOfTwoSidedPowerIsDisabled <- function(design) {
     if (design$sided == 2 && !is.na(design$twoSidedPower) && !design$twoSidedPower &&
             design$isUserDefinedParameter("twoSidedPower")) {
-        warning("design$twoSidedPower = FALSE will be ignored because design$sided = 2", call. = FALSE)
+        warnArgumentIgnored("design$twoSidedPower = FALSE will be ignored because design$sided = 2", call. = FALSE,
+            userInstructions = paste0(
+                "Check the two-sided design specification; twoSidedPower = FALSE is not used in this ",
+                "calculation for sided = 2."
+            )
+        )
     }
 }
 
@@ -2361,10 +2423,14 @@ NULL
 .assertIsValidAllocationRatioPlanned <- function(allocationRatioPlanned, numberOfGroups) {
     if (numberOfGroups == 1) {
         if (allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT) {
-            warning(
+            warnArgumentIgnored(
                 "Planned allocation ratio ", allocationRatioPlanned, " will be ignored ",
                 "because the specified data has only one group",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Supply two-group data if a two-group analysis is intended; otherwise remove the ",
+                    "inapplicable two-group argument."
+                )
             )
         }
         return(invisible())
@@ -2633,9 +2699,15 @@ NULL
         userFunctionCallEnabled = TRUE) {
     if (sided == 2 && !is.na(directionUpper)) {
         if (userFunctionCallEnabled) {
-            warning("'directionUpper' (", directionUpper, ") will be ignored because it ",
+            warnArgumentIgnored("'directionUpper' (", directionUpper, ") will be ignored because it ",
                 "is not applicable for 'sided' = 2",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "directionUpper",
+                value = directionUpper,
+                userInstructions = paste0(
+                    "Use a one-sided design if a directional alternative is intended; otherwise remove this ",
+                    "argument after confirming two-sided testing."
+                )
             )
         }
         return(invisible(NA))
@@ -2655,10 +2727,13 @@ NULL
             identical(default, C_DIRECTION_UPPER_SURVIVAL_DEFAULT) &&
             isTRUE(is.na(directionUpper)) &&
             isTRUE(is.na(design$directionUpper))) {
-        warning(
+        warnArgumentAdjusted(
             "The default value of 'directionUpper' for survival endpoints has changed ",
             "from TRUE to FALSE. Please specify 'directionUpper' explicitly to avoid this warning.",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Specify directionUpper explicitly to match the intended alternative for the survival endpoint."
+            )
         )
     }
 }
@@ -2946,15 +3021,27 @@ NULL
     if (is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(parameterValues) != 1 || !is.na(parameterValues)) {
             if (calcSubjectsFunctionEnabled) {
-                warning(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
+                warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
                     "will be ignored because neither 'conditionalPower' nor ",
                     .pQuote(calcSubjectsFunctionName), " is defined",
-                    call. = FALSE
+                    call. = FALSE,
+                    parameter = parameterName,
+                    value = parameterValues,
+                    userInstructions = paste0(
+                        "Specify conditionalPower or the supported sample-size/event recalculation function to ",
+                        "use these bounds; otherwise remove them."
+                    )
                 )
             } else {
-                warning(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
+                warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
                     "will be ignored because 'conditionalPower' is not defined",
-                    call. = FALSE
+                    call. = FALSE,
+                    parameter = parameterName,
+                    value = parameterValues,
+                    userInstructions = paste0(
+                        "Specify conditionalPower if this alternative assumption should be used for ",
+                        "reassessment; otherwise remove the unused argument."
+                    )
                 )
             }
         }
@@ -3001,9 +3088,16 @@ NULL
     }
 
     if (!is.na(parameterValues[1]) && parameterValues[1] != plannedSubjects[1]) {
-        warning("First value of ", .pQuote(parameterName), " ",
+        warnArgumentAdjusted("First value of ", .pQuote(parameterName), " ",
             "(", parameterValues[1], ") will be ignored",
-            call. = FALSE
+            call. = FALSE,
+            parameter = parameterName,
+            value = parameterValues,
+            reason = "The first-stage sample size is fixed by plannedSubjects[1].",
+            userInstructions = paste0(
+                "Set the first bound to plannedSubjects[1]; adaptive sample-size limits apply only after the ",
+                "first stage."
+            )
         )
     }
 
@@ -3071,12 +3165,16 @@ NULL
         }
     }
     if (!is.na(param)) {
-        warning("Observed ", param, " (", .arrayToString(paramValues),
+        warnDataIssue("Observed ", param, " (", .arrayToString(paramValues),
             ") not according to specified information rates (",
             .arrayToString(design$informationRates[1:stage]), ") in ",
             "group sequential design. ",
             "Test procedure might not control Type I error rate",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Verify stage information and use a design or boundary recalculation appropriate for the ",
+                "observed information before interpreting Type I error control."
+            )
         )
     }
 }
@@ -3264,7 +3362,12 @@ NULL
                 message, "and 'Dunnett' will be used instead ",
                 "because conditional Dunnett test was specified as design"
             )
-            warning(message, call. = FALSE)
+            warnArgumentAdjusted(message, call. = FALSE,
+                userInstructions = paste0(
+                    "Use intersectionTest = \"Dunnett\" for the conditional Dunnett design, or choose a design ",
+                    "supporting the intended intersection test."
+                )
+            )
         }
         intersectionTest <- "Dunnett"
     }
@@ -3339,10 +3442,16 @@ NULL
         prefix <- paste0(trimws(prefix), " ")
     }
 
-    warning(prefix, .pQuote(paramName), " (",
+    warnArgumentIgnored(prefix, .pQuote(paramName), " (",
         .arrayToString(paramValue), ") will be ignored because ",
         requirementFailedReason,
-        call. = FALSE
+        call. = FALSE,
+        parameter = paramName,
+        value = paramValue,
+        userInstructions = paste0(
+            "Satisfy the reported applicability requirement if this argument is intended; otherwise remove it ",
+            "after confirming the current settings."
+        )
     )
     return(NA_real_)
 }
@@ -3434,9 +3543,15 @@ NULL
 
     if (dataInput$getNumberOfGroups() == 1) {
         if (!is.na(stdErrorEstimate)) {
-            warning("'stdErrorEstimate' (", stdErrorEstimate,
+            warnArgumentIgnored("'stdErrorEstimate' (", stdErrorEstimate,
                 ") will be ignored because data input has only one group",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "stdErrorEstimate",
+                value = stdErrorEstimate,
+                userInstructions = paste0(
+                    "Supply two-group data if a two-group analysis is intended; otherwise remove the ",
+                    "inapplicable two-group argument."
+                )
             )
         }
 
@@ -3521,18 +3636,36 @@ NULL
             naAllowed = FALSE, noDefaultAvailable = TRUE
         )
         if (activeArms == 1) {
-            warning("'typeOfSelection' (\"", typeOfSelection, "\") will be ignored ",
+            warnArgumentIgnored("'typeOfSelection' (\"", typeOfSelection, "\") will be ignored ",
                 "because 'activeArms' or 'populations' = 1",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "typeOfSelection",
+                value = typeOfSelection,
+                userInstructions = paste0(
+                    "Provide multiple active arms/populations if selection is intended; otherwise omit ",
+                    "typeOfSelection."
+                )
             )
         } else if (rValue > activeArms) {
-            warning("'rValue' (", rValue, ") is larger than activeArms or populations ",
+            warnArgumentIgnored("'rValue' (", rValue, ") is larger than activeArms or populations ",
                 "(", activeArms, ") and will be ignored",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "rValue",
+                value = rValue,
+                userInstructions = "Set rValue no larger than the number of active arms/populations."
             )
         }
     } else if (!is.na(rValue)) {
-        warning("'rValue' (", rValue, ") will be ignored because 'typeOfSelection' != \"rBest\"", call. = FALSE)
+        warnArgumentIgnored("'rValue' (", rValue, ") will be ignored because 'typeOfSelection' != \"rBest\"", call. = FALSE,
+            parameter = "rValue",
+            value = rValue,
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            userInstructions = paste0(
+                "Set typeOfSelection = \"rBest\" to use rValue, or remove rValue after confirming the chosen ",
+                "selection rule."
+            )
+        )
     }
 
     if (typeOfSelection == "epsilon") {
@@ -3543,9 +3676,17 @@ NULL
             lower = 0, upper = NULL, naAllowed = TRUE
         )
     } else if (!is.na(epsilonValue)) {
-        warning("'epsilonValue' (", epsilonValue, ") will be ignored ",
+        warnArgumentIgnored("'epsilonValue' (", epsilonValue, ") will be ignored ",
             "because 'typeOfSelection' != \"epsilon\"",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "epsilonValue",
+            value = epsilonValue,
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            userInstructions = paste0(
+                "Set typeOfSelection = \"epsilon\" to use epsilonValue, or remove epsilonValue after confirming ",
+                "the chosen selection rule."
+            )
         )
     }
 
@@ -3818,22 +3959,39 @@ NULL
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {
-            warning(sQuote(valueMaxVectorName), " (", .arrayToString(valueMaxVector),
+            warnArgumentIgnored(sQuote(valueMaxVectorName), " (", .arrayToString(valueMaxVector),
                 ") will be ignored because it will be set to first column of 'effectMatrix'",
-                call. = FALSE
+                call. = FALSE,
+                parameter = valueMaxVectorName,
+                value = valueMaxVector,
+                userInstructions = paste0(
+                    "Set the intended effects in the first column of effectMatrix, or choose a shape that uses ",
+                    "the maximum-effect vector."
+                )
             )
         }
         if (!is.null(doseLevels) && !anyNA(doseLevels)) {
-            warning("'doseLevels' (", .arrayToString(doseLevels), ") ",
+            warnArgumentIgnored("'doseLevels' (", .arrayToString(doseLevels), ") ",
                 "will be ignored because 'typeOfShape' ",
                 "is defined as ", .pQuote(typeOfShape),
-                call. = FALSE
+                call. = FALSE,
+                parameter = "doseLevels",
+                value = doseLevels,
+                userInstructions = paste0(
+                    "Choose a dose-response shape supporting doseLevels if needed; otherwise remove doseLevels ",
+                    "after confirming typeOfShape."
+                )
             )
         }
     } else if (!is.null(effectMatrix)) {
-        warning("'effectMatrix' will be ignored because 'typeOfShape' ",
+        warnArgumentIgnored("'effectMatrix' will be ignored because 'typeOfShape' ",
             "is defined as ", .pQuote(typeOfShape),
-            call. = FALSE
+            call. = FALSE,
+            parameter = "effectMatrix",
+            userInstructions = paste0(
+                "Set typeOfShape = \"userDefined\" to supply effectMatrix, or remove effectMatrix after ",
+                "confirming the chosen shape."
+            )
         )
     }
 
@@ -4353,10 +4511,18 @@ NULL
             )
         }
         if (anyNA(accrualIntensity) && !anyNA(accrualTime) && !is.na(fixedExposureTime)) {
-            warning(
+            warnArgumentIgnored(
                 "Specification of 'accrualTime' has no ",
                 "influence of calculation and will be ignored",
-                call. = FALSE
+                call. = FALSE,
+                reason = paste0(
+                    "With fixedExposureTime and no accrualIntensity, accrualTime does not enter this count-data ",
+                    "calculation."
+                ),
+                userInstructions = paste0(
+                    "Specify accrualIntensity if calendar-time recruitment should matter; otherwise remove ",
+                    "accrualTime for the fixed-exposure calculation."
+                )
             )
         }
     } else {
@@ -4510,11 +4676,16 @@ NULL
         valueStr <- paste0(" (", .arrayToString(argValue), ")")
     }
 
-    warning(
+    warnArgumentIgnored(
         sQuote(argumentName), valueStr, " will be ignored ",
         "because it is not required for the conversion from ",
         .pQuote(sourceScale), " to ", .pQuote(targetScale),
-        call. = FALSE
+        call. = FALSE,
+        parameter = argumentName,
+        userInstructions = paste0(
+            "Remove the unneeded conversion input only after verifying sourceScale and targetScale; choose the ",
+            "intended scales if they are incorrect."
+        )
     )
 }
 
@@ -4717,17 +4888,33 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
 
     if (!is.null(lowerBound) && length(lowerBound) > 0 && !anyNA(lowerBound) &&
             any(futilityBounds < lowerBound, na.rm = TRUE)) {
-        warning(
+        warnNumericalIssue(
             "At least one calculated futility bound outside acceptable range",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "futilityBounds",
+            value = futilityBounds,
+            relatedParameter = c("lowerBound", "upperBound"),
+            relatedValue = list(lowerBound = lowerBound, upperBound = upperBound),
+            userInstructions = paste0(
+                "Review the design and futility conversion inputs; do not rely on bounds outside the acceptable ",
+                "range."
+            )
         )
     }
 
     if (!is.null(upperBound) && length(upperBound) > 0 && !anyNA(upperBound) &&
             any(futilityBounds > upperBound, na.rm = TRUE)) {
-        warning(
+        warnNumericalIssue(
             "At least one calculated futility bound outside acceptable range",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "futilityBounds",
+            value = futilityBounds,
+            relatedParameter = c("lowerBound", "upperBound"),
+            relatedValue = list(lowerBound = lowerBound, upperBound = upperBound),
+            userInstructions = paste0(
+                "Review the design and futility conversion inputs; do not rely on bounds outside the acceptable ",
+                "range."
+            )
         )
     }
 }

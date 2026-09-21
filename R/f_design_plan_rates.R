@@ -518,33 +518,60 @@ NULL
     if (groups == 1) {
         .setValueAndParameterType(designPlan, "pi2", pi2, NA_real_, notApplicableIfNA = TRUE)
         if (designPlan$isUserDefinedParameter("pi2")) {
-            warning(
+            warnArgumentIgnored(
                 "'pi2' (",
                 pi2,
                 ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "pi2",
+                value = pi2,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                userInstructions = paste0(
+                    "Set groups = 2 if a two-group comparison is intended, or remove this argument after ",
+                    "confirming the one-group design."
+                )
             )
         }
         designPlan$.setParameterType("pi2", C_PARAM_NOT_APPLICABLE)
 
         if (isTRUE(riskRatio)) {
-            warning(
+            warnArgumentIgnored(
                 "'riskRatio' (",
                 riskRatio,
                 ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "riskRatio",
+                value = riskRatio,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                userInstructions = paste0(
+                    "Set groups = 2 if a two-group comparison is intended, or remove this argument after ",
+                    "confirming the one-group design."
+                )
             )
         }
         designPlan$.setParameterType("riskRatio", C_PARAM_NOT_APPLICABLE)
 
         if (length(allocationRatioPlanned) == 1 && !is.na(allocationRatioPlanned)) {
-            warning(
+            warnArgumentIgnored(
                 "'allocationRatioPlanned' (",
                 allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                userInstructions = paste0(
+                    "Set groups = 2 if a two-group comparison is intended, or remove this argument after ",
+                    "confirming the one-group design."
+                )
             )
         }
         designPlan$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)

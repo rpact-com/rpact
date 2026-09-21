@@ -678,9 +678,10 @@ NULL
     }
 
     if (anyNA(criticalValues[1:stage])) {
-        warning(
+        warnResultUnavailable(
             "Repeated confidence intervals not because ", sum(is.na(criticalValues)),
-            " critical values are NA (", .arrayToString(criticalValues), ")"
+            " critical values are NA (", .arrayToString(criticalValues), ")",
+            userInstructions = "Resolve the missing critical values before requesting repeated confidence intervals."
         )
         return(repeatedConfidenceIntervals)
     }
@@ -1190,7 +1191,12 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warning("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE)
+                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE,
+                        userInstructions = paste0(
+                            "Check the stage data, design boundaries and planned future sample sizes/events; ",
+                            "conditional power for the reported stage could not be calculated."
+                        )
+                    )
                     results$conditionalPower[population, kMax] <- NA_real_
                 } else {
                     results$conditionalPower[population, kMax] <- 1 - stats::pnorm(.getQNorm(result) -

@@ -153,9 +153,14 @@ NULL
                             paramValueFormatted <- .getParameterValueFormattedByFormatFunctionName(formatFunctionName, paramValueFormatted, obj)
                         },
                         error = function(e) {
-                            warning("Failed to format value ", sQuote(parameterName), " with function ",
+                            warnRuntimeIssue("Failed to format value ", sQuote(parameterName), " with function ",
                                 formatFunctionName, "(): ", e$message,
-                                call. = FALSE
+                                call. = FALSE,
+                                userInstructions = paste0(
+                                    "Inspect the affected parameter and its format or dimensions; correct the ",
+                                    "reported formatting or extraction problem before using the incomplete ",
+                                    "output."
+                                )
                             )
                         }
                     )

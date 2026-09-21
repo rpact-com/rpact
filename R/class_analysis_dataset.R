@@ -730,10 +730,13 @@ writeDatasets <- function(
 getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
     dataset <- .getDataset(floatingPointNumbersEnabled = floatingPointNumbersEnabled, ...)
     if (dataset$.enrichmentEnabled && dataset$getNumberOfGroups() != 2) {
-        warning("Only population enrichment data with 2 groups can be analyzed but ",
+        warnDataIssue("Only population enrichment data with 2 groups can be analyzed but ",
             dataset$getNumberOfGroups(), " group",
             ifelse(dataset$getNumberOfGroups() == 1, " is", "s are"), " defined",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Provide population enrichment data with exactly two groups before requesting an analysis."
+            )
         )
     }
     dataset <- .resetPipeOperatorQueue(dataset)
@@ -771,9 +774,13 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 argInfo <- paste0(sQuote(argName), " ")
             }
             argInfo <- paste0(argInfo, "(", .arrayToString(arg), ")")
-            warning(
+            warnArgumentIgnored(
                 "Argument ", argInfo, " will be ignored ",
-                "because only 'emmGrid' objects will be respected"
+                "because only 'emmGrid' objects will be respected",
+                userInstructions = paste0(
+                    "Pass only emmGrid objects to this dataset constructor; remove other arguments only after ",
+                    "confirming the intended data source."
+                )
             )
         }
     }
@@ -911,24 +918,36 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
             }
 
             if (lmEnabled) {
-                warning("When using ", modelFunction, "() ",
+                warnNumericalIssue("When using ", modelFunction, "() ",
                     "the estimated marginal means and standard deviations can be inaccurate ",
                     "and analysis results based on this values may be imprecise",
-                    call. = FALSE
+                    call. = FALSE,
+                    userInstructions = paste0(
+                        "Check the marginal means and standard deviations against the fitted model before ",
+                        "relying on the resulting analysis."
+                    )
                 )
             } else {
-                warning("Using ", modelFunction, " emmeans result objects as ",
+                warnNotValidated("Using ", modelFunction, " emmeans result objects as ",
                     "arguments of getDataset() is experminental in this rpact ",
                     "version and not fully validated",
-                    call. = FALSE
+                    call. = FALSE,
+                    userInstructions = paste0(
+                        "Validate this experimental feature independently for the intended use before relying ",
+                        "on its results."
+                    )
                 )
             }
         },
         error = function(e) {
-            warning("Using emmeans result objects as ",
+            warnNotValidated("Using emmeans result objects as ",
                 "arguments of getDataset() is experminental in this rpact ",
                 "version and not fully validated",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Validate this experimental feature independently for the intended use before relying on ",
+                    "its results."
+                )
             )
         }
     )
@@ -1162,15 +1181,24 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         }
 
         if (length(emptySubsetNames) == 1) {
-            warning("The undefined subset ", emptySubsetNames,
+            warnDataIssue("The undefined subset ", emptySubsetNames,
                 " was defined as empty subset",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Define the missing subsets explicitly and verify the population membership before ",
+                    "analysis."
+                )
             )
         } else {
-            warning(gettextf(
+            warnDataIssue(gettextf(
                 "The %s undefined subsets %s were defined as empty subsets",
                 length(emptySubsetNames), .arrayToString(emptySubsetNames)
-            ), call. = FALSE)
+            ), call. = FALSE,
+                userInstructions = paste0(
+                    "Define the missing subsets explicitly and verify the population membership before ",
+                    "analysis."
+                )
+            )
         }
     }
 
@@ -1951,9 +1979,14 @@ Dataset <- R6::R6Class("Dataset",
 
             nToCheck <- stats::na.omit(x)
             if (any(nToCheck != as.integer(nToCheck))) {
-                warning(parameterName, " specified as floating-point ",
+                warnArgumentAdjusted(parameterName, " specified as floating-point ",
                     "numbers were truncated",
-                    call. = FALSE
+                    call. = FALSE,
+                    parameter = parameterName,
+                    userInstructions = paste0(
+                        "Supply integer counts explicitly; check that truncation has not changed the intended ",
+                        "dataset."
+                    )
                 )
             }
 
@@ -2457,9 +2490,13 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
             denom <- (sampleSizes[k] - 1)
             value <- (numK - numBeforeK + numSumBeforeK - numSumK) / denom
             if (is.null(value) || length(value) != 1 || is.na(value) || value < 0) {
-                warning("No calculation of stage-wise standard deviation from ",
+                warnResultUnavailable("No calculation of stage-wise standard deviation from ",
                     "overall standard deviations possible at stage ", k,
-                    call. = FALSE
+                    call. = FALSE,
+                    userInstructions = paste0(
+                        "Check the cumulative sample sizes and standard deviations at this stage; supply ",
+                        "consistent data to derive stage-wise standard deviations."
+                    )
                 )
                 return(NA_real_)
             }
@@ -3106,7 +3143,10 @@ plot.Dataset <- function(
     }
 
     if (!is.logical(showSource) || isTRUE(showSource)) {
-        warning("'showSource' != FALSE is not yet implemented for class ", .getClassName(x))
+        warnResultUnavailable("'showSource' != FALSE is not yet implemented for class ", .getClassName(x),
+            parameter = "showSource",
+            userInstructions = "Set showSource = FALSE for this dataset class."
+        )
     }
 
     if (is.null(plotSettings)) {
@@ -4931,9 +4971,15 @@ print.Dataset <- function(
 
     if (isTRUE(markdown)) {
         if (output != "list") {
-            warning("'output' (\"", output, "\") will be ignored ",
+            warnArgumentIgnored("'output' (\"", output, "\") will be ignored ",
                 "because only \"list\" is supported yet if markdown is enabled",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "output",
+                value = output,
+                userInstructions = paste0(
+                    "Use output = \"list\" with markdown, or disable markdown if another output format is ",
+                    "required."
+                )
             )
         }
 

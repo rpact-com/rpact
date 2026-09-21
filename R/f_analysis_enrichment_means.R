@@ -1128,9 +1128,14 @@ NULL
     stDevsH1 <- .getOptionalArgument("stDevsH1", ...)
     if (!is.null(stDevsH1) && !is.na(stDevsH1)) {
         if (!is.na(assumedStDevs)) {
-            warning(
+            warnArgumentIgnored(
                 sQuote("assumedStDevs"), " will be ignored because ",
-                sQuote("stDevsH1"), " is defined"
+                sQuote("stDevsH1"), " is defined",
+                parameter = "assumedStDevs",
+                userInstructions = paste0(
+                    "Use stDevsH1 for the alternative standard deviations, or remove stDevsH1 if assumedStDevs ",
+                    "is intended."
+                )
             )
         }
         assumedStDevs <- stDevsH1
@@ -1426,9 +1431,13 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warning("Calculation not possible: could not calculate conditional power for stage ",
+                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ",
                         kMax,
-                        call. = FALSE
+                        call. = FALSE,
+                        userInstructions = paste0(
+                            "Check the stage data, design boundaries and planned future sample sizes/events; ",
+                            "conditional power for the reported stage could not be calculated."
+                        )
                     )
                     results$conditionalPower[population, kMax] <- NA_real_
                 } else {

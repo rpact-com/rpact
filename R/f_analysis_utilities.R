@@ -25,9 +25,15 @@ NULL
     design <- results$.design
     if (design$kMax == 1) {
         if (.isConditionalPowerEnabled(nPlanned)) {
-            warning("'nPlanned' (", .arrayToString(nPlanned), ") ",
+            warnArgumentIgnored("'nPlanned' (", .arrayToString(nPlanned), ") ",
                 "will be ignored because design is fixed",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "nPlanned",
+                value = nPlanned,
+                userInstructions = paste0(
+                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                    "after confirming the fixed-sample design."
+                )
             )
         }
         results$.setParameterType("nPlanned", C_PARAM_NOT_APPLICABLE)
@@ -49,9 +55,13 @@ NULL
     if (!.isConditionalPowerEnabled(nPlanned)) {
         if (length(paramValues) > 0 && !all(is.na(paramValues)) &&
                 !results$isGeneratedParameter(paramName)) {
-            warning(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
+            warnArgumentIgnored(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
                 "will be ignored because 'nPlanned' is not defined",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Specify nPlanned for future stages to use this argument, or remove it if future-stage ",
+                    "calculations are not intended."
+                )
             )
         }
         return(invisible())
@@ -59,9 +69,13 @@ NULL
     if (results$.design$kMax == 1) {
         if (length(paramValues) > 0 && !all(is.na(paramValues)) &&
                 !results$isGeneratedParameter(paramName)) {
-            warning(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
+            warnArgumentIgnored(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
                 "will be ignored because design is fixed",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                    "after confirming the fixed-sample design."
+                )
             )
         }
         return(invisible())
@@ -562,9 +576,12 @@ NULL
     }
 
     if (dataFrameCounter > 1) {
-        warning("Found ", dataFrameCounter, ", data.frame arguments; ",
+        warnArgumentIgnored("Found ", dataFrameCounter, ", data.frame arguments; ",
             "only the first data.frame will be used for the initialization of the dataset",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Combine the intended data into one data.frame and pass that single data.frame to getDataset()."
+            )
         )
     }
 
@@ -994,15 +1011,27 @@ getLongFormat <- function(dataInput) {
     if (!.isConditionalPowerEnabled(nPlanned) || numberOfGroups == 1) {
         if (numberOfGroups == 1) {
             if (length(allocationRatioPlanned) == 1 && !identical(allocationRatioPlanned, 1)) {
-                warning("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
+                warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
                     "will be ignored because the specified data has only one group",
-                    call. = FALSE
+                    call. = FALSE,
+                    parameter = "allocationRatioPlanned",
+                    value = allocationRatioPlanned,
+                    userInstructions = paste0(
+                        "Supply two-group data if a two-group analysis is intended; otherwise remove the ",
+                        "inapplicable two-group argument."
+                    )
                 )
             }
         } else if (!identical(allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)) {
-            warning("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
+            warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
                 "will be ignored because 'nPlanned' is not defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned,
+                userInstructions = paste0(
+                    "Specify nPlanned for future stages to use this argument, or remove it if future-stage ",
+                    "calculations are not intended."
+                )
             )
         }
         results$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)

@@ -867,8 +867,11 @@ NULL
         output <- list()
     } else {
         if (!design$enforceMonotonicity) {
-            warning(
-                "Monotonisation is required. Set enforceMonotonicity to TRUE in design object for strict type I error control."
+            warnNumericalIssue(
+                "Monotonisation is required. Set enforceMonotonicity to TRUE in design object for strict type I error control.",
+                userInstructions = paste0(
+                    "Set enforceMonotonicity = TRUE in the design object for strict Type I error control."
+                )
             )
         }
     }
@@ -900,7 +903,12 @@ NULL
 .getNu <- function(alpha, conditionalPower) {
     nu <- 0
     if (any(alpha > conditionalPower)) {
-        warning("alpha/conditional error should not exceed conditionalPower. Information is otherwise 0")
+        warnInvalidInput("alpha/conditional error should not exceed conditionalPower. Information is otherwise 0",
+            userInstructions = paste0(
+                "Choose conditionalPower above alpha or the applicable conditional error if positive ",
+                "information is required."
+            )
+        )
     } else {
         nu <- (stats::qnorm(alpha, lower.tail = FALSE) + stats::qnorm(conditionalPower))^2
     }

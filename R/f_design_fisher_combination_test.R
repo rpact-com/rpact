@@ -243,20 +243,38 @@ getDesignFisher <- function(
         bindingFutility <- C_BINDING_FUTILITY_FISHER_DEFAULT
     } else if (userFunctionCallEnabled) {
         if (!is.na(kMax) && kMax == 1) {
-            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because kMax = 1",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "bindingFutility",
+                value = bindingFutility,
+                userInstructions = paste0(
+                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                    "after confirming the fixed-sample design."
+                )
             )
         } else if (anyNA(alpha0Vec)) {
-            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'alpha0Vec' is not defined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "bindingFutility",
+                value = bindingFutility,
+                userInstructions = paste0(
+                    "Specify non-default alpha0Vec futility bounds if binding futility is intended; otherwise ",
+                    "remove bindingFutility."
+                )
             )
         } else if (all(alpha0Vec == C_ALPHA_0_VEC_DEFAULT, na.rm = TRUE)) {
-            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'alpha0Vec' (", .arrayToString(alpha0Vec), ") ",
                 "is set to default values",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "bindingFutility",
+                value = bindingFutility,
+                userInstructions = paste0(
+                    "Specify non-default alpha0Vec futility bounds if binding futility is intended; otherwise ",
+                    "remove bindingFutility."
+                )
             )
         }
     }
@@ -302,7 +320,12 @@ getDesignFisher <- function(
     design$alpha0Vec <- .getValidatedAlpha0Vec(design)
 
     if (design$sided == 2 && design$bindingFutility && any(design$alpha0Vec < 1)) {
-        warning("Binding futility will be ignored because the test is defined as two-sided", call. = FALSE)
+        warnArgumentIgnored("Binding futility will be ignored because the test is defined as two-sided", call. = FALSE,
+            userInstructions = paste0(
+                "Use a supported one-sided design if binding futility is intended here; otherwise remove ",
+                "bindingFutility after confirming two-sided testing."
+            )
+        )
     }
 
     if (design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
@@ -310,9 +333,14 @@ getDesignFisher <- function(
     } else {
         design$.setParameterType("userAlphaSpending", C_PARAM_NOT_APPLICABLE)
         if (.isDefinedArgument(design$userAlphaSpending)) {
-            warning("'userAlphaSpending' will be ignored because 'method' is not ",
+            warnArgumentIgnored("'userAlphaSpending' will be ignored because 'method' is not ",
                 .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
-                call. = FALSE
+                call. = FALSE,
+                parameter = "userAlphaSpending",
+                userInstructions = paste0(
+                    "Choose the user-defined alpha-spending Fisher method to use userAlphaSpending, or remove ",
+                    "it after confirming the intended method."
+                )
             )
         }
     }
@@ -433,7 +461,11 @@ getDesignFisher <- function(
             }
         },
         error = function(e) {
-            warning("Output may be wrong because an error occured: ", e$message, call. = FALSE)
+            warnNumericalIssue("Output may be wrong because an error occured: ", e$message, call. = FALSE,
+                userInstructions = paste0(
+                    "Resolve the reported design calculation error and recompute before relying on the output."
+                )
+            )
         }
     )
 

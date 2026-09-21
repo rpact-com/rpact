@@ -17,7 +17,9 @@
 
 .writeLinesToFile <- function(lines, fileName) {
     if (is.null(lines) || length(lines) == 0 || !is.character(lines)) {
-        warning("Empty lines. Stop to write ", .vQuote(fileName))
+        warnRuntimeIssue("Empty lines. Stop to write ", .vQuote(fileName),
+            userInstructions = "Provide non-empty lines before writing the output file."
+        )
         return(invisible(fileName))
     }
 

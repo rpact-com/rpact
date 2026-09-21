@@ -1,5 +1,10 @@
 ## New features
 
+* Warnings now use typed conditions with optional diagnostic context. Set
+  `options(rpact.warning.context = TRUE)` to include parameter values, reasons
+  and corrective instructions, or register `rpact.warning.factory.condition`
+  for integration with client packages such as `rpact.code.api`.
+
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
 * `getSimulationMultiArmSurvival()` and `getSimulationEnrichmentSurvival()` now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument `simulationType` can be used to choose between the new C++ implementation (`"patientWise"`), the previous test-statistic-based approach (`"testStatisticBased"`), and a basic R reference implementation (`"patientWiseBasic"`) intended for validation and testing. The default `"auto"` setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.
 * `getDataset()` now supports datasets of general, endpoint-independent estimates through the new `DatasetGeneral` class. Stage-wise estimates and standard errors can be provided using `est` and `se`; degrees of freedom (`df`) are optional and default internally to `Inf`, corresponding to a normal approximation.

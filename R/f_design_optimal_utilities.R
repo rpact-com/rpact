@@ -227,7 +227,12 @@ plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), 
 
     if (plotNonMonotoneFunction && type != 3) {
         if (!x$enforceMonotonicity || length(x$monotonisationConstants) == 0) {
-            warning("No distinct non-monotone function is available for this design.", call. = FALSE)
+            warnResultUnavailable("No distinct non-monotone function is available for this design.", call. = FALSE,
+                userInstructions = paste0(
+                    "Use the available conditional power function; a separate non-monotone function is not ",
+                    "available for this design."
+                )
+            )
         } else {
             secondDesign <- x$clone(deep = TRUE)
             secondDesign$enforceMonotonicity <- FALSE

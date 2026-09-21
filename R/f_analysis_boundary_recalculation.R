@@ -219,11 +219,15 @@ getObservedInformationRates <- function(
     }
 
     if (any(informationRates > 1)) {
-        warning("The observed information at stage ",
+        warnDataIssue("The observed information at stage ",
             .arrayToString(which(informationRates > 1)), " is over-running, ",
             "i.e., the information rate (", .arrayToString(informationRates[informationRates > 1]), ") ",
             "is larger than the planned maximum information rate (1)",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Verify observed information against the planned maximum and use an appropriate boundary ",
+                "recalculation before interpreting inference."
+            )
         )
     }
 
@@ -270,12 +274,17 @@ getObservedInformationRates <- function(
         }
     }
     if (length(parametersToIgnore) > 0) {
-        warning("The user-defined parameter",
+        warnArgumentIgnored("The user-defined parameter",
             ifelse(length(parametersToIgnore) == 1, "", "s"), " ",
             .arrayToString(sQuote(parametersToIgnore), mode = "and"),
             " will be ignored because they are not applicable ",
             "for automatic recalculation of the boundaries",
-            call. = FALSE
+            call. = FALSE,
+            parameter = parametersToIgnore,
+            userInstructions = paste0(
+                "Review the automatic boundary recalculation settings; omit parameters not applicable to this ",
+                "method only after confirming the chosen method."
+            )
         )
     }
 
@@ -315,11 +324,16 @@ getObservedInformationRates <- function(
             arguments <- c(arguments, paste0("'informationEpsilon' (", .arrayToString(informationEpsilon), ")"))
         }
         if (length(arguments) > 0) {
-            warning(.arrayToString(arguments, mode = "and"),
+            warnArgumentIgnored(.arrayToString(arguments, mode = "and"),
                 " will be ignored because ", ifelse(length(arguments) == 1, "it is", "they are"),
                 " only applicable for alpha spending", "\n",
                 "group sequential designs with no futility bounds and a single hypothesis",
-                call. = FALSE
+                call. = FALSE,
+                parameter = arguments,
+                userInstructions = paste0(
+                    "Use an alpha-spending group sequential design with no futility bounds and one hypothesis ",
+                    "if automatic recalculation is intended; otherwise omit these arguments."
+                )
             )
         }
         return(result)
@@ -327,9 +341,15 @@ getObservedInformationRates <- function(
 
     if (is.null(maxInformation) || length(maxInformation) == 0 || is.na(maxInformation)) {
         if (!is.null(informationEpsilon) && !all(is.na(informationEpsilon))) {
-            warning("'informationEpsilon' (", .arrayToString(informationEpsilon),
+            warnArgumentIgnored("'informationEpsilon' (", .arrayToString(informationEpsilon),
                 ") will be ignored because 'maxInformation' is undefined",
-                call. = FALSE
+                call. = FALSE,
+                parameter = "informationEpsilon",
+                value = informationEpsilon,
+                userInstructions = paste0(
+                    "Specify maxInformation to use informationEpsilon, or remove informationEpsilon if no ",
+                    "maximum information is intended."
+                )
             )
         }
         return(result)
@@ -445,9 +465,13 @@ getObservedInformationRates <- function(
         )
     )
     base::options("rpact.analysis.repeated.p.values.warnings.enabled" = "FALSE")
-    warning("Repeated p-values not available for automatic ",
+    warnResultUnavailable("Repeated p-values not available for automatic ",
         "recalculation of boundaries at final stage",
-        call. = FALSE
+        call. = FALSE,
+        userInstructions = paste0(
+            "Use the available final-stage inference; repeated p-values are unavailable with automatic boundary ",
+            "recalculation at the final stage."
+        )
     )
 
     return(list(

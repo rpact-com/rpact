@@ -738,22 +738,30 @@ getTestLabel <- function(x) {
 
     if (!acceptResultsOutOfTolerance) {
         if (!suppressWarnings) {
-            warning(.getCallingFunctionInformation(callingFunctionInformation),
+            warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                 "NA returned because root search by 'uniroot' produced a function result (",
                 unirootResult$f.root, ") that differs from target 0 ",
                 "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
                 ", last function argument was ", unirootResult$root, ")",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Check root-search bounds, target feasibility and tolerance; verify numerical convergence ",
+                    "before using the result."
+                )
             )
         }
         return(NA_real_)
     } else if (!suppressWarnings) {
-        warning(.getCallingFunctionInformation(callingFunctionInformation),
+        warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
             "Root search by 'uniroot' produced a function result (", unirootResult$f.root, ") ",
             "that differs from target 0 ",
             "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
             ", last function argument was ", unirootResult$root, ")",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Check root-search bounds, target feasibility and tolerance; verify numerical convergence ",
+                "before using the result."
+            )
         )
     }
 
@@ -823,10 +831,14 @@ getTestLabel <- function(x) {
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
             if (!suppressWarnings) {
-                warning(.getCallingFunctionInformation(callingFunctionInformation),
+                warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                     "Root search via 'bisection' stopped: maximum number of search iterations reached. ",
                     "Check if lower and upper search bounds were calculated correctly",
-                    call. = FALSE
+                    call. = FALSE,
+                    userInstructions = paste0(
+                        "Check root-search bounds, target feasibility and tolerance; verify numerical ",
+                        "convergence before using the result."
+                    )
                 )
             }
             .plotMonotoneFunctionRootSearch(fun, lowerStart, upperStart)
@@ -841,20 +853,28 @@ getTestLabel <- function(x) {
 
         if (!acceptResultsOutOfTolerance) {
             if (!suppressWarnings) {
-                warning(.getCallingFunctionInformation(callingFunctionInformation),
+                warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                     "NA returned because root search via 'bisection' produced a function result (",
                     result, ") that differs from target 0 ",
                     "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                    call. = FALSE
+                    call. = FALSE,
+                    userInstructions = paste0(
+                        "Check root-search bounds, target feasibility and tolerance; verify numerical ",
+                        "convergence before using the result."
+                    )
                 )
             }
             return(NA_real_)
         } else if (!suppressWarnings) {
-            warning(.getCallingFunctionInformation(callingFunctionInformation),
+            warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                 "Root search via 'bisection' produced a function result (", result, ") ",
                 "that differs from target 0 ",
                 "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Check root-search bounds, target feasibility and tolerance; verify numerical convergence ",
+                    "before using the result."
+                )
             )
         }
     }
@@ -1595,7 +1615,12 @@ getParameterName <- function(obj, parameterCaption) {
         log.p = FALSE,
         epsilon = C_QNORM_EPSILON) {
     if (any(p < -1e-07 | p > 1 + 1e-07, na.rm = TRUE)) {
-        warning("Tried to get qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)")
+        warnNumericalIssue("Tried to get qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)",
+            userInstructions = paste0(
+                "Supply probabilities strictly between 0 and 1 for a finite normal quantile; check the upstream ",
+                "probability calculation."
+            )
+        )
     }
 
     p[p <= 0] <- epsilon
@@ -1622,7 +1647,12 @@ getParameterName <- function(obj, parameterCaption) {
     }
 
     if (any(p < -1e-07 | p > 1 + 1e-07, na.rm = TRUE)) {
-        warning("Tried to get 1 - qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)")
+        warnNumericalIssue("Tried to get 1 - qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)",
+            userInstructions = paste0(
+                "Supply probabilities strictly between 0 and 1 for a finite normal quantile; check the upstream ",
+                "probability calculation."
+            )
+        )
     }
 
     p[p <= 0] <- epsilon
@@ -2232,7 +2262,12 @@ saveOptions <- function() {
             return(invisible(file.exists(optionsFile)))
         },
         error = function(e) {
-            warning("Failed to save rpact options: ", e$message, call. = FALSE)
+            warnRuntimeIssue("Failed to save rpact options: ", e$message, call. = FALSE,
+                userInstructions = paste0(
+                    "Check access to the rpact options file and the reported error, then retry saving or ",
+                    "resetting the options."
+                )
+            )
             return(invisible(FALSE))
         }
     )
@@ -2284,7 +2319,12 @@ resetOptions <- function(persist = TRUE) {
             return(invisible(TRUE))
         },
         error = function(e) {
-            warning("Failed to reset rpact options: ", e$message, call. = FALSE)
+            warnRuntimeIssue("Failed to reset rpact options: ", e$message, call. = FALSE,
+                userInstructions = paste0(
+                    "Check access to the rpact options file and the reported error, then retry saving or ",
+                    "resetting the options."
+                )
+            )
             return(invisible(FALSE))
         }
     )

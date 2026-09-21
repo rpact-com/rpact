@@ -22,9 +22,14 @@ NULL
     piValue <- designPlan[[piValueName]]
     if (!is.null(piValue) && !is.na(piValue) && length(piValue) > 0) {
         designPlan$.setParameterType(piValueName, C_PARAM_NOT_APPLICABLE)
-        warning("'pi2' (", .arrayToString(piValue), ") will be ignored ",
+        warnArgumentIgnored("'pi2' (", .arrayToString(piValue), ") will be ignored ",
             "because piecewise exponential survival function is enabled",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "pi2",
+            userInstructions = paste0(
+                "Use the piecewise hazards to specify survival, or change the survival model if event ",
+                "probabilities at a single event time are intended."
+            )
         )
         designPlan[[piValueName]] <- NA_real_
     }
@@ -361,9 +366,15 @@ getSimulationSurvival <- function(
         )
     }
     if (all(is.na(lambda2)) && !all(is.na(lambda1))) {
-        warning("'lambda1' (", .arrayToString(lambda1), ") will be ignored ",
+        warnArgumentIgnored("'lambda1' (", .arrayToString(lambda1), ") will be ignored ",
             "because 'lambda2' (", .arrayToString(lambda2), ") is undefined",
-            call. = FALSE
+            call. = FALSE,
+            parameter = "lambda1",
+            value = lambda1,
+            userInstructions = paste0(
+                "Provide lambda2 to use lambda1, or remove lambda1 after confirming the alternative survival ",
+                "parameterization."
+            )
         )
         lambda1 <- NA_real_
     }
@@ -383,7 +394,13 @@ getSimulationSurvival <- function(
         "design is fixed ('kMax' = 1)", "Assumed effect"
     )
     if (is.na(conditionalPower) && !is.na(thetaH1)) {
-        warning("'thetaH1' will be ignored because 'conditionalPower' is not defined", call. = FALSE)
+        warnArgumentIgnored("'thetaH1' will be ignored because 'conditionalPower' is not defined", call. = FALSE,
+            parameter = "thetaH1",
+            userInstructions = paste0(
+                "Specify conditionalPower if this alternative assumption should be used for reassessment; ",
+                "otherwise remove the unused argument."
+            )
+        )
     }
     conditionalPower <- .ignoreParameterIfNotUsed(
         "conditionalPower",
@@ -438,7 +455,13 @@ getSimulationSurvival <- function(
                 maxNumberOfEventsPerStage, NA_real_
             )
         } else {
-            warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+            warnArgumentIgnored("'conditionalPower' will be ignored for fixed sample design", call. = FALSE,
+                parameter = "conditionalPower",
+                userInstructions = paste0(
+                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                    "after confirming the fixed-sample design."
+                )
+            )
         }
     } else {
         simulationResults$minNumberOfEventsPerStage <- NA_real_
@@ -448,7 +471,13 @@ getSimulationSurvival <- function(
         simulationResults$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
     }
     if (!is.na(conditionalPower) && (design$kMax == 1)) {
-        warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnored("'conditionalPower' will be ignored for fixed sample design", call. = FALSE,
+            parameter = "conditionalPower",
+            userInstructions = paste0(
+                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
+                "after confirming the fixed-sample design."
+            )
+        )
     }
 
     accrualSetup <- getAccrualTime(
@@ -634,10 +663,15 @@ getSimulationSurvival <- function(
 
     allocationFraction <- .getFraction(allocation1 / allocation2)
     if (allocationFraction[1] != allocation1 || allocationFraction[2] != allocation2) {
-        warning(sprintf(
+        warnArgumentAdjusted(sprintf(
             "allocation1 = %s and allocation2 = %s was replaced by allocation1 = %s and allocation2 = %s",
             allocation1, allocation2, allocationFraction[1], allocationFraction[2]
-        ), call. = FALSE)
+        ), call. = FALSE,
+            userInstructions = paste0(
+                "Check the effective allocation1 and allocation2; supply the intended integer allocation ratio ",
+                "explicitly."
+            )
+        )
         allocation1 <- allocationFraction[1]
         allocation2 <- allocationFraction[2]
     }
@@ -893,7 +927,12 @@ getSimulationSurvival <- function(
     }
     if (is.null(simulationResults$expectedNumberOfEvents) ||
             length(simulationResults$expectedNumberOfEvents) == 0) {
-        warning("Failed to calculate expected number of events", call. = FALSE)
+        warnNumericalIssue("Failed to calculate expected number of events", call. = FALSE,
+            userInstructions = paste0(
+                "Check simulation event counts and survival/accrual assumptions before using expected event ",
+                "numbers."
+            )
+        )
     }
 
     simulationResults$.data <- resultData$data[!is.na(resultData$data$iterationNumber), ]
@@ -916,9 +955,13 @@ getSimulationSurvival <- function(
             missingStageNumbers <- stages
         }
         if (length(missingStageNumbers) > 0) {
-            warning("Could not get rawData (individual results) for stages ",
+            warnResultUnavailable("Could not get rawData (individual results) for stages ",
                 .arrayToString(missingStageNumbers),
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Check that raw-data collection includes the requested stages; rerun with the required data ",
+                    "retained if individual results are needed."
+                )
             )
         }
     } else {
@@ -939,9 +982,13 @@ getSimulationSurvival <- function(
             censorIndicator = numeric(0)
         )
         if (maxNumberOfRawDatasetsPerStage > 0) {
-            warning("Could not get rawData (individual results) for stages ",
+            warnResultUnavailable("Could not get rawData (individual results) for stages ",
                 .arrayToString(stages),
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Check that raw-data collection includes the requested stages; rerun with the required data ",
+                    "retained if individual results are needed."
+                )
             )
         }
     }

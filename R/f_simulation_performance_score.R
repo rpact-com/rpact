@@ -172,9 +172,13 @@ getPerformanceScore <- function(simulationResult) {
     }
 
     if (inherits(simulationResult, "SimulationResultsRates")) {
-        warning("The performance score function is experimental and hence not fully validated ",
+        warnNotValidated("The performance score function is experimental and hence not fully validated ",
             "(see www.rpact.com/experimental)",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Validate this experimental feature independently for the intended use before relying on its ",
+                "results."
+            )
         )
     }
 

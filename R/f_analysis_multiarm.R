@@ -207,9 +207,13 @@ NULL
 
     if (stageResults$isDatasetMeans()) {
         if ("assumedStDev" %in% names(list(...))) {
-            warning("For multi-arm analysis the argument for assumed standard deviation ",
+            warnInvalidInput("For multi-arm analysis the argument for assumed standard deviation ",
                 "is named 'assumedStDevs' and not 'assumedStDev'",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Rename assumedStDev to assumedStDevs and provide the standard deviations required by the ",
+                    "populations or treatment arms."
+                )
             )
         }
 
@@ -502,26 +506,38 @@ getClosedCombinationTestResults <- function(stageResults) {
 
     if (.isTrialDesignInverseNormal(design)) {
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
-            warning("Repeated p-values not available for 'typeOfDesign' = ",
+            warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = ",
                 .vQuote(C_TYPE_OF_DESIGN_AS_USER),
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Use a design/method supporting repeated p-values if these are required; do not interpret ",
+                    "missing repeated p-values as calculated results."
+                )
             )
             return(repeatedPValues)
         }
 
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
-            warning("Repeated p-values not available for 'typeOfDesign' = ",
+            warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = ",
                 .vQuote(C_TYPE_OF_DESIGN_WT_OPTIMUM),
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Use a design/method supporting repeated p-values if these are required; do not interpret ",
+                    "missing repeated p-values as calculated results."
+                )
             )
             return(repeatedPValues)
         }
     }
 
     if (.isTrialDesignFisher(design) && design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
-        warning("Repeated p-values not available for 'method' = ",
+        warnResultUnavailable("Repeated p-values not available for 'method' = ",
             .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Use a design/method supporting repeated p-values if these are required; do not interpret ",
+                "missing repeated p-values as calculated results."
+            )
         )
         return(repeatedPValues)
     }
@@ -852,7 +868,12 @@ getClosedConditionalDunnettTestResults <- function(
                 conditionalErrorRate[i, 1] <- 1 - stats::integrate(integrandFunction, lower = -Inf, upper = Inf)$value
             },
             error = function(e) {
-                warning("Failed to calculate conditionalErrorRate[", i, ", 1]: ", e$message)
+                warnNumericalIssue("Failed to calculate conditionalErrorRate[", i, ", 1]: ", e$message,
+                    userInstructions = paste0(
+                        "Inspect the reported calculation error and the affected arm/stage before using ",
+                        "conditional error rates or second-stage p-values."
+                    )
+                )
             }
         )
 
@@ -895,7 +916,12 @@ getClosedConditionalDunnettTestResults <- function(
                 }
             },
             error = function(e) {
-                warning("Failed to calculate secondStagePValues[", i, ", 2]: ", e$message)
+                warnNumericalIssue("Failed to calculate secondStagePValues[", i, ", 2]: ", e$message,
+                    userInstructions = paste0(
+                        "Inspect the reported calculation error and the affected arm/stage before using ",
+                        "conditional error rates or second-stage p-values."
+                    )
+                )
             }
         )
     }

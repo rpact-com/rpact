@@ -195,9 +195,13 @@ NULL
 
     if (stageResults$isDatasetMeans()) {
         if ("assumedStDev" %in% names(list(...))) {
-            warning("For enrichment analysis the argument for assumed standard deviation ",
+            warnInvalidInput("For enrichment analysis the argument for assumed standard deviation ",
                 "is named 'assumedStDevs' and not 'assumedStDev'",
-                call. = FALSE
+                call. = FALSE,
+                userInstructions = paste0(
+                    "Rename assumedStDev to assumedStDevs and provide the standard deviations required by the ",
+                    "populations or treatment arms."
+                )
             )
         }
 

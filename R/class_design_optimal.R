@@ -110,8 +110,16 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             if (!is.na(conditionalPower)) {
                 .assertIsInOpenInterval(conditionalPower, "conditionalPower", lower = 0, upper = 1)
                 if (!is.null(conditionalPowerFunction) && !identical(conditionalPowerFunction, NA)) {
-                    warning("Both conditionalPower and conditionalPowerFunction are provided. Using conditionalPower.",
-                        call. = FALSE
+                    warnArgumentIgnored("Both conditionalPower and conditionalPowerFunction are provided. Using conditionalPower.",
+                        call. = FALSE,
+                        parameter = "conditionalPowerFunction",
+                        relatedParameter = "conditionalPower",
+                        relatedValue = conditionalPower,
+                        reason = "When both are supplied, conditionalPower takes precedence.",
+                        userInstructions = paste0(
+                            "Choose either conditionalPower or conditionalPowerFunction; remove ",
+                            "conditionalPower if the function should determine conditional power."
+                        )
                     )
                 }
             } else {
@@ -130,8 +138,12 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                 pValueGrid <- seq(alpha1, alpha0, length.out = 50)
                 conditionalPowerValues <- .getOptimalConditionalPower(pValueGrid, self)
                 if (any(diff(conditionalPowerValues) > 0)) {
-                    warning("Conditional power function should not be increasing in the first-stage p-value.",
-                        call. = FALSE
+                    warnInvalidInput("Conditional power function should not be increasing in the first-stage p-value.",
+                        call. = FALSE,
+                        userInstructions = paste0(
+                            "Supply a conditionalPowerFunction that does not increase with the first-stage ",
+                            "p-value."
+                        )
                     )
                 }
             }
@@ -198,7 +210,16 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     self$delta1Max <- delta1Max
 
                     if (!is.null(ncp1Min)) {
-                        warning("Both ncp1Min and delta1Min are provided. Using delta1Min and ignoring ncp1Min.")
+                        warnArgumentIgnored("Both ncp1Min and delta1Min are provided. Using delta1Min and ignoring ncp1Min.",
+                            parameter = "ncp1Min",
+                            value = ncp1Min,
+                            relatedParameter = "delta1Min",
+                            relatedValue = delta1Min,
+                            userInstructions = paste0(
+                                "Supply delta1Min or ncp1Min, not both; remove delta1Min if the noncentrality ",
+                                "bound is intended."
+                            )
+                        )
                     }
 
                     self$ncp1Min <- delta1Min * sqrt(firstStageInformation)
@@ -239,7 +260,16 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
 
                     self$delta1 <- delta1
                     if (!is.null(ncp1)) {
-                        warning("Both delta1 and ncp1 are provided. Using delta1 and ignoring ncp1.")
+                        warnArgumentIgnored("Both delta1 and ncp1 are provided. Using delta1 and ignoring ncp1.",
+                            parameter = "ncp1",
+                            value = ncp1,
+                            relatedParameter = "delta1",
+                            relatedValue = delta1,
+                            userInstructions = paste0(
+                                "Supply delta1 or ncp1, not both; remove delta1 if the noncentrality parameter ",
+                                "is intended."
+                            )
+                        )
                     }
                     self$ncp1 <- delta1 * sqrt(firstStageInformation)
                 } else if (!is.null(ncp1)) {
@@ -469,8 +499,12 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
 
             if (is.function(self$conditionalPowerFunction) && useInterimEstimate &&
                     (minimumSecondStageInformation > 0 || maximumSecondStageInformation < Inf)) {
-                warning("Conditional power functions with interim estimates and information constraints may be non-monotone.",
-                    call. = FALSE
+                warnNotValidated("Conditional power functions with interim estimates and information constraints may be non-monotone.",
+                    call. = FALSE,
+                    userInstructions = paste0(
+                        "Inspect monotonicity of the resulting conditional power function when combining ",
+                        "interim estimates and information constraints."
+                    )
                 )
             }
 

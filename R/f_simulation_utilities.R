@@ -502,9 +502,17 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             ignore <- effectListNames[!(effectListNames %in% C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL)]
         }
         if (length(ignore) > 0) {
-            warning("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
+            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
-                call. = FALSE
+                call. = FALSE,
+                parameter = ignore,
+                relatedParameter = "endpoint",
+                relatedValue = endpoint,
+                reason = "These effect parameters do not belong to the selected endpoint.",
+                userInstructions = paste0(
+                    "Supply effect parameters matching the selected endpoint, or correct the endpoint before ",
+                    "removing these parameters."
+                )
             )
         }
     }
@@ -662,9 +670,17 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             ignore <- effectDataNames[!(effectDataNames %in% gsub("s$", "", C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL))]
         }
         if (length(ignore) > 0) {
-            warning("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
+            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
-                call. = FALSE
+                call. = FALSE,
+                parameter = ignore,
+                relatedParameter = "endpoint",
+                relatedValue = endpoint,
+                reason = "These effect parameters do not belong to the selected endpoint.",
+                userInstructions = paste0(
+                    "Supply effect parameters matching the selected endpoint, or correct the endpoint before ",
+                    "removing these parameters."
+                )
             )
         }
     }
@@ -1237,15 +1253,29 @@ getRawData <- function(x, aggregate = FALSE) {
         }
         simulationResults$.setParameterType("effectMatrix", C_PARAM_DERIVED)
         if (!is.null(gED50) && !is.na(gED50)) {
-            warning("'gED50' (", gED50, ") will be ignored because 'typeOfShape' ",
+            warnArgumentIgnored("'gED50' (", gED50, ") will be ignored because 'typeOfShape' ",
                 "is defined as ", .vQuote(typeOfShape),
-                call. = FALSE
+                call. = FALSE,
+                parameter = "gED50",
+                value = gED50,
+                reason = "The linear dose-response shape does not use gED50 or slope.",
+                userInstructions = paste0(
+                    "Set typeOfShape = \"sigmoidEmax\" to use this parameter, or remove it after confirming the ",
+                    "linear shape."
+                )
             )
         }
         if (!is.null(slope) && !is.na(slope) && slope != 1) {
-            warning("'slope' (", slope, ") will be ignored because 'typeOfShape' ",
+            warnArgumentIgnored("'slope' (", slope, ") will be ignored because 'typeOfShape' ",
                 "is defined as ", .vQuote(typeOfShape),
-                call. = FALSE
+                call. = FALSE,
+                parameter = "slope",
+                value = slope,
+                reason = "The linear dose-response shape does not use gED50 or slope.",
+                userInstructions = paste0(
+                    "Set typeOfShape = \"sigmoidEmax\" to use this parameter, or remove it after confirming the ",
+                    "linear shape."
+                )
             )
         }
 
@@ -1289,12 +1319,16 @@ getRawData <- function(x, aggregate = FALSE) {
     simulationResults$eventsNotAchieved <- eventsNotAchieved
     if (any(simulationResults$eventsNotAchieved > 0)) { 
         simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_GENERATED)
-        warning("Presumably due to drop-outs, required number of events ",
+        warnResultUnavailable("Presumably due to drop-outs, required number of events ",
             "were not achieved for at least one situation. ",
             "Increase the maximum number of subjects (",
             accrualSetup$maxNumberOfSubjects, ") ",
             "to avoid this situation",
-            call. = FALSE
+            call. = FALSE,
+            userInstructions = paste0(
+                "Increase maxNumberOfSubjects to allow the target event count despite dropouts, and rerun the ",
+                "simulation."
+            )
         )
     } else {
         simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_NOT_APPLICABLE)
