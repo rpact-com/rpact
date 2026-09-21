@@ -33,3 +33,27 @@ package.
   local path and make it accessible to the coding agent, for example by adding
   it to the agent's workspace. Do not create tests in the `rpact` repository as
   a fallback.
+
+## New vignettes
+
+- Create new rpact vignettes as Quarto (`.qmd`) files in the separate website
+  project `rpact-org_website`. Do not create new `.Rmd` vignettes in the
+  `rpact` package's `vignettes` directory.
+- Before creating a vignette, locate `rpact-org_website` using the coding
+  agent's configured projects and workspace folders, and verify that its
+  `vignettes` directory exists and is accessible. Do not assume a
+  machine-specific absolute path.
+- If the website project or its `vignettes` directory cannot be located or
+  accessed, ask the user to provide the correct path and make it accessible to
+  the coding agent. Do not create the vignette in the `rpact` repository as a
+  fallback.
+- Choose the appropriate topic directory under `rpact-org_website/vignettes`:
+  `analysis`, `getting-started`, `planning`, or `utilities`.
+- Always create a new directory named after the vignette in `snake_case`
+  within the selected topic directory, and save the vignette as `index.qmd`
+  inside it. Use this structure:
+  `rpact-org_website/vignettes/<topic>/<vignette_name>/index.qmd`.
+- Before drafting, read the applicable instructions in the website project
+  and inspect existing vignettes, especially those in the selected topic
+  directory. Follow their layout, overall structure, and writing style,
+  including established conventions for metadata, headings, and code examples.
