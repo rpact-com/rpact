@@ -489,12 +489,7 @@ NULL
     
     if (endpoint == "means") {
         simulationResults <- SimulationResultsMultiArmMeans$new(design, showStatistics = showStatistics)
-    } else if (endpoint == "rates") {
-        piMaxVector <- .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = TRUE)
-        if (all(is.na(piMaxVector))) {
-            piMaxVector <- .getPi1Default(type = "power", endpoint = endpoint)
-        }
-        
+    } else if (endpoint == "rates") {        
         simulationResults <- SimulationResultsMultiArmRates$new(design, showStatistics = showStatistics)
     } else if (endpoint == "survival") {
         simulationResults <- SimulationResultsMultiArmSurvival$new(design, showStatistics = showStatistics)
@@ -736,6 +731,11 @@ NULL
         .assertIsInOpenInterval(piControlH1, "piControlH1", lower = 0, upper = 1, naAllowed = TRUE)
         .setValueAndParameterType(simulationResults, "piControlH1", piControlH1, NA_real_)
 
+        piMaxVector <- .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = TRUE)
+        if (all(is.na(piMaxVector)) && !identical(typeOfShape, "userDefined")) {
+            piMaxVector <- .getPi1Default(type = "power", endpoint = endpoint)
+        }
+        
         effectMatrix <- .assertIsValidEffectMatrixRates(
             simulationResults = simulationResults,
             activeArms = activeArms,
@@ -749,7 +749,7 @@ NULL
             doseLevels = doseLevels
         )
 
-        if (typeOfShape == "userDefined") {
+        if (identical(typeOfShape, "userDefined")) {
             if (!all(is.na(piMaxVector))) {
                 warnArgumentIgnored("'piMaxVector' (", .arrayToString(piMaxVector), ") will be ignored ",
                     "because 'typeOfShape' = \"userDefined\"",
@@ -768,7 +768,7 @@ NULL
             piMaxVector <- .getPi1Default(type = "power", endpoint = "rates")
         }
         .setValueAndParameterType(simulationResults, "piMaxVector", piMaxVector, NA_real_)
-        if (typeOfShape == "userDefined") {
+        if (identical(typeOfShape, "userDefined")) {
             simulationResults$.setParameterType("piMaxVector", C_PARAM_DERIVED)
         }
     } else if (endpoint == "survival") {
