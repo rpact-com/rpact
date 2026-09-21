@@ -24,7 +24,6 @@ NULL
         designPlan$.setParameterType(piValueName, C_PARAM_NOT_APPLICABLE)
         warnArgumentIgnored("'pi2' (", .arrayToString(piValue), ") will be ignored ",
             "because piecewise exponential survival function is enabled",
-            call. = FALSE,
             parameter = "pi2",
             userInstructions = paste0(
                 "Use the piecewise hazards to specify survival, or change the survival model if event ",
@@ -368,7 +367,6 @@ getSimulationSurvival <- function(
     if (all(is.na(lambda2)) && !all(is.na(lambda1))) {
         warnArgumentIgnored("'lambda1' (", .arrayToString(lambda1), ") will be ignored ",
             "because 'lambda2' (", .arrayToString(lambda2), ") is undefined",
-            call. = FALSE,
             parameter = "lambda1",
             value = lambda1,
             userInstructions = paste0(
@@ -394,7 +392,7 @@ getSimulationSurvival <- function(
         "design is fixed ('kMax' = 1)", "Assumed effect"
     )
     if (is.na(conditionalPower) && !is.na(thetaH1)) {
-        warnArgumentIgnored("'thetaH1' will be ignored because 'conditionalPower' is not defined", call. = FALSE,
+        warnArgumentIgnored("'thetaH1' will be ignored because 'conditionalPower' is not defined",
             parameter = "thetaH1",
             userInstructions = paste0(
                 "Specify conditionalPower if this alternative assumption should be used for reassessment; ",
@@ -654,7 +652,7 @@ getSimulationSurvival <- function(
         warnArgumentAdjusted(sprintf(
             "allocation1 = %s and allocation2 = %s was replaced by allocation1 = %s and allocation2 = %s",
             allocation1, allocation2, allocationFraction[1], allocationFraction[2]
-        ), call. = FALSE,
+        ),
             userInstructions = paste0(
                 "Check the effective allocation1 and allocation2; supply the intended integer allocation ratio ",
                 "explicitly."
@@ -915,7 +913,7 @@ getSimulationSurvival <- function(
     }
     if (is.null(simulationResults$expectedNumberOfEvents) ||
             length(simulationResults$expectedNumberOfEvents) == 0) {
-        warnNumericalIssue("Failed to calculate expected number of events", call. = FALSE,
+        warnNumericalIssue("Failed to calculate expected number of events",
             userInstructions = paste0(
                 "Check simulation event counts and survival/accrual assumptions before using expected event ",
                 "numbers."
@@ -945,7 +943,6 @@ getSimulationSurvival <- function(
         if (length(missingStageNumbers) > 0) {
             warnResultUnavailable("Could not get rawData (individual results) for stages ",
                 .arrayToString(missingStageNumbers),
-                call. = FALSE,
                 userInstructions = paste0(
                     "Check that raw-data collection includes the requested stages; rerun with the required data ",
                     "retained if individual results are needed."
@@ -972,7 +969,6 @@ getSimulationSurvival <- function(
         if (maxNumberOfRawDatasetsPerStage > 0) {
             warnResultUnavailable("Could not get rawData (individual results) for stages ",
                 .arrayToString(stages),
-                call. = FALSE,
                 userInstructions = paste0(
                     "Check that raw-data collection includes the requested stages; rerun with the required data ",
                     "retained if individual results are needed."

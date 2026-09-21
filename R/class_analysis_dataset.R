@@ -733,7 +733,6 @@ getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
         warnDataIssue("Only population enrichment data with 2 groups can be analyzed but ",
             dataset$getNumberOfGroups(), " group",
             ifelse(dataset$getNumberOfGroups() == 1, " is", "s are"), " defined",
-            call. = FALSE,
             userInstructions = paste0(
                 "Provide population enrichment data with exactly two groups before requesting an analysis."
             )
@@ -921,7 +920,6 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 warnNumericalIssue("When using ", modelFunction, "() ",
                     "the estimated marginal means and standard deviations can be inaccurate ",
                     "and analysis results based on this values may be imprecise",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Check the marginal means and standard deviations against the fitted model before ",
                         "relying on the resulting analysis."
@@ -931,7 +929,6 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 warnNotValidated("Using ", modelFunction, " emmeans result objects as ",
                     "arguments of getDataset() is experminental in this rpact ",
                     "version and not fully validated",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Validate this experimental feature independently for the intended use before relying ",
                         "on its results."
@@ -943,7 +940,6 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
             warnNotValidated("Using emmeans result objects as ",
                 "arguments of getDataset() is experminental in this rpact ",
                 "version and not fully validated",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Validate this experimental feature independently for the intended use before relying on ",
                     "its results."
@@ -1183,7 +1179,6 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         if (length(emptySubsetNames) == 1) {
             warnDataIssue("The undefined subset ", emptySubsetNames,
                 " was defined as empty subset",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Define the missing subsets explicitly and verify the population membership before ",
                     "analysis."
@@ -1193,7 +1188,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
             warnDataIssue(gettextf(
                 "The %s undefined subsets %s were defined as empty subsets",
                 length(emptySubsetNames), .arrayToString(emptySubsetNames)
-            ), call. = FALSE,
+            ),
                 userInstructions = paste0(
                     "Define the missing subsets explicitly and verify the population membership before ",
                     "analysis."
@@ -1981,7 +1976,6 @@ Dataset <- R6::R6Class("Dataset",
             if (any(nToCheck != as.integer(nToCheck))) {
                 warnArgumentAdjusted(parameterName, " specified as floating-point ",
                     "numbers were truncated",
-                    call. = FALSE,
                     parameter = parameterName,
                     userInstructions = paste0(
                         "Supply integer counts explicitly; check that truncation has not changed the intended ",
@@ -2492,7 +2486,6 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
             if (is.null(value) || length(value) != 1 || is.na(value) || value < 0) {
                 warnResultUnavailable("No calculation of stage-wise standard deviation from ",
                     "overall standard deviations possible at stage ", k,
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Check the cumulative sample sizes and standard deviations at this stage; supply ",
                         "consistent data to derive stage-wise standard deviations."
@@ -4973,7 +4966,6 @@ print.Dataset <- function(
         if (output != "list") {
             warnArgumentIgnored("'output' (\"", output, "\") will be ignored ",
                 "because only \"list\" is supported yet if markdown is enabled",
-                call. = FALSE,
                 parameter = "output",
                 value = output,
                 userInstructions = paste0(

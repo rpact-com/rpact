@@ -110,7 +110,6 @@ NULL
                         "'information[1]' (", information1, ") will be ignored ",
                         "because it is not required for the conversion from ",
                         .vQuote(sourceScale), " to ", .vQuote(targetScale),
-                        call. = FALSE,
                         userInstructions = paste0(
                             "Remove the unneeded conversion input only after verifying sourceScale and ",
                             "targetScale; choose the intended scales if they are incorrect."
@@ -125,7 +124,6 @@ NULL
                         "'information[2]' (", information2, ") will be ignored ",
                         "because it is not required for the conversion from ",
                         .vQuote(sourceScale), " to ", .vQuote(targetScale),
-                        call. = FALSE,
                         userInstructions = paste0(
                             "Remove the unneeded conversion input only after verifying sourceScale and ",
                             "targetScale; choose the intended scales if they are incorrect."
@@ -168,7 +166,6 @@ NULL
             warnArgumentIgnored(
                 "'information1' (", information1, ") will be ignored ",
                 "because it will only be taken into account if the information is provided for both stages",
-                call. = FALSE,
                 parameter = "information1",
                 value = information1,
                 userInstructions = paste0(
@@ -181,7 +178,6 @@ NULL
             warnArgumentIgnored(
                 "'information2' (", information2, ") will be ignored ",
                 "because it will only be taken into account if the information is provided for both stages",
-                call. = FALSE,
                 parameter = "information2",
                 value = information2,
                 userInstructions = paste0(
@@ -816,7 +812,6 @@ summary.FutilityBounds <- function(object, ...) {
         warnArgumentIgnored(
             "Fisher information is not required for conversion from ",
             .vQuote("zValue"), " to ", .vQuote(targetScale), " and will be ignored",
-            call. = FALSE,
             userInstructions = paste0(
                 "Remove the unneeded conversion input only after verifying sourceScale and targetScale; choose ",
                 "the intended scales if they are incorrect."
@@ -1805,7 +1800,6 @@ getFutilityBounds <- function(
             } else {
                 warnResultUnavailable(
                     "Source scale ", .vQuote(sourceScale), " not implemented for Fisher's combination test design",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Choose a source scale supported for Fisher combination designs, or a different design ",
                         "if scientifically appropriate."
@@ -1817,7 +1811,6 @@ getFutilityBounds <- function(
         warning = function(w) {
             warnNumericalIssue("Failed to calculate ", sQuote(sourceScale), " source value from ",
                 sourceValue, ": ", w$message,
-                call. = FALSE,
                 userInstructions = paste0(
                     "Check sourceScale and sourceValue and resolve the reported conversion problem before using ",
                     "the converted bounds."
@@ -1827,7 +1820,6 @@ getFutilityBounds <- function(
         error = function(e) {
             warnNumericalIssue("Failed to calculate ", sQuote(sourceScale), " source value from ",
                 sourceValue, ": ", e$message,
-                call. = FALSE,
                 userInstructions = paste0(
                     "Check sourceScale and sourceValue and resolve the reported conversion problem before using ",
                     "the converted bounds."

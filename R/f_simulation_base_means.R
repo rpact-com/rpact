@@ -254,7 +254,6 @@ getSimulationMeans <- function(
         if (isTRUE(meanRatio)) {
             warnArgumentIgnored("'meanRatio' (", meanRatio, ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE,
                 parameter = "meanRatio",
                 value = meanRatio,
                 relatedParameter = "groups",
@@ -269,7 +268,6 @@ getSimulationMeans <- function(
         if (!is.na(allocationRatioPlanned)) {
             warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE,
                 parameter = "allocationRatioPlanned",
                 value = allocationRatioPlanned,
                 relatedParameter = "groups",
@@ -328,7 +326,6 @@ getSimulationMeans <- function(
         warnArgumentIgnored("'stDevH1' (", .arrayToString(stDevH1), ") will be ignored ",
             "because neither 'conditionalPower' nor ",
             "'calcSubjectsFunction' is defined",
-            call. = FALSE,
             parameter = "stDevH1",
             value = stDevH1,
             userInstructions = paste0(
@@ -400,7 +397,6 @@ getSimulationMeans <- function(
                 .arrayToString(minNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE,
                 parameter = "minNumberOfSubjectsPerStage",
                 value = minNumberOfSubjectsPerStage,
                 userInstructions = paste0(
@@ -416,7 +412,6 @@ getSimulationMeans <- function(
                 .arrayToString(maxNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE,
                 parameter = "maxNumberOfSubjectsPerStage",
                 value = maxNumberOfSubjectsPerStage,
                 userInstructions = paste0(

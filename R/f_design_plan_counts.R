@@ -51,7 +51,6 @@
             ", 'allocation2' = ",
             allocation2,
             ") might yield unreliable results",
-            call. = FALSE,
             userInstructions = paste0(
                 "Review allocation1 and allocation2 and validate the allocation scheme before relying on ",
                 "count-data results."
@@ -338,7 +337,6 @@
             warnNumericalIssue(
                 "Failed to calculate the calendar time. ",
                 "Fisher information might be bounded, e.g., due to overdispersion > 0",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Check whether the required information can be reached under the overdispersion and accrual ",
                     "assumptions; revise those assumptions if scientifically justified."

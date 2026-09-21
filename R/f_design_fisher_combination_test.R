@@ -247,7 +247,6 @@ getDesignFisher <- function(
         } else if (anyNA(alpha0Vec)) {
             warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'alpha0Vec' is not defined",
-                call. = FALSE,
                 parameter = "bindingFutility",
                 value = bindingFutility,
                 userInstructions = paste0(
@@ -259,7 +258,6 @@ getDesignFisher <- function(
             warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'alpha0Vec' (", .arrayToString(alpha0Vec), ") ",
                 "is set to default values",
-                call. = FALSE,
                 parameter = "bindingFutility",
                 value = bindingFutility,
                 userInstructions = paste0(
@@ -311,7 +309,7 @@ getDesignFisher <- function(
     design$alpha0Vec <- .getValidatedAlpha0Vec(design)
 
     if (design$sided == 2 && design$bindingFutility && any(design$alpha0Vec < 1)) {
-        warnArgumentIgnored("Binding futility will be ignored because the test is defined as two-sided", call. = FALSE,
+        warnArgumentIgnored("Binding futility will be ignored because the test is defined as two-sided",
             userInstructions = paste0(
                 "Use a supported one-sided design if binding futility is intended here; otherwise remove ",
                 "bindingFutility after confirming two-sided testing."
@@ -326,7 +324,6 @@ getDesignFisher <- function(
         if (.isDefinedArgument(design$userAlphaSpending)) {
             warnArgumentIgnored("'userAlphaSpending' will be ignored because 'method' is not ",
                 .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
-                call. = FALSE,
                 parameter = "userAlphaSpending",
                 userInstructions = paste0(
                     "Choose the user-defined alpha-spending Fisher method to use userAlphaSpending, or remove ",
@@ -452,7 +449,7 @@ getDesignFisher <- function(
             }
         },
         error = function(e) {
-            warnNumericalIssue("Output may be wrong because an error occured: ", e$message, call. = FALSE,
+            warnNumericalIssue("Output may be wrong because an error occured: ", e$message,
                 userInstructions = paste0(
                     "Resolve the reported design calculation error and recompute before relying on the output."
                 )

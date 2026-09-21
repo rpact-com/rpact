@@ -235,7 +235,6 @@
             warnArgumentAdjusted("Options 'rpact.plot.show.alpha.spent' and ",
                 "'rpact.plot.show.beta.spent' are both FALSE; ",
                 "'alphaSpent' will be shown",
-                call. = FALSE,
                 parameter = "rpact.plot.show.beta.spent",
                 userInstructions = paste0(
                     "Set showAlphaSpent or showBetaSpent to TRUE explicitly to select the spending curve to ",
@@ -245,7 +244,6 @@
         } else {
             warnArgumentAdjusted("'showAlphaSpent' and 'showBetaSpent' are both FALSE; ",
                 "'alphaSpent' will be shown",
-                call. = FALSE,
                 parameter = "showAlphaSpent",
                 userInstructions = paste0(
                     "Set showAlphaSpent or showBetaSpent to TRUE explicitly to select the spending curve to ",
@@ -1334,7 +1332,6 @@
                 lambda1 <- designPlan$lambda1[1]
                 warnArgumentAdjusted("Only the first 'lambda1' (", round(lambda1, 4),
                     ") was used for plotting",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Choose one scenario explicitly for this plot, or create separate plots for each ",
                         "intended scenario."
@@ -1494,7 +1491,6 @@
     if (length(alternative) > 1) {
         warnArgumentAdjusted("Only the first 'alternative' (", round(alternative[1], 3),
             ") was used for plotting",
-            call. = FALSE,
             userInstructions = paste0(
                 "Choose one scenario explicitly for this plot, or create separate plots for each intended ",
                 "scenario."
@@ -1509,7 +1505,6 @@
     if (length(pi1) > 1) {
         warnArgumentAdjusted("Only the first 'pi1' (", round(pi1[1], 3),
             ") was used for plotting",
-            call. = FALSE,
             userInstructions = paste0(
                 "Choose one scenario explicitly for this plot, or create separate plots for each intended ",
                 "scenario."
@@ -1524,7 +1519,6 @@
     if (length(hazardRatio) > 1) {
         warnArgumentAdjusted("Only the first 'hazardRatio' (", round(hazardRatio[1], 3),
             ") was used for plotting",
-            call. = FALSE,
             userInstructions = paste0(
                 "Choose one scenario explicitly for this plot, or create separate plots for each intended ",
                 "scenario."
@@ -1721,7 +1715,6 @@ plot.TrialDesignPlan <- function(
     nMax <- list(...)[["nMax"]]
     if (!is.null(nMax)) {
         warnArgumentIgnored("'nMax' (", nMax, ") will be ignored because it will be taken from design plan",
-            call. = FALSE,
             parameter = "nMax",
             value = nMax,
             userInstructions = "Remove the redundant plotting argument 'nMax'."

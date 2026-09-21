@@ -342,7 +342,6 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
                     warnArgumentAdjusted("Only the parent design of ", .getClassName(d),
                         " was added to trial design set",
-                        call. = FALSE,
                         userInstructions = paste0(
                             "Pass the parent trial design explicitly when constructing the design set; retain ",
                             "the delayed-information design separately if needed."
@@ -362,7 +361,6 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                 warnArgumentIgnored("Argument", ifelse(length(args) > 1, "s", ""), " ",
                     .arrayToString(args, encapsulate = TRUE), " will be ignored ",
                     "because for 'designs' only argument 'variedParameters' will be respected",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Use variedParameters when supplying designs, or construct the individual designs with ",
                         "the intended parameters first."
@@ -445,7 +443,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
             argumentNames <- names(args)
             if (length(argumentNames) == 0) {
-                warnInvalidInput("No argument names available for ", paste(args, collapse = ", "), call. = FALSE,
+                warnInvalidInput("No argument names available for ", paste(args, collapse = ", "),
                     userInstructions = "Supply named, valid design parameters to create design variants."
                 )
                 return(character())
@@ -510,7 +508,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             argumentNames <- self$.getArgumentNames(validatedDesign = validatedDesign, ...)
 
             if (length(argumentNames) == 0) {
-                warnInvalidInput("Creation of design variants stopped: no valid design parameters found", call. = FALSE,
+                warnInvalidInput("Creation of design variants stopped: no valid design parameters found",
                     userInstructions = "Supply named, valid design parameters to create design variants."
                 )
                 return(list())
@@ -586,7 +584,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                         warnArgumentIgnored(sprintf(
                             "Argument ignored: there exists already a design with %s = %s (%s = %s)",
                             argumentName, argumentValue, parameterNameBefore, parameterValueBefore
-                        ), call. = FALSE,
+                        ),
                             parameter = argumentName,
                             value = argumentValue,
                             userInstructions = paste0(
@@ -598,7 +596,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                         warnArgumentIgnored(sprintf(
                             "Argument ignored: there exists already a design with %s = %s",
                             argumentName, argumentValue
-                        ), call. = FALSE,
+                        ),
                             parameter = argumentName,
                             value = argumentValue,
                             userInstructions = paste0(

@@ -1026,7 +1026,7 @@ setOutputFormat <- function(
                     )
                 }
             } else {
-                warnArgumentIgnored("The output format ", key, " affects no parameters", call. = FALSE,
+                warnArgumentIgnored("The output format ", key, " affects no parameters",
                     userInstructions = paste0(
                         "Use an output-format key matching a parameter to be formatted, or remove the unused ",
                         "format entry."

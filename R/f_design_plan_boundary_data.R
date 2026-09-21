@@ -61,7 +61,6 @@
                 warnNumericalIssue("The computation of last stage efficacy boundary on treatment ",
                     "effect scale not performed presumably ",
                     "due to too small degrees of freedom",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Check stage sample sizes and degrees of freedom before requesting efficacy boundaries ",
                         "on the treatment-effect scale."
@@ -75,7 +74,6 @@
                     "efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " ",
                     "on treatment effect scale not performed presumably ",
                     "due to too small degrees of freedom",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Check stage sample sizes and degrees of freedom before requesting efficacy boundaries ",
                         "on the treatment-effect scale."
@@ -789,7 +787,6 @@
                 "is not consistent with the calculated 'directionUpper' (",
                 .arrayToString(directionUpperCalculated), "). ",
                 "The calculated 'directionUpper' is used instead.",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Align directionUpper with the alternative used in the calculation; verify the calculated ",
                     "direction before interpreting the bounds."

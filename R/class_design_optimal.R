@@ -113,7 +113,6 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     warnArgumentIgnored(
                         "Both 'conditionalPower' and 'conditionalPowerFunction' are provided. ",
                         "Using 'conditionalPower' and ignoring 'conditionalPowerFunction'.",
-                        call. = FALSE,
                         parameter = "conditionalPowerFunction",
                         relatedParameter = "conditionalPower",
                         relatedValue = conditionalPower,
@@ -141,7 +140,6 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                 conditionalPowerValues <- .getOptimalConditionalPower(pValueGrid, self)
                 if (any(diff(conditionalPowerValues) > 0)) {
                     warnInvalidInput("Conditional power function should not be increasing in the first-stage p-value.",
-                        call. = FALSE,
                         userInstructions = paste0(
                             "Supply a conditionalPowerFunction that does not increase with the first-stage ",
                             "p-value."
@@ -504,7 +502,6 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             if (is.function(self$conditionalPowerFunction) && useInterimEstimate &&
                     (minimumSecondStageInformation > 0 || maximumSecondStageInformation < Inf)) {
                 warnNotValidated("Conditional power functions with interim estimates and information constraints may be non-monotone.",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Inspect monotonicity of the resulting conditional power function when combining ",
                         "interim estimates and information constraints."

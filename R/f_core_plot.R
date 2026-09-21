@@ -619,7 +619,7 @@ getAvailablePlotTypes <- function(
         }
 
         if (!(showSource %in% C_PLOT_SHOW_SOURCE_ARGUMENTS)) {
-            warnArgumentIgnored("'showSource' (", showSource, ") is not allowed and will be ignored", call. = FALSE,
+            warnArgumentIgnored("'showSource' (", showSource, ") is not allowed and will be ignored",
                 parameter = "showSource",
                 value = showSource,
                 userInstructions = paste0(
@@ -1417,7 +1417,7 @@ getAvailablePlotTypes <- function(
         warnDataIssue(sprintf(
             "Removed %s rows containing (0, 0)-points and %s rows containing missing values",
             removedRows1, removedRows2
-        ), call. = FALSE,
+        ),
             userInstructions = paste0(
                 "Inspect omitted zero/zero and missing-value rows; provide valid coordinates if those ",
                 "observations should appear in the plot."
@@ -1864,7 +1864,6 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         objTypeInfo <- ifelse(!is.null(obj) && !inherits(obj, "TrialDesignPlan"), " design plan", "")
         warnArgumentIgnored("Argument 'showFutilityBounds' (", showFutilityBounds, ") is only available for", objTypeInfo, " plot type 3; ",
             "it will be ignored",
-            call. = FALSE,
             parameter = "showFutilityBounds",
             value = showFutilityBounds,
             userInstructions = paste0(
@@ -1881,7 +1880,6 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         if (!is.null(showAlphaSpent) && !is.null(showBetaSpent)) {
             warnArgumentIgnored("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
                 "are only available for plot type 4; they will be ignored",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Use plot type 4 to display alpha/beta spending, or remove the spending-display arguments ",
                     "after confirming the plot type."
@@ -1890,7 +1888,6 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         } else if (!is.null(showAlphaSpent)) {
             warnArgumentIgnored("Argument 'showAlphaSpent' (", showAlphaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
-                call. = FALSE,
                 parameter = "showAlphaSpent",
                 value = showAlphaSpent,
                 userInstructions = paste0(
@@ -1901,7 +1898,6 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         } else {
             warnArgumentIgnored("Argument 'showBetaSpent' (", showBetaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
-                call. = FALSE,
                 parameter = "showBetaSpent",
                 value = showBetaSpent,
                 userInstructions = paste0(

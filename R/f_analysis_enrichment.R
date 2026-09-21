@@ -197,7 +197,6 @@ NULL
         if ("assumedStDev" %in% names(list(...))) {
             warnInvalidInput("For enrichment analysis the argument for assumed standard deviation ",
                 "is named 'assumedStDevs' and not 'assumedStDev'",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Rename assumedStDev to assumedStDevs and provide the standard deviations required by the ",
                     "populations or treatment arms."

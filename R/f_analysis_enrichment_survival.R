@@ -1191,7 +1191,7 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE,
+                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax,
                         userInstructions = paste0(
                             "Check the stage data, design boundaries and planned future sample sizes/events; ",
                             "conditional power for the reported stage could not be calculated."

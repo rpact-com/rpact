@@ -710,7 +710,6 @@ NULL
         if (anyNA(criticalValues[1:stage])) {
             warnResultUnavailable("Repeated confidence intervals not because ", sum(is.na(criticalValues)),
                 " critical values are NA (", .arrayToString(criticalValues), ")",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Resolve the missing critical values before requesting repeated confidence intervals."
                 )
@@ -1254,7 +1253,6 @@ NULL
                 if (result <= 0 || result >= 1) {
                     warnNumericalIssue("Calculation not possible: ",
                         "could not calculate conditional power for stage ", kMax,
-                        call. = FALSE,
                         userInstructions = paste0(
                             "Check the stage data, design boundaries and planned future sample sizes/events; ",
                             "conditional power for the reported stage could not be calculated."
@@ -1307,7 +1305,7 @@ NULL
     )
 
     if (stage > 1) {
-        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage", call. = FALSE,
+        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage",
             userInstructions = paste0(
                 "Request conditional power for the first interim stage; later-stage conditional power is not ",
                 "implemented by this method."

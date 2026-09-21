@@ -1392,7 +1392,6 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
     if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {
         warnArgumentIgnored("'theta' (", .reconstructSequenceCommand(theta), ") ",
             "will be ignored for plot type ", type,
-            call. = FALSE,
             parameter = "theta",
             value = theta,
             userInstructions = paste0(

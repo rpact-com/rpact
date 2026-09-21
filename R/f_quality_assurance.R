@@ -313,7 +313,7 @@ NULL
                     method = "auto", mode = "wb"
                 )
                 if (result != 0) {
-                    warnRuntimeIssue("'testthat.R' download result in ", result, call. = FALSE,
+                    warnRuntimeIssue("'testthat.R' download result in ", result,
                         parameter = "testthat.R",
                         userInstructions = paste0(
                             "Check network access and the test download source, then retry and verify that all ",
@@ -330,7 +330,7 @@ NULL
                 method = "auto", mode = "wb"
             )
             if (result != 0) {
-                warnRuntimeIssue("Unit test index file download result in ", result, call. = FALSE,
+                warnRuntimeIssue("Unit test index file download result in ", result,
                     userInstructions = paste0(
                         "Check network access and the test download source, then retry and verify that all ",
                         "required test files are available."
@@ -368,7 +368,6 @@ NULL
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
                     .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Check network access and the test download source, then retry and verify that all ",
                         "required test files are available."
@@ -410,7 +409,7 @@ NULL
                         file.remove(indexFile)
                     },
                     error = function(e) {
-                        warnRuntimeIssue("Failed to remove unit test index file: ", e$message, call. = FALSE,
+                        warnRuntimeIssue("Failed to remove unit test index file: ", e$message,
                             userInstructions = paste0(
                                 "Check file access permissions and remove the temporary unit-test index file if ",
                                 "it remains."
@@ -506,7 +505,6 @@ NULL
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
                     .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Check network access and the test download source, then retry and verify that all ",
                         "required test files are available."
@@ -535,7 +533,7 @@ NULL
                         file.remove(indexFile)
                     },
                     error = function(e) {
-                        warnRuntimeIssue("Failed to remove unit test index file: ", e$message, call. = FALSE,
+                        warnRuntimeIssue("Failed to remove unit test index file: ", e$message,
                             userInstructions = paste0(
                                 "Check file access permissions and remove the temporary unit-test index file if ",
                                 "it remains."
@@ -1302,7 +1300,6 @@ testPackage <- function(
     if (!is.na(testFileDirectory) && !dir.exists(file.path(testFileDirectory, "testthat"))) {
         warnArgumentIgnored("'testFileDirectory' (", testFileDirectory, ") will be ignored ",
             "because it does not contain a 'testthat' subfolder",
-            call. = FALSE,
             parameter = "testFileDirectory",
             value = testFileDirectory,
             userInstructions = paste0(
@@ -1346,7 +1343,6 @@ testPackage <- function(
         if (credentialsAvailable) {
             warnArgumentIgnored("The connection token and secret will be ignored ",
                 "because 'testFileDirectory' is defined",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Use the local testFileDirectory without connection credentials, or omit testFileDirectory ",
                     "if tests should be downloaded."
@@ -2293,7 +2289,6 @@ MarkdownReporter <- R6::R6Class(
                 if (!dir.create(sourcePath)) {
                     warnRuntimeIssue("Failed to create directory ", sQuote(sourcePath), ". ",
                         "Source files will be saved to ", sQuote(outputPath), ".",
-                        call. = FALSE,
                         userInstructions = paste0(
                             "Check directory permissions; retrieve source files from the reported fallback ",
                             "outputPath."
@@ -2323,7 +2318,6 @@ MarkdownReporter <- R6::R6Class(
                 error = function(e) {
                     warnRuntimeIssue("Failed to render ", sQuote(self$outputFile),
                         " to html: ", e$message,
-                        call. = FALSE,
                         userInstructions = paste0(
                             "Resolve the reported rendering error and check the rendering dependencies before ",
                             "regenerating the report."
@@ -2359,7 +2353,7 @@ MarkdownReporter <- R6::R6Class(
                     }
                 },
                 error = function(e) {
-                    warnRuntimeIssue("Failed to render ", sQuote(mdFileForTex), " to pdf: ", e$message, call. = FALSE,
+                    warnRuntimeIssue("Failed to render ", sQuote(mdFileForTex), " to pdf: ", e$message,
                         userInstructions = paste0(
                             "Resolve the reported rendering error and check the rendering dependencies before ",
                             "regenerating the report."

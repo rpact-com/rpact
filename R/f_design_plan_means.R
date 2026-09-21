@@ -548,7 +548,6 @@ NULL
         if (isTRUE(meanRatio)) {
             warnArgumentIgnored("'meanRatio' (", meanRatio, ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE,
                 parameter = "meanRatio",
                 value = meanRatio,
                 relatedParameter = "groups",
@@ -565,7 +564,6 @@ NULL
         if (length(allocationRatioPlanned) == 1 && !is.na(allocationRatioPlanned)) {
             warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE,
                 parameter = "allocationRatioPlanned",
                 value = allocationRatioPlanned,
                 relatedParameter = "groups",

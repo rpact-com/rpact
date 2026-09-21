@@ -365,7 +365,6 @@ NULL
             if (userFunctionCallEnabled) {
                 warnArgumentAdjusted("'normalApproximation' was set to TRUE ",
                     "because conditional Dunnett test was specified as design",
-                    call. = FALSE,
                     parameter = "normalApproximation",
                     userInstructions = paste0(
                         "Use normalApproximation = TRUE for a conditional Dunnett design, or select a different ",
@@ -792,7 +791,6 @@ NULL
         if (intersectionTest == "Hierarchical") {
             warnResultUnavailable("Repeated confidence intervals not available for ",
                 "'intersectionTest' = \"Hierarchical\"",
-                call. = FALSE,
                 parameter = "intersectionTest",
                 userInstructions = paste0(
                     "Choose a supported intersection test if repeated confidence intervals are required; retain ",
@@ -1069,7 +1067,6 @@ NULL
         if (!is.na(piTreatments)) {
             warnArgumentIgnored(sQuote("piTreatments"), " will be ignored because ",
                 sQuote("piTreatmentsH1"), " is defined",
-                call. = FALSE,
                 parameter = "piTreatments",
                 userInstructions = paste0(
                     "Use piTreatmentsH1 for the alternative treatment probabilities, or remove piTreatmentsH1 ",
@@ -1085,7 +1082,6 @@ NULL
         if (!is.na(piControl)) {
             warnArgumentIgnored(sQuote("piControl"), " will be ignored because ",
                 sQuote("piControlH1"), " is defined",
-                call. = FALSE,
                 parameter = "piControl",
                 userInstructions = paste0(
                     "Use piControlH1 for the alternative control probability, or remove piControlH1 if ",
@@ -1436,7 +1432,7 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE,
+                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax,
                         userInstructions = paste0(
                             "Check the stage data, design boundaries and planned future sample sizes/events; ",
                             "conditional power for the reported stage could not be calculated."
@@ -1492,7 +1488,7 @@ NULL
     )
 
     if (stage > 1) {
-        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage", call. = FALSE,
+        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage",
             userInstructions = paste0(
                 "Request conditional power for the first interim stage; later-stage conditional power is not ",
                 "implemented by this method."

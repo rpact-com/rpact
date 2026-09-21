@@ -494,7 +494,6 @@ NULL
             warnInvalidInput("Accrual duration longer than maximum study ",
                 "duration (time to maximum number of events); followUpTime = ",
                 .arrayToString(designPlan$followUpTime),
-                call. = FALSE,
                 userInstructions = paste0(
                     "Check accrual duration, target events and follow-up assumptions; ensure the intended ",
                     "recruitment schedule is consistent with the calculated study duration."
@@ -504,7 +503,6 @@ NULL
     } else {
         warnNumericalIssue("Follow-up time could not be calculated for hazardRatio = ",
             .arrayToString(designPlan$hazardRatio),
-            call. = FALSE,
             userInstructions = paste0(
                 "Check event hazards, target events and the maximum sample size for the reported hazard ratios; ",
                 "verify that the target can be reached."
@@ -812,7 +810,6 @@ NULL
         warnArgumentAdjusted("Only the first default 'pi1' (", designPlan$.piecewiseSurvivalTime$pi1, ") was used ",
             "because the accrual intensities (", .arrayToString(accrualSetup$accrualIntensity), ") ",
             "were defined relative (all accrual intensities are < 1)",
-            call. = FALSE,
             userInstructions = paste0(
                 "Choose pi1 explicitly for relative accrual intensities, or run separate calculations for each ",
                 "intended survival scenario."
@@ -847,7 +844,6 @@ NULL
                 length(followUpTime) == 1 && !is.na(followUpTime)) {
             warnArgumentIgnored("Follow-up time will be calculated, value entered (",
                 followUpTime, ") is not taken into account",
-                call. = FALSE,
                 reason = "With a user-defined maximum number of subjects, the required follow-up time is calculated.",
                 userInstructions = paste0(
                     "Remove maxNumberOfSubjects if followUpTime should determine sample size; otherwise remove ",
@@ -949,7 +945,6 @@ NULL
             designPlan$accountForObservationTimes <- TRUE
             warnArgumentAdjusted("'accountForObservationTimes' was set to TRUE ",
                 "because piecewise exponential survival function is enabled",
-                call. = FALSE,
                 parameter = "accountForObservationTimes",
                 userInstructions = paste0(
                     "Use accountForObservationTimes = TRUE with piecewise exponential survival; verify the ",
@@ -1452,7 +1447,6 @@ NULL
                 warnResultUnavailable("Expected number of subjects H1 and study duration H1 ",
                     "cannot be calculated because the futility probabilities ",
                     "are not applicable for the specified design",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Use a design with applicable futility probabilities if expected sample size and study ",
                         "duration under H1 are required."
@@ -1716,7 +1710,6 @@ getEventProbabilities <- function(
             setting$isUserDefinedParameter("lambda1")) {
         warnArgumentAdjusted("Only the first 'lambda1' (", lambda1[1], ") ",
             "was used to calculate event probabilities",
-            call. = FALSE,
             userInstructions = paste0(
                 "Supply one lambda1 scenario, or calculate event probabilities separately for each intended ",
                 "lambda1."
@@ -2498,7 +2491,6 @@ getSampleSizeSurvival <- function(
                 sampleSizeSurvival$.setParameterType("followUpTime", C_PARAM_GENERATED)
                 warnArgumentIgnored("User defined 'followUpTime' (", followUpTime, ") ignored because ",
                     "follow-up time is ", round(sampleSizeSurvival$followUpTime, 4),
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Use the follow-up time from the sample-size result, or recompute that result with the ",
                         "intended survival assumptions."
@@ -2770,7 +2762,6 @@ getPowerSurvival <- function(
                 warnResultUnavailable("Cannot calculate analysis time at stage ", j, ": ",
                     "'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ") is too ",
                     "small to reach maximum number of events",
-                    call. = FALSE,
                     parameter = "maxNumberOfSubjects",
                     value = designPlan$maxNumberOfSubjects,
                     userInstructions = paste0(

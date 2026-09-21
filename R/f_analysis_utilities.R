@@ -48,7 +48,6 @@ NULL
                 !results$isGeneratedParameter(paramName)) {
             warnArgumentIgnored(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
                 "will be ignored because 'nPlanned' is not defined",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Specify nPlanned for future stages to use this argument, or remove it if future-stage ",
                     "calculations are not intended."
@@ -562,7 +561,6 @@ NULL
     if (dataFrameCounter > 1) {
         warnArgumentIgnored("Found ", dataFrameCounter, ", data.frame arguments; ",
             "only the first data.frame will be used for the initialization of the dataset",
-            call. = FALSE,
             userInstructions = paste0(
                 "Combine the intended data into one data.frame and pass that single data.frame to getDataset()."
             )
@@ -997,7 +995,6 @@ getLongFormat <- function(dataInput) {
             if (length(allocationRatioPlanned) == 1 && !identical(allocationRatioPlanned, 1)) {
                 warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
                     "will be ignored because the specified data has only one group",
-                    call. = FALSE,
                     parameter = "allocationRatioPlanned",
                     value = allocationRatioPlanned,
                     userInstructions = paste0(
@@ -1009,7 +1006,6 @@ getLongFormat <- function(dataInput) {
         } else if (!identical(allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)) {
             warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
                 "will be ignored because 'nPlanned' is not defined",
-                call. = FALSE,
                 parameter = "allocationRatioPlanned",
                 value = allocationRatioPlanned,
                 userInstructions = paste0(

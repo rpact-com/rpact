@@ -373,7 +373,6 @@ NULL
             if (userFunctionCallEnabled) {
                 warnArgumentAdjusted("'normalApproximation' was set to TRUE ",
                     "because conditional Dunnett test was specified as design",
-                    call. = FALSE,
                     parameter = "normalApproximation",
                     userInstructions = paste0(
                         "Use normalApproximation = TRUE for a conditional Dunnett design, or select a different ",
@@ -1170,7 +1169,6 @@ NULL
         if (!is.na(assumedStDevs)) {
             warnArgumentIgnored(sQuote("assumedStDevs"), " will be ignored because ",
                 sQuote("stDevsH1"), " is defined",
-                call. = FALSE,
                 parameter = "assumedStDevs",
                 userInstructions = paste0(
                     "Use stDevsH1 for the alternative standard deviations, or remove stDevsH1 if assumedStDevs ",
@@ -1465,7 +1463,6 @@ NULL
                 if (result <= 0 || result >= 1) {
                     warnNumericalIssue("Calculation not possible: could not calculate ",
                         "conditional power for stage ", kMax,
-                        call. = FALSE,
                         userInstructions = paste0(
                             "Check the stage data, design boundaries and planned future sample sizes/events; ",
                             "conditional power for the reported stage could not be calculated."
@@ -1520,7 +1517,7 @@ NULL
     )
 
     if (stage > 1) {
-        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage", call. = FALSE,
+        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage",
             userInstructions = paste0(
                 "Request conditional power for the first interim stage; later-stage conditional power is not ",
                 "implemented by this method."

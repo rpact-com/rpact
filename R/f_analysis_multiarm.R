@@ -209,7 +209,6 @@ NULL
         if ("assumedStDev" %in% names(list(...))) {
             warnInvalidInput("For multi-arm analysis the argument for assumed standard deviation ",
                 "is named 'assumedStDevs' and not 'assumedStDev'",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Rename assumedStDev to assumedStDevs and provide the standard deviations required by the ",
                     "populations or treatment arms."
@@ -508,7 +507,6 @@ getClosedCombinationTestResults <- function(stageResults) {
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
             warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = ",
                 .vQuote(C_TYPE_OF_DESIGN_AS_USER),
-                call. = FALSE,
                 userInstructions = paste0(
                     "Use a design/method supporting repeated p-values if these are required; do not interpret ",
                     "missing repeated p-values as calculated results."
@@ -520,7 +518,6 @@ getClosedCombinationTestResults <- function(stageResults) {
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
             warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = ",
                 .vQuote(C_TYPE_OF_DESIGN_WT_OPTIMUM),
-                call. = FALSE,
                 userInstructions = paste0(
                     "Use a design/method supporting repeated p-values if these are required; do not interpret ",
                     "missing repeated p-values as calculated results."
@@ -533,7 +530,6 @@ getClosedCombinationTestResults <- function(stageResults) {
     if (.isTrialDesignFisher(design) && design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
         warnResultUnavailable("Repeated p-values not available for 'method' = ",
             .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
-            call. = FALSE,
             userInstructions = paste0(
                 "Use a design/method supporting repeated p-values if these are required; do not interpret ",
                 "missing repeated p-values as calculated results."

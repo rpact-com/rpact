@@ -1439,7 +1439,6 @@ NULL
                 "Calculation not possible: could not calculate ",
                 "conditional power for stage ",
                 kMax,
-                call. = FALSE,
                 userInstructions = paste0(
                     "Check the stage data, design boundaries and planned future sample sizes/events; ",
                     "conditional power for the reported stage could not be calculated."
@@ -1479,7 +1478,6 @@ NULL
                 " will be ignored because ",
                 sQuote("stDevH1"),
                 " is defined",
-                call. = FALSE,
                 parameter = "assumedStDev",
                 userInstructions = paste0(
                     "Use stDevH1 for the assumed alternative standard deviation, or remove stDevH1 if ",
@@ -1652,7 +1650,7 @@ NULL
     )
     if (length(warningMessages) > 0) {
         for (m in warningMessages) {
-            warnNumericalIssue(m, call. = FALSE,
+            warnNumericalIssue(m,
                 reason = "A warning was raised while calculating conditional power or likelihood values for the plot.",
                 userInstructions = paste0(
                     "Inspect the reported warning and the effect range, stage data and planned information used ",

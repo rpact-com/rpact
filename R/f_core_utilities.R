@@ -743,7 +743,6 @@ getTestLabel <- function(x) {
                 unirootResult$f.root, ") that differs from target 0 ",
                 "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
                 ", last function argument was ", unirootResult$root, ")",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Check root-search bounds, target feasibility and tolerance; verify numerical convergence ",
                     "before using the result."
@@ -757,7 +756,6 @@ getTestLabel <- function(x) {
             "that differs from target 0 ",
             "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
             ", last function argument was ", unirootResult$root, ")",
-            call. = FALSE,
             userInstructions = paste0(
                 "Check root-search bounds, target feasibility and tolerance; verify numerical convergence ",
                 "before using the result."
@@ -834,7 +832,6 @@ getTestLabel <- function(x) {
                 warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                     "Root search via 'bisection' stopped: maximum number of search iterations reached. ",
                     "Check if lower and upper search bounds were calculated correctly",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Check root-search bounds, target feasibility and tolerance; verify numerical ",
                         "convergence before using the result."
@@ -857,7 +854,6 @@ getTestLabel <- function(x) {
                     "NA returned because root search via 'bisection' produced a function result (",
                     result, ") that differs from target 0 ",
                     "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                    call. = FALSE,
                     userInstructions = paste0(
                         "Check root-search bounds, target feasibility and tolerance; verify numerical ",
                         "convergence before using the result."
@@ -870,7 +866,6 @@ getTestLabel <- function(x) {
                 "Root search via 'bisection' produced a function result (", result, ") ",
                 "that differs from target 0 ",
                 "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                call. = FALSE,
                 userInstructions = paste0(
                     "Check root-search bounds, target feasibility and tolerance; verify numerical convergence ",
                     "before using the result."
@@ -2262,7 +2257,7 @@ saveOptions <- function() {
             return(invisible(file.exists(optionsFile)))
         },
         error = function(e) {
-            warnRuntimeIssue("Failed to save rpact options: ", e$message, call. = FALSE,
+            warnRuntimeIssue("Failed to save rpact options: ", e$message,
                 userInstructions = paste0(
                     "Check access to the rpact options file and the reported error, then retry saving or ",
                     "resetting the options."
@@ -2319,7 +2314,7 @@ resetOptions <- function(persist = TRUE) {
             return(invisible(TRUE))
         },
         error = function(e) {
-            warnRuntimeIssue("Failed to reset rpact options: ", e$message, call. = FALSE,
+            warnRuntimeIssue("Failed to reset rpact options: ", e$message,
                 userInstructions = paste0(
                     "Check access to the rpact options file and the reported error, then retry saving or ",
                     "resetting the options."

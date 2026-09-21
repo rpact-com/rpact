@@ -975,7 +975,6 @@ NULL
         if (!is.na(piTreatments)) {
             warnArgumentIgnored(sQuote("piTreatments"), " will be ignored because ",
                 sQuote("piTreatmentsH1"), " is defined",
-                call. = FALSE,
                 parameter = "piTreatments",
                 userInstructions = paste0(
                     "Use piTreatmentsH1 for the alternative treatment probabilities, or remove piTreatmentsH1 ",
@@ -995,7 +994,6 @@ NULL
         if (!is.na(piControl)) {
             warnArgumentIgnored(sQuote("piControl"), " will be ignored because ",
                 sQuote("piControlH1"), " is defined",
-                call. = FALSE,
                 parameter = "piControl",
                 userInstructions = paste0(
                     "Use piControlH1 for the alternative control probability, or remove piControlH1 if ",
@@ -1349,7 +1347,6 @@ NULL
                 if (result <= 0 || result >= 1) {
                     warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ",
                         kMax,
-                        call. = FALSE,
                         userInstructions = paste0(
                             "Check the stage data, design boundaries and planned future sample sizes/events; ",
                             "conditional power for the reported stage could not be calculated."

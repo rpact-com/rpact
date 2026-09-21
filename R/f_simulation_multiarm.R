@@ -658,7 +658,6 @@ NULL
             "'threshold' (",
             threshold,
             ") will be ignored because 'typeOfSelection' = \"userDefined\"",
-            call. = FALSE,
             parameter = "threshold",
             value = threshold,
             relatedParameter = "typeOfSelection",
@@ -672,7 +671,7 @@ NULL
     }
 
     if (length(typeOfSelection) == 1 && typeOfSelection != "userDefined" && !is.null(selectArmsFunction)) {
-        warnArgumentIgnored("'selectArmsFunction' will be ignored because 'typeOfSelection' is not \"userDefined\"", call. = FALSE,
+        warnArgumentIgnored("'selectArmsFunction' will be ignored because 'typeOfSelection' is not \"userDefined\"",
             parameter = "selectArmsFunction",
             relatedParameter = "typeOfSelection",
             relatedValue = typeOfSelection,
@@ -753,7 +752,7 @@ NULL
         if (typeOfShape == "userDefined") {
             if (!all(is.na(piMaxVector))) {
                 warnArgumentIgnored("'piMaxVector' (", .arrayToString(piMaxVector), ") will be ignored ",
-                    "because 'typeOfShape' = \"userDefined\"", call. = FALSE,
+                    "because 'typeOfShape' = \"userDefined\"",
                     parameter = "piMaxVector",
                     value = piMaxVector,
                     userInstructions = paste0(
@@ -1023,7 +1022,6 @@ NULL
                 .arrayToString(minNumberOfSubjectsPerStage),
                 ") will be ignored because ",
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
-                call. = FALSE,
                 parameter = "minNumberOfSubjectsPerStage",
                 value = minNumberOfSubjectsPerStage,
                 userInstructions = paste0(
@@ -1039,7 +1037,6 @@ NULL
                 .arrayToString(maxNumberOfSubjectsPerStage),
                 ") will be ignored because ",
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
-                call. = FALSE,
                 parameter = "maxNumberOfSubjectsPerStage",
                 value = maxNumberOfSubjectsPerStage,
                 userInstructions = paste0(
@@ -1058,7 +1055,6 @@ NULL
                 .arrayToString(minNumberOfEventsPerStage),
                 ") ",
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
-                call. = FALSE,
                 parameter = "minNumberOfEventsPerStage",
                 value = minNumberOfEventsPerStage,
                 userInstructions = paste0(
@@ -1074,7 +1070,6 @@ NULL
                 .arrayToString(maxNumberOfEventsPerStage),
                 ") ",
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
-                call. = FALSE,
                 parameter = "maxNumberOfEventsPerStage",
                 value = maxNumberOfEventsPerStage,
                 userInstructions = paste0(

@@ -342,7 +342,6 @@ getSimulationCounts <- function(
     } else if (!all(is.na(plannedCalendarTime))) {
         warnArgumentIgnored("'plannedCalendarTime' (", .arrayToString(plannedCalendarTime), ") ",
             "has no influence on simulation",
-            call. = FALSE,
             parameter = "plannedCalendarTime",
             value = plannedCalendarTime,
             reason = "The fixed design has no interim analyses, so plannedCalendarTime does not affect the simulation.",
@@ -813,7 +812,6 @@ getSimulationCounts <- function(
 
     warnNotValidated("The simulation count data feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
-        call. = FALSE,
         userInstructions = paste0(
             "Validate this experimental feature independently for the intended use before relying on its ",
             "results."

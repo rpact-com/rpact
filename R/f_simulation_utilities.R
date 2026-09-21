@@ -505,7 +505,6 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", 
                 .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
-                call. = FALSE,
                 parameter = ignore,
                 relatedParameter = "endpoint",
                 relatedValue = endpoint,
@@ -674,7 +673,6 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", 
                 .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
-                call. = FALSE,
                 parameter = ignore,
                 relatedParameter = "endpoint",
                 relatedValue = endpoint,
@@ -1257,7 +1255,6 @@ getRawData <- function(x, aggregate = FALSE) {
         if (!is.null(gED50) && !is.na(gED50)) {
             warnArgumentIgnored("'gED50' (", gED50, ") will be ignored because 'typeOfShape' ",
                 "is defined as ", .vQuote(typeOfShape),
-                call. = FALSE,
                 parameter = "gED50",
                 value = gED50,
                 reason = "The linear dose-response shape does not use gED50 or slope.",
@@ -1270,7 +1267,6 @@ getRawData <- function(x, aggregate = FALSE) {
         if (!is.null(slope) && !is.na(slope) && slope != 1) {
             warnArgumentIgnored("'slope' (", slope, ") will be ignored because 'typeOfShape' ",
                 "is defined as ", .vQuote(typeOfShape),
-                call. = FALSE,
                 parameter = "slope",
                 value = slope,
                 reason = "The linear dose-response shape does not use gED50 or slope.",
@@ -1326,7 +1322,6 @@ getRawData <- function(x, aggregate = FALSE) {
             "Increase the maximum number of subjects (",
             accrualSetup$maxNumberOfSubjects, ") ",
             "to avoid this situation",
-            call. = FALSE,
             userInstructions = paste0(
                 "Increase maxNumberOfSubjects to allow the target event count despite dropouts, and rerun the ",
                 "simulation."

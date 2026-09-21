@@ -336,7 +336,6 @@ getSimulationRates <- function(
                 .arrayToString(minNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE,
                 parameter = "minNumberOfSubjectsPerStage",
                 value = minNumberOfSubjectsPerStage,
                 userInstructions = paste0(
@@ -352,7 +351,6 @@ getSimulationRates <- function(
                 .arrayToString(maxNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE,
                 parameter = "maxNumberOfSubjectsPerStage",
                 value = maxNumberOfSubjectsPerStage,
                 userInstructions = paste0(
@@ -379,7 +377,6 @@ getSimulationRates <- function(
         if (isTRUE(riskRatio)) {
             warnArgumentIgnored("'riskRatio' (", riskRatio, ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE,
                 parameter = "riskRatio",
                 value = riskRatio,
                 relatedParameter = "groups",
@@ -395,7 +392,6 @@ getSimulationRates <- function(
         if (!is.na(allocationRatioPlanned)) {
             warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE,
                 parameter = "allocationRatioPlanned",
                 value = allocationRatioPlanned,
                 relatedParameter = "groups",
@@ -413,7 +409,6 @@ getSimulationRates <- function(
         if (!is.na(pi2)) {
             warnArgumentIgnored("'pi2' (", pi2,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE,
                 parameter = "pi2",
                 value = pi2,
                 relatedParameter = "groups",

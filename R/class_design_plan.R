@@ -910,7 +910,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                 warnArgumentIgnored(sprintf(
                     "Specified '%s' (%s) not taken into account",
                     argumentName, .arrayToString(argument)
-                ), call. = FALSE,
+                ),
                     parameter = argumentName,
                     value = argument,
                     reason = paste0(

@@ -172,7 +172,6 @@ NULL
                 (!twoSidedWarningForDefaultValues && any(na.omit(parameterValues) != defaultValue)))) {
         warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues),
             ") will be ignored because the design is two-sided",
-            call. = FALSE,
             parameter = parameterName,
             value = parameterValues,
             userInstructions = paste0(
@@ -275,7 +274,6 @@ NULL
     if (design$isUserDefinedParameter(parameterName)) {
         warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(design[[parameterName]]),
             ") will be ignored because it will be calculated",
-            call. = FALSE,
             parameter = parameterName,
             value = design[[parameterName]],
             userInstructions = paste0(
@@ -451,7 +449,6 @@ NULL
     if (design$kMax > 2 && (any(design$userAlphaSpending[2:design$kMax] - design$userAlphaSpending[1:(design$kMax - 1)] < design$tolerance))) {
         warnNumericalIssue("Chosen 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = FALSE),
             ") might yield imprecise critical values due to numerical inaccuracy",
-            call. = FALSE,
             userInstructions = paste0(
                 "Review the spending increments and verify numerical stability of the resulting boundaries ",
                 "before using this spending specification."
@@ -539,7 +536,6 @@ NULL
     if (design$kMax > 2 && (any(design$userBetaSpending[2:design$kMax] - design$userBetaSpending[1:(design$kMax - 1)] < design$tolerance))) {
         warnNumericalIssue("Chosen 'userBetaSpending' (", .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = FALSE),
             ") might yield imprecise futility bounds due to numerical inaccuracy",
-            call. = FALSE,
             userInstructions = paste0(
                 "Review the spending increments and verify numerical stability of the resulting boundaries ",
                 "before using this spending specification."
@@ -754,7 +750,6 @@ NULL
             length(piecewiseSurvivalTime) > 0 && !all(is.na(piecewiseSurvivalTime))) {
         warnArgumentIgnored("Argument 'piecewiseSurvivalTime' will be ignored because ",
             "length of 'piecewiseLambda' is 1",
-            call. = FALSE,
             parameter = "piecewiseSurvivalTime",
             userInstructions = paste0(
                 "Supply multiple piecewiseLambda values for piecewise hazards, or remove piecewiseSurvivalTime ",
@@ -1176,7 +1171,6 @@ getPiByLambda <- function(
         warnNumericalIssue("Calculation of pi (1) by lambda (", .arrayToString(round(lambda, 4)),
             ") results in a possible loss of precision ",
             "because pi = 1 was returned but pi is not exactly 1",
-            call. = FALSE,
             userInstructions = paste0(
                 "Check lambda and eventTime; the event probability rounds to 1, so avoid treating it as an ",
                 "exact probability of 1 in downstream calculations."

@@ -594,7 +594,6 @@ plot.NumberOfSubjects <- function(
         warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
             ") will be ignored because 'y' is undefined ",
             "(for more information see ?plot.NumberOfSubjects)",
-            call. = FALSE,
             parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned,
             userInstructions = paste0(
