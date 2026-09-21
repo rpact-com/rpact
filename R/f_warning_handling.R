@@ -76,7 +76,7 @@ warnArgumentIgnored <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
         reason = NULL, userInstructions = NULL, call = sys.call(-1L),
-        call. = TRUE) {
+        call. = FALSE) {
     .warnWithContext(..., code = "ARGUMENT_IGNORED", category = "ignored_input",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
@@ -108,7 +108,7 @@ warnArgumentAdjusted <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
         reason = NULL, userInstructions = NULL, call = sys.call(-1L),
-        call. = TRUE) {
+        call. = FALSE) {
     .warnWithContext(..., code = "ARGUMENT_ADJUSTED", category = "adjusted_input",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
@@ -121,7 +121,7 @@ warnInvalidInput <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
         reason = NULL, userInstructions = NULL, call = sys.call(-1L),
-        call. = TRUE) {
+        call. = FALSE) {
     .warnWithContext(..., code = "INVALID_INPUT", category = "invalid_input",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
@@ -134,7 +134,7 @@ warnNumericalIssue <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
         reason = NULL, userInstructions = NULL, call = sys.call(-1L),
-        call. = TRUE) {
+        call. = FALSE) {
     .warnWithContext(..., code = "NUMERICAL_ISSUE", category = "numerical_issue",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
@@ -147,7 +147,7 @@ warnResultUnavailable <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
         reason = NULL, userInstructions = NULL, call = sys.call(-1L),
-        call. = TRUE) {
+        call. = FALSE) {
     .warnWithContext(..., code = "RESULT_UNAVAILABLE", category = "unavailable_result",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
@@ -160,7 +160,7 @@ warnNotValidated <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
         reason = NULL, userInstructions = NULL, call = sys.call(-1L),
-        call. = TRUE) {
+        call. = FALSE) {
     .warnWithContext(..., code = "NOT_VALIDATED", category = "validation_limitation",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
@@ -186,7 +186,7 @@ warnDataIssue <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
         reason = NULL, userInstructions = NULL, call = sys.call(-1L),
-        call. = TRUE) {
+        call. = FALSE) {
     .warnWithContext(..., code = "DATA_ISSUE", category = "data_issue",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
