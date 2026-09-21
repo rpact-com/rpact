@@ -773,31 +773,13 @@ NULL
     }
 
     if (kMax == 1 && !is.na(conditionalPower)) {
-        warnArgumentIgnored("'conditionalPower' will be ignored for fixed sample design", call. = FALSE,
-            parameter = "conditionalPower",
-            userInstructions = paste0(
-                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                "after confirming the fixed-sample design."
-            )
-        )
+        warnArgumentIgnoredFixedDesign("conditionalPower")
     }
     if (endpoint %in% c("means", "rates") && kMax == 1 && !is.null(calcSubjectsFunction)) {
-        warnArgumentIgnored("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE,
-            parameter = "calcSubjectsFunction",
-            userInstructions = paste0(
-                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                "after confirming the fixed-sample design."
-            )
-        )
+        warnArgumentIgnoredFixedDesign("calcSubjectsFunction")
     }
     if (endpoint == "survival" && kMax == 1 && !is.null(calcEventsFunction)) {
-        warnArgumentIgnored("'calcEventsFunction' will be ignored for fixed sample design", call. = FALSE,
-            parameter = "calcEventsFunction",
-            userInstructions = paste0(
-                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                "after confirming the fixed-sample design."
-            )
-        )
+        warnArgumentIgnoredFixedDesign("calcEventsFunction")
     }
 
     if (endpoint %in% c("means", "rates") && is.na(conditionalPower) && is.null(calcSubjectsFunction)) {

@@ -455,13 +455,7 @@ getSimulationSurvival <- function(
                 maxNumberOfEventsPerStage, NA_real_
             )
         } else {
-            warnArgumentIgnored("'conditionalPower' will be ignored for fixed sample design", call. = FALSE,
-                parameter = "conditionalPower",
-                userInstructions = paste0(
-                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                    "after confirming the fixed-sample design."
-                )
-            )
+            warnArgumentIgnoredFixedDesign("conditionalPower")
         }
     } else {
         simulationResults$minNumberOfEventsPerStage <- NA_real_
@@ -471,13 +465,7 @@ getSimulationSurvival <- function(
         simulationResults$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
     }
     if (!is.na(conditionalPower) && (design$kMax == 1)) {
-        warnArgumentIgnored("'conditionalPower' will be ignored for fixed sample design", call. = FALSE,
-            parameter = "conditionalPower",
-            userInstructions = paste0(
-                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                "after confirming the fixed-sample design."
-            )
-        )
+        warnArgumentIgnoredFixedDesign("conditionalPower")
     }
 
     accrualSetup <- getAccrualTime(

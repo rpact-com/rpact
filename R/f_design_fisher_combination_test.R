@@ -243,16 +243,7 @@ getDesignFisher <- function(
         bindingFutility <- C_BINDING_FUTILITY_FISHER_DEFAULT
     } else if (userFunctionCallEnabled) {
         if (!is.na(kMax) && kMax == 1) {
-            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
-                "because kMax = 1",
-                call. = FALSE,
-                parameter = "bindingFutility",
-                value = bindingFutility,
-                userInstructions = paste0(
-                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                    "after confirming the fixed-sample design."
-                )
-            )
+            warnArgumentIgnoredFixedDesign("bindingFutility", value = bindingFutility)
         } else if (anyNA(alpha0Vec)) {
             warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'alpha0Vec' is not defined",

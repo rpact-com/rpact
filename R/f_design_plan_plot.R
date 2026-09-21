@@ -1724,7 +1724,7 @@ plot.TrialDesignPlan <- function(
             call. = FALSE,
             parameter = "nMax",
             value = nMax,
-            userInstructions = "Set the intended nMax in the design plan, or remove the redundant plotting argument."
+            userInstructions = "Remove the redundant plotting argument 'nMax'."
         )
     }
 

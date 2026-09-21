@@ -85,6 +85,25 @@ warnArgumentIgnored <- function(
 }
 
 #' @noRd
+warnArgumentIgnoredFixedDesign <- function(
+        parameter, value = NULL, call = sys.call(-1L), call. = FALSE) {
+    warnArgumentIgnored(
+        paste0("'", parameter, "'", collapse = ", "),
+        " will be ignored for fixed sample design",
+        parameter = parameter, value = value,
+        relatedParameter = "kMax", relatedValue = 1L,
+        constraint = "kMax must be greater than 1",
+        reason = "A fixed sample design has only one stage and no interim adaptation.",
+        userInstructions = paste0(
+            "Use a multi-stage design if interim adaptation is intended; otherwise remove ",
+            if (length(parameter) == 1L) "this argument " else "these arguments ",
+            "after confirming the fixed-sample design."
+        ),
+        call = call, call. = call.
+    )
+}
+
+#' @noRd
 warnArgumentAdjusted <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,

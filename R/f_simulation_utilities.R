@@ -502,7 +502,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             ignore <- effectListNames[!(effectListNames %in% C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL)]
         }
         if (length(ignore) > 0) {
-            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
+            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", 
+                .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
                 call. = FALSE,
                 parameter = ignore,
@@ -670,7 +671,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             ignore <- effectDataNames[!(effectDataNames %in% gsub("s$", "", C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL))]
         }
         if (length(ignore) > 0) {
-            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
+            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", 
+                .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
                 call. = FALSE,
                 parameter = ignore,

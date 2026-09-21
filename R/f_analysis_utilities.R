@@ -25,16 +25,7 @@ NULL
     design <- results$.design
     if (design$kMax == 1) {
         if (.isConditionalPowerEnabled(nPlanned)) {
-            warnArgumentIgnored("'nPlanned' (", .arrayToString(nPlanned), ") ",
-                "will be ignored because design is fixed",
-                call. = FALSE,
-                parameter = "nPlanned",
-                value = nPlanned,
-                userInstructions = paste0(
-                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                    "after confirming the fixed-sample design."
-                )
-            )
+            warnArgumentIgnoredFixedDesign("nPlanned", value = nPlanned)
         }
         results$.setParameterType("nPlanned", C_PARAM_NOT_APPLICABLE)
     }
@@ -69,14 +60,7 @@ NULL
     if (results$.design$kMax == 1) {
         if (length(paramValues) > 0 && !all(is.na(paramValues)) &&
                 !results$isGeneratedParameter(paramName)) {
-            warnArgumentIgnored(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
-                "will be ignored because design is fixed",
-                call. = FALSE,
-                userInstructions = paste0(
-                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                    "after confirming the fixed-sample design."
-                )
-            )
+            warnArgumentIgnoredFixedDesign(paramName, value = paramValues)
         }
         return(invisible())
     }

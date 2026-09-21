@@ -539,16 +539,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     design$alphaSpent[1] <- design$alpha
     design$.setParameterType("typeOfDesign", C_PARAM_NOT_APPLICABLE)
     if (!identical(design$typeOfDesign, C_DEFAULT_TYPE_OF_DESIGN)) {
-        warnArgumentIgnored("'typeOfDesign' (", design$typeOfDesign, ") will be ignored ",
-            "because design is fixed",
-            call. = FALSE,
-            parameter = "typeOfDesign",
-            value = design$typeOfDesign,
-            userInstructions = paste0(
-                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                "after confirming the fixed-sample design."
-            )
-        )
+        warnArgumentIgnoredFixedDesign("typeOfDesign", value = design$typeOfDesign)
     }
     return(invisible(design))
 }
@@ -1735,16 +1726,7 @@ getDesignInverseNormal <- function(
             !identical(typeOfDesign, C_TYPE_OF_DESIGN_PT) &&
             !grepl("^bs", typeBetaSpending)) {
         if (!is.na(kMax) && kMax == 1) {
-            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
-                "because kMax = 1",
-                call. = FALSE,
-                parameter = "bindingFutility",
-                value = bindingFutility,
-                userInstructions = paste0(
-                    "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                    "after confirming the fixed-sample design."
-                )
-            )
+            warnArgumentIgnoredFixedDesign("bindingFutility", value = bindingFutility)
         } else if (anyNA(futilityBounds)) {
             warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'futilityBounds' is not defined",

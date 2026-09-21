@@ -110,12 +110,14 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             if (!is.na(conditionalPower)) {
                 .assertIsInOpenInterval(conditionalPower, "conditionalPower", lower = 0, upper = 1)
                 if (!is.null(conditionalPowerFunction) && !identical(conditionalPowerFunction, NA)) {
-                    warnArgumentIgnored("Both conditionalPower and conditionalPowerFunction are provided. Using conditionalPower.",
+                    warnArgumentIgnored(
+                        "Both 'conditionalPower' and 'conditionalPowerFunction' are provided. ",
+                        "Using 'conditionalPower' and ignoring 'conditionalPowerFunction'.",
                         call. = FALSE,
                         parameter = "conditionalPowerFunction",
                         relatedParameter = "conditionalPower",
                         relatedValue = conditionalPower,
-                        reason = "When both are supplied, conditionalPower takes precedence.",
+                        reason = "When both are supplied, 'conditionalPower' takes precedence.",
                         userInstructions = paste0(
                             "Choose either conditionalPower or conditionalPowerFunction; remove ",
                             "conditionalPower if the function should determine conditional power."
@@ -210,7 +212,8 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     self$delta1Max <- delta1Max
 
                     if (!is.null(ncp1Min)) {
-                        warnArgumentIgnored("Both ncp1Min and delta1Min are provided. Using delta1Min and ignoring ncp1Min.",
+                        warnArgumentIgnored(
+                            "Both 'ncp1Min' and 'delta1Min' are provided. Using 'delta1Min' and ignoring 'ncp1Min'.",
                             parameter = "ncp1Min",
                             value = ncp1Min,
                             relatedParameter = "delta1Min",
@@ -260,7 +263,8 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
 
                     self$delta1 <- delta1
                     if (!is.null(ncp1)) {
-                        warnArgumentIgnored("Both delta1 and ncp1 are provided. Using delta1 and ignoring ncp1.",
+                        warnArgumentIgnored(
+                            "Both 'delta1' and 'ncp1' are provided. Using 'delta1' and ignoring 'ncp1'.",
                             parameter = "ncp1",
                             value = ncp1,
                             relatedParameter = "delta1",

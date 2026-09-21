@@ -327,13 +327,7 @@ getSimulationRates <- function(
         )
     }
     if (design$kMax == 1 && !is.na(conditionalPower)) {
-        warnArgumentIgnored("'conditionalPower' will be ignored for fixed sample design", call. = FALSE,
-            parameter = "conditionalPower",
-            userInstructions = paste0(
-                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                "after confirming the fixed-sample design."
-            )
-        )
+        warnArgumentIgnoredFixedDesign("conditionalPower")
     }
     if (design$kMax > 1 && is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(minNumberOfSubjectsPerStage) != 1 ||

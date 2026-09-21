@@ -387,22 +387,10 @@ getSimulationMeans <- function(
         )
     }
     if (!is.na(conditionalPower) && design$kMax == 1) {
-        warnArgumentIgnored("'conditionalPower' will be ignored for fixed sample design", call. = FALSE,
-            parameter = "conditionalPower",
-            userInstructions = paste0(
-                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                "after confirming the fixed-sample design."
-            )
-        )
+        warnArgumentIgnoredFixedDesign("conditionalPower")
     }
     if (!is.null(calcSubjectsFunction) && design$kMax == 1) {
-        warnArgumentIgnored("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE,
-            parameter = "calcSubjectsFunction",
-            userInstructions = paste0(
-                "Use a multi-stage design if interim adaptation is intended; otherwise remove this argument ",
-                "after confirming the fixed-sample design."
-            )
-        )
+        warnArgumentIgnoredFixedDesign("calcSubjectsFunction")
     }
 
     if (is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
