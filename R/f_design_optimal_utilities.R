@@ -282,7 +282,8 @@ summary.TrialDesignOptimalConditionalError <- function(object, ...) {
     cat("Second-stage information: \n")
     cat(
         "  Expected second-stage information (theta=0):",
-        getStageInformation(type = "expected", design = object, likelihoodRatioDistribution = "fixed", thetaLR = 0),
+        getStageInformation(type = "expected", design = object, 
+            likelihoodRatioDistribution = "fixed", thetaLR = 0),
         "\n"
     )
     if (!object$useInterimEstimate && length(object$weightsLR) <= 1) {
@@ -339,7 +340,8 @@ summary.TrialDesignOptimalConditionalError <- function(object, ...) {
             "  Expected second-stage information (theta=Mean of given likelihood ratio distr.=",
             theta,
             "): ",
-            getStageInformation(type = "expected", design = object, likelihoodRatioDistribution = "fixed", thetaLR = theta),
+            getStageInformation(type = "expected", design = object, 
+                likelihoodRatioDistribution = "fixed", thetaLR = theta),
             "\n",
             sep = ""
         )

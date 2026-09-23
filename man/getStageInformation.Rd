@@ -59,7 +59,8 @@ where
 \item \eqn{\Delta_1} is the assumed treatment effect (expressed as a mean difference).
 }
 The conditional error is calculated according to the specification provided in the \code{design} argument.
-For p-values smaller or equal to the first-stage efficacy boundary as well as p-values greater than the first-stage futility boundary,
+For p-values smaller or equal to the first-stage efficacy boundary as well
+as p-values greater than the first-stage futility boundary,
 the returned information is 0 (since the trial is ended early in both cases).
 When \code{efficacyBounds = 0}, early efficacy stopping is disabled, including at a p-value of zero.
 }
@@ -72,9 +73,15 @@ where
 \itemize{
 \item \eqn{\alpha_1, \alpha_0} are the first-stage efficacy and futility boundaries
 \item \eqn{\alpha_2(p_1)} is the optimal conditional error calculated for \eqn{p_1}
-\item \eqn{l(p_1)} is the "true" likelihood ratio under which to calculate the expected sample size. This can be different from the likelihood ratio used to calibrate the optimal conditional error function.
-\item \eqn{\Delta_1} is the assumed treatment effect to power for, expressed as a mean difference. It may depend on the interim data (i.e., \eqn{p_1}) in case \code{useInterimEstimate = TRUE} was specified for the design object.
-\item \eqn{\nu(\alpha_2(p_1)) = (\Phi^{-1}(1-\alpha_2(p_1))+\Phi^{-1}(CP))^2} is a factor calculated for the specific assumptions about the optimal conditional error function and the target conditional power \eqn{CP}.
+\item \eqn{l(p_1)} is the "true" likelihood ratio under which to calculate the
+expected sample size. This can be different from the likelihood ratio used
+to calibrate the optimal conditional error function.
+\item \eqn{\Delta_1} is the assumed treatment effect to power for, expressed as a
+mean difference. It may depend on the interim data (i.e., \eqn{p_1}) in case
+\code{useInterimEstimate = TRUE} was specified for the design object.
+\item \eqn{\nu(\alpha_2(p_1)) = (\Phi^{-1}(1-\alpha_2(p_1))+\Phi^{-1}(CP))^2} is a
+factor calculated for the specific assumptions about the optimal conditional
+error function and the target conditional power \eqn{CP}.
 }
 
 Add \code{design$firstStageInformation} to obtain expected total information.
@@ -85,15 +92,17 @@ Changing the evaluation distribution here does not recalibrate the design.
 \examples{
 # Get a design
 design <- getDesignOptimalConditionalError(
-    alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
-    thetaH1 = 0.25, likelihoodRatioDistribution = "fixed", thetaLR = 0.25,
+    alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, 
+    conditionalPower = 0.9, thetaH1 = 0.25, 
+    likelihoodRatioDistribution = "fixed", thetaLR = 0.25,
     firstStageInformation = 80, useInterimEstimate = FALSE
 )
 # Calculate expected information under correct specification
 getStageInformation(type = "expected", design = design)
 
 # Compare operating characteristics under a different true effect.
-getStageInformation(type = "expected", design = design, likelihoodRatioDistribution = "fixed", thetaLR = 0.15)
+getStageInformation(type = "expected", design = design, 
+    likelihoodRatioDistribution = "fixed", thetaLR = 0.15)
 
 # Calculate expected information under the null hypothesis
 getStageInformation(type = "expected",

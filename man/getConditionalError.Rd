@@ -20,12 +20,16 @@ A numeric vector of conditional errors, one per first-stage p-value.
 Calculate the Optimal Conditional Error
 }
 \details{
-The optimal conditional error \eqn{\alpha_2} given a first-stage p-value \eqn{p_1} is calculated as:
+The optimal conditional error \eqn{\alpha_2} given a
+first-stage p-value \eqn{p_1} is calculated as:
 \deqn{\alpha_2(p_1)=\psi(-e^{c_0} \cdot \frac{\Delta_1^2}{l(p_1)}).}
 
-The level constant \eqn{c_0} as well as the specification of the effect size \eqn{\Delta_1} and the likelihood ratio \eqn{l(p_1)}
+The level constant \eqn{c_0} as well as the specification of the effect
+size \eqn{\Delta_1} and the likelihood ratio \eqn{l(p_1)}
 must be contained in the \code{design} object (see \code{?getDesignOptimalConditionalError}).
-Early stopping rules are supported, i.e., for \eqn{p_1 \leq \alpha_1} with \eqn{\alpha_1 > 0}, the returned conditional error is 1 and for \eqn{p_1 > \alpha_0}, the returned conditional error is 0.
+Early stopping rules are supported, i.e., for \eqn{p_1 \leq \alpha_1}
+with \eqn{\alpha_1 > 0}, the returned conditional error is 1 and for
+\eqn{p_1 > \alpha_0}, the returned conditional error is 0.
 }
 \examples{
 # Create a design

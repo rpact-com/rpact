@@ -272,8 +272,7 @@ NULL
 #' In contrast to \code{getSimulationSurvival()} (where survival times are simulated), normally
 #' distributed logrank test statistics are simulated.
 #'
-#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
-#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.
+#' @inheritParams param_omegaMaxVector
 #' @inheritParams param_intersectionTest_MultiArm
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_effectMeasure
