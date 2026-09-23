@@ -36,7 +36,6 @@ NULL
 #' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
 #' than 1 can be used, for example, to simulate non-inferiority designs.
 #'
-#' @inheritParams param_omegaMaxVector
 #' @inheritParams param_intersectionTest_MultiArm
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_effectMeasure
@@ -81,6 +80,7 @@ NULL
 #' @inheritParams param_maxNumberOfRawDatasetsPerStage
 #' @inheritParams param_simulationType_multiarm_survival
 #' @inheritParams param_piControl
+#' @inheritParams param_omegaMaxVector
 #'
 #' @details
 #' At given design the function simulates the analysis times, power, stopping

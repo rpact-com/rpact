@@ -2,12 +2,12 @@
 % Please edit documentation in R/parameter_descriptions.R
 \name{param_omegaMaxVector}
 \alias{param_omegaMaxVector}
-\title{Parameter Description: Omega Max Vector
-#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
+\title{Parameter Description: Omega Max Vector}
+\arguments{
+\item{omegaMaxVector}{Range of hazard ratios with highest response for \code{"linear"} and
 \code{"sigmoidEmax"} model, default is \code{seq(1, 0.4, -0.2)}.}
+}
 \description{
 Parameter Description: Omega Max Vector
-#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
-\code{"sigmoidEmax"} model, default is \code{seq(1, 0.4, -0.2)}.
 }
 \keyword{internal}

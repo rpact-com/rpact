@@ -56,3 +56,4 @@ index\.txt$
 ^private-tests$
 ^release-notes-draft-full\.md$
 ^release-notes-draft\.md$
+^AGENTS\.md$

@@ -176,10 +176,10 @@ NULL
                     rmOverall <- (allocationRatioPlanned[k] * overallRates[treatmentArm, k] +
                         overallRatesControl[k]) / (allocationRatioPlanned[k] + 1)
                     overallTestStatistics[treatmentArm, k] <- overallEffectSizes[treatmentArm, k] /
-                        sqrt(rmOverall * (1 - rmOverall) * sqrt(
+                        sqrt(rmOverall * (1 - rmOverall) * (
                             1 / sum(subjectsPerStage[treatmentArm, 1:k]) +
-                                1 / sum(subjectsPerStage[gMax + 1, 1:k])
-                        ))
+                            1 / sum(subjectsPerStage[gMax + 1, 1:k])
+                            ))
                 } else {
                     activeSubjects <- sum(subjectsPerStage[treatmentArm, 1:k])
                     controlSubjects <- sum(subjectsPerStage[gMax + 1, 1:k])
