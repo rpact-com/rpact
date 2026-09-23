@@ -354,7 +354,15 @@ getObservedInformationRates <- function(
     if (design$typeOfDesign == "asUser") {
         stopIllegalArgument("recalculation of the information rates not possible ",
             "for user-defined alpha spending designs",
-            functionName = ".getDesignWithRecalculatedBoundaries"
+            functionName = ".getDesignWithRecalculatedBoundaries",
+            reason = paste0(
+                "User-defined alpha spending fixes spending amounts at the planned analyses and does not ",
+                "support this information-rate recalculation."
+            ),
+            userInstructions = paste0(
+                "Retain the planned information rates, or choose an alpha-spending function that supports ",
+                "recalculation if that matches the prespecified design."
+            )
         )
     }
 
@@ -391,7 +399,9 @@ getObservedInformationRates <- function(
     stageFromData <- dataInput$getNumberOfStages()
     if (stageFromData == 1) {
         stopIllegalArgument("recalculation of the information rates not possible at stage 1",
-            functionName = ".getDesignWithRecalculatedBoundaries"
+            functionName = ".getDesignWithRecalculatedBoundaries",
+            reason = "There is no completed interim stage before stage 1 for this recalculation.",
+            userInstructions = "Request recalculation only at a supported later stage with the required observed information."
         )
     }
 

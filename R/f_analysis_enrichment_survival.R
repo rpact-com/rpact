@@ -158,13 +158,26 @@ NULL
     if (gMax > 2 && intersectionTest == "SpiessensDebois") {
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
             functionName = ".getStageResultsSurvivalEnrichment",
-            parameter = "gMax", value = gMax
+            parameter = "gMax", value = gMax,
+            reason = paste0(
+                "The implemented Spiessens-Debois intersection test is restricted to one subset and the full ",
+                "population."
+            ),
+            userInstructions = paste0(
+                "Use a supported intersection test for the intended number of populations; reduce the ",
+                "population set only if it matches the trial objectives."
+            )
         )
     }
 
     if (!stratifiedAnalysis) {
         stopIllegalArgument("only stratified analysis can be performed for enrichment survival designs",
-            functionName = ".getStageResultsSurvivalEnrichment"
+            functionName = ".getStageResultsSurvivalEnrichment",
+            reason = "This enrichment procedure supports only stratified analysis.",
+            userInstructions = paste0(
+                "Use stratifiedAnalysis = TRUE and the corresponding stratified data or assumptions; otherwise ",
+                "choose a procedure supporting the intended analysis."
+            )
         )
     }
 
@@ -1011,7 +1024,12 @@ NULL
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalPowerSurvivalEnrichment",
-        parameter = "design"
+        parameter = "design",
+        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
+        userInstructions = paste0(
+            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+            "supporting the intended design. Do not change the object class manually."
+        )
     )
 }
 

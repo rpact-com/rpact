@@ -394,7 +394,12 @@ NULL
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1", value = pi1,
                 relatedParameter = "thetaH0",
-                relatedValue = thetaH0
+                relatedValue = thetaH0,
+                reason = "Sample-size planning requires an alternative effect distinct from the null hypothesis.",
+                userInstructions = paste0(
+                    "Check the effect scale and null hypothesis. Specify a scientifically justified alternative ",
+                    "distinct from thetaH0; do not change the null simply to obtain a finite sample size."
+                )
             )
         }
 
@@ -402,14 +407,25 @@ NULL
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
             stopIllegalArgument("exact sample size calculation not available for two-sided testing",
-                functionName = ".createDesignPlanRates"
+                functionName = ".createDesignPlanRates",
+                reason = "This exact sample-size method is not implemented for two-sided testing.",
+                userInstructions = paste0(
+                    "Choose a supported approximate method if appropriate, or a different validated method for ",
+                    "the intended two-sided exact calculation; do not change sided merely to bypass the ",
+                    "limitation."
+                )
             )
         }
 
         if (normalApproximation && !conservative && (objectType == "sampleSize")) {
             stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation",
                 functionName = ".createDesignPlanRates",
-                parameter = "conservative", value = conservative
+                parameter = "conservative", value = conservative,
+                reason = "The conservative option does not apply to this sample-size calculation.",
+                userInstructions = paste0(
+                    "Remove conservative from this call after confirming that the selected sample-size method ",
+                    "matches the intended analysis."
+                )
             )
         }
     } else if (groups == 2L) {
@@ -424,7 +440,12 @@ NULL
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1 - pi2", value = pi1 - pi2,
                 relatedParameter = "thetaH0",
-                relatedValue = thetaH0
+                relatedValue = thetaH0,
+                reason = "Sample-size planning requires an alternative effect distinct from the null hypothesis.",
+                userInstructions = paste0(
+                    "Check the effect scale and null hypothesis. Specify a scientifically justified alternative ",
+                    "distinct from thetaH0; do not change the null simply to obtain a finite sample size."
+                )
             )
         }
 
@@ -439,7 +460,12 @@ NULL
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1 / pi2", value = pi1 / pi2,
                 relatedParameter = "thetaH0",
-                relatedValue = thetaH0
+                relatedValue = thetaH0,
+                reason = "Sample-size planning requires an alternative effect distinct from the null hypothesis.",
+                userInstructions = paste0(
+                    "Check the effect scale and null hypothesis. Specify a scientifically justified alternative ",
+                    "distinct from thetaH0; do not change the null simply to obtain a finite sample size."
+                )
             )
         }
 
@@ -450,13 +476,24 @@ NULL
             ) {
             stopIllegalArgument("two-sided case ",
                 "is implemented only for superiority testing",
-                functionName = ".createDesignPlanRates"
+                functionName = ".createDesignPlanRates",
+                reason = "The implemented two-sided sample-size calculation supports superiority testing only.",
+                userInstructions = paste0(
+                    "Check the null on the selected effect scale. Use the superiority null only if ",
+                    "scientifically intended; for non-inferiority or another null, select a supported procedure ",
+                    "consistent with the hypothesis."
+                )
             )
         }
 
         if (!normalApproximation) {
             stopIllegalArgument("only normal approximation case is implemented for two groups",
-                functionName = ".createDesignPlanRates"
+                functionName = ".createDesignPlanRates",
+                reason = "Two-group sample-size planning here supports only the normal approximation.",
+                userInstructions = paste0(
+                    "Use normalApproximation = TRUE if appropriate for the planned trial, or choose a method ",
+                    "supporting the intended exact calculation."
+                )
             )
         }
 
@@ -464,7 +501,12 @@ NULL
             stopIllegalArgument("'conservative' (", conservative, ") ",
                 "has no effect on sample size calculation for two groups",
                 functionName = ".createDesignPlanRates",
-                parameter = "conservative", value = conservative
+                parameter = "conservative", value = conservative,
+                reason = "The conservative option does not apply to this sample-size calculation.",
+                userInstructions = paste0(
+                    "Remove conservative from this call after confirming that the selected sample-size method ",
+                    "matches the intended analysis."
+                )
             )
         }
 

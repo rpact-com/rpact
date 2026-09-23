@@ -349,7 +349,13 @@ getSimulationSurvival <- function(
     
     if (design$sided == 2) {
         stopIllegalArgument("Only one-sided case is implemented for the survival simulation design",
-            functionName = "getSimulationSurvival"
+            functionName = "getSimulationSurvival",
+            reason = "The selected procedure is implemented only for one-sided testing.",
+            userInstructions = paste0(
+                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
+                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
+                "error."
+            )
         )
     }
     if (!all(is.na(lambda2)) && !all(is.na(lambda1)) &&
@@ -384,7 +390,15 @@ getSimulationSurvival <- function(
             parameter = "piecewiseSurvivalTime",
             relatedParameter = "lambda2",
             relatedValue = lambda2,
-            value = piecewiseSurvivalTime
+            value = piecewiseSurvivalTime,
+            reason = paste0(
+                "Separate hazard inputs cannot be combined with a list that already specifies piecewise ",
+                "survival parameters."
+            ),
+            userInstructions = paste0(
+                "Use a numeric piecewiseSurvivalTime vector with separate hazard vectors, or keep the ",
+                "self-contained list and remove redundant separate hazards."
+            )
         )
     }
     thetaH1 <- .ignoreParameterIfNotUsed(
@@ -441,7 +455,12 @@ getSimulationSurvival <- function(
                     .arrayToString(minNumberOfEventsPerStage), ")",
                     functionName = "getSimulationSurvival",
                     parameter = "maxNumberOfEventsPerStage",
-                    value = maxNumberOfEventsPerStage
+                    value = maxNumberOfEventsPerStage,
+                    reason = "At least one per-stage maximum event count is below its corresponding minimum.",
+                    userInstructions = paste0(
+                        "Check the stage order of minNumberOfEventsPerStage and maxNumberOfEventsPerStage; make ",
+                        "each minimum no greater than its corresponding maximum."
+                    )
                 )
             }
             .setValueAndParameterType(
@@ -631,7 +650,12 @@ getSimulationSurvival <- function(
                 parameter = "longTimeSimulationAllowed",
                 value = longTimeSimulationAllowed,
                 constraint = "must be TRUE for simulations exceeding the long-time threshold",
-                functionName = "getSimulationSurvival"
+                functionName = "getSimulationSurvival",
+                reason = "The estimated simulation workload exceeds the limit while long simulations are disabled.",
+                userInstructions = paste0(
+                    "Reduce the requested workload if appropriate, or set longTimeSimulationAllowed = TRUE ",
+                    "after accepting the longer runtime."
+                )
             )
         }
 

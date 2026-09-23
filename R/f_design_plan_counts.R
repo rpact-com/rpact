@@ -477,7 +477,13 @@
 
     if (design$sided == 2 && thetaH0 != 1) {
         stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
-            functionName = ".getDesignPlanCountData"
+            functionName = ".getDesignPlanCountData",
+            reason = "The implemented two-sided sample-size calculation supports superiority testing only.",
+            userInstructions = paste0(
+                "Check the null on the selected effect scale. Use the superiority null only if scientifically ",
+                "intended; for non-inferiority or another null, select a supported procedure consistent with ",
+                "the hypothesis."
+            )
         )
     }
 

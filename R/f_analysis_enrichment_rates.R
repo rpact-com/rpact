@@ -145,7 +145,16 @@ NULL
                 if (thetaH0 != 0) {
                     stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
                         functionName = ".calcRatesTestStatistics",
-                        parameter = "thetaH0", value = thetaH0
+                        parameter = "thetaH0", value = thetaH0,
+                        reason = paste0(
+                            "The implemented two-sample exact test requires equality of the rates under the ",
+                            "null hypothesis."
+                        ),
+                        userInstructions = paste0(
+                            "Use thetaH0 = 0 only if equality of rates is the intended null. For a different ",
+                            "null, choose a supported approximate analysis consistent with the scientific ",
+                            "question."
+                        )
                     )
                 }
 
@@ -234,26 +243,49 @@ NULL
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
             functionName = ".getStageResultsRatesEnrichment",
-            parameter = "gMax", value = gMax
+            parameter = "gMax", value = gMax,
+            reason = paste0(
+                "The implemented Spiessens-Debois intersection test is restricted to one subset and the full ",
+                "population."
+            ),
+            userInstructions = paste0(
+                "Use a supported intersection test for the intended number of populations; reduce the ",
+                "population set only if it matches the trial objectives."
+            )
         )
     }
 
     if (intersectionTest == "SpiessensDebois" && !normalApproximation) {
         stopIllegalArgument("Spiessens & Debois test cannot be used with Fisher's ",
             "exact test (normalApproximation = FALSE)",
-            functionName = ".getStageResultsRatesEnrichment"
+            functionName = ".getStageResultsRatesEnrichment",
+            reason = "This intersection test is not implemented with Fisher's exact test.",
+            userInstructions = paste0(
+                "Use normalApproximation = TRUE if the approximate method is appropriate, or choose an ",
+                "intersection test compatible with exact testing."
+            )
         )
     }
 
     if (stratifiedAnalysis && !normalApproximation) {
         stopConflictingArguments("stratified version is not available for Fisher's exact test",
-            functionName = ".getStageResultsRatesEnrichment"
+            functionName = ".getStageResultsRatesEnrichment",
+            reason = "A stratified version of Fisher's exact test is not implemented here.",
+            userInstructions = paste0(
+                "Choose a supported stratified approximate analysis, or use unstratified exact testing only if ",
+                "that matches the analysis plan."
+            )
         )
     }
 
     if (stratifiedAnalysis && !dataInput$isStratified()) {
         stopIllegalArgument("stratified analysis is only possible for stratified data input",
-            functionName = ".getStageResultsRatesEnrichment"
+            functionName = ".getStageResultsRatesEnrichment",
+            reason = "Stratified analysis requires stratified input data.",
+            userInstructions = paste0(
+                "Supply the appropriate stratified dataset or disable stratifiedAnalysis only if an ",
+                "unstratified analysis is intended."
+            )
         )
     }
 
@@ -1119,7 +1151,12 @@ NULL
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalPowerRatesEnrichment",
-        parameter = "design"
+        parameter = "design",
+        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
+        userInstructions = paste0(
+            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+            "supporting the intended design. Do not change the object class manually."
+        )
     )
 }
 

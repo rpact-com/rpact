@@ -611,7 +611,16 @@ NULL
             } else {
                 if (thetaH0 != 0) {
                     stopConflictingArguments("thetaH0 must be equal 0 for performing Fisher's exact test",
-                        functionName = ".getStageResultsRates"
+                        functionName = ".getStageResultsRates",
+                        reason = paste0(
+                            "The implemented two-sample exact test requires equality of the rates under the ",
+                            "null hypothesis."
+                        ),
+                        userInstructions = paste0(
+                            "Use thetaH0 = 0 only if equality of rates is the intended null. For a different ",
+                            "null, choose a supported approximate analysis consistent with the scientific ",
+                            "question."
+                        )
                     )
                 }
 

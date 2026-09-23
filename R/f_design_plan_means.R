@@ -451,7 +451,13 @@ NULL
                     parameter = "alternative",
                     value = alternative,
                     relatedParameter = "thetaH0",
-                    relatedValue = thetaH0
+                    relatedValue = thetaH0,
+                    reason = "Sample-size planning requires an alternative effect distinct from the null hypothesis.",
+                    userInstructions = paste0(
+                        "Check the effect scale and null hypothesis. Specify a scientifically justified ",
+                        "alternative distinct from thetaH0; do not change the null simply to obtain a finite ",
+                        "sample size."
+                    )
                 )
             }
         }
@@ -482,7 +488,13 @@ NULL
                 (thetaH0 != 1 && meanRatio))) {
             stopIllegalArgument("two-sided case is implemented only for superiority testing ",
                 "(i.e., thetaH0 = ", ifelse(meanRatio, 1, 0), ")",
-                functionName = ".createDesignPlanMeans"
+                functionName = ".createDesignPlanMeans",
+                reason = "The implemented two-sided sample-size calculation supports superiority testing only.",
+                userInstructions = paste0(
+                    "Check the null on the selected effect scale. Use the superiority null only if ",
+                    "scientifically intended; for non-inferiority or another null, select a supported procedure ",
+                    "consistent with the hypothesis."
+                )
             )
         }
 

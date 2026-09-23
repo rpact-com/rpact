@@ -390,7 +390,13 @@ NULL
                         "the output must be a single numeric value",
                         functionName = ".getSimulatedStageSurvivalEnrichment",
                         parameter = "calcEventsFunction",
-                        value = calcEventsFunction
+                        value = calcEventsFunction,
+                        reason = "The custom event-count adaptation function returned an unsupported result.",
+                        userInstructions = paste0(
+                            "Correct calcEventsFunction so every execution path returns a single finite numeric ",
+                            "event count within the documented bounds; test zero, missing and extreme interim ",
+                            "inputs."
+                        )
                     )
                 }
 

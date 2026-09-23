@@ -1081,7 +1081,12 @@ NULL
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
         "or TrialDesignConditionalDunnett",
         functionName = ".getConditionalPowerSurvivalMultiArm",
-        parameter = "design"
+        parameter = "design",
+        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
+        userInstructions = paste0(
+            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+            "supporting the intended design. Do not change the object class manually."
+        )
     )
 }
 

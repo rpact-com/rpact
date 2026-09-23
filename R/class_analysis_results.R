@@ -2062,7 +2062,15 @@ plot.AnalysisResults <- function(
     data <- .getConfidenceIntervalData(x, treatmentArmsToShow)
     if (nrow(data) == 0) {
         stopIllegalArgument("unable to create plot because no RCIs are available in the specified analysis result",
-            functionName = ".plotAnalysisResultsRCI"
+            functionName = ".plotAnalysisResultsRCI",
+            reason = paste0(
+                "The requested plot needs repeated confidence intervals that are absent from this analysis ",
+                "result."
+            ),
+            userInstructions = paste0(
+                "Check whether the analysis method supports repeated confidence intervals and recreate the ",
+                "analysis with the required output, or choose an available plot type."
+            )
         )
     }
 

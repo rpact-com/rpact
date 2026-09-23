@@ -226,14 +226,27 @@ NULL
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
             functionName = ".getStageResultsMeansEnrichment",
-            parameter = "gMax", value = gMax
+            parameter = "gMax", value = gMax,
+            reason = paste0(
+                "The implemented Spiessens-Debois intersection test is restricted to one subset and the full ",
+                "population."
+            ),
+            userInstructions = paste0(
+                "Use a supported intersection test for the intended number of populations; reduce the ",
+                "population set only if it matches the trial objectives."
+            )
         )
     }
     if (varianceOption == "pooledFromFull") {
         if (gMax > 2) {
             stopIllegalArgument("gMax (", gMax, ") > 2: varianceOption 'pooledFromFull' can only be used for one subset",
                 functionName = ".getStageResultsMeansEnrichment",
-                parameter = "pooledFromFull"
+                parameter = "pooledFromFull",
+                reason = "pooledFromFull is implemented only for the full population and one subset.",
+                userInstructions = paste0(
+                    "Choose a varianceOption supported for the intended number of populations, or use one ",
+                    "subset only if scientifically intended."
+                )
             )
         }
     }
@@ -242,7 +255,15 @@ NULL
         stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ",
             "residual (stratified) variance from full population,\n\t\t\t select 'varianceOption' = \"pooledFromFull\"",
             parameter = "varianceOption", value = varianceOption, constraint = "pooledFromFull",
-            functionName = ".getStageResultsMeansEnrichment"
+            functionName = ".getStageResultsMeansEnrichment",
+            reason = paste0(
+                "The implemented Spiessens-Debois t test needs the pooled residual variance from the full ",
+                "population."
+            ),
+            userInstructions = paste0(
+                "Set varianceOption = \"pooledFromFull\" if this is the intended variance model, or choose a ",
+                "compatible intersection test."
+            )
         )
     }
 
@@ -250,7 +271,12 @@ NULL
         stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ",
             "residual (stratified) variance from full population,\n\t\t\tselect 'stratifiedAnalysis' = TRUE",
             parameter = "stratifiedAnalysis", value = stratifiedAnalysis, constraint = TRUE,
-            functionName = ".getStageResultsMeansEnrichment"
+            functionName = ".getStageResultsMeansEnrichment",
+            reason = "The implemented Spiessens-Debois t test requires stratified analysis.",
+            userInstructions = paste0(
+                "Set stratifiedAnalysis = TRUE with appropriate stratified data, or choose an intersection test ",
+                "compatible with the intended analysis."
+            )
         )
     }
 
@@ -1239,7 +1265,12 @@ NULL
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalPowerMeansEnrichment",
-        parameter = "design"
+        parameter = "design",
+        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
+        userInstructions = paste0(
+            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+            "supporting the intended design. Do not change the object class manually."
+        )
     )
 }
 

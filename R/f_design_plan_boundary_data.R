@@ -797,7 +797,16 @@
                 "is not consistent with the calculated 'directionUpper' (",
                 .arrayToString(directionUpperCalculated), "). ",
                 functionName = ".setDirectionUpper",
-                parameter = "directionUpper"
+                parameter = "directionUpper",
+                reason = paste0(
+                    "The direction specified for the calculation conflicts with the direction of the design or ",
+                    "effect assumptions."
+                ),
+                userInstructions = paste0(
+                    "Check the effect scale and intended alternative, then use a consistent directionUpper in ",
+                    "the design and calculation; recreate the design if its direction was specified ",
+                    "incorrectly."
+                )
             )
         }
     }

@@ -366,7 +366,12 @@ NULL
         if (is.na(argValues[1])) {
             stopIllegalArgument(.pQuote(argName), " is NA at first stage; a valid numeric value must be specified at stage 1",
                 functionName = ".createDataFrame",
-                parameter = argName
+                parameter = argName,
+                reason = "All groups require observed first-stage data before selection can occur.",
+                userInstructions = paste0(
+                    "Supply the actual first-stage observations for this group; use NA only for subsequently ",
+                    "deselected stages according to the dataset conventions."
+                )
             )
         }
 
@@ -418,7 +423,12 @@ NULL
                 functionName = ".createDataFrame",
                 parameter = argName,
                 relatedParameter = "argValues",
-                relatedValue = argValues
+                relatedValue = argValues,
+                reason = "The control group is required at every analyzed stage.",
+                userInstructions = paste0(
+                    "Supply complete control-group observations for all analyzed stages; verify the stage ",
+                    "labels against the source data."
+                )
             )
         }
 
@@ -431,7 +441,12 @@ NULL
                     functionName = ".createDataFrame",
                     parameter = argName,
                     relatedParameter = "stageIndex",
-                    relatedValue = stageIndex
+                    relatedValue = stageIndex,
+                    reason = "Missing stage data may occur only at the end of a data vector.",
+                    userInstructions = paste0(
+                        "Check the observed stages and any deselection decisions. Use trailing NA values for ",
+                        "unobserved stages; do not fill gaps with fabricated observations."
+                    )
                 )
             }
         }
@@ -444,7 +459,12 @@ NULL
                     stopIllegalArgument(.pQuote(argName), " contains alternating values and NA's; ",
                         "NA's must be the last values",
                         functionName = ".createDataFrame",
-                        parameter = argName, value = argValues
+                        parameter = argName, value = argValues,
+                        reason = "Missing stage data may occur only at the end of a data vector.",
+                        userInstructions = paste0(
+                            "Check the observed stages and any deselection decisions. Use trailing NA values for ",
+                            "unobserved stages; do not fill gaps with fabricated observations."
+                        )
                     )
                 }
                 indexBefore <- index
@@ -457,7 +477,15 @@ NULL
                     if (!.arraysAreEqual(naIndicesBefore, naIndices)) {
                         stopConflictingArguments("inconsistent NA definition; ",
                             "if NA's exist, then they are mandatory for each group at the same stage",
-                            functionName = ".createDataFrame"
+                            functionName = ".createDataFrame",
+                            reason = paste0(
+                                "Missing stage data must be represented consistently across groups in this ",
+                                "dataset."
+                            ),
+                            userInstructions = paste0(
+                                "Check which stages were observed and align the NA pattern across all groups; ",
+                                "do not impute observations merely to pass validation."
+                            )
                         )
                     }
                 }
@@ -471,7 +499,16 @@ NULL
                         stopConflictingArguments("values of treatment ", groupNumber, " not correctly specified; ",
                             "if NA's exist, then they are mandatory for each parameter at the same stage",
                             functionName = ".createDataFrame",
-                            parameter = "groupNumber", value = groupNumber
+                            parameter = "groupNumber", value = groupNumber,
+                            reason = paste0(
+                                "Deselection is represented by missing values consistently across all ",
+                                "parameters of the same group and stage."
+                            ),
+                            userInstructions = paste0(
+                                "Check the source data and selection decisions. Mark all parameters of a ",
+                                "deselected group as NA at that stage; keep complete observations for retained ",
+                                "groups."
+                            )
                         )
                     }
                 }
@@ -523,7 +560,15 @@ NULL
                         stopConflictingArguments("inconsistent NA definition for group ", groupNumber, "; ",
                             "if NA's exist, then they are mandatory for each group at the same stage",
                             functionName = ".createDataFrame",
-                            parameter = "groupNumber", value = groupNumber
+                            parameter = "groupNumber", value = groupNumber,
+                            reason = paste0(
+                                "Missing stage data must be represented consistently across groups in this ",
+                                "dataset."
+                            ),
+                            userInstructions = paste0(
+                                "Check which stages were observed and align the NA pattern across all groups; ",
+                                "do not impute observations merely to pass validation."
+                            )
                         )
                     }
                 }
@@ -682,13 +727,23 @@ NULL
         if (length(unknownArgs) == 1) {
             stopIllegalArgument("the argument ", .pQuote(unknownArgs), " is not a valid dataset argument",
                 functionName = ".assertIsValidDatasetArgument",
-                parameter = "unknownArgs", value = unknownArgs
+                parameter = "unknownArgs", value = unknownArgs,
+                reason = "The supplied argument name is not supported by the receiving function.",
+                userInstructions = paste0(
+                    "Check the documented argument names and spelling for this function. Remove the unsupported ",
+                    "argument or move it to the correct function after confirming its intended role."
+                )
             )
         } else {
             stopIllegalArgument("the arguments ", .arrayToString(unknownArgs, encapsulate = TRUE),
                 " are no valid dataset arguments",
                 functionName = ".assertIsValidDatasetArgument",
-                parameter = "unknownArgs", value = unknownArgs
+                parameter = "unknownArgs", value = unknownArgs,
+                reason = "The supplied argument name is not supported by the receiving function.",
+                userInstructions = paste0(
+                    "Check the documented argument names and spelling for this function. Remove the unsupported ",
+                    "argument or move it to the correct function after confirming its intended role."
+                )
             )
         }
     }

@@ -258,14 +258,28 @@ getSimulationRates <- function(
 
     if (design$sided == 2) {
         stopIllegalArgument("only one-sided case is implemented for the simulation design",
-            functionName = "getSimulationRates"
+            functionName = "getSimulationRates",
+            reason = "The selected procedure is implemented only for one-sided testing.",
+            userInstructions = paste0(
+                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
+                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
+                "error."
+            )
         )
     }
 
     if (!normalApproximation && (groups == 2) && (riskRatio || (thetaH0 != 0))) {
         stopIllegalArgument("in the two-sample case, exact test is ",
             "implemented only for testing H0: pi1 - pi2 = 0",
-            functionName = "getSimulationRates"
+            functionName = "getSimulationRates",
+            reason = paste0(
+                "The implemented two-sample exact test requires equality of the rates under the null ",
+                "hypothesis."
+            ),
+            userInstructions = paste0(
+                "Use thetaH0 = 0 only if equality of rates is the intended null. For a different null, choose a ",
+                "supported approximate analysis consistent with the scientific question."
+            )
         )
     }
 
@@ -314,7 +328,12 @@ getSimulationRates <- function(
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
                 functionName = "getSimulationRates",
                 parameter = "maxNumberOfSubjectsPerStage",
-                value = maxNumberOfSubjectsPerStage
+                value = maxNumberOfSubjectsPerStage,
+                reason = "At least one per-stage maximum sample size is below its corresponding minimum.",
+                userInstructions = paste0(
+                    "Check the stage order and units of minNumberOfSubjectsPerStage and ",
+                    "maxNumberOfSubjectsPerStage; make each minimum no greater than its corresponding maximum."
+                )
             )
         }
         .setValueAndParameterType(

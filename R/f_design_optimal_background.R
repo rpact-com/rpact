@@ -287,7 +287,12 @@ NULL
             constraint = "effective lower conditional error bound must not exceed the upper bound or conditional power",
             relatedParameter = c("maximumConditionalError", "minimumSecondStageInformation", "conditionalPower", "firstStagePValue"),
             relatedValue = list(maximumConditionalError = design$maximumConditionalError, minimumSecondStageInformation = design$minimumSecondStageInformation, conditionalPower = conditionalPower, firstStagePValue = firstStagePValue),
-            functionName = ".getOptimalConditionalErrorConstraints"
+            functionName = ".getOptimalConditionalErrorConstraints",
+            reason = "The combined conditional-error and second-stage-information bounds leave no feasible solution.",
+            userInstructions = paste0(
+                "Review the lower and upper constraints jointly at the reported first-stage p-value. Relax ",
+                "conflicting bounds only when consistent with the intended adaptation requirements."
+            )
         )
     }
 
@@ -336,7 +341,16 @@ NULL
                 constraint = "alpha1 + conditionalPower * (alpha0 - alpha1) > alpha",
                 relatedParameter = c("alpha", "alpha1", "alpha0"),
                 relatedValue = c(alpha = design$alpha, alpha1 = design$alpha1, alpha0 = design$alpha0),
-                functionName = ".getLevelConstant"
+                functionName = ".getLevelConstant",
+                reason = paste0(
+                    "The conditional power specification does not permit a level constant exhausting the ",
+                    "requested alpha over the continuation region."
+                ),
+                userInstructions = paste0(
+                    "Review conditionalPower or conditionalPowerFunction together with alpha1 and alpha0. ",
+                    "Choose a feasible continuation region and power specification without changing the target ",
+                    "alpha merely to bypass the error."
+                )
             )
         }
     } else if (is.function(design$conditionalPowerFunction)) {
@@ -352,7 +366,16 @@ NULL
                 constraint = "integral of conditionalPowerFunction over (alpha1, alpha0) > alpha - alpha1",
                 relatedParameter = c("alpha", "alpha1", "alpha0"),
                 relatedValue = c(alpha = design$alpha, alpha1 = design$alpha1, alpha0 = design$alpha0),
-                functionName = ".getLevelConstant"
+                functionName = ".getLevelConstant",
+                reason = paste0(
+                    "The conditional power specification does not permit a level constant exhausting the ",
+                    "requested alpha over the continuation region."
+                ),
+                userInstructions = paste0(
+                    "Review conditionalPower or conditionalPowerFunction together with alpha1 and alpha0. ",
+                    "Choose a feasible continuation region and power specification without changing the target ",
+                    "alpha merely to bypass the error."
+                )
             )
         }
     } else {
@@ -393,7 +416,12 @@ NULL
                 constraint = "integrated upper bound + alpha1 >= alpha",
                 relatedParameter = c("alpha", "alpha1", "alpha0"),
                 relatedValue = c(alpha = design$alpha, alpha1 = design$alpha1, alpha0 = design$alpha0),
-                functionName = ".getLevelConstant"
+                functionName = ".getLevelConstant",
+                reason = "The integrated upper conditional-error bound is too low to attain the target alpha.",
+                userInstructions = paste0(
+                    "Consider increasing maximumConditionalError or reducing minimumSecondStageInformation if ",
+                    "allowed by the adaptation plan; otherwise revise the infeasible constraints."
+                )
             )
         }
         if (integrateBound(FALSE) > design$alpha + 1e-10) {
@@ -404,7 +432,12 @@ NULL
                 constraint = "integrated lower bound + alpha1 <= alpha",
                 relatedParameter = c("alpha", "alpha1", "alpha0"),
                 relatedValue = c(alpha = design$alpha, alpha1 = design$alpha1, alpha0 = design$alpha0),
-                functionName = ".getLevelConstant"
+                functionName = ".getLevelConstant",
+                reason = "The integrated lower conditional-error bound already exceeds the target alpha.",
+                userInstructions = paste0(
+                    "Consider decreasing minimumConditionalError or increasing maximumSecondStageInformation if ",
+                    "allowed by the adaptation plan; otherwise revise the infeasible constraints."
+                )
             )
         }
     }
@@ -432,7 +465,13 @@ NULL
                     constraint = "search interval must bracket a root of the level equation",
                     relatedParameter = "alpha",
                     relatedValue = design$alpha,
-                    functionName = ".getLevelConstant"
+                    functionName = ".getLevelConstant",
+                    reason = "The level-constant root search failed within the specified interval and constraints.",
+                    userInstructions = paste0(
+                        "Check constraint feasibility first, then adjust levelConstantMinimum and ",
+                        "levelConstantMaximum if the root lies outside the search interval; report persistent ",
+                        "failures with a reproducible example."
+                    )
                 )
             }
         }
@@ -486,7 +525,12 @@ NULL
                 constraint = "required for the selected likelihood ratio distribution",
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = design$likelihoodRatioDistribution,
-                functionName = ".getLikelihoodRatio"
+                functionName = ".getLikelihoodRatio",
+                reason = "The fixed likelihood-ratio specification requires its effect value or support points.",
+                userInstructions = paste0(
+                    "Supply deltaLR for the intended fixed-effect specification; if another prior was intended, ",
+                    "correct likelihoodRatioDistribution instead."
+                )
             )
         }
 
@@ -509,7 +553,12 @@ NULL
                 constraint = "finite nonnegative weights, one per deltaLR entry, summing to one",
                 relatedParameter = "deltaLR",
                 relatedValue = design$deltaLR,
-                functionName = ".getLikelihoodRatio"
+                functionName = ".getLikelihoodRatio",
+                reason = "The fixed likelihood-ratio mixture needs valid probability weights for its support points.",
+                userInstructions = paste0(
+                    "Specify one finite nonnegative weightsDeltaLR value per deltaLR value, summing to 1; ",
+                    "choose weights that represent the intended mixture."
+                )
             )
         }
 
@@ -539,7 +588,12 @@ NULL
                 constraint = "required for the selected likelihood ratio distribution",
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = design$likelihoodRatioDistribution,
-                functionName = ".getLikelihoodRatio"
+                functionName = ".getLikelihoodRatio",
+                reason = "The normal likelihood-ratio prior requires both its location and scale.",
+                userInstructions = paste0(
+                    "Specify deltaLR and tauLR for the intended normal prior, or select the intended ",
+                    "likelihoodRatioDistribution."
+                )
             )
         }
 
@@ -570,7 +624,12 @@ NULL
                 constraint = "required for the selected likelihood ratio distribution",
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = design$likelihoodRatioDistribution,
-                functionName = ".getLikelihoodRatio"
+                functionName = ".getLikelihoodRatio",
+                reason = "The exponential likelihood-ratio prior requires its kappaLR parameter.",
+                userInstructions = paste0(
+                    "Supply a valid kappaLR for the intended exponential prior, or select the intended ",
+                    "likelihoodRatioDistribution."
+                )
             )
         }
 
@@ -600,7 +659,12 @@ NULL
                 constraint = "required for the selected likelihood ratio distribution",
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = design$likelihoodRatioDistribution,
-                functionName = ".getLikelihoodRatio"
+                functionName = ".getLikelihoodRatio",
+                reason = "The uniform likelihood-ratio prior requires its upper effect bound.",
+                userInstructions = paste0(
+                    "Supply deltaMaxLR for the intended uniform prior, or select the intended ",
+                    "likelihoodRatioDistribution."
+                )
             )
         }
 
@@ -1146,7 +1210,12 @@ NULL
                 constraint = "required for the selected likelihood ratio distribution",
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = likelihoodRatioDistribution,
-                functionName = ".integrateExpectedInformation"
+                functionName = ".integrateExpectedInformation",
+                reason = "The fixed likelihood-ratio specification requires its effect value or support points.",
+                userInstructions = paste0(
+                    "Supply deltaLR for the intended fixed-effect specification; if another prior was intended, ",
+                    "correct likelihoodRatioDistribution instead."
+                )
             )
         }
         .assertIsNumericVector(x = deltaLR, argumentName = "deltaLR")
@@ -1181,7 +1250,12 @@ NULL
                 constraint = "required for the selected likelihood ratio distribution",
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = likelihoodRatioDistribution,
-                functionName = ".integrateExpectedInformation"
+                functionName = ".integrateExpectedInformation",
+                reason = "The normal likelihood-ratio prior requires both its location and scale.",
+                userInstructions = paste0(
+                    "Specify deltaLR and tauLR for the intended normal prior, or select the intended ",
+                    "likelihoodRatioDistribution."
+                )
             )
         }
         .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
@@ -1215,7 +1289,12 @@ NULL
                 constraint = "required for the selected likelihood ratio distribution",
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = likelihoodRatioDistribution,
-                functionName = ".integrateExpectedInformation"
+                functionName = ".integrateExpectedInformation",
+                reason = "The exponential likelihood-ratio prior requires its kappaLR parameter.",
+                userInstructions = paste0(
+                    "Supply a valid kappaLR for the intended exponential prior, or select the intended ",
+                    "likelihoodRatioDistribution."
+                )
             )
         }
         .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
@@ -1246,7 +1325,12 @@ NULL
                 constraint = "required for the selected likelihood ratio distribution",
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = likelihoodRatioDistribution,
-                functionName = ".integrateExpectedInformation"
+                functionName = ".integrateExpectedInformation",
+                reason = "The uniform likelihood-ratio prior requires its upper effect bound.",
+                userInstructions = paste0(
+                    "Supply deltaMaxLR for the intended uniform prior, or select the intended ",
+                    "likelihoodRatioDistribution."
+                )
             )
         }
 

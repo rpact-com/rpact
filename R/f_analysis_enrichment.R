@@ -270,7 +270,12 @@ NULL
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalRejectionProbabilitiesEnrichment",
-        parameter = "design"
+        parameter = "design",
+        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
+        userInstructions = paste0(
+            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+            "supporting the intended design. Do not change the object class manually."
+        )
     )
 }
 
@@ -442,7 +447,12 @@ NULL
     }
     if (stage < 1 || kMax == 1) {
         stopIllegalArgument("cannot plot conditional power of a fixed design",
-            functionName = ".getConditionalPowerPlotEnrichment"
+            functionName = ".getConditionalPowerPlotEnrichment",
+            reason = "A fixed design has no interim stage or early stopping decision to display.",
+            userInstructions = paste0(
+                "Choose a plot supported for the fixed design. Use a multi-stage design only if interim ",
+                "analyses are part of the intended trial."
+            )
         )
     }
     if (stage >= kMax) {

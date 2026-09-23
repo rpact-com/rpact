@@ -24,7 +24,12 @@ NULL
                 length(simulationResults$alternative) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
-                parameter = "alternative"
+                parameter = "alternative",
+                reason = "The requested plot compares multiple effect scenarios but only one is available.",
+                userInstructions = paste0(
+                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
+                    "type available for a single scenario."
+                )
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsRates")) {
@@ -33,7 +38,12 @@ NULL
                 length(simulationResults$pi1) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
-                parameter = "pi1"
+                parameter = "pi1",
+                reason = "The requested plot compares multiple effect scenarios but only one is available.",
+                userInstructions = paste0(
+                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
+                    "type available for a single scenario."
+                )
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsSurvival")) {
@@ -42,7 +52,12 @@ NULL
                 length(simulationResults$hazardRatio) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined or derived",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
-                parameter = "hazardRatio"
+                parameter = "hazardRatio",
+                reason = "The requested plot compares multiple effect scenarios but only one is available.",
+                userInstructions = paste0(
+                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
+                    "type available for a single scenario."
+                )
             )
         }
         if (length(simulationResults$hazardRatio) != length(simulationResults$overallReject)) {
@@ -792,7 +807,12 @@ NULL
             stopIllegalArgument("plot type 8 (Early Stopping) ",
                 "is not available for 'kMax' = 1",
                 functionName = ".plotSimulationResults",
-                parameter = "kMax"
+                parameter = "kMax",
+                reason = "A fixed design has no interim stage or early stopping decision to display.",
+                userInstructions = paste0(
+                    "Choose a plot supported for the fixed design. Use a multi-stage design only if interim ",
+                    "analyses are part of the intended trial."
+                )
             )
         }
 

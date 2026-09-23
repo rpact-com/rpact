@@ -926,7 +926,12 @@ setOutputFormat <- function(
             stopIllegalArgument("'file' (", file, ") does not exist",
                 functionName = "setOutputFormat",
                 parameter = "file",
-                value = file
+                value = file,
+                reason = "The input file cannot be found at the supplied path.",
+                userInstructions = paste0(
+                    "Resolve the path relative to the current working directory or supply an existing absolute ",
+                    "file path; verify that the file is accessible before retrying."
+                )
             )
         }
 

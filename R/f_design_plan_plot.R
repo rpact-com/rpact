@@ -133,7 +133,12 @@
                 length(designPlan$alternative) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForPlotting",
-                parameter = "alternative"
+                parameter = "alternative",
+                reason = "The requested plot compares multiple effect scenarios but only one is available.",
+                userInstructions = paste0(
+                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
+                    "type available for a single scenario."
+                )
             )
         }
     } else if (.isTrialDesignPlanRates(designPlan)) {
@@ -141,7 +146,12 @@
                 length(designPlan$pi1) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForPlotting",
-                parameter = "pi1"
+                parameter = "pi1",
+                reason = "The requested plot compares multiple effect scenarios but only one is available.",
+                userInstructions = paste0(
+                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
+                    "type available for a single scenario."
+                )
             )
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
@@ -149,7 +159,12 @@
                 length(designPlan$hazardRatio) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForPlotting",
-                parameter = "hazardRatio"
+                parameter = "hazardRatio",
+                reason = "The requested plot compares multiple effect scenarios but only one is available.",
+                userInstructions = paste0(
+                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
+                    "type available for a single scenario."
+                )
             )
         }
     }

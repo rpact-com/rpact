@@ -155,7 +155,12 @@ NULL
                 value = selectedPopulations, constraint = paste0("logical vector of length ", gMax),
                 relatedParameter = "gMax",
                 relatedValue = gMax,
-                functionName = ".selectPopulations"
+                functionName = ".selectPopulations",
+                reason = "The population-selection callback must return one logical decision per population.",
+                userInstructions = paste0(
+                    "Correct selectPopulationsFunction to return a logical vector of length gMax in the ",
+                    "documented population order for every possible interim input."
+                )
             )
         }
         if (!is.logical(selectedPopulations)) {
@@ -164,7 +169,12 @@ NULL
                 parameter = "selectPopulationsFunction", value = selectedPopulations, constraint = "logical vector",
                 relatedParameter = "class of selected populations",
                 relatedValue = .getClassName(selectedPopulations),
-                functionName = ".selectPopulations"
+                functionName = ".selectPopulations",
+                reason = "The population-selection callback must return one logical decision per population.",
+                userInstructions = paste0(
+                    "Correct selectPopulationsFunction to return a logical vector of length gMax in the ",
+                    "documented population order for every possible interim input."
+                )
             )
         }
     }
@@ -181,7 +191,13 @@ NULL
         successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stopIllegalArgument("Group sequential design cannot be used for enrichment designs with population selection",
-            functionName = ".performClosedCombinationTestForSimulationEnrichment"
+            functionName = ".performClosedCombinationTestForSimulationEnrichment",
+            reason = "This group-sequential design does not support the requested adaptive selection.",
+            userInstructions = paste0(
+                "Choose a design supporting the intended population or treatment-arm selection, such as an ",
+                "appropriate combination-test design; retain the original design only if selection is not ",
+                "intended."
+            )
         )
     }
 
@@ -502,7 +518,15 @@ NULL
         stopIllegalArgument(
             "Spiessen & Debois intersection test cannot generally ",
             "be used for enrichment designs with more than two populations",
-            functionName = ".createSimulationResultsEnrichmentObject"
+            functionName = ".createSimulationResultsEnrichmentObject",
+            reason = paste0(
+                "The implemented Spiessens-Debois intersection test is restricted to one subset and the full ",
+                "population."
+            ),
+            userInstructions = paste0(
+                "Use a supported intersection test for the intended number of populations; reduce the ",
+                "population set only if it matches the trial objectives."
+            )
         )
     }
 
@@ -557,7 +581,12 @@ NULL
 
     if (!stratifiedAnalysis && endpoint %in% c("means")) {
         stopIllegalArgument("For testing means, only stratified analysis is supported",
-            functionName = ".createSimulationResultsEnrichmentObject"
+            functionName = ".createSimulationResultsEnrichmentObject",
+            reason = "This enrichment procedure supports only stratified analysis.",
+            userInstructions = paste0(
+                "Use stratifiedAnalysis = TRUE and the corresponding stratified data or assumptions; otherwise ",
+                "choose a procedure supporting the intended analysis."
+            )
         )
     }
 
@@ -692,7 +721,13 @@ NULL
                     ") must be not smaller than minNumberOfSubjectsPerStage' (",
                     .arrayToString(minNumberOfSubjectsPerStage), ")",
                     functionName = ".createSimulationResultsEnrichmentObject",
-                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage
+                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage,
+                    reason = "At least one per-stage maximum sample size is below its corresponding minimum.",
+                    userInstructions = paste0(
+                        "Check the stage order and units of minNumberOfSubjectsPerStage and ",
+                        "maxNumberOfSubjectsPerStage; make each minimum no greater than its corresponding ",
+                        "maximum."
+                    )
                 )
             }
             .setValueAndParameterType(
@@ -752,7 +787,12 @@ NULL
                     functionName = ".createSimulationResultsEnrichmentObject",
                     parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage,
                     relatedParameter = "minNumberOfEventsPerStage",
-                    relatedValue = minNumberOfEventsPerStage
+                    relatedValue = minNumberOfEventsPerStage,
+                    reason = "At least one per-stage maximum event count is below its corresponding minimum.",
+                    userInstructions = paste0(
+                        "Check the stage order of minNumberOfEventsPerStage and maxNumberOfEventsPerStage; make ",
+                        "each minimum no greater than its corresponding maximum."
+                    )
                 )
             }
             .setValueAndParameterType(
@@ -996,7 +1036,12 @@ NULL
         stopIllegalArgument(
             "'adaptations' must have length ", (kMax - 1), " (kMax - 1)",
             functionName = ".createSimulationResultsEnrichmentObject",
-            parameter = "adaptations", value = adaptations
+            parameter = "adaptations", value = adaptations,
+            reason = "This vector describes interim stages only; the final analysis is excluded.",
+            userInstructions = paste0(
+                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
+                "entry intended solely for the final analysis."
+            )
         )
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))

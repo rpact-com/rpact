@@ -382,7 +382,12 @@ NULL
 
     if (intersectionTest == "Dunnett" && !normalApproximation) {
         stopIllegalArgument("Dunnett test cannot be used with Fisher's exact test (normalApproximation = FALSE)",
-            functionName = ".getStageResultsRatesMultiArm"
+            functionName = ".getStageResultsRatesMultiArm",
+            reason = "This intersection test is not implemented with Fisher's exact test.",
+            userInstructions = paste0(
+                "Use normalApproximation = TRUE if the approximate method is appropriate, or choose an ",
+                "intersection test compatible with exact testing."
+            )
         )
     }
 
@@ -462,7 +467,16 @@ NULL
                 if (thetaH0 != 0) {
                     stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
                         functionName = ".getStageResultsRatesMultiArm",
-                        parameter = "thetaH0", value = thetaH0
+                        parameter = "thetaH0", value = thetaH0,
+                        reason = paste0(
+                            "The implemented two-sample exact test requires equality of the rates under the ",
+                            "null hypothesis."
+                        ),
+                        userInstructions = paste0(
+                            "Use thetaH0 = 0 only if equality of rates is the intended null. For a different ",
+                            "null, choose a supported approximate analysis consistent with the scientific ",
+                            "question."
+                        )
                     )
                 }
 
@@ -527,7 +541,16 @@ NULL
                 if (thetaH0 != 0) {
                     stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
                         functionName = ".getStageResultsRatesMultiArm",
-                        parameter = "thetaH0", value = thetaH0
+                        parameter = "thetaH0", value = thetaH0,
+                        reason = paste0(
+                            "The implemented two-sample exact test requires equality of the rates under the ",
+                            "null hypothesis."
+                        ),
+                        userInstructions = paste0(
+                            "Use thetaH0 = 0 only if equality of rates is the intended null. For a different ",
+                            "null, choose a supported approximate analysis consistent with the scientific ",
+                            "question."
+                        )
                     )
                 }
 
@@ -1210,7 +1233,12 @@ NULL
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
         "or TrialDesignConditionalDunnett",
         functionName = ".getConditionalPowerRatesMultiArm",
-        parameter = "design"
+        parameter = "design",
+        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
+        userInstructions = paste0(
+            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+            "supporting the intended design. Do not change the object class manually."
+        )
     )
 }
 

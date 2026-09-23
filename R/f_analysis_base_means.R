@@ -132,7 +132,12 @@ NULL
                     parameter = "assumedStDev",
                     value = assumedStDev,
                     relatedParameter = "stDevH1",
-                    relatedValue = stDevH1
+                    relatedValue = stDevH1,
+                    reason = "This calculation needs a standard-deviation assumption for the alternative.",
+                    userInstructions = paste0(
+                        "Specify assumedStDev or stDevH1 using the planned variability assumption; do not ",
+                        "substitute an arbitrary value."
+                    )
                 )
             }
         }

@@ -155,7 +155,12 @@ writeKeyValueFile <- function(
     if (file.exists(filePath) && !overwrite) {
         stopIllegalArgument("file exists and overwrite = FALSE: ", sQuote(filePath),
             functionName = "writeKeyValueFile",
-            parameter = filePath
+            parameter = filePath,
+            reason = "The destination file exists and overwriting was explicitly disabled.",
+            userInstructions = paste0(
+                "Choose a new file path, or set overwrite = TRUE only after confirming that replacing the ",
+                "existing file is intended."
+            )
         )
     }
 
@@ -332,7 +337,12 @@ readKeyValueFile <- function(
     if (!file.exists(filePath)) {
         stopIllegalArgument("file not found: ", sQuote(filePath),
             functionName = "readKeyValueFile",
-            parameter = filePath
+            parameter = filePath,
+            reason = "The input file cannot be found at the supplied path.",
+            userInstructions = paste0(
+                "Resolve the path relative to the current working directory or supply an existing absolute file ",
+                "path; verify that the file is accessible before retrying."
+            )
         )
     }
 

@@ -235,7 +235,13 @@ getDesignFisher <- function(
 
     if (sided != 1) {
         stopIllegalArgument("Fisher's combination test only available for one-sided testing",
-            functionName = ".getDesignFisher"
+            functionName = ".getDesignFisher",
+            reason = "The selected procedure is implemented only for one-sided testing.",
+            userInstructions = paste0(
+                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
+                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
+                "error."
+            )
         )
     }
 
@@ -356,7 +362,12 @@ getDesignFisher <- function(
             design$kMax, ")",
             functionName = ".getDesignFisher",
             parameter = "C_FISHER_METHOD_NO_INTERACTION",
-            value = C_FISHER_METHOD_NO_INTERACTION
+            value = C_FISHER_METHOD_NO_INTERACTION,
+            reason = "The no-interaction Fisher method requires more than two stages.",
+            userInstructions = paste0(
+                "Choose a Fisher method supported for the intended kMax; increase the number of stages only if ",
+                "additional analyses are part of the trial plan."
+            )
         )
     }
 
@@ -382,7 +393,12 @@ getDesignFisher <- function(
             functionName = ".getDesignFisher",
             parameter = "method",
             relatedParameter = "alpha0Vec",
-            relatedValue = alpha0Vec, value = method
+            relatedValue = alpha0Vec, value = method,
+            reason = "The no-interaction method requires binding futility with nontrivial alpha0Vec thresholds.",
+            userInstructions = paste0(
+                "Specify bindingFutility = TRUE and the intended nontrivial alpha0Vec thresholds, or choose ",
+                "another Fisher method if binding futility is not planned."
+            )
         )
     }
 

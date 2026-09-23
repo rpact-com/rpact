@@ -335,7 +335,12 @@ getSimulationCounts <- function(
                         "followUpTime"
                     ),
                     relatedValue = list(accrualTime = accrualTime, followUpTime = followUpTime),
-                    functionName = "getSimulationCounts"
+                    functionName = "getSimulationCounts",
+                    reason = "The final planned analysis time must coincide with the end of accrual plus follow-up.",
+                    userInstructions = paste0(
+                        "Align the last plannedCalendarTime with max(accrualTime) + followUpTime, using ",
+                        "consistent time units and the intended final analysis schedule."
+                    )
                 )
             }
         }

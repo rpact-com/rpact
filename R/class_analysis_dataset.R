@@ -183,7 +183,12 @@ readDataset <- function(
         stopIllegalArgument("the file ", .vQuote(file), " does not exist",
             functionName = "readDataset",
             parameter = "file",
-            value = file
+            value = file,
+            reason = "The input file cannot be found at the supplied path.",
+            userInstructions = paste0(
+                "Resolve the path relative to the current working directory or supply an existing absolute file ",
+                "path; verify that the file is accessible before retrying."
+            )
         )
     }
 
@@ -336,7 +341,12 @@ readDatasets <- function(
         stopIllegalArgument("the file ", .vQuote(file), " does not exist",
             functionName = "readDatasets",
             parameter = "file",
-            value = file
+            value = file,
+            reason = "The input file cannot be found at the supplied path.",
+            userInstructions = paste0(
+                "Resolve the path relative to the current working directory or supply an existing absolute file ",
+                "path; verify that the file is accessible before retrying."
+            )
         )
     }
 
@@ -348,7 +358,12 @@ readDatasets <- function(
     if (is.null(data[["datasetId"]])) {
         stopIllegalArgument("data file must contain the column 'datasetId'",
             functionName = "readDatasets",
-            parameter = "datasetId"
+            parameter = "datasetId",
+            reason = "readDatasets() uses datasetId to separate datasets in a shared data file.",
+            userInstructions = paste0(
+                "Include a datasetId column identifying each dataset, or use readDataset() if the file contains ",
+                "only one dataset."
+            )
         )
     }
 
@@ -628,7 +643,12 @@ writeDatasets <- function(
     }
 
     stopIllegalArgument("failed to identify dataset type",
-        functionName = ".getDataset"
+        functionName = ".getDataset",
+        reason = "The supplied columns do not identify a supported endpoint-specific dataset.",
+        userInstructions = paste0(
+            "Check the argument names against getDataset() for the intended endpoint and supply the required ",
+            "stage-wise data together; do not invent missing observations."
+        )
     )
 }
 
@@ -891,7 +911,12 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         levelsList <- methods::slot(emmeansResultPerStage, "levels")
         if (!is.null(levelsList) && length(levelsList) > 1) {
             stopIllegalArgument("models with covariates are not yet supported by getDataset()",
-                functionName = ".getDatasetMeansFromModelsByStage"
+                functionName = ".getDatasetMeansFromModelsByStage",
+                reason = "This getDataset() conversion does not support models with covariates.",
+                userInstructions = paste0(
+                    "Use a supported analysis workflow for the fitted model; do not remove scientifically ",
+                    "required covariates merely to make this conversion succeed."
+                )
             )
         }
     }
@@ -1251,7 +1276,15 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                     paste0("inconsistent deselection in group %s at stage %s (", "%s: all or none must be NA)"),
                     dataFrame$group[i], dataFrame$stage[i], .arrayToString(paramNames, maxCharacters = 40)
                 ),
-                functionName = ".validateEnrichmentDataFrameDeselection"
+                functionName = ".validateEnrichmentDataFrameDeselection",
+                reason = paste0(
+                    "Deselection is represented by missing values consistently across all parameters of the ",
+                    "same group and stage."
+                ),
+                userInstructions = paste0(
+                    "Check the source data and selection decisions. Mark all parameters of a deselected group ",
+                    "as NA at that stage; keep complete observations for retained groups."
+                )
             )
         }
     }
@@ -1268,7 +1301,12 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                         "%s was deselected at stage %s ", "and therefore must be also deselected in the following stages, ",
                         "but is no longer deselected in stage %s"
                     ), s, deselectedStage, stage),
-                    functionName = ".validateEnrichmentDataFrameDeselection"
+                    functionName = ".validateEnrichmentDataFrameDeselection",
+                    reason = "A deselected group cannot re-enter the analysis at a later stage.",
+                    userInstructions = paste0(
+                        "Check the recorded deselection stage and represent subsequent stages consistently with ",
+                        "trailing NA values; do not fill missing observations with fabricated data."
+                    )
                 )
             }
 
@@ -1328,7 +1366,15 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                                 .arrayToString(sampleSizeFull), s, .arrayToString(sampleSizeSubset), group, stage
                             ),
                             functionName = ".validateEnrichmentDataFrameMeans",
-                            parameter = "sampleSize"
+                            parameter = "sampleSize",
+                            reason = paste0(
+                                "A subset cannot contain more subjects than the full population at the same ",
+                                "stage and in the same group."
+                            ),
+                            userInstructions = paste0(
+                                "Verify the full-population and subset sample sizes against the source data, ",
+                                "including whether values are stage-wise or cumulative."
+                            )
                         )
                     }
                 }
@@ -1368,7 +1414,12 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                                 .arrayToString(eventFull), s, .arrayToString(eventSubset), group, stage
                             ),
                             functionName = ".validateEnrichmentDataFrameSurvival",
-                            parameter = "event"
+                            parameter = "event",
+                            reason = "Events in a subset are included in the full-population event count.",
+                            userInstructions = paste0(
+                                "Verify subgroup membership and stage-wise versus cumulative event counts ",
+                                "against the source data; correct the inconsistent counts."
+                            )
                         )
                     }
                 }
@@ -1410,7 +1461,15 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                                 .arrayToString(sampleSizeFull), s, .arrayToString(sampleSizeSubset), group, stage
                             ),
                             functionName = ".validateEnrichmentDataFrameRates",
-                            parameter = "sampleSize"
+                            parameter = "sampleSize",
+                            reason = paste0(
+                                "A subset cannot contain more subjects than the full population at the same ",
+                                "stage and in the same group."
+                            ),
+                            userInstructions = paste0(
+                                "Verify the full-population and subset sample sizes against the source data, ",
+                                "including whether values are stage-wise or cumulative."
+                            )
                         )
                     }
                 }
@@ -1433,7 +1492,12 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                     "subset %s has incomplete stages (%s)",
                     s, .arrayToString(subsetStages)
                 ),
-                functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages"
+                functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages",
+                reason = "Enrichment analysis requires the same stage structure across all subsets.",
+                userInstructions = paste0(
+                    "Align subset datasets to the same stages and use the documented NA convention for ",
+                    "deselected subsets."
+                )
             )
         }
 
@@ -1445,7 +1509,12 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         stopConflictingArguments(
             "all subsets must have the identical number of ",
             "stages defined (kMax: ", .listToString(kMaxList), ")",
-            functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages"
+            functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages",
+            reason = "Enrichment analysis requires the same stage structure across all subsets.",
+            userInstructions = paste0(
+                "Align subset datasets to the same stages and use the documented NA convention for deselected ",
+                "subsets."
+            )
         )
     }
 }
@@ -1495,7 +1564,15 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                                         group, stage
                                     ),
                                     functionName = ".validateEnrichmentDataFrame",
-                                    parameter = paramName
+                                    parameter = paramName,
+                                    reason = paste0(
+                                        "The remaining population cannot stay selected when the associated ",
+                                        "subset is deselected in this representation."
+                                    ),
+                                    userInstructions = paste0(
+                                        "Check the intended enrichment selection and mark the remaining ",
+                                        "population R consistently with the deselected subset."
+                                    )
                                 )
                             }
                         }
@@ -4311,7 +4388,15 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
             if (any(stats::na.omit(result) <= 0)) {
                 stopIllegalArgument("overall allocation ratios not correctly specified: ",
                     "one or more calculated stage-wise allocation ratios <= 0",
-                    functionName = ".getStageWiseAllocationRatios"
+                    functionName = ".getStageWiseAllocationRatios",
+                    reason = paste0(
+                        "Differencing the cumulative sample-size and allocation inputs produced a non-positive ",
+                        "stage-wise allocation ratio."
+                    ),
+                    userInstructions = paste0(
+                        "Check cumulative sample sizes and allocation ratios jointly; reconstruct them from ",
+                        "valid positive stage-wise group sizes."
+                    )
                 )
             }
             return(result)

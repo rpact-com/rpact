@@ -307,7 +307,12 @@ getExpectedSecondStageInformation <- function(design, likelihoodRatioDistributio
             parameter = "likelihoodRatioDistribution",
             value = distribution,
             constraint = "a probability distribution: fixed, normal, exp or unif",
-            functionName = "getExpectedSecondStageInformation"
+            functionName = "getExpectedSecondStageInformation",
+            reason = "Expected information requires a probability distribution; maxlr does not supply one.",
+            userInstructions = paste0(
+                "Choose fixed, normal, exp or unif with its required parameters if that distribution matches ",
+                "the intended effect assumptions."
+            )
         )
     }
     # Integrate over a helper function from alpha1 to alpha0

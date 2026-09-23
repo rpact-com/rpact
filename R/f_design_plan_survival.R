@@ -50,7 +50,15 @@ NULL
         if (kappa != 1 && phi > 0) {
             stopIllegalArgument("Weibull distribution cannot ",
                 "be used together with specified dropout rate (use simulation instead)",
-                functionName = ".getEventProbabilityFunction"
+                functionName = ".getEventProbabilityFunction",
+                reason = paste0(
+                    "This analytical event-probability calculation does not combine a non-unit Weibull shape ",
+                    "with dropout."
+                ),
+                userInstructions = paste0(
+                    "Use survival simulation for the intended Weibull model with dropout. Set kappa = 1 or ",
+                    "remove dropout only if those assumptions are scientifically justified."
+                )
             )
         }
 
@@ -75,7 +83,15 @@ NULL
 
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise survival definition",
-            functionName = ".getEventProbabilityFunction"
+            functionName = ".getEventProbabilityFunction",
+            reason = paste0(
+                "Piecewise exponential survival and a non-unit Weibull shape are incompatible in this ",
+                "calculation."
+            ),
+            userInstructions = paste0(
+                "Use kappa = 1 for a piecewise exponential model, or remove the piecewise specification for a ",
+                "Weibull model. Choose according to the intended survival assumptions."
+            )
         )
     }
     len <- length(piecewiseSurvivalTime)
@@ -640,7 +656,13 @@ NULL
 
         if (design$sided == 2 && thetaH0 != 1) {
             stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
-                functionName = ".createDesignPlanSurvival"
+                functionName = ".createDesignPlanSurvival",
+                reason = "The implemented two-sided sample-size calculation supports superiority testing only.",
+                userInstructions = paste0(
+                    "Check the null on the selected effect scale. Use the superiority null only if ",
+                    "scientifically intended; for non-inferiority or another null, select a supported procedure ",
+                    "consistent with the hypothesis."
+                )
             )
         }
 
@@ -662,7 +684,12 @@ NULL
 
         if (typeOfComputation != "Schoenfeld" && thetaH0 != 1) {
             stopIllegalArgument("Freedman test calculation is possible only for superiority testing (thetaH0 != 1)",
-                functionName = ".createDesignPlanSurvival"
+                functionName = ".createDesignPlanSurvival",
+                reason = "The Freedman-based calculations support only the superiority null thetaH0 = 1.",
+                userInstructions = paste0(
+                    "Use typeOfComputation = \"Schoenfeld\" for a supported non-superiority null, or set thetaH0 ",
+                    "= 1 only if superiority is the intended hypothesis."
+                )
             )
         }
     }
@@ -960,7 +987,12 @@ NULL
                 stopIllegalArgument("'accountForObservationTimes' must be TRUE because 'maxNumberOfSubjects' is > 0",
                     functionName = ".initDesignPlanSurvival",
                     parameter = "accountForObservationTimes",
-                    relatedParameter = "maxNumberOfSubjects"
+                    relatedParameter = "maxNumberOfSubjects",
+                    reason = "A fixed maximum subject count requires accounting for observation times.",
+                    userInstructions = paste0(
+                        "Set accountForObservationTimes = TRUE when maxNumberOfSubjects is specified, or remove ",
+                        "the subject cap only if it was not intended."
+                    )
                 )
             }
 
@@ -1034,7 +1066,12 @@ NULL
             functionName = ".getSampleSizeFixedSurvival",
             parameter = "allocationRatioPlanned",
             relatedParameter = "maxNumberOfSubjects",
-            relatedValue = designPlan$maxNumberOfSubjects
+            relatedValue = designPlan$maxNumberOfSubjects,
+            reason = "Allocation optimization is unavailable when the subject total is fixed in this calculation.",
+            userInstructions = paste0(
+                "Specify a positive allocationRatioPlanned consistent with the recruitment plan, or remove the ",
+                "fixed subject-total constraint only if it was not intended."
+            )
         )
     }
 
@@ -1135,7 +1172,16 @@ NULL
                             maxNumberOfSubjects, designPlan$eventsFixed[i], i, hazardRatio[i]
                         ),
                         functionName = ".getSampleSizeFixedSurvival",
-                        parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects
+                        parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects,
+                        reason = paste0(
+                            "The required event total exceeds the number of subjects available to experience an ",
+                            "event."
+                        ),
+                        userInstructions = paste0(
+                            "Increase maxNumberOfSubjects to a feasible planned total or revisit the planning ",
+                            "assumptions. Account for censoring and dropout; do not lower observed event ",
+                            "counts."
+                        )
                     )
                 } else {
                     stopIllegalArgument(
@@ -1148,7 +1194,16 @@ NULL
                         ),
                         functionName = ".getSampleSizeFixedSurvival",
                         parameter = "maxNumberOfSubjects",
-                        value = maxNumberOfSubjects
+                        value = maxNumberOfSubjects,
+                        reason = paste0(
+                            "The required event total exceeds the number of subjects available to experience an ",
+                            "event."
+                        ),
+                        userInstructions = paste0(
+                            "Increase maxNumberOfSubjects to a feasible planned total or revisit the planning ",
+                            "assumptions. Account for censoring and dropout; do not lower observed event ",
+                            "counts."
+                        )
                     )
                 }
             }
@@ -1168,7 +1223,16 @@ NULL
                     stopIllegalArgument(
                         "the number of subjects is too small to reach maximum number of events ",
                         "(presumably due to drop-out rates), search algorithm failed",
-                        functionName = ".getSampleSizeFixedSurvival"
+                        functionName = ".getSampleSizeFixedSurvival",
+                        reason = paste0(
+                            "The current subject total did not yield the required event count; dropout may ",
+                            "contribute."
+                        ),
+                        userInstructions = paste0(
+                            "Review maxNumberOfSubjects, accrual, follow-up and dropout assumptions together. ",
+                            "Use a feasible recruitment plan while preserving justified effect and error-rate ",
+                            "assumptions."
+                        )
                     )
                 }
             }
@@ -1302,7 +1366,16 @@ NULL
                             ),
                             designPlan$maxNumberOfSubjects[i], designPlan$cumulativeEventsPerStage[kMax, i], i
                         ),
-                        functionName = ".getSampleSizeSequentialSurvival"
+                        functionName = ".getSampleSizeSequentialSurvival",
+                        reason = paste0(
+                            "The required event total exceeds the number of subjects available to experience an ",
+                            "event."
+                        ),
+                        userInstructions = paste0(
+                            "Increase maxNumberOfSubjects to a feasible planned total or revisit the planning ",
+                            "assumptions. Account for censoring and dropout; do not lower observed event ",
+                            "counts."
+                        )
                     )
                 }
 
@@ -1325,7 +1398,16 @@ NULL
                         stopIllegalArgument(
                             "the number of subjects is too small to reach maximum number of events ",
                             "(presumably due to drop-out rates)",
-                            functionName = ".getSampleSizeSequentialSurvival"
+                            functionName = ".getSampleSizeSequentialSurvival",
+                            reason = paste0(
+                                "The current subject total did not yield the required event count; dropout may ",
+                                "contribute."
+                            ),
+                            userInstructions = paste0(
+                                "Review maxNumberOfSubjects, accrual, follow-up and dropout assumptions ",
+                                "together. Use a feasible recruitment plan while preserving justified effect ",
+                                "and error-rate assumptions."
+                            )
                         )
                     }
                 }
@@ -1762,7 +1844,15 @@ getEventProbabilities <- function(
 
     if (kappa != 1 && any(phi > 0)) {
         stopIllegalArgument("for Weibull distribution (kappa != 1) drop-out rates (phi) cannot be specified",
-            functionName = "getEventProbabilities"
+            functionName = "getEventProbabilities",
+            reason = paste0(
+                "This analytical event-probability calculation does not combine a non-unit Weibull shape with ",
+                "dropout."
+            ),
+            userInstructions = paste0(
+                "Use survival simulation for the intended Weibull model with dropout. Set kappa = 1 or remove ",
+                "dropout only if those assumptions are scientifically justified."
+            )
         )
     }
 
@@ -2736,7 +2826,16 @@ getPowerSurvival <- function(
                     "(presumably due to drop-out rates)",
                     functionName = "getPowerSurvival",
                     parameter = "maxNumberOfSubjects",
-                    value = designPlan$maxNumberOfSubjects
+                    value = designPlan$maxNumberOfSubjects,
+                    reason = paste0(
+                        "The current subject total did not yield the required event count; dropout may ",
+                        "contribute."
+                    ),
+                    userInstructions = paste0(
+                        "Review maxNumberOfSubjects, accrual, follow-up and dropout assumptions together. Use a ",
+                        "feasible recruitment plan while preserving justified effect and error-rate ",
+                        "assumptions."
+                    )
                 )
             }
         }

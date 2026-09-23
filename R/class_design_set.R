@@ -408,7 +408,12 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             if (is.null(design) && optionalArgumentsDefined && length(self$designs) == 0) {
                 stopIncompleteArguments("at least one design (master) must be defined in this ",
                     "design set to respect any design parameters",
-                    functionName = ".validateOptionalArguments"
+                    functionName = ".validateOptionalArguments",
+                    reason = paste0(
+                        "Varying design parameters requires a master design from which the remaining settings ",
+                        "can be taken."
+                    ),
+                    userInstructions = "Add a valid trial design to the design set before adding parameter variations."
                 )
             }
 
@@ -498,7 +503,12 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                     stopConflictingArguments(
                         "designs have different directions of alternative (design master is ",
                         ifelse(sided == 1, "one", "two"), " sided)",
-                        functionName = "assertHaveEqualSidedValues"
+                        functionName = "assertHaveEqualSidedValues",
+                        reason = "The designs being combined use different one-sided or two-sided specifications.",
+                        userInstructions = paste0(
+                            "Compare designs with consistent sided settings, or keep designs with different ",
+                            "testing specifications in separate design sets."
+                        )
                     )
                 }
             }

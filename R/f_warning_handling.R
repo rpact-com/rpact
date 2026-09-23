@@ -17,15 +17,6 @@
 #' @include f_error_handling.R
 NULL
 
-# Warning factories deliberately do not fall back to error factories.
-# Set rpact.warning.factory.condition (or a type-specific factory) to enrich
-# warnings in a client package. Factories receive the same diagnostic fields as
-# error factories, plus reason and userInstructions, and must return a warning
-# condition, not an error. Alternatively, rpact.warning.context = TRUE attaches
-# the built-in context without requiring a client package.
-# See inst/WARNING_CONTEXT.md for the schema and a complete capture example.
-# Capture with withCallingHandlers(..., warning = function(w) { ...;
-# invokeRestart("muffleWarning") }) to retain the successful calculation result.
 .warnWithContext <- function(
         ..., code, category, parameter = NULL, value = NULL,
         constraint = NULL, functionName = NULL, relatedParameter = NULL,

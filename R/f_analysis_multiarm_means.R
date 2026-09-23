@@ -397,7 +397,12 @@ NULL
             relatedParameter = "intersectionTest",
             relatedValue = intersectionTest,
             constraint = "'varianceOption' = \"overallPooled\"",
-            functionName = ".getStageResultsMeansMultiArm"
+            functionName = ".getStageResultsMeansMultiArm",
+            reason = "The implemented Dunnett t test uses an overall pooled variance estimate.",
+            userInstructions = paste0(
+                "Set varianceOption = \"overallPooled\" if appropriate for the analysis plan, or choose a ",
+                "supported test with the intended variance model."
+            )
         )
     }
 
@@ -1275,7 +1280,12 @@ NULL
         "TrialDesignInverseNormal, TrialDesignFisher, or ",
         "TrialDesignConditionalDunnett",
         functionName = ".getConditionalPowerMeansMultiArm",
-        parameter = "design"
+        parameter = "design",
+        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
+        userInstructions = paste0(
+            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+            "supporting the intended design. Do not change the object class manually."
+        )
     )
 }
 

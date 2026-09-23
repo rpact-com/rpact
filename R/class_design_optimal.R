@@ -132,7 +132,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         constraint = "provide conditionalPower or a conditionalPowerFunction",
                         relatedParameter = "conditionalPowerFunction",
                         relatedValue = conditionalPowerFunction,
-                        functionName = "getDesignOptimalConditionalErrorFunction"
+                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        reason = paste0(
+                            "The optimal conditional error design requires a conditional power target or a ",
+                            "function defining that target."
+                        ),
+                        userInstructions = paste0(
+                            "Specify conditionalPower or a valid conditionalPowerFunction consistent with the ",
+                            "intended adaptation rule."
+                        )
                     )
                 }
                 self$conditionalPowerFunction <- conditionalPowerFunction
@@ -290,7 +298,12 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         constraint = "provide delta1 or ncp1 when useInterimEstimate is FALSE",
                         relatedParameter = "ncp1",
                         relatedValue = ncp1,
-                        functionName = "getDesignOptimalConditionalErrorFunction"
+                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        reason = "A fixed effect for conditional power needs an explicit interim-effect assumption.",
+                        userInstructions = paste0(
+                            "Supply delta1 for the intended fixed effect, or choose the conditional power ",
+                            "specification that matches the intended adaptation rule."
+                        )
                     )
                 }
             }
@@ -389,7 +402,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         constraint = "required for the selected likelihood ratio distribution",
                         relatedParameter = "likelihoodRatioDistribution",
                         relatedValue = likelihoodRatioDistribution,
-                        functionName = "getDesignOptimalConditionalErrorFunction"
+                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        reason = paste0(
+                            "The fixed likelihood-ratio specification requires its effect value or support ",
+                            "points."
+                        ),
+                        userInstructions = paste0(
+                            "Supply deltaLR for the intended fixed-effect specification; if another prior was ",
+                            "intended, correct likelihoodRatioDistribution instead."
+                        )
                     )
                 } else {
                     .assertIsNumericVector(x = deltaLR, argumentName = "deltaLR")
@@ -427,7 +448,15 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                                 parameter = "weightsDeltaLR",
                                 value = weightsDeltaLR,
                                 constraint = "weights must sum to one within sqrt(.Machine$double.eps)",
-                                functionName = "getDesignOptimalConditionalErrorFunction"
+                                functionName = "getDesignOptimalConditionalErrorFunction",
+                                reason = paste0(
+                                    "The fixed likelihood-ratio mixture needs valid probability weights for its ",
+                                    "support points."
+                                ),
+                                userInstructions = paste0(
+                                    "Specify one finite nonnegative weightsDeltaLR value per deltaLR value, ",
+                                    "summing to 1; choose weights that represent the intended mixture."
+                                )
                             )
                         }
                         self$weightsDeltaLR <- weightsDeltaLR / sum(weightsDeltaLR)
@@ -444,7 +473,12 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         constraint = "required for the selected likelihood ratio distribution",
                         relatedParameter = "likelihoodRatioDistribution",
                         relatedValue = likelihoodRatioDistribution,
-                        functionName = "getDesignOptimalConditionalErrorFunction"
+                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        reason = "The normal likelihood-ratio prior requires both its location and scale.",
+                        userInstructions = paste0(
+                            "Specify deltaLR and tauLR for the intended normal prior, or select the intended ",
+                            "likelihoodRatioDistribution."
+                        )
                     )
                 } else {
                     .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
@@ -465,7 +499,12 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         constraint = "required for the selected likelihood ratio distribution",
                         relatedParameter = "likelihoodRatioDistribution",
                         relatedValue = likelihoodRatioDistribution,
-                        functionName = "getDesignOptimalConditionalErrorFunction"
+                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        reason = "The exponential likelihood-ratio prior requires its kappaLR parameter.",
+                        userInstructions = paste0(
+                            "Supply a valid kappaLR for the intended exponential prior, or select the intended ",
+                            "likelihoodRatioDistribution."
+                        )
                     )
                 } else {
                     .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
@@ -482,7 +521,12 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         constraint = "required for the selected likelihood ratio distribution",
                         relatedParameter = "likelihoodRatioDistribution",
                         relatedValue = likelihoodRatioDistribution,
-                        functionName = "getDesignOptimalConditionalErrorFunction"
+                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        reason = "The uniform likelihood-ratio prior requires its upper effect bound.",
+                        userInstructions = paste0(
+                            "Supply deltaMaxLR for the intended uniform prior, or select the intended ",
+                            "likelihoodRatioDistribution."
+                        )
                     )
                 } else {
                     .assertIsSingleNumber(x = deltaMaxLR, argumentName = "deltaMaxLR")

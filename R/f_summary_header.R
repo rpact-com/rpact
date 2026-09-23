@@ -457,6 +457,14 @@ NULL
                 )
             )
         }
+        
+        print("settings$multiArmEnabled") # TODO remove
+        print(settings$multiArmEnabled)
+
+        if (!is.null(designPlan[["piControl"]]) && length(designPlan$piControl) == 1 && !is.na(designPlan$piControl)) {
+            treatmentRateText <- paste0(treatmentRateText, ", control rate pi(control) = ", round(designPlan$piControl, 3))
+        }
+        
         header <- paste0(header, ", \n", .createSummaryHypothesisText(designPlan, summaryFactory))
         header <- .concatenateSummaryText(header, treatmentRateText)
         header <- .addEnrichmentEffectListToHeader(header, designPlan)

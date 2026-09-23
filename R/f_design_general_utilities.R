@@ -401,7 +401,12 @@ NULL
             value = length(design$userAlphaSpending), constraint = "length must equal length of informationRates",
             relatedParameter = "informationRates",
             relatedValue = length(design$informationRates),
-            functionName = ".validateUserAlphaSpending"
+            functionName = ".validateUserAlphaSpending",
+            reason = "User-defined alpha spending needs one cumulative amount per analysis stage.",
+            userInstructions = paste0(
+                "Supply kMax cumulative userAlphaSpending values aligned with informationRates; do not supply ",
+                "stage-wise increments."
+            )
         )
     }
 
@@ -414,7 +419,12 @@ NULL
             parameter = "userAlphaSpending", value = length(design$userAlphaSpending), constraint = "length must equal kMax",
             relatedParameter = "kMax",
             relatedValue = design$kMax,
-            functionName = ".validateUserAlphaSpending"
+            functionName = ".validateUserAlphaSpending",
+            reason = "User-defined alpha spending needs one cumulative amount per analysis stage.",
+            userInstructions = paste0(
+                "Supply kMax cumulative userAlphaSpending values aligned with informationRates; do not supply ",
+                "stage-wise increments."
+            )
         )
     }
 
@@ -442,7 +452,12 @@ NULL
             parameter = "userAlphaSpending", value = design$userAlphaSpending, constraint = "0 <= alpha_1 <= .. <= alpha_kMax <= alpha",
             relatedParameter = c("kMax", "alpha"),
             relatedValue = list(kMax = design$kMax, alpha = design$alpha),
-            functionName = ".validateUserAlphaSpending"
+            functionName = ".validateUserAlphaSpending",
+            reason = "userAlphaSpending contains cumulative error probabilities bounded by alpha.",
+            userInstructions = paste0(
+                "Supply nondecreasing cumulative spending amounts between 0 and alpha. Convert stage-wise ",
+                "increments to cumulative amounts if needed; preserve the intended total type I error."
+            )
         )
     }
 
@@ -476,7 +491,12 @@ NULL
             value = length(design$userBetaSpending), constraint = "length must equal length of informationRates",
             relatedParameter = "informationRates",
             relatedValue = length(design$informationRates),
-            functionName = ".validateUserBetaSpending"
+            functionName = ".validateUserBetaSpending",
+            reason = "User-defined beta spending needs one cumulative amount per analysis stage.",
+            userInstructions = paste0(
+                "Supply kMax cumulative userBetaSpending values aligned with informationRates; do not supply ",
+                "stage-wise increments."
+            )
         )
     }
 
@@ -489,7 +509,12 @@ NULL
             parameter = "userBetaSpending", value = length(design$userBetaSpending), constraint = "length must equal kMax",
             relatedParameter = "kMax",
             relatedValue = design$kMax,
-            functionName = ".validateUserBetaSpending"
+            functionName = ".validateUserBetaSpending",
+            reason = "User-defined beta spending needs one cumulative amount per analysis stage.",
+            userInstructions = paste0(
+                "Supply kMax cumulative userBetaSpending values aligned with informationRates; do not supply ",
+                "stage-wise increments."
+            )
         )
     }
 
@@ -529,7 +554,12 @@ NULL
             parameter = "userBetaSpending", value = design$userBetaSpending, constraint = "0 <= beta_1 <= .. <= beta_kMax <= beta",
             relatedParameter = c("kMax", "beta"),
             relatedValue = list(kMax = design$kMax, beta = design$beta),
-            functionName = ".validateUserBetaSpending"
+            functionName = ".validateUserBetaSpending",
+            reason = "userBetaSpending contains cumulative error probabilities bounded by beta.",
+            userInstructions = paste0(
+                "Supply nondecreasing cumulative spending amounts between 0 and beta, preserving the intended ",
+                "power target."
+            )
         )
     }
 
@@ -623,7 +653,15 @@ NULL
 
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise survival definition",
-            functionName = ".getPiecewiseExponentialDistributionSingleTime"
+            functionName = ".getPiecewiseExponentialDistributionSingleTime",
+            reason = paste0(
+                "Piecewise exponential survival and a non-unit Weibull shape are incompatible in this ",
+                "calculation."
+            ),
+            userInstructions = paste0(
+                "Use kappa = 1 for a piecewise exponential model, or remove the piecewise specification for a ",
+                "Weibull model. Choose according to the intended survival assumptions."
+            )
         )
     }
 
@@ -668,7 +706,15 @@ NULL
 
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise exponential survival definition",
-            functionName = ".getPiecewiseExponentialSingleQuantile"
+            functionName = ".getPiecewiseExponentialSingleQuantile",
+            reason = paste0(
+                "Piecewise exponential survival and a non-unit Weibull shape are incompatible in this ",
+                "calculation."
+            ),
+            userInstructions = paste0(
+                "Use kappa = 1 for a piecewise exponential model, or remove the piecewise specification for a ",
+                "Weibull model. Choose according to the intended survival assumptions."
+            )
         )
     }
 
@@ -738,7 +784,15 @@ NULL
             functionName = ".getPiecewiseExponentialSettings",
             parameter = "piecewiseSurvivalTime",
             relatedParameter = "piecewiseLambda",
-            relatedValue = piecewiseLambda, value = piecewiseSurvivalTime
+            relatedValue = piecewiseLambda, value = piecewiseSurvivalTime,
+            reason = paste0(
+                "Separate hazard inputs cannot be combined with a list that already specifies piecewise ",
+                "survival parameters."
+            ),
+            userInstructions = paste0(
+                "Use a numeric piecewiseSurvivalTime vector with separate hazard vectors, or keep the ",
+                "self-contained list and remove redundant separate hazards."
+            )
         )
     }
 

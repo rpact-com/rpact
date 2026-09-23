@@ -51,13 +51,29 @@ getPerformanceScore <- function(simulationResult) {
 
     if (!inherits(simulationResult, "SimulationResultsMeans") && !inherits(simulationResult, "SimulationResultsRates")) {
         stopIllegalArgument("performance score so far implemented only for single comparisons with continuous and binary endpoints",
-            functionName = "getPerformanceScore"
+            functionName = "getPerformanceScore",
+            reason = paste0(
+                "The performance score is restricted to supported two-stage, single-comparison designs with ",
+                "continuous or binary endpoints."
+            ),
+            userInstructions = paste0(
+                "Use the score only for supported results. For a different endpoint or design, evaluate other ",
+                "appropriate performance measures without changing the trial solely to obtain this score."
+            )
         )
     }
 
     if (design$kMax != 2) {
         stopIllegalArgument("performance score so far implemented only for two-stage designs",
-            functionName = "getPerformanceScore"
+            functionName = "getPerformanceScore",
+            reason = paste0(
+                "The performance score is restricted to supported two-stage, single-comparison designs with ",
+                "continuous or binary endpoints."
+            ),
+            userInstructions = paste0(
+                "Use the score only for supported results. For a different endpoint or design, evaluate other ",
+                "appropriate performance measures without changing the trial solely to obtain this score."
+            )
         )
     }
 
@@ -101,7 +117,15 @@ getPerformanceScore <- function(simulationResult) {
     } else {
         stopIllegalArgument("performance score is not available for class ",
             .getClassName(simulationResult),
-            functionName = "getPerformanceScore"
+            functionName = "getPerformanceScore",
+            reason = paste0(
+                "The performance score is restricted to supported two-stage, single-comparison designs with ",
+                "continuous or binary endpoints."
+            ),
+            userInstructions = paste0(
+                "Use the score only for supported results. For a different endpoint or design, evaluate other ",
+                "appropriate performance measures without changing the trial solely to obtain this score."
+            )
         )
     }
     alternativeValues <- simulationResult[[alternativeParamName]]

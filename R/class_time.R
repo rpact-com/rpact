@@ -240,7 +240,15 @@ getPiecewiseSurvivalTime <- function(
             stopIllegalArgument("'piecewiseSurvivalTime' must be lambda or median based; ",
                 "pi based defintion is not allowed",
                 functionName = "getPiecewiseSurvivalTime",
-                parameter = "piecewiseSurvivalTime", value = piecewiseSurvivalTime
+                parameter = "piecewiseSurvivalTime", value = piecewiseSurvivalTime,
+                reason = paste0(
+                    "Piecewise survival construction requires hazard rates or medians rather than this ",
+                    "probability-based definition."
+                ),
+                userInstructions = paste0(
+                    "Express the intended survival assumptions using lambda or median inputs and preserve their ",
+                    "time units."
+                )
             )
         }
 
@@ -382,7 +390,15 @@ getAccrualTime <- function(
                 parameter = "accrualIntensityType",
                 value = accrualIntensityType,
                 relatedParameter = "accrualIntensity",
-                relatedValue = accrualIntensity
+                relatedValue = accrualIntensity,
+                reason = paste0(
+                    "Absolute accrual intensities use subject counts per time unit; the supplied values violate ",
+                    "this mode."
+                ),
+                userInstructions = paste0(
+                    "Check the units of accrualIntensity. Use relative intensities only if proportions were ",
+                    "intended; otherwise supply valid absolute intensities."
+                )
             )
         }
     } else if (accrualIntensityType == "relative") {
@@ -739,7 +755,12 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     parameter = "argName1",
                     value = argName1,
                     relatedParameter = "argName2",
-                    relatedValue = argName2
+                    relatedValue = argName2,
+                    reason = "These arguments are alternative parameterizations of the same survival assumptions.",
+                    userInstructions = paste0(
+                        "Keep one of the conflicting parameterizations and remove the other after confirming ",
+                        "which represents the intended survival model."
+                    )
                 )
             }
         },
@@ -1112,7 +1133,17 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                                     parameter = "lambda2",
                                     value = self$lambda2,
                                     relatedParameter = "unique(lambda1 / hazardRatio)",
-                                    relatedValue = unique(round(self$lambda2, 8))
+                                    relatedValue = unique(round(self$lambda2, 8)),
+                                    reason = paste0(
+                                        "This conversion requires a constant derived control hazard or hazard ",
+                                        "ratio across the supplied intervals."
+                                    ),
+                                    userInstructions = paste0(
+                                        "Check the interval-specific hazards and the intended ",
+                                        "proportional-hazards assumption. Use a workflow supporting the ",
+                                        "intended time-varying effects rather than forcing incompatible values ",
+                                        "into this conversion."
+                                    )
                                 )
                             }
 
@@ -1590,7 +1621,16 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 parameter = "hazardRatio",
                 value = hr,
                 relatedParameter = "unique(lambda1 / lambda2)",
-                relatedValue = unique(round(hr, 4))
+                relatedValue = unique(round(hr, 4)),
+                reason = paste0(
+                    "This conversion requires a constant derived control hazard or hazard ratio across the ",
+                    "supplied intervals."
+                ),
+                userInstructions = paste0(
+                    "Check the interval-specific hazards and the intended proportional-hazards assumption. Use ",
+                    "a workflow supporting the intended time-varying effects rather than forcing incompatible ",
+                    "values into this conversion."
+                )
             )
         },
         .validateInitialization = function() {
@@ -1956,7 +1996,15 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     self$.getFormula(), " = ", numberOfSubjects,
                     functionName = ".validateFormula",
                     parameter = "maxNumberOfSubjects",
-                    value = self$maxNumberOfSubjects
+                    value = self$maxNumberOfSubjects,
+                    reason = paste0(
+                        "The specified subject total conflicts with the total implied by accrual durations and ",
+                        "intensities."
+                    ),
+                    userInstructions = paste0(
+                        "Reconcile maxNumberOfSubjects with the accrual schedule and its time units; adjust ",
+                        "only inputs that do not represent the intended recruitment plan."
+                    )
                 )
             }
         },
@@ -2224,7 +2272,15 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     functionName = ".validate",
                     parameter = "followUpTime",
                     relatedParameter = "maxNumberOfSubjects",
-                    relatedValue = self$maxNumberOfSubjects
+                    relatedValue = self$maxNumberOfSubjects,
+                    reason = paste0(
+                        "Relative accrual intensities do not determine an absolute recruitment duration without ",
+                        "an end of accrual."
+                    ),
+                    userInstructions = paste0(
+                        "Specify the end of accrual in accrualTime, or provide a consistent absolute accrual ",
+                        "schedule."
+                    )
                 )
             }
 
@@ -2237,7 +2293,15 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     "can only be done if end of accrual is defined",
                     functionName = ".validate",
                     parameter = "maxNumberOfSubjects",
-                    relatedParameter = "followUpTime"
+                    relatedParameter = "followUpTime",
+                    reason = paste0(
+                        "Relative accrual intensities do not determine an absolute recruitment duration without ",
+                        "an end of accrual."
+                    ),
+                    userInstructions = paste0(
+                        "Specify the end of accrual in accrualTime, or provide a consistent absolute accrual ",
+                        "schedule."
+                    )
                 )
             }
         },
@@ -2380,7 +2444,16 @@ AccrualTime <- R6::R6Class("AccrualTime",
                                 self$.getFormula(), " = ", self$.getSampleSize(),
                                 functionName = ".initAccrualIntensityAbsolute",
                                 parameter = "maxNumberOfSubjects",
-                                value = self$maxNumberOfSubjects
+                                value = self$maxNumberOfSubjects,
+                                reason = paste0(
+                                    "The specified subject total conflicts with the total implied by accrual ",
+                                    "durations and intensities."
+                                ),
+                                userInstructions = paste0(
+                                    "Reconcile maxNumberOfSubjects with the accrual schedule and its time ",
+                                    "units; adjust only inputs that do not represent the intended recruitment ",
+                                    "plan."
+                                )
                             )
                         }
                     } else {
@@ -2599,7 +2672,16 @@ AccrualTime <- R6::R6Class("AccrualTime",
                                         self$.getFormula(), " = ", sampleSize,
                                         functionName = ".init",
                                         parameter = "maxNumberOfSubjects",
-                                        value = self$maxNumberOfSubjects
+                                        value = self$maxNumberOfSubjects,
+                                        reason = paste0(
+                                            "The specified subject total conflicts with the total implied by ",
+                                            "accrual durations and intensities."
+                                        ),
+                                        userInstructions = paste0(
+                                            "Reconcile maxNumberOfSubjects with the accrual schedule and its ",
+                                            "time units; adjust only inputs that do not represent the intended ",
+                                            "recruitment plan."
+                                        )
                                     )
                                 } else {
                                     stopIllegalArgument(
@@ -2762,7 +2844,12 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     sampleSize, ")",
                     functionName = ".calculateRemainingTime",
                     parameter = "maxNumberOfSubjects",
-                    value = self$maxNumberOfSubjects
+                    value = self$maxNumberOfSubjects,
+                    reason = "The defined accrual periods already imply more subjects than the supplied maximum.",
+                    userInstructions = paste0(
+                        "Check maxNumberOfSubjects and the recruitment schedule together; use a feasible ",
+                        "subject cap or revise the intended accrual duration or intensity."
+                    )
                 )
             }
 
@@ -2795,7 +2882,12 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     "is too small for the defined accrual time",
                     functionName = ".calculateRemainingTime",
                     parameter = "maxNumberOfSubjects",
-                    value = self$maxNumberOfSubjects
+                    value = self$maxNumberOfSubjects,
+                    reason = "The defined accrual periods already imply more subjects than the supplied maximum.",
+                    userInstructions = paste0(
+                        "Check maxNumberOfSubjects and the recruitment schedule together; use a feasible ",
+                        "subject cap or revise the intended accrual duration or intensity."
+                    )
                 )
             }
         },

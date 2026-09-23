@@ -192,7 +192,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     if ((.isBetaSpendingDesignType(design$typeBetaSpending) || !.isAlphaSpendingDesignType(design$typeOfDesign)) &&
             (design$informationRates[length(design$informationRates)] != 1)) {
         stopIllegalArgument("For specified design, last information rate should be equal 1",
-            functionName = ".validateTypeOfDesign"
+            functionName = ".validateTypeOfDesign",
+            reason = "This design specification requires the final analysis at the full planned information.",
+            userInstructions = paste0(
+                "Set the last informationRates entry to 1 after checking the normalization of all cumulative ",
+                "information fractions."
+            )
         )
     }
 
@@ -355,7 +360,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
                 parameter = "userAlphaSpending", value = length(userAlphaSpending), constraint = "length must equal kMax",
                 relatedParameter = "kMax",
                 relatedValue = kMax,
-                functionName = ".createDesign"
+                functionName = ".createDesign",
+                reason = "User-defined alpha spending needs one cumulative amount per analysis stage.",
+                userInstructions = paste0(
+                    "Supply kMax cumulative userAlphaSpending values aligned with informationRates; do not ",
+                    "supply stage-wise increments."
+                )
             )
         }
         kMax <- length(userAlphaSpending)
@@ -933,7 +943,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             functionName = ".getDesignGroupSequentialUserDefinedBetaSpending",
             parameter = "typeBetaSpending",
             value = design$typeBetaSpending,
-            relatedParameter = ") must be "
+            relatedParameter = ") must be ",
+            reason = "The user-defined beta-spending calculation requires the bsUser design type.",
+            userInstructions = paste0(
+                "Use typeBetaSpending = \"bsUser\" for explicit userBetaSpending, or use the calculation matching ",
+                "the intended beta-spending function."
+            )
         )
     }
 
@@ -1510,7 +1525,12 @@ getDesignInverseNormal <- function(
             functionName = ".getDesignWithInterimStops",
             parameter = "typeOfDesign",
             relatedParameter = "efficacyStops",
-            value = typeOfDesign
+            value = typeOfDesign,
+            reason = "Selective interim stopping is supported only for the listed alpha-spending designs.",
+            userInstructions = paste0(
+                "Choose typeOfDesign from asOF, asP, asKD, asHSD or asUser if selective interim stopping is ",
+                "intended; otherwise remove efficacyStops and futilityStops after confirming the design choice."
+            )
         )
     }
     if (identical(typeBetaSpending, C_TYPE_OF_DESIGN_BS_USER)) {
@@ -1519,7 +1539,12 @@ getDesignInverseNormal <- function(
             functionName = ".getDesignWithInterimStops",
             parameter = "typeBetaSpending",
             relatedParameter = C_TYPE_OF_DESIGN_BS_USER,
-            value = typeBetaSpending
+            value = typeBetaSpending,
+            reason = "Selective interim stopping cannot be combined with user-defined beta spending.",
+            userInstructions = paste0(
+                "Choose a supported beta-spending function for the intended stopping scheme, or remove ",
+                "efficacyStops and futilityStops if the user-defined beta-spending design should be retained."
+            )
         )
     }
 
@@ -1555,7 +1580,12 @@ getDesignInverseNormal <- function(
             ") must have length kMax - 1 (", kMax - 1, ")",
             functionName = ".getDesignWithInterimStops",
             parameter = "efficacyStops",
-            value = efficacyStops
+            value = efficacyStops,
+            reason = "This vector describes interim stages only; the final analysis is excluded.",
+            userInstructions = paste0(
+                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
+                "entry intended solely for the final analysis."
+            )
         )
     }
 
@@ -1568,7 +1598,12 @@ getDesignInverseNormal <- function(
             ") must have length kMax - 1 (", kMax - 1, ")",
             functionName = ".getDesignWithInterimStops",
             parameter = "futilityStops",
-            value = futilityStops
+            value = futilityStops,
+            reason = "This vector describes interim stages only; the final analysis is excluded.",
+            userInstructions = paste0(
+                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
+                "entry intended solely for the final analysis."
+            )
         )
     }
 
@@ -1995,7 +2030,13 @@ getDesignInverseNormal <- function(
                 "'futilityBounds' (", .arrayToString(design$futilityBounds), ") ",
                 "too extreme for this situation",
                 functionName = ".getDesignGroupSequential",
-                parameter = "futilityBounds", value = design$futilityBounds
+                parameter = "futilityBounds", value = design$futilityBounds,
+                reason = "The requested futility boundaries are numerically too extreme for this calculation.",
+                userInstructions = paste0(
+                    "Review the futility stopping assumptions and their scale. Use feasible bounds supported by ",
+                    "the intended design; if valid bounds still fail, report a reproducible example to the ",
+                    "rpact developers."
+                )
             )
         }
     }
@@ -2073,7 +2114,13 @@ getDesignInverseNormal <- function(
     if (design$sided != 1) {
         stopIllegalArgument("decision critical values for delayed response design ",
             "are only available for one-sided designs",
-            functionName = ".getDesignGroupSequential"
+            functionName = ".getDesignGroupSequential",
+            reason = "The selected procedure is implemented only for one-sided testing.",
+            userInstructions = paste0(
+                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
+                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
+                "error."
+            )
         )
     }
 
@@ -2088,7 +2135,12 @@ getDesignInverseNormal <- function(
     if (all(contRegionLower <= C_FUTILITY_BOUNDS_DEFAULT + 1e-06)) {
         stopIllegalArgument("decision critical values for delayed response design are ",
             "only available for designs with valid futility bounds",
-            functionName = ".getDesignGroupSequential"
+            functionName = ".getDesignGroupSequential",
+            reason = "Delayed-response decision critical values require valid interim futility boundaries.",
+            userInstructions = paste0(
+                "Provide the intended valid futilityBounds before requesting delayed-response decision critical ",
+                "values."
+            )
         )
     }
 
@@ -2101,7 +2153,12 @@ getDesignInverseNormal <- function(
             (kMax - 1), " (kMax - 1)",
             functionName = ".getDesignGroupSequential",
             parameter = "delayedInformation",
-            value = delayedInformation
+            value = delayedInformation,
+            reason = "This vector describes interim stages only; the final analysis is excluded.",
+            userInstructions = paste0(
+                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
+                "entry intended solely for the final analysis."
+            )
         )
     }
 
@@ -2135,7 +2192,16 @@ getDesignInverseNormal <- function(
             parameter = "delayedInformation",
             value = delayedInformation,
             relatedParameter = "informationRates",
-            relatedValue = informationRates
+            relatedValue = informationRates,
+            reason = paste0(
+                "Interim recruitment-stop information plus pipeline information must remain below final trial ",
+                "information."
+            ),
+            userInstructions = paste0(
+                "Check the normalization and stage alignment of delayedInformation and informationRates. ",
+                "Specify interim analyses whose combined information is below 1, or revise the analysis ",
+                "schedule if no separate interim analysis remains."
+            )
         )
     }
 

@@ -27,7 +27,12 @@ NULL
         ), " (is ", .getClassName(design, quote = TRUE), ")",
         functionName = ".stopWithWrongDesignMessage",
         parameter = "design",
-        value = design
+        value = design,
+        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
+        userInstructions = paste0(
+            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+            "supporting the intended design. Do not change the object class manually."
+        )
     )
 }
 
@@ -41,7 +46,12 @@ NULL
         " (is ", .getClassName(design, quote = TRUE), ")",
         functionName = ".stopWithWrongDesignMessageEnrichment",
         parameter = "design",
-        value = design
+        value = design,
+        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
+        userInstructions = paste0(
+            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+            "supporting the intended design. Do not change the object class manually."
+        )
     )
 }
 
@@ -160,7 +170,15 @@ NULL
             " (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesign",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -171,7 +189,15 @@ NULL
             "'TrialDesignInverseNormal' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormal",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -182,7 +208,15 @@ NULL
             "'TrialDesignInverseNormal', ", "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -193,7 +227,15 @@ NULL
             "'TrialDesignFisher' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignFisher",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -204,7 +246,15 @@ NULL
             "'TrialDesignGroupSequential' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignGroupSequential",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -215,7 +265,15 @@ NULL
             "'TrialDesignGroupSequential' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignGroupSequentialOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -226,7 +284,15 @@ NULL
             "'TrialDesignConditionalDunnett' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignConditionalDunnett",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -237,7 +303,15 @@ NULL
             "'TrialDesignInverseNormal' or 'TrialDesignGroupSequential' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequential",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -249,7 +323,15 @@ NULL
             "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -269,7 +351,15 @@ NULL
             "'TrialDesignFisher' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -282,7 +372,15 @@ NULL
             "'TrialDesignFisher', or ", "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFisherOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -295,7 +393,15 @@ NULL
             "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrFisherOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -308,7 +414,15 @@ NULL
             "'TrialDesignFisher', 'TrialDesignConditionalDunnett', or 'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            reason = paste0(
+                "The selected analysis or operation requires one of the trial design classes listed in the ",
+                "error."
+            ),
+            userInstructions = paste0(
+                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
+                "supporting the intended design. Do not change the object class manually."
+            )
         )
     }
 }
@@ -415,7 +529,12 @@ NULL
                 constraint = paste0(.pQuote(xName), ifelse(lowerIncluded, " >= ", " > "), lower),
                 functionName = functionName,
                 lowerBound = lower,
-                upperBound = NULL
+                upperBound = NULL,
+                reason = "One or more supplied values violate the stated interval constraint.",
+                userInstructions = paste0(
+                    "Choose values satisfying the exact constraint, including whether each boundary is open or ",
+                    "closed; do not clamp values without checking the intended parameter assumptions."
+                )
             )
         }
     } else {
@@ -434,7 +553,12 @@ NULL
                     constraint = paste0(.pQuote(xName), " == ", lower),
                     functionName = functionName,
                     lowerBound = lower,
-                    upperBound = upper
+                    upperBound = upper,
+                    reason = "One or more supplied values violate the stated interval constraint.",
+                    userInstructions = paste0(
+                        "Choose values satisfying the exact constraint, including whether each boundary is open ",
+                        "or closed; do not clamp values without checking the intended parameter assumptions."
+                    )
                 )
             }
         } else if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
@@ -449,7 +573,12 @@ NULL
                 ),
                 functionName = functionName,
                 lowerBound = lower,
-                upperBound = upper
+                upperBound = upper,
+                reason = "One or more supplied values violate the stated interval constraint.",
+                userInstructions = paste0(
+                    "Choose values satisfying the exact constraint, including whether each boundary is open or ",
+                    "closed; do not clamp values without checking the intended parameter assumptions."
+                )
             )
         }
     }
@@ -612,7 +741,15 @@ NULL
                 if (any(na.omit(dataInput$getEventsUpTo(stage)) >
                         na.omit(dataInput$getSampleSizesUpTo(stage)))) {
                     stopIllegalDataInput("all events must be <= corresponding sample size",
-                        functionName = ".assertIsValidDataInput"
+                        functionName = ".assertIsValidDataInput",
+                        reason = paste0(
+                            "A binary endpoint cannot have more events than subjects in the corresponding group ",
+                            "and stage."
+                        ),
+                        userInstructions = paste0(
+                            "Check event counts and sample sizes against the source data, including stage-wise ",
+                            "versus cumulative input; do not truncate observed counts."
+                        )
                     )
                 }
             }
@@ -646,7 +783,15 @@ NULL
                 if (any(na.omit(dataInput$getEventsUpTo(stage, 1)) > na.omit(dataInput$getSampleSizesUpTo(stage, 1))) ||
                         any(na.omit(dataInput$getEventsUpTo(stage, 2)) > na.omit(dataInput$getSampleSizesUpTo(stage, 2)))) {
                     stopIllegalDataInput("all events must be <= corresponding sample size",
-                        functionName = ".assertIsValidDataInput"
+                        functionName = ".assertIsValidDataInput",
+                        reason = paste0(
+                            "A binary endpoint cannot have more events than subjects in the corresponding group ",
+                            "and stage."
+                        ),
+                        userInstructions = paste0(
+                            "Check event counts and sample sizes against the source data, including stage-wise ",
+                            "versus cumulative input; do not truncate observed counts."
+                        )
                     )
                 }
             }
@@ -700,7 +845,12 @@ NULL
             "(is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDataset",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
+            userInstructions = paste0(
+                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
+                "not relabel the class of an incompatible dataset."
+            )
         )
     }
 }
@@ -711,7 +861,12 @@ NULL
             "'DatasetMeans' (is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetMeans",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
+            userInstructions = paste0(
+                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
+                "not relabel the class of an incompatible dataset."
+            )
         )
     }
 }
@@ -722,7 +877,12 @@ NULL
             "'DatasetGeneral' (is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetGeneral",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
+            userInstructions = paste0(
+                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
+                "not relabel the class of an incompatible dataset."
+            )
         )
     }
 }
@@ -733,7 +893,12 @@ NULL
             "'DatasetRates' (is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetRates",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
+            userInstructions = paste0(
+                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
+                "not relabel the class of an incompatible dataset."
+            )
         )
     }
 }
@@ -745,7 +910,12 @@ NULL
             "(is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetSurvival",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
+            userInstructions = paste0(
+                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
+                "not relabel the class of an incompatible dataset."
+            )
         )
     }
 }
@@ -1597,7 +1767,12 @@ NULL
             value = informationRates,
             relatedParameter = "kMax",
             relatedValue = kMax,
-            functionName = ".assertAreValidInformationRates"
+            functionName = ".assertAreValidInformationRates",
+            reason = "Each analysis stage requires its own cumulative information fraction.",
+            userInstructions = paste0(
+                "Supply exactly kMax informationRates values in stage order, or correct kMax if a different ",
+                "number of analyses was intended."
+            )
         )
     }
 
@@ -1622,7 +1797,13 @@ NULL
                 "must be strictly increasing: 0 < x_1 < .. < x_%s <= 1",
                 kMax
             ),
-            functionName = ".assertAreValidInformationRates"
+            functionName = ".assertAreValidInformationRates",
+            reason = "informationRates represents cumulative information, not stage-wise increments.",
+            userInstructions = paste0(
+                "Provide strictly increasing cumulative information fractions greater than 0 and no greater ",
+                "than 1. If the input contains stage-wise fractions, convert them to cumulative fractions ",
+                "first."
+            )
         )
     }
 
@@ -1797,7 +1978,12 @@ NULL
             parameter = "futilityBounds", value = futilityBounds,
             relatedParameter = "kMax",
             relatedValue = kMax,
-            functionName = ".assertAreValidFutilityBounds"
+            functionName = ".assertAreValidFutilityBounds",
+            reason = "This vector describes interim stages only; the final analysis is excluded.",
+            userInstructions = paste0(
+                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
+                "entry intended solely for the final analysis."
+            )
         )
     }
 
@@ -1847,7 +2033,12 @@ NULL
             value = alpha0Vec,
             relatedParameter = "kMax",
             relatedValue = kMax,
-            functionName = ".assertIsValidAlpha0Vec"
+            functionName = ".assertIsValidAlpha0Vec",
+            reason = "This vector describes interim stages only; the final analysis is excluded.",
+            userInstructions = paste0(
+                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
+                "entry intended solely for the final analysis."
+            )
         )
     }
 
@@ -1989,7 +2180,12 @@ NULL
             ),
             functionName = ".assertIsValidNPlanned",
             parameter = "nPlanned",
-            value = nPlanned
+            value = nPlanned,
+            reason = "nPlanned describes the remaining stages after the currently analyzed stage.",
+            userInstructions = paste0(
+                "Provide one planned sample-size or event-count entry for each remaining stage, following the ",
+                "endpoint-specific nPlanned convention; exclude completed stages."
+            )
         )
     }
 
@@ -2115,7 +2311,13 @@ NULL
                     parameter = argName,
                     value = argValue,
                     relatedParameter = "functionName",
-                    relatedValue = functionName
+                    relatedValue = functionName,
+                    reason = "The supplied argument name is not supported by the receiving function.",
+                    userInstructions = paste0(
+                        "Check the documented argument names and spelling for this function. Remove the ",
+                        "unsupported argument or move it to the correct function after confirming its intended ",
+                        "role."
+                    )
                 )
             } else if (exceptionEnabled) {
                 stopArgumentUnknown(.pQuote(argName), " = ", argValue,
@@ -2124,7 +2326,13 @@ NULL
                     parameter = argName,
                     value = argValue,
                     relatedParameter = "functionName",
-                    relatedValue = functionName
+                    relatedValue = functionName,
+                    reason = "The supplied argument name is not supported by the receiving function.",
+                    userInstructions = paste0(
+                        "Check the documented argument names and spelling for this function. Remove the ",
+                        "unsupported argument or move it to the correct function after confirming its intended ",
+                        "role."
+                    )
                 )
             } else {
                 warnArgumentIgnored("Argument unknown in ", functionName, "(...): ",
@@ -2235,7 +2443,12 @@ NULL
             parameter = "packageName",
             value = packageName,
             constraint = "installed package namespace",
-            functionName = ".assertPackageIsInstalled"
+            functionName = ".assertPackageIsInstalled",
+            reason = "The requested operation requires an optional package that is unavailable to this R session.",
+            userInstructions = paste0(
+                "Install the package identified by packageName in a library accessible to this R session, then ",
+                "rerun the call."
+            )
         )
     }
 }
@@ -2463,7 +2676,12 @@ NULL
             functionName = ".assertIsValidAllocationRatioPlannedSampleSize",
             parameter = "maxNumberOfSubjects",
             value = maxNumberOfSubjects,
-            relatedParameter = "allocationRatioPlanned"
+            relatedParameter = "allocationRatioPlanned",
+            reason = "Allocation optimization is unavailable when the subject total is fixed in this calculation.",
+            userInstructions = paste0(
+                "Specify a positive allocationRatioPlanned consistent with the recruitment plan, or remove the ",
+                "fixed subject-total constraint only if it was not intended."
+            )
         )
     }
 
@@ -2660,7 +2878,12 @@ NULL
             )]), ") must be unequal to 'thetaH0' (", thetaH0, ")",
             functionName = ".assertIsValidHazardRatio",
             parameter = "thetaH0",
-            value = thetaH0
+            value = thetaH0,
+            reason = "Sample-size planning requires an alternative effect distinct from the null hypothesis.",
+            userInstructions = paste0(
+                "Check the effect scale and null hypothesis. Specify a scientifically justified alternative ",
+                "distinct from thetaH0; do not change the null simply to obtain a finite sample size."
+            )
         )
     }
     return(invisible(hazardRatio))
@@ -2761,7 +2984,15 @@ NULL
             directionUpper,
             functionName = ".assertIsValidDirectionUpper",
             parameter = "directionUpper",
-            value = design$directionUpper
+            value = design$directionUpper,
+            reason = paste0(
+                "The direction specified for the calculation conflicts with the direction of the design or ",
+                "effect assumptions."
+            ),
+            userInstructions = paste0(
+                "Check the effect scale and intended alternative, then use a consistent directionUpper in the ",
+                "design and calculation; recreate the design if its direction was specified incorrectly."
+            )
         )
     }
 
@@ -2863,7 +3094,12 @@ NULL
                 parameter = funArgName,
                 value = fun,
                 constraint = "must contain the three-dots argument '...'",
-                functionName = ".assertIsValidFunction"
+                functionName = ".assertIsValidFunction",
+                reason = "The callback must accept additional arguments passed by the simulation engine.",
+                userInstructions = paste0(
+                    "Add ... to the callback signature while retaining the documented named inputs, and verify ",
+                    "that the callback still implements the intended adaptation rule."
+                )
             )
         }
     }
@@ -3047,7 +3283,12 @@ NULL
                 functionName = ".assertIsValidNumberOfSubjectsPerStage",
                 parameter = parameterName,
                 relatedParameter = "conditionalPower",
-                relatedValue = conditionalPower
+                relatedValue = conditionalPower,
+                reason = "The requested adaptive calculation requires explicit per-stage limits.",
+                userInstructions = paste0(
+                    "Supply the missing per-stage bound for the intended adaptation rule. Remove ",
+                    "conditionalPower or the custom adaptation function only if adaptation was not intended."
+                )
             )
         } else {
             stopMissingArgument(.pQuote(parameterName), " must be defined ",
@@ -3055,7 +3296,12 @@ NULL
                 functionName = ".assertIsValidNumberOfSubjectsPerStage",
                 parameter = parameterName,
                 relatedParameter = "conditionalPower",
-                relatedValue = conditionalPower
+                relatedValue = conditionalPower,
+                reason = "The requested adaptive calculation requires explicit per-stage limits.",
+                userInstructions = paste0(
+                    "Supply the missing per-stage bound for the intended adaptation rule. Remove ",
+                    "conditionalPower or the custom adaptation function only if adaptation was not intended."
+                )
             )
         }
     }
@@ -3181,7 +3427,13 @@ NULL
             parameter = "designType",
             value = designType,
             relatedParameter = "engineType",
-            relatedValue = engineType
+            relatedValue = engineType,
+            reason = "The selected procedure is implemented only for one-sided testing.",
+            userInstructions = paste0(
+                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
+                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
+                "error."
+            )
         )
     }
 }
@@ -3386,7 +3638,12 @@ NULL
             parameter = "intersectionTest",
             value = intersectionTest,
             relatedParameter = "design",
-            relatedValue = design
+            relatedValue = design,
+            reason = "A conditional Dunnett design requires the corresponding Dunnett intersection test.",
+            userInstructions = paste0(
+                "Use intersectionTest = \"Dunnett\" with this design, or create a design compatible with the ",
+                "intended intersection test."
+            )
         )
     }
 }
@@ -3466,7 +3723,12 @@ NULL
             "getStageResults() or getAnalysisResults()",
             functionName = ".stopInCaseOfIllegalStageDefinition",
             parameter = "stage",
-            value = stage
+            value = stage,
+            reason = "The analysis stage is determined when stage or analysis results are created.",
+            userInstructions = paste0(
+                "Pass stage to getStageResults() or getAnalysisResults(), then use the resulting object without ",
+                "specifying stage again here."
+            )
         )
     }
 }
@@ -3477,7 +3739,12 @@ NULL
         stopIllegalArgument("'stage' (", forbiddenStage, ") can only be defined in ",
             "getStageResults() or getAnalysisResults()",
             functionName = ".stopInCaseOfIllegalStageDefinition2",
-            parameter = "stage"
+            parameter = "stage",
+            reason = "The analysis stage is determined when stage or analysis results are created.",
+            userInstructions = paste0(
+                "Pass stage to getStageResults() or getAnalysisResults(), then use the resulting object without ",
+                "specifying stage again here."
+            )
         )
     }
 }
@@ -3509,7 +3776,12 @@ NULL
             parameter = "varianceOption",
             value = varianceOption,
             relatedParameter = "design",
-            relatedValue = design
+            relatedValue = design,
+            reason = "The conditional Dunnett design requires its designated variance estimator.",
+            userInstructions = paste0(
+                "Use the varianceOption stated in the error for this design, or choose a design compatible with ",
+                "the intended variance model."
+            )
         )
     }
 }
@@ -4117,7 +4389,12 @@ NULL
         stopMissingArgument("either 'design' or 'delayedInformation' must be specified",
             functionName = ".isDelayedInformationEnabled",
             parameter = "design",
-            relatedParameter = "delayedInformation"
+            relatedParameter = "delayedInformation",
+            reason = "Delayed-response calculations require either a design or explicit delayed information.",
+            userInstructions = paste0(
+                "Supply the intended design or delayedInformation in the documented scale; do not invent ",
+                "pipeline information."
+            )
         )
     }
 
@@ -4174,7 +4451,12 @@ NULL
                 parameter = "existingParamNames",
                 value = existingParamNames,
                 relatedParameter = "requiredParamNames",
-                relatedValue = requiredParamNames
+                relatedValue = requiredParamNames,
+                reason = "The selected count-data parameterization requires additional companion parameters.",
+                userInstructions = paste0(
+                    "Provide the listed required parameters for the chosen parameterization, or remove the ",
+                    "initiating parameters if a different parameterization was intended."
+                )
             )
         }
     }
@@ -4215,7 +4497,12 @@ NULL
         functionName = ".assertIsValidCountsParameterCombination",
         parameter = "existingParamNames", value = existingParamNames,
         relatedParameter = "foundParamNames",
-        relatedValue = foundParamNames
+        relatedValue = foundParamNames,
+        reason = "The supplied parameters define mutually exclusive input specifications.",
+        userInstructions = paste0(
+            "Choose one consistent parameterization and remove the conflicting alternative inputs after ",
+            "confirming the intended model."
+        )
     )
 }
 
@@ -4294,7 +4581,12 @@ NULL
             parameter = "lambda1 / lambda2",
             value = lambda1 / lambda2,
             relatedParameter = "thetaH0",
-            relatedValue = thetaH0
+            relatedValue = thetaH0,
+            reason = "Sample-size planning requires an alternative effect distinct from the null hypothesis.",
+            userInstructions = paste0(
+                "Check the effect scale and null hypothesis. Specify a scientifically justified alternative ",
+                "distinct from thetaH0; do not change the null simply to obtain a finite sample size."
+            )
         )
     }
 }
@@ -4335,7 +4627,12 @@ NULL
             " cannot be specified together",
             functionName = ".assertParametersAreSpecifiedCorrectlyTogether",
             parameter = "paramVector",
-            value = paramVector
+            value = paramVector,
+            reason = "The supplied parameters define mutually exclusive input specifications.",
+            userInstructions = paste0(
+                "Choose one consistent parameterization and remove the conflicting alternative inputs after ",
+                "confirming the intended model."
+            )
         )
     } else if (case == "eitherOr" && all(is.na(params[[1]])) && all(is.na(params[[2]]))) {
         stopMissingArgument("either ",
@@ -4343,7 +4640,9 @@ NULL
             " must be specified",
             functionName = ".assertParametersAreSpecifiedCorrectlyTogether",
             parameter = "paramNames",
-            value = paramNames
+            value = paramNames,
+            reason = "None of the supported alternative input specifications was supplied.",
+            userInstructions = "Supply one of the listed parameter alternatives using the intended model assumptions."
         )
     }
 }
@@ -4378,7 +4677,12 @@ NULL
             parameter = "accrualIntensity",
             relatedParameter = "accrualTime",
             relatedValue = accrualTime,
-            value = accrualIntensity
+            value = accrualIntensity,
+            reason = "Piecewise recruitment needs an intensity for each specified accrual interval.",
+            userInstructions = paste0(
+                "Supply accrualIntensity matching the piecewise accrual schedule, or simplify accrualTime only ",
+                "if constant recruitment was intended."
+            )
         )
     }
 
@@ -4572,7 +4876,12 @@ NULL
             value = plannedCalendarTime,
             relatedParameter = "kMax",
             relatedValue = kMax,
-            functionName = ".assertAreValidCalendarTimes"
+            functionName = ".assertAreValidCalendarTimes",
+            reason = "Each design stage requires a corresponding planned calendar analysis time.",
+            userInstructions = paste0(
+                "Specify one plannedCalendarTime per stage, aligned with kMax and the intended recruitment and ",
+                "follow-up schedule."
+            )
         )
     }
 }
@@ -4677,7 +4986,12 @@ NULL
         functionName = ".showFutilityBoundsMissingArgumentError",
         parameter = argumentName,
         relatedParameter = scaleName,
-        relatedValue = scaleValue
+        relatedValue = scaleValue,
+        reason = "The chosen futility-bound scale requires additional information for conversion.",
+        userInstructions = paste0(
+            "Supply the missing argument in the units required by the chosen scale, or select the scale that ",
+            "actually describes the supplied bounds."
+        )
     )
 }
 

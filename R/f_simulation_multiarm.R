@@ -91,7 +91,12 @@ NULL
                 value = selectedArms, constraint = paste0("logical vector of length ", gMax),
                 relatedParameter = "gMax",
                 relatedValue = gMax,
-                functionName = ".selectTreatmentArms"
+                functionName = ".selectTreatmentArms",
+                reason = "The treatment-selection callback must return one logical decision per treatment arm.",
+                userInstructions = paste0(
+                    "Correct selectArmsFunction to return a logical vector of length gMax in the documented arm ",
+                    "order for every possible interim input."
+                )
             )
         }
         if (!is.logical(selectedArms)) {
@@ -99,7 +104,12 @@ NULL
                 parameter = "selectArmsFunction", value = selectedArms, constraint = "logical vector",
                 relatedParameter = "class of selected arms",
                 relatedValue = .getClassName(selectedArms),
-                functionName = ".selectTreatmentArms"
+                functionName = ".selectTreatmentArms",
+                reason = "The treatment-selection callback must return one logical decision per treatment arm.",
+                userInstructions = paste0(
+                    "Correct selectArmsFunction to return a logical vector of length gMax in the documented arm ",
+                    "order for every possible interim input."
+                )
             )
         }
     }
@@ -118,7 +128,13 @@ NULL
         successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stopIllegalArgument("Group sequential design cannot be used for designs with treatment arm selection",
-            functionName = ".performClosedCombinationTestForSimulationMultiArm"
+            functionName = ".performClosedCombinationTestForSimulationMultiArm",
+            reason = "This group-sequential design does not support the requested adaptive selection.",
+            userInstructions = paste0(
+                "Choose a design supporting the intended population or treatment-arm selection, such as an ",
+                "appropriate combination-test design; retain the original design only if selection is not ",
+                "intended."
+            )
         )
     }
 
@@ -288,7 +304,12 @@ NULL
         allocationRatioPlanned) {
     if (length(allocationRatioPlanned) > 1 && allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
         stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages",
-            functionName = ".getCriticalValuesDunnettForSimulation"
+            functionName = ".getCriticalValuesDunnettForSimulation",
+            reason = "The conditional Dunnett procedure assumes a constant allocation ratio across stages.",
+            userInstructions = paste0(
+                "Use equal allocationRatioPlanned values over stages, or choose a design supporting the ",
+                "intended varying allocation ratios."
+            )
         )
     }
 
@@ -926,7 +947,13 @@ NULL
                     ") must be not smaller than minNumberOfSubjectsPerStage' (",
                     .arrayToString(minNumberOfSubjectsPerStage), ")",
                     functionName = ".createSimulationResultsMultiArmObject",
-                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage
+                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage,
+                    reason = "At least one per-stage maximum sample size is below its corresponding minimum.",
+                    userInstructions = paste0(
+                        "Check the stage order and units of minNumberOfSubjectsPerStage and ",
+                        "maxNumberOfSubjectsPerStage; make each minimum no greater than its corresponding ",
+                        "maximum."
+                    )
                 )
             }
             .setValueAndParameterType(
@@ -987,7 +1014,12 @@ NULL
                     functionName = ".createSimulationResultsMultiArmObject",
                     parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage,
                     relatedParameter = "minNumberOfEventsPerStage",
-                    relatedValue = minNumberOfEventsPerStage
+                    relatedValue = minNumberOfEventsPerStage,
+                    reason = "At least one per-stage maximum event count is below its corresponding minimum.",
+                    userInstructions = paste0(
+                        "Check the stage order of minNumberOfEventsPerStage and maxNumberOfEventsPerStage; make ",
+                        "each minimum no greater than its corresponding maximum."
+                    )
                 )
             }
             .setValueAndParameterType(
@@ -1241,7 +1273,12 @@ NULL
     if (length(adaptations) != kMax - 1) {
         stopIllegalArgument("'adaptations' must have length ", (kMax - 1), " (kMax - 1)",
             functionName = ".createSimulationResultsMultiArmObject",
-            parameter = "adaptations", value = adaptations
+            parameter = "adaptations", value = adaptations,
+            reason = "This vector describes interim stages only; the final analysis is excluded.",
+            userInstructions = paste0(
+                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
+                "entry intended solely for the final analysis."
+            )
         )
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))

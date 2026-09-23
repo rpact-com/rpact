@@ -1775,7 +1775,9 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         stopIllegalArgument("'filename' seems to be a path. ", "Please specify 'outputPath' separately",
             functionName = "saveLastPlot",
             parameter = "filename",
-            relatedParameter = "outputPath", value = filename
+            relatedParameter = "outputPath", value = filename,
+            reason = "The file name and destination directory are separate arguments.",
+            userInstructions = "Pass the directory as outputPath and only the base file name as filename."
         )
     }
 
