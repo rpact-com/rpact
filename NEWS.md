@@ -1,3 +1,5 @@
+# rpact 4.5.0
+
 ## New features
 
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
