@@ -15,7 +15,7 @@
 #' @description R6 parameter set for an adaptive two-stage design based on an
 #' optimal conditional error function.
 #'
-#' @details Create objects with [getDesignOptimalConditionalErrorFunction()].
+#' @details Create objects with [getDesignOptimalConditionalError()].
 #' This class inherits from `ParameterSet`, not `TrialDesign`: its second-stage
 #' information depends on the interim result. Functions accepting conventional
 #' group sequential or combination-test designs cannot use this object.
@@ -24,88 +24,107 @@
 #'
 #' @keywords internal
 #'
-#' @seealso [getDesignOptimalConditionalErrorFunction()]
+#' @seealso [getDesignOptimalConditionalError()]
 #'
 TrialDesignOptimalConditionalError <- R6::R6Class(
     "TrialDesignOptimalConditionalError",
     inherit = ParameterSet,
     public = list(
         alpha = NULL,
-        alpha1 = NULL,
-        alpha0 = NULL,
+        efficacyBounds = NULL,
+        futilityBounds = NULL,
+        efficacyBoundsScale = NULL,
+        futilityBoundsScale = NULL,
         conditionalPower = NULL,
         conditionalPowerFunction = NULL,
-        delta1 = NULL,
-        delta1Min = NULL,
-        delta1Max = NULL,
-        ncp1 = NULL,
-        ncp1Min = NULL,
-        ncp1Max = NULL,
+        thetaH1 = NULL,
+        minThetaH1 = NULL,
+        maxThetaH1 = NULL,
+        nonCentralityParameterH1 = NULL,
+        minNonCentralityParameterH1 = NULL,
+        maxNonCentralityParameterH1 = NULL,
         firstStageInformation = NULL,
         useInterimEstimate = NULL,
         likelihoodRatioDistribution = NULL,
-        deltaLR = NULL,
-        weightsDeltaLR = NULL,
-        tauLR = NULL,
+        thetaLR = NULL,
+        weightsLR = NULL,
+        stDevLR = NULL,
         kappaLR = NULL,
-        deltaMaxLR = NULL,
+        maxThetaLR = NULL,
         levelConstant = NULL,
         monotonisationConstants = NULL,
-        minimumSecondStageInformation = NULL,
-        maximumSecondStageInformation = NULL,
-        minimumConditionalError = NULL,
-        maximumConditionalError = NULL,
-        levelConstantMinimum = NULL,
-        levelConstantMaximum = NULL,
+        minInformationPerStage = NULL,
+        maxInformationPerStage = NULL,
+        minConditionalError = NULL,
+        maxConditionalError = NULL,
+        minLevelConstant = NULL,
+        maxLevelConstant = NULL,
         enforceMonotonicity = NULL,
         initialize = function(
                 alpha = NA_real_,
-                alpha1 = NA_real_,
-                alpha0 = NA_real_,
+                efficacyBounds = NA_real_,
+                futilityBounds = NA_real_,
                 conditionalPower = NA_real_,
                 conditionalPowerFunction = NULL,
-                delta1 = NA_real_,
-                delta1Min = NA_real_,
-                delta1Max = NA_real_,
+                thetaH1 = NA_real_,
+                minThetaH1 = NA_real_,
+                maxThetaH1 = NA_real_,
                 firstStageInformation = NA_real_,
                 useInterimEstimate = TRUE,
                 likelihoodRatioDistribution = "",
-                deltaLR = NA_real_,
-                weightsDeltaLR = NA_real_,
-                tauLR = NA_real_,
+                thetaLR = NA_real_,
+                weightsLR = NA_real_,
+                stDevLR = NA_real_,
                 kappaLR = NA_real_,
-                deltaMaxLR = NA_real_,
-                minimumSecondStageInformation = 0,
-                maximumSecondStageInformation = Inf,
-                minimumConditionalError = 0,
-                maximumConditionalError = 1,
-                levelConstantMinimum = 0,
-                levelConstantMaximum = 10,
+                maxThetaLR = NA_real_,
+                minInformationPerStage = 0,
+                maxInformationPerStage = Inf,
+                minConditionalError = 0,
+                maxConditionalError = 1,
+                minLevelConstant = 0,
+                maxLevelConstant = 10,
                 enforceMonotonicity = TRUE,
+                efficacyBoundsScale = "pValue",
+                futilityBoundsScale = "pValue",
+                nonCentralityParameterH1 = NULL,
+                minNonCentralityParameterH1 = NULL,
+                maxNonCentralityParameterH1 = Inf,
                 ...) {
             super$initialize()
             .assertIsSingleLogical(useInterimEstimate, "useInterimEstimate")
             .assertIsSingleLogical(enforceMonotonicity, "enforceMonotonicity")
-            for (parameterName in c("conditionalPower", "delta1", "delta1Min", "delta1Max")) {
+            for (parameterName in c("conditionalPower", "thetaH1", "minThetaH1", "maxThetaH1")) {
                 .assertIsSingleNumber(get(parameterName), parameterName, naAllowed = TRUE)
             }
             .warnInCaseOfUnknownArguments(
-                functionName = "getDesignOptimalConditionalErrorFunction",
-                ..., ignore = c("ncp1", "ncp1Min", "ncp1Max")
+                functionName = "getDesignOptimalConditionalError",
+                ...
             )
-            # Range assertions for alpha, alpha1, alpha0
+            for (parameterName in c("efficacyBoundsScale", "futilityBoundsScale")) {
+                value <- get(parameterName)
+                .assertIsSingleCharacter(value, parameterName)
+                if (value != "pValue") {
+                    stopIllegalArgument(
+                        "'", parameterName, "' must be 'pValue' for optimal conditional error designs.",
+                        parameter = parameterName, value = value, constraint = "must be pValue",
+                        functionName = "getDesignOptimalConditionalError"
+                    )
+                }
+                self[[parameterName]] <- value
+            }
+            # Range assertions for alpha, efficacyBounds, futilityBounds
             # General range assertions
             .assertIsSingleNumber(x = alpha, argumentName = "alpha")
-            .assertIsSingleNumber(x = alpha1, argumentName = "alpha1")
-            .assertIsSingleNumber(x = alpha0, argumentName = "alpha0")
+            .assertIsSingleNumber(x = efficacyBounds, argumentName = "efficacyBounds")
+            .assertIsSingleNumber(x = futilityBounds, argumentName = "futilityBounds")
 
             .assertIsInOpenInterval(x = alpha, xName = "alpha", lower = 0, upper = 1)
-            .assertIsInClosedInterval(x = alpha1, xName = "alpha1", lower = 0, upper = 1)
-            .assertIsInClosedInterval(x = alpha0, xName = "alpha0", lower = 0, upper = 1)
+            .assertIsInClosedInterval(x = efficacyBounds, xName = "efficacyBounds", lower = 0, upper = 1)
+            .assertIsInClosedInterval(x = futilityBounds, xName = "futilityBounds", lower = 0, upper = 1)
 
             # Context-related range assertions
-            .assertIsInClosedInterval(x = alpha1, xName = "alpha1", lower = 0, upper = alpha)
-            .assertIsInClosedInterval(x = alpha0, xName = "alpha0", lower = alpha1, upper = 1)
+            .assertIsInClosedInterval(x = efficacyBounds, xName = "efficacyBounds", lower = 0, upper = alpha)
+            .assertIsInClosedInterval(x = futilityBounds, xName = "futilityBounds", lower = efficacyBounds, upper = 1)
 
             if (!is.na(conditionalPower)) {
                 .assertIsInOpenInterval(conditionalPower, "conditionalPower", lower = 0, upper = 1)
@@ -132,7 +151,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         constraint = "provide conditionalPower or a conditionalPowerFunction",
                         relatedParameter = "conditionalPowerFunction",
                         relatedValue = conditionalPowerFunction,
-                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        functionName = "getDesignOptimalConditionalError",
                         reason = paste0(
                             "The optimal conditional error design requires a conditional power target or a ",
                             "function defining that target."
@@ -144,8 +163,8 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     )
                 }
                 self$conditionalPowerFunction <- conditionalPowerFunction
-                pValueGrid <- seq(alpha1, alpha0, length.out = 50)
-                conditionalPowerValues <- .getOptimalConditionalPower(pValueGrid, self)
+                pValueGrid <- seq(efficacyBounds, futilityBounds, length.out = 50)
+                conditionalPowerValues <- .getOptimalDesignConditionalPowerTarget(pValueGrid, self)
                 if (any(diff(conditionalPowerValues) > 0)) {
                     warnInvalidInput("Conditional power function should not be increasing in the first-stage p-value.",
                         userInstructions = paste0(
@@ -162,146 +181,141 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
 
             # Set initial parameters
             self$alpha <- alpha
-            self$alpha1 <- alpha1
-            self$alpha0 <- alpha0
+            self$efficacyBounds <- efficacyBounds
+            self$futilityBounds <- futilityBounds
             self$conditionalPower <- conditionalPower
             self$firstStageInformation <- firstStageInformation
             self$likelihoodRatioDistribution <- likelihoodRatioDistribution
             self$useInterimEstimate <- useInterimEstimate
 
-            .assertIsSingleNumber(x = levelConstantMinimum, argumentName = "levelConstantMinimum")
-            .assertIsSingleNumber(x = levelConstantMaximum, argumentName = "levelConstantMaximum")
+            .assertIsSingleNumber(x = minLevelConstant, argumentName = "minLevelConstant")
+            .assertIsSingleNumber(x = maxLevelConstant, argumentName = "maxLevelConstant")
 
-            if (!is.finite(levelConstantMinimum) || !is.finite(levelConstantMaximum) ||
-                    levelConstantMinimum >= levelConstantMaximum) {
+            if (!is.finite(minLevelConstant) || !is.finite(maxLevelConstant) ||
+                    minLevelConstant >= maxLevelConstant) {
                 stopConflictingArguments(
-                    "levelConstantMinimum must be smaller than levelConstantMaximum.",
-                    parameter = "levelConstantMinimum",
-                    value = levelConstantMinimum,
-                    constraint = "finite bounds with levelConstantMinimum < levelConstantMaximum",
-                    relatedParameter = "levelConstantMaximum",
-                    relatedValue = levelConstantMaximum,
-                    functionName = "getDesignOptimalConditionalErrorFunction"
+                    "minLevelConstant must be smaller than maxLevelConstant.",
+                    parameter = "minLevelConstant",
+                    value = minLevelConstant,
+                    constraint = "finite bounds with minLevelConstant < maxLevelConstant",
+                    relatedParameter = "maxLevelConstant",
+                    relatedValue = maxLevelConstant,
+                    functionName = "getDesignOptimalConditionalError"
                 )
             }
 
-            self$levelConstantMinimum <- levelConstantMinimum
-            self$levelConstantMaximum <- levelConstantMaximum
+            self$minLevelConstant <- minLevelConstant
+            self$maxLevelConstant <- maxLevelConstant
 
             # Derive effect sizes for conditional power
             # When using an interim estimate, derive minimal or maximal effects
             if (useInterimEstimate) {
                 # Neither lower limit provided -> error
-                # Extract hidden arguments from ...
-                ncp1Min <- list(...)$ncp1Min
-                ncp1Max <- list(...)$ncp1Max
-                if (is.null(ncp1Max)) ncp1Max <- Inf
+                if (is.null(maxNonCentralityParameterH1)) maxNonCentralityParameterH1 <- Inf
 
-                if (is.na(delta1Min) && is.null(ncp1Min)) {
+                if (is.na(minThetaH1) && is.null(minNonCentralityParameterH1)) {
                     stopMissingArgument(
-                        "Must provide a lower limit for the interim estimate by using delta1Min.",
-                        parameter = "delta1Min",
-                        value = delta1Min,
-                        constraint = "provide delta1Min or ncp1Min when useInterimEstimate is TRUE",
-                        relatedParameter = "ncp1Min",
-                        relatedValue = ncp1Min,
-                        functionName = "getDesignOptimalConditionalErrorFunction"
+                        "Must provide a lower limit for the interim estimate by using minThetaH1.",
+                        parameter = "minThetaH1",
+                        value = minThetaH1,
+                        constraint = "provide minThetaH1 or minNonCentralityParameterH1 when useInterimEstimate is TRUE",
+                        relatedParameter = "minNonCentralityParameterH1",
+                        relatedValue = minNonCentralityParameterH1,
+                        functionName = "getDesignOptimalConditionalError"
                     )
-                } else if (!is.na(delta1Min)) {
-                    .assertIsSingleNumber(x = delta1Min, argumentName = "delta1Min")
-                    .assertIsInOpenInterval(x = delta1Min, xName = "delta1Min", lower = 0, upper = Inf)
+                } else if (!is.na(minThetaH1)) {
+                    .assertIsSingleNumber(x = minThetaH1, argumentName = "minThetaH1")
+                    .assertIsInOpenInterval(x = minThetaH1, xName = "minThetaH1", lower = 0, upper = Inf)
 
-                    .assertIsSingleNumber(x = delta1Max, argumentName = "delta1Max")
-                    .assertIsInClosedInterval(x = delta1Max, xName = "delta1Max", lower = delta1Min, upper = Inf)
+                    .assertIsSingleNumber(x = maxThetaH1, argumentName = "maxThetaH1")
+                    .assertIsInClosedInterval(x = maxThetaH1, xName = "maxThetaH1", lower = minThetaH1, upper = Inf)
 
-                    self$delta1Min <- delta1Min
-                    self$delta1Max <- delta1Max
+                    self$minThetaH1 <- minThetaH1
+                    self$maxThetaH1 <- maxThetaH1
 
-                    if (!is.null(ncp1Min)) {
+                    if (!is.null(minNonCentralityParameterH1)) {
                         warnArgumentIgnored(
-                            "Both 'ncp1Min' and 'delta1Min' are provided. Using 'delta1Min' and ignoring 'ncp1Min'.",
-                            parameter = "ncp1Min",
-                            value = ncp1Min,
-                            relatedParameter = "delta1Min",
-                            relatedValue = delta1Min,
+                            "Both 'minNonCentralityParameterH1' and 'minThetaH1' are provided. Using 'minThetaH1' and ignoring 'minNonCentralityParameterH1'.",
+                            parameter = "minNonCentralityParameterH1",
+                            value = minNonCentralityParameterH1,
+                            relatedParameter = "minThetaH1",
+                            relatedValue = minThetaH1,
                             userInstructions = paste0(
-                                "Supply delta1Min or ncp1Min, not both; remove delta1Min if the noncentrality ",
+                                "Supply minThetaH1 or minNonCentralityParameterH1, not both; remove minThetaH1 if the noncentrality ",
                                 "bound is intended."
                             )
                         )
                     }
 
-                    self$ncp1Min <- delta1Min * sqrt(firstStageInformation)
-                    self$ncp1Max <- delta1Max * sqrt(firstStageInformation)
-                } else if (!is.null(ncp1Min)) {
-                    .assertIsSingleNumber(x = ncp1Min, argumentName = "ncp1Min")
-                    .assertIsInOpenInterval(x = ncp1Min, xName = "ncp1Min", lower = 0, upper = Inf)
+                    self$minNonCentralityParameterH1 <- minThetaH1 * sqrt(firstStageInformation)
+                    self$maxNonCentralityParameterH1 <- maxThetaH1 * sqrt(firstStageInformation)
+                } else if (!is.null(minNonCentralityParameterH1)) {
+                    .assertIsSingleNumber(x = minNonCentralityParameterH1, argumentName = "minNonCentralityParameterH1")
+                    .assertIsInOpenInterval(x = minNonCentralityParameterH1, xName = "minNonCentralityParameterH1", lower = 0, upper = Inf)
 
-                    .assertIsSingleNumber(x = ncp1Max, argumentName = "ncp1Max")
-                    .assertIsInClosedInterval(x = ncp1Max, xName = "ncp1Max", lower = ncp1Min, upper = Inf)
+                    .assertIsSingleNumber(x = maxNonCentralityParameterH1, argumentName = "maxNonCentralityParameterH1")
+                    .assertIsInClosedInterval(x = maxNonCentralityParameterH1, xName = "maxNonCentralityParameterH1", lower = minNonCentralityParameterH1, upper = Inf)
 
-                    self$ncp1Min <- ncp1Min
-                    self$ncp1Max <- ifelse(is.null(ncp1Max), Inf, ncp1Max)
+                    self$minNonCentralityParameterH1 <- minNonCentralityParameterH1
+                    self$maxNonCentralityParameterH1 <- ifelse(is.null(maxNonCentralityParameterH1), Inf, maxNonCentralityParameterH1)
 
-                    self$delta1Min <- ncp1Min / sqrt(firstStageInformation)
-                    self$delta1Max <- ifelse(ncp1Max == Inf, Inf, ncp1Max / sqrt(firstStageInformation))
+                    self$minThetaH1 <- minNonCentralityParameterH1 / sqrt(firstStageInformation)
+                    self$maxThetaH1 <- ifelse(maxNonCentralityParameterH1 == Inf, Inf, maxNonCentralityParameterH1 / sqrt(firstStageInformation))
                 } else {
                     stopRuntimeIssue(
                         "Unexpected error occurred during determination of restrictions for interim estimate.",
-                        parameter = c("delta1Min", "delta1Max"),
-                        value = list(delta1Min = delta1Min, delta1Max = delta1Max),
+                        parameter = c("minThetaH1", "maxThetaH1"),
+                        value = list(minThetaH1 = minThetaH1, maxThetaH1 = maxThetaH1),
                         constraint = "interim estimate restrictions must be derivable",
-                        relatedParameter = c("ncp1Min", "ncp1Max"),
-                        relatedValue = list(ncp1Min = ncp1Min, ncp1Max = ncp1Max),
-                        functionName = "getDesignOptimalConditionalErrorFunction"
+                        relatedParameter = c("minNonCentralityParameterH1", "maxNonCentralityParameterH1"),
+                        relatedValue = list(minNonCentralityParameterH1 = minNonCentralityParameterH1, maxNonCentralityParameterH1 = maxNonCentralityParameterH1),
+                        functionName = "getDesignOptimalConditionalError"
                     )
                 }
             } else {
                 # When not using an interim estimate, derive fixed effects
-                # If non-centrality parameter was not specified, calculate it from delta1
+                # If non-centrality parameter was not specified, calculate it from thetaH1
 
-                # Extract hidden argument from ...
-                ncp1 <- list(...)$ncp1
 
-                if (!is.na(delta1)) {
-                    .assertIsSingleNumber(x = delta1, argumentName = "delta1")
-                    .assertIsInOpenInterval(x = delta1, xName = "delta1", lower = 0, upper = Inf)
+                if (!is.na(thetaH1)) {
+                    .assertIsSingleNumber(x = thetaH1, argumentName = "thetaH1")
+                    .assertIsInOpenInterval(x = thetaH1, xName = "thetaH1", lower = 0, upper = Inf)
 
-                    self$delta1 <- delta1
-                    if (!is.null(ncp1)) {
+                    self$thetaH1 <- thetaH1
+                    if (!is.null(nonCentralityParameterH1)) {
                         warnArgumentIgnored(
-                            "Both 'delta1' and 'ncp1' are provided. Using 'delta1' and ignoring 'ncp1'.",
-                            parameter = "ncp1",
-                            value = ncp1,
-                            relatedParameter = "delta1",
-                            relatedValue = delta1,
+                            "Both 'thetaH1' and 'nonCentralityParameterH1' are provided. Using 'thetaH1' and ignoring 'nonCentralityParameterH1'.",
+                            parameter = "nonCentralityParameterH1",
+                            value = nonCentralityParameterH1,
+                            relatedParameter = "thetaH1",
+                            relatedValue = thetaH1,
                             userInstructions = paste0(
-                                "Supply delta1 or ncp1, not both; remove delta1 if the noncentrality parameter ",
+                                "Supply thetaH1 or nonCentralityParameterH1, not both; remove thetaH1 if the noncentrality parameter ",
                                 "is intended."
                             )
                         )
                     }
-                    self$ncp1 <- delta1 * sqrt(firstStageInformation)
-                } else if (!is.null(ncp1)) {
-                    # If delta1 was not specified, calculate it from ncp1
-                    .assertIsSingleNumber(x = ncp1, argumentName = "ncp1")
-                    .assertIsInOpenInterval(x = ncp1, xName = "ncp1", lower = 0, upper = Inf)
+                    self$nonCentralityParameterH1 <- thetaH1 * sqrt(firstStageInformation)
+                } else if (!is.null(nonCentralityParameterH1)) {
+                    # If thetaH1 was not specified, calculate it from nonCentralityParameterH1
+                    .assertIsSingleNumber(x = nonCentralityParameterH1, argumentName = "nonCentralityParameterH1")
+                    .assertIsInOpenInterval(x = nonCentralityParameterH1, xName = "nonCentralityParameterH1", lower = 0, upper = Inf)
 
-                    self$ncp1 <- ncp1
-                    self$delta1 <- ncp1 / sqrt(firstStageInformation)
+                    self$nonCentralityParameterH1 <- nonCentralityParameterH1
+                    self$thetaH1 <- nonCentralityParameterH1 / sqrt(firstStageInformation)
                 } else {
-                    # Else, none of ncp1 and delta1 were specified
+                    # Else, none of nonCentralityParameterH1 and thetaH1 were specified
                     stopMissingArgument(
-                        "Must specify delta1 when using a fixed effect for conditional power.",
-                        parameter = "delta1",
-                        value = delta1,
-                        constraint = "provide delta1 or ncp1 when useInterimEstimate is FALSE",
-                        relatedParameter = "ncp1",
-                        relatedValue = ncp1,
-                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        "Must specify thetaH1 when using a fixed effect for conditional power.",
+                        parameter = "thetaH1",
+                        value = thetaH1,
+                        constraint = "provide thetaH1 or nonCentralityParameterH1 when useInterimEstimate is FALSE",
+                        relatedParameter = "nonCentralityParameterH1",
+                        relatedValue = nonCentralityParameterH1,
+                        functionName = "getDesignOptimalConditionalError",
                         reason = "A fixed effect for conditional power needs an explicit interim-effect assumption.",
                         userInstructions = paste0(
-                            "Supply delta1 for the intended fixed effect, or choose the conditional power ",
+                            "Supply thetaH1 for the intended fixed effect, or choose the conditional power ",
                             "specification that matches the intended adaptation rule."
                         )
                     )
@@ -310,77 +324,77 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
 
             # Range assertions for constraints
             # General range assertions
-            .assertIsSingleNumber(x = minimumConditionalError, argumentName = "minimumConditionalError")
+            .assertIsSingleNumber(x = minConditionalError, argumentName = "minConditionalError")
             .assertIsInClosedInterval(
-                x = minimumConditionalError,
-                xName = "minimumConditionalError",
+                x = minConditionalError,
+                xName = "minConditionalError",
                 lower = 0,
                 upper = 1
             )
-            .assertIsSingleNumber(x = maximumConditionalError, argumentName = "maximumConditionalError")
+            .assertIsSingleNumber(x = maxConditionalError, argumentName = "maxConditionalError")
             .assertIsInClosedInterval(
-                x = maximumConditionalError,
-                xName = "maximumConditionalError",
+                x = maxConditionalError,
+                xName = "maxConditionalError",
                 lower = 0,
                 upper = 1
             )
 
-            .assertIsSingleNumber(x = minimumSecondStageInformation, argumentName = "minimumSecondStageInformation")
+            .assertIsSingleNumber(x = minInformationPerStage, argumentName = "minInformationPerStage")
             .assertIsInClosedInterval(
-                x = minimumSecondStageInformation,
-                xName = "minimumSecondStageInformation",
+                x = minInformationPerStage,
+                xName = "minInformationPerStage",
                 lower = 0,
                 upper = Inf
             )
-            .assertIsSingleNumber(x = maximumSecondStageInformation, argumentName = "maximumSecondStageInformation")
+            .assertIsSingleNumber(x = maxInformationPerStage, argumentName = "maxInformationPerStage")
             .assertIsInClosedInterval(
-                x = maximumSecondStageInformation,
-                xName = "maximumSecondStageInformation",
+                x = maxInformationPerStage,
+                xName = "maxInformationPerStage",
                 lower = 0,
                 upper = Inf
             )
 
-            if (maximumSecondStageInformation == 0) {
+            if (maxInformationPerStage == 0) {
                 stopArgumentOutOfRange(
                     "Maximum second-stage information must be larger than 0.",
-                    parameter = "maximumSecondStageInformation",
-                    value = maximumSecondStageInformation,
+                    parameter = "maxInformationPerStage",
+                    value = maxInformationPerStage,
                     constraint = "must be greater than zero",
                     lowerBound = 0,
                     upperBound = Inf,
-                    functionName = "getDesignOptimalConditionalErrorFunction"
+                    functionName = "getDesignOptimalConditionalError"
                 )
             }
 
             # Context-related range assertions
             .assertIsInClosedInterval(
-                x = minimumConditionalError,
-                xName = "minimumConditionalError",
+                x = minConditionalError,
+                xName = "minConditionalError",
                 lower = 0,
-                upper = maximumConditionalError
+                upper = maxConditionalError
             )
 
             .assertIsInClosedInterval(
-                x = minimumSecondStageInformation,
-                xName = "minimumSecondStageInformation",
+                x = minInformationPerStage,
+                xName = "minInformationPerStage",
                 lower = 0,
-                upper = maximumSecondStageInformation
+                upper = maxInformationPerStage
             )
 
             # Identify constraints for minimum conditional error / maximum second-stage information
-            self$minimumConditionalError <- minimumConditionalError
-            self$maximumSecondStageInformation <- maximumSecondStageInformation
+            self$minConditionalError <- minConditionalError
+            self$maxInformationPerStage <- maxInformationPerStage
 
             # Identify constraints for maximum conditional error / minimum second-stage information
-            self$maximumConditionalError <- maximumConditionalError
-            self$minimumSecondStageInformation <- minimumSecondStageInformation
+            self$maxConditionalError <- maxConditionalError
+            self$minInformationPerStage <- minInformationPerStage
 
             .assertIsSingleLogical(x = enforceMonotonicity, argumentName = "enforceMonotonicity")
             self$enforceMonotonicity <- enforceMonotonicity
 
             .assertIsSingleCharacter(x = likelihoodRatioDistribution, argumentName = "likelihoodRatioDistribution")
 
-            for (parameterName in c("deltaLR", "tauLR", "kappaLR", "deltaMaxLR")) {
+            for (parameterName in c("thetaLR", "stDevLR", "kappaLR", "maxThetaLR")) {
                 value <- get(parameterName)
                 if (is.numeric(value) && any(is.infinite(value))) {
                     stopIllegalArgument(
@@ -388,106 +402,106 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         parameter = parameterName,
                         value = value,
                         constraint = "must contain finite values",
-                        functionName = "getDesignOptimalConditionalErrorFunction"
+                        functionName = "getDesignOptimalConditionalError"
                     )
                 }
             }
             # Identify specific distribution parameters
             if (likelihoodRatioDistribution == "fixed") {
-                if (any(is.na(deltaLR))) {
+                if (any(is.na(thetaLR))) {
                     stopMissingArgument(
-                        "Must provide deltaLR for fixed effect in likelihood ratio.",
-                        parameter = "deltaLR",
-                        value = deltaLR,
+                        "Must provide thetaLR for fixed effect in likelihood ratio.",
+                        parameter = "thetaLR",
+                        value = thetaLR,
                         constraint = "required for the selected likelihood ratio distribution",
                         relatedParameter = "likelihoodRatioDistribution",
                         relatedValue = likelihoodRatioDistribution,
-                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        functionName = "getDesignOptimalConditionalError",
                         reason = paste0(
                             "The fixed likelihood-ratio specification requires its effect value or support ",
                             "points."
                         ),
                         userInstructions = paste0(
-                            "Supply deltaLR for the intended fixed-effect specification; if another prior was ",
+                            "Supply thetaLR for the intended fixed-effect specification; if another prior was ",
                             "intended, correct likelihoodRatioDistribution instead."
                         )
                     )
                 } else {
-                    .assertIsNumericVector(x = deltaLR, argumentName = "deltaLR")
-                    self$deltaLR <- deltaLR
+                    .assertIsNumericVector(x = thetaLR, argumentName = "thetaLR")
+                    self$thetaLR <- thetaLR
                     # If any of the weights are NA, use equal weights
-                    if (any(is.na(weightsDeltaLR))) {
-                        self$weightsDeltaLR <- rep(1 / length(deltaLR), length(deltaLR))
+                    if (any(is.na(weightsLR))) {
+                        self$weightsLR <- rep(1 / length(thetaLR), length(thetaLR))
                         # For multiple effects, tell the user that equal weights are used.
-                        if (length(deltaLR) > 1) {
+                        if (length(thetaLR) > 1) {
                             message(
-                                "At least one entry in weightsDeltaLR is NA. Using equal weights for effects in fixed likelihood ratio."
+                                "At least one entry in weightsLR is NA. Using equal weights for effects in fixed likelihood ratio."
                             )
                         }
                     } else {
-                        .assertIsNumericVector(x = weightsDeltaLR, argumentName = "weightsDeltaLR")
-                        .assertIsInClosedInterval(x = weightsDeltaLR, xName = "weightsDeltaLR", lower = 0, upper = 1)
-                        # Check if weightsDeltaLR and deltaLR are of equal length
-                        if (length(weightsDeltaLR) != length(deltaLR)) {
+                        .assertIsNumericVector(x = weightsLR, argumentName = "weightsLR")
+                        .assertIsInClosedInterval(x = weightsLR, xName = "weightsLR", lower = 0, upper = 1)
+                        # Check if weightsLR and thetaLR are of equal length
+                        if (length(weightsLR) != length(thetaLR)) {
                             stopArgumentLengthOutOfBounds(
-                                "Must provide exactly one weight in weightsDeltaLR per entry of deltaLR.",
-                                parameter = "weightsDeltaLR",
-                                value = weightsDeltaLR,
-                                constraint = "one weight per deltaLR entry",
-                                relatedParameter = "deltaLR",
-                                relatedValue = deltaLR,
-                                expectedLength = length(deltaLR),
-                                actualLength = length(weightsDeltaLR),
-                                functionName = "getDesignOptimalConditionalErrorFunction"
+                                "Must provide exactly one weight in weightsLR per entry of thetaLR.",
+                                parameter = "weightsLR",
+                                value = weightsLR,
+                                constraint = "one weight per thetaLR entry",
+                                relatedParameter = "thetaLR",
+                                relatedValue = thetaLR,
+                                expectedLength = length(thetaLR),
+                                actualLength = length(weightsLR),
+                                functionName = "getDesignOptimalConditionalError"
                             )
                         }
-                        # Verify that weightsDeltaLR sums to 1
-                        if (abs(sum(weightsDeltaLR) - 1) > sqrt(.Machine$double.eps)) {
+                        # Verify that weightsLR sums to 1
+                        if (abs(sum(weightsLR) - 1) > sqrt(.Machine$double.eps)) {
                             stopIllegalArgument(
-                                "Weights in weightsDeltaLR must sum to 1.",
-                                parameter = "weightsDeltaLR",
-                                value = weightsDeltaLR,
+                                "Weights in weightsLR must sum to 1.",
+                                parameter = "weightsLR",
+                                value = weightsLR,
                                 constraint = "weights must sum to one within sqrt(.Machine$double.eps)",
-                                functionName = "getDesignOptimalConditionalErrorFunction",
+                                functionName = "getDesignOptimalConditionalError",
                                 reason = paste0(
                                     "The fixed likelihood-ratio mixture needs valid probability weights for its ",
                                     "support points."
                                 ),
                                 userInstructions = paste0(
-                                    "Specify one finite nonnegative weightsDeltaLR value per deltaLR value, ",
+                                    "Specify one finite nonnegative weightsLR value per thetaLR value, ",
                                     "summing to 1; choose weights that represent the intended mixture."
                                 )
                             )
                         }
-                        self$weightsDeltaLR <- weightsDeltaLR / sum(weightsDeltaLR)
+                        self$weightsLR <- weightsLR / sum(weightsLR)
                     }
                 }
             } else if (likelihoodRatioDistribution == "normal") {
-                .assertIsSingleNumber(deltaLR, "deltaLR", naAllowed = TRUE)
-                .assertIsSingleNumber(tauLR, "tauLR", naAllowed = TRUE)
-                if (is.na(deltaLR) || is.na(tauLR)) {
+                .assertIsSingleNumber(thetaLR, "thetaLR", naAllowed = TRUE)
+                .assertIsSingleNumber(stDevLR, "stDevLR", naAllowed = TRUE)
+                if (is.na(thetaLR) || is.na(stDevLR)) {
                     stopMissingArgument(
-                        "Must provide deltaLR and tauLR for normal prior in likelihood ratio.",
-                        parameter = c("deltaLR", "tauLR"),
-                        value = list(deltaLR = deltaLR, tauLR = tauLR),
+                        "Must provide thetaLR and stDevLR for normal prior in likelihood ratio.",
+                        parameter = c("thetaLR", "stDevLR"),
+                        value = list(thetaLR = thetaLR, stDevLR = stDevLR),
                         constraint = "required for the selected likelihood ratio distribution",
                         relatedParameter = "likelihoodRatioDistribution",
                         relatedValue = likelihoodRatioDistribution,
-                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        functionName = "getDesignOptimalConditionalError",
                         reason = "The normal likelihood-ratio prior requires both its location and scale.",
                         userInstructions = paste0(
-                            "Specify deltaLR and tauLR for the intended normal prior, or select the intended ",
+                            "Specify thetaLR and stDevLR for the intended normal prior, or select the intended ",
                             "likelihoodRatioDistribution."
                         )
                     )
                 } else {
-                    .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
-                    self$deltaLR <- deltaLR
+                    .assertIsSingleNumber(x = thetaLR, argumentName = "thetaLR")
+                    self$thetaLR <- thetaLR
 
-                    .assertIsSingleNumber(x = tauLR, argumentName = "tauLR")
-                    .assertIsInOpenInterval(x = tauLR, xName = "tauLR", lower = 0, upper = Inf)
+                    .assertIsSingleNumber(x = stDevLR, argumentName = "stDevLR")
+                    .assertIsInOpenInterval(x = stDevLR, xName = "stDevLR", lower = 0, upper = Inf)
 
-                    self$tauLR <- tauLR
+                    self$stDevLR <- stDevLR
                 }
             } else if (likelihoodRatioDistribution == "exp") {
                 .assertIsSingleNumber(kappaLR, "kappaLR", naAllowed = TRUE)
@@ -499,7 +513,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         constraint = "required for the selected likelihood ratio distribution",
                         relatedParameter = "likelihoodRatioDistribution",
                         relatedValue = likelihoodRatioDistribution,
-                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        functionName = "getDesignOptimalConditionalError",
                         reason = "The exponential likelihood-ratio prior requires its kappaLR parameter.",
                         userInstructions = paste0(
                             "Supply a valid kappaLR for the intended exponential prior, or select the intended ",
@@ -512,26 +526,26 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     self$kappaLR <- kappaLR
                 }
             } else if (likelihoodRatioDistribution == "unif") {
-                .assertIsSingleNumber(deltaMaxLR, "deltaMaxLR", naAllowed = TRUE)
-                if (is.na(deltaMaxLR)) {
+                .assertIsSingleNumber(maxThetaLR, "maxThetaLR", naAllowed = TRUE)
+                if (is.na(maxThetaLR)) {
                     stopMissingArgument(
-                        "Must provide deltaMaxLR for uniform prior in likelihood ratio.",
-                        parameter = "deltaMaxLR",
-                        value = deltaMaxLR,
+                        "Must provide maxThetaLR for uniform prior in likelihood ratio.",
+                        parameter = "maxThetaLR",
+                        value = maxThetaLR,
                         constraint = "required for the selected likelihood ratio distribution",
                         relatedParameter = "likelihoodRatioDistribution",
                         relatedValue = likelihoodRatioDistribution,
-                        functionName = "getDesignOptimalConditionalErrorFunction",
+                        functionName = "getDesignOptimalConditionalError",
                         reason = "The uniform likelihood-ratio prior requires its upper effect bound.",
                         userInstructions = paste0(
-                            "Supply deltaMaxLR for the intended uniform prior, or select the intended ",
+                            "Supply maxThetaLR for the intended uniform prior, or select the intended ",
                             "likelihoodRatioDistribution."
                         )
                     )
                 } else {
-                    .assertIsSingleNumber(x = deltaMaxLR, argumentName = "deltaMaxLR")
-                    .assertIsInOpenInterval(x = deltaMaxLR, xName = "deltaMaxLR", lower = 0, upper = Inf)
-                    self$deltaMaxLR <- deltaMaxLR
+                    .assertIsSingleNumber(x = maxThetaLR, argumentName = "maxThetaLR")
+                    .assertIsInOpenInterval(x = maxThetaLR, xName = "maxThetaLR", lower = 0, upper = Inf)
+                    self$maxThetaLR <- maxThetaLR
                 }
             } else if (likelihoodRatioDistribution == "maxlr") {} else {
                 stopIllegalArgument(
@@ -539,12 +553,12 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     parameter = "likelihoodRatioDistribution",
                     value = likelihoodRatioDistribution,
                     constraint = "one of fixed, normal, exp, unif or maxlr",
-                    functionName = "getDesignOptimalConditionalErrorFunction"
+                    functionName = "getDesignOptimalConditionalError"
                 )
             }
 
             if (is.function(self$conditionalPowerFunction) && useInterimEstimate &&
-                    (minimumSecondStageInformation > 0 || maximumSecondStageInformation < Inf)) {
+                    (minInformationPerStage > 0 || maxInformationPerStage < Inf)) {
                 warnNotValidated("Conditional power functions with interim estimates and information constraints may be non-monotone.",
                     userInstructions = paste0(
                         "Inspect monotonicity of the resulting conditional power function when combining ",
@@ -554,16 +568,16 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             }
 
             # Calculate monotonisation constants
-            self$monotonisationConstants <- .getMonotonisationConstants(
-                fun = .getQ,
-                lower = alpha1,
-                upper = alpha0,
-                argument = "firstStagePValue",
+            self$monotonisationConstants <- .getOptimalDesignMonotonisationConstants(
+                fun = .getOptimalDesignQ,
+                lower = efficacyBounds,
+                upper = futilityBounds,
+                argument = "pValue",
                 design = self
             )
 
             # Calculate level constant
-            self$levelConstant <- .getLevelConstant(
+            self$levelConstant <- .getOptimalDesignLevelConstant(
                 design = self
             )$root
             self$.initParameterTypes()
@@ -575,24 +589,24 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     C_PARAM_USER_DEFINED
                 })
             }
-            for (parameterName in c("ncp1", "ncp1Min", "ncp1Max")) {
+            for (parameterName in c("nonCentralityParameterH1", "minNonCentralityParameterH1", "maxNonCentralityParameterH1")) {
                 if (!is.null(self[[parameterName]])) self$.setParameterType(parameterName, C_PARAM_DERIVED)
             }
-            if (!useInterimEstimate && is.na(delta1)) {
-                self$.setParameterType("ncp1", C_PARAM_USER_DEFINED)
-                self$.setParameterType("delta1", C_PARAM_DERIVED)
-            } else if (useInterimEstimate && is.na(delta1Min)) {
-                self$.setParameterType("ncp1Min", C_PARAM_USER_DEFINED)
-                self$.setParameterType("delta1Min", C_PARAM_DERIVED)
-                self$.setParameterType("ncp1Max", if (is.null(list(...)$ncp1Max)) {
+            if (!useInterimEstimate && is.na(thetaH1)) {
+                self$.setParameterType("nonCentralityParameterH1", C_PARAM_USER_DEFINED)
+                self$.setParameterType("thetaH1", C_PARAM_DERIVED)
+            } else if (useInterimEstimate && is.na(minThetaH1)) {
+                self$.setParameterType("minNonCentralityParameterH1", C_PARAM_USER_DEFINED)
+                self$.setParameterType("minThetaH1", C_PARAM_DERIVED)
+                self$.setParameterType("maxNonCentralityParameterH1", if (missing(maxNonCentralityParameterH1)) {
                     C_PARAM_DEFAULT_VALUE
                 } else {
                     C_PARAM_USER_DEFINED
                 })
-                self$.setParameterType("delta1Max", C_PARAM_DERIVED)
+                self$.setParameterType("maxThetaH1", C_PARAM_DERIVED)
             }
-            if (likelihoodRatioDistribution == "fixed" && any(is.na(weightsDeltaLR))) {
-                self$.setParameterType("weightsDeltaLR", C_PARAM_DEFAULT_VALUE)
+            if (likelihoodRatioDistribution == "fixed" && any(is.na(weightsLR))) {
+                self$.setParameterType("weightsLR", C_PARAM_DEFAULT_VALUE)
             }
             for (parameterName in c("levelConstant", "monotonisationConstants")) {
                 self$.setParameterType(parameterName, C_PARAM_GENERATED)
@@ -607,7 +621,61 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             if (showType == 2) {
                 super$.show(showType = showType, consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                .showOptimalConditionalErrorDesign(self, consoleOutputEnabled = consoleOutputEnabled)
+                .showOptimalDesign(self, consoleOutputEnabled = consoleOutputEnabled)
+            }
+        }
+    )
+)
+
+#' Characteristics of an Optimal Conditional Error Design
+#'
+#' @description Operating characteristics returned by [getDesignCharacteristics()]
+#'   for an optimal conditional error design. Inherits from `ParameterSet`.
+#' @details `theta` contains the evaluated effects and `overallReject` the overall
+#'   rejection probabilities. `rejectPerStage` has two rows (stages one and two),
+#'   and `futilityPerStage` one row (interim futility). Columns correspond to `theta`.
+#'   Final non-rejection is not classified as early futility.
+#' @include class_core_parameter_set.R
+#' @keywords internal
+TrialDesignOptimalConditionalErrorCharacteristics <- R6::R6Class(
+    "TrialDesignOptimalConditionalErrorCharacteristics",
+    inherit = ParameterSet,
+    public = list(
+        .design = NULL,
+        theta = NULL,
+        overallReject = NULL,
+        rejectPerStage = NULL,
+        futilityPerStage = NULL,
+        initialize = function(design, theta, overallReject, rejectPerStage, futilityPerStage) {
+            super$initialize()
+            self$.design <- design
+            self$theta <- theta
+            self$overallReject <- overallReject
+            self$rejectPerStage <- rejectPerStage
+            self$futilityPerStage <- futilityPerStage
+            rownames(self$rejectPerStage) <- paste("stage =", 1:2)
+            rownames(self$futilityPerStage) <- "stage = 1"
+            self$.initParameterTypes()
+            self$.setParameterType("theta", C_PARAM_USER_DEFINED)
+            for (parameterName in c("overallReject", "rejectPerStage", "futilityPerStage")) {
+                self$.setParameterType(parameterName, C_PARAM_GENERATED)
+            }
+        },
+        show = function(showType = 1, digits = NA_integer_) {
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            invisible(self)
+        },
+        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
+            self$.resetCat()
+            if (showType == 2) {
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+            } else {
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Operating characteristics",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
             }
         }
     )

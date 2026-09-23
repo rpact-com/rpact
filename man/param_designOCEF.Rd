@@ -4,7 +4,7 @@
 \alias{param_designOCEF}
 \title{Parameter Description: Design Object (optimal conditional error design)}
 \arguments{
-\item{design}{An object of class \code{TrialDesignOptimalConditionalError} created by \code{getDesignOptimalConditionalErrorFunction()}. Contains all necessary arguments to calculate the optimal conditional error function for the specified case.}
+\item{design}{An object of class \code{TrialDesignOptimalConditionalError} created by \code{getDesignOptimalConditionalError()}. Contains all necessary arguments to calculate the optimal conditional error function for the specified case.}
 }
 \description{
 Parameter Description: Design Object (optimal conditional error design)

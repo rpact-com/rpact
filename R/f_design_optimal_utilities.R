@@ -25,26 +25,26 @@ print.TrialDesignOptimalConditionalError <- function(x, ..., markdown = NA) {
     return(print.ParameterSet(x, ..., markdown = markdown))
 }
 
-.showOptimalConditionalErrorDesign <- function(x, consoleOutputEnabled = TRUE) {
+.showOptimalDesign <- function(x, consoleOutputEnabled = TRUE) {
     cat <- function(..., sep = " ") {
         x$.cat(..., sep = sep, consoleOutputEnabled = consoleOutputEnabled)
     }
-    cat("Optimal Conditional Error Function Design: \n \n")
+    cat("Optimal Conditional Error Design: \n \n")
     cat("General design parameters: \n")
     cat("  Overall significance level:", x$alpha, "\n")
-    cat("  First-stage efficacy boundary (p-value scale):", x$alpha1, "\n")
-    cat("  Binding first-stage futility boundary (p-value scale):", x$alpha0, "\n")
-    if (x$minimumConditionalError > 0 || x$maximumConditionalError < 1) {
+    cat("  First-stage efficacy boundary (p-value scale):", x$efficacyBounds, "\n")
+    cat("  Binding first-stage futility boundary (p-value scale):", x$futilityBounds, "\n")
+    if (x$minConditionalError > 0 || x$maxConditionalError < 1) {
         cat(
             "  Constraints on optimal conditional error:",
-            paste("[", x$minimumConditionalError, ", ", x$maximumConditionalError, "]", sep = ""),
+            paste("[", x$minConditionalError, ", ", x$maxConditionalError, "]", sep = ""),
             "\n"
         )
     }
-    if (x$minimumSecondStageInformation > 0 || x$maximumSecondStageInformation < Inf) {
+    if (x$minInformationPerStage > 0 || x$maxInformationPerStage < Inf) {
         cat(
             "  Constraints on second-stage information:",
-            paste("[", x$minimumSecondStageInformation, ", ", x$maximumSecondStageInformation, "]", sep = ""),
+            paste("[", x$minInformationPerStage, ", ", x$maxInformationPerStage, "]", sep = ""),
             "\n"
         )
     }
@@ -60,17 +60,17 @@ print.TrialDesignOptimalConditionalError <- function(x, ..., markdown = NA) {
     if (x$useInterimEstimate) {
         cat(
             "  Alternative: interim estimate restricted to",
-            paste("[", x$delta1Min, ", ", x$delta1Max, "]", sep = ""),
+            paste("[", x$minThetaH1, ", ", x$maxThetaH1, "]", sep = ""),
             "\n"
         )
         cat(
             "  First-stage non-centrality parameter restricted to",
-            paste("[", x$ncp1Min, ", ", x$ncp1Max, "]", sep = ""),
+            paste("[", x$minNonCentralityParameterH1, ", ", x$maxNonCentralityParameterH1, "]", sep = ""),
             "\n"
         )
     } else {
-        cat("  Alternative:", x$delta1, "\n")
-        cat("  First-stage non-centrality parameter:", x$ncp1, "\n")
+        cat("  Alternative:", x$thetaH1, "\n")
+        cat("  First-stage non-centrality parameter:", x$nonCentralityParameterH1, "\n")
     }
     cat("  First-stage information:", x$firstStageInformation, "\n")
     cat("\n")
@@ -81,22 +81,22 @@ print.TrialDesignOptimalConditionalError <- function(x, ..., markdown = NA) {
         fixed = {
             cat(
                 "  Fixed parameter(s) in likelihood ratio: ",
-                paste(format(x$deltaLR, trim = TRUE), collapse = ", "),
+                paste(format(x$thetaLR, trim = TRUE), collapse = ", "),
                 "\n"
             )
-            cat("  Parameter weights: ", paste(format(x$weightsDeltaLR, trim = TRUE), collapse = ", "), "\n")
+            cat("  Parameter weights: ", paste(format(x$weightsLR, trim = TRUE), collapse = ", "), "\n")
         },
         normal = {
             cat(
                 "  Normally distributed prior in likelihood ratio with mean ",
-                x$deltaLR,
+                x$thetaLR,
                 " and standard deviation ",
-                x$tauLR,
+                x$stDevLR,
                 "\n"
             )
         },
         unif = {
-            cat("  Uniformly distributed prior in likelihood ratio with maximum ", x$deltaMaxLR, "\n")
+            cat("  Uniformly distributed prior in likelihood ratio with maximum ", x$maxThetaLR, "\n")
         },
         exp = {
             cat("  Exponentially distributed prior in likelihood ratio with scaled rate ", x$kappaLR, "\n")
@@ -111,7 +111,7 @@ print.TrialDesignOptimalConditionalError <- function(x, ..., markdown = NA) {
     cat("  Constant:", x$levelConstant, "\n")
     cat(
         "  Searched on interval:",
-        paste("[", x$levelConstantMinimum, ", ", x$levelConstantMaximum, "]", sep = ""),
+        paste("[", x$minLevelConstant, ", ", x$maxLevelConstant, "]", sep = ""),
         "\n"
     )
 
@@ -152,17 +152,17 @@ print.TrialDesignOptimalConditionalError <- function(x, ..., markdown = NA) {
 #' @return A `ggplot` object.
 #' @param range Numeric vector with two entries specifying the range of the x-axis of the plot.
 #' @param type Type of plot to be created. Options are: \itemize{
-#' \item \code{type = 1}: Plot the values of the optimal conditional error function against the first-stage p-value.
-#' \item \code{type = 2}: Plot the second-stage information resulting from the optimal conditional error function against the first-stage p-value.
-#' \item \code{type = 3}: Plot the likelihood ratio of the given specification of the optimal conditional error function against the first-stage p-value.
-#' \item \code{type = 4}: Plot the function Q of the given specification of the optimal conditional error function against the first-stage p-value.
+#' \item \code{type = "conditionalError"} (or \code{1}): Plot the values of the optimal conditional error function against the first-stage p-value.
+#' \item \code{type = "stageInformation"} (or \code{2}): Plot the second-stage information resulting from the optimal conditional error function against the first-stage p-value.
+#' \item \code{type = "likelihoodRatio"} (or \code{3}): Plot the likelihood ratio of the given specification of the optimal conditional error function against the first-stage p-value.
+#' \item \code{type = "qFunction"} (or \code{4}): Plot the function Q of the given specification of the optimal conditional error function against the first-stage p-value.
 #' }
-#' @param plotNonMonotoneFunction Logical. Should the non-monotone version of the plot be drawn? Not applicable for plot type 3. Default: \code{FALSE}.
+#' @param plotNonMonotoneFunction Logical. Should the non-monotone version of the plot be drawn? Not applicable for `type = "likelihoodRatio"`. Default: \code{FALSE}.
 #' @param ... Additional arguments for the generic method.
 #'
 #' @export
-plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), type = 1, plotNonMonotoneFunction = FALSE) {
-    .assertIsOptimalConditionalErrorDesign(x)
+plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), type = "conditionalError", plotNonMonotoneFunction = FALSE) {
+    .assertIsOptimalDesign(x)
     .assertIsNumericVector(range, "range", len = 2)
     .assertIsInClosedInterval(range, "range", lower = 0, upper = 1)
     if (range[1] >= range[2]) {
@@ -173,6 +173,18 @@ plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), 
             constraint = "range[1] < range[2]",
             functionName = "plot.TrialDesignOptimalConditionalError"
         )
+    }
+    if (is.character(type)) {
+        .assertIsSingleCharacter(type, "type")
+        plotTypes <- c("conditionalError", "stageInformation", "likelihoodRatio", "qFunction")
+        if (!type %in% plotTypes) {
+            stopIllegalArgument(
+                "Unknown optimal design plot type.", parameter = "type", value = type,
+                constraint = paste(plotTypes, collapse = ", "),
+                functionName = "plot.TrialDesignOptimalConditionalError"
+            )
+        }
+        type <- match(type, plotTypes)
     }
     .assertIsSingleInteger(type, "type", validateType = FALSE)
     .assertIsInClosedInterval(type, "type", lower = 1, upper = 4)
@@ -187,42 +199,42 @@ plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), 
         )
     }
     if (type == 4) {
-        continuationRange <- c(max(range[1], x$alpha1), min(range[2], x$alpha0))
+        continuationRange <- c(max(range[1], x$efficacyBounds), min(range[2], x$futilityBounds))
         if (continuationRange[1] >= continuationRange[2]) {
             stopConflictingArguments(
                 "'range' must overlap the continuation region for plot type 4.",
                 parameter = "range",
                 value = range,
                 constraint = "must overlap the continuation region for type 4",
-                relatedParameter = c("type", "alpha1", "alpha0"),
-                relatedValue = list(type = type, alpha1 = x$alpha1, alpha0 = x$alpha0),
+                relatedParameter = c("type", "efficacyBounds", "futilityBounds"),
+                relatedValue = list(type = type, efficacyBounds = x$efficacyBounds, futilityBounds = x$futilityBounds),
                 functionName = "plot.TrialDesignOptimalConditionalError"
             )
         }
         range <- continuationRange
     }
     # Open endpoints avoid infinite likelihood ratios in diagnostic plots.
-    firstStagePValues <- seq(range[1], range[2], length.out = 1000)
-    if (type %in% c(3, 4)) firstStagePValues <- firstStagePValues[firstStagePValues > 0 & firstStagePValues < 1]
+    pValues <- seq(range[1], range[2], length.out = 1000)
+    if (type %in% c(3, 4)) pValues <- pValues[pValues > 0 & pValues < 1]
     getValues <- function(design) {
         switch(
             type,
-            getOptimalConditionalError(firstStagePValues, design),
-            getSecondStageInformation(firstStagePValues, design),
-            .getLikelihoodRatio(firstStagePValues, design),
-            .getMonotoneFunction(firstStagePValues, fun = .getQ, design = design)
+            getConditionalError(pValue = pValues, design = design),
+            getStageInformation(pValue = pValues, design = design),
+            .getOptimalDesignLikelihoodRatio(pValues, design),
+            .getOptimalDesignMonotoneValues(pValues, fun = .getOptimalDesignQ, design = design)
         )
     }
     values <- getValues(x)
-    data <- data.frame(firstStagePValue = firstStagePValues, value = values)
-    result <- ggplot2::ggplot(data, ggplot2::aes(x = .data$firstStagePValue, y = .data$value)) +
+    data <- data.frame(pValue = pValues, value = values)
+    result <- ggplot2::ggplot(data, ggplot2::aes(x = .data$pValue, y = .data$value)) +
         ggplot2::geom_line(linewidth = 1.1) +
         ggplot2::labs(x = "First-stage p-value", y = c(
             "Optimal conditional error", "Second-stage information", "Likelihood ratio", "Q"
         )[type]) +
         ggplot2::theme_bw() +
-        ggplot2::geom_vline(xintercept = x$alpha0, linetype = "dotted", colour = "red") +
-        ggplot2::geom_vline(xintercept = x$alpha1, linetype = "dotted", colour = "blue") +
+        ggplot2::geom_vline(xintercept = x$futilityBounds, linetype = "dotted", colour = "red") +
+        ggplot2::geom_vline(xintercept = x$efficacyBounds, linetype = "dotted", colour = "blue") +
         ggplot2::coord_cartesian(xlim = range)
 
     if (plotNonMonotoneFunction && type != 3) {
@@ -236,8 +248,8 @@ plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), 
         } else {
             secondDesign <- x$clone(deep = TRUE)
             secondDesign$enforceMonotonicity <- FALSE
-            if (type %in% c(1, 2)) secondDesign$levelConstant <- .getLevelConstant(secondDesign)$root
-            comparisonData <- data.frame(firstStagePValue = firstStagePValues, value = getValues(secondDesign))
+            if (type %in% c(1, 2)) secondDesign$levelConstant <- .getOptimalDesignLevelConstant(secondDesign)$root
+            comparisonData <- data.frame(pValue = pValues, value = getValues(secondDesign))
             result <- result + ggplot2::geom_line(
                 data = comparisonData,
                 colour = "gray", linetype = "dashed", linewidth = 1.1
@@ -259,29 +271,29 @@ plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), 
 #' @return The design, invisibly, after printing its operating characteristics.
 #' @export
 summary.TrialDesignOptimalConditionalError <- function(object, ...) {
-    .assertIsOptimalConditionalErrorDesign(object)
-    cat("Summary of the Optimal Conditional Error Function Design: \n \n")
+    .assertIsOptimalDesign(object)
+    cat("Summary of the Optimal Conditional Error Design: \n \n")
     cat("General design parameters: \n")
     cat("  Overall significance level:", object$alpha, "\n")
-    cat("  First-stage efficacy boundary (p-value scale):", object$alpha1, "\n")
-    cat("  Binding first-stage futility boundary (p-value scale):", object$alpha0, "\n")
+    cat("  First-stage efficacy boundary (p-value scale):", object$efficacyBounds, "\n")
+    cat("  Binding first-stage futility boundary (p-value scale):", object$futilityBounds, "\n")
     cat("\n")
 
     cat("Second-stage information: \n")
     cat(
-        "  Expected second-stage information (delta=0):",
-        getExpectedSecondStageInformation(design = object, likelihoodRatioDistribution = "fixed", deltaLR = 0),
+        "  Expected second-stage information (theta=0):",
+        getStageInformation(type = "expected", design = object, likelihoodRatioDistribution = "fixed", thetaLR = 0),
         "\n"
     )
-    if (!object$useInterimEstimate && length(object$weightsDeltaLR) <= 1) {
+    if (!object$useInterimEstimate && length(object$weightsLR) <= 1) {
         cat(
-            "  Expected second-stage information (delta=delta1=",
-            object$delta1,
+            "  Expected second-stage information (theta=thetaH1=",
+            object$thetaH1,
             "): ",
-            getExpectedSecondStageInformation(
+            getStageInformation(type = "expected",
                 design = object,
                 likelihoodRatioDistribution = "fixed",
-                deltaLR = object$delta1
+                thetaLR = object$thetaH1
             ),
             "\n",
             sep = ""
@@ -289,45 +301,45 @@ summary.TrialDesignOptimalConditionalError <- function(object, ...) {
     }
     if (object$useInterimEstimate) {
         cat(
-            "  Expected Second Stage Information (delta=delta1Min=",
-            object$delta1Min,
+            "  Expected Second Stage Information (theta=minThetaH1=",
+            object$minThetaH1,
             "): ",
-            getExpectedSecondStageInformation(
+            getStageInformation(type = "expected",
                 design = object,
                 likelihoodRatioDistribution = "fixed",
-                deltaLR = object$delta1Min
+                thetaLR = object$minThetaH1
             ),
             "\n",
             sep = ""
         )
     }
-    cat(
-        "  Expected second-stage information (Given likelihood ratio distr.):",
-        getExpectedSecondStageInformation(design = object),
-        "\n"
-    )
     if (object$likelihoodRatioDistribution != "maxlr") {
+        cat(
+            "  Expected second-stage information (Given likelihood ratio distr.):",
+            getStageInformation(type = "expected", design = object),
+            "\n"
+        )
         if (object$likelihoodRatioDistribution == "fixed") {
-            if (length(object$weightsDeltaLR) <= 1) {
-                delta <- object$deltaLR
+            if (length(object$weightsLR) <= 1) {
+                theta <- object$thetaLR
             } else {
-                delta <- object$deltaLR %*% object$weightsDeltaLR
+                theta <- object$thetaLR %*% object$weightsLR
             }
         }
         if (object$likelihoodRatioDistribution == "normal") {
-            delta <- object$deltaLR
+            theta <- object$thetaLR
         }
         if (object$likelihoodRatioDistribution == "exp") {
-            delta <- 1 / (object$kappaLR * object$firstStageInformation)
+            theta <- 1 / (object$kappaLR * object$firstStageInformation)
         }
         if (object$likelihoodRatioDistribution == "unif") {
-            delta <- object$deltaMaxLR / 2
+            theta <- object$maxThetaLR / 2
         }
         cat(
-            "  Expected second-stage information (delta=Mean of given likelihood ratio distr.=",
-            delta,
+            "  Expected second-stage information (theta=Mean of given likelihood ratio distr.=",
+            theta,
             "): ",
-            getExpectedSecondStageInformation(design = object, likelihoodRatioDistribution = "fixed", deltaLR = delta),
+            getStageInformation(type = "expected", design = object, likelihoodRatioDistribution = "fixed", thetaLR = theta),
             "\n",
             sep = ""
         )
@@ -335,7 +347,7 @@ summary.TrialDesignOptimalConditionalError <- function(object, ...) {
     if (!is.na(object$conditionalPower)) {
         cat(
             "  Second-stage information at the futility boundary:",
-            getSecondStageInformation(design = object, firstStagePValue = object$alpha0)
+            getStageInformation(design = object, pValue = object$futilityBounds)
         )
     }
     cat("\n \n")
@@ -346,85 +358,85 @@ summary.TrialDesignOptimalConditionalError <- function(object, ...) {
     } else if (!is.na(object$conditionalPower)) {
         cat("  Conditional power (fixed):", object$conditionalPower, "\n")
     }
-    if (!object$useInterimEstimate && length(object$weightsDeltaLR) <= 1) {
-        powerResults <- getOverallPower(design = object, alternative = object$delta1)
-        cat("  Overall power (delta1=", object$delta1, "): ", powerResults$overallPower, "\n", sep = "")
+    if (!object$useInterimEstimate && length(object$weightsLR) <= 1) {
+        powerResults <- getDesignCharacteristics(design = object, theta = object$thetaH1)
+        cat("  Overall power (thetaH1=", object$thetaH1, "): ", powerResults$overallReject, "\n", sep = "")
         cat(
-            "  Efficacy stopping probability (delta1=",
-            object$delta1,
+            "  Efficacy stopping probability (thetaH1=",
+            object$thetaH1,
             "): ",
-            powerResults$firstStageEfficacy,
+            powerResults$rejectPerStage[1, ],
             "\n",
             sep = ""
         )
         cat(
-            "  Futility stopping probability (delta1=",
-            object$delta1,
+            "  Futility stopping probability (thetaH1=",
+            object$thetaH1,
             "): ",
-            powerResults$firstStageFutility,
+            powerResults$futilityPerStage[1, ],
             "\n",
             sep = ""
         )
     }
     if (object$useInterimEstimate) {
-        powerResults <- getOverallPower(design = object, alternative = object$delta1Min)
-        cat("  Overall power (delta1=delta1Min= ", object$delta1Min, "): ", powerResults$overallPower, "\n", sep = "")
+        powerResults <- getDesignCharacteristics(design = object, theta = object$minThetaH1)
+        cat("  Overall power (thetaH1=minThetaH1= ", object$minThetaH1, "): ", powerResults$overallReject, "\n", sep = "")
         cat(
-            "  Efficacy stopping probability (delta1=delta1Min= ",
-            object$delta1Min,
+            "  Efficacy stopping probability (thetaH1=minThetaH1= ",
+            object$minThetaH1,
             "): ",
-            powerResults$firstStageEfficacy,
+            powerResults$rejectPerStage[1, ],
             "\n",
             sep = ""
         )
         cat(
-            "  Futility stopping probability (delta1=delta1Min= ",
-            object$delta1Min,
+            "  Futility stopping probability (thetaH1=minThetaH1= ",
+            object$minThetaH1,
             "): ",
-            powerResults$firstStageFutility,
+            powerResults$futilityPerStage[1, ],
             "\n",
             sep = ""
         )
     }
     if (object$likelihoodRatioDistribution != "maxlr") {
         if (object$likelihoodRatioDistribution == "fixed") {
-            if (length(object$weightsDeltaLR) <= 1) {
-                delta1 <- object$deltaLR
+            if (length(object$weightsLR) <= 1) {
+                thetaH1 <- object$thetaLR
             } else {
-                delta1 <- as.numeric(object$deltaLR %*% object$weightsDeltaLR)
+                thetaH1 <- as.numeric(object$thetaLR %*% object$weightsLR)
             }
         }
         if (object$likelihoodRatioDistribution == "normal") {
-            delta1 <- object$deltaLR
+            thetaH1 <- object$thetaLR
         }
         if (object$likelihoodRatioDistribution == "exp") {
-            delta1 <- 1 / (object$kappaLR * object$firstStageInformation)
+            thetaH1 <- 1 / (object$kappaLR * object$firstStageInformation)
         }
         if (object$likelihoodRatioDistribution == "unif") {
-            delta1 <- object$deltaMaxLR / 2
+            thetaH1 <- object$maxThetaLR / 2
         }
-        powerResults <- getOverallPower(design = object, alternative = delta1)
+        powerResults <- getDesignCharacteristics(design = object, theta = thetaH1)
         cat(
-            "  Overall power (delta1=Mean of given likelihood ratio distr.= ",
-            delta1,
+            "  Overall power (thetaH1=Mean of given likelihood ratio distr.= ",
+            thetaH1,
             "): ",
-            powerResults$overallPower,
+            powerResults$overallReject,
             "\n",
             sep = ""
         )
         cat(
-            "  Efficacy stopping probability (delta1=Mean of given likelihood ratio distr.= ",
-            delta1,
+            "  Efficacy stopping probability (thetaH1=Mean of given likelihood ratio distr.= ",
+            thetaH1,
             "): ",
-            powerResults$firstStageEfficacy,
+            powerResults$rejectPerStage[1, ],
             "\n",
             sep = ""
         )
         cat(
-            "  Futility stopping probability (delta1=Mean of given likelihood ratio distr.= ",
-            delta1,
+            "  Futility stopping probability (thetaH1=Mean of given likelihood ratio distr.= ",
+            thetaH1,
             "): ",
-            powerResults$firstStageFutility,
+            powerResults$futilityPerStage[1, ],
             "\n",
             sep = ""
         )

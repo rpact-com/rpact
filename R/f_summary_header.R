@@ -409,8 +409,9 @@ NULL
 
         if (length(designPlan[[userDefinedParam]]) == 1) {
             treatmentRateText <- paste0("H1: ", paramName, " = ", round(designPlan[[userDefinedParam]], 3))
-        } else if (!is.null(designPlan[["omegaMaxVector"]]) && length(designPlan$omegaMaxVector) == 1) {
-            treatmentRateText <- paste0("H1: omega_max = ", round(designPlan$omegaMaxVector, 3))
+        } else if (!is.null(designPlan[["omegaMaxVector"]]) && length(designPlan$omegaMaxVector) >= 1) {
+            treatmentRateText <- paste0("H1: omega_max = ", 
+                .arrayToString(designPlan$omegaMaxVector, mode = "vector", digits = 3))
         } else if (!is.null(designPlan[["hazardRatio"]]) && (length(designPlan$hazardRatio) == 1) ||
                 (inherits(designPlan, "SimulationResults") && !is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
                     designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled)) {
@@ -485,12 +486,12 @@ NULL
 
     if ("effectMatrix" %in% names(designPlan) && 
             !is.null(designPlan$effectMatrix) && 
-            designPlan$isUserDefinedParameter("effectMatrix")) {
+            (designPlan$isUserDefinedParameter("effectMatrix") || designPlan$isDerivedParameter("effectMatrix"))) {
         effectMatrixLines <- .formatSummaryEffectMatrix(designPlan$effectMatrix, consoleOutputEnabled)
 
         header <- paste0(
             header, "\n\n",
-            "User defined effect shape:",
+            ifelse(designPlan$isUserDefinedParameter("effectMatrix"), "User defined effect shape:", "Effect shape:"),
             ifelse(consoleOutputEnabled, "\n", "\n\n"), paste(effectMatrixLines, collapse = "\n")
         )
     }

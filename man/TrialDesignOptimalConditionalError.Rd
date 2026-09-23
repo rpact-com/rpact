@@ -8,12 +8,12 @@ R6 parameter set for an adaptive two-stage design based on an
 optimal conditional error function.
 }
 \details{
-Create objects with \code{\link[=getDesignOptimalConditionalErrorFunction]{getDesignOptimalConditionalErrorFunction()}}.
+Create objects with \code{\link[=getDesignOptimalConditionalError]{getDesignOptimalConditionalError()}}.
 This class inherits from \code{ParameterSet}, not \code{TrialDesign}: its second-stage
 information depends on the interim result. Functions accepting conventional
 group sequential or combination-test designs cannot use this object.
 }
 \seealso{
-\code{\link[=getDesignOptimalConditionalErrorFunction]{getDesignOptimalConditionalErrorFunction()}}
+\code{\link[=getDesignOptimalConditionalError]{getDesignOptimalConditionalError()}}
 }
 \keyword{internal}
