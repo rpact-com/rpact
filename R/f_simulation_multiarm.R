@@ -91,7 +91,8 @@ NULL
                 value = selectedArms, constraint = paste0("logical vector of length ", gMax),
                 relatedParameter = "gMax",
                 relatedValue = gMax,
-                functionName = ".selectTreatmentArms"
+                functionName = ".selectTreatmentArms",
+                diagnosticId = "simulation.arm_selection_result_invalid"
             )
         }
         if (!is.logical(selectedArms)) {
@@ -99,7 +100,8 @@ NULL
                 parameter = "selectArmsFunction", value = selectedArms, constraint = "logical vector",
                 relatedParameter = "class of selected arms",
                 relatedValue = .getClassName(selectedArms),
-                functionName = ".selectTreatmentArms"
+                functionName = ".selectTreatmentArms",
+                diagnosticId = "simulation.arm_selection_result_invalid"
             )
         }
     }
@@ -118,7 +120,8 @@ NULL
         successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stopIllegalArgument("Group sequential design cannot be used for designs with treatment arm selection",
-            functionName = ".performClosedCombinationTestForSimulationMultiArm"
+            functionName = ".performClosedCombinationTestForSimulationMultiArm",
+            diagnosticId = "simulation.group_sequential_selection_unsupported"
         )
     }
 
@@ -286,9 +289,10 @@ NULL
         alpha,
         indices,
         allocationRatioPlanned) {
-    if (allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
+    if (length(allocationRatioPlanned) > 1 && allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
         stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages",
-            functionName = ".getCriticalValuesDunnettForSimulation"
+            functionName = ".getCriticalValuesDunnettForSimulation",
+            diagnosticId = "simulation.dunnett_allocation_varies"
         )
     }
 
@@ -469,6 +473,7 @@ NULL
         minNumberOfEventsPerStage = NA_real_, # survival only
         maxNumberOfEventsPerStage = NA_real_, # survival only
         conditionalPower,
+        thetaH0 = NA_real_, # means + rates + survival only
         thetaH1 = NA_real_, # means + survival only
         stDevH1 = NA_real_, # means only
         piTreatmentsH1 = NA_real_, # rates only
@@ -480,16 +485,15 @@ NULL
         selectArmsFunction,
         showStatistics,
         endpoint = c("means", "rates", "survival"),
-        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic")) {
+        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+        simulationTypeIsUserDefined = FALSE) {
     endpoint <- match.arg(endpoint)
     simulationType <- match.arg(simulationType)
-
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
-    piMaxVector <- .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = TRUE)
     
     if (endpoint == "means") {
         simulationResults <- SimulationResultsMultiArmMeans$new(design, showStatistics = showStatistics)
-    } else if (endpoint == "rates") {
+    } else if (endpoint == "rates") {        
         simulationResults <- SimulationResultsMultiArmRates$new(design, showStatistics = showStatistics)
     } else if (endpoint == "survival") {
         simulationResults <- SimulationResultsMultiArmSurvival$new(design, showStatistics = showStatistics)
@@ -499,7 +503,14 @@ NULL
             "testStatisticBased",
             "patientWise"
         )
-        simulationResults$.setParameterType("simulationType", C_PARAM_DERIVED)
+        simulationResults$.setParameterType("simulationType", 
+            ifelse(isFALSE(simulationTypeIsUserDefined) || identical(simulationType, "auto"), 
+                ifelse(
+                    identical(simulationType, "testStatisticBased"),
+                    C_PARAM_DERIVED,
+                    C_PARAM_DEFAULT_VALUE
+                ), 
+                C_PARAM_USER_DEFINED))
     }
 
     if (is.na(activeArms)) {
@@ -601,12 +612,19 @@ NULL
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
 
     if (endpoint %in% c("rates", "survival")) {
-        .assertIsSingleLogical(directionUpper, "directionUpper")
+        directionUpper <- .setDirectionUpper(
+            simulationResults,
+            design,
+            directionUpper,
+            objectType = "power",
+            endpoint = endpoint,
+            userFunctionCallEnabled = TRUE)
     }
 
     if (endpoint %in% c("means", "survival")) {
         .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE) # means + survival only
     }
+    .assertIsValidThetaH0(thetaH0, endpoint = endpoint, groups = 2)
 
     if (endpoint == "means") {
         stDev <- .assertIsValidStandardDeviation(stDev) # means only
@@ -635,24 +653,28 @@ NULL
             length(threshold) == 1 &&
             threshold != -Inf
         ) {
-        warning(
+        warnArgumentIgnored(
             "'threshold' (",
             threshold,
             ") will be ignored because 'typeOfSelection' = \"userDefined\"",
-            call. = FALSE
+            parameter = "threshold",
+            value = threshold,
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            diagnosticId = "selection.threshold_ignored_for_callback"
         )
         threshold <- -Inf
     }
 
     if (length(typeOfSelection) == 1 && typeOfSelection != "userDefined" && !is.null(selectArmsFunction)) {
-        warning("'selectArmsFunction' will be ignored because 'typeOfSelection' is not \"userDefined\"", call. = FALSE)
+        warnArgumentIgnored("'selectArmsFunction' will be ignored because 'typeOfSelection' is not \"userDefined\"",
+            parameter = "selectArmsFunction",
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            diagnosticId = "selection.arm_callback_requires_user_defined"
+        )
     } else if (!is.null(selectArmsFunction) && is.function(selectArmsFunction)) {
         simulationResults$selectArmsFunction <- selectArmsFunction
-    }
-
-    if (endpoint %in% c("rates", "survival")) {
-        .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, 
-            ifelse(identical(endpoint, "survival"), C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT))
     }
 
     if (endpoint == "means") {
@@ -707,6 +729,11 @@ NULL
         .assertIsInOpenInterval(piControlH1, "piControlH1", lower = 0, upper = 1, naAllowed = TRUE)
         .setValueAndParameterType(simulationResults, "piControlH1", piControlH1, NA_real_)
 
+        piMaxVector <- .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = TRUE)
+        if (all(is.na(piMaxVector)) && !identical(typeOfShape, "userDefined")) {
+            piMaxVector <- .getPi1Default(type = "power", endpoint = endpoint)
+        }
+        
         effectMatrix <- .assertIsValidEffectMatrixRates(
             simulationResults = simulationResults,
             activeArms = activeArms,
@@ -720,10 +747,14 @@ NULL
             doseLevels = doseLevels
         )
 
-        if (typeOfShape == "userDefined") {
+        if (identical(typeOfShape, "userDefined")) {
             if (!all(is.na(piMaxVector))) {
-                warning("'piMaxVector' (", .arrayToString(piMaxVector), ") will be ignored ",
-                    "because 'typeOfShape' = \"userDefined\"", call. = FALSE)
+                warnArgumentIgnored("'piMaxVector' (", .arrayToString(piMaxVector), ") will be ignored ",
+                    "because 'typeOfShape' = \"userDefined\"",
+                    parameter = "piMaxVector",
+                    value = piMaxVector,
+                    diagnosticId = "shape.maximum_probability_ignored"
+                )
             }
             piMaxVector <- effectMatrix[, gMax]
         } else if (!all(is.na(piMaxVector))) {
@@ -732,10 +763,14 @@ NULL
             piMaxVector <- .getPi1Default(type = "power", endpoint = "rates")
         }
         .setValueAndParameterType(simulationResults, "piMaxVector", piMaxVector, NA_real_)
-        if (typeOfShape == "userDefined") {
+        if (identical(typeOfShape, "userDefined")) {
             simulationResults$.setParameterType("piMaxVector", C_PARAM_DERIVED)
         }
     } else if (endpoint == "survival") {
+        .assertIsNumericVector(omegaMaxVector, "omegaMaxVector", naAllowed = TRUE)
+        if (!identical(typeOfShape, "userDefined") && all(is.na(omegaMaxVector))) {
+            omegaMaxVector <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+        }
         effectMatrix <- .assertIsValidEffectMatrixSurvival(
             simulationResults = simulationResults,
             activeArms = activeArms,
@@ -886,7 +921,8 @@ NULL
                     ") must be not smaller than minNumberOfSubjectsPerStage' (",
                     .arrayToString(minNumberOfSubjectsPerStage), ")",
                     functionName = ".createSimulationResultsMultiArmObject",
-                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage
+                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage,
+                    diagnosticId = "simulation.subject_bounds_inverted"
                 )
             }
             .setValueAndParameterType(
@@ -947,7 +983,8 @@ NULL
                     functionName = ".createSimulationResultsMultiArmObject",
                     parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage,
                     relatedParameter = "minNumberOfEventsPerStage",
-                    relatedValue = minNumberOfEventsPerStage
+                    relatedValue = minNumberOfEventsPerStage,
+                    diagnosticId = "simulation.event_bounds_inverted"
                 )
             }
             .setValueAndParameterType(
@@ -966,33 +1003,37 @@ NULL
     }
 
     if (kMax == 1 && !is.na(conditionalPower)) {
-        warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("conditionalPower")
     }
     if (endpoint %in% c("means", "rates") && kMax == 1 && !is.null(calcSubjectsFunction)) {
-        warning("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("calcSubjectsFunction")
     }
     if (endpoint == "survival" && kMax == 1 && !is.null(calcEventsFunction)) {
-        warning("'calcEventsFunction' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("calcEventsFunction")
     }
 
     if (endpoint %in% c("means", "rates") && is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(minNumberOfSubjectsPerStage) != 1 || !is.na(minNumberOfSubjectsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage),
                 ") will be ignored because ",
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
-                call. = FALSE
+                parameter = "minNumberOfSubjectsPerStage",
+                value = minNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$minNumberOfSubjectsPerStage <- NA_real_
         }
         if (length(maxNumberOfSubjectsPerStage) != 1 || !is.na(maxNumberOfSubjectsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'maxNumberOfSubjectsPerStage' (",
                 .arrayToString(maxNumberOfSubjectsPerStage),
                 ") will be ignored because ",
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
-                call. = FALSE
+                parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$maxNumberOfSubjectsPerStage <- NA_real_
         }
@@ -1000,22 +1041,26 @@ NULL
 
     if (endpoint == "survival" && is.na(conditionalPower) && is.null(calcEventsFunction)) {
         if (length(minNumberOfEventsPerStage) != 1 || !is.na(minNumberOfEventsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'minNumberOfEventsPerStage' (",
                 .arrayToString(minNumberOfEventsPerStage),
                 ") ",
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
-                call. = FALSE
+                parameter = "minNumberOfEventsPerStage",
+                value = minNumberOfEventsPerStage,
+                diagnosticId = "simulation.argument_requires_event_reassessment"
             )
             simulationResults$minNumberOfEventsPerStage <- NA_real_
         }
         if (length(maxNumberOfEventsPerStage) != 1 || !is.na(maxNumberOfEventsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'maxNumberOfEventsPerStage' (",
                 .arrayToString(maxNumberOfEventsPerStage),
                 ") ",
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
-                call. = FALSE
+                parameter = "maxNumberOfEventsPerStage",
+                value = maxNumberOfEventsPerStage,
+                diagnosticId = "simulation.argument_requires_event_reassessment"
             )
             simulationResults$maxNumberOfEventsPerStage <- NA_real_
         }
@@ -1162,6 +1207,15 @@ NULL
     if (endpoint %in% c("means", "survival")) {
         .setValueAndParameterType(simulationResults, "thetaH1", thetaH1, NA_real_, notApplicableIfNA = TRUE)
     }
+    if (endpoint %in% c("means", "rates", "survival")) {
+        thetaH0Default <- switch(
+            endpoint,
+            "means" = C_THETA_H0_MEANS_DEFAULT,
+            "rates" = C_THETA_H0_RATES_DEFAULT,
+            "survival" = C_THETA_H0_SURVIVAL_DEFAULT
+        )
+        .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, thetaH0Default)
+    }
     if (endpoint == "means") {
         .setValueAndParameterType(simulationResults, "stDevH1", stDevH1, NA_real_, notApplicableIfNA = TRUE)
     }
@@ -1172,7 +1226,8 @@ NULL
     if (length(adaptations) != kMax - 1) {
         stopIllegalArgument("'adaptations' must have length ", (kMax - 1), " (kMax - 1)",
             functionName = ".createSimulationResultsMultiArmObject",
-            parameter = "adaptations", value = adaptations
+            parameter = "adaptations", value = adaptations,
+            diagnosticId = "validation.interim_vector_length"
         )
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))

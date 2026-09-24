@@ -371,9 +371,10 @@ NULL
     if (.isTrialDesignConditionalDunnett(design)) {
         if (!normalApproximation) {
             if (userFunctionCallEnabled) {
-                warning("'normalApproximation' was set to TRUE ",
+                warnArgumentAdjusted("'normalApproximation' was set to TRUE ",
                     "because conditional Dunnett test was specified as design",
-                    call. = FALSE
+                    parameter = "normalApproximation",
+                    diagnosticId = "analysis.conditional_dunnett_requires_normal"
                 )
             }
             normalApproximation <- TRUE
@@ -393,7 +394,8 @@ NULL
             relatedParameter = "intersectionTest",
             relatedValue = intersectionTest,
             constraint = "'varianceOption' = \"overallPooled\"",
-            functionName = ".getStageResultsMeansMultiArm"
+            functionName = ".getStageResultsMeansMultiArm",
+            diagnosticId = "analysis.dunnett_requires_pooled_variance"
         )
     }
 
@@ -870,9 +872,11 @@ NULL
     } else {
         # Repeated onfidence intervals when using combination tests
         if (intersectionTest == "Hierarchical") {
-            warning(
+            warnResultUnavailable(
                 "Repeated confidence intervals not available for ",
-                "'intersectionTest' = \"Hierarchical\""
+                "'intersectionTest' = \"Hierarchical\"",
+                parameter = "intersectionTest",
+                diagnosticId = "analysis.hierarchical_repeated_intervals_unsupported"
             )
             return(repeatedConfidenceIntervals)
         }
@@ -1158,9 +1162,10 @@ NULL
     stDevsH1 <- .getOptionalArgument("stDevsH1", ...)
     if (!is.null(stDevsH1) && !is.na(stDevsH1)) {
         if (!is.na(assumedStDevs)) {
-            warning(sQuote("assumedStDevs"), " will be ignored because ",
+            warnArgumentIgnored(sQuote("assumedStDevs"), " will be ignored because ",
                 sQuote("stDevsH1"), " is defined",
-                call. = FALSE
+                parameter = "assumedStDevs",
+                diagnosticId = "analysis.alternative_standard_deviations_overridden"
             )
         }
         assumedStDevs <- stDevsH1
@@ -1262,7 +1267,8 @@ NULL
         "TrialDesignInverseNormal, TrialDesignFisher, or ",
         "TrialDesignConditionalDunnett",
         functionName = ".getConditionalPowerMeansMultiArm",
-        parameter = "design"
+        parameter = "design",
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1448,9 +1454,9 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warning("Calculation not possible: could not calculate ",
+                    warnNumericalIssue("Calculation not possible: could not calculate ",
                         "conditional power for stage ", kMax,
-                        call. = FALSE
+                        diagnosticId = "analysis.conditional_power_calculation_failed"
                     )
                     results$conditionalPower[treatmentArm, kMax] <- NA_real_
                 } else {
@@ -1501,7 +1507,9 @@ NULL
     )
 
     if (stage > 1) {
-        warning("Conditional power is only calculated for the first (interim) stage", call. = FALSE)
+        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage",
+            diagnosticId = "analysis.conditional_power_later_stage_unsupported"
+        )
     }
 
     kMax <- 2

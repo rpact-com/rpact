@@ -907,10 +907,14 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
         },
         .warnInCaseArgumentExists = function(argument, argumentName) {
             if (!all(is.na(argument)) && any(argument > 0)) {
-                warning(sprintf(
+                warnArgumentIgnored(sprintf(
                     "Specified '%s' (%s) not taken into account",
                     argumentName, .arrayToString(argument)
-                ), call. = FALSE)
+                ),
+                    parameter = argumentName,
+                    value = argument,
+                    diagnosticId = "planning.observation_time_inputs_ignored"
+                )
             }
         },
         recreate = function(..., hazardRatio = NA_real_, pi1 = NA_real_, maxNumberOfSubjects = NA_integer_) {

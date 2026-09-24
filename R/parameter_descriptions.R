@@ -1028,3 +1028,263 @@ NULL
 #' @name param_correlationComputation
 #' @keywords internal
 NULL
+
+#' Parameter Description: Pi Control
+#' @param piControl The assumed probability in the control arm, default is \code{0.5}.
+#' @name param_piControl
+#' @keywords internal
+NULL
+
+#' Parameter Description: Omega Max Vector
+#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
+#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 0.4, -0.2)}.
+#' @name param_omegaMaxVector
+#' @keywords internal
+NULL
+
+##
+## Optimal Conditional Error Function
+##
+
+#' Parameter Description: Overall Type I Error Rate (optimal conditional error design)
+#' @param alpha
+#' The overall type I error rate \eqn{\alpha} of the design. Must be a numeric value between 0 and 1.
+#' @name param_alphaOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: (Conditional) Type I Error Rate (optimal conditional error design)
+#' @param alpha
+#' The (conditional) type I error rate of the design. Must be a numeric vector with values between 0 and 1.
+#' @name param_alphaGenericOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Futility boundary (optimal conditional error design)
+#' @param futilityBounds
+#' Binding stage 1 futility boundary \eqn{\alpha_0} (p-value scale). Must be a numeric value between 0 and 1. Should be greater than \code{efficacyBounds}. Specify \code{futilityBounds=1} to disable early stopping for futility.
+#' @name param_futilityBoundsOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Efficacy boundary (optimal conditional error design)
+#' @param efficacyBounds
+#' Stage 1 efficacy boundary \eqn{\alpha_1} (p-value scale). Must be a numeric value between 0 and 1. Should be smaller than \code{futilityBounds}.
+#' @name param_efficacyBoundsOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Alternative (optimal conditional error design)
+#' @param theta
+#' Finite numeric vector of assumed treatment effects on the mean difference scale.
+#' @name param_thetaOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Monotonisation argument (optimal conditional error design)
+#' @param argument
+#' The argument in which the function should be monotonised, given as a character.
+#' @name param_argumentOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Conditional Power (optimal conditional error design)
+#' @param conditionalPower
+#' The target conditional power \eqn{CP} of the design. Must be a numeric scalar strictly between 0 and 1. Takes precedence over \code{conditionalPowerFunction}.
+#' @name param_conditionalPowerOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Conditional Power Function (optimal conditional error design)
+#' @param conditionalPowerFunction
+#' A function accepting a single first-stage p-value and returning a numeric scalar strictly between 0 and 1. The function is evaluated separately for each p-value. This function should not be increasing in the first-stage p-value, otherwise monotonicity issues may occur. With a conditional power function, the resulting conditional error function is not necessarily optimal for expected second-stage information.
+#' @name param_conditionalPowerFunctionOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Integration Constant (optimal conditional error design)
+#' @param constant
+#' Current value of the level constant for the optimal conditional error function, internally used as integral argument.
+#' @name param_constantOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Planning effect (optimal conditional error design)
+#' @param thetaH1
+#' Fixed effect assumption at which the conditional power should be achieved, expressed on the mean difference scale. Is only used if \code{useInterimEstimate=FALSE}. Must be a numeric value greater than 0.
+#' @name param_thetaH1OCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum planning effect (optimal conditional error design)
+#' @param maxThetaH1
+#' The maximum for an interim estimate of the treatment effect, specified on the mean difference scale. If the interim estimate (on the mean difference scale) yields a value larger than \code{maxThetaH1}, \code{maxThetaH1} is used for it. Is only used if \code{useInterimEstimate=TRUE}. Must be a numeric value. Default value is \code{Inf}, i.e., no upper restriction.
+#' @name param_maxThetaH1OCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Minimum planning effect (optimal conditional error design)
+#' @param minThetaH1
+#' The minimum for an interim estimate of the treatment effect, specified on the mean difference scale. If the interim estimate (on the mean difference scale) yields a value smaller than \code{minThetaH1}, \code{minThetaH1} is used for it. Is only used if \code{useInterimEstimate=TRUE}. Must be a numeric value.
+#' @name param_minThetaH1OCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Design Object (optimal conditional error design)
+#' @param design
+#' An object of class \code{TrialDesignOptimalConditionalError} created by \code{getDesignOptimalConditionalError()}. Contains all necessary arguments to calculate the optimal conditional error function for the specified case.
+#' @name param_designOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Enforce Monotonicity (optimal conditional error design)
+#' @param enforceMonotonicity
+#' Logical. Determines whether or not the optimal conditional error function should automatically be modified to be non-increasing. Default is \code{TRUE}.
+#' @name param_enforceMonotonicityOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: epsilon (optimal conditional error design)
+#' @param epsilon
+#' Maximum allowed difference between the initial and monotone integral. Must be a numeric value. Default 10^-5.
+#' @name param_epsilonOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: First-stage information (optimal conditional error design)
+#' @param firstStageInformation
+#' Information of the first stage of the trial. Must be a positive numeric value.
+#' @name param_firstStageInformationOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Integration first-stage p-value (optimal conditional error design)
+#' @param pValue
+#' First-stage p-value, internally used as integral argument.
+#' @name param_pValueIntegralOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: First-stage p-value (optimal conditional error design)
+#' @param pValue
+#' First-stage p-value or p-values. Must be a numeric vector between 0 and 1.
+#' @name param_pValueOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Function to be made monotone (optimal conditional error design)
+#' @param fun
+#' The function to be made monotone.
+#' @name param_funOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum for level constant search interval (optimal conditional error design)
+#' @param maxLevelConstant
+#' The maximum of the interval on which the value for the level constant should be searched. Default value is 10.
+#' @name param_maxLevelConstantOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Minimum for level constant search interval (optimal conditional error design)
+#' @param minLevelConstant
+#' The minimum of the interval on which the value for the level constant should be searched. Default value is 0.
+#' @name param_minLevelConstantOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Likelihood ratio distribution for expected information (optimal conditional error design)
+#' @param likelihoodRatioDistribution
+#' The distribution to be used for the effect size of the likelihood ratio in the calculation of the expected second-stage information. Options are \code{"fixed", "normal", "exp", "unif"} for fixed effect size, normally distributed, exponentially distributed, and uniformly distributed prior of the effect size, respectively.
+#' Each case requires different additional specifications: \cr
+#' \itemize{
+#' \item \code{likelihoodRatioDistribution="fixed"} uses one (or more) fixed effect sizes for the likelihood ratio and requires the parameter \code{thetaLR} which provides the mean difference under which to calculate the likelihood ratio. If \code{thetaLR} contains multiple values, they may be weighted using an additional argument \code{weightsLR}. Omitting \code{weightsLR} automatically leads to equal weighting.
+#' \item \code{likelihoodRatioDistribution="normal"} uses a normal prior for the effect size and requires parameters \code{thetaLR} and \code{stDevLR} for the mean and standard deviation of the normal distribution (both on mean difference scale).
+#' \item \code{likelihoodRatioDistribution="exp"} uses an exponential prior for the effect size and requires the parameter \code{kappaLR} which specifies the rate on the non-centrality scale divided by \code{sqrt(firstStageInformation)}. The mean effect on the mean difference scale is \code{1 / (kappaLR * firstStageInformation)}.
+#' \item \code{likelihoodRatioDistribution="unif"} uses a uniform prior for the effect size and requires the specification of \code{maxThetaLR}, which is the maximum of the support for the uniform likelihood ratio distribution (on the mean difference scale).
+#' }
+#' The default is \code{likelihoodRatioDistribution=NULL}.
+#' In this case, the likelihood ratio distribution under which the expected second-stage information is calculated is taken directly from the design object.
+#' @name param_likelihoodRatioDistributionExpectedOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Likelihood ratio distribution for minimisation (optimal conditional error design)
+#' @param likelihoodRatioDistribution
+#' The distribution to be used for the effect size of the likelihood ratio in the optimal conditional error function. Options are \code{"fixed", "normal", "exp", "unif", "maxlr"} for fixed effect size, normally distributed, exponentially distributed, uniformly distributed prior of the effect size and maximum likelihood ratio, respectively.
+#' Each case requires different additional specifications: \cr
+#' \itemize{
+#' \item \code{likelihoodRatioDistribution="fixed"} uses one (or more) fixed effect sizes for the likelihood ratio and requires the parameter \code{thetaLR} which provides the mean difference under which to calculate the likelihood ratio. If \code{thetaLR} contains multiple values, they may be weighted using an additional argument \code{weightsLR}. Omitting \code{weightsLR} automatically leads to equal weighting.
+#' \item \code{likelihoodRatioDistribution="normal"} uses a normal prior for the effect size and requires parameters \code{thetaLR} and \code{stDevLR} for the mean and standard deviation of the normal distribution (both on mean difference scale).
+#' \item \code{likelihoodRatioDistribution="exp"} uses an exponential prior for the effect size and requires the parameter \code{kappaLR} which specifies the rate on the non-centrality scale divided by \code{sqrt(firstStageInformation)}. The mean effect on the mean difference scale is \code{1 / (kappaLR * firstStageInformation)}.
+#' \item \code{likelihoodRatioDistribution="unif"} uses a uniform prior for the effect size and requires the specification of \code{maxThetaLR}, which is the maximum of the support for the uniform likelihood ratio distribution (on the mean difference scale).
+#' \item \code{likelihoodRatioDistribution="maxlr"} estimates the non-centrality parameter to be used for the likelihood ratio from the data. No additional parameters must be specified.
+#' }
+#' @name param_likelihoodRatioDistributionOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Lower limit of monotonisation interval (optimal conditional error design)
+#' @param lower
+#' The lower limit of the interval on which the function should be monotonised. Must be a numeric value.
+#' @name param_lowerOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum conditional error (optimal conditional error design)
+#' @param maxConditionalError
+#' Upper boundary for the optimal conditional error function. Default value is 1, however, the optimal conditional error function is inherently bounded by the conditional power.
+#' @name param_maxConditionalErrorOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum second-stage information (optimal conditional error design)
+#' @param maxInformationPerStage
+#' The maximum additional information allowed in stage two. A single numeric value; does not apply to firstStageInformation. Default value is \code{Inf}, i.e., no restriction.
+#' @name param_maxInformationPerStageOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Minimum conditional error (optimal conditional error design)
+#' @param minConditionalError
+#' Lower boundary for the optimal conditional error function. Default 0 (no restriction).
+#' @name param_minConditionalErrorOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Minimum second-stage information (optimal conditional error design)
+#' @param minInformationPerStage
+#' The minimum additional information allowed in stage two. A single numeric value; does not apply to firstStageInformation. Default value is \code{0}, i.e., no restriction.
+#' @name param_minInformationPerStageOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Number of steps for checking monotonicity (optimal conditional error design)
+#' @param gridSize
+#' The number of steps to be taken when checking the function for monotonicity. Must be a numeric value. Default 10^4.
+#' @name param_gridSizeOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Max. iterations to determine Q (optimal conditional error design)
+#' @param maxIterations
+#' Maximum number of iterations allowed to determine each value of q. Must be a numeric value. Default 10^4.
+#' @name param_maxIterationsOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Upper limit of monotonisation interval (optimal conditional error design)
+#' @param upper
+#' The upper limit of the interval on which the function should be monotonised.
+#' @name param_upperOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Use Interim Estimate (optimal conditional error design)
+#' @param useInterimEstimate
+#' Logical. Defines whether or not an interim estimate should be used for conditional power.
+#' If \code{TRUE}, a lower cut-off for the interim estimate must be specified by \code{minThetaH1} or \code{minNonCentralityParameterH1}. An upper cut-off may also
+#' be specified by \code{maxThetaH1} or \code{maxNonCentralityParameterH1}. If \code{FALSE}, the fixed effect size must be specified by \code{thetaH1} or \code{nonCentralityParameterH1}.
+#' @name param_useInterimEstimateOCEF
+#' @keywords internal
+NULL

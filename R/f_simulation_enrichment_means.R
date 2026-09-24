@@ -389,7 +389,8 @@ NULL
                         "the output must be a single numeric value >= 0",
                         functionName = ".getSimulatedStageMeansEnrichment",
                         parameter = "calcSubjectsFunction",
-                        value = calcSubjectsFunction
+                        value = calcSubjectsFunction,
+                        diagnosticId = "simulation.subject_callback_result_invalid"
                     )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {

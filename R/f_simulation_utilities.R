@@ -235,7 +235,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     }
 
     effectListNames <- names(effectList)
-    if (is.null(effectListNames) || any(nchar(trimws(effectListNames)) == 0)) {
+    if (is.null(effectListNames) || anyNA(effectListNames) || any(nchar(trimws(effectListNames)) == 0)) {
         stopIllegalArgument(
             sQuote("effectList"), " must be named. Current names are ",
             .arrayToString(effectListNames, encapsulate = TRUE),
@@ -252,6 +252,10 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         names(effectList)[names(effectList) == singularName] <- paste0(singularName, "s")
     }
     effectListNames <- names(effectList)
+    if (anyDuplicated(effectListNames)) {
+        stopIllegalArgument("'effectList' must not contain duplicate entry names",
+            functionName = ".getEffectData", parameter = "effectList", value = effectListNames)
+    }
 
     if (!("subGroups" %in% effectListNames)) {
         stopIllegalArgument(
@@ -276,6 +280,11 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         subGroups <- as.character(subGroups)
     }
 
+    if (anyNA(subGroups) || anyDuplicated(subGroups)) {
+        stopIllegalArgument("'effectList$subGroups' must not contain missing or duplicate values",
+            functionName = ".getEffectData", parameter = "effectList$subGroups", value = subGroups)
+    }
+
     expectedSubGroups <- "F"
     if (length(subGroups) > 1) {
         if (is.na(gMax)) {
@@ -295,7 +304,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
                 " makes no sense and is not allowed (use remaining population 'R' instead of 'F')",
                 functionName = ".getEffectData",
                 parameter = "F",
-                relatedParameter = "R"
+                relatedParameter = "R",
+                diagnosticId = "enrichment.overlapping_full_population"
             )
         }
         expectedSubGroups <- .createSubsetsByGMax(gMax, stratifiedInput = TRUE, all = FALSE)
@@ -420,7 +430,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (abs(sum(prevalences) - 1) > 1e-04) {
         stopIllegalArgument(sQuote("effectList$prevalences"), " must sum to 1",
             functionName = ".getEffectData",
-            parameter = "effectList$prevalences", value = effectList$prevalences
+            parameter = "effectList$prevalences", value = effectList$prevalences,
+            diagnosticId = "enrichment.prevalences_not_partition"
         )
     }
     for (i in indices) {
@@ -493,9 +504,13 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             ignore <- effectListNames[!(effectListNames %in% C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL)]
         }
         if (length(ignore) > 0) {
-            warning("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
+            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", 
+                .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
-                call. = FALSE
+                parameter = ignore,
+                relatedParameter = "endpoint",
+                relatedValue = endpoint,
+                diagnosticId = "simulation.endpoint_effects_ignored"
             )
         }
     }
@@ -653,48 +668,21 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             ignore <- effectDataNames[!(effectDataNames %in% gsub("s$", "", C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL))]
         }
         if (length(ignore) > 0) {
-            warning("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
+            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", 
+                .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
-                call. = FALSE
+                parameter = ignore,
+                relatedParameter = "endpoint",
+                relatedValue = endpoint,
+                diagnosticId = "simulation.endpoint_effects_ignored"
             )
         }
     }
-
-    if (!is.null(effectList[["prevalences"]])) {
-        .assertIsInClosedInterval(effectList$prevalences, "effectList$prevalences",
-            lower = 0, upper = 1
-        )
-    }
-    if (!is.null(effectList[["effects"]])) {
-        .assertIsValidMatrix(effectList$effects, "effectList$effects")
-    }
-    for (piParam in c("piControls", "piTreatments")) {
-        if (piParam %in% names(effectList) && !is.null(effectList[[piParam]])) {
-            if (piParam == matrixNameNew && is.matrix(effectList[[piParam]])) {
-                for (i in 1:nrow(effectList[[piParam]])) {
-                    .assertIsInOpenInterval(effectList[[piParam]][i, ], paste0("effectList$", piParam),
-                        lower = 0, upper = 1, matrixAllowed = TRUE
-                    )
-                }
-            } else {
-                .assertIsInOpenInterval(effectList[[piParam]], paste0("effectList$", piParam),
-                    lower = 0, upper = 1, matrixAllowed = TRUE
-                )
-            }
-        }
-    }
-    for (ratioParam in c("hazardRatios", "stDevs")) {
-        if (ratioParam %in% names(effectList) && !is.null(effectList[[ratioParam]])) {
-            .assertIsInOpenInterval(effectList[[ratioParam]], paste0("effectList$", ratioParam),
-                lower = 0, upper = NULL, matrixAllowed = TRUE
-            )
-        }
-    }
-
     return(effectList)
 }
 
-.getValidatedEffectList <- function(effectList, ..., endpoint, gMax = NA_integer_, nullAllowed = TRUE) {
+.getValidatedEffectList <- function(effectList, ..., endpoint, gMax = NA_integer_, nullAllowed = TRUE,
+        simulationType = "auto") {
     if (is.null(endpoint) || !(endpoint %in% c("means", "rates", "survival"))) {
         stopRuntimeIssue(
             "'endpoint' (", endpoint, ") must be one of 'means', 'rates', or 'survival'",
@@ -713,11 +701,13 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     }
 
     if (is.data.frame(effectList)) {
-        return(.getEffectList(effectList, parameterName = "effectList", endpoint = endpoint))
+        effectList <- .getEffectList(effectList, parameterName = "effectList", endpoint = endpoint)
     }
 
     effectData <- .getEffectData(effectList, endpoint = endpoint, gMax = gMax, nullAllowed = nullAllowed)
-    return(.getEffectList(effectData))
+    effectList <- .getEffectList(effectData)
+    .assertIsValidEffectList(effectList, endpoint = endpoint, simulationType = simulationType)
+    return(effectList)
 }
 
 .getVariedParameterSimulationMultiArm <- function(designPlan) {
@@ -825,13 +815,32 @@ getData <- function(x) {
         )
     }
 
-    return(x$.data)
+    return(.getTweakedSimulationData(x$.data))
 }
 
 #' @rdname getData
 #' @export
 getData.SimulationResults <- function(x) {
-    return(x$.data)
+    return(.getTweakedSimulationData(x$.data))
+}
+
+.getTweakedSimulationData <- function(df) {
+    # order by column pi1 if it exists
+    if (all(c("pi1", "iterationNumber", "stageNumber") %in% colnames(df))) {
+        df <- df[order(df$pi1, df$iterationNumber, df$stageNumber), ]
+    }
+    
+    # move columns pi1 and pi2 to first position if they exist
+    if (all(c("pi1", "pi2") %in% colnames(df))) {
+        df <- .moveColumnToFirstPosition(df, "pi2")
+        df <- .moveColumnToFirstPosition(df, "pi1")
+    }
+    
+    # move column omegaMax to first position if it exist
+    if ("omegaMax" %in% colnames(df)) {
+        df <- .moveColumnToFirstPosition(df, "omegaMax")
+    }
+    return(df)    
 }
 
 .assertIsValidMaxNumberOfRawDatasetsPerStage <- function(maxNumberOfRawDatasetsPerStage) {
@@ -1113,6 +1122,7 @@ getRawData <- function(x, aggregate = FALSE) {
             value = x
         )
     }
+    .assertIsSingleLogical(aggregate, "aggregate", naAllowed = FALSE)
 
     rawData <- x$.rawData
     if (is.null(rawData) || ncol(rawData) == 0 || nrow(rawData) == 0) {
@@ -1124,7 +1134,8 @@ getRawData <- function(x, aggregate = FALSE) {
                 functionName = "getRawData",
                 parameter = "simulationType",
                 value = x$simulationType,
-                relatedParameter = "maxNumberOfRawDatasetsPerStage"
+                relatedParameter = "maxNumberOfRawDatasetsPerStage",
+                diagnosticId = "simulation.raw_data_requires_patient_wise"
             )
         }
         simulationFunction <- if (inherits(x, "SimulationResultsMultiArmSurvival")) {
@@ -1139,12 +1150,15 @@ getRawData <- function(x, aggregate = FALSE) {
             "choose a 'maxNumberOfRawDatasetsPerStage' > 0, e.g., ",
             simulationFunction, "(..., maxNumberOfRawDatasetsPerStage = 1)",
             functionName = "getRawData",
-            parameter = "maxNumberOfRawDatasetsPerStage"
+            parameter = "maxNumberOfRawDatasetsPerStage",
+            diagnosticId = "simulation.raw_data_not_retained"
         )
     }
 
     if (!aggregate) {
-        return(rawData[, names(rawData) != "lastObservationTime", drop = FALSE])
+        rawData <- rawData[, !names(rawData) %in% c("lastObservationTime", "event", "dropoutEvent"), drop = FALSE]
+        rawData <- .getTweakedSimulationData(rawData)
+        return(rawData)
     }
 
     if (inherits(x, "SimulationResultsMultiArmSurvival")) {
@@ -1235,15 +1249,19 @@ getRawData <- function(x, aggregate = FALSE) {
         }
         simulationResults$.setParameterType("effectMatrix", C_PARAM_DERIVED)
         if (!is.null(gED50) && !is.na(gED50)) {
-            warning("'gED50' (", gED50, ") will be ignored because 'typeOfShape' ",
+            warnArgumentIgnored("'gED50' (", gED50, ") will be ignored because 'typeOfShape' ",
                 "is defined as ", .vQuote(typeOfShape),
-                call. = FALSE
+                parameter = "gED50",
+                value = gED50,
+                diagnosticId = "shape.linear_parameters_ignored"
             )
         }
         if (!is.null(slope) && !is.na(slope) && slope != 1) {
-            warning("'slope' (", slope, ") will be ignored because 'typeOfShape' ",
+            warnArgumentIgnored("'slope' (", slope, ") will be ignored because 'typeOfShape' ",
                 "is defined as ", .vQuote(typeOfShape),
-                call. = FALSE
+                parameter = "slope",
+                value = slope,
+                diagnosticId = "shape.linear_parameters_ignored"
             )
         }
 
@@ -1287,12 +1305,12 @@ getRawData <- function(x, aggregate = FALSE) {
     simulationResults$eventsNotAchieved <- eventsNotAchieved
     if (any(simulationResults$eventsNotAchieved > 0)) { 
         simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_GENERATED)
-        warning("Presumably due to drop-outs, required number of events ",
+        warnResultUnavailable("Presumably due to drop-outs, required number of events ",
             "were not achieved for at least one situation. ",
             "Increase the maximum number of subjects (",
             accrualSetup$maxNumberOfSubjects, ") ",
             "to avoid this situation",
-            call. = FALSE
+            diagnosticId = "simulation.dropout_prevents_event_target"
         )
     } else {
         simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_NOT_APPLICABLE)

@@ -132,7 +132,8 @@ NULL
                     parameter = "assumedStDev",
                     value = assumedStDev,
                     relatedParameter = "stDevH1",
-                    relatedValue = stDevH1
+                    relatedValue = stDevH1,
+                    diagnosticId = "analysis.alternative_standard_deviation_missing"
                 )
             }
         }
@@ -1435,11 +1436,11 @@ NULL
         divisor <- prod(pValues[1:(kMax - 1)]^weightsFisher[1:(kMax - 1)])
         result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
         if (result <= 0 || result >= 1) {
-            warning(
+            warnNumericalIssue(
                 "Calculation not possible: could not calculate ",
                 "conditional power for stage ",
                 kMax,
-                call. = FALSE
+                diagnosticId = "analysis.conditional_power_calculation_failed"
             )
             conditionalPower[kMax] <- NA_real_
         } else {
@@ -1470,12 +1471,13 @@ NULL
     stDevH1 <- .getOptionalArgument("stDevH1", ...)
     if (!is.null(stDevH1) && !is.na(stDevH1)) {
         if (!is.na(assumedStDev)) {
-            warning(
+            warnArgumentIgnored(
                 sQuote("assumedStDev"),
                 " will be ignored because ",
                 sQuote("stDevH1"),
                 " is defined",
-                call. = FALSE
+                parameter = "assumedStDev",
+                diagnosticId = "analysis.assumed_standard_deviation_overridden"
             )
         }
         assumedStDev <- stDevH1
@@ -1643,7 +1645,9 @@ NULL
     )
     if (length(warningMessages) > 0) {
         for (m in warningMessages) {
-            warning(m, call. = FALSE)
+            warnNumericalIssue(m,
+                diagnosticId = "plot.conditional_power_calculation_warning"
+            )
         }
     }
 

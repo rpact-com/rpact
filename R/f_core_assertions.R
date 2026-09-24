@@ -27,7 +27,8 @@ NULL
         ), " (is ", .getClassName(design, quote = TRUE), ")",
         functionName = ".stopWithWrongDesignMessage",
         parameter = "design",
-        value = design
+        value = design,
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -41,7 +42,8 @@ NULL
         " (is ", .getClassName(design, quote = TRUE), ")",
         functionName = ".stopWithWrongDesignMessageEnrichment",
         parameter = "design",
-        value = design
+        value = design,
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -160,7 +162,8 @@ NULL
             " (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesign",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -171,7 +174,8 @@ NULL
             "'TrialDesignInverseNormal' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormal",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -182,7 +186,8 @@ NULL
             "'TrialDesignInverseNormal', ", "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -193,7 +198,8 @@ NULL
             "'TrialDesignFisher' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignFisher",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -204,7 +210,8 @@ NULL
             "'TrialDesignGroupSequential' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignGroupSequential",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -215,7 +222,8 @@ NULL
             "'TrialDesignGroupSequential' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignGroupSequentialOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -226,7 +234,8 @@ NULL
             "'TrialDesignConditionalDunnett' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignConditionalDunnett",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -237,7 +246,8 @@ NULL
             "'TrialDesignInverseNormal' or 'TrialDesignGroupSequential' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequential",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -249,7 +259,8 @@ NULL
             "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -269,7 +280,8 @@ NULL
             "'TrialDesignFisher' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -282,7 +294,8 @@ NULL
             "'TrialDesignFisher', or ", "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFisherOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -295,7 +308,8 @@ NULL
             "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrFisherOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -308,7 +322,8 @@ NULL
             "'TrialDesignFisher', 'TrialDesignConditionalDunnett', or 'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
             functionName = ".assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed",
             parameter = "design",
-            value = design
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -415,7 +430,8 @@ NULL
                 constraint = paste0(.pQuote(xName), ifelse(lowerIncluded, " >= ", " > "), lower),
                 functionName = functionName,
                 lowerBound = lower,
-                upperBound = NULL
+                upperBound = NULL,
+                diagnosticId = "validation.values_outside_interval"
             )
         }
     } else {
@@ -434,7 +450,8 @@ NULL
                     constraint = paste0(.pQuote(xName), " == ", lower),
                     functionName = functionName,
                     lowerBound = lower,
-                    upperBound = upper
+                    upperBound = upper,
+                    diagnosticId = "validation.values_outside_interval"
                 )
             }
         } else if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
@@ -449,7 +466,8 @@ NULL
                 ),
                 functionName = functionName,
                 lowerBound = lower,
-                upperBound = upper
+                upperBound = upper,
+                diagnosticId = "validation.values_outside_interval"
             )
         }
     }
@@ -612,7 +630,8 @@ NULL
                 if (any(na.omit(dataInput$getEventsUpTo(stage)) >
                         na.omit(dataInput$getSampleSizesUpTo(stage)))) {
                     stopIllegalDataInput("all events must be <= corresponding sample size",
-                        functionName = ".assertIsValidDataInput"
+                        functionName = ".assertIsValidDataInput",
+                        diagnosticId = "dataset.binary_events_exceed_subjects"
                     )
                 }
             }
@@ -646,7 +665,8 @@ NULL
                 if (any(na.omit(dataInput$getEventsUpTo(stage, 1)) > na.omit(dataInput$getSampleSizesUpTo(stage, 1))) ||
                         any(na.omit(dataInput$getEventsUpTo(stage, 2)) > na.omit(dataInput$getSampleSizesUpTo(stage, 2)))) {
                     stopIllegalDataInput("all events must be <= corresponding sample size",
-                        functionName = ".assertIsValidDataInput"
+                        functionName = ".assertIsValidDataInput",
+                        diagnosticId = "dataset.binary_events_exceed_subjects"
                     )
                 }
             }
@@ -673,13 +693,15 @@ NULL
         if (numberOfStages > kMax) {
             s <- numberOfStages - kMax
             plural <- ifelse(s == 1, "", "s")
-            warning(sprintf(
+            warnDataIssue(sprintf(
                 paste0(
                     "The data of the last %s in the dataset will be ",
                     "ignored because the design has specified kMax = %s"
                 ),
                 ifelse(s == 1, "stage", paste0(s, " stages")), kMax
-            ), call. = FALSE)
+            ),
+                diagnosticId = "dataset.stages_exceed_design"
+            )
         } else if (numberOfStages < kMax) {
             dataInput$.fillWithNAs(kMax)
         }
@@ -695,7 +717,8 @@ NULL
             "(is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDataset",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -706,7 +729,8 @@ NULL
             "'DatasetMeans' (is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetMeans",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -717,7 +741,8 @@ NULL
             "'DatasetGeneral' (is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetGeneral",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -728,7 +753,8 @@ NULL
             "'DatasetRates' (is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetRates",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -740,7 +766,8 @@ NULL
             "(is ", .getClassName(dataInput, quote = TRUE), ")",
             functionName = ".assertIsDatasetSurvival",
             parameter = "dataInput",
-            value = dataInput
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -1299,10 +1326,12 @@ NULL
             type = "character"
         )
         if (identical(type, "warning")) {
-            warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
+            warnNotValidated("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
                 spendingFunctionName, "is out of validated bounds ",
                 bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix,
-                call. = FALSE
+                parameter = parameterName,
+                value = parameterValue,
+                diagnosticId = "validation.parameter_outside_validated_range"
             )
         } else if (identical(type, "message")) {
             message(
@@ -1545,7 +1574,9 @@ NULL
     .assertIsSingleInteger(kMax, "kMax", validateType = FALSE)
     .assertIsInClosedInterval(kMax, "kMax", lower = kMaxLowerBound, upper = kMaxUpperBound)
     if (showWarnings && kMax > 10) {
-        warning("The usage of 'kMax' (", kMax, ") > 10 is not validated", call. = FALSE)
+        warnNotValidated("The usage of 'kMax' (", kMax, ") > 10 is not validated",
+            diagnosticId = "validation.stage_count_outside_validated_range"
+        )
     }
 }
 
@@ -1582,7 +1613,8 @@ NULL
             value = informationRates,
             relatedParameter = "kMax",
             relatedValue = kMax,
-            functionName = ".assertAreValidInformationRates"
+            functionName = ".assertAreValidInformationRates",
+            diagnosticId = "design.information_rates_length"
         )
     }
 
@@ -1607,15 +1639,16 @@ NULL
                 "must be strictly increasing: 0 < x_1 < .. < x_%s <= 1",
                 kMax
             ),
-            functionName = ".assertAreValidInformationRates"
+            functionName = ".assertAreValidInformationRates",
+            diagnosticId = "design.information_rates_not_cumulative"
         )
     }
 
     if (kMax > 1 && kMax <= 10 && (any(informationRates[2:kMax] - informationRates[1:(kMax - 1)] < 0.05 - 1e-10))) {
-        warning("Chosen 'informationRates' (",
+        warnNotValidated("Chosen 'informationRates' (",
             .arrayToString(informationRates, vectorLookAndFeelEnabled = FALSE),
             ") outside validated range",
-            call. = FALSE
+            diagnosticId = "validation.parameter_outside_validated_range"
         )
     }
 }
@@ -1779,7 +1812,8 @@ NULL
             parameter = "futilityBounds", value = futilityBounds,
             relatedParameter = "kMax",
             relatedValue = kMax,
-            functionName = ".assertAreValidFutilityBounds"
+            functionName = ".assertAreValidFutilityBounds",
+            diagnosticId = "validation.interim_vector_length"
         )
     }
 
@@ -1829,7 +1863,8 @@ NULL
             value = alpha0Vec,
             relatedParameter = "kMax",
             relatedValue = kMax,
-            functionName = ".assertIsValidAlpha0Vec"
+            functionName = ".assertIsValidAlpha0Vec",
+            diagnosticId = "validation.interim_vector_length"
         )
     }
 
@@ -1928,7 +1963,10 @@ NULL
             ifelse(length(definedArguments) > 1, " are", " is"), " defined"
         )
         if (warningOnlyEnabled) {
-            warning(C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS, message, call. = FALSE)
+            warnInvalidInput(C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS, message,
+                parameter = undefinedArguments,
+                diagnosticId = "validation.companion_arguments_undefined"
+            )
             return(FALSE)
         } else {
             stopMissingArgument(message,
@@ -1965,7 +2003,8 @@ NULL
             ),
             functionName = ".assertIsValidNPlanned",
             parameter = "nPlanned",
-            value = nPlanned
+            value = nPlanned,
+            diagnosticId = "analysis.remaining_stages_length"
         )
     }
 
@@ -1984,7 +2023,10 @@ NULL
 
 .isValidNPlanned <- function(nPlanned, kMax, stage) {
     if (missing(nPlanned)) {
-        warning("'nPlanned' is missing", call. = FALSE)
+        warnInvalidInput("'nPlanned' is missing",
+            parameter = "nPlanned",
+            diagnosticId = "analysis.n_planned_missing"
+        )
         return(FALSE)
     }
 
@@ -1993,24 +2035,32 @@ NULL
     }
 
     if (length(nPlanned) != kMax - stage) {
-        warning(sprintf(
+        warnArgumentIgnored(sprintf(
             paste0(
                 "'nPlanned' (%s) will be ignored: ",
                 "length must be equal to %s (kMax - stage = %s - %s)"
             ),
             .arrayToString(nPlanned), kMax - stage, kMax, stage
-        ), call. = FALSE)
+        ),
+            parameter = "nPlanned",
+            value = nPlanned,
+            diagnosticId = "analysis.n_planned_length"
+        )
         return(FALSE)
     }
 
     if (sum(nPlanned <= 0, na.rm = TRUE) > 0) {
-        warning(sprintf(
+        warnArgumentIgnored(sprintf(
             paste0(
                 "'nPlanned' (%s) will be ignored: ",
                 "all values must be > 0"
             ),
             .arrayToString(nPlanned)
-        ), call. = FALSE)
+        ),
+            parameter = "nPlanned",
+            value = nPlanned,
+            diagnosticId = "analysis.n_planned_nonpositive"
+        )
         return(FALSE)
     }
 
@@ -2077,7 +2127,8 @@ NULL
                     parameter = argName,
                     value = argValue,
                     relatedParameter = "functionName",
-                    relatedValue = functionName
+                    relatedValue = functionName,
+                    diagnosticId = "validation.unknown_argument"
                 )
             } else if (exceptionEnabled) {
                 stopArgumentUnknown(.pQuote(argName), " = ", argValue,
@@ -2086,12 +2137,15 @@ NULL
                     parameter = argName,
                     value = argValue,
                     relatedParameter = "functionName",
-                    relatedValue = functionName
+                    relatedValue = functionName,
+                    diagnosticId = "validation.unknown_argument"
                 )
             } else {
-                warning("Argument unknown in ", functionName, "(...): ",
+                warnArgumentIgnored("Argument unknown in ", functionName, "(...): ",
                     .pQuote(argName), " = ", argValue, " will be ignored",
-                    call. = FALSE
+                    parameter = argName,
+                    value = arg,
+                    diagnosticId = "validation.unused_argument"
                 )
             }
         }
@@ -2100,7 +2154,7 @@ NULL
 
 .warnInCaseOfUnusedArgument <- function(arg, argName, defaultValue, functionName) {
     if (!identical(arg, defaultValue)) {
-        warning(
+        warnArgumentIgnored(
             "Unused argument in ", functionName, "(...): ", .pQuote(argName), " = ", .arrayToString(
                 arg,
                 vectorLookAndFeelEnabled = (length(arg) > 1),
@@ -2108,7 +2162,9 @@ NULL
                 encapsulate = !is.null(arg) && any(is.character(arg))
             ),
             " will be ignored",
-            call. = FALSE
+            parameter = argName,
+            value = arg,
+            diagnosticId = "validation.unused_argument"
         )
     }
 }
@@ -2117,14 +2173,19 @@ NULL
     args <- list(...)
     argNames <- names(args)
     if ("twoSidedPower" %in% argNames) {
-        warning("'twoSidedPower' can only be defined in 'design'", call. = FALSE)
+        warnArgumentIgnored("'twoSidedPower' can only be defined in 'design'",
+            parameter = "twoSidedPower",
+            diagnosticId = "design.two_sided_power_set_in_design"
+        )
     }
 }
 
 .warnInCaseOfTwoSidedPowerIsDisabled <- function(design) {
     if (design$sided == 2 && !is.na(design$twoSidedPower) && !design$twoSidedPower &&
             design$isUserDefinedParameter("twoSidedPower")) {
-        warning("design$twoSidedPower = FALSE will be ignored because design$sided = 2", call. = FALSE)
+        warnArgumentIgnored("design$twoSidedPower = FALSE will be ignored because design$sided = 2",
+            diagnosticId = "design.two_sided_power_ignored"
+        )
     }
 }
 
@@ -2177,7 +2238,8 @@ NULL
             parameter = "packageName",
             value = packageName,
             constraint = "installed package namespace",
-            functionName = ".assertPackageIsInstalled"
+            functionName = ".assertPackageIsInstalled",
+            diagnosticId = "runtime.optional_package_missing"
         )
     }
 }
@@ -2361,10 +2423,10 @@ NULL
 .assertIsValidAllocationRatioPlanned <- function(allocationRatioPlanned, numberOfGroups) {
     if (numberOfGroups == 1) {
         if (allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT) {
-            warning(
+            warnArgumentIgnored(
                 "Planned allocation ratio ", allocationRatioPlanned, " will be ignored ",
                 "because the specified data has only one group",
-                call. = FALSE
+                diagnosticId = "analysis.two_group_argument_ignored"
             )
         }
         return(invisible())
@@ -2402,7 +2464,8 @@ NULL
             functionName = ".assertIsValidAllocationRatioPlannedSampleSize",
             parameter = "maxNumberOfSubjects",
             value = maxNumberOfSubjects,
-            relatedParameter = "allocationRatioPlanned"
+            relatedParameter = "allocationRatioPlanned",
+            diagnosticId = "planning.allocation_optimization_with_fixed_total"
         )
     }
 
@@ -2599,7 +2662,8 @@ NULL
             )]), ") must be unequal to 'thetaH0' (", thetaH0, ")",
             functionName = ".assertIsValidHazardRatio",
             parameter = "thetaH0",
-            value = thetaH0
+            value = thetaH0,
+            diagnosticId = "planning.alternative_equals_null"
         )
     }
     return(invisible(hazardRatio))
@@ -2633,9 +2697,11 @@ NULL
         userFunctionCallEnabled = TRUE) {
     if (sided == 2 && !is.na(directionUpper)) {
         if (userFunctionCallEnabled) {
-            warning("'directionUpper' (", directionUpper, ") will be ignored because it ",
+            warnArgumentIgnored("'directionUpper' (", directionUpper, ") will be ignored because it ",
                 "is not applicable for 'sided' = 2",
-                call. = FALSE
+                parameter = "directionUpper",
+                value = directionUpper,
+                diagnosticId = "design.direction_not_applicable"
             )
         }
         return(invisible(NA))
@@ -2655,10 +2721,10 @@ NULL
             identical(default, C_DIRECTION_UPPER_SURVIVAL_DEFAULT) &&
             isTRUE(is.na(directionUpper)) &&
             isTRUE(is.na(design$directionUpper))) {
-        warning(
+        warnArgumentAdjusted(
             "The default value of 'directionUpper' for survival endpoints has changed ",
             "from TRUE to FALSE. Please specify 'directionUpper' explicitly to avoid this warning.",
-            call. = FALSE
+            diagnosticId = "design.survival_direction_default"
         )
     }
 }
@@ -2673,7 +2739,7 @@ NULL
     objectType <- match.arg(objectType)
 
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
-
+    
     if (!identical(objectType, "sampleSize")) {
         .warnInCaseOfChangedDirectionUpperSurvivalDefault(
             directionUpper,
@@ -2693,7 +2759,8 @@ NULL
             directionUpper,
             functionName = ".assertIsValidDirectionUpper",
             parameter = "directionUpper",
-            value = design$directionUpper
+            value = design$directionUpper,
+            diagnosticId = "design.direction_mismatch"
         )
     }
 
@@ -2716,7 +2783,7 @@ NULL
             directionUpper <- default
         }
     }
-
+    
     return(directionUpper)
 }
 
@@ -2795,7 +2862,8 @@ NULL
                 parameter = funArgName,
                 value = fun,
                 constraint = "must contain the three-dots argument '...'",
-                functionName = ".assertIsValidFunction"
+                functionName = ".assertIsValidFunction",
+                diagnosticId = "simulation.callback_requires_dots"
             )
         }
     }
@@ -2946,15 +3014,19 @@ NULL
     if (is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(parameterValues) != 1 || !is.na(parameterValues)) {
             if (calcSubjectsFunctionEnabled) {
-                warning(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
+                warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
                     "will be ignored because neither 'conditionalPower' nor ",
                     .pQuote(calcSubjectsFunctionName), " is defined",
-                    call. = FALSE
+                    parameter = parameterName,
+                    value = parameterValues,
+                    diagnosticId = "simulation.bounds_require_reassessment"
                 )
             } else {
-                warning(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
+                warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
                     "will be ignored because 'conditionalPower' is not defined",
-                    call. = FALSE
+                    parameter = parameterName,
+                    value = parameterValues,
+                    diagnosticId = "simulation.alternative_requires_conditional_power"
                 )
             }
         }
@@ -2969,7 +3041,8 @@ NULL
                 functionName = ".assertIsValidNumberOfSubjectsPerStage",
                 parameter = parameterName,
                 relatedParameter = "conditionalPower",
-                relatedValue = conditionalPower
+                relatedValue = conditionalPower,
+                diagnosticId = "simulation.per_stage_bounds_missing"
             )
         } else {
             stopMissingArgument(.pQuote(parameterName), " must be defined ",
@@ -2977,7 +3050,8 @@ NULL
                 functionName = ".assertIsValidNumberOfSubjectsPerStage",
                 parameter = parameterName,
                 relatedParameter = "conditionalPower",
-                relatedValue = conditionalPower
+                relatedValue = conditionalPower,
+                diagnosticId = "simulation.per_stage_bounds_missing"
             )
         }
     }
@@ -3001,9 +3075,11 @@ NULL
     }
 
     if (!is.na(parameterValues[1]) && parameterValues[1] != plannedSubjects[1]) {
-        warning("First value of ", .pQuote(parameterName), " ",
+        warnArgumentAdjusted("First value of ", .pQuote(parameterName), " ",
             "(", parameterValues[1], ") will be ignored",
-            call. = FALSE
+            parameter = parameterName,
+            value = parameterValues,
+            diagnosticId = "simulation.first_stage_bound_adjusted"
         )
     }
 
@@ -3071,12 +3147,12 @@ NULL
         }
     }
     if (!is.na(param)) {
-        warning("Observed ", param, " (", .arrayToString(paramValues),
+        warnDataIssue("Observed ", param, " (", .arrayToString(paramValues),
             ") not according to specified information rates (",
             .arrayToString(design$informationRates[1:stage]), ") in ",
             "group sequential design. ",
             "Test procedure might not control Type I error rate",
-            call. = FALSE
+            diagnosticId = "analysis.information_rates_changed"
         )
     }
 }
@@ -3094,7 +3170,8 @@ NULL
             parameter = "designType",
             value = designType,
             relatedParameter = "engineType",
-            relatedValue = engineType
+            relatedValue = engineType,
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
 }
@@ -3264,7 +3341,9 @@ NULL
                 message, "and 'Dunnett' will be used instead ",
                 "because conditional Dunnett test was specified as design"
             )
-            warning(message, call. = FALSE)
+            warnArgumentAdjusted(message,
+                diagnosticId = "analysis.intersection_test_adjusted_to_dunnett"
+            )
         }
         intersectionTest <- "Dunnett"
     }
@@ -3294,7 +3373,8 @@ NULL
             parameter = "intersectionTest",
             value = intersectionTest,
             relatedParameter = "design",
-            relatedValue = design
+            relatedValue = design,
+            diagnosticId = "analysis.conditional_dunnett_intersection_test"
         )
     }
 }
@@ -3339,10 +3419,12 @@ NULL
         prefix <- paste0(trimws(prefix), " ")
     }
 
-    warning(prefix, .pQuote(paramName), " (",
+    warnArgumentIgnored(prefix, .pQuote(paramName), " (",
         .arrayToString(paramValue), ") will be ignored because ",
         requirementFailedReason,
-        call. = FALSE
+        parameter = paramName,
+        value = paramValue,
+        diagnosticId = "validation.argument_not_applicable"
     )
     return(NA_real_)
 }
@@ -3369,7 +3451,8 @@ NULL
             "getStageResults() or getAnalysisResults()",
             functionName = ".stopInCaseOfIllegalStageDefinition",
             parameter = "stage",
-            value = stage
+            value = stage,
+            diagnosticId = "analysis.stage_argument_misplaced"
         )
     }
 }
@@ -3380,7 +3463,8 @@ NULL
         stopIllegalArgument("'stage' (", forbiddenStage, ") can only be defined in ",
             "getStageResults() or getAnalysisResults()",
             functionName = ".stopInCaseOfIllegalStageDefinition2",
-            parameter = "stage"
+            parameter = "stage",
+            diagnosticId = "analysis.stage_argument_misplaced"
         )
     }
 }
@@ -3412,7 +3496,8 @@ NULL
             parameter = "varianceOption",
             value = varianceOption,
             relatedParameter = "design",
-            relatedValue = design
+            relatedValue = design,
+            diagnosticId = "analysis.conditional_dunnett_variance"
         )
     }
 }
@@ -3434,9 +3519,11 @@ NULL
 
     if (dataInput$getNumberOfGroups() == 1) {
         if (!is.na(stdErrorEstimate)) {
-            warning("'stdErrorEstimate' (", stdErrorEstimate,
+            warnArgumentIgnored("'stdErrorEstimate' (", stdErrorEstimate,
                 ") will be ignored because data input has only one group",
-                call. = FALSE
+                parameter = "stdErrorEstimate",
+                value = stdErrorEstimate,
+                diagnosticId = "analysis.two_group_argument_ignored"
             )
         }
 
@@ -3521,18 +3608,28 @@ NULL
             naAllowed = FALSE, noDefaultAvailable = TRUE
         )
         if (activeArms == 1) {
-            warning("'typeOfSelection' (\"", typeOfSelection, "\") will be ignored ",
+            warnArgumentIgnored("'typeOfSelection' (\"", typeOfSelection, "\") will be ignored ",
                 "because 'activeArms' or 'populations' = 1",
-                call. = FALSE
+                parameter = "typeOfSelection",
+                value = typeOfSelection,
+                diagnosticId = "selection.requires_multiple_groups"
             )
         } else if (rValue > activeArms) {
-            warning("'rValue' (", rValue, ") is larger than activeArms or populations ",
+            warnArgumentIgnored("'rValue' (", rValue, ") is larger than activeArms or populations ",
                 "(", activeArms, ") and will be ignored",
-                call. = FALSE
+                parameter = "rValue",
+                value = rValue,
+                diagnosticId = "selection.r_exceeds_group_count"
             )
         }
     } else if (!is.na(rValue)) {
-        warning("'rValue' (", rValue, ") will be ignored because 'typeOfSelection' != \"rBest\"", call. = FALSE)
+        warnArgumentIgnored("'rValue' (", rValue, ") will be ignored because 'typeOfSelection' != \"rBest\"",
+            parameter = "rValue",
+            value = rValue,
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            diagnosticId = "selection.r_requires_r_best"
+        )
     }
 
     if (typeOfSelection == "epsilon") {
@@ -3543,9 +3640,13 @@ NULL
             lower = 0, upper = NULL, naAllowed = TRUE
         )
     } else if (!is.na(epsilonValue)) {
-        warning("'epsilonValue' (", epsilonValue, ") will be ignored ",
+        warnArgumentIgnored("'epsilonValue' (", epsilonValue, ") will be ignored ",
             "because 'typeOfSelection' != \"epsilon\"",
-            call. = FALSE
+            parameter = "epsilonValue",
+            value = epsilonValue,
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            diagnosticId = "selection.epsilon_requires_epsilon_rule"
         )
     }
 
@@ -3723,6 +3824,57 @@ NULL
     }
 }
 
+# Validate the normalized enrichment effect list after list/data.frame conversion.
+.assertIsValidEffectList <- function(effectList, ..., endpoint, simulationType = "auto") {
+    requiredNames <- c("subGroups", "prevalences")
+    if (endpoint == "means") {
+        requiredNames <- c(requiredNames, "effects", "stDevs")
+    } else if (endpoint == "rates") {
+        requiredNames <- c(requiredNames, "piTreatments", "piControls")
+    } else if (endpoint == "survival") {
+        if (is.null(effectList$hazardRatios)) {
+            requiredNames <- c(requiredNames, "piTreatments", "piControls")
+        }
+        if (simulationType %in% c("patientWise", "patientWiseBasic")) {
+            requiredNames <- c(requiredNames, "piControls")
+        }
+    }
+    for (name in unique(requiredNames)) {
+        if (is.null(effectList[[name]]) || length(effectList[[name]]) == 0) {
+            patientWiseControls <- name == "piControls" && endpoint == "survival" &&
+                simulationType %in% c("patientWise", "patientWiseBasic")
+            stopMissingArgument(
+                sQuote(paste0("effectList$", name)),
+                if (patientWiseControls) {
+                    " must be specified for patient-wise survival simulations"
+                } else {
+                    " must be specified"
+                },
+                functionName = ".assertIsValidEffectList",
+                parameter = paste0("effectList$", name), value = effectList[[name]]
+            )
+        }
+    }
+    for (name in intersect(names(effectList), c(
+        "prevalences", "effects", "stDevs", "piControls", "piTreatments", "hazardRatios"
+    ))) {
+        .assertIsNumericVector(effectList[[name]], paste0("effectList$", name), matrixAllowed = TRUE)
+        .assertArgumentFitsWithSubGroups(effectList[[name]], name, effectList$subGroups)
+    }
+    .assertIsInClosedInterval(effectList$prevalences, "effectList$prevalences", lower = 0, upper = 1)
+    for (name in intersect(names(effectList), c("effects", "piTreatments", "hazardRatios"))) {
+        .assertIsValidMatrix(effectList[[name]], paste0("effectList$", name))
+    }
+    for (name in intersect(names(effectList), c("piControls", "piTreatments"))) {
+        .assertIsInOpenInterval(effectList[[name]], paste0("effectList$", name),
+            lower = 0, upper = 1, matrixAllowed = TRUE)
+    }
+    for (name in intersect(names(effectList), c("hazardRatios", "stDevs"))) {
+        .assertIsInOpenInterval(effectList[[name]], paste0("effectList$", name),
+            lower = 0, upper = NULL, matrixAllowed = TRUE)
+    }
+}
+
 .assertIsValidEffectMatrix <- function(
         ...,
         simulationResults,
@@ -3767,22 +3919,27 @@ NULL
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {
-            warning(sQuote(valueMaxVectorName), " (", .arrayToString(valueMaxVector),
+            warnArgumentIgnored(sQuote(valueMaxVectorName), " (", .arrayToString(valueMaxVector),
                 ") will be ignored because it will be set to first column of 'effectMatrix'",
-                call. = FALSE
+                parameter = valueMaxVectorName,
+                value = valueMaxVector,
+                diagnosticId = "shape.maximum_effect_ignored"
             )
         }
         if (!is.null(doseLevels) && !anyNA(doseLevels)) {
-            warning("'doseLevels' (", .arrayToString(doseLevels), ") ",
+            warnArgumentIgnored("'doseLevels' (", .arrayToString(doseLevels), ") ",
                 "will be ignored because 'typeOfShape' ",
                 "is defined as ", .pQuote(typeOfShape),
-                call. = FALSE
+                parameter = "doseLevels",
+                value = doseLevels,
+                diagnosticId = "shape.dose_levels_ignored"
             )
         }
     } else if (!is.null(effectMatrix)) {
-        warning("'effectMatrix' will be ignored because 'typeOfShape' ",
+        warnArgumentIgnored("'effectMatrix' will be ignored because 'typeOfShape' ",
             "is defined as ", .pQuote(typeOfShape),
-            call. = FALSE
+            parameter = "effectMatrix",
+            diagnosticId = "shape.effect_matrix_requires_user_defined"
         )
     }
 
@@ -3927,7 +4084,8 @@ NULL
         stopMissingArgument("either 'design' or 'delayedInformation' must be specified",
             functionName = ".isDelayedInformationEnabled",
             parameter = "design",
-            relatedParameter = "delayedInformation"
+            relatedParameter = "delayedInformation",
+            diagnosticId = "design.delayed_information_missing"
         )
     }
 
@@ -3984,7 +4142,8 @@ NULL
                 parameter = "existingParamNames",
                 value = existingParamNames,
                 relatedParameter = "requiredParamNames",
-                relatedValue = requiredParamNames
+                relatedValue = requiredParamNames,
+                diagnosticId = "counts.companion_parameters_missing"
             )
         }
     }
@@ -4025,7 +4184,8 @@ NULL
         functionName = ".assertIsValidCountsParameterCombination",
         parameter = "existingParamNames", value = existingParamNames,
         relatedParameter = "foundParamNames",
-        relatedValue = foundParamNames
+        relatedValue = foundParamNames,
+        diagnosticId = "validation.conflicting_parameterizations"
     )
 }
 
@@ -4104,7 +4264,8 @@ NULL
             parameter = "lambda1 / lambda2",
             value = lambda1 / lambda2,
             relatedParameter = "thetaH0",
-            relatedValue = thetaH0
+            relatedValue = thetaH0,
+            diagnosticId = "planning.alternative_equals_null"
         )
     }
 }
@@ -4145,7 +4306,8 @@ NULL
             " cannot be specified together",
             functionName = ".assertParametersAreSpecifiedCorrectlyTogether",
             parameter = "paramVector",
-            value = paramVector
+            value = paramVector,
+            diagnosticId = "validation.conflicting_parameterizations"
         )
     } else if (case == "eitherOr" && all(is.na(params[[1]])) && all(is.na(params[[2]]))) {
         stopMissingArgument("either ",
@@ -4153,7 +4315,8 @@ NULL
             " must be specified",
             functionName = ".assertParametersAreSpecifiedCorrectlyTogether",
             parameter = "paramNames",
-            value = paramNames
+            value = paramNames,
+            diagnosticId = "validation.alternative_parameters_missing"
         )
     }
 }
@@ -4188,7 +4351,8 @@ NULL
             parameter = "accrualIntensity",
             relatedParameter = "accrualTime",
             relatedValue = accrualTime,
-            value = accrualIntensity
+            value = accrualIntensity,
+            diagnosticId = "accrual.piecewise_intensities_missing"
         )
     }
 
@@ -4302,10 +4466,10 @@ NULL
             )
         }
         if (anyNA(accrualIntensity) && !anyNA(accrualTime) && !is.na(fixedExposureTime)) {
-            warning(
+            warnArgumentIgnored(
                 "Specification of 'accrualTime' has no ",
                 "influence of calculation and will be ignored",
-                call. = FALSE
+                diagnosticId = "counts.accrual_ignored_for_fixed_exposure"
             )
         }
     } else {
@@ -4375,7 +4539,8 @@ NULL
             value = plannedCalendarTime,
             relatedParameter = "kMax",
             relatedValue = kMax,
-            functionName = ".assertAreValidCalendarTimes"
+            functionName = ".assertAreValidCalendarTimes",
+            diagnosticId = "simulation.calendar_time_length"
         )
     }
 }
@@ -4459,11 +4624,12 @@ NULL
         valueStr <- paste0(" (", .arrayToString(argValue), ")")
     }
 
-    warning(
+    warnArgumentIgnored(
         sQuote(argumentName), valueStr, " will be ignored ",
         "because it is not required for the conversion from ",
         .pQuote(sourceScale), " to ", .pQuote(targetScale),
-        call. = FALSE
+        parameter = argumentName,
+        diagnosticId = "futility.conversion_input_ignored"
     )
 }
 
@@ -4476,7 +4642,8 @@ NULL
         functionName = ".showFutilityBoundsMissingArgumentError",
         parameter = argumentName,
         relatedParameter = scaleName,
-        relatedValue = scaleValue
+        relatedValue = scaleValue,
+        diagnosticId = "futility.conversion_input_missing"
     )
 }
 
@@ -4666,17 +4833,25 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
 
     if (!is.null(lowerBound) && length(lowerBound) > 0 && !anyNA(lowerBound) &&
             any(futilityBounds < lowerBound, na.rm = TRUE)) {
-        warning(
+        warnNumericalIssue(
             "At least one calculated futility bound outside acceptable range",
-            call. = FALSE
+            parameter = "futilityBounds",
+            value = futilityBounds,
+            relatedParameter = c("lowerBound", "upperBound"),
+            relatedValue = list(lowerBound = lowerBound, upperBound = upperBound),
+            diagnosticId = "futility.bounds_outside_range"
         )
     }
 
     if (!is.null(upperBound) && length(upperBound) > 0 && !anyNA(upperBound) &&
             any(futilityBounds > upperBound, na.rm = TRUE)) {
-        warning(
+        warnNumericalIssue(
             "At least one calculated futility bound outside acceptable range",
-            call. = FALSE
+            parameter = "futilityBounds",
+            value = futilityBounds,
+            relatedParameter = c("lowerBound", "upperBound"),
+            relatedValue = list(lowerBound = lowerBound, upperBound = upperBound),
+            diagnosticId = "futility.bounds_outside_range"
         )
     }
 }

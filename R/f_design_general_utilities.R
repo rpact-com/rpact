@@ -170,9 +170,11 @@ NULL
             ) &&
             (twoSidedWarningForDefaultValues && !all(is.na(parameterValues)) ||
                 (!twoSidedWarningForDefaultValues && any(na.omit(parameterValues) != defaultValue)))) {
-        warning(.pQuote(parameterName), " (", .arrayToString(parameterValues),
+        warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues),
             ") will be ignored because the design is two-sided",
-            call. = FALSE
+            parameter = parameterName,
+            value = parameterValues,
+            diagnosticId = "design.direction_not_applicable"
         )
         parameterValues <- rep(defaultValue, design$kMax - 1)
     }
@@ -267,9 +269,11 @@ NULL
     }
 
     if (design$isUserDefinedParameter(parameterName)) {
-        warning(.pQuote(parameterName), " (", .arrayToString(design[[parameterName]]),
+        warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(design[[parameterName]]),
             ") will be ignored because it will be calculated",
-            call. = FALSE
+            parameter = parameterName,
+            value = design[[parameterName]],
+            diagnosticId = "design.explicit_futility_bounds_ignored"
         )
     } else if (design$isGeneratedParameter(parameterName)) {
         return(FALSE)
@@ -391,7 +395,8 @@ NULL
             value = length(design$userAlphaSpending), constraint = "length must equal length of informationRates",
             relatedParameter = "informationRates",
             relatedValue = length(design$informationRates),
-            functionName = ".validateUserAlphaSpending"
+            functionName = ".validateUserAlphaSpending",
+            diagnosticId = "design.user_alpha_spending_length"
         )
     }
 
@@ -404,7 +409,8 @@ NULL
             parameter = "userAlphaSpending", value = length(design$userAlphaSpending), constraint = "length must equal kMax",
             relatedParameter = "kMax",
             relatedValue = design$kMax,
-            functionName = ".validateUserAlphaSpending"
+            functionName = ".validateUserAlphaSpending",
+            diagnosticId = "design.user_alpha_spending_length"
         )
     }
 
@@ -432,14 +438,15 @@ NULL
             parameter = "userAlphaSpending", value = design$userAlphaSpending, constraint = "0 <= alpha_1 <= .. <= alpha_kMax <= alpha",
             relatedParameter = c("kMax", "alpha"),
             relatedValue = list(kMax = design$kMax, alpha = design$alpha),
-            functionName = ".validateUserAlphaSpending"
+            functionName = ".validateUserAlphaSpending",
+            diagnosticId = "design.user_alpha_spending_not_cumulative"
         )
     }
 
     if (design$kMax > 2 && (any(design$userAlphaSpending[2:design$kMax] - design$userAlphaSpending[1:(design$kMax - 1)] < design$tolerance))) {
-        warning("Chosen 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = FALSE),
+        warnNumericalIssue("Chosen 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = FALSE),
             ") might yield imprecise critical values due to numerical inaccuracy",
-            call. = FALSE
+            diagnosticId = "design.spending_numerical_precision"
         )
     }
 }
@@ -463,7 +470,8 @@ NULL
             value = length(design$userBetaSpending), constraint = "length must equal length of informationRates",
             relatedParameter = "informationRates",
             relatedValue = length(design$informationRates),
-            functionName = ".validateUserBetaSpending"
+            functionName = ".validateUserBetaSpending",
+            diagnosticId = "design.user_beta_spending_length"
         )
     }
 
@@ -476,7 +484,8 @@ NULL
             parameter = "userBetaSpending", value = length(design$userBetaSpending), constraint = "length must equal kMax",
             relatedParameter = "kMax",
             relatedValue = design$kMax,
-            functionName = ".validateUserBetaSpending"
+            functionName = ".validateUserBetaSpending",
+            diagnosticId = "design.user_beta_spending_length"
         )
     }
 
@@ -516,14 +525,15 @@ NULL
             parameter = "userBetaSpending", value = design$userBetaSpending, constraint = "0 <= beta_1 <= .. <= beta_kMax <= beta",
             relatedParameter = c("kMax", "beta"),
             relatedValue = list(kMax = design$kMax, beta = design$beta),
-            functionName = ".validateUserBetaSpending"
+            functionName = ".validateUserBetaSpending",
+            diagnosticId = "design.user_beta_spending_not_cumulative"
         )
     }
 
     if (design$kMax > 2 && (any(design$userBetaSpending[2:design$kMax] - design$userBetaSpending[1:(design$kMax - 1)] < design$tolerance))) {
-        warning("Chosen 'userBetaSpending' (", .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = FALSE),
+        warnNumericalIssue("Chosen 'userBetaSpending' (", .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = FALSE),
             ") might yield imprecise futility bounds due to numerical inaccuracy",
-            call. = FALSE
+            diagnosticId = "design.spending_numerical_precision"
         )
     }
 }
@@ -607,7 +617,8 @@ NULL
 
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise survival definition",
-            functionName = ".getPiecewiseExponentialDistributionSingleTime"
+            functionName = ".getPiecewiseExponentialDistributionSingleTime",
+            diagnosticId = "survival.weibull_piecewise_incompatible"
         )
     }
 
@@ -652,7 +663,8 @@ NULL
 
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise exponential survival definition",
-            functionName = ".getPiecewiseExponentialSingleQuantile"
+            functionName = ".getPiecewiseExponentialSingleQuantile",
+            diagnosticId = "survival.weibull_piecewise_incompatible"
         )
     }
 
@@ -722,7 +734,8 @@ NULL
             functionName = ".getPiecewiseExponentialSettings",
             parameter = "piecewiseSurvivalTime",
             relatedParameter = "piecewiseLambda",
-            relatedValue = piecewiseLambda, value = piecewiseSurvivalTime
+            relatedValue = piecewiseLambda, value = piecewiseSurvivalTime,
+            diagnosticId = "survival.list_and_separate_hazards_conflict"
         )
     }
 
@@ -732,9 +745,10 @@ NULL
 
     if (length(piecewiseLambda) == 1 && !is.na(piecewiseLambda) &&
             length(piecewiseSurvivalTime) > 0 && !all(is.na(piecewiseSurvivalTime))) {
-        warning("Argument 'piecewiseSurvivalTime' will be ignored because ",
+        warnArgumentIgnored("Argument 'piecewiseSurvivalTime' will be ignored because ",
             "length of 'piecewiseLambda' is 1",
-            call. = FALSE
+            parameter = "piecewiseSurvivalTime",
+            diagnosticId = "survival.piecewise_times_with_constant_hazard"
         )
     }
 
@@ -1148,10 +1162,10 @@ getPiByLambda <- function(
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
     x <- exp(-(lambda * eventTime)^kappa)
     if (any(x < 1e-15, na.rm = TRUE)) {
-        warning("Calculation of pi (1) by lambda (", .arrayToString(round(lambda, 4)),
+        warnNumericalIssue("Calculation of pi (1) by lambda (", .arrayToString(round(lambda, 4)),
             ") results in a possible loss of precision ",
             "because pi = 1 was returned but pi is not exactly 1",
-            call. = FALSE
+            diagnosticId = "survival.event_probability_rounded_to_one"
         )
     }
     return(1 - x)
@@ -1229,7 +1243,8 @@ getMedianByPi <- function(
     }
 
     designParametersToShow <- c(".design$stages")
-    if (grepl("Dunnett", .getClassName(parameterSet))) {
+    design <- parameterSet$.design
+    if (grepl("Dunnett", .getClassName(design))) {
         designParametersToShow <- c(
             designParametersToShow,
             ".design$alpha",
@@ -1238,7 +1253,6 @@ getMedianByPi <- function(
             ".design$sided"
         )
     } else {
-        design <- parameterSet$.design
         designParametersToShow <- c()
         if (design$kMax > 1) {
             if (is.null(parameterSet[[".stageResults"]]) || .isTrialDesignGroupSequential(design)) {

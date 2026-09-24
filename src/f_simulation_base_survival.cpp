@@ -202,7 +202,7 @@ NumericVector getTestStatistics(int stage, int designNumber, NumericVector infor
 	}
 
 	// Inverse normal design
-	if (designNumber == 2) {
+	if (designNumber == 2L) {
 
 		if (stage == 1) {
 			return NumericVector::create(logRankOverStages[0], 1 - getNormalDistribution((double) logRankOverStages[0]));

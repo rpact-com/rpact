@@ -235,7 +235,8 @@ getDesignFisher <- function(
 
     if (sided != 1) {
         stopIllegalArgument("Fisher's combination test only available for one-sided testing",
-            functionName = ".getDesignFisher"
+            functionName = ".getDesignFisher",
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
 
@@ -243,20 +244,21 @@ getDesignFisher <- function(
         bindingFutility <- C_BINDING_FUTILITY_FISHER_DEFAULT
     } else if (userFunctionCallEnabled) {
         if (!is.na(kMax) && kMax == 1) {
-            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
-                "because kMax = 1",
-                call. = FALSE
-            )
+            warnArgumentIgnoredFixedDesign("bindingFutility", value = bindingFutility)
         } else if (anyNA(alpha0Vec)) {
-            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'alpha0Vec' is not defined",
-                call. = FALSE
+                parameter = "bindingFutility",
+                value = bindingFutility,
+                diagnosticId = "fisher.binding_futility_requires_bounds"
             )
         } else if (all(alpha0Vec == C_ALPHA_0_VEC_DEFAULT, na.rm = TRUE)) {
-            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+            warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'alpha0Vec' (", .arrayToString(alpha0Vec), ") ",
                 "is set to default values",
-                call. = FALSE
+                parameter = "bindingFutility",
+                value = bindingFutility,
+                diagnosticId = "fisher.binding_futility_requires_bounds"
             )
         }
     }
@@ -302,7 +304,9 @@ getDesignFisher <- function(
     design$alpha0Vec <- .getValidatedAlpha0Vec(design)
 
     if (design$sided == 2 && design$bindingFutility && any(design$alpha0Vec < 1)) {
-        warning("Binding futility will be ignored because the test is defined as two-sided", call. = FALSE)
+        warnArgumentIgnored("Binding futility will be ignored because the test is defined as two-sided",
+            diagnosticId = "fisher.binding_futility_requires_one_sided"
+        )
     }
 
     if (design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
@@ -310,9 +314,10 @@ getDesignFisher <- function(
     } else {
         design$.setParameterType("userAlphaSpending", C_PARAM_NOT_APPLICABLE)
         if (.isDefinedArgument(design$userAlphaSpending)) {
-            warning("'userAlphaSpending' will be ignored because 'method' is not ",
+            warnArgumentIgnored("'userAlphaSpending' will be ignored because 'method' is not ",
                 .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
-                call. = FALSE
+                parameter = "userAlphaSpending",
+                diagnosticId = "fisher.user_spending_method_required"
             )
         }
     }
@@ -340,7 +345,8 @@ getDesignFisher <- function(
             design$kMax, ")",
             functionName = ".getDesignFisher",
             parameter = "C_FISHER_METHOD_NO_INTERACTION",
-            value = C_FISHER_METHOD_NO_INTERACTION
+            value = C_FISHER_METHOD_NO_INTERACTION,
+            diagnosticId = "fisher.no_interaction_requires_three_stages"
         )
     }
 
@@ -366,7 +372,8 @@ getDesignFisher <- function(
             functionName = ".getDesignFisher",
             parameter = "method",
             relatedParameter = "alpha0Vec",
-            relatedValue = alpha0Vec, value = method
+            relatedValue = alpha0Vec, value = method,
+            diagnosticId = "fisher.no_interaction_requires_binding_futility"
         )
     }
 
@@ -433,7 +440,9 @@ getDesignFisher <- function(
             }
         },
         error = function(e) {
-            warning("Output may be wrong because an error occured: ", e$message, call. = FALSE)
+            warnNumericalIssue("Output may be wrong because an error occured: ", e$message,
+                diagnosticId = "fisher.design_calculation_failed"
+            )
         }
     )
 

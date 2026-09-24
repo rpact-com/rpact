@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.5.0.9317
-Date: 2026-09-09
+Version: 4.5.0.9321
+Date: 2026-09-24
 Authors@R: c(
 	person(
 		given = "Gernot",
@@ -18,16 +18,16 @@ Authors@R: c(
     	role = c("aut", "cre")
     ),
     person(
-    	given = "Till",
-    	family = "Jensen",
-    	email = "till.jensen@rpact.com",
-    	role = c("ctb")
-	),
-    person(
     	given = "Daniel",
     	family = "Sabanes Bove",
     	email = "daniel.sabanes_bove@rpact.com",
             comment = c(ORCID = "0000-0002-0176-9239"),
+    	role = c("ctb")
+	),
+    person(
+    	given = "Till",
+    	family = "Jensen",
+    	email = "till.jensen@rpact.com",
     	role = c("ctb")
 	),
     person(
@@ -44,6 +44,18 @@ Authors@R: c(
     	comment = c(ORCID = "0000-0002-4111-1941"),
     	role = c("ctb")
 	),
+    person(
+    	given = "Morton",
+    	family = "Dreher",
+    	email = "morten.dreher@outlook.de",
+    	role = c("ctb")
+	),
+    person(
+        given = "Werner", 
+        family = "Brannath", 
+        role = c("ctb"), 
+        comment = c(ORCID = "0000-0002-8622-3904")
+    ),
     person(
         "RPACT GmbH",
         role = c("cph", "fnd"),
@@ -101,12 +113,14 @@ Collate:
     'class_analysis_dataset.R'
     'class_analysis_stage_results.R'
     'class_analysis_results.R'
+    'class_design_optimal.R'
     'f_design_general_utilities.R'
     'class_time.R'
     'class_design_set.R'
     'class_design_plan.R'
     'class_design_power_and_asn.R'
     'class_event_probabilities.R'
+    'class_fisher_information.R'
     'f_simulation_base_counts.R'
     'f_simulation_utilities.R'
     'f_simulation_base_survival.R'
@@ -133,6 +147,10 @@ Collate:
     'f_design_fixed.R'
     'f_design_futility_bounds.R'
     'f_design_group_sequential.R'
+    'parameter_descriptions.R'
+    'f_design_optimal_background.R'
+    'f_design_optimal_user.R'
+    'f_design_optimal_utilities.R'
     'f_design_plan_boundary_data.R'
     'f_design_plan_counts.R'
     'f_design_plan_means.R'
@@ -167,8 +185,8 @@ Collate:
     'f_summary_parameters.R'
     'f_summary_title.R'
     'f_summary_utilities.R'
+    'f_warning_handling.R'
     'parameter_column_names.R'
-    'parameter_descriptions.R'
     'parameter_formats.R'
     'parameter_names.R'
     'parameter_order.R'

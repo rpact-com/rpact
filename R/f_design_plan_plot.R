@@ -133,7 +133,8 @@
                 length(designPlan$alternative) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForPlotting",
-                parameter = "alternative"
+                parameter = "alternative",
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     } else if (.isTrialDesignPlanRates(designPlan)) {
@@ -141,7 +142,8 @@
                 length(designPlan$pi1) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForPlotting",
-                parameter = "pi1"
+                parameter = "pi1",
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
@@ -149,7 +151,8 @@
                 length(designPlan$hazardRatio) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForPlotting",
-                parameter = "hazardRatio"
+                parameter = "hazardRatio",
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     }
@@ -232,15 +235,17 @@
                     default = FALSE,
                     type = "logical"
                 ))) {
-            warning("Options 'rpact.plot.show.alpha.spent' and ",
+            warnArgumentAdjusted("Options 'rpact.plot.show.alpha.spent' and ",
                 "'rpact.plot.show.beta.spent' are both FALSE; ",
                 "'alphaSpent' will be shown",
-                call. = FALSE
+                parameter = "rpact.plot.show.beta.spent",
+                diagnosticId = "plot.spending_curve_selected"
             )
         } else {
-            warning("'showAlphaSpent' and 'showBetaSpent' are both FALSE; ",
+            warnArgumentAdjusted("'showAlphaSpent' and 'showBetaSpent' are both FALSE; ",
                 "'alphaSpent' will be shown",
-                call. = FALSE
+                parameter = "showAlphaSpent",
+                diagnosticId = "plot.spending_curve_selected"
             )
         }
     }
@@ -1322,9 +1327,9 @@
         if (designPlan$.piecewiseSurvivalTime$.isLambdaBased(minNumberOfLambdas = 1)) {
             if (length(designPlan$lambda1) > 1) {
                 lambda1 <- designPlan$lambda1[1]
-                warning("Only the first 'lambda1' (", round(lambda1, 4),
+                warnArgumentAdjusted("Only the first 'lambda1' (", round(lambda1, 4),
                     ") was used for plotting",
-                    call. = FALSE
+                    diagnosticId = "plot.single_scenario_selected"
                 )
             }
         } else {
@@ -1478,9 +1483,9 @@
 
 .warnInCaseOfUnusedValuesForPlottingMeans <- function(alternative) {
     if (length(alternative) > 1) {
-        warning("Only the first 'alternative' (", round(alternative[1], 3),
+        warnArgumentAdjusted("Only the first 'alternative' (", round(alternative[1], 3),
             ") was used for plotting",
-            call. = FALSE
+            diagnosticId = "plot.single_scenario_selected"
         )
         return(list(title = "alternative", value = alternative[1], subscript = NA_character_))
     }
@@ -1489,9 +1494,9 @@
 
 .warnInCaseOfUnusedValuesForPlottingRates <- function(pi1) {
     if (length(pi1) > 1) {
-        warning("Only the first 'pi1' (", round(pi1[1], 3),
+        warnArgumentAdjusted("Only the first 'pi1' (", round(pi1[1], 3),
             ") was used for plotting",
-            call. = FALSE
+            diagnosticId = "plot.single_scenario_selected"
         )
         return(list(title = "pi", value = pi1[1], subscript = "1"))
     }
@@ -1500,9 +1505,9 @@
 
 .warnInCaseOfUnusedValuesForPlottingSurvival <- function(hazardRatio) {
     if (length(hazardRatio) > 1) {
-        warning("Only the first 'hazardRatio' (", round(hazardRatio[1], 3),
+        warnArgumentAdjusted("Only the first 'hazardRatio' (", round(hazardRatio[1], 3),
             ") was used for plotting",
-            call. = FALSE
+            diagnosticId = "plot.single_scenario_selected"
         )
         return(list(title = "hazardRatio", value = hazardRatio[1], subscript = NA_character_))
     }
@@ -1694,8 +1699,10 @@ plot.TrialDesignPlan <- function(
 
     nMax <- list(...)[["nMax"]]
     if (!is.null(nMax)) {
-        warning("'nMax' (", nMax, ") will be ignored because it will be taken from design plan",
-            call. = FALSE
+        warnArgumentIgnored("'nMax' (", nMax, ") will be ignored because it will be taken from design plan",
+            parameter = "nMax",
+            value = nMax,
+            diagnosticId = "plot.n_max_ignored"
         )
     }
 

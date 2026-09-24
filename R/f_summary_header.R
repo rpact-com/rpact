@@ -18,7 +18,7 @@
 #' @include f_core_assertions.R
 NULL
 
-.createSummaryHeaderDesign <- function(design, designPlan, summaryFactory) {
+.createSummaryHeaderDesign <- function(design, designPlan, summaryFactory, consoleOutputEnabled = TRUE) {
     if (is.null(designPlan)) {
         if (design$kMax == 1) {
             header <- "Fixed"
@@ -155,7 +155,8 @@ NULL
     if (design$kMax == 1) {
         header <- paste0(header, "Fixed sample analysis")
     } else {
-        header <- paste0(header, "Sequential analysis with a maximum of ", design$kMax, " looks")
+        header <- paste0(header, "Sequential analysis with a maximum of ", 
+            .integerToWrittenNumber(design$kMax), " looks")
         prefix <- ifelse(design$.isDelayedResponseDesign(), "delayed response ", "")
         header <- .concatenateSummaryText(header,
             paste0("(", prefix, design$.toString(startWithUpperCase = FALSE), ")"),
@@ -166,17 +167,27 @@ NULL
     header <- paste0(header, "\n")
 
     header <- paste0(header, "The results were ")
-    header <- paste0(header, ifelse(inherits(designPlan, "SimulationResults"), "simulated", "calculated"))
-    header <- paste0(header, " for a ")
+    if (inherits(designPlan, "SimulationResults")) {
+        header <- paste0(header, "obtained using")
+        if (inherits(designPlan, "SimulationResultsSurvival") || identical(designPlan$simulationType, "patientWise")) {
+            header <- paste0(header, " patient-level simulation")
+        } else {
+            header <- paste0(header, " test-statistic-based simulation")
+        }
+    } else {
+        header <- paste0(header, "calculated")
+    }
+
+    header <- paste0(header, " for ")
     if (settings$meansEnabled) {
         if (settings$multiArmEnabled && settings$groups > 1) {
             header <- .concatenateSummaryText(header, "multi-arm comparisons for means", sep = "")
         } else if (settings$enrichmentEnabled && settings$populations > 1) {
             header <- .concatenateSummaryText(header, "population enrichment comparisons for means", sep = "")
         } else if (settings$groups == 1 && !settings$multiArmEnabled) {
-            header <- .concatenateSummaryText(header, "one-sample t-test", sep = "")
+            header <- .concatenateSummaryText(header, "a one-sample t-test", sep = "")
         } else if (settings$groups == 2 || settings$multiArmEnabled) {
-            header <- .concatenateSummaryText(header, "two-sample t-test", sep = "")
+            header <- .concatenateSummaryText(header, "a two-sample t-test", sep = "")
         }
     } else if (settings$ratesEnabled) {
         if (settings$multiArmEnabled && settings$groups > 1) {
@@ -184,20 +195,20 @@ NULL
         } else if (settings$enrichmentEnabled && settings$populations > 1) {
             header <- .concatenateSummaryText(header, "population enrichment comparisons for rates", sep = "")
         } else if (settings$groups == 1 && !settings$multiArmEnabled) {
-            header <- .concatenateSummaryText(header, "one-sample test for rates", sep = "")
+            header <- .concatenateSummaryText(header, "a one-sample test for rates", sep = "")
         } else if (settings$groups == 2 || settings$multiArmEnabled) {
-            header <- .concatenateSummaryText(header, "two-sample test for rates", sep = "")
+            header <- .concatenateSummaryText(header, "a two-sample test for rates", sep = "")
         }
     } else if (settings$survivalEnabled) {
         if (settings$multiArmEnabled && settings$groups > 1) {
-            header <- .concatenateSummaryText(header, "multi-arm logrank test", sep = "")
+            header <- .concatenateSummaryText(header, "a multi-arm logrank test", sep = "")
         } else if (settings$enrichmentEnabled && settings$populations > 1) {
-            header <- .concatenateSummaryText(header, "population enrichment logrank test", sep = "")
+            header <- .concatenateSummaryText(header, "a population enrichment logrank test", sep = "")
         } else if (settings$groups == 2 || settings$multiArmEnabled) {
-            header <- .concatenateSummaryText(header, "two-sample logrank test", sep = "")
+            header <- .concatenateSummaryText(header, "a two-sample logrank test", sep = "")
         }
     } else if (settings$countDataEnabled) {
-        header <- .concatenateSummaryText(header, "two-sample Wald-test for count data", sep = "")
+        header <- .concatenateSummaryText(header, "a two-sample Wald-test for count data", sep = "")
     }
 
     part <- ""
@@ -398,8 +409,9 @@ NULL
 
         if (length(designPlan[[userDefinedParam]]) == 1) {
             treatmentRateText <- paste0("H1: ", paramName, " = ", round(designPlan[[userDefinedParam]], 3))
-        } else if (!is.null(designPlan[["omegaMaxVector"]]) && length(designPlan$omegaMaxVector) == 1) {
-            treatmentRateText <- paste0("H1: omega_max = ", round(designPlan$omegaMaxVector, 3))
+        } else if (!is.null(designPlan[["omegaMaxVector"]]) && length(designPlan$omegaMaxVector) >= 1) {
+            treatmentRateText <- paste0("H1: omega_max = ", 
+                .arrayToString(designPlan$omegaMaxVector, mode = "vector", digits = 3))
         } else if (!is.null(designPlan[["hazardRatio"]]) && (length(designPlan$hazardRatio) == 1) ||
                 (inherits(designPlan, "SimulationResults") && !is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
                     designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled)) {
@@ -446,6 +458,14 @@ NULL
                 )
             )
         }
+        
+        print("settings$multiArmEnabled") # TODO remove
+        print(settings$multiArmEnabled)
+
+        if (!is.null(designPlan[["piControl"]]) && length(designPlan$piControl) == 1 && !is.na(designPlan$piControl)) {
+            treatmentRateText <- paste0(treatmentRateText, ", control rate pi(control) = ", round(designPlan$piControl, 3))
+        }
+        
         header <- paste0(header, ", \n", .createSummaryHypothesisText(designPlan, summaryFactory))
         header <- .concatenateSummaryText(header, treatmentRateText)
         header <- .addEnrichmentEffectListToHeader(header, designPlan)
@@ -464,25 +484,56 @@ NULL
     }
     header <- paste0(header, ".")
 
-    if ("effectMatrix" %in% names(designPlan) && !is.null(designPlan$effectMatrix)) {
-        effectMatrix <- designPlan$effectMatrix
-        activeArms <- nrow(effectMatrix)
-        if (activeArms == 1) {
-            rownames(effectMatrix) <- NULL
-        }
-        effectMatrixLines <- capture.output(print(effectMatrix))
-        if (activeArms == 1) {
-            effectMatrixLines <- substring(effectMatrixLines, 6)
-        }
+    if ("effectMatrix" %in% names(designPlan) && 
+            !is.null(designPlan$effectMatrix) && 
+            (designPlan$isUserDefinedParameter("effectMatrix") || designPlan$isDerivedParameter("effectMatrix"))) {
+        effectMatrixLines <- .formatSummaryEffectMatrix(designPlan$effectMatrix, consoleOutputEnabled)
 
         header <- paste0(
             header, "\n\n",
-            "User defined effect shape:",
-            "\n", paste(effectMatrixLines, collapse = "\n")
+            ifelse(designPlan$isUserDefinedParameter("effectMatrix"), "User defined effect shape:", "Effect shape:"),
+            ifelse(consoleOutputEnabled, "\n", "\n\n"), paste(effectMatrixLines, collapse = "\n")
         )
     }
 
     return(header)
+}
+
+.formatSummaryEffectMatrix <- function(effectMatrix, consoleOutputEnabled = TRUE) {
+    activeArms <- nrow(effectMatrix)
+    if (activeArms == 1) {
+        rownames(effectMatrix) <- NULL
+    }
+    if (consoleOutputEnabled) {
+        effectMatrixLines <- capture.output(print(effectMatrix))
+        if (activeArms == 1) {
+            effectMatrixLines <- substring(effectMatrixLines, 6)
+        }
+        return(effectMatrixLines)
+    }
+
+    columnNames <- colnames(effectMatrix)
+    if (is.null(columnNames)) {
+        columnNames <- paste0("[,", seq_len(ncol(effectMatrix)), "]")
+    }
+    values <- format(effectMatrix)
+    if (activeArms > 1) {
+        rowNames <- rownames(effectMatrix)
+        if (is.null(rowNames)) {
+            rowNames <- paste0("[", seq_len(activeArms), ",]")
+        }
+        columnNames <- c("", columnNames)
+        values <- cbind(rowNames, values)
+    }
+
+    fieldSet <- FieldSet$new()
+    tableColumns <- ncol(values)
+    fieldSet$.cat(columnNames, tableColumns = tableColumns, consoleOutputEnabled = FALSE)
+    fieldSet$.cat(rep("-----", tableColumns), tableColumns = tableColumns, consoleOutputEnabled = FALSE)
+    for (i in seq_len(activeArms)) {
+        fieldSet$.cat(values[i, ], tableColumns = tableColumns, consoleOutputEnabled = FALSE)
+    }
+    return(sub("\n$", "", fieldSet$.catLines))
 }
 
 .createSummaryHeaderAnalysisResults <- function(design, analysisResults, summaryFactory, digits) {
@@ -499,7 +550,8 @@ NULL
     if (design$kMax == 1) {
         header <- paste0(header, "Fixed sample analysis")
     } else {
-        header <- paste0(header, "Sequential analysis with ", design$kMax, " looks")
+        header <- paste0(header, "Sequential analysis with ", 
+            .integerToWrittenNumber(design$kMax), " looks")
         header <- .concatenateSummaryText(header,
             paste0("(", design$.toString(startWithUpperCase = FALSE), ")"),
             sep = " "
@@ -632,13 +684,13 @@ NULL
     return(header)
 }
 
-.createSummaryHeaderObject <- function(object, summaryFactory, digits = NA_integer_) {
+.createSummaryHeaderObject <- function(object, summaryFactory, digits = NA_integer_, consoleOutputEnabled = TRUE) {
     if (inherits(object, "TrialDesignCharacteristics")) {
         return(.createSummaryHeaderDesign(object$.design, NULL, summaryFactory))
     }
 
     if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
-        return(.createSummaryHeaderDesign(object$.design, object, summaryFactory))
+        return(.createSummaryHeaderDesign(object$.design, object, summaryFactory, consoleOutputEnabled))
     }
 
     if (inherits(object, "AnalysisResults")) {

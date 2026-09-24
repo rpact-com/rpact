@@ -25,10 +25,7 @@ NULL
     design <- results$.design
     if (design$kMax == 1) {
         if (.isConditionalPowerEnabled(nPlanned)) {
-            warning("'nPlanned' (", .arrayToString(nPlanned), ") ",
-                "will be ignored because design is fixed",
-                call. = FALSE
-            )
+            warnArgumentIgnoredFixedDesign("nPlanned", value = nPlanned)
         }
         results$.setParameterType("nPlanned", C_PARAM_NOT_APPLICABLE)
     }
@@ -49,9 +46,9 @@ NULL
     if (!.isConditionalPowerEnabled(nPlanned)) {
         if (length(paramValues) > 0 && !all(is.na(paramValues)) &&
                 !results$isGeneratedParameter(paramName)) {
-            warning(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
+            warnArgumentIgnored(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
                 "will be ignored because 'nPlanned' is not defined",
-                call. = FALSE
+                diagnosticId = "analysis.argument_requires_n_planned"
             )
         }
         return(invisible())
@@ -59,10 +56,7 @@ NULL
     if (results$.design$kMax == 1) {
         if (length(paramValues) > 0 && !all(is.na(paramValues)) &&
                 !results$isGeneratedParameter(paramName)) {
-            warning(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
-                "will be ignored because design is fixed",
-                call. = FALSE
-            )
+            warnArgumentIgnoredFixedDesign(paramName, value = paramValues)
         }
         return(invisible())
     }
@@ -369,7 +363,8 @@ NULL
         if (is.na(argValues[1])) {
             stopIllegalArgument(.pQuote(argName), " is NA at first stage; a valid numeric value must be specified at stage 1",
                 functionName = ".createDataFrame",
-                parameter = argName
+                parameter = argName,
+                diagnosticId = "dataset.first_stage_observations_missing"
             )
         }
 
@@ -421,7 +416,8 @@ NULL
                 functionName = ".createDataFrame",
                 parameter = argName,
                 relatedParameter = "argValues",
-                relatedValue = argValues
+                relatedValue = argValues,
+                diagnosticId = "dataset.control_observations_missing"
             )
         }
 
@@ -434,7 +430,8 @@ NULL
                     functionName = ".createDataFrame",
                     parameter = argName,
                     relatedParameter = "stageIndex",
-                    relatedValue = stageIndex
+                    relatedValue = stageIndex,
+                    diagnosticId = "dataset.nontrailing_missing_values"
                 )
             }
         }
@@ -447,7 +444,8 @@ NULL
                     stopIllegalArgument(.pQuote(argName), " contains alternating values and NA's; ",
                         "NA's must be the last values",
                         functionName = ".createDataFrame",
-                        parameter = argName, value = argValues
+                        parameter = argName, value = argValues,
+                        diagnosticId = "dataset.nontrailing_missing_values"
                     )
                 }
                 indexBefore <- index
@@ -460,7 +458,8 @@ NULL
                     if (!.arraysAreEqual(naIndicesBefore, naIndices)) {
                         stopConflictingArguments("inconsistent NA definition; ",
                             "if NA's exist, then they are mandatory for each group at the same stage",
-                            functionName = ".createDataFrame"
+                            functionName = ".createDataFrame",
+                            diagnosticId = "dataset.inconsistent_missing_stages"
                         )
                     }
                 }
@@ -474,7 +473,8 @@ NULL
                         stopConflictingArguments("values of treatment ", groupNumber, " not correctly specified; ",
                             "if NA's exist, then they are mandatory for each parameter at the same stage",
                             functionName = ".createDataFrame",
-                            parameter = "groupNumber", value = groupNumber
+                            parameter = "groupNumber", value = groupNumber,
+                            diagnosticId = "dataset.inconsistent_deselection"
                         )
                     }
                 }
@@ -526,7 +526,8 @@ NULL
                         stopConflictingArguments("inconsistent NA definition for group ", groupNumber, "; ",
                             "if NA's exist, then they are mandatory for each group at the same stage",
                             functionName = ".createDataFrame",
-                            parameter = "groupNumber", value = groupNumber
+                            parameter = "groupNumber", value = groupNumber,
+                            diagnosticId = "dataset.inconsistent_missing_stages"
                         )
                     }
                 }
@@ -562,9 +563,9 @@ NULL
     }
 
     if (dataFrameCounter > 1) {
-        warning("Found ", dataFrameCounter, ", data.frame arguments; ",
+        warnArgumentIgnored("Found ", dataFrameCounter, ", data.frame arguments; ",
             "only the first data.frame will be used for the initialization of the dataset",
-            call. = FALSE
+            diagnosticId = "dataset.multiple_data_frames"
         )
     }
 
@@ -683,13 +684,15 @@ NULL
         if (length(unknownArgs) == 1) {
             stopIllegalArgument("the argument ", .pQuote(unknownArgs), " is not a valid dataset argument",
                 functionName = ".assertIsValidDatasetArgument",
-                parameter = "unknownArgs", value = unknownArgs
+                parameter = "unknownArgs", value = unknownArgs,
+                diagnosticId = "validation.unknown_argument"
             )
         } else {
             stopIllegalArgument("the arguments ", .arrayToString(unknownArgs, encapsulate = TRUE),
                 " are no valid dataset arguments",
                 functionName = ".assertIsValidDatasetArgument",
-                parameter = "unknownArgs", value = unknownArgs
+                parameter = "unknownArgs", value = unknownArgs,
+                diagnosticId = "validation.unknown_argument"
             )
         }
     }
@@ -994,15 +997,19 @@ getLongFormat <- function(dataInput) {
     if (!.isConditionalPowerEnabled(nPlanned) || numberOfGroups == 1) {
         if (numberOfGroups == 1) {
             if (length(allocationRatioPlanned) == 1 && !identical(allocationRatioPlanned, 1)) {
-                warning("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
+                warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
                     "will be ignored because the specified data has only one group",
-                    call. = FALSE
+                    parameter = "allocationRatioPlanned",
+                    value = allocationRatioPlanned,
+                    diagnosticId = "analysis.two_group_argument_ignored"
                 )
             }
         } else if (!identical(allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)) {
-            warning("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
+            warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned, ") ",
                 "will be ignored because 'nPlanned' is not defined",
-                call. = FALSE
+                parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned,
+                diagnosticId = "analysis.argument_requires_n_planned"
             )
         }
         results$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)

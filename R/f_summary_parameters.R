@@ -430,9 +430,9 @@ NULL
             totalNumberOfGroups <- designPlan$activeArms
         }
         if (is.null(totalNumberOfGroups) || is.na(totalNumberOfGroups)) {
-            warning("Unable to identify 'totalNumberOfGroups' from ",
+            warnResultUnavailable("Unable to identify 'totalNumberOfGroups' from ",
                 .pQuote(parameterName), "in ", .getClassName(designPlan),
-                call = FALSE
+                diagnosticId = "summary.group_count_unavailable"
             )
         }
 

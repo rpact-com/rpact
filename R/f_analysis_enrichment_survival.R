@@ -158,13 +158,15 @@ NULL
     if (gMax > 2 && intersectionTest == "SpiessensDebois") {
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
             functionName = ".getStageResultsSurvivalEnrichment",
-            parameter = "gMax", value = gMax
+            parameter = "gMax", value = gMax,
+            diagnosticId = "enrichment.spiessens_debois_population_limit"
         )
     }
 
     if (!stratifiedAnalysis) {
         stopIllegalArgument("only stratified analysis can be performed for enrichment survival designs",
-            functionName = ".getStageResultsSurvivalEnrichment"
+            functionName = ".getStageResultsSurvivalEnrichment",
+            diagnosticId = "enrichment.stratification_required"
         )
     }
 
@@ -678,9 +680,10 @@ NULL
     }
 
     if (anyNA(criticalValues[1:stage])) {
-        warning(
+        warnResultUnavailable(
             "Repeated confidence intervals not because ", sum(is.na(criticalValues)),
-            " critical values are NA (", .arrayToString(criticalValues), ")"
+            " critical values are NA (", .arrayToString(criticalValues), ")",
+            diagnosticId = "analysis.repeated_intervals_missing_critical_values"
         )
         return(repeatedConfidenceIntervals)
     }
@@ -1010,7 +1013,8 @@ NULL
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalPowerSurvivalEnrichment",
-        parameter = "design"
+        parameter = "design",
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1190,7 +1194,9 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warning("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE)
+                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax,
+                        diagnosticId = "analysis.conditional_power_calculation_failed"
+                    )
                     results$conditionalPower[population, kMax] <- NA_real_
                 } else {
                     results$conditionalPower[population, kMax] <- 1 - stats::pnorm(.getQNorm(result) -

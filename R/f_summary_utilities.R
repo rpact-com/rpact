@@ -585,11 +585,12 @@ print.SummaryFactory <- function(
             parameterSet$isNotApplicableParameter(parameterName)) {
         if (!is.null(values) && .getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE") &&
                 validateParameterType && !.isMarkdownEnabled()) {
-            warning(
+            warnRuntimeIssue(
                 "Failed to add parameter ", .arrayToString(parameterName), " (",
                 .arrayToString(values), ") stored in ",
                 .getClassName(parameterSet), " because the ",
-                "parameter has type C_PARAM_NOT_APPLICABLE"
+                "parameter has type C_PARAM_NOT_APPLICABLE",
+                diagnosticId = "output.parameter_formatting_failed"
             )
         }
 
@@ -924,10 +925,11 @@ print.SummaryFactory <- function(
             }
             if (is.null(variedParameter) || length(variedParameter) == 0 || variedParameter == "") {
                 if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE")) {
-                    warning(
+                    warnRuntimeIssue(
                         "Failed to get varied parameter from ", .getClassName(parameterSet),
                         " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ";",
-                        length(variedParameter), " varied parameter values)"
+                        length(variedParameter), " varied parameter values)",
+                        diagnosticId = "output.parameter_formatting_failed"
                     )
                 }
                 return(invisible())

@@ -50,7 +50,8 @@ NULL
         if (kappa != 1 && phi > 0) {
             stopIllegalArgument("Weibull distribution cannot ",
                 "be used together with specified dropout rate (use simulation instead)",
-                functionName = ".getEventProbabilityFunction"
+                functionName = ".getEventProbabilityFunction",
+                diagnosticId = "survival.weibull_dropout_analytical_unsupported"
             )
         }
 
@@ -75,7 +76,8 @@ NULL
 
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise survival definition",
-            functionName = ".getEventProbabilityFunction"
+            functionName = ".getEventProbabilityFunction",
+            diagnosticId = "survival.weibull_piecewise_incompatible"
         )
     }
     len <- length(piecewiseSurvivalTime)
@@ -491,16 +493,16 @@ NULL
 
     if (!anyNA(designPlan$followUpTime)) {
         if (any(designPlan$followUpTime < -1e-02)) {
-            warning("Accrual duration longer than maximum study ",
+            warnInvalidInput("Accrual duration longer than maximum study ",
                 "duration (time to maximum number of events); followUpTime = ",
                 .arrayToString(designPlan$followUpTime),
-                call. = FALSE
+                diagnosticId = "survival.accrual_duration_inconsistent"
             )
         }
     } else {
-        warning("Follow-up time could not be calculated for hazardRatio = ",
+        warnNumericalIssue("Follow-up time could not be calculated for hazardRatio = ",
             .arrayToString(designPlan$hazardRatio),
-            call. = FALSE
+            diagnosticId = "survival.event_target_calculation_failed"
         )
     }
 
@@ -621,13 +623,6 @@ NULL
         .assertIsSingleLogical(accountForObservationTimes, "accountForObservationTimes", naAllowed = TRUE)
         .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
         .assertIsValidKappa(kappa)
-        directionUpper <- .assertIsValidDirectionUpper(
-            directionUpper,
-            design,
-            objectType = objectType, 
-            userFunctionCallEnabled = TRUE, 
-            default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-        )
 
         if (objectType == "power") {
             .assertIsSingleNumber(maxNumberOfEvents, "maxNumberOfEvents")
@@ -641,7 +636,8 @@ NULL
 
         if (design$sided == 2 && thetaH0 != 1) {
             stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
-                functionName = ".createDesignPlanSurvival"
+                functionName = ".createDesignPlanSurvival",
+                diagnosticId = "planning.two_sided_requires_superiority"
             )
         }
 
@@ -663,7 +659,8 @@ NULL
 
         if (typeOfComputation != "Schoenfeld" && thetaH0 != 1) {
             stopIllegalArgument("Freedman test calculation is possible only for superiority testing (thetaH0 != 1)",
-                functionName = ".createDesignPlanSurvival"
+                functionName = ".createDesignPlanSurvival",
+                diagnosticId = "survival.freedman_requires_superiority"
             )
         }
     }
@@ -688,7 +685,8 @@ NULL
     }
 
     if (userFunctionCallEnabled) {
-        allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
+        allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(
+            allocationRatioPlanned, maxNumberOfSubjects)
     }
 
     designPlan <- TrialDesignPlanSurvival$new(
@@ -709,6 +707,14 @@ NULL
         hazardRatio = hazardRatio,
         objectType = objectType
     )
+    
+    directionUpper <- .setDirectionUpper(
+        designPlan,
+        design,
+        directionUpper,
+        objectType = objectType,
+        endpoint = "survival",
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     .setValueAndParameterType(
         designPlan, "allocationRatioPlanned",
@@ -799,10 +805,10 @@ NULL
             length(designPlan$.piecewiseSurvivalTime$pi1) > 1 &&
             length(accrualSetup$accrualIntensity) > 1 && all(accrualSetup$accrualIntensity < 1)) {
         designPlan$.piecewiseSurvivalTime$pi1 <- designPlan$.piecewiseSurvivalTime$pi1[1]
-        warning("Only the first default 'pi1' (", designPlan$.piecewiseSurvivalTime$pi1, ") was used ",
+        warnArgumentAdjusted("Only the first default 'pi1' (", designPlan$.piecewiseSurvivalTime$pi1, ") was used ",
             "because the accrual intensities (", .arrayToString(accrualSetup$accrualIntensity), ") ",
             "were defined relative (all accrual intensities are < 1)",
-            call. = FALSE
+            diagnosticId = "survival.relative_accrual_scenario_selected"
         )
     }
 
@@ -831,9 +837,9 @@ NULL
 
         if (.isUserDefinedMaxNumberOfSubjects(designPlan) && !is.null(followUpTime) &&
                 length(followUpTime) == 1 && !is.na(followUpTime)) {
-            warning("Follow-up time will be calculated, value entered (",
+            warnArgumentIgnored("Follow-up time will be calculated, value entered (",
                 followUpTime, ") is not taken into account",
-                call. = FALSE
+                diagnosticId = "survival.follow_up_derived_from_subject_cap"
             )
         } else if (is.na(followUpTime)) {
             designPlan$followUpTime <- C_FOLLOW_UP_TIME_DEFAULT
@@ -867,7 +873,6 @@ NULL
         }
     }
 
-    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT)
     if (objectType == "power") {
         .setValueAndParameterType(designPlan, "maxNumberOfEvents", maxNumberOfEvents, NA_real_)
         designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
@@ -929,9 +934,10 @@ NULL
 
         if (!designPlan$accountForObservationTimes) {
             designPlan$accountForObservationTimes <- TRUE
-            warning("'accountForObservationTimes' was set to TRUE ",
+            warnArgumentAdjusted("'accountForObservationTimes' was set to TRUE ",
                 "because piecewise exponential survival function is enabled",
-                call. = FALSE
+                parameter = "accountForObservationTimes",
+                diagnosticId = "survival.observation_times_enabled"
             )
         }
     } else {
@@ -942,7 +948,8 @@ NULL
                 stopIllegalArgument("'accountForObservationTimes' must be TRUE because 'maxNumberOfSubjects' is > 0",
                     functionName = ".initDesignPlanSurvival",
                     parameter = "accountForObservationTimes",
-                    relatedParameter = "maxNumberOfSubjects"
+                    relatedParameter = "maxNumberOfSubjects",
+                    diagnosticId = "survival.subject_cap_requires_observation_times"
                 )
             }
 
@@ -1016,7 +1023,8 @@ NULL
             functionName = ".getSampleSizeFixedSurvival",
             parameter = "allocationRatioPlanned",
             relatedParameter = "maxNumberOfSubjects",
-            relatedValue = designPlan$maxNumberOfSubjects
+            relatedValue = designPlan$maxNumberOfSubjects,
+            diagnosticId = "planning.allocation_optimization_with_fixed_total"
         )
     }
 
@@ -1117,7 +1125,8 @@ NULL
                             maxNumberOfSubjects, designPlan$eventsFixed[i], i, hazardRatio[i]
                         ),
                         functionName = ".getSampleSizeFixedSurvival",
-                        parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects
+                        parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects,
+                        diagnosticId = "survival.events_exceed_subject_cap"
                     )
                 } else {
                     stopIllegalArgument(
@@ -1130,7 +1139,8 @@ NULL
                         ),
                         functionName = ".getSampleSizeFixedSurvival",
                         parameter = "maxNumberOfSubjects",
-                        value = maxNumberOfSubjects
+                        value = maxNumberOfSubjects,
+                        diagnosticId = "survival.events_exceed_subject_cap"
                     )
                 }
             }
@@ -1150,7 +1160,8 @@ NULL
                     stopIllegalArgument(
                         "the number of subjects is too small to reach maximum number of events ",
                         "(presumably due to drop-out rates), search algorithm failed",
-                        functionName = ".getSampleSizeFixedSurvival"
+                        functionName = ".getSampleSizeFixedSurvival",
+                        diagnosticId = "survival.event_target_unreachable"
                     )
                 }
             }
@@ -1284,7 +1295,8 @@ NULL
                             ),
                             designPlan$maxNumberOfSubjects[i], designPlan$cumulativeEventsPerStage[kMax, i], i
                         ),
-                        functionName = ".getSampleSizeSequentialSurvival"
+                        functionName = ".getSampleSizeSequentialSurvival",
+                        diagnosticId = "survival.events_exceed_subject_cap"
                     )
                 }
 
@@ -1307,7 +1319,8 @@ NULL
                         stopIllegalArgument(
                             "the number of subjects is too small to reach maximum number of events ",
                             "(presumably due to drop-out rates)",
-                            functionName = ".getSampleSizeSequentialSurvival"
+                            functionName = ".getSampleSizeSequentialSurvival",
+                            diagnosticId = "survival.event_target_unreachable"
                         )
                     }
                 }
@@ -1426,10 +1439,10 @@ NULL
                 c(designCharacteristics$futilityProbabilities, 0)
 
             if (all(is.na(designCharacteristics$futilityProbabilities))) {
-                warning("Expected number of subjects H1 and study duration H1 ",
+                warnResultUnavailable("Expected number of subjects H1 and study duration H1 ",
                     "cannot be calculated because the futility probabilities ",
                     "are not applicable for the specified design",
-                    call. = FALSE
+                    diagnosticId = "survival.expected_h1_results_unavailable"
                 )
             }
 
@@ -1687,9 +1700,9 @@ getEventProbabilities <- function(
 
     if (!setting$delayedResponseEnabled && length(setting$lambda1) > 1 &&
             setting$isUserDefinedParameter("lambda1")) {
-        warning("Only the first 'lambda1' (", lambda1[1], ") ",
+        warnArgumentAdjusted("Only the first 'lambda1' (", lambda1[1], ") ",
             "was used to calculate event probabilities",
-            call. = FALSE
+            diagnosticId = "survival.event_probability_scenario_selected"
         )
         setting <- getPiecewiseSurvivalTime(
             piecewiseSurvivalTime = piecewiseSurvivalTime,
@@ -1738,7 +1751,8 @@ getEventProbabilities <- function(
 
     if (kappa != 1 && any(phi > 0)) {
         stopIllegalArgument("for Weibull distribution (kappa != 1) drop-out rates (phi) cannot be specified",
-            functionName = "getEventProbabilities"
+            functionName = "getEventProbabilities",
+            diagnosticId = "survival.weibull_dropout_analytical_unsupported"
         )
     }
 
@@ -2465,9 +2479,9 @@ getSampleSizeSurvival <- function(
             if (sampleSizeSurvival$followUpTime < followUpTime - 1e-02 ||
                     sampleSizeSurvival$followUpTime > followUpTime + 1e-02) {
                 sampleSizeSurvival$.setParameterType("followUpTime", C_PARAM_GENERATED)
-                warning("User defined 'followUpTime' (", followUpTime, ") ignored because ",
+                warnArgumentIgnored("User defined 'followUpTime' (", followUpTime, ") ignored because ",
                     "follow-up time is ", round(sampleSizeSurvival$followUpTime, 4),
-                    call. = FALSE
+                    diagnosticId = "survival.follow_up_argument_ignored"
                 )
             }
         }
@@ -2709,7 +2723,8 @@ getPowerSurvival <- function(
                     "(presumably due to drop-out rates)",
                     functionName = "getPowerSurvival",
                     parameter = "maxNumberOfSubjects",
-                    value = designPlan$maxNumberOfSubjects
+                    value = designPlan$maxNumberOfSubjects,
+                    diagnosticId = "survival.event_target_unreachable"
                 )
             }
         }
@@ -2732,10 +2747,12 @@ getPowerSurvival <- function(
                 callingFunctionInformation = "getPowerSurvival"
             )
             if (is.na(designPlan$analysisTime[j, i])) {
-                warning("Cannot calculate analysis time at stage ", j, ": ",
+                warnResultUnavailable("Cannot calculate analysis time at stage ", j, ": ",
                     "'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ") is too ",
                     "small to reach maximum number of events",
-                    call. = FALSE
+                    parameter = "maxNumberOfSubjects",
+                    value = designPlan$maxNumberOfSubjects,
+                    diagnosticId = "survival.subject_cap_insufficient"
                 )
             }
         }

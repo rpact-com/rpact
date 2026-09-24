@@ -202,7 +202,7 @@ getSimulationRates <- function(
             ), ...
         )
     } else {
-        .assertIsTrialDesign(design)
+        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design) 
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationRates",
             ignore = c("showStatistics"), ...
@@ -210,10 +210,6 @@ getSimulationRates <- function(
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
     }
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design,
-        objectType = "power", userFunctionCallEnabled = TRUE
-    )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsValidGroupsParameter(groups)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
@@ -262,18 +258,28 @@ getSimulationRates <- function(
 
     if (design$sided == 2) {
         stopIllegalArgument("only one-sided case is implemented for the simulation design",
-            functionName = "getSimulationRates"
+            functionName = "getSimulationRates",
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
 
     if (!normalApproximation && (groups == 2) && (riskRatio || (thetaH0 != 0))) {
         stopIllegalArgument("in the two-sample case, exact test is ",
             "implemented only for testing H0: pi1 - pi2 = 0",
-            functionName = "getSimulationRates"
+            functionName = "getSimulationRates",
+            diagnosticId = "analysis.exact_test_requires_equality_null"
         )
     }
 
     simulationResults <- SimulationResultsRates$new(design, showStatistics = showStatistics)
+    
+    directionUpper <- .setDirectionUpper(
+        simulationResults,
+        design,
+        directionUpper,
+        objectType = "power",
+        endpoint = "rates",
+        userFunctionCallEnabled = TRUE)
 
     pi1 <- .setPi1(simulationResults, pi1, type = "power", endpoint = "rates")
     pi2 <- .setPi2(simulationResults, pi2, endpoint = "rates", applyToObject = (groups == 2L))
@@ -310,7 +316,8 @@ getSimulationRates <- function(
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
                 functionName = "getSimulationRates",
                 parameter = "maxNumberOfSubjectsPerStage",
-                value = maxNumberOfSubjectsPerStage
+                value = maxNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.subject_bounds_inverted"
             )
         }
         .setValueAndParameterType(
@@ -323,26 +330,30 @@ getSimulationRates <- function(
         )
     }
     if (design$kMax == 1 && !is.na(conditionalPower)) {
-        warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("conditionalPower")
     }
     if (design$kMax > 1 && is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(minNumberOfSubjectsPerStage) != 1 ||
                 !is.na(minNumberOfSubjectsPerStage)) {
-            warning("'minNumberOfSubjectsPerStage' (",
+            warnArgumentIgnored("'minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE
+                parameter = "minNumberOfSubjectsPerStage",
+                value = minNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$minNumberOfSubjectsPerStage <- NA_real_
         }
         if (length(maxNumberOfSubjectsPerStage) != 1 ||
                 !is.na(maxNumberOfSubjectsPerStage)) {
-            warning("'maxNumberOfSubjectsPerStage' (",
+            warnArgumentIgnored("'maxNumberOfSubjectsPerStage' (",
                 .arrayToString(maxNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE
+                parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$maxNumberOfSubjectsPerStage <- NA_real_
         }
@@ -361,25 +372,40 @@ getSimulationRates <- function(
 
     if (groups == 1L) {
         if (isTRUE(riskRatio)) {
-            warning("'riskRatio' (", riskRatio, ") will be ignored ",
+            warnArgumentIgnored("'riskRatio' (", riskRatio, ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "riskRatio",
+                value = riskRatio,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
 
         if (!is.na(allocationRatioPlanned)) {
-            warning("'allocationRatioPlanned' (", allocationRatioPlanned,
+            warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
             simulationResults$allocationRatioPlanned <- NA_real_
         }
         simulationResults$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)
 
         if (!is.na(pi2)) {
-            warning("'pi2' (", pi2,
+            warnArgumentIgnored("'pi2' (", pi2,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "pi2",
+                value = pi2,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
             simulationResults$pi2 <- NA_real_
         }
@@ -438,10 +464,6 @@ getSimulationRates <- function(
     .setValueAndParameterType(
         simulationResults, "plannedSubjects",
         plannedSubjects, NA_real_
-    )
-    .setValueAndParameterType(
-        simulationResults, "directionUpper",
-        directionUpper, C_DIRECTION_UPPER_DEFAULT
     )
     .setValueAndParameterType(simulationResults, "minNumberOfSubjectsPerStage",
         minNumberOfSubjectsPerStage, NA_real_,

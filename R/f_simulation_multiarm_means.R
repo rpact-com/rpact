@@ -25,6 +25,7 @@ NULL
         plannedSubjects,
         allocationRatioPlanned,
         selectedArms,
+        thetaH0,
         thetaH1,
         overallEffects,
         stDevH1,
@@ -36,11 +37,11 @@ NULL
     if (!is.na(conditionalPower)) {
         if (any(selectedArms[1:gMax, stage + 1], na.rm = TRUE)) {
             if (is.na(thetaH1)) {
-                thetaStandardized <- max(min(overallEffects[
+                thetaStandardized <- max(min((overallEffects[
                     selectedArms[1:gMax, stage + 1], stage
-                ] / stDevH1, na.rm = TRUE), 1e-07)
+                ] - thetaH0) / stDevH1, na.rm = TRUE), 1e-07)
             } else {
-                thetaStandardized <- max(thetaH1 / stDevH1, 1e-07)
+                thetaStandardized <- max((thetaH1 - thetaH0) / stDevH1, 1e-07)
             }
 
             if (conditionalCriticalValue[stage] > 8) {
@@ -79,6 +80,7 @@ NULL
         minNumberOfSubjectsPerStage,
         maxNumberOfSubjectsPerStage,
         conditionalPower,
+        thetaH0,
         thetaH1,
         stDevH1,
         calcSubjectsFunction,
@@ -128,7 +130,7 @@ NULL
                         1, muVector[treatmentArm],
                         stDev / sqrt(subjectsPerStage[treatmentArm, k])
                     )
-                    testStatistics[treatmentArm, k] <- (simMeans[treatmentArm, k] - simMeans[gMax + 1, k]) /
+                    testStatistics[treatmentArm, k] <- (simMeans[treatmentArm, k] - simMeans[gMax + 1, k] - thetaH0) /
                         (stDev * sqrt(1 / subjectsPerStage[treatmentArm, k] + 1 / subjectsPerStage[gMax + 1, k]))
                 }
 
@@ -137,7 +139,7 @@ NULL
                     sum(subjectsPerStage[treatmentArm, 1:k]) -
                     subjectsPerStage[gMax + 1, 1:k] %*% simMeans[gMax + 1, 1:k] / sum(subjectsPerStage[gMax + 1, 1:k])
 
-                overallTestStatistics[treatmentArm, k] <- overallEffects[treatmentArm, k] /
+                overallTestStatistics[treatmentArm, k] <- (overallEffects[treatmentArm, k] - thetaH0) /
                     (stDev * sqrt(1 / sum(subjectsPerStage[treatmentArm, 1:k]) + 1 / sum(subjectsPerStage[gMax + 1, 1:k])))
 
                 separatePValues[treatmentArm, k] <- 1 - stats::pnorm(testStatistics[treatmentArm, k])
@@ -180,6 +182,7 @@ NULL
                     plannedSubjects = plannedSubjects,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     thetaH1 = thetaH1,
                     stDevH1 = stDevH1,
                     overallEffects = overallEffects
@@ -210,6 +213,7 @@ NULL
                     plannedSubjects = plannedSubjects,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     thetaH1 = thetaH1,
                     stDevH1 = stDevH1,
                     overallEffects = overallEffects,
@@ -223,7 +227,8 @@ NULL
                         "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
                         "the output must be a single numeric value >= 0",
                         functionName = ".getSimulatedStageMeansMultiArm",
-                        parameter = "calcSubjectsFunction", value = calcSubjectsFunction
+                        parameter = "calcSubjectsFunction", value = calcSubjectsFunction,
+                        diagnosticId = "simulation.subject_callback_result_invalid"
                     )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
@@ -235,9 +240,9 @@ NULL
             }
 
             if (is.na(thetaH1)) {
-                thetaStandardized <- max(min(overallEffects[selectedArms[1:gMax, k], k] / stDevH1, na.rm = TRUE), 1e-12)
+                thetaStandardized <- max(min((overallEffects[selectedArms[1:gMax, k], k] - thetaH0) / stDevH1, na.rm = TRUE), 1e-12)
             } else {
-                thetaStandardized <- thetaH1 / stDevH1
+                thetaStandardized <- (thetaH1 - thetaH0) / stDevH1
             }
 
             conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
@@ -299,6 +304,7 @@ NULL
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
 #' @inheritParams param_showStatistics
+#' @inheritParams param_thetaH0
 #'
 #' @details
 #' At given design the function simulates the power, stopping probabilities, selection probabilities,
@@ -357,6 +363,7 @@ getSimulationMultiArmMeans <- function(
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
         conditionalPower = NA_real_,
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
         maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
@@ -409,6 +416,7 @@ getSimulationMultiArmMeans <- function(
         minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage, # means + rates only
         maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage, # means + rates only
         conditionalPower            = conditionalPower,
+        thetaH0                     = thetaH0,
         thetaH1                     = thetaH1, # means + survival only
         stDevH1                     = stDevH1, # means only
         maxNumberOfIterations       = maxNumberOfIterations,
@@ -417,7 +425,8 @@ getSimulationMultiArmMeans <- function(
         selectArmsFunction          = selectArmsFunction,
         showStatistics              = showStatistics,
         endpoint                    = "means",
-        simulationType              = "testStatisticBased"
+        simulationType              = "testStatisticBased",
+        simulationTypeIsUserDefined = FALSE
     )
 
     design <- simulationResults$.design
@@ -431,10 +440,12 @@ getSimulationMultiArmMeans <- function(
     effectMatrix <- t(simulationResults$effectMatrix)
     muMaxVector <- simulationResults$muMaxVector # means only
     thetaH1 <- simulationResults$thetaH1 # means + survival only
+    thetaH0 <- simulationResults$thetaH0
     stDevH1 <- simulationResults$stDevH1 # means only
     conditionalPower <- simulationResults$conditionalPower
     minNumberOfSubjectsPerStage <- simulationResults$minNumberOfSubjectsPerStage
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
 
@@ -506,6 +517,7 @@ getSimulationMultiArmMeans <- function(
                 minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage,
                 maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage,
                 conditionalPower = conditionalPower,
+                thetaH0 = thetaH0,
                 thetaH1 = thetaH1,
                 stDevH1 = stDevH1,
                 calcSubjectsFunction = calcSubjectsFunction,
@@ -674,7 +686,7 @@ getSimulationMultiArmMeans <- function(
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
-        armNumber = dataArmNumber,
+        activeArm = dataArmNumber,
         muMax = dataAlternative,
         effect = dataEffect,
         numberOfSubjects = dataNumberOfSubjects,

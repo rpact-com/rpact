@@ -29,6 +29,7 @@ getSimulationMultiArmRates(
   minNumberOfSubjectsPerStage = NA_real_,
   maxNumberOfSubjectsPerStage = NA_real_,
   conditionalPower = NA_real_,
+  thetaH0 = C_THETA_H0_MEANS_DEFAULT,
   piTreatmentsH1 = NA_real_,
   piControlH1 = NA_real_,
   maxNumberOfIterations = NA_integer_,
@@ -152,6 +153,23 @@ It is defined as the power for the subsequent stage given the current data. By d
 the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
 \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
+
+\item{thetaH0}{The null hypothesis value,
+default is \code{0} for general estimates, the normal case, and the binary case,
+it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
+For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
+That is, in case of (one-sided) testing of
+\itemize{
+\item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
+\item \emph{means}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the mean ratio) can be specified.
+\item \emph{rates}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
+\item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{count data}: a bound for testing H0: \code{lambda1 / lambda2 = thetaH0 != 1} can be specified.
+}
+For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
+defining the null hypothesis H0: \code{pi = thetaH0}.}
 
 \item{piTreatmentsH1}{If specified, the assumed probability in the active treatment arm(s)
 under which the sample size recalculation is performed.}

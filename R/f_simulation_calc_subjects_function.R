@@ -358,7 +358,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
 
     if (design$kMax == 1) {
         if (!is.null(calcFunction)) {
-            warning(.pQuote(functionFieldName), " will be ignored for fixed sample design", call. = FALSE)
+            warnArgumentIgnoredFixedDesign(functionFieldName)
         }
         simulationResults$.setParameterType(functionFieldName, C_PARAM_NOT_APPLICABLE)
         return(list(
@@ -421,7 +421,8 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
                         parameter = "calcFunction",
                         value = calcFunction,
                         constraint = "available C++ compiler",
-                        functionName = ".getCalcSubjectsFunction"
+                        functionName = ".getCalcSubjectsFunction",
+                        diagnosticId = "simulation.cpp_toolchain_missing"
                     )
                 }
 
@@ -487,7 +488,8 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
                     parameter = functionFieldName,
                     value = calcFunction,
                     constraint = "valid compilable C++ code",
-                    functionName = ".getCalcSubjectsFunction"
+                    functionName = ".getCalcSubjectsFunction",
+                    diagnosticId = "simulation.callback_compilation_failed"
                 )
             }
         )
@@ -509,7 +511,8 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
                 parameter = functionFieldName,
                 value = calcFunction,
                 constraint = "valid R function code",
-                functionName = ".getCalcSubjectsFunction"
+                functionName = ".getCalcSubjectsFunction",
+                diagnosticId = "simulation.callback_parse_failed"
             )
         }
     )

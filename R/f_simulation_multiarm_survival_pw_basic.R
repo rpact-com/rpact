@@ -268,6 +268,7 @@ NULL
         minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage,
         conditionalPower,
+        thetaH0,
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
@@ -278,6 +279,7 @@ NULL
     maxNumberOfSubjects <- length(recruitmentTimes)
 
     singleEventsPerStage <- matrix(NA_integer_, nrow = gMax + 1, ncol = kMax)
+    cumulativeEventsPerArmAndStage <- matrix(NA_integer_, nrow = gMax + 1, ncol = kMax)
     cumulativeEventsPerStage <- matrix(NA_integer_, nrow = gMax, ncol = kMax)
     simSurvival <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     overallEffects <- matrix(NA_real_, nrow = gMax, ncol = kMax)
@@ -345,15 +347,16 @@ NULL
                         survivalDataSet = survivalDataSet,
                         time = analysisTime[1],
                         treatmentArms = c(g, gMax + 1),
-                        directionUpper = directionUpper
+                        directionUpper = directionUpper,
+                        thetaH0 = thetaH0
                     )
 
                     testStatistics[g, k] <- logRank$logRank
                     overallTestStatistics[g, k] <- logRank$logRank
                     cumulativeEventsPerStage[g, k] <- sum(logRank$events)
-                    singleEventsPerStage[g, k] <- logRank$events[1]
+                    cumulativeEventsPerArmAndStage[g, k] <- logRank$events[1]
                 }
-                singleEventsPerStage[gMax + 1, k] <- logRank$events[2]
+                cumulativeEventsPerArmAndStage[gMax + 1, k] <- logRank$events[2]
             }
         } else {
             if (analysisTime[k - 1] < max(survivalDataSet$accrualTime)) {
@@ -369,8 +372,13 @@ NULL
                         allocationFraction
                     )
                     survivalDataSet$treatmentArm <- treatments[1:maxNumberOfSubjects]
-
-                    for (i in numberOfSubjects[k - 1]:maxNumberOfSubjects) {
+                    
+                    # guard the loop so it runs only when new subjects exist
+                    if (numberOfSubjects[k - 1] >= maxNumberOfSubjects) {
+                        next
+                    }
+                    
+                    for (i in seq.int(numberOfSubjects[k - 1] + 1, maxNumberOfSubjects)) {
                         for (g in 1:gMax) {
                             if (survivalDataSet$treatmentArm[i] == g && selectedArms[g, k]) {
                                 survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
@@ -397,9 +405,14 @@ NULL
 
             survivalDataSetSelected <- survivalDataSet[survivalDataSet$treatmentArm %in% c(which(selectedArms[, k]), gMax + 1), ]
 
+            # Retained arms contribute the planned increment, in addition to their
+            # own events at the previous analysis (not events from dropped arms).
+            retainedArms <- c(which(selectedArms[, k]), gMax + 1)
+            eventTarget <- sum(cumulativeEventsPerArmAndStage[retainedArms, k - 1]) +
+                plannedEvents[k] - plannedEvents[k - 1]
             analysisTime[k] <- .findObservationTime(
                 survivalDataSetSelected,
-                plannedEvents[k]
+                eventTarget
             )$time
 
             if (is.na(analysisTime[k])) {
@@ -413,10 +426,11 @@ NULL
                             survivalDataSet = survivalDataSet,
                             time = analysisTime[k],
                             treatmentArms = c(g, gMax + 1),
-                            directionUpper = directionUpper
+                            directionUpper = directionUpper,
+                            thetaH0 = thetaH0
                         )
                         overallTestStatistics[g, k] <- logRank$logRank
-                        singleEventsPerStage[g, k] <- logRank$events[1]
+                        cumulativeEventsPerArmAndStage[g, k] <- logRank$events[1]
                         cumulativeEventsPerStage[g, k] <- sum(logRank$events)
                         testStatistics[g, k] <- (sqrt(cumulativeEventsPerStage[g, k]) *
                             overallTestStatistics[g, k] -
@@ -424,11 +438,17 @@ NULL
                             sqrt(cumulativeEventsPerStage[g, k] - cumulativeEventsPerStage[g, k - 1])
                     }
                 }
-                singleEventsPerStage[gMax + 1, k] <- logRank$events[2]
+                cumulativeEventsPerArmAndStage[gMax + 1, k] <- logRank$events[2]
             }
         }
+        retainedArms <- c(which(selectedArms[, k]), gMax + 1)
+        singleEventsPerStage[retainedArms, k] <- cumulativeEventsPerArmAndStage[retainedArms, k]
+        if (k > 1) {
+            singleEventsPerStage[retainedArms, k] <- singleEventsPerStage[retainedArms, k] -
+                cumulativeEventsPerArmAndStage[retainedArms, k - 1]
+        }
         separatePValues[, k] <- 1 - stats::pnorm(testStatistics[, k])
-        overallEffects[, k] <- exp(
+        overallEffects[, k] <- thetaH0 * exp(
             (2 * directionUpper - 1) *
                 overallTestStatistics[, k] *
                 (1 + allocationFraction[1] / allocationFraction[2]) /
@@ -476,6 +496,7 @@ NULL
                     plannedEvents = plannedEvents,
                     allocationRatioPlanned = allocationFraction[1] / allocationFraction[2],
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     thetaH1 = thetaH1,
                     overallEffects = overallEffects
                 )
@@ -508,7 +529,7 @@ NULL
                 }
 
                 if (!directionUpper) {
-                    estimatedTheta <- 1 / estimatedTheta
+                    estimatedTheta <- thetaH0^2 / estimatedTheta
                 }
 
                 conditionalCriticalValuePerStage <- conditionalCriticalValue
@@ -524,10 +545,11 @@ NULL
                     conditionalPower = conditionalPower,
                     conditionalCriticalValue = conditionalCriticalValuePerStage,
                     plannedEvents = plannedEvents,
-                    eventsOverStages = colSums(singleEventsPerStage, na.rm = TRUE),
+                    eventsOverStages = cumsum(colSums(singleEventsPerStage, na.rm = TRUE)),
                     # necessary for use in .getSimulationSurvivalMultiArmStageEventsBasic():
                     allocationRatioPlanned = rep(allocationFraction[1] / allocationFraction[2], k + 1),
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     estimatedTheta = estimatedTheta,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
@@ -539,7 +561,8 @@ NULL
                         "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
                         "the output must be a single numeric value",
                         functionName = ".getSimulatedStageResultsSurvivalMultiArmPatientWise",
-                        parameter = "calcEventsFunction", value = calcEventsFunction
+                        parameter = "calcEventsFunction", value = calcEventsFunction,
+                        diagnosticId = "simulation.event_callback_result_invalid"
                     )
                 }
 
@@ -555,9 +578,14 @@ NULL
             }
 
             if (is.na(thetaH1)) {
-                thetaStandardized <- log(min(overallEffects[selectedArms[1:gMax, k], k], na.rm = TRUE))
+                thetaStandardized <- log(.applyDirectionOfAlternative(
+                    overallEffects[selectedArms[1:gMax, k], k],
+                    directionUpper,
+                    type = "minMax",
+                    phase = "planning"
+                ) / thetaH0)
             } else {
-                thetaStandardized <- log(thetaH1)
+                thetaStandardized <- log(thetaH1 / thetaH0)
             }
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
 
@@ -619,6 +647,7 @@ NULL
         minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage,
         conditionalPower,
+        thetaH0,
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
@@ -638,7 +667,7 @@ NULL
     simulatedRejections <- array(0, dim = c(kMax, cols, gMax))
     simulatedNumberOfActiveArms <- matrix(0, nrow = kMax, ncol = cols)
     simulatedSingleEventsPerStage <- array(0, dim = c(kMax, cols, gMax + 1))
-    simulatedPlannedEvents <- matrix(0, nrow = kMax, ncol = cols)
+    simulatedOverallEventsPerStage <- matrix(0, nrow = kMax, ncol = cols)
     simulatedSuccessStopping <- matrix(0, nrow = kMax, ncol = cols)
     simulatedFutilityStopping <- matrix(0, nrow = kMax - 1, ncol = cols)
     simulatedConditionalPower <- matrix(0, nrow = kMax, ncol = cols)
@@ -697,6 +726,7 @@ NULL
                 minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                 maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
                 conditionalPower = conditionalPower,
+                thetaH0 = thetaH0,
                 thetaH1 = thetaH1,
                 calcEventsFunction = calcEventsFunction,
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
@@ -780,7 +810,7 @@ NULL
                     simulatedSingleEventsPerStage[k, i, gMax + 1] <- simulatedSingleEventsPerStage[k, i, gMax + 1] +
                         stageResults$singleEventsPerStage[gMax + 1, k]
 
-                    simulatedPlannedEvents[k, i] <- simulatedPlannedEvents[k, i] +
+                    simulatedOverallEventsPerStage[k, i] <- simulatedOverallEventsPerStage[k, i] +
                         sum(stageResults$singleEventsPerStage[, k], na.rm = TRUE)
 
                     iterations[k, i] <- iterations[k, i] + 1
@@ -840,7 +870,7 @@ NULL
         for (g in 1:(gMax + 1)) {
             simulatedSingleEventsPerStage[, i, g] <- simulatedSingleEventsPerStage[, i, g] / pmax(iterations[, i], 1)
         }
-        simulatedPlannedEvents[, i] <- simulatedPlannedEvents[, i] / pmax(iterations[, i], 1)
+        simulatedOverallEventsPerStage[, i] <- simulatedOverallEventsPerStage[, i] / pmax(iterations[, i], 1)
         simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / pmax(iterations[, i], 1)
         simulatedAnalysisTime[, i] <- simulatedAnalysisTime[, i] / pmax(iterations[, i], 1)
         simulatedNumberOfActiveArms[, i] <- simulatedNumberOfActiveArms[, i] / pmax(iterations[, i], 1)
@@ -852,9 +882,9 @@ NULL
             stopping <- cumsum(simulatedSuccessStopping[1:(kMax - 1), i] + simulatedFutilityStopping[, i]) /
                 maxNumberOfIterations
 
-            expectedNumberOfEvents[i] <- simulatedPlannedEvents[1, i] +
+            expectedNumberOfEvents[i] <- simulatedOverallEventsPerStage[1, i] +
                 t(1 - stopping) %*%
-                (simulatedPlannedEvents[2:kMax, i] - simulatedPlannedEvents[1:(kMax - 1), i])
+                simulatedOverallEventsPerStage[2:kMax, i]
 
             expectedNumberOfSubjects[i] <- simulatedNumberOfSubjects[1, i] +
                 t(1 - stopping) %*%
@@ -864,7 +894,7 @@ NULL
                 t(1 - stopping) %*%
                 (simulatedAnalysisTime[2:kMax, i] - simulatedAnalysisTime[1:(kMax - 1), i])
         } else {
-            expectedNumberOfEvents[i] <- simulatedPlannedEvents[1, i]
+            expectedNumberOfEvents[i] <- simulatedOverallEventsPerStage[1, i]
             expectedNumberOfSubjects[i] <- simulatedNumberOfSubjects[1, i]
             expectedStudyDuration[i] <- simulatedAnalysisTime[1, i]
         }
@@ -882,7 +912,7 @@ NULL
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
-        armNumber = dataArmNumber,
+        activeArm = dataArmNumber,
         omegaMax = dataAlternative,
         effect = dataEffect,
         analysisTime = dataAnalysisTime,
@@ -909,7 +939,7 @@ NULL
         simulatedRejections = simulatedRejections,
         simulatedNumberOfActiveArms = simulatedNumberOfActiveArms,
         simulatedSingleEventsPerStage = simulatedSingleEventsPerStage,
-        simulatedPlannedEvents = simulatedPlannedEvents,
+        simulatedOverallEventsPerStage = simulatedOverallEventsPerStage,
         simulatedSuccessStopping = simulatedSuccessStopping,
         simulatedFutilityStopping = simulatedFutilityStopping,
         simulatedConditionalPower = simulatedConditionalPower,

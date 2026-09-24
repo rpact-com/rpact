@@ -1120,6 +1120,7 @@ getDesignConditionalDunnett <- function(
     .assertIsSingleNumber(informationAtInterim, "informationAtInterim")
     .assertIsInOpenInterval(informationAtInterim, "informationAtInterim", lower = 0, upper = 1)
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
+    .warnInCaseOfUnknownArguments(..., functionName = "getDesignConditionalDunnett")
     design <- TrialDesignConditionalDunnett$new(
         alpha = alpha,
         informationAtInterim = informationAtInterim,
@@ -1389,9 +1390,11 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
     }
 
     if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {
-        warning("'theta' (", .reconstructSequenceCommand(theta), ") ",
+        warnArgumentIgnored("'theta' (", .reconstructSequenceCommand(theta), ") ",
             "will be ignored for plot type ", type,
-            call. = FALSE
+            parameter = "theta",
+            value = theta,
+            diagnosticId = "plot.theta_not_applicable"
         )
     }
 

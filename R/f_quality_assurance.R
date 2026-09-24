@@ -223,7 +223,11 @@ NULL
 
     .assertIsSingleCharacter(packageSource, "packageSource")
     if (!file.exists(packageSource)) {
-        warning(sQuote("packageSource"), " (", packageSource, ") does not exist")
+        warnRuntimeIssue(sQuote("packageSource"), " (", packageSource, ") does not exist",
+            parameter = "packageSource",
+            value = packageSource,
+            diagnosticId = "qa.package_source_missing"
+        )
     }
 
     if (!grepl("\\.tar\\.gz$", packageSource)) {
@@ -309,7 +313,10 @@ NULL
                     method = "auto", mode = "wb"
                 )
                 if (result != 0) {
-                    warning("'testthat.R' download result in ", result, call. = FALSE)
+                    warnRuntimeIssue("'testthat.R' download result in ", result,
+                        parameter = "testthat.R",
+                        diagnosticId = "qa.test_download_failed"
+                    )
                 }
             }
 
@@ -320,7 +327,9 @@ NULL
                 method = "auto", mode = "wb"
             )
             if (result != 0) {
-                warning("Unit test index file download result in ", result, call. = FALSE)
+                warnRuntimeIssue("Unit test index file download result in ", result,
+                    diagnosticId = "qa.test_download_failed"
+                )
             }
 
             lines <- .readLinesFromFile(indexFile)
@@ -349,11 +358,11 @@ NULL
                 }
             }
             if (counter < length(testFiles)) {
-                warning(
+                warnRuntimeIssue(
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
                     .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
-                    call. = FALSE
+                    diagnosticId = "qa.test_download_failed"
                 )
             } else {
                 message(
@@ -391,7 +400,9 @@ NULL
                         file.remove(indexFile)
                     },
                     error = function(e) {
-                        warning("Failed to remove unit test index file: ", e$message, call. = FALSE)
+                        warnRuntimeIssue("Failed to remove unit test index file: ", e$message,
+                            diagnosticId = "qa.temporary_index_cleanup_failed"
+                        )
                     }
                 )
             }
@@ -426,7 +437,10 @@ NULL
                     cacheOK = cacheOK, extra = extra, headers = NULL
                 )
                 if (result != 0) {
-                    warning("'testthat.R' download result in ", result)
+                    warnRuntimeIssue("'testthat.R' download result in ", result,
+                        parameter = "testthat.R",
+                        diagnosticId = "qa.test_download_failed"
+                    )
                 }
             }
 
@@ -437,7 +451,9 @@ NULL
                 cacheOK = cacheOK, extra = extra, headers = NULL
             )
             if (result != 0) {
-                warning("Unit test index file download result in ", result)
+                warnRuntimeIssue("Unit test index file download result in ", result,
+                    diagnosticId = "qa.test_download_failed"
+                )
             }
 
             lines <- .readLinesFromFile(indexFile)
@@ -467,11 +483,11 @@ NULL
                 }
             }
             if (counter < length(testFiles)) {
-                warning(
+                warnRuntimeIssue(
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
                     .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
-                    call. = FALSE
+                    diagnosticId = "qa.test_download_failed"
                 )
             } else {
                 message(
@@ -496,7 +512,9 @@ NULL
                         file.remove(indexFile)
                     },
                     error = function(e) {
-                        warning("Failed to remove unit test index file: ", e$message, call. = FALSE)
+                        warnRuntimeIssue("Failed to remove unit test index file: ", e$message,
+                            diagnosticId = "qa.temporary_index_cleanup_failed"
+                        )
                     }
                 )
             }
@@ -1256,9 +1274,11 @@ testPackage <- function(
     startTime <- Sys.time()
 
     if (!is.na(testFileDirectory) && !dir.exists(file.path(testFileDirectory, "testthat"))) {
-        warning("'testFileDirectory' (", testFileDirectory, ") will be ignored ",
+        warnArgumentIgnored("'testFileDirectory' (", testFileDirectory, ") will be ignored ",
             "because it does not contain a 'testthat' subfolder",
-            call. = FALSE
+            parameter = "testFileDirectory",
+            value = testFileDirectory,
+            diagnosticId = "qa.test_directory_ignored"
         )
         testFileDirectory <- NA_character_
     }
@@ -1294,9 +1314,9 @@ testPackage <- function(
 
     if (!is.na(testFileDirectory)) {
         if (credentialsAvailable) {
-            warning("The connection token and secret will be ignored ",
+            warnArgumentIgnored("The connection token and secret will be ignored ",
                 "because 'testFileDirectory' is defined",
-                call. = FALSE
+                diagnosticId = "qa.credentials_ignored_for_local_tests"
             )
         }
         credentialsAvailable <- TRUE
@@ -1304,7 +1324,9 @@ testPackage <- function(
 
     if (executionMode == "downloadOnly") {
         if (testInstalledBasicPackages) {
-            warning("The test of installed R basic packages is not supported in 'downloadOnly' mode")
+            warnResultUnavailable("The test of installed R basic packages is not supported in 'downloadOnly' mode",
+                diagnosticId = "qa.basic_tests_download_only_unsupported"
+            )
         }
         testInstalledBasicPackages <- FALSE
     }
@@ -1318,7 +1340,7 @@ testPackage <- function(
     } else if (executionMode %in% c("downloadAndRunTests", "runTestsInTestFileDirectory")) {
         if (completeUnitTestSetEnabled) {
             cat("Run all tests. Please wait...\n")
-            cat("Have a break - it takes about 45 minutes.\n")
+            cat("Have a break - it takes about 55 minutes.\n")
             cat("Exceution of all available unit tests startet at ",
                 format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
                 sep = ""
@@ -1715,6 +1737,10 @@ print.InstallationQualificationResult <- function(x, ...) {
     return(isTRUE(completeUnitTestSetEnabled))
 }
 
+.enableCompleteUnitTestSet <- function() {
+    Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
+}
+
 #'
 #' @title
 #' Test Plan Section
@@ -1780,7 +1806,9 @@ test_plan_section <- function(section) {
             }
         },
         error = function(e) {
-            warning("Failed to get the minimum number of expected tests: ", e$message)
+            warnRuntimeIssue("Failed to get the minimum number of expected tests: ", e$message,
+                diagnosticId = "qa.test_metadata_failed"
+            )
         }
     )
     return(minNumberOfExpectedTestsDefault)
@@ -2226,9 +2254,9 @@ MarkdownReporter <- R6::R6Class(
             sourcePath <- file.path(outputPath, "src")
             if (self$keepSourceFiles && !dir.exists(sourcePath)) {
                 if (!dir.create(sourcePath)) {
-                    warning("Failed to create directory ", sQuote(sourcePath), ". ",
+                    warnRuntimeIssue("Failed to create directory ", sQuote(sourcePath), ". ",
                         "Source files will be saved to ", sQuote(outputPath), ".",
-                        call. = FALSE
+                        diagnosticId = "qa.source_output_fallback"
                     )
                     sourcePath <- outputPath
                 }
@@ -2252,9 +2280,9 @@ MarkdownReporter <- R6::R6Class(
                     }
                 },
                 error = function(e) {
-                    warning("Failed to render ", sQuote(self$outputFile),
+                    warnRuntimeIssue("Failed to render ", sQuote(self$outputFile),
                         " to html: ", e$message,
-                        call. = FALSE
+                        diagnosticId = "qa.report_render_failed"
                     )
                 }
             )
@@ -2286,7 +2314,9 @@ MarkdownReporter <- R6::R6Class(
                     }
                 },
                 error = function(e) {
-                    warning("Failed to render ", sQuote(mdFileForTex), " to pdf: ", e$message, call. = FALSE)
+                    warnRuntimeIssue("Failed to render ", sQuote(mdFileForTex), " to pdf: ", e$message,
+                        diagnosticId = "qa.report_render_failed"
+                    )
                 }
             )
         }

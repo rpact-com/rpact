@@ -329,7 +329,7 @@ SimulationResults <- R6::R6Class(
                                     }
                                 }
                             }
-                            if (parameterName == "subjectsActiveArm" && variedParameterName2 == "armNumber") {
+                            if (parameterName == "subjectsActiveArm" && variedParameterName2 == "activeArm") {
                                 parameterName2 <- "subjectsControlArm"
                                 paramCaption2 <- .getParameterCaption(parameterName2, self)
                                 if (is.null(paramCaption2)) {
@@ -415,7 +415,7 @@ SimulationResults <- R6::R6Class(
                         !inherits(self, "SimulationResultsSurvival") &&
                         grepl("MultiArm", .getClassName(self))
                     ) {
-                    return("armNumber")
+                    return("activeArm")
                 }
                 return(NA_character_)
             }
@@ -456,7 +456,7 @@ SimulationResults <- R6::R6Class(
             return(parameterValues)
         },
         .getVariedParameterValueString = function(variedParameterName, parameterValue) {
-            if (variedParameterName %in% c("armNumber")) {
+            if (variedParameterName %in% c("activeArm")) {
                 return(paste0(" (", parameterValue[1], ")"))
             }
             variedParameterName <- sub("Max$", "_max", variedParameterName)
@@ -824,6 +824,7 @@ SimulationResultsMultiArmMeans <- R6::R6Class(
         slope = NULL,
         successCriterion = NULL,
         successPerStage = NULL,
+        thetaH0 = NULL,
         threshold = NULL,
         typeOfSelection = NULL,
         typeOfShape = NULL,
@@ -1022,6 +1023,7 @@ SimulationResultsRates <- R6::R6Class(
 #' @template field_threshold
 #' @template field_typeOfSelection
 #' @template field_typeOfShape
+#' @template field_thetaH0
 #'
 #' @details
 #' Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}
@@ -1067,6 +1069,7 @@ SimulationResultsMultiArmRates <- R6::R6Class(
         slope = NULL,
         successCriterion = NULL,
         successPerStage = NULL,
+        thetaH0 = NULL,
         threshold = NULL,
         typeOfSelection = NULL,
         typeOfShape = NULL,
@@ -1096,6 +1099,7 @@ SimulationResultsBaseSurvival <- R6::R6Class(
         maxNumberOfEventsPerStage = NULL,
         minNumberOfEventsPerStage = NULL,
         plannedEvents = NULL,
+        thetaH0 = NULL,
         thetaH1 = NULL,
         studyDuration = NULL,
         maxStudyDuration = NULL,
@@ -1236,7 +1240,6 @@ SimulationResultsSurvival <- R6::R6Class(
         piecewiseSurvivalTime = NULL,
         rejectPerStage = NULL,
         singleEventsPerStage = NULL,
-        thetaH0 = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             for (notApplicableParam in c(
@@ -1345,6 +1348,7 @@ SimulationResultsSurvival <- R6::R6Class(
 #' @template field_simulationType
 #' @template field_slope
 #' @template field_studyDuration
+#' @template field_thetaH0
 #' @template field_successPerStage
 #' @template field_threshold
 #' @template field_typeOfShape
@@ -1701,6 +1705,7 @@ SimulationResultsEnrichmentRates <- R6::R6Class(
 #' @template field_studyDuration
 #' @template field_successCriterion
 #' @template field_successPerStage
+#' @template field_thetaH0
 #' @template field_thetaH1_survival
 #' @template field_threshold
 #' @template field_typeOfSelection

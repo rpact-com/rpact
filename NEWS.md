@@ -7,8 +7,34 @@
 * `getDataset()` now supports datasets of general, endpoint-independent estimates through the new `DatasetGeneral` class. Stage-wise estimates and standard errors can be provided using `est` and `se`; degrees of freedom (`df`) are optional and default internally to `Inf`, corresponding to a normal approximation.
 * rpact options can now be configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles; see the new vignette [Hidden rpact Features: Options and Environment Variables](https://www.rpact.org/vignettes/utilities/rpact_hidden_features/).
 * Optimized the display of `criticalValues` and `futilityBounds` for designs with `directionUpper = FALSE`. If the direction of the alternative is already specified when creating a design, e.g., with `getDesignGroupSequential(directionUpper = FALSE)`, the boundaries are now shown in the correct direction, typically as negative values. This also applies to futility bounds generated for beta-spending designs.
-* The new function `getFisherInformation()` can be used to calculate the Fisher information at the first planned analysis stage for a design plan for means, rates, or survival endpoints.
+* The new function `getFisherInformation()` can be used to calculate cumulative
+  or stage-wise Fisher information at selected planned analyses for a design
+  plan or simulation results object for means, rates, survival, or count data
+  endpoints. Its typed output can be passed directly to `getFutilityBounds()`,
+  which validates that cumulative or stage-wise information is used as required
+  by the requested conversion. Complete multi-stage and multi-situation output
+  can be piped into `getFutilityBounds()`; the calculation is then carried out
+  separately for every interim stage and planning situation. The print methods
+  identify the target scale, information type, requested analysis stages and,
+  where applicable, the planning situations represented by the values.
+  Trial design plans and simulation results can also be piped directly into
+  `getFutilityBounds()`; the required Fisher information and its cumulative or
+  stage-wise type are then determined internally from the requested target scale.
 * For survival endpoints, the default value of `directionUpper` has changed from `TRUE` to `FALSE`. Accordingly, the default event rates have been adjusted to provide meaningful examples for an alternative in the lower direction: `pi2` (and `piControl`) now defaults to `0.5`, while the sample size default for `pi1` is now `c(0.1, 0.2, 0.3)`; the power and simulation default for `pi1` remains `seq(0.2, 0.5, 0.1)`. One-sided power calculations and simulations issue a warning if `directionUpper` is not specified explicitly, making users aware of the changed default. No warning is issued for sample size calculations because the `directionUpper` argument has only been added to these functions in this version. For sample size calculations, the direction is always derived from the specified alternative; the argument is provided solely to validate that this derived direction is consistent with a `directionUpper` value that may already have been set in the design.
+* Added `getDesignOptimalConditionalError()` for adaptive two-stage trials,
+  with p-value boundaries `efficacyBounds` and `futilityBounds`, planning effects
+  `thetaH1` and `thetaLR`, and explicit boundary scales. `getConditionalError()`
+  evaluates interim conditional errors; `getStageInformation()` provides conditional
+  or expected additional information. `getDesignCharacteristics()` evaluates power
+  and stage-wise stopping probabilities at specified `theta` values. Diagnostic
+  plots have descriptive type names. The methods follow Brannath and Bauer (2004)
+  [doi:10.1111/j.0006-341X.2004.00221.x](https://doi.org/10.1111/j.0006-341X.2004.00221.x)
+  and Brannath et al. (2024)
+  [doi:10.48550/arXiv.2402.00814](https://doi.org/10.48550/arXiv.2402.00814),
+  also available in [optconerrf on CRAN](https://CRAN.R-project.org/package=optconerrf).
+  The new vignette `rpact_optimal_conditional_error` and expanded help examples
+  cover trial decisions, information constraints, interim estimates, weighted
+  alternatives, and conditional power functions.
 
 ## Improvements, issues, and changes
 
@@ -21,7 +47,9 @@
 * Refactored error handling in plotting functions to use more specific internal error functions (`stopIllegalArgument`, `stopMissingArgument`) for clearer and more consistent error messages.
 * Standardized and clarified function signatures for R6 class initializers and S3 methods, improving readability and maintainability. This includes consistent formatting and argument ordering across multiple classes 
 * `getSampleSizeCounts()`: field 'expectedStudyDurationH1' in result object was replaced by 'studyDuration', i.e., 'expectedStudyDurationH1' is deprecated 
+* In all simulation raw data, the `armNumber` column was renamed to `activeArm`
 * For consistency with other result objects, the `direction` field in `getStageResults()` result objects was renamed to `directionUpper`.
+* Error and warning context now identifies diagnostic situations with stable IDs and factual metadata. Authored explanations and corrective instructions are maintained separately by consuming applications; ordinary condition messages remain unchanged.
 
 # rpact 4.4.0
 
@@ -82,7 +110,6 @@
 * Issue [#99](https://github.com/rpact-com/rpact/issues/99) fixed
 * Testing improved, e.g., new helper function `getTestLabel()` introduced
 * Several minor improvements
-
 
 # rpact 4.2.1
 
@@ -566,3 +593,11 @@ note that this is a novel implementation, hence experimental
 # rpact 1.0.0
 
 * First release of rpact
+
+## Optimal conditional error updates
+
+* Applied the constraint-related fixes from optconerrf 1.0.3: bounds now enter
+  the selection between competing conditional error solutions at high conditional
+  power, and infeasible integrated bounds are detected before calibration.
+* Clarified that conditional power functions do not guarantee optimality and
+  that conditional power also limits the conditional error in the continuation region.

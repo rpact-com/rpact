@@ -32,6 +32,7 @@
     if (length(directionUpper) == 1 && nParameters > 1) {
         directionUpper <- rep(directionUpper, nParameters)
     }
+    
     return(directionUpper)
 }
 
@@ -57,20 +58,20 @@
         if (design$kMax > 1 && identical(design$typeOfDesign, "noEarlyEfficacy")) {
             if ((is.matrix(criticalValues) && anyNA(criticalValues[design$kMax, ])) ||
                     (is.vector(criticalValues) && is.na(criticalValues[design$kMax]))) {
-                warning("The computation of last stage efficacy boundary on treatment ",
+                warnNumericalIssue("The computation of last stage efficacy boundary on treatment ",
                     "effect scale not performed presumably ",
                     "due to too small degrees of freedom",
-                    call. = FALSE
+                    diagnosticId = "futility.invalid_degrees_of_freedom"
                 )
             }
         } else {
             numberOfNAs <- sum(is.na(criticalValues))
             if (numberOfNAs > 0) {
-                warning("The computation of ", .integerToWrittenNumber(numberOfNAs), " ",
+                warnNumericalIssue("The computation of ", .integerToWrittenNumber(numberOfNAs), " ",
                     "efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " ",
                     "on treatment effect scale not performed presumably ",
                     "due to too small degrees of freedom",
-                    call. = FALSE
+                    diagnosticId = "futility.invalid_degrees_of_freedom"
                 )
             }
         }
@@ -775,19 +776,20 @@
         if (length(unique(na.omit(directionUpperCalculated))) > 1) {
             designPlan$directionUpper <- directionUpperCalculated
             designPlan$.setParameterType("directionUpper", C_PARAM_DERIVED)
-            warning(
+            warnArgumentAdjusted(
                 "The specified 'directionUpper' (", directionUpperDefined, ") ",
                 "is not consistent with the calculated 'directionUpper' (",
                 .arrayToString(directionUpperCalculated), "). ",
                 "The calculated 'directionUpper' is used instead.",
-                call. = FALSE
+                diagnosticId = "design.direction_adjusted"
             )
         } else {
             stopIllegalArgument("The specified 'directionUpper' (", directionUpperDefined, ") ",
                 "is not consistent with the calculated 'directionUpper' (",
                 .arrayToString(directionUpperCalculated), "). ",
                 functionName = ".setDirectionUpper",
-                parameter = "directionUpper"
+                parameter = "directionUpper",
+                diagnosticId = "design.direction_mismatch"
             )
         }
     }

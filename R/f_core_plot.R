@@ -276,7 +276,9 @@ NULL
                 return(eval(parse(text = plotCmd)))
             },
             error = function(e) {
-                warning("Failed to create grid plot using command ", .sQuote(plotCmd), ": ", e$message)
+                warnRuntimeIssue("Failed to create grid plot using command ", .sQuote(plotCmd), ": ", e$message,
+                    diagnosticId = "plot.grid_failed"
+                )
             }
         )
     }
@@ -614,7 +616,11 @@ getAvailablePlotTypes <- function(
         }
 
         if (!(showSource %in% C_PLOT_SHOW_SOURCE_ARGUMENTS)) {
-            warning("'showSource' (", showSource, ") is not allowed and will be ignored", call. = FALSE)
+            warnArgumentIgnored("'showSource' (", showSource, ") is not allowed and will be ignored",
+                parameter = "showSource",
+                value = showSource,
+                diagnosticId = "plot.invalid_source_display"
+            )
             return(invisible())
         }
     } else if (!isTRUE(showSource)) {
@@ -1132,7 +1138,9 @@ getAvailablePlotTypes <- function(
                 data$xValues <- as.numeric(.formatSampleSizes(data$xValues))
             },
             error = function(e) {
-                warning("Failed to format sample sizes on x-axis: ", e$message)
+                warnRuntimeIssue("Failed to format sample sizes on x-axis: ", e$message,
+                    diagnosticId = "plot.axis_formatting_failed"
+                )
             }
         )
     }
@@ -1401,10 +1409,12 @@ getAvailablePlotTypes <- function(
     removedRows2 <- nRow - nrow(data)
 
     if (getLogLevel() == C_LOG_LEVEL_WARN && (removedRows1 > 0 || removedRows2 > 0)) {
-        warning(sprintf(
+        warnDataIssue(sprintf(
             "Removed %s rows containing (0, 0)-points and %s rows containing missing values",
             removedRows1, removedRows2
-        ), call. = FALSE)
+        ),
+            diagnosticId = "plot.rows_omitted"
+        )
     }
 
     categoryEnabled <- !is.null(data[["categories"]]) && !all(is.na(data$categories))
@@ -1757,7 +1767,8 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         stopIllegalArgument("'filename' seems to be a path. ", "Please specify 'outputPath' separately",
             functionName = "saveLastPlot",
             parameter = "filename",
-            relatedParameter = "outputPath", value = filename
+            relatedParameter = "outputPath", value = filename,
+            diagnosticId = "io.filename_contains_directory"
         )
     }
 
@@ -1844,9 +1855,11 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     showFutilityBounds <- .getOptionalArgument("showFutilityBounds", ...)
     if ((all(type != 3, na.rm = TRUE) || (!is.null(obj) && !inherits(obj, "TrialDesignPlan"))) && !is.null(showFutilityBounds)) {
         objTypeInfo <- ifelse(!is.null(obj) && !inherits(obj, "TrialDesignPlan"), " design plan", "")
-        warning("Argument 'showFutilityBounds' (", showFutilityBounds, ") is only available for", objTypeInfo, " plot type 3; ",
+        warnArgumentIgnored("Argument 'showFutilityBounds' (", showFutilityBounds, ") is only available for", objTypeInfo, " plot type 3; ",
             "it will be ignored",
-            call. = FALSE
+            parameter = "showFutilityBounds",
+            value = showFutilityBounds,
+            diagnosticId = "plot.futility_display_ignored"
         )
     }
 
@@ -1855,19 +1868,23 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     if (all(type != 4, na.rm = TRUE) && all(type != "all", na.rm = TRUE) &&
             (!is.null(showAlphaSpent) || !is.null(showBetaSpent))) {
         if (!is.null(showAlphaSpent) && !is.null(showBetaSpent)) {
-            warning("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
+            warnArgumentIgnored("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
                 "are only available for plot type 4; they will be ignored",
-                call. = FALSE
+                diagnosticId = "plot.spending_display_ignored"
             )
         } else if (!is.null(showAlphaSpent)) {
-            warning("Argument 'showAlphaSpent' (", showAlphaSpent, ") is only available for plot type 4; ",
+            warnArgumentIgnored("Argument 'showAlphaSpent' (", showAlphaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
-                call. = FALSE
+                parameter = "showAlphaSpent",
+                value = showAlphaSpent,
+                diagnosticId = "plot.spending_display_ignored"
             )
         } else {
-            warning("Argument 'showBetaSpent' (", showBetaSpent, ") is only available for plot type 4; ",
+            warnArgumentIgnored("Argument 'showBetaSpent' (", showBetaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
-                call. = FALSE
+                parameter = "showBetaSpent",
+                value = showBetaSpent,
+                diagnosticId = "plot.spending_display_ignored"
             )
         }
     }

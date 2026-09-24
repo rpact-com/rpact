@@ -157,7 +157,8 @@ NULL
             ) {
             stopIllegalArgument("at least one sample size specification too small to create simulation results, ",
                 "e.g., due to small prevalences of subsets",
-                functionName = ".getSimulatedStageRatesEnrichment"
+                functionName = ".getSimulatedStageRatesEnrichment",
+                diagnosticId = "simulation.subset_sample_size_insufficient"
             )
         }
 
@@ -854,7 +855,8 @@ NULL
                         "the output must be a single numeric value",
                         functionName = ".getSimulatedStageRatesEnrichment",
                         parameter = "calcSubjectsFunction",
-                        value = calcSubjectsFunction
+                        value = calcSubjectsFunction,
+                        diagnosticId = "simulation.subject_callback_result_invalid"
                     )
                 }
 
@@ -1059,13 +1061,6 @@ getSimulationEnrichmentRates <- function(
 
     calcSubjectsFunctionIsUserDefined <- !is.null(calcSubjectsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE
-    )
-
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design = design,
         effectList = effectList,
@@ -1112,6 +1107,7 @@ getSimulationEnrichmentRates <- function(
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
     maxNumberOfIterations <- simulationResults$maxNumberOfIterations
+    directionUpper <- simulationResults$directionUpper
 
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)

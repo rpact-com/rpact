@@ -395,8 +395,7 @@ NULL
     }
 }
 
-# Note that 'directionUpper' and 'maxNumberOfSubjects' are only applicable
-# for 'objectType' = "power"
+# 'maxNumberOfSubjects' is only applicable for 'objectType' = "power"
 .createDesignPlanMeans <- function(
         ...,
         objectType = c("sampleSize", "power"),
@@ -432,47 +431,41 @@ NULL
         )
     }
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design,
-        objectType = objectType,
-        userFunctionCallEnabled = TRUE, default = NA
-    )
-
-    if (objectType == "sampleSize" && !anyNA(alternative)) {
-        if (!is.na(directionUpper)) {
-            effect <- alternative - thetaH0
-            effect <- .applyDirectionOfAlternative(effect, directionUpper,
-                type = "negateIfLower", phase = "planning"
-            )
-            if (design$sided == 1 && any(effect <= 0)) {
-                stopIllegalArgument(
-                    "any 'alternative' (", .arrayToString(alternative), ") must be ",
-                    ifelse(isFALSE(directionUpper), "<", ">"), " 'thetaH0' (", thetaH0, ")",
-                    functionName = ".createDesignPlanMeans",
-                    parameter = "alternative",
-                    value = alternative,
-                    relatedParameter = "thetaH0",
-                    relatedValue = thetaH0
-                )
-            }
-        }
-
-        if (any(alternative - thetaH0 == 0)) {
-            stopIllegalArgument("any 'alternative' (", .arrayToString(alternative), ") ",
-                "must be != 'thetaH0' (", thetaH0, ")",
-                functionName = ".createDesignPlanMeans",
-                parameter = "alternative",
-                value = alternative,
-                relatedParameter = "thetaH0",
-                relatedValue = thetaH0
-            )
-        }
-    }
-
     designPlan <- TrialDesignPlanMeans$new(
         design = design, 
         meanRatio = meanRatio,
         objectType = objectType)
+
+    if (objectType == "sampleSize") {
+        directionUpper <- .assertIsValidDirectionUpper(
+            directionUpper, design,
+            objectType = objectType,
+            userFunctionCallEnabled = TRUE, default = NA
+        )
+        
+        if (!anyNA(alternative)) {
+            if (any(alternative - thetaH0 == 0)) {
+                stopIllegalArgument("any 'alternative' (", .arrayToString(alternative), ") ",
+                    "must be != 'thetaH0' (", thetaH0, ")",
+                    functionName = ".createDesignPlanMeans",
+                    parameter = "alternative",
+                    value = alternative,
+                    relatedParameter = "thetaH0",
+                    relatedValue = thetaH0,
+                    diagnosticId = "planning.alternative_equals_null"
+                )
+            }
+        }
+    } else {
+        directionUpper <- .setDirectionUpper(
+            designPlan,
+            design,
+            directionUpper,
+            objectType = objectType,
+            endpoint = "means",
+            userFunctionCallEnabled = !identical(objectType, "sampleSize"))
+    }
+
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {
@@ -490,7 +483,8 @@ NULL
                 (thetaH0 != 1 && meanRatio))) {
             stopIllegalArgument("two-sided case is implemented only for superiority testing ",
                 "(i.e., thetaH0 = ", ifelse(meanRatio, 1, 0), ")",
-                functionName = ".createDesignPlanMeans"
+                functionName = ".createDesignPlanMeans",
+                diagnosticId = "planning.two_sided_requires_superiority"
             )
         }
 
@@ -554,17 +548,27 @@ NULL
     .setValueAndParameterType(designPlan, "groups", groups, 2)
     if (groups == 1) {
         if (isTRUE(meanRatio)) {
-            warning("'meanRatio' (", meanRatio, ") will be ignored ",
+            warnArgumentIgnored("'meanRatio' (", meanRatio, ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "meanRatio",
+                value = meanRatio,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         designPlan$.setParameterType("meanRatio", C_PARAM_NOT_APPLICABLE)
 
         if (length(allocationRatioPlanned) == 1 && !is.na(allocationRatioPlanned)) {
-            warning("'allocationRatioPlanned' (", allocationRatioPlanned,
+            warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         designPlan$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)

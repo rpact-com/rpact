@@ -22,9 +22,10 @@ NULL
     piValue <- designPlan[[piValueName]]
     if (!is.null(piValue) && !is.na(piValue) && length(piValue) > 0) {
         designPlan$.setParameterType(piValueName, C_PARAM_NOT_APPLICABLE)
-        warning("'pi2' (", .arrayToString(piValue), ") will be ignored ",
+        warnArgumentIgnored("'pi2' (", .arrayToString(piValue), ") will be ignored ",
             "because piecewise exponential survival function is enabled",
-            call. = FALSE
+            parameter = "pi2",
+            diagnosticId = "survival.probabilities_ignored_for_piecewise_hazards"
         )
         designPlan[[piValueName]] <- NA_real_
     }
@@ -301,7 +302,7 @@ getSimulationSurvival <- function(
             ), "showStatistics"), ...
         )
     } else {
-        .assertIsTrialDesign(design)
+        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design) 
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationSurvival",
             ignore = "showStatistics", ...
@@ -310,13 +311,6 @@ getSimulationSurvival <- function(
         design <- .resetPipeOperatorQueue(design)
     }
 
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power", 
-        userFunctionCallEnabled = TRUE,
-        default = C_DIRECTION_UPPER_SURVIVAL_DEFAULT
-    )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
     minNumberOfEventsPerStage <- .assertIsNumericVector(
@@ -352,7 +346,8 @@ getSimulationSurvival <- function(
     
     if (design$sided == 2) {
         stopIllegalArgument("Only one-sided case is implemented for the survival simulation design",
-            functionName = "getSimulationSurvival"
+            functionName = "getSimulationSurvival",
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
     if (!all(is.na(lambda2)) && !all(is.na(lambda1)) &&
@@ -368,9 +363,11 @@ getSimulationSurvival <- function(
         )
     }
     if (all(is.na(lambda2)) && !all(is.na(lambda1))) {
-        warning("'lambda1' (", .arrayToString(lambda1), ") will be ignored ",
+        warnArgumentIgnored("'lambda1' (", .arrayToString(lambda1), ") will be ignored ",
             "because 'lambda2' (", .arrayToString(lambda2), ") is undefined",
-            call. = FALSE
+            parameter = "lambda1",
+            value = lambda1,
+            diagnosticId = "survival.treatment_hazard_requires_control"
         )
         lambda1 <- NA_real_
     }
@@ -382,7 +379,8 @@ getSimulationSurvival <- function(
             parameter = "piecewiseSurvivalTime",
             relatedParameter = "lambda2",
             relatedValue = lambda2,
-            value = piecewiseSurvivalTime
+            value = piecewiseSurvivalTime,
+            diagnosticId = "survival.list_and_separate_hazards_conflict"
         )
     }
     thetaH1 <- .ignoreParameterIfNotUsed(
@@ -390,7 +388,10 @@ getSimulationSurvival <- function(
         "design is fixed ('kMax' = 1)", "Assumed effect"
     )
     if (is.na(conditionalPower) && !is.na(thetaH1)) {
-        warning("'thetaH1' will be ignored because 'conditionalPower' is not defined", call. = FALSE)
+        warnArgumentIgnored("'thetaH1' will be ignored because 'conditionalPower' is not defined",
+            parameter = "thetaH1",
+            diagnosticId = "simulation.alternative_requires_conditional_power"
+        )
     }
     conditionalPower <- .ignoreParameterIfNotUsed(
         "conditionalPower",
@@ -414,6 +415,15 @@ getSimulationSurvival <- function(
     )
 
     simulationResults <- SimulationResultsSurvival$new(design, showStatistics = showStatistics)
+    
+    directionUpper <- .setDirectionUpper(
+        simulationResults,
+        design,
+        directionUpper,
+        objectType = "power",
+        endpoint = "survival",
+        userFunctionCallEnabled = TRUE)
+    
     if (!is.na(conditionalPower)) {
         if (design$kMax > 1) {
             if (any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0) &&
@@ -424,7 +434,8 @@ getSimulationSurvival <- function(
                     .arrayToString(minNumberOfEventsPerStage), ")",
                     functionName = "getSimulationSurvival",
                     parameter = "maxNumberOfEventsPerStage",
-                    value = maxNumberOfEventsPerStage
+                    value = maxNumberOfEventsPerStage,
+                    diagnosticId = "simulation.event_bounds_inverted"
                 )
             }
             .setValueAndParameterType(
@@ -436,7 +447,7 @@ getSimulationSurvival <- function(
                 maxNumberOfEventsPerStage, NA_real_
             )
         } else {
-            warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+            warnArgumentIgnoredFixedDesign("conditionalPower")
         }
     } else {
         simulationResults$minNumberOfEventsPerStage <- NA_real_
@@ -446,7 +457,7 @@ getSimulationSurvival <- function(
         simulationResults$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
     }
     if (!is.na(conditionalPower) && (design$kMax == 1)) {
-        warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("conditionalPower")
     }
 
     accrualSetup <- getAccrualTime(
@@ -614,7 +625,8 @@ getSimulationSurvival <- function(
                 parameter = "longTimeSimulationAllowed",
                 value = longTimeSimulationAllowed,
                 constraint = "must be TRUE for simulations exceeding the long-time threshold",
-                functionName = "getSimulationSurvival"
+                functionName = "getSimulationSurvival",
+                diagnosticId = "simulation.long_runtime_disabled"
             )
         }
 
@@ -625,7 +637,6 @@ getSimulationSurvival <- function(
         )
     }
 
-    .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, C_DROP_OUT_RATE_1_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, C_DROP_OUT_RATE_2_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, C_DROP_OUT_TIME_DEFAULT)
@@ -633,10 +644,12 @@ getSimulationSurvival <- function(
 
     allocationFraction <- .getFraction(allocation1 / allocation2)
     if (allocationFraction[1] != allocation1 || allocationFraction[2] != allocation2) {
-        warning(sprintf(
+        warnArgumentAdjusted(sprintf(
             "allocation1 = %s and allocation2 = %s was replaced by allocation1 = %s and allocation2 = %s",
             allocation1, allocation2, allocationFraction[1], allocationFraction[2]
-        ), call. = FALSE)
+        ),
+            diagnosticId = "simulation.integer_allocation_adjusted"
+        )
         allocation1 <- allocationFraction[1]
         allocation2 <- allocationFraction[2]
     }
@@ -705,6 +718,12 @@ getSimulationSurvival <- function(
         designNumber <- 2L
     } else if (.isTrialDesignFisher(design)) {
         designNumber <- 3L
+    } else {
+        stopRuntimeIssue("unknown design type", 
+            functionName = "getSimulationSurvival",
+            parameter = "design",
+            value = .getClassName(design)
+        )
     }
 
     calcSubjectsFunctionList <- .getCalcSubjectsFunction(
@@ -886,7 +905,9 @@ getSimulationSurvival <- function(
     }
     if (is.null(simulationResults$expectedNumberOfEvents) ||
             length(simulationResults$expectedNumberOfEvents) == 0) {
-        warning("Failed to calculate expected number of events", call. = FALSE)
+        warnNumericalIssue("Failed to calculate expected number of events",
+            diagnosticId = "simulation.expected_events_failed"
+        )
     }
 
     simulationResults$.data <- resultData$data[!is.na(resultData$data$iterationNumber), ]
@@ -909,9 +930,9 @@ getSimulationSurvival <- function(
             missingStageNumbers <- stages
         }
         if (length(missingStageNumbers) > 0) {
-            warning("Could not get rawData (individual results) for stages ",
+            warnResultUnavailable("Could not get rawData (individual results) for stages ",
                 .arrayToString(missingStageNumbers),
-                call. = FALSE
+                diagnosticId = "simulation.raw_stage_data_unavailable"
             )
         }
     } else {
@@ -932,9 +953,9 @@ getSimulationSurvival <- function(
             censorIndicator = numeric(0)
         )
         if (maxNumberOfRawDatasetsPerStage > 0) {
-            warning("Could not get rawData (individual results) for stages ",
+            warnResultUnavailable("Could not get rawData (individual results) for stages ",
                 .arrayToString(stages),
-                call. = FALSE
+                diagnosticId = "simulation.raw_stage_data_unavailable"
             )
         }
     }

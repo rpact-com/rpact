@@ -191,10 +191,6 @@ getSimulationMeans <- function(
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
     }
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design,
-        objectType = "power", userFunctionCallEnabled = TRUE
-    )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     if (meanRatio) {
         .assertIsInOpenInterval(thetaH0, "thetaH0",
@@ -236,27 +232,46 @@ getSimulationMeans <- function(
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
     simulationResults <- SimulationResultsMeans$new(design, showStatistics = showStatistics)
+    
+    directionUpper <- .setDirectionUpper(
+        simulationResults,
+        design,
+        directionUpper,
+        objectType = "power",
+        endpoint = "means",
+        userFunctionCallEnabled = TRUE)
 
     maxNumberOfIterations <- .setMaxNumberOfIterations(simulationResults, maxNumberOfIterations)
     .validateAndSetSeed(simulationResults, seed)
 
     if (design$sided == 2) {
         stopIllegalArgument("only one-sided case is implemented for the simulation design",
-            functionName = "getSimulationMeans"
+            functionName = "getSimulationMeans",
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
 
     if (groups == 1L) {
         if (isTRUE(meanRatio)) {
-            warning("'meanRatio' (", meanRatio, ") will be ignored ",
+            warnArgumentIgnored("'meanRatio' (", meanRatio, ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "meanRatio",
+                value = meanRatio,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         if (!is.na(allocationRatioPlanned)) {
-            warning("'allocationRatioPlanned' (", allocationRatioPlanned,
+            warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
             simulationResults$allocationRatioPlanned <- NA_real_
         }
@@ -303,10 +318,12 @@ getSimulationMeans <- function(
         "design is fixed ('kMax' = 1)", "Assumed effect"
     )
     if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !all(is.na(stDevH1))) {
-        warning("'stDevH1' (", .arrayToString(stDevH1), ") will be ignored ",
+        warnArgumentIgnored("'stDevH1' (", .arrayToString(stDevH1), ") will be ignored ",
             "because neither 'conditionalPower' nor ",
             "'calcSubjectsFunction' is defined",
-            call. = FALSE
+            parameter = "stDevH1",
+            value = stDevH1,
+            diagnosticId = "simulation.argument_requires_subject_reassessment"
         )
     }
     conditionalPower <- .ignoreParameterIfNotUsed(
@@ -346,7 +363,8 @@ getSimulationMeans <- function(
                 .arrayToString(minNumberOfSubjectsPerStage), ")",
                 functionName = "getSimulationMeans",
                 parameter = "maxNumberOfSubjectsPerStage",
-                value = maxNumberOfSubjectsPerStage
+                value = maxNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.subject_bounds_inverted"
             )
         }
         .setValueAndParameterType(
@@ -359,30 +377,34 @@ getSimulationMeans <- function(
         )
     }
     if (!is.na(conditionalPower) && design$kMax == 1) {
-        warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("conditionalPower")
     }
     if (!is.null(calcSubjectsFunction) && design$kMax == 1) {
-        warning("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("calcSubjectsFunction")
     }
 
     if (is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(minNumberOfSubjectsPerStage) != 1 ||
                 !is.na(minNumberOfSubjectsPerStage)) {
-            warning("'minNumberOfSubjectsPerStage' (",
+            warnArgumentIgnored("'minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE
+                parameter = "minNumberOfSubjectsPerStage",
+                value = minNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$minNumberOfSubjectsPerStage <- NA_real_
         }
         if (length(maxNumberOfSubjectsPerStage) != 1 ||
                 !is.na(maxNumberOfSubjectsPerStage)) {
-            warning("'maxNumberOfSubjectsPerStage' (",
+            warnArgumentIgnored("'maxNumberOfSubjectsPerStage' (",
                 .arrayToString(maxNumberOfSubjectsPerStage), ") ",
                 "will be ignored because neither 'conditionalPower' nor ",
                 "'calcSubjectsFunction' is defined",
-                call. = FALSE
+                parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$maxNumberOfSubjectsPerStage <- NA_real_
         }
@@ -416,10 +438,6 @@ getSimulationMeans <- function(
     .setValueAndParameterType(
         simulationResults, "plannedSubjects",
         plannedSubjects, NA_real_
-    )
-    .setValueAndParameterType(
-        simulationResults, "directionUpper",
-        directionUpper, C_DIRECTION_UPPER_DEFAULT
     )
     .setValueAndParameterType(simulationResults, "minNumberOfSubjectsPerStage",
         minNumberOfSubjectsPerStage, NA_real_,
