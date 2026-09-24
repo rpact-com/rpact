@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9321</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,8 +46,9 @@
 <code><a href="../reference/getDataset.html">getDataset()</a></code> now supports datasets of general, endpoint-independent estimates through the new <code>DatasetGeneral</code> class. Stage-wise estimates and standard errors can be provided using <code>est</code> and <code>se</code>; degrees of freedom (<code>df</code>) are optional and default internally to <code>Inf</code>, corresponding to a normal approximation.</li>
 <li>rpact options can now be configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles; see the new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_hidden_features/" class="external-link">Hidden rpact Features: Options and Environment Variables</a>.</li>
 <li>Optimized the display of <code>criticalValues</code> and <code>futilityBounds</code> for designs with <code>directionUpper = FALSE</code>. If the direction of the alternative is already specified when creating a design, e.g., with <code>getDesignGroupSequential(directionUpper = FALSE)</code>, the boundaries are now shown in the correct direction, typically as negative values. This also applies to futility bounds generated for beta-spending designs.</li>
-<li>The new function <code><a href="../reference/getFisherInformation.html">getFisherInformation()</a></code> can be used to calculate the Fisher information at the first planned analysis stage for a design plan for means, rates, or survival endpoints.</li>
+<li>The new function <code><a href="../reference/getFisherInformation.html">getFisherInformation()</a></code> can be used to calculate cumulative or stage-wise Fisher information at selected planned analyses for a design plan or simulation results object for means, rates, survival, or count data endpoints. Its typed output can be passed directly to <code><a href="../reference/getFutilityBounds.html">getFutilityBounds()</a></code>, which validates that cumulative or stage-wise information is used as required by the requested conversion. Complete multi-stage and multi-situation output can be piped into <code><a href="../reference/getFutilityBounds.html">getFutilityBounds()</a></code>; the calculation is then carried out separately for every interim stage and planning situation. The print methods identify the target scale, information type, requested analysis stages and, where applicable, the planning situations represented by the values. Trial design plans and simulation results can also be piped directly into <code><a href="../reference/getFutilityBounds.html">getFutilityBounds()</a></code>; the required Fisher information and its cumulative or stage-wise type are then determined internally from the requested target scale.</li>
 <li>For survival endpoints, the default value of <code>directionUpper</code> has changed from <code>TRUE</code> to <code>FALSE</code>. Accordingly, the default event rates have been adjusted to provide meaningful examples for an alternative in the lower direction: <code>pi2</code> (and <code>piControl</code>) now defaults to <code>0.5</code>, while the sample size default for <code>pi1</code> is now <code>c(0.1, 0.2, 0.3)</code>; the power and simulation default for <code>pi1</code> remains <code>seq(0.2, 0.5, 0.1)</code>. One-sided power calculations and simulations issue a warning if <code>directionUpper</code> is not specified explicitly, making users aware of the changed default. No warning is issued for sample size calculations because the <code>directionUpper</code> argument has only been added to these functions in this version. For sample size calculations, the direction is always derived from the specified alternative; the argument is provided solely to validate that this derived direction is consistent with a <code>directionUpper</code> value that may already have been set in the design.</li>
+<li>Added <code><a href="../reference/getDesignOptimalConditionalError.html">getDesignOptimalConditionalError()</a></code> for adaptive two-stage trials, with p-value boundaries <code>efficacyBounds</code> and <code>futilityBounds</code>, planning effects <code>thetaH1</code> and <code>thetaLR</code>, and explicit boundary scales. <code><a href="../reference/getConditionalError.html">getConditionalError()</a></code> evaluates interim conditional errors; <code><a href="../reference/getStageInformation.html">getStageInformation()</a></code> provides conditional or expected additional information. <code><a href="../reference/getDesignCharacteristics.html">getDesignCharacteristics()</a></code> evaluates power and stage-wise stopping probabilities at specified <code>theta</code> values. Diagnostic plots have descriptive type names. The methods follow Brannath and Bauer (2004) <a href="https://doi.org/10.1111/j.0006-341X.2004.00221.x" class="external-link">doi:10.1111/j.0006-341X.2004.00221.x</a> and Brannath et al. (2024) <a href="https://doi.org/10.48550/arXiv.2402.00814" class="external-link">doi:10.48550/arXiv.2402.00814</a>, also available in <a href="https://CRAN.R-project.org/package=optconerrf" class="external-link">optconerrf on CRAN</a>. The new vignette <code>rpact_optimal_conditional_error</code> and expanded help examples cover trial decisions, information constraints, interim estimates, weighted alternatives, and conditional power functions.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-5-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-5-0"></a></h3>
@@ -61,7 +62,10 @@
 <li>Standardized and clarified function signatures for R6 class initializers and S3 methods, improving readability and maintainability. This includes consistent formatting and argument ordering across multiple classes</li>
 <li>
 <code><a href="../reference/getSampleSizeCounts.html">getSampleSizeCounts()</a></code>: field ‘expectedStudyDurationH1’ in result object was replaced by ‘studyDuration’, i.e., ‘expectedStudyDurationH1’ is deprecated</li>
+<li>In all simulation raw data, the <code>armNumber</code> column was renamed to <code>activeArm</code>
+</li>
 <li>For consistency with other result objects, the <code>direction</code> field in <code><a href="../reference/getStageResults.html">getStageResults()</a></code> result objects was renamed to <code>directionUpper</code>.</li>
+<li>Error and warning context now identifies diagnostic situations with stable IDs and factual metadata. Authored explanations and corrective instructions are maintained separately by consuming applications; ordinary condition messages remain unchanged.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -684,7 +688,12 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="rpact-100">rpact 1.0.0<a class="anchor" aria-label="anchor" href="#rpact-100"></a></h2><p class="text-muted">CRAN release: 2018-10-30</p>
 <ul><li>First release of rpact</li>
+</ul><div class="section level3">
+<h3 id="optimal-conditional-error-updates-1-0-0">Optimal conditional error updates<a class="anchor" aria-label="anchor" href="#optimal-conditional-error-updates-1-0-0"></a></h3>
+<ul><li>Applied the constraint-related fixes from optconerrf 1.0.3: bounds now enter the selection between competing conditional error solutions at high conditional power, and infeasible integrated bounds are detected before calibration.</li>
+<li>Clarified that conditional power functions do not guarantee optimality and that conditional power also limits the conditional error in the continuation region.</li>
 </ul></div>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

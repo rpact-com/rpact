@@ -20,6 +20,8 @@
   : Get Closed Combination Test Results
 - [`getClosedConditionalDunnettTestResults()`](https://docs.rpact.org/reference/getClosedConditionalDunnettTestResults.md)
   : Get Closed Conditional Dunnett Test Results
+- [`getConditionalError()`](https://docs.rpact.org/reference/getConditionalError.md)
+  : Calculate the Optimal Conditional Error
 - [`getConditionalPower()`](https://docs.rpact.org/reference/getConditionalPower.md)
   : Get Conditional Power
 - [`getConditionalRejectionProbabilities()`](https://docs.rpact.org/reference/getConditionalRejectionProbabilities.md)
@@ -42,6 +44,8 @@
   : Get Design Group Sequential
 - [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md)
   : Get Design Inverse Normal
+- [`getDesignOptimalConditionalError()`](https://docs.rpact.org/reference/getDesignOptimalConditionalError.md)
+  : Create an Optimal Conditional Error Design
 - [`getDesignSet()`](https://docs.rpact.org/reference/getDesignSet.md) :
   Get Design Set
 - [`getEventProbabilities()`](https://docs.rpact.org/reference/getEventProbabilities.md)
@@ -113,6 +117,8 @@
   : Get Simulation Rates
 - [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md)
   : Get Simulation Survival
+- [`getStageInformation()`](https://docs.rpact.org/reference/getStageInformation.md)
+  : Calculate Stage Information for an Adaptive Design
 - [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md)
   : Get Stage Results
 - [`getTestActions()`](https://docs.rpact.org/reference/getTestActions.md)
@@ -142,6 +148,8 @@
 - [`plot(`*`<TrialDesign>`*`)`](https://docs.rpact.org/reference/plot.TrialDesign.md)
   [`plot(`*`<TrialDesignCharacteristics>`*`)`](https://docs.rpact.org/reference/plot.TrialDesign.md)
   : Trial Design Plotting
+- [`plot(`*`<TrialDesignOptimalConditionalError>`*`)`](https://docs.rpact.org/reference/plot.TrialDesignOptimalConditionalError.md)
+  : Plot the optimal conditional error function
 - [`plot(`*`<TrialDesignPlan>`*`)`](https://docs.rpact.org/reference/plot.TrialDesignPlan.md)
   : Trial Design Plan Plotting
 - [`plot(`*`<TrialDesignSet>`*`)`](https://docs.rpact.org/reference/plot.TrialDesignSet.md)
@@ -152,6 +160,8 @@
   : Summary Factory Printing
 - [`print(`*`<TrialDesignCharacteristics>`*`)`](https://docs.rpact.org/reference/print.TrialDesignCharacteristics.md)
   : Trial Design Characteristics Printing
+- [`print(`*`<TrialDesignOptimalConditionalError>`*`)`](https://docs.rpact.org/reference/print.TrialDesignOptimalConditionalError.md)
+  : Print optimal conditional error trial design
 - [`print(`*`<TrialDesignSummaries>`*`)`](https://docs.rpact.org/reference/print.TrialDesignSummaries.md)
   : Print Trial Design Summaries
 - [`readDataset()`](https://docs.rpact.org/reference/readDataset.md) :
@@ -163,6 +173,8 @@
   Confirmatory Adaptive Clinical Trial Design and Analysis
 - [`setOutputFormat()`](https://docs.rpact.org/reference/setOutputFormat.md)
   : Set Output Format
+- [`summary(`*`<TrialDesignOptimalConditionalError>`*`)`](https://docs.rpact.org/reference/summary.TrialDesignOptimalConditionalError.md)
+  : Summary of the optimal conditional error trial design
 - [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) :
   Test and Validate the rpact Package Installation
 - [`getPiecewiseExponentialDistribution()`](https://docs.rpact.org/reference/utilitiesForPiecewiseExponentialDistribution.md)

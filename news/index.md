@@ -43,9 +43,23 @@
   also applies to futility bounds generated for beta-spending designs.
 - The new function
   [`getFisherInformation()`](https://docs.rpact.org/reference/getFisherInformation.md)
-  can be used to calculate the Fisher information at the first planned
-  analysis stage for a design plan for means, rates, or survival
-  endpoints.
+  can be used to calculate cumulative or stage-wise Fisher information
+  at selected planned analyses for a design plan or simulation results
+  object for means, rates, survival, or count data endpoints. Its typed
+  output can be passed directly to
+  [`getFutilityBounds()`](https://docs.rpact.org/reference/getFutilityBounds.md),
+  which validates that cumulative or stage-wise information is used as
+  required by the requested conversion. Complete multi-stage and
+  multi-situation output can be piped into
+  [`getFutilityBounds()`](https://docs.rpact.org/reference/getFutilityBounds.md);
+  the calculation is then carried out separately for every interim stage
+  and planning situation. The print methods identify the target scale,
+  information type, requested analysis stages and, where applicable, the
+  planning situations represented by the values. Trial design plans and
+  simulation results can also be piped directly into
+  [`getFutilityBounds()`](https://docs.rpact.org/reference/getFutilityBounds.md);
+  the required Fisher information and its cumulative or stage-wise type
+  are then determined internally from the requested target scale.
 - For survival endpoints, the default value of `directionUpper` has
   changed from `TRUE` to `FALSE`. Accordingly, the default event rates
   have been adjusted to provide meaningful examples for an alternative
@@ -61,6 +75,27 @@
   provided solely to validate that this derived direction is consistent
   with a `directionUpper` value that may already have been set in the
   design.
+- Added
+  [`getDesignOptimalConditionalError()`](https://docs.rpact.org/reference/getDesignOptimalConditionalError.md)
+  for adaptive two-stage trials, with p-value boundaries
+  `efficacyBounds` and `futilityBounds`, planning effects `thetaH1` and
+  `thetaLR`, and explicit boundary scales.
+  [`getConditionalError()`](https://docs.rpact.org/reference/getConditionalError.md)
+  evaluates interim conditional errors;
+  [`getStageInformation()`](https://docs.rpact.org/reference/getStageInformation.md)
+  provides conditional or expected additional information.
+  [`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.md)
+  evaluates power and stage-wise stopping probabilities at specified
+  `theta` values. Diagnostic plots have descriptive type names. The
+  methods follow Brannath and Bauer (2004)
+  [doi:10.1111/j.0006-341X.2004.00221.x](https://doi.org/10.1111/j.0006-341X.2004.00221.x)
+  and Brannath et al. (2024)
+  [doi:10.48550/arXiv.2402.00814](https://doi.org/10.48550/arXiv.2402.00814),
+  also available in [optconerrf on
+  CRAN](https://CRAN.R-project.org/package=optconerrf). The new vignette
+  `rpact_optimal_conditional_error` and expanded help examples cover
+  trial decisions, information constraints, interim estimates, weighted
+  alternatives, and conditional power functions.
 
 ### Improvements, issues, and changes
 
@@ -95,9 +130,15 @@
 - [`getSampleSizeCounts()`](https://docs.rpact.org/reference/getSampleSizeCounts.md):
   field ‘expectedStudyDurationH1’ in result object was replaced by
   ‘studyDuration’, i.e., ‘expectedStudyDurationH1’ is deprecated
+- In all simulation raw data, the `armNumber` column was renamed to
+  `activeArm`
 - For consistency with other result objects, the `direction` field in
   [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md)
   result objects was renamed to `directionUpper`.
+- Error and warning context now identifies diagnostic situations with
+  stable IDs and factual metadata. Authored explanations and corrective
+  instructions are maintained separately by consuming applications;
+  ordinary condition messages remain unchanged.
 
 ## rpact 4.4.0
 
@@ -1156,3 +1197,13 @@ CRAN release: 2019-05-28
 CRAN release: 2018-10-30
 
 - First release of rpact
+
+### Optimal conditional error updates
+
+- Applied the constraint-related fixes from optconerrf 1.0.3: bounds now
+  enter the selection between competing conditional error solutions at
+  high conditional power, and infeasible integrated bounds are detected
+  before calibration.
+- Clarified that conditional power functions do not guarantee optimality
+  and that conditional power also limits the conditional error in the
+  continuation region.

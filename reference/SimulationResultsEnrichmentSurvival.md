@@ -247,6 +247,10 @@ to create an object of this type.
   The simulated success probabilities per stage where success is defined
   by user. Is a numeric matrix.
 
+- `thetaH0`:
+
+  The difference or assumed effect under H0. Is a single numeric value.
+
 - `thetaH1`:
 
   The assumed effect under the alternative hypothesis. For survival

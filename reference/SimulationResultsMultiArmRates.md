@@ -213,3 +213,7 @@ to create an object of this type.
 
   The shape of the dose-response relationship over the treatment groups.
   Is a single character value.
+
+- `thetaH0`:
+
+  The difference or assumed effect under H0. Is a single numeric value.

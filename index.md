@@ -50,8 +50,8 @@ simulation, and analysis:
 
 - Power and operating-characteristic simulations for means, rates,
   survival data, and count data
-- Assessment of sample size or event-number recalculations based on
-  conditional power
+- Assessment of adaptive sample size or event-number reassessment based
+  on conditional power
 - Multi-stage adaptive hypothesis testing based on the combination
   testing principle
 - Assessment of treatment selection strategies in multi-arm trials,

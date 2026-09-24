@@ -4,12 +4,16 @@ and expected sample size for testing hazard ratios in an enrichment design testi
 Depending on simulationType, either a patient-wise survival simulation is performed
 or normally distributed log-rank test statistics are simulated. The default
 simulationType = "auto" chooses the simulation approach automatically based on
-the explicitly specified arguments.'><meta property="og:description" content='Returns the simulated power, stopping and selection probabilities, conditional power,
+the explicitly specified arguments.
+The null hypothesis is defined by the hazard ratio thetaH0; values other
+than 1 can be used, for example, to simulate non-inferiority designs.'><meta property="og:description" content='Returns the simulated power, stopping and selection probabilities, conditional power,
 and expected sample size for testing hazard ratios in an enrichment design testing situation.
 Depending on simulationType, either a patient-wise survival simulation is performed
 or normally distributed log-rank test statistics are simulated. The default
 simulationType = "auto" chooses the simulation approach automatically based on
-the explicitly specified arguments.'><meta property="og:image" content="https://docs.rpact.org/logo.png"><meta name="keywords" content="rpact, adaptive designs, clinical trials, simulation, analysis, rstats, Shiny, r-project, R package"><link href="reference/figures/favicon.ico" rel="icon"><link href="reference/figures/favicon.ico" rel="apple-touch-icon"><link href="reference/figures/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"></head><body>
+the explicitly specified arguments.
+The null hypothesis is defined by the hazard ratio thetaH0; values other
+than 1 can be used, for example, to simulate non-inferiority designs.'><meta property="og:image" content="https://docs.rpact.org/logo.png"><meta name="keywords" content="rpact, adaptive designs, clinical trials, simulation, analysis, rstats, Shiny, r-project, R package"><link href="reference/figures/favicon.ico" rel="icon"><link href="reference/figures/favicon.ico" rel="apple-touch-icon"><link href="reference/figures/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -17,7 +21,7 @@ the explicitly specified arguments.'><meta property="og:image" content="https://
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9321</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +56,9 @@ and expected sample size for testing hazard ratios in an enrichment design testi
 <p>Depending on <code>simulationType</code>, either a patient-wise survival simulation is performed
 or normally distributed log-rank test statistics are simulated. The default
 <code>simulationType = "auto"</code> chooses the simulation approach automatically based on
-the explicitly specified arguments.</p>
+the explicitly specified arguments.
+The null hypothesis is defined by the hazard ratio <code>thetaH0</code>; values other
+than 1 can be used, for example, to simulate non-inferiority designs.</p>
     </div>
 
     <div class="section level2">
@@ -60,6 +66,7 @@ the explicitly specified arguments.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getSimulationEnrichmentSurvival</span><span class="op">(</span></span>
 <span>  design <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  thetaH0 <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  simulationType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"patientWise"</span>, <span class="st">"testStatisticBased"</span>, <span class="st">"patientWiseBasic"</span><span class="op">)</span>,</span>
 <span>  effectList <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  kappa <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -109,6 +116,22 @@ and <code>sided</code> can be directly entered as argument where necessary.</p><
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.</p></dd>
+
+
+<dt id="arg-thetah-">thetaH0<a class="anchor" aria-label="anchor" href="#arg-thetah-"></a></dt>
+<dd><p>The null hypothesis value,
+default is <code>0</code> for general estimates, the normal case, and the binary case,
+it is <code>1</code> for the survival case (testing the hazard ratio).<br><br>
+For non-inferiority designs, <code>thetaH0</code> is the non-inferiority bound.
+That is, in case of (one-sided) testing of</p><ul><li><p><em>general estimates</em>: a value on the scale of the supplied estimates can be specified.</p></li>
+<li><p><em>means</em>: a value <code>!= 0</code>
+(or a value <code>!= 1</code> for testing the mean ratio) can be specified.</p></li>
+<li><p><em>rates</em>: a value <code>!= 0</code>
+(or a value <code>!= 1</code> for testing the risk ratio <code>pi1 / pi2</code>) can be specified.</p></li>
+<li><p><em>survival data</em>: a bound for testing H0: <code>hazard ratio = thetaH0 != 1</code> can be specified.</p></li>
+<li><p><em>count data</em>: a bound for testing H0: <code>lambda1 / lambda2 = thetaH0 != 1</code> can be specified.</p></li>
+</ul><p>For testing a rate in one sample, a value <code>thetaH0</code> in (0, 1) has to be specified for
+defining the null hypothesis H0: <code>pi = thetaH0</code>.</p></dd>
 
 
 <dt id="arg-simulationtype">simulationType<a class="anchor" aria-label="anchor" href="#arg-simulationtype"></a></dt>
@@ -362,6 +385,7 @@ The function might depend on the variables
 <code>selectedPopulations</code>,
 <code>plannedEvents</code>,
 <code>directionUpper</code>,
+<code>thetaH0</code>,
 <code>allocationRatioPlanned</code>,
 <code>minNumberOfEventsPerStage</code>,
 <code>maxNumberOfEventsPerStage</code>,
@@ -421,6 +445,18 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 <span class="r-in"><span>    maxNumberOfEventsPerStage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">150</span>, <span class="fl">30</span><span class="op">)</span>, thetaH1 <span class="op">=</span> <span class="fl">4</span> <span class="op">/</span> <span class="fl">3</span>,</span></span>
 <span class="r-in"><span>    maxNumberOfIterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">simResultsPE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Non-inferiority in the full population (H0: hazard ratio = 1.2)</span></span></span>
+<span class="r-in"><span><span class="va">effectListNonInferiority</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    subGroups <span class="op">=</span> <span class="st">"F"</span>, prevalences <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>    hazardRatios <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, piControls <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">simulationResultsNonInferiority</span> <span class="op">&lt;-</span> <span class="fu">getSimulationEnrichmentSurvival</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    design <span class="op">=</span> <span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span>sided <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, thetaH0 <span class="op">=</span> <span class="fl">1.2</span>,</span></span>
+<span class="r-in"><span>    directionUpper <span class="op">=</span> <span class="cn">FALSE</span>, effectList <span class="op">=</span> <span class="va">effectListNonInferiority</span>,</span></span>
+<span class="r-in"><span>    plannedEvents <span class="op">=</span> <span class="fl">80</span>, allocationRatioPlanned <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfSubjects <span class="op">=</span> <span class="fl">400</span>, accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fl">20</span>, maxNumberOfIterations <span class="op">=</span> <span class="fl">50</span>,</span></span>
+<span class="r-in"><span>    simulationType <span class="op">=</span> <span class="st">"patientWise"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

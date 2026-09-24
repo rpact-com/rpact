@@ -7,16 +7,21 @@
 - **Friedrich Pahlke**. Author, maintainer.
   [](https://orcid.org/0000-0003-2105-2582)
 
-- **Till Jensen**. Contributor.
-
 - **Daniel Sabanes Bove**. Contributor.
   [](https://orcid.org/0000-0002-0176-9239)
+
+- **Till Jensen**. Contributor.
 
 - **Stephen Schueuerhuis**. Contributor.
   [](https://orcid.org/0009-0006-3124-6056)
 
 - **Tobias Muetze**. Contributor.
   [](https://orcid.org/0000-0002-4111-1941)
+
+- **Morton Dreher**. Contributor.
+
+- **Werner Brannath**. Contributor.
+  [](https://orcid.org/0000-0002-8622-3904)
 
 - **RPACT GmbH**. Copyright holder, funder.
 
@@ -26,14 +31,14 @@ Source:
 [`inst/CITATION`](https://github.com/rpact-com/rpact/blob/main/inst/CITATION)
 
 Wassmer G, Pahlke F (2026). rpact: Confirmatory Adaptive Clinical Trial
-Design and Analysis. R package version 4.5.0.9317.
+Design and Analysis. R package version 4.5.0.9321.
 doi:10.32614/CRAN.package.rpact
 
     @Manual{,
       title = {rpact: Confirmatory Adaptive Clinical Trial Design and Analysis},
       author = {Gernot Wassmer and Friedrich Pahlke},
       year = {2026},
-      note = {R package version 4.5.0.9317},
+      note = {R package version 4.5.0.9321},
       doi = {10.32614/CRAN.package.rpact},
       url = {https://CRAN.R-project.org/package=rpact},
     }

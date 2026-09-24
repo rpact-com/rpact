@@ -8,7 +8,9 @@ Depending on `simulationType`, either a patient-wise survival simulation
 is performed, a patient-wise basic approximation is used, or normally
 distributed log-rank test statistics are simulated. The default
 `simulationType = "auto"` chooses the simulation approach automatically
-based on the explicitly specified arguments.
+based on the explicitly specified arguments. The null hypothesis is
+defined by the hazard ratio `thetaH0`; values other than 1 can be used,
+for example, to simulate non-inferiority designs.
 
 ## Usage
 
@@ -17,11 +19,12 @@ getSimulationMultiArmSurvival(
   design = NULL,
   ...,
   simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+  thetaH0 = 1,
   activeArms = NA_integer_,
   piControl = NA_real_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
-  omegaMaxVector = seq(1, 2.6, 0.4),
+  omegaMaxVector = NA_real_,
   kappa = 1,
   gED50 = NA_real_,
   slope = 1,
@@ -85,6 +88,33 @@ getSimulationMultiArmSurvival(
   provided, a patient-wise simulation approach is used; otherwise the
   test-statistic-based simulation is used for backward compatibility.
 
+- thetaH0:
+
+  The null hypothesis value, default is `0` for general estimates, the
+  normal case, and the binary case, it is `1` for the survival case
+  (testing the hazard ratio).  
+    
+  For non-inferiority designs, `thetaH0` is the non-inferiority bound.
+  That is, in case of (one-sided) testing of
+
+  - *general estimates*: a value on the scale of the supplied estimates
+    can be specified.
+
+  - *means*: a value `!= 0` (or a value `!= 1` for testing the mean
+    ratio) can be specified.
+
+  - *rates*: a value `!= 0` (or a value `!= 1` for testing the risk
+    ratio `pi1 / pi2`) can be specified.
+
+  - *survival data*: a bound for testing H0:
+    `hazard ratio = thetaH0 != 1` can be specified.
+
+  - *count data*: a bound for testing H0:
+    `lambda1 / lambda2 = thetaH0 != 1` can be specified.
+
+  For testing a rate in one sample, a value `thetaH0` in (0, 1) has to
+  be specified for defining the null hypothesis H0: `pi = thetaH0`.
+
 - activeArms:
 
   The number of active treatment arms to be compared with control,
@@ -115,7 +145,7 @@ getSimulationMultiArmSurvival(
 - omegaMaxVector:
 
   Range of hazard ratios with highest response for `"linear"` and
-  `"sigmoidEmax"` model, default is `seq(1, 2.6, 0.4)`.
+  `"sigmoidEmax"` model, default is `seq(1, 0.4, -0.2)`.
 
 - kappa:
 
@@ -419,7 +449,7 @@ The definition of `thetaH1` makes only sense if `kMax` \> 1 and if
 This function returns the number of events at given conditional power
 and conditional critical value for specified testing situation. The
 function might depend on the variables `stage`, `selectedArms`,
-`plannedEvents`, `directionUpper`, `allocationRatioPlanned`,
+`plannedEvents`, `directionUpper`, `thetaH0`, `allocationRatioPlanned`,
 `minNumberOfEventsPerStage`, `maxNumberOfEventsPerStage`,
 `conditionalPower`, `conditionalCriticalValue`, and `overallEffects`.
 The function has to contain the three-dots argument '...' (see
@@ -474,5 +504,15 @@ y2$rejectAtLeastOne
 
 y1$selectedArms
 y2$selectedArms
+
+# Non-inferiority with one active arm (H0: hazard ratio = 1.2)
+simulationResultsNonInferiority <- getSimulationMultiArmSurvival(
+    design = getDesignFixed(sided = 1), thetaH0 = 1.2,
+    directionUpper = FALSE, activeArms = 1,
+    typeOfShape = "userDefined", effectMatrix = matrix(1),
+    piControl = 0.3, plannedEvents = 80,
+    allocationRatioPlanned = 1, maxNumberOfSubjects = 400,
+    accrualTime = c(0, 20), accrualIntensity = 20,
+    maxNumberOfIterations = 50, simulationType = "patientWise")
 } # }
 ```

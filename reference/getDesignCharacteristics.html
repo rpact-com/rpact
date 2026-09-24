@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9317</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9321</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,9 @@
 
 
 <dl><dt id="arg-design">design<a class="anchor" aria-label="anchor" href="#arg-design"></a></dt>
-<dd><p>The trial design.</p></dd>
+<dd><p>A conventional <code>TrialDesign</code> object or an optimal conditional
+error design created with <code><a href="getDesignOptimalConditionalError.html">getDesignOptimalConditionalError()</a></code>. If omitted,
+a default conventional design is created.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -60,7 +62,15 @@ that a warning will be displayed if unknown arguments are passed.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns a <code><a href="TrialDesignCharacteristics.html">TrialDesignCharacteristics</a></code> object.
+    <p>For an optimal conditional error design, a
+<code>TrialDesignOptimalConditionalErrorCharacteristics</code> parameter set with
+<code>theta</code>, <code>overallReject</code>, <code>rejectPerStage</code> (two rows, one per stage), and
+<code>futilityPerStage</code> (one row for interim futility). Matrix columns correspond
+to entries in <code>theta</code>, including for a single effect. Final non-rejection
+is not counted as early futility. <code>overallReject</code> is overall power under
+an alternative and the type I error probability at <code>theta = 0</code>.
+See <code><a href="getDesignOptimalConditionalError.html">getDesignOptimalConditionalError()</a></code> for the method and its assumptions.</p>
+<p>For conventional designs, returns a <code><a href="TrialDesignCharacteristics.html">TrialDesignCharacteristics</a></code> object.
 The following generics (R generic functions) are available for this result object:</p><ul><li><p><code><a href="names.FieldSet.html">names()</a></code> to obtain the field names,</p></li>
 <li><p><code><a href="print.FieldSet.html">print()</a></code> to print the object,</p></li>
 <li><p><code><a href="summary.ParameterSet.html">summary()</a></code> to display a summary of the object,</p></li>
@@ -75,6 +85,9 @@ to coerce the object to a <code><a href="https://rdrr.io/r/base/data.frame.html"
 the expected reduction in sample size under H1, under H0, and under a value in between H0 and H1.
 Furthermore, absolute information values are calculated
 under the prototype case testing H0: mu = 0 against H1: mu = 1.</p>
+<p>For an optimal conditional error design, supply <code>theta</code> through <code>...</code> as a
+finite numeric vector of treatment effects on the mean difference scale.
+The design is evaluated at those effects without recalibration.</p>
     </div>
     <div class="section level2">
     <h2 id="how-to-get-help-for-generic-functions">How to get help for generic functions<a class="anchor" aria-label="anchor" href="#how-to-get-help-for-generic-functions"></a></h2>
@@ -89,8 +102,15 @@ There you can find, e.g., <code>plot.AnalysisResults</code> and
 obtain the specific help documentation linked above by typing <code><a href="plot.AnalysisResults.html">?plot.AnalysisResults</a></code>.</p>
     </div>
     <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Brannath, W. &amp; Bauer, P. (2004). Optimal conditional error functions for the control of conditional power. Biometrics, 60(3), 715-723. <a href="https://doi.org/10.1111/j.0006-341X.2004.00221.x" class="external-link">doi:10.1111/j.0006-341X.2004.00221.x</a></p>
+<p>Brannath, W., zur Verth, J., Dreher, M. &amp; Scharpenberg, M. (2024; revised 2026). Optimal monotone conditional error functions. <a href="https://doi.org/10.48550/arXiv.2402.00814" class="external-link">doi:10.48550/arXiv.2402.00814</a></p>
+<p>The related R package <a href="https://CRAN.R-project.org/package=optconerrf" class="external-link">optconerrf: Optimal Monotone Conditional Error Functions</a> provides a standalone implementation of this methodology. The rpact implementation uses rpact design objects and interfaces; optconerrf is not required to run these functions.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other design functions:
+    <div class="dont-index"><p><a href="https://www.rpact.org/vignettes/planning/rpact_optimal_conditional_error/" class="external-link">Optimal Conditional Error Designs with rpact</a> for a worked example with stopping rules, information constraints, interim estimates, and conditional power functions.</p>
+<p>Other design functions:
 <code><a href="getDesignConditionalDunnett.html">getDesignConditionalDunnett()</a></code>,
 <code><a href="getDesignFisher.html">getDesignFisher()</a></code>,
 <code><a href="getDesignFixed.html">getDesignFixed()</a></code>,
@@ -102,7 +122,23 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDesignOptimalConditionalError.html">getDesignOptimalConditionalError</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    alpha <span class="op">=</span> <span class="fl">0.025</span>, efficacyBounds <span class="op">=</span> <span class="fl">0.001</span>, futilityBounds <span class="op">=</span> <span class="fl">0.5</span>, conditionalPower <span class="op">=</span> <span class="fl">0.9</span>,</span></span>
+<span class="r-in"><span>    thetaH1 <span class="op">=</span> <span class="fl">0.5</span>, useInterimEstimate <span class="op">=</span> <span class="cn">FALSE</span>, firstStageInformation <span class="op">=</span> <span class="fl">4</span>,</span></span>
+<span class="r-in"><span>    likelihoodRatioDistribution <span class="op">=</span> <span class="st">"maxlr"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">getDesignCharacteristics</span><span class="op">(</span><span class="va">design</span>, theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Effect                      : 0.00, 0.25, 0.50 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Operating characteristics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall reject              : 0.0250, 0.2927, 0.7590 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Reject per stage [1]        : 0.001000, 0.004796, 0.018298 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Reject per stage [2]        : 0.024000, 0.287861, 0.740742 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Futility stop per stage     : 0.5000, 0.3085, 0.1587 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># Calculate design characteristics for a three-stage O'Brien &amp; Fleming </span></span></span>
 <span class="r-in"><span><span class="co"># design at power 90% and compare it with Pocock's design.  </span></span></span>
 <span class="r-in"><span><span class="fu">getDesignCharacteristics</span><span class="op">(</span><span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>beta <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span></span>

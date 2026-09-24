@@ -31,6 +31,7 @@ getSimulationMultiArmMeans(
   minNumberOfSubjectsPerStage = NA_real_,
   maxNumberOfSubjectsPerStage = NA_real_,
   conditionalPower = NA_real_,
+  thetaH0 = C_THETA_H0_MEANS_DEFAULT,
   thetaH1 = NA_real_,
   stDevH1 = NA_real_,
   maxNumberOfIterations = NA_integer_,
@@ -217,6 +218,33 @@ getSimulationMultiArmMeans(
   (for simulating rates), or `thetaH1` (for simulating hazard ratios) as
   parameters under which it is calculated and the sample size
   recalculation is performed.
+
+- thetaH0:
+
+  The null hypothesis value, default is `0` for general estimates, the
+  normal case, and the binary case, it is `1` for the survival case
+  (testing the hazard ratio).  
+    
+  For non-inferiority designs, `thetaH0` is the non-inferiority bound.
+  That is, in case of (one-sided) testing of
+
+  - *general estimates*: a value on the scale of the supplied estimates
+    can be specified.
+
+  - *means*: a value `!= 0` (or a value `!= 1` for testing the mean
+    ratio) can be specified.
+
+  - *rates*: a value `!= 0` (or a value `!= 1` for testing the risk
+    ratio `pi1 / pi2`) can be specified.
+
+  - *survival data*: a bound for testing H0:
+    `hazard ratio = thetaH0 != 1` can be specified.
+
+  - *count data*: a bound for testing H0:
+    `lambda1 / lambda2 = thetaH0 != 1` can be specified.
+
+  For testing a rate in one sample, a value `thetaH0` in (0, 1) has to
+  be specified for defining the null hypothesis H0: `pi = thetaH0`.
 
 - thetaH1:
 

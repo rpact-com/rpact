@@ -7,7 +7,9 @@ an enrichment design testing situation.
 Depending on `simulationType`, either a patient-wise survival simulation
 is performed or normally distributed log-rank test statistics are
 simulated. The default `simulationType = "auto"` chooses the simulation
-approach automatically based on the explicitly specified arguments.
+approach automatically based on the explicitly specified arguments. The
+null hypothesis is defined by the hazard ratio `thetaH0`; values other
+than 1 can be used, for example, to simulate non-inferiority designs.
 
 ## Usage
 
@@ -15,6 +17,7 @@ approach automatically based on the explicitly specified arguments.
 getSimulationEnrichmentSurvival(
   design = NULL,
   ...,
+  thetaH0 = 1,
   simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
   effectList = NULL,
   kappa = 1,
@@ -64,6 +67,33 @@ getSimulationEnrichmentSurvival(
 
   Ensures that all arguments (starting from the "...") are to be named
   and that a warning will be displayed if unknown arguments are passed.
+
+- thetaH0:
+
+  The null hypothesis value, default is `0` for general estimates, the
+  normal case, and the binary case, it is `1` for the survival case
+  (testing the hazard ratio).  
+    
+  For non-inferiority designs, `thetaH0` is the non-inferiority bound.
+  That is, in case of (one-sided) testing of
+
+  - *general estimates*: a value on the scale of the supplied estimates
+    can be specified.
+
+  - *means*: a value `!= 0` (or a value `!= 1` for testing the mean
+    ratio) can be specified.
+
+  - *rates*: a value `!= 0` (or a value `!= 1` for testing the risk
+    ratio `pi1 / pi2`) can be specified.
+
+  - *survival data*: a bound for testing H0:
+    `hazard ratio = thetaH0 != 1` can be specified.
+
+  - *count data*: a bound for testing H0:
+    `lambda1 / lambda2 = thetaH0 != 1` can be specified.
+
+  For testing a rate in one sample, a value `thetaH0` in (0, 1) has to
+  be specified for defining the null hypothesis H0: `pi = thetaH0`.
 
 - simulationType:
 
@@ -365,7 +395,7 @@ The definition of `thetaH1` makes only sense if `kMax` \> 1 and if
 This function returns the number of events at given conditional power
 and conditional critical value for specified testing situation. The
 function might depend on the variables `stage`, `selectedPopulations`,
-`plannedEvents`, `directionUpper`, `allocationRatioPlanned`,
+`plannedEvents`, `directionUpper`, `thetaH0`, `allocationRatioPlanned`,
 `minNumberOfEventsPerStage`, `maxNumberOfEventsPerStage`,
 `conditionalPower`, `conditionalCriticalValue`, and `overallEffects`.
 The function has to contain the three-dots argument '...' (see
@@ -422,5 +452,17 @@ simResultsPE <- getSimulationEnrichmentSurvival(design,
     maxNumberOfEventsPerStage = c(NA, 150, 30), thetaH1 = 4 / 3,
     maxNumberOfIterations = 100)
 print(simResultsPE)
+
+# Non-inferiority in the full population (H0: hazard ratio = 1.2)
+effectListNonInferiority <- list(
+    subGroups = "F", prevalences = 1,
+    hazardRatios = matrix(1), piControls = 0.3)
+simulationResultsNonInferiority <- getSimulationEnrichmentSurvival(
+    design = getDesignFixed(sided = 1), thetaH0 = 1.2,
+    directionUpper = FALSE, effectList = effectListNonInferiority,
+    plannedEvents = 80, allocationRatioPlanned = 1,
+    maxNumberOfSubjects = 400, accrualTime = c(0, 20),
+    accrualIntensity = 20, maxNumberOfIterations = 50,
+    simulationType = "patientWise")
 } # }
 ```

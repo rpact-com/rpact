@@ -239,6 +239,10 @@ to create an object of this type.
   The study duration for specified effect size. Is a positive numeric
   vector.
 
+- `thetaH0`:
+
+  The difference or assumed effect under H0. Is a single numeric value.
+
 - `successPerStage`:
 
   The simulated success probabilities per stage where success is defined
