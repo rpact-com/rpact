@@ -227,14 +227,7 @@ NULL
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
             functionName = ".getStageResultsMeansEnrichment",
             parameter = "gMax", value = gMax,
-            reason = paste0(
-                "The implemented Spiessens-Debois intersection test is restricted to one subset and the full ",
-                "population."
-            ),
-            userInstructions = paste0(
-                "Use a supported intersection test for the intended number of populations; reduce the ",
-                "population set only if it matches the trial objectives."
-            )
+            diagnosticId = "enrichment.spiessens_debois_population_limit"
         )
     }
     if (varianceOption == "pooledFromFull") {
@@ -242,11 +235,7 @@ NULL
             stopIllegalArgument("gMax (", gMax, ") > 2: varianceOption 'pooledFromFull' can only be used for one subset",
                 functionName = ".getStageResultsMeansEnrichment",
                 parameter = "pooledFromFull",
-                reason = "pooledFromFull is implemented only for the full population and one subset.",
-                userInstructions = paste0(
-                    "Choose a varianceOption supported for the intended number of populations, or use one ",
-                    "subset only if scientifically intended."
-                )
+                diagnosticId = "enrichment.pooled_variance_population_limit"
             )
         }
     }
@@ -256,14 +245,7 @@ NULL
             "residual (stratified) variance from full population,\n\t\t\t select 'varianceOption' = \"pooledFromFull\"",
             parameter = "varianceOption", value = varianceOption, constraint = "pooledFromFull",
             functionName = ".getStageResultsMeansEnrichment",
-            reason = paste0(
-                "The implemented Spiessens-Debois t test needs the pooled residual variance from the full ",
-                "population."
-            ),
-            userInstructions = paste0(
-                "Set varianceOption = \"pooledFromFull\" if this is the intended variance model, or choose a ",
-                "compatible intersection test."
-            )
+            diagnosticId = "enrichment.spiessens_debois_variance"
         )
     }
 
@@ -272,11 +254,7 @@ NULL
             "residual (stratified) variance from full population,\n\t\t\tselect 'stratifiedAnalysis' = TRUE",
             parameter = "stratifiedAnalysis", value = stratifiedAnalysis, constraint = TRUE,
             functionName = ".getStageResultsMeansEnrichment",
-            reason = "The implemented Spiessens-Debois t test requires stratified analysis.",
-            userInstructions = paste0(
-                "Set stratifiedAnalysis = TRUE with appropriate stratified data, or choose an intersection test ",
-                "compatible with the intended analysis."
-            )
+            diagnosticId = "enrichment.spiessens_debois_stratification"
         )
     }
 
@@ -1158,10 +1136,7 @@ NULL
                 sQuote("assumedStDevs"), " will be ignored because ",
                 sQuote("stDevsH1"), " is defined",
                 parameter = "assumedStDevs",
-                userInstructions = paste0(
-                    "Use stDevsH1 for the alternative standard deviations, or remove stDevsH1 if assumedStDevs ",
-                    "is intended."
-                )
+                diagnosticId = "analysis.alternative_standard_deviations_overridden"
             )
         }
         assumedStDevs <- stDevsH1
@@ -1266,11 +1241,7 @@ NULL
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalPowerMeansEnrichment",
         parameter = "design",
-        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
-        userInstructions = paste0(
-            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-            "supporting the intended design. Do not change the object class manually."
-        )
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1464,10 +1435,7 @@ NULL
                 if (result <= 0 || result >= 1) {
                     warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ",
                         kMax,
-                        userInstructions = paste0(
-                            "Check the stage data, design boundaries and planned future sample sizes/events; ",
-                            "conditional power for the reported stage could not be calculated."
-                        )
+                        diagnosticId = "analysis.conditional_power_calculation_failed"
                     )
                     results$conditionalPower[population, kMax] <- NA_real_
                 } else {

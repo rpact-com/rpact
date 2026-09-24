@@ -247,12 +247,7 @@ getSimulationMeans <- function(
     if (design$sided == 2) {
         stopIllegalArgument("only one-sided case is implemented for the simulation design",
             functionName = "getSimulationMeans",
-            reason = "The selected procedure is implemented only for one-sided testing.",
-            userInstructions = paste0(
-                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
-                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
-                "error."
-            )
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
 
@@ -265,10 +260,7 @@ getSimulationMeans <- function(
                 relatedParameter = "groups",
                 relatedValue = groups,
                 constraint = "groups must be 2",
-                userInstructions = paste0(
-                    "Set groups = 2 if a two-group comparison is intended, or remove this argument after ",
-                    "confirming the one-group design."
-                )
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         if (!is.na(allocationRatioPlanned)) {
@@ -279,10 +271,7 @@ getSimulationMeans <- function(
                 relatedParameter = "groups",
                 relatedValue = groups,
                 constraint = "groups must be 2",
-                userInstructions = paste0(
-                    "Set groups = 2 if a two-group comparison is intended, or remove this argument after ",
-                    "confirming the one-group design."
-                )
+                diagnosticId = "planning.two_group_argument_ignored"
             )
             simulationResults$allocationRatioPlanned <- NA_real_
         }
@@ -334,10 +323,7 @@ getSimulationMeans <- function(
             "'calcSubjectsFunction' is defined",
             parameter = "stDevH1",
             value = stDevH1,
-            userInstructions = paste0(
-                "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or remove ",
-                "this argument after confirming reassessment is not intended."
-            )
+            diagnosticId = "simulation.argument_requires_subject_reassessment"
         )
     }
     conditionalPower <- .ignoreParameterIfNotUsed(
@@ -378,11 +364,7 @@ getSimulationMeans <- function(
                 functionName = "getSimulationMeans",
                 parameter = "maxNumberOfSubjectsPerStage",
                 value = maxNumberOfSubjectsPerStage,
-                reason = "At least one per-stage maximum sample size is below its corresponding minimum.",
-                userInstructions = paste0(
-                    "Check the stage order and units of minNumberOfSubjectsPerStage and ",
-                    "maxNumberOfSubjectsPerStage; make each minimum no greater than its corresponding maximum."
-                )
+                diagnosticId = "simulation.subject_bounds_inverted"
             )
         }
         .setValueAndParameterType(
@@ -410,10 +392,7 @@ getSimulationMeans <- function(
                 "'calcSubjectsFunction' is defined",
                 parameter = "minNumberOfSubjectsPerStage",
                 value = minNumberOfSubjectsPerStage,
-                userInstructions = paste0(
-                    "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or ",
-                    "remove this argument after confirming reassessment is not intended."
-                )
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$minNumberOfSubjectsPerStage <- NA_real_
         }
@@ -425,10 +404,7 @@ getSimulationMeans <- function(
                 "'calcSubjectsFunction' is defined",
                 parameter = "maxNumberOfSubjectsPerStage",
                 value = maxNumberOfSubjectsPerStage,
-                userInstructions = paste0(
-                    "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or ",
-                    "remove this argument after confirming reassessment is not intended."
-                )
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$maxNumberOfSubjectsPerStage <- NA_real_
         }

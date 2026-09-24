@@ -596,10 +596,7 @@ plot.NumberOfSubjects <- function(
             "(for more information see ?plot.NumberOfSubjects)",
             parameter = "allocationRatioPlanned",
             value = allocationRatioPlanned,
-            userInstructions = paste0(
-                "Supply y if an allocation ratio is needed for this plot, or remove allocationRatioPlanned ",
-                "after confirming that y should be omitted."
-            )
+            diagnosticId = "plot.allocation_requires_y"
         )
     }
 

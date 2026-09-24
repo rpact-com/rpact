@@ -25,10 +25,7 @@ NULL
         warnArgumentIgnored("'pi2' (", .arrayToString(piValue), ") will be ignored ",
             "because piecewise exponential survival function is enabled",
             parameter = "pi2",
-            userInstructions = paste0(
-                "Use the piecewise hazards to specify survival, or change the survival model if event ",
-                "probabilities at a single event time are intended."
-            )
+            diagnosticId = "survival.probabilities_ignored_for_piecewise_hazards"
         )
         designPlan[[piValueName]] <- NA_real_
     }
@@ -350,12 +347,7 @@ getSimulationSurvival <- function(
     if (design$sided == 2) {
         stopIllegalArgument("Only one-sided case is implemented for the survival simulation design",
             functionName = "getSimulationSurvival",
-            reason = "The selected procedure is implemented only for one-sided testing.",
-            userInstructions = paste0(
-                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
-                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
-                "error."
-            )
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
     if (!all(is.na(lambda2)) && !all(is.na(lambda1)) &&
@@ -375,10 +367,7 @@ getSimulationSurvival <- function(
             "because 'lambda2' (", .arrayToString(lambda2), ") is undefined",
             parameter = "lambda1",
             value = lambda1,
-            userInstructions = paste0(
-                "Provide lambda2 to use lambda1, or remove lambda1 after confirming the alternative survival ",
-                "parameterization."
-            )
+            diagnosticId = "survival.treatment_hazard_requires_control"
         )
         lambda1 <- NA_real_
     }
@@ -391,14 +380,7 @@ getSimulationSurvival <- function(
             relatedParameter = "lambda2",
             relatedValue = lambda2,
             value = piecewiseSurvivalTime,
-            reason = paste0(
-                "Separate hazard inputs cannot be combined with a list that already specifies piecewise ",
-                "survival parameters."
-            ),
-            userInstructions = paste0(
-                "Use a numeric piecewiseSurvivalTime vector with separate hazard vectors, or keep the ",
-                "self-contained list and remove redundant separate hazards."
-            )
+            diagnosticId = "survival.list_and_separate_hazards_conflict"
         )
     }
     thetaH1 <- .ignoreParameterIfNotUsed(
@@ -408,10 +390,7 @@ getSimulationSurvival <- function(
     if (is.na(conditionalPower) && !is.na(thetaH1)) {
         warnArgumentIgnored("'thetaH1' will be ignored because 'conditionalPower' is not defined",
             parameter = "thetaH1",
-            userInstructions = paste0(
-                "Specify conditionalPower if this alternative assumption should be used for reassessment; ",
-                "otherwise remove the unused argument."
-            )
+            diagnosticId = "simulation.alternative_requires_conditional_power"
         )
     }
     conditionalPower <- .ignoreParameterIfNotUsed(
@@ -456,11 +435,7 @@ getSimulationSurvival <- function(
                     functionName = "getSimulationSurvival",
                     parameter = "maxNumberOfEventsPerStage",
                     value = maxNumberOfEventsPerStage,
-                    reason = "At least one per-stage maximum event count is below its corresponding minimum.",
-                    userInstructions = paste0(
-                        "Check the stage order of minNumberOfEventsPerStage and maxNumberOfEventsPerStage; make ",
-                        "each minimum no greater than its corresponding maximum."
-                    )
+                    diagnosticId = "simulation.event_bounds_inverted"
                 )
             }
             .setValueAndParameterType(
@@ -651,11 +626,7 @@ getSimulationSurvival <- function(
                 value = longTimeSimulationAllowed,
                 constraint = "must be TRUE for simulations exceeding the long-time threshold",
                 functionName = "getSimulationSurvival",
-                reason = "The estimated simulation workload exceeds the limit while long simulations are disabled.",
-                userInstructions = paste0(
-                    "Reduce the requested workload if appropriate, or set longTimeSimulationAllowed = TRUE ",
-                    "after accepting the longer runtime."
-                )
+                diagnosticId = "simulation.long_runtime_disabled"
             )
         }
 
@@ -677,10 +648,7 @@ getSimulationSurvival <- function(
             "allocation1 = %s and allocation2 = %s was replaced by allocation1 = %s and allocation2 = %s",
             allocation1, allocation2, allocationFraction[1], allocationFraction[2]
         ),
-            userInstructions = paste0(
-                "Check the effective allocation1 and allocation2; supply the intended integer allocation ratio ",
-                "explicitly."
-            )
+            diagnosticId = "simulation.integer_allocation_adjusted"
         )
         allocation1 <- allocationFraction[1]
         allocation2 <- allocationFraction[2]
@@ -938,10 +906,7 @@ getSimulationSurvival <- function(
     if (is.null(simulationResults$expectedNumberOfEvents) ||
             length(simulationResults$expectedNumberOfEvents) == 0) {
         warnNumericalIssue("Failed to calculate expected number of events",
-            userInstructions = paste0(
-                "Check simulation event counts and survival/accrual assumptions before using expected event ",
-                "numbers."
-            )
+            diagnosticId = "simulation.expected_events_failed"
         )
     }
 
@@ -967,10 +932,7 @@ getSimulationSurvival <- function(
         if (length(missingStageNumbers) > 0) {
             warnResultUnavailable("Could not get rawData (individual results) for stages ",
                 .arrayToString(missingStageNumbers),
-                userInstructions = paste0(
-                    "Check that raw-data collection includes the requested stages; rerun with the required data ",
-                    "retained if individual results are needed."
-                )
+                diagnosticId = "simulation.raw_stage_data_unavailable"
             )
         }
     } else {
@@ -993,10 +955,7 @@ getSimulationSurvival <- function(
         if (maxNumberOfRawDatasetsPerStage > 0) {
             warnResultUnavailable("Could not get rawData (individual results) for stages ",
                 .arrayToString(stages),
-                userInstructions = paste0(
-                    "Check that raw-data collection includes the requested stages; rerun with the required data ",
-                    "retained if individual results are needed."
-                )
+                diagnosticId = "simulation.raw_stage_data_unavailable"
             )
         }
     }

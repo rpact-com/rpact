@@ -336,11 +336,7 @@ getSimulationCounts <- function(
                     ),
                     relatedValue = list(accrualTime = accrualTime, followUpTime = followUpTime),
                     functionName = "getSimulationCounts",
-                    reason = "The final planned analysis time must coincide with the end of accrual plus follow-up.",
-                    userInstructions = paste0(
-                        "Align the last plannedCalendarTime with max(accrualTime) + followUpTime, using ",
-                        "consistent time units and the intended final analysis schedule."
-                    )
+                    diagnosticId = "counts.final_calendar_time_mismatch"
                 )
             }
         }
@@ -349,11 +345,7 @@ getSimulationCounts <- function(
             "has no influence on simulation",
             parameter = "plannedCalendarTime",
             value = plannedCalendarTime,
-            reason = "The fixed design has no interim analyses, so plannedCalendarTime does not affect the simulation.",
-            userInstructions = paste0(
-                "Use a multi-stage design if planned calendar interim analyses are intended; otherwise remove ",
-                "plannedCalendarTime."
-            )
+            diagnosticId = "simulation.fixed_calendar_time_ignored"
         )
     }
 
@@ -817,10 +809,7 @@ getSimulationCounts <- function(
 
     warnNotValidated("The simulation count data feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
-        userInstructions = paste0(
-            "Validate this experimental feature independently for the intended use before relying on its ",
-            "results."
-        )
+        diagnosticId = "validation.experimental_feature"
     )
 
     return(simulationResults)

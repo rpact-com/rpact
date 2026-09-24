@@ -226,7 +226,7 @@ NULL
         warnRuntimeIssue(sQuote("packageSource"), " (", packageSource, ") does not exist",
             parameter = "packageSource",
             value = packageSource,
-            userInstructions = "Provide an existing packageSource path."
+            diagnosticId = "qa.package_source_missing"
         )
     }
 
@@ -315,10 +315,7 @@ NULL
                 if (result != 0) {
                     warnRuntimeIssue("'testthat.R' download result in ", result,
                         parameter = "testthat.R",
-                        userInstructions = paste0(
-                            "Check network access and the test download source, then retry and verify that all ",
-                            "required test files are available."
-                        )
+                        diagnosticId = "qa.test_download_failed"
                     )
                 }
             }
@@ -331,10 +328,7 @@ NULL
             )
             if (result != 0) {
                 warnRuntimeIssue("Unit test index file download result in ", result,
-                    userInstructions = paste0(
-                        "Check network access and the test download source, then retry and verify that all ",
-                        "required test files are available."
-                    )
+                    diagnosticId = "qa.test_download_failed"
                 )
             }
 
@@ -368,10 +362,7 @@ NULL
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
                     .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
-                    userInstructions = paste0(
-                        "Check network access and the test download source, then retry and verify that all ",
-                        "required test files are available."
-                    )
+                    diagnosticId = "qa.test_download_failed"
                 )
             } else {
                 message(
@@ -410,10 +401,7 @@ NULL
                     },
                     error = function(e) {
                         warnRuntimeIssue("Failed to remove unit test index file: ", e$message,
-                            userInstructions = paste0(
-                                "Check file access permissions and remove the temporary unit-test index file if ",
-                                "it remains."
-                            )
+                            diagnosticId = "qa.temporary_index_cleanup_failed"
                         )
                     }
                 )
@@ -451,10 +439,7 @@ NULL
                 if (result != 0) {
                     warnRuntimeIssue("'testthat.R' download result in ", result,
                         parameter = "testthat.R",
-                        userInstructions = paste0(
-                            "Check network access and the test download source, then retry and verify that all ",
-                            "required test files are available."
-                        )
+                        diagnosticId = "qa.test_download_failed"
                     )
                 }
             }
@@ -467,10 +452,7 @@ NULL
             )
             if (result != 0) {
                 warnRuntimeIssue("Unit test index file download result in ", result,
-                    userInstructions = paste0(
-                        "Check network access and the test download source, then retry and verify that all ",
-                        "required test files are available."
-                    )
+                    diagnosticId = "qa.test_download_failed"
                 )
             }
 
@@ -505,10 +487,7 @@ NULL
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
                     .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
-                    userInstructions = paste0(
-                        "Check network access and the test download source, then retry and verify that all ",
-                        "required test files are available."
-                    )
+                    diagnosticId = "qa.test_download_failed"
                 )
             } else {
                 message(
@@ -534,10 +513,7 @@ NULL
                     },
                     error = function(e) {
                         warnRuntimeIssue("Failed to remove unit test index file: ", e$message,
-                            userInstructions = paste0(
-                                "Check file access permissions and remove the temporary unit-test index file if ",
-                                "it remains."
-                            )
+                            diagnosticId = "qa.temporary_index_cleanup_failed"
                         )
                     }
                 )
@@ -1302,10 +1278,7 @@ testPackage <- function(
             "because it does not contain a 'testthat' subfolder",
             parameter = "testFileDirectory",
             value = testFileDirectory,
-            userInstructions = paste0(
-                "Point testFileDirectory to a directory containing a testthat subfolder, or omit it to use the ",
-                "configured download source."
-            )
+            diagnosticId = "qa.test_directory_ignored"
         )
         testFileDirectory <- NA_character_
     }
@@ -1343,10 +1316,7 @@ testPackage <- function(
         if (credentialsAvailable) {
             warnArgumentIgnored("The connection token and secret will be ignored ",
                 "because 'testFileDirectory' is defined",
-                userInstructions = paste0(
-                    "Use the local testFileDirectory without connection credentials, or omit testFileDirectory ",
-                    "if tests should be downloaded."
-                )
+                diagnosticId = "qa.credentials_ignored_for_local_tests"
             )
         }
         credentialsAvailable <- TRUE
@@ -1355,7 +1325,7 @@ testPackage <- function(
     if (executionMode == "downloadOnly") {
         if (testInstalledBasicPackages) {
             warnResultUnavailable("The test of installed R basic packages is not supported in 'downloadOnly' mode",
-                userInstructions = "Disable downloadOnly to run tests of installed R basic packages."
+                diagnosticId = "qa.basic_tests_download_only_unsupported"
             )
         }
         testInstalledBasicPackages <- FALSE
@@ -1837,10 +1807,7 @@ test_plan_section <- function(section) {
         },
         error = function(e) {
             warnRuntimeIssue("Failed to get the minimum number of expected tests: ", e$message,
-                userInstructions = paste0(
-                    "Resolve the reported test-metadata error before interpreting completeness of the ",
-                    "quality-assurance run."
-                )
+                diagnosticId = "qa.test_metadata_failed"
             )
         }
     )
@@ -2289,10 +2256,7 @@ MarkdownReporter <- R6::R6Class(
                 if (!dir.create(sourcePath)) {
                     warnRuntimeIssue("Failed to create directory ", sQuote(sourcePath), ". ",
                         "Source files will be saved to ", sQuote(outputPath), ".",
-                        userInstructions = paste0(
-                            "Check directory permissions; retrieve source files from the reported fallback ",
-                            "outputPath."
-                        )
+                        diagnosticId = "qa.source_output_fallback"
                     )
                     sourcePath <- outputPath
                 }
@@ -2318,10 +2282,7 @@ MarkdownReporter <- R6::R6Class(
                 error = function(e) {
                     warnRuntimeIssue("Failed to render ", sQuote(self$outputFile),
                         " to html: ", e$message,
-                        userInstructions = paste0(
-                            "Resolve the reported rendering error and check the rendering dependencies before ",
-                            "regenerating the report."
-                        )
+                        diagnosticId = "qa.report_render_failed"
                     )
                 }
             )
@@ -2354,10 +2315,7 @@ MarkdownReporter <- R6::R6Class(
                 },
                 error = function(e) {
                     warnRuntimeIssue("Failed to render ", sQuote(mdFileForTex), " to pdf: ", e$message,
-                        userInstructions = paste0(
-                            "Resolve the reported rendering error and check the rendering dependencies before ",
-                            "regenerating the report."
-                        )
+                        diagnosticId = "qa.report_render_failed"
                     )
                 }
             )

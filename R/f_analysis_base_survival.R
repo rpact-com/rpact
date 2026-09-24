@@ -1145,10 +1145,7 @@ NULL
         result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
         if (result <= 0 || result >= 1) {
             warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax,
-                userInstructions = paste0(
-                    "Check the stage data, design boundaries and planned future sample sizes/events; ",
-                    "conditional power for the reported stage could not be calculated."
-                )
+                diagnosticId = "analysis.conditional_power_calculation_failed"
             )
             conditionalPower[kMax] <- NA_real_
         } else {
@@ -1322,11 +1319,7 @@ NULL
     if (length(warningMessages) > 0) {
         for (m in warningMessages) {
             warnNumericalIssue(m,
-                reason = "A warning was raised while calculating conditional power or likelihood values for the plot.",
-                userInstructions = paste0(
-                    "Inspect the reported warning and the effect range, stage data and planned information used ",
-                    "for the conditional-power plot."
-                )
+                diagnosticId = "plot.conditional_power_calculation_warning"
             )
         }
     }

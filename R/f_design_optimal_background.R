@@ -288,11 +288,7 @@ NULL
             relatedParameter = c("maxConditionalError", "minInformationPerStage", "conditionalPower", "pValue"),
             relatedValue = list(maxConditionalError = design$maxConditionalError, minInformationPerStage = design$minInformationPerStage, conditionalPower = conditionalPower, pValue = pValue),
             functionName = ".getOptimalDesignConditionalErrorConstraints",
-            reason = "The combined conditional-error and second-stage-information bounds leave no feasible solution.",
-            userInstructions = paste0(
-                "Review the lower and upper constraints jointly at the reported first-stage p-value. Relax ",
-                "conflicting bounds only when consistent with the intended adaptation requirements."
-            )
+            diagnosticId = "optimal.infeasible_conditional_error_bounds"
         )
     }
 
@@ -342,15 +338,7 @@ NULL
                 relatedParameter = c("alpha", "efficacyBounds", "futilityBounds"),
                 relatedValue = c(alpha = design$alpha, efficacyBounds = design$efficacyBounds, futilityBounds = design$futilityBounds),
                 functionName = ".getOptimalDesignLevelConstant",
-                reason = paste0(
-                    "The conditional power specification does not permit a level constant exhausting the ",
-                    "requested alpha over the continuation region."
-                ),
-                userInstructions = paste0(
-                    "Review conditionalPower or conditionalPowerFunction together with efficacyBounds and futilityBounds. ",
-                    "Choose a feasible continuation region and power specification without changing the target ",
-                    "alpha merely to bypass the error."
-                )
+                diagnosticId = "optimal.conditional_power_cannot_exhaust_alpha"
             )
         }
     } else if (is.function(design$conditionalPowerFunction)) {
@@ -367,15 +355,7 @@ NULL
                 relatedParameter = c("alpha", "efficacyBounds", "futilityBounds"),
                 relatedValue = c(alpha = design$alpha, efficacyBounds = design$efficacyBounds, futilityBounds = design$futilityBounds),
                 functionName = ".getOptimalDesignLevelConstant",
-                reason = paste0(
-                    "The conditional power specification does not permit a level constant exhausting the ",
-                    "requested alpha over the continuation region."
-                ),
-                userInstructions = paste0(
-                    "Review conditionalPower or conditionalPowerFunction together with efficacyBounds and futilityBounds. ",
-                    "Choose a feasible continuation region and power specification without changing the target ",
-                    "alpha merely to bypass the error."
-                )
+                diagnosticId = "optimal.conditional_power_cannot_exhaust_alpha"
             )
         }
     } else {
@@ -417,11 +397,7 @@ NULL
                 relatedParameter = c("alpha", "efficacyBounds", "futilityBounds"),
                 relatedValue = c(alpha = design$alpha, efficacyBounds = design$efficacyBounds, futilityBounds = design$futilityBounds),
                 functionName = ".getOptimalDesignLevelConstant",
-                reason = "The integrated upper conditional-error bound is too low to attain the target alpha.",
-                userInstructions = paste0(
-                    "Consider increasing maxConditionalError or reducing minInformationPerStage if ",
-                    "allowed by the adaptation plan; otherwise revise the infeasible constraints."
-                )
+                diagnosticId = "optimal.upper_error_bound_too_strict"
             )
         }
         if (integrateBound(FALSE) > design$alpha + 1e-10) {
@@ -433,11 +409,7 @@ NULL
                 relatedParameter = c("alpha", "efficacyBounds", "futilityBounds"),
                 relatedValue = c(alpha = design$alpha, efficacyBounds = design$efficacyBounds, futilityBounds = design$futilityBounds),
                 functionName = ".getOptimalDesignLevelConstant",
-                reason = "The integrated lower conditional-error bound already exceeds the target alpha.",
-                userInstructions = paste0(
-                    "Consider decreasing minConditionalError or increasing maxInformationPerStage if ",
-                    "allowed by the adaptation plan; otherwise revise the infeasible constraints."
-                )
+                diagnosticId = "optimal.lower_error_bound_too_strict"
             )
         }
     }
@@ -466,12 +438,7 @@ NULL
                     relatedParameter = "alpha",
                     relatedValue = design$alpha,
                     functionName = ".getOptimalDesignLevelConstant",
-                    reason = "The level-constant root search failed within the specified interval and constraints.",
-                    userInstructions = paste0(
-                        "Check constraint feasibility first, then adjust minLevelConstant and ",
-                        "maxLevelConstant if the root lies outside the search interval; report persistent ",
-                        "failures with a reproducible example."
-                    )
+                    diagnosticId = "optimal.level_constant_root_failed"
                 )
             }
         }
@@ -526,11 +493,7 @@ NULL
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = design$likelihoodRatioDistribution,
                 functionName = ".getOptimalDesignLikelihoodRatio",
-                reason = "The fixed likelihood-ratio specification requires its effect value or support points.",
-                userInstructions = paste0(
-                    "Supply thetaLR for the intended fixed-effect specification; if another prior was intended, ",
-                    "correct likelihoodRatioDistribution instead."
-                )
+                diagnosticId = "optimal.fixed_prior_effect_missing"
             )
         }
 
@@ -554,11 +517,7 @@ NULL
                 relatedParameter = "thetaLR",
                 relatedValue = design$thetaLR,
                 functionName = ".getOptimalDesignLikelihoodRatio",
-                reason = "The fixed likelihood-ratio mixture needs valid probability weights for its support points.",
-                userInstructions = paste0(
-                    "Specify one finite nonnegative weightsLR value per thetaLR value, summing to 1; ",
-                    "choose weights that represent the intended mixture."
-                )
+                diagnosticId = "optimal.mixture_weights_invalid"
             )
         }
 
@@ -589,11 +548,7 @@ NULL
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = design$likelihoodRatioDistribution,
                 functionName = ".getOptimalDesignLikelihoodRatio",
-                reason = "The normal likelihood-ratio prior requires both its location and scale.",
-                userInstructions = paste0(
-                    "Specify thetaLR and stDevLR for the intended normal prior, or select the intended ",
-                    "likelihoodRatioDistribution."
-                )
+                diagnosticId = "optimal.normal_prior_parameters_missing"
             )
         }
 
@@ -625,11 +580,7 @@ NULL
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = design$likelihoodRatioDistribution,
                 functionName = ".getOptimalDesignLikelihoodRatio",
-                reason = "The exponential likelihood-ratio prior requires its kappaLR parameter.",
-                userInstructions = paste0(
-                    "Supply a valid kappaLR for the intended exponential prior, or select the intended ",
-                    "likelihoodRatioDistribution."
-                )
+                diagnosticId = "optimal.exponential_prior_parameter_missing"
             )
         }
 
@@ -660,11 +611,7 @@ NULL
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = design$likelihoodRatioDistribution,
                 functionName = ".getOptimalDesignLikelihoodRatio",
-                reason = "The uniform likelihood-ratio prior requires its upper effect bound.",
-                userInstructions = paste0(
-                    "Supply maxThetaLR for the intended uniform prior, or select the intended ",
-                    "likelihoodRatioDistribution."
-                )
+                diagnosticId = "optimal.uniform_prior_bound_missing"
             )
         }
 
@@ -933,9 +880,7 @@ NULL
         if (!design$enforceMonotonicity) {
             warnNumericalIssue(
                 "Monotonisation is required. Set enforceMonotonicity to TRUE in design object for strict type I error control.",
-                userInstructions = paste0(
-                    "Set enforceMonotonicity = TRUE in the design object for strict Type I error control."
-                )
+                diagnosticId = "optimal.nonmonotone_conditional_error"
             )
         }
     }
@@ -968,10 +913,7 @@ NULL
     nu <- 0
     if (any(alpha > conditionalPower)) {
         warnInvalidInput("alpha/conditional error should not exceed conditionalPower. Information is otherwise 0",
-            userInstructions = paste0(
-                "Choose conditionalPower above alpha or the applicable conditional error if positive ",
-                "information is required."
-            )
+            diagnosticId = "optimal.conditional_power_below_error"
         )
     } else {
         nu <- (stats::qnorm(alpha, lower.tail = FALSE) + stats::qnorm(conditionalPower))^2
@@ -1211,11 +1153,7 @@ NULL
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = likelihoodRatioDistribution,
                 functionName = ".getOptimalDesignExpectedInformationIntegrand",
-                reason = "The fixed likelihood-ratio specification requires its effect value or support points.",
-                userInstructions = paste0(
-                    "Supply thetaLR for the intended fixed-effect specification; if another prior was intended, ",
-                    "correct likelihoodRatioDistribution instead."
-                )
+                diagnosticId = "optimal.fixed_prior_effect_missing"
             )
         }
         .assertIsNumericVector(x = thetaLR, argumentName = "thetaLR")
@@ -1251,11 +1189,7 @@ NULL
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = likelihoodRatioDistribution,
                 functionName = ".getOptimalDesignExpectedInformationIntegrand",
-                reason = "The normal likelihood-ratio prior requires both its location and scale.",
-                userInstructions = paste0(
-                    "Specify thetaLR and stDevLR for the intended normal prior, or select the intended ",
-                    "likelihoodRatioDistribution."
-                )
+                diagnosticId = "optimal.normal_prior_parameters_missing"
             )
         }
         .assertIsSingleNumber(x = thetaLR, argumentName = "thetaLR")
@@ -1290,11 +1224,7 @@ NULL
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = likelihoodRatioDistribution,
                 functionName = ".getOptimalDesignExpectedInformationIntegrand",
-                reason = "The exponential likelihood-ratio prior requires its kappaLR parameter.",
-                userInstructions = paste0(
-                    "Supply a valid kappaLR for the intended exponential prior, or select the intended ",
-                    "likelihoodRatioDistribution."
-                )
+                diagnosticId = "optimal.exponential_prior_parameter_missing"
             )
         }
         .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
@@ -1326,11 +1256,7 @@ NULL
                 relatedParameter = "likelihoodRatioDistribution",
                 relatedValue = likelihoodRatioDistribution,
                 functionName = ".getOptimalDesignExpectedInformationIntegrand",
-                reason = "The uniform likelihood-ratio prior requires its upper effect bound.",
-                userInstructions = paste0(
-                    "Supply maxThetaLR for the intended uniform prior, or select the intended ",
-                    "likelihoodRatioDistribution."
-                )
+                diagnosticId = "optimal.uniform_prior_bound_missing"
             )
         }
 
@@ -1517,7 +1443,7 @@ NULL
             "Only stage ", supportedStage, " is supported for this calculation.",
             parameter = "stage", value = stage, constraint = paste("must equal", supportedStage),
             functionName = functionName,
-            reason = "Optimal conditional error designs currently support two-stage trials only."
+            diagnosticId = "optimal.two_stages_required"
         )
     }
     invisible(stage)

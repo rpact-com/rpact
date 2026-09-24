@@ -913,14 +913,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                 ),
                     parameter = argumentName,
                     value = argument,
-                    reason = paste0(
-                        "Observation times are not accounted for, so accrual, dropout and follow-up inputs are ",
-                        "not used."
-                    ),
-                    userInstructions = paste0(
-                        "Set accountForObservationTimes = TRUE if accrual, dropout or follow-up should enter ",
-                        "the calculation; otherwise remove these arguments."
-                    )
+                    diagnosticId = "planning.observation_time_inputs_ignored"
                 )
             }
         },

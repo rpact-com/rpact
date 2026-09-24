@@ -277,10 +277,7 @@ NULL
             },
             error = function(e) {
                 warnRuntimeIssue("Failed to create grid plot using command ", .sQuote(plotCmd), ": ", e$message,
-                    userInstructions = paste0(
-                        "Check the reported plotting command and error, including the plot objects being ",
-                        "combined, before retrying the grid plot."
-                    )
+                    diagnosticId = "plot.grid_failed"
                 )
             }
         )
@@ -622,9 +619,7 @@ getAvailablePlotTypes <- function(
             warnArgumentIgnored("'showSource' (", showSource, ") is not allowed and will be ignored",
                 parameter = "showSource",
                 value = showSource,
-                userInstructions = paste0(
-                    "Use a supported showSource value from the plot documentation, or set showSource = FALSE."
-                )
+                diagnosticId = "plot.invalid_source_display"
             )
             return(invisible())
         }
@@ -1144,7 +1139,7 @@ getAvailablePlotTypes <- function(
             },
             error = function(e) {
                 warnRuntimeIssue("Failed to format sample sizes on x-axis: ", e$message,
-                    userInstructions = "Inspect the axis values and reported formatting error before using the plot."
+                    diagnosticId = "plot.axis_formatting_failed"
                 )
             }
         )
@@ -1418,10 +1413,7 @@ getAvailablePlotTypes <- function(
             "Removed %s rows containing (0, 0)-points and %s rows containing missing values",
             removedRows1, removedRows2
         ),
-            userInstructions = paste0(
-                "Inspect omitted zero/zero and missing-value rows; provide valid coordinates if those ",
-                "observations should appear in the plot."
-            )
+            diagnosticId = "plot.rows_omitted"
         )
     }
 
@@ -1776,8 +1768,7 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
             functionName = "saveLastPlot",
             parameter = "filename",
             relatedParameter = "outputPath", value = filename,
-            reason = "The file name and destination directory are separate arguments.",
-            userInstructions = "Pass the directory as outputPath and only the base file name as filename."
+            diagnosticId = "io.filename_contains_directory"
         )
     }
 
@@ -1868,10 +1859,7 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
             "it will be ignored",
             parameter = "showFutilityBounds",
             value = showFutilityBounds,
-            userInstructions = paste0(
-                "Use plot type 3 for a supported object to show futility bounds, or remove showFutilityBounds ",
-                "after confirming the plot type."
-            )
+            diagnosticId = "plot.futility_display_ignored"
         )
     }
 
@@ -1882,30 +1870,21 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         if (!is.null(showAlphaSpent) && !is.null(showBetaSpent)) {
             warnArgumentIgnored("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
                 "are only available for plot type 4; they will be ignored",
-                userInstructions = paste0(
-                    "Use plot type 4 to display alpha/beta spending, or remove the spending-display arguments ",
-                    "after confirming the plot type."
-                )
+                diagnosticId = "plot.spending_display_ignored"
             )
         } else if (!is.null(showAlphaSpent)) {
             warnArgumentIgnored("Argument 'showAlphaSpent' (", showAlphaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
                 parameter = "showAlphaSpent",
                 value = showAlphaSpent,
-                userInstructions = paste0(
-                    "Use plot type 4 to display alpha/beta spending, or remove the spending-display arguments ",
-                    "after confirming the plot type."
-                )
+                diagnosticId = "plot.spending_display_ignored"
             )
         } else {
             warnArgumentIgnored("Argument 'showBetaSpent' (", showBetaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
                 parameter = "showBetaSpent",
                 value = showBetaSpent,
-                userInstructions = paste0(
-                    "Use plot type 4 to display alpha/beta spending, or remove the spending-display arguments ",
-                    "after confirming the plot type."
-                )
+                diagnosticId = "plot.spending_display_ignored"
             )
         }
     }

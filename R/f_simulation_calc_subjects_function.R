@@ -422,11 +422,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
                         value = calcFunction,
                         constraint = "available C++ compiler",
                         functionName = ".getCalcSubjectsFunction",
-                        reason = "The supplied compiled adaptation function requires a usable C++ toolchain.",
-                        userInstructions = paste0(
-                            "Configure a C++ compiler usable by the active R installation; on Windows install ",
-                            "the matching Rtools release and verify compilation before retrying."
-                        )
+                        diagnosticId = "simulation.cpp_toolchain_missing"
                     )
                 }
 
@@ -493,12 +489,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
                     value = calcFunction,
                     constraint = "valid compilable C++ code",
                     functionName = ".getCalcSubjectsFunction",
-                    reason = "Compilation of the custom adaptation function failed.",
-                    userInstructions = paste0(
-                        "Inspect the compiler error, required headers and callback signature; verify the ",
-                        "R-compatible toolchain and compile the callback successfully before rerunning the ",
-                        "simulation."
-                    )
+                    diagnosticId = "simulation.callback_compilation_failed"
                 )
             }
         )
@@ -521,11 +512,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
                 value = calcFunction,
                 constraint = "valid R function code",
                 functionName = ".getCalcSubjectsFunction",
-                reason = "The supplied adaptation function could not be parsed or evaluated.",
-                userInstructions = paste0(
-                    "Correct the R function definition and ensure its referenced objects are available; test ",
-                    "the callback independently before rerunning the simulation."
-                )
+                diagnosticId = "simulation.callback_parse_failed"
             )
         }
     )

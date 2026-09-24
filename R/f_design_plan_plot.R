@@ -134,11 +134,7 @@
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForPlotting",
                 parameter = "alternative",
-                reason = "The requested plot compares multiple effect scenarios but only one is available.",
-                userInstructions = paste0(
-                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
-                    "type available for a single scenario."
-                )
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     } else if (.isTrialDesignPlanRates(designPlan)) {
@@ -147,11 +143,7 @@
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForPlotting",
                 parameter = "pi1",
-                reason = "The requested plot compares multiple effect scenarios but only one is available.",
-                userInstructions = paste0(
-                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
-                    "type available for a single scenario."
-                )
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
@@ -160,11 +152,7 @@
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForPlotting",
                 parameter = "hazardRatio",
-                reason = "The requested plot compares multiple effect scenarios but only one is available.",
-                userInstructions = paste0(
-                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
-                    "type available for a single scenario."
-                )
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     }
@@ -251,19 +239,13 @@
                 "'rpact.plot.show.beta.spent' are both FALSE; ",
                 "'alphaSpent' will be shown",
                 parameter = "rpact.plot.show.beta.spent",
-                userInstructions = paste0(
-                    "Set showAlphaSpent or showBetaSpent to TRUE explicitly to select the spending curve to ",
-                    "display."
-                )
+                diagnosticId = "plot.spending_curve_selected"
             )
         } else {
             warnArgumentAdjusted("'showAlphaSpent' and 'showBetaSpent' are both FALSE; ",
                 "'alphaSpent' will be shown",
                 parameter = "showAlphaSpent",
-                userInstructions = paste0(
-                    "Set showAlphaSpent or showBetaSpent to TRUE explicitly to select the spending curve to ",
-                    "display."
-                )
+                diagnosticId = "plot.spending_curve_selected"
             )
         }
     }
@@ -1347,10 +1329,7 @@
                 lambda1 <- designPlan$lambda1[1]
                 warnArgumentAdjusted("Only the first 'lambda1' (", round(lambda1, 4),
                     ") was used for plotting",
-                    userInstructions = paste0(
-                        "Choose one scenario explicitly for this plot, or create separate plots for each ",
-                        "intended scenario."
-                    )
+                    diagnosticId = "plot.single_scenario_selected"
                 )
             }
         } else {
@@ -1506,10 +1485,7 @@
     if (length(alternative) > 1) {
         warnArgumentAdjusted("Only the first 'alternative' (", round(alternative[1], 3),
             ") was used for plotting",
-            userInstructions = paste0(
-                "Choose one scenario explicitly for this plot, or create separate plots for each intended ",
-                "scenario."
-            )
+            diagnosticId = "plot.single_scenario_selected"
         )
         return(list(title = "alternative", value = alternative[1], subscript = NA_character_))
     }
@@ -1520,10 +1496,7 @@
     if (length(pi1) > 1) {
         warnArgumentAdjusted("Only the first 'pi1' (", round(pi1[1], 3),
             ") was used for plotting",
-            userInstructions = paste0(
-                "Choose one scenario explicitly for this plot, or create separate plots for each intended ",
-                "scenario."
-            )
+            diagnosticId = "plot.single_scenario_selected"
         )
         return(list(title = "pi", value = pi1[1], subscript = "1"))
     }
@@ -1534,10 +1507,7 @@
     if (length(hazardRatio) > 1) {
         warnArgumentAdjusted("Only the first 'hazardRatio' (", round(hazardRatio[1], 3),
             ") was used for plotting",
-            userInstructions = paste0(
-                "Choose one scenario explicitly for this plot, or create separate plots for each intended ",
-                "scenario."
-            )
+            diagnosticId = "plot.single_scenario_selected"
         )
         return(list(title = "hazardRatio", value = hazardRatio[1], subscript = NA_character_))
     }
@@ -1732,7 +1702,7 @@ plot.TrialDesignPlan <- function(
         warnArgumentIgnored("'nMax' (", nMax, ") will be ignored because it will be taken from design plan",
             parameter = "nMax",
             value = nMax,
-            userInstructions = "Remove the redundant plotting argument 'nMax'."
+            diagnosticId = "plot.n_max_ignored"
         )
     }
 

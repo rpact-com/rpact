@@ -199,15 +199,7 @@ getSimulationMultiArmSurvival <- function(
                 functionName = "getSimulationMultiArmSurvival",
                 parameter = "testStatisticBased",
                 relatedParameter = "patientWise",
-                reason = paste0(
-                    "Automatic engine selection cannot reconcile patient-wise inputs with test-statistic-only ",
-                    "correlationComputation."
-                ),
-                userInstructions = paste0(
-                    "Choose the intended simulationType explicitly and remove incompatible arguments: ",
-                    "correlationComputation for patient-wise simulation, or patient-wise inputs for ",
-                    "test-statistic-based simulation."
-                )
+                diagnosticId = "simulation.engine_inputs_conflict"
             )
         }
         if (usesBasicOnlyArgs) {
@@ -228,12 +220,7 @@ getSimulationMultiArmSurvival <- function(
                 value = maxNumberOfRawDatasetsPerStage,
                 relatedParameter = "simulationType",
                 relatedValue = simulationType,
-                reason = "Test-statistic-based simulations do not generate patient-level raw data.",
-                userInstructions = paste0(
-                    "Use simulationType = \"patientWise\" with the required survival inputs and ",
-                    "maxNumberOfRawDatasetsPerStage > 0 if patient data are needed; otherwise omit the raw-data ",
-                    "request."
-                )
+                diagnosticId = "simulation.raw_data_requires_patient_wise"
             )
         }
         if (usesPatientWiseOnlyArgs) {
@@ -243,14 +230,7 @@ getSimulationMultiArmSurvival <- function(
                 functionName = "getSimulationMultiArmSurvival",
                 parameter = "simulationType", 
                 value = simulationType,
-                reason = paste0(
-                    "The selected simulation engine works with test statistics rather than individual accrual ",
-                    "and survival times."
-                ),
-                userInstructions = paste0(
-                    "Choose simulationType = \"patientWise\" if accrual, dropout or other patient-wise inputs are ",
-                    "intended; otherwise remove those inputs after confirming the test-statistic-based model."
-                )
+                diagnosticId = "simulation.patient_inputs_with_statistic_engine"
             )
         }
 
@@ -306,14 +286,7 @@ getSimulationMultiArmSurvival <- function(
                 parameter = "correlationComputation",
                 relatedParameter = "simulationType",
                 value = correlationComputation,
-                reason = paste0(
-                    "Patient-wise simulation derives dependence from simulated patients rather than ",
-                    "correlationComputation."
-                ),
-                userInstructions = paste0(
-                    "Remove correlationComputation for patientWise or patientWiseBasic; use testStatisticBased ",
-                    "only if that engine matches the intended model."
-                )
+                diagnosticId = "simulation.correlation_ignored_for_patient_wise"
             )
         }
         return(.getSimulationMultiArmSurvivalPatientWise(

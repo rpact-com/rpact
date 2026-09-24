@@ -1394,9 +1394,7 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
             "will be ignored for plot type ", type,
             parameter = "theta",
             value = theta,
-            userInstructions = paste0(
-                "Choose a plot type supporting theta, or remove theta after confirming the intended plot type."
-            )
+            diagnosticId = "plot.theta_not_applicable"
         )
     }
 

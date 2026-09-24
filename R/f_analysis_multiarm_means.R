@@ -374,10 +374,7 @@ NULL
                 warnArgumentAdjusted("'normalApproximation' was set to TRUE ",
                     "because conditional Dunnett test was specified as design",
                     parameter = "normalApproximation",
-                    userInstructions = paste0(
-                        "Use normalApproximation = TRUE for a conditional Dunnett design, or select a different ",
-                        "design if a non-normal method is intended."
-                    )
+                    diagnosticId = "analysis.conditional_dunnett_requires_normal"
                 )
             }
             normalApproximation <- TRUE
@@ -398,11 +395,7 @@ NULL
             relatedValue = intersectionTest,
             constraint = "'varianceOption' = \"overallPooled\"",
             functionName = ".getStageResultsMeansMultiArm",
-            reason = "The implemented Dunnett t test uses an overall pooled variance estimate.",
-            userInstructions = paste0(
-                "Set varianceOption = \"overallPooled\" if appropriate for the analysis plan, or choose a ",
-                "supported test with the intended variance model."
-            )
+            diagnosticId = "analysis.dunnett_requires_pooled_variance"
         )
     }
 
@@ -883,10 +876,7 @@ NULL
                 "Repeated confidence intervals not available for ",
                 "'intersectionTest' = \"Hierarchical\"",
                 parameter = "intersectionTest",
-                userInstructions = paste0(
-                    "Choose a supported intersection test if repeated confidence intervals are required; retain ",
-                    "Hierarchical only if this limitation is acceptable."
-                )
+                diagnosticId = "analysis.hierarchical_repeated_intervals_unsupported"
             )
             return(repeatedConfidenceIntervals)
         }
@@ -1175,10 +1165,7 @@ NULL
             warnArgumentIgnored(sQuote("assumedStDevs"), " will be ignored because ",
                 sQuote("stDevsH1"), " is defined",
                 parameter = "assumedStDevs",
-                userInstructions = paste0(
-                    "Use stDevsH1 for the alternative standard deviations, or remove stDevsH1 if assumedStDevs ",
-                    "is intended."
-                )
+                diagnosticId = "analysis.alternative_standard_deviations_overridden"
             )
         }
         assumedStDevs <- stDevsH1
@@ -1281,11 +1268,7 @@ NULL
         "TrialDesignConditionalDunnett",
         functionName = ".getConditionalPowerMeansMultiArm",
         parameter = "design",
-        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
-        userInstructions = paste0(
-            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-            "supporting the intended design. Do not change the object class manually."
-        )
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1473,10 +1456,7 @@ NULL
                 if (result <= 0 || result >= 1) {
                     warnNumericalIssue("Calculation not possible: could not calculate ",
                         "conditional power for stage ", kMax,
-                        userInstructions = paste0(
-                            "Check the stage data, design boundaries and planned future sample sizes/events; ",
-                            "conditional power for the reported stage could not be calculated."
-                        )
+                        diagnosticId = "analysis.conditional_power_calculation_failed"
                     )
                     results$conditionalPower[treatmentArm, kMax] <- NA_real_
                 } else {
@@ -1528,10 +1508,7 @@ NULL
 
     if (stage > 1) {
         warnResultUnavailable("Conditional power is only calculated for the first (interim) stage",
-            userInstructions = paste0(
-                "Request conditional power for the first interim stage; later-stage conditional power is not ",
-                "implemented by this method."
-            )
+            diagnosticId = "analysis.conditional_power_later_stage_unsupported"
         )
     }
 

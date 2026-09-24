@@ -61,10 +61,7 @@
                 warnNumericalIssue("The computation of last stage efficacy boundary on treatment ",
                     "effect scale not performed presumably ",
                     "due to too small degrees of freedom",
-                    userInstructions = paste0(
-                        "Check stage sample sizes and degrees of freedom before requesting efficacy boundaries ",
-                        "on the treatment-effect scale."
-                    )
+                    diagnosticId = "futility.invalid_degrees_of_freedom"
                 )
             }
         } else {
@@ -74,10 +71,7 @@
                     "efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " ",
                     "on treatment effect scale not performed presumably ",
                     "due to too small degrees of freedom",
-                    userInstructions = paste0(
-                        "Check stage sample sizes and degrees of freedom before requesting efficacy boundaries ",
-                        "on the treatment-effect scale."
-                    )
+                    diagnosticId = "futility.invalid_degrees_of_freedom"
                 )
             }
         }
@@ -787,10 +781,7 @@
                 "is not consistent with the calculated 'directionUpper' (",
                 .arrayToString(directionUpperCalculated), "). ",
                 "The calculated 'directionUpper' is used instead.",
-                userInstructions = paste0(
-                    "Align directionUpper with the alternative used in the calculation; verify the calculated ",
-                    "direction before interpreting the bounds."
-                )
+                diagnosticId = "design.direction_adjusted"
             )
         } else {
             stopIllegalArgument("The specified 'directionUpper' (", directionUpperDefined, ") ",
@@ -798,15 +789,7 @@
                 .arrayToString(directionUpperCalculated), "). ",
                 functionName = ".setDirectionUpper",
                 parameter = "directionUpper",
-                reason = paste0(
-                    "The direction specified for the calculation conflicts with the direction of the design or ",
-                    "effect assumptions."
-                ),
-                userInstructions = paste0(
-                    "Check the effect scale and intended alternative, then use a consistent directionUpper in ",
-                    "the design and calculation; recreate the design if its direction was specified ",
-                    "incorrectly."
-                )
+                diagnosticId = "design.direction_mismatch"
             )
         }
     }

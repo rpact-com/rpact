@@ -452,12 +452,7 @@ NULL
                     value = alternative,
                     relatedParameter = "thetaH0",
                     relatedValue = thetaH0,
-                    reason = "Sample-size planning requires an alternative effect distinct from the null hypothesis.",
-                    userInstructions = paste0(
-                        "Check the effect scale and null hypothesis. Specify a scientifically justified ",
-                        "alternative distinct from thetaH0; do not change the null simply to obtain a finite ",
-                        "sample size."
-                    )
+                    diagnosticId = "planning.alternative_equals_null"
                 )
             }
         }
@@ -489,12 +484,7 @@ NULL
             stopIllegalArgument("two-sided case is implemented only for superiority testing ",
                 "(i.e., thetaH0 = ", ifelse(meanRatio, 1, 0), ")",
                 functionName = ".createDesignPlanMeans",
-                reason = "The implemented two-sided sample-size calculation supports superiority testing only.",
-                userInstructions = paste0(
-                    "Check the null on the selected effect scale. Use the superiority null only if ",
-                    "scientifically intended; for non-inferiority or another null, select a supported procedure ",
-                    "consistent with the hypothesis."
-                )
+                diagnosticId = "planning.two_sided_requires_superiority"
             )
         }
 
@@ -565,10 +555,7 @@ NULL
                 relatedParameter = "groups",
                 relatedValue = groups,
                 constraint = "groups must be 2",
-                userInstructions = paste0(
-                    "Set groups = 2 if a two-group comparison is intended, or remove this argument after ",
-                    "confirming the one-group design."
-                )
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         designPlan$.setParameterType("meanRatio", C_PARAM_NOT_APPLICABLE)
@@ -581,10 +568,7 @@ NULL
                 relatedParameter = "groups",
                 relatedValue = groups,
                 constraint = "groups must be 2",
-                userInstructions = paste0(
-                    "Set groups = 2 if a two-group comparison is intended, or remove this argument after ",
-                    "confirming the one-group design."
-                )
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         designPlan$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)

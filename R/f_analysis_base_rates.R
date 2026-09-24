@@ -274,10 +274,7 @@ NULL
                 "because the specified data has only one group",
                 parameter = "pi2",
                 value = pi2,
-                userInstructions = paste0(
-                    "Supply two-group data if a two-group analysis is intended; otherwise remove the ",
-                    "inapplicable two-group argument."
-                )
+                diagnosticId = "analysis.two_group_argument_ignored"
             )
         }
         results$pi2 <- NA_real_
@@ -612,15 +609,7 @@ NULL
                 if (thetaH0 != 0) {
                     stopConflictingArguments("thetaH0 must be equal 0 for performing Fisher's exact test",
                         functionName = ".getStageResultsRates",
-                        reason = paste0(
-                            "The implemented two-sample exact test requires equality of the rates under the ",
-                            "null hypothesis."
-                        ),
-                        userInstructions = paste0(
-                            "Use thetaH0 = 0 only if equality of rates is the intended null. For a different ",
-                            "null, choose a supported approximate analysis consistent with the scientific ",
-                            "question."
-                        )
+                        diagnosticId = "analysis.exact_test_requires_equality_null"
                     )
                 }
 
@@ -1519,10 +1508,7 @@ NULL
         result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
         if (result <= 0 || result >= 1) {
             warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax,
-                userInstructions = paste0(
-                    "Check the stage data, design boundaries and planned future sample sizes/events; ",
-                    "conditional power for the reported stage could not be calculated."
-                )
+                diagnosticId = "analysis.conditional_power_calculation_failed"
             )
             conditionalPower[kMax] <- NA_real_
         } else {
@@ -1555,9 +1541,7 @@ NULL
         if (!is.na(pi1)) {
             warnArgumentIgnored(sQuote("pi1"), " will be ignored because ", sQuote("pi1H1"), " is defined",
                 parameter = "pi1",
-                userInstructions = paste0(
-                    "Use pi1H1 for the assumed treatment probability, or remove pi1H1 if pi1 is intended."
-                )
+                diagnosticId = "analysis.treatment_probability_overridden"
             )
         }
         pi1 <- pi1H1
@@ -1568,7 +1552,7 @@ NULL
         if (!is.na(pi2)) {
             warnArgumentIgnored(sQuote("pi2"), " will be ignored because ", sQuote("pi2H1"), " is defined",
                 parameter = "pi2",
-                userInstructions = "Use pi2H1 for the assumed control probability, or remove pi2H1 if pi2 is intended."
+                diagnosticId = "analysis.control_probability_overridden"
             )
         }
         pi2 <- pi2H1
@@ -1793,11 +1777,7 @@ NULL
     if (length(warningMessages) > 0) {
         for (m in warningMessages) {
             warnNumericalIssue(m,
-                reason = "A warning was raised while calculating conditional power or likelihood values for the plot.",
-                userInstructions = paste0(
-                    "Inspect the reported warning and the effect range, stage data and planned information used ",
-                    "for the conditional-power plot."
-                )
+                diagnosticId = "plot.conditional_power_calculation_warning"
             )
         }
     }

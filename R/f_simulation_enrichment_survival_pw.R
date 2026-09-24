@@ -602,26 +602,14 @@ getSimulationEnrichmentSurvival <- function(
                 value = maxNumberOfRawDatasetsPerStage,
                 relatedParameter = "simulationType",
                 relatedValue = simulationType,
-                reason = "Test-statistic-based simulations do not generate patient-level raw data.",
-                userInstructions = paste0(
-                    "Use simulationType = \"patientWise\" with the required survival inputs and ",
-                    "maxNumberOfRawDatasetsPerStage > 0 if patient data are needed; otherwise omit the raw-data ",
-                    "request."
-                )
+                diagnosticId = "simulation.raw_data_requires_patient_wise"
             )
         }
         if (usesPatientWiseOnlyArgs) {
             stopIllegalArgument("patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"",
                 functionName = "getSimulationEnrichmentSurvival",
                 parameter = "simulationType", value = simulationType,
-                reason = paste0(
-                    "The selected simulation engine works with test statistics rather than individual accrual ",
-                    "and survival times."
-                ),
-                userInstructions = paste0(
-                    "Choose simulationType = \"patientWise\" if accrual, dropout or other patient-wise inputs are ",
-                    "intended; otherwise remove those inputs after confirming the test-statistic-based model."
-                )
+                diagnosticId = "simulation.patient_inputs_with_statistic_engine"
             )
         }
 

@@ -18,7 +18,7 @@
 .writeLinesToFile <- function(lines, fileName) {
     if (is.null(lines) || length(lines) == 0 || !is.character(lines)) {
         warnRuntimeIssue("Empty lines. Stop to write ", .vQuote(fileName),
-            userInstructions = "Provide non-empty lines before writing the output file."
+            diagnosticId = "io.empty_output"
         )
         return(invisible(fileName))
     }
@@ -156,11 +156,7 @@ writeKeyValueFile <- function(
         stopIllegalArgument("file exists and overwrite = FALSE: ", sQuote(filePath),
             functionName = "writeKeyValueFile",
             parameter = filePath,
-            reason = "The destination file exists and overwriting was explicitly disabled.",
-            userInstructions = paste0(
-                "Choose a new file path, or set overwrite = TRUE only after confirming that replacing the ",
-                "existing file is intended."
-            )
+            diagnosticId = "io.overwrite_disabled"
         )
     }
 
@@ -338,11 +334,7 @@ readKeyValueFile <- function(
         stopIllegalArgument("file not found: ", sQuote(filePath),
             functionName = "readKeyValueFile",
             parameter = filePath,
-            reason = "The input file cannot be found at the supplied path.",
-            userInstructions = paste0(
-                "Resolve the path relative to the current working directory or supply an existing absolute file ",
-                "path; verify that the file is accessible before retrying."
-            )
+            diagnosticId = "io.input_file_missing"
         )
     }
 

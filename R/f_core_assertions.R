@@ -28,11 +28,7 @@ NULL
         functionName = ".stopWithWrongDesignMessage",
         parameter = "design",
         value = design,
-        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
-        userInstructions = paste0(
-            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-            "supporting the intended design. Do not change the object class manually."
-        )
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -47,11 +43,7 @@ NULL
         functionName = ".stopWithWrongDesignMessageEnrichment",
         parameter = "design",
         value = design,
-        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
-        userInstructions = paste0(
-            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-            "supporting the intended design. Do not change the object class manually."
-        )
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -171,14 +163,7 @@ NULL
             functionName = ".assertIsTrialDesign",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -190,14 +175,7 @@ NULL
             functionName = ".assertIsTrialDesignInverseNormal",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -209,14 +187,7 @@ NULL
             functionName = ".assertIsTrialDesignInverseNormalOrFixed",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -228,14 +199,7 @@ NULL
             functionName = ".assertIsTrialDesignFisher",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -247,14 +211,7 @@ NULL
             functionName = ".assertIsTrialDesignGroupSequential",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -266,14 +223,7 @@ NULL
             functionName = ".assertIsTrialDesignGroupSequentialOrFixed",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -285,14 +235,7 @@ NULL
             functionName = ".assertIsTrialDesignConditionalDunnett",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -304,14 +247,7 @@ NULL
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequential",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -324,14 +260,7 @@ NULL
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -352,14 +281,7 @@ NULL
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -373,14 +295,7 @@ NULL
             functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFisherOrFixed",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -394,14 +309,7 @@ NULL
             functionName = ".assertIsTrialDesignInverseNormalOrFisherOrFixed",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -415,14 +323,7 @@ NULL
             functionName = ".assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed",
             parameter = "design",
             value = design,
-            reason = paste0(
-                "The selected analysis or operation requires one of the trial design classes listed in the ",
-                "error."
-            ),
-            userInstructions = paste0(
-                "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-                "supporting the intended design. Do not change the object class manually."
-            )
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -530,11 +431,7 @@ NULL
                 functionName = functionName,
                 lowerBound = lower,
                 upperBound = NULL,
-                reason = "One or more supplied values violate the stated interval constraint.",
-                userInstructions = paste0(
-                    "Choose values satisfying the exact constraint, including whether each boundary is open or ",
-                    "closed; do not clamp values without checking the intended parameter assumptions."
-                )
+                diagnosticId = "validation.values_outside_interval"
             )
         }
     } else {
@@ -554,11 +451,7 @@ NULL
                     functionName = functionName,
                     lowerBound = lower,
                     upperBound = upper,
-                    reason = "One or more supplied values violate the stated interval constraint.",
-                    userInstructions = paste0(
-                        "Choose values satisfying the exact constraint, including whether each boundary is open ",
-                        "or closed; do not clamp values without checking the intended parameter assumptions."
-                    )
+                    diagnosticId = "validation.values_outside_interval"
                 )
             }
         } else if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
@@ -574,11 +467,7 @@ NULL
                 functionName = functionName,
                 lowerBound = lower,
                 upperBound = upper,
-                reason = "One or more supplied values violate the stated interval constraint.",
-                userInstructions = paste0(
-                    "Choose values satisfying the exact constraint, including whether each boundary is open or ",
-                    "closed; do not clamp values without checking the intended parameter assumptions."
-                )
+                diagnosticId = "validation.values_outside_interval"
             )
         }
     }
@@ -742,14 +631,7 @@ NULL
                         na.omit(dataInput$getSampleSizesUpTo(stage)))) {
                     stopIllegalDataInput("all events must be <= corresponding sample size",
                         functionName = ".assertIsValidDataInput",
-                        reason = paste0(
-                            "A binary endpoint cannot have more events than subjects in the corresponding group ",
-                            "and stage."
-                        ),
-                        userInstructions = paste0(
-                            "Check event counts and sample sizes against the source data, including stage-wise ",
-                            "versus cumulative input; do not truncate observed counts."
-                        )
+                        diagnosticId = "dataset.binary_events_exceed_subjects"
                     )
                 }
             }
@@ -784,14 +666,7 @@ NULL
                         any(na.omit(dataInput$getEventsUpTo(stage, 2)) > na.omit(dataInput$getSampleSizesUpTo(stage, 2)))) {
                     stopIllegalDataInput("all events must be <= corresponding sample size",
                         functionName = ".assertIsValidDataInput",
-                        reason = paste0(
-                            "A binary endpoint cannot have more events than subjects in the corresponding group ",
-                            "and stage."
-                        ),
-                        userInstructions = paste0(
-                            "Check event counts and sample sizes against the source data, including stage-wise ",
-                            "versus cumulative input; do not truncate observed counts."
-                        )
+                        diagnosticId = "dataset.binary_events_exceed_subjects"
                     )
                 }
             }
@@ -825,10 +700,7 @@ NULL
                 ),
                 ifelse(s == 1, "stage", paste0(s, " stages")), kMax
             ),
-                userInstructions = paste0(
-                    "Match the number of dataset stages to the design kMax; remove extra stages only after ",
-                    "confirming the intended design."
-                )
+                diagnosticId = "dataset.stages_exceed_design"
             )
         } else if (numberOfStages < kMax) {
             dataInput$.fillWithNAs(kMax)
@@ -846,11 +718,7 @@ NULL
             functionName = ".assertIsDataset",
             parameter = "dataInput",
             value = dataInput,
-            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
-            userInstructions = paste0(
-                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
-                "not relabel the class of an incompatible dataset."
-            )
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -862,11 +730,7 @@ NULL
             functionName = ".assertIsDatasetMeans",
             parameter = "dataInput",
             value = dataInput,
-            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
-            userInstructions = paste0(
-                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
-                "not relabel the class of an incompatible dataset."
-            )
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -878,11 +742,7 @@ NULL
             functionName = ".assertIsDatasetGeneral",
             parameter = "dataInput",
             value = dataInput,
-            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
-            userInstructions = paste0(
-                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
-                "not relabel the class of an incompatible dataset."
-            )
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -894,11 +754,7 @@ NULL
             functionName = ".assertIsDatasetRates",
             parameter = "dataInput",
             value = dataInput,
-            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
-            userInstructions = paste0(
-                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
-                "not relabel the class of an incompatible dataset."
-            )
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -911,11 +767,7 @@ NULL
             functionName = ".assertIsDatasetSurvival",
             parameter = "dataInput",
             value = dataInput,
-            reason = "The analysis requires an endpoint-specific rpact dataset of the indicated class.",
-            userInstructions = paste0(
-                "Create dataInput with getDataset() using the actual observations for the intended endpoint; do ",
-                "not relabel the class of an incompatible dataset."
-            )
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
@@ -1479,10 +1331,7 @@ NULL
                 bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix,
                 parameter = parameterName,
                 value = parameterValue,
-                userInstructions = paste0(
-                    "Choose values within the documented validated range, or independently validate the design ",
-                    "for the chosen values."
-                )
+                diagnosticId = "validation.parameter_outside_validated_range"
             )
         } else if (identical(type, "message")) {
             message(
@@ -1726,10 +1575,7 @@ NULL
     .assertIsInClosedInterval(kMax, "kMax", lower = kMaxLowerBound, upper = kMaxUpperBound)
     if (showWarnings && kMax > 10) {
         warnNotValidated("The usage of 'kMax' (", kMax, ") > 10 is not validated",
-            userInstructions = paste0(
-                "Use at most 10 stages within the validated scope, or independently validate the design with ",
-                "more stages."
-            )
+            diagnosticId = "validation.stage_count_outside_validated_range"
         )
     }
 }
@@ -1768,11 +1614,7 @@ NULL
             relatedParameter = "kMax",
             relatedValue = kMax,
             functionName = ".assertAreValidInformationRates",
-            reason = "Each analysis stage requires its own cumulative information fraction.",
-            userInstructions = paste0(
-                "Supply exactly kMax informationRates values in stage order, or correct kMax if a different ",
-                "number of analyses was intended."
-            )
+            diagnosticId = "design.information_rates_length"
         )
     }
 
@@ -1798,12 +1640,7 @@ NULL
                 kMax
             ),
             functionName = ".assertAreValidInformationRates",
-            reason = "informationRates represents cumulative information, not stage-wise increments.",
-            userInstructions = paste0(
-                "Provide strictly increasing cumulative information fractions greater than 0 and no greater ",
-                "than 1. If the input contains stage-wise fractions, convert them to cumulative fractions ",
-                "first."
-            )
+            diagnosticId = "design.information_rates_not_cumulative"
         )
     }
 
@@ -1811,10 +1648,7 @@ NULL
         warnNotValidated("Chosen 'informationRates' (",
             .arrayToString(informationRates, vectorLookAndFeelEnabled = FALSE),
             ") outside validated range",
-            userInstructions = paste0(
-                "Choose values within the documented validated range, or independently validate the design for ",
-                "the chosen values."
-            )
+            diagnosticId = "validation.parameter_outside_validated_range"
         )
     }
 }
@@ -1979,11 +1813,7 @@ NULL
             relatedParameter = "kMax",
             relatedValue = kMax,
             functionName = ".assertAreValidFutilityBounds",
-            reason = "This vector describes interim stages only; the final analysis is excluded.",
-            userInstructions = paste0(
-                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
-                "entry intended solely for the final analysis."
-            )
+            diagnosticId = "validation.interim_vector_length"
         )
     }
 
@@ -2034,11 +1864,7 @@ NULL
             relatedParameter = "kMax",
             relatedValue = kMax,
             functionName = ".assertIsValidAlpha0Vec",
-            reason = "This vector describes interim stages only; the final analysis is excluded.",
-            userInstructions = paste0(
-                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
-                "entry intended solely for the final analysis."
-            )
+            diagnosticId = "validation.interim_vector_length"
         )
     }
 
@@ -2139,10 +1965,7 @@ NULL
         if (warningOnlyEnabled) {
             warnInvalidInput(C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS, message,
                 parameter = undefinedArguments,
-                userInstructions = paste0(
-                    "Provide all associated arguments listed as undefined, or remove the defined arguments if ",
-                    "that calculation is not intended."
-                )
+                diagnosticId = "validation.companion_arguments_undefined"
             )
             return(FALSE)
         } else {
@@ -2181,11 +2004,7 @@ NULL
             functionName = ".assertIsValidNPlanned",
             parameter = "nPlanned",
             value = nPlanned,
-            reason = "nPlanned describes the remaining stages after the currently analyzed stage.",
-            userInstructions = paste0(
-                "Provide one planned sample-size or event-count entry for each remaining stage, following the ",
-                "endpoint-specific nPlanned convention; exclude completed stages."
-            )
+            diagnosticId = "analysis.remaining_stages_length"
         )
     }
 
@@ -2206,10 +2025,7 @@ NULL
     if (missing(nPlanned)) {
         warnInvalidInput("'nPlanned' is missing",
             parameter = "nPlanned",
-            userInstructions = paste0(
-                "Provide nPlanned for the remaining stages if conditional power or future-stage inference is ",
-                "required."
-            )
+            diagnosticId = "analysis.n_planned_missing"
         )
         return(FALSE)
     }
@@ -2228,7 +2044,7 @@ NULL
         ),
             parameter = "nPlanned",
             value = nPlanned,
-            userInstructions = "Supply nPlanned with exactly kMax - stage entries for the remaining stages."
+            diagnosticId = "analysis.n_planned_length"
         )
         return(FALSE)
     }
@@ -2243,7 +2059,7 @@ NULL
         ),
             parameter = "nPlanned",
             value = nPlanned,
-            userInstructions = "Supply strictly positive nPlanned values for every remaining stage."
+            diagnosticId = "analysis.n_planned_nonpositive"
         )
         return(FALSE)
     }
@@ -2312,12 +2128,7 @@ NULL
                     value = argValue,
                     relatedParameter = "functionName",
                     relatedValue = functionName,
-                    reason = "The supplied argument name is not supported by the receiving function.",
-                    userInstructions = paste0(
-                        "Check the documented argument names and spelling for this function. Remove the ",
-                        "unsupported argument or move it to the correct function after confirming its intended ",
-                        "role."
-                    )
+                    diagnosticId = "validation.unknown_argument"
                 )
             } else if (exceptionEnabled) {
                 stopArgumentUnknown(.pQuote(argName), " = ", argValue,
@@ -2327,22 +2138,14 @@ NULL
                     value = argValue,
                     relatedParameter = "functionName",
                     relatedValue = functionName,
-                    reason = "The supplied argument name is not supported by the receiving function.",
-                    userInstructions = paste0(
-                        "Check the documented argument names and spelling for this function. Remove the ",
-                        "unsupported argument or move it to the correct function after confirming its intended ",
-                        "role."
-                    )
+                    diagnosticId = "validation.unknown_argument"
                 )
             } else {
                 warnArgumentIgnored("Argument unknown in ", functionName, "(...): ",
                     .pQuote(argName), " = ", argValue, " will be ignored",
                     parameter = argName,
                     value = arg,
-                    userInstructions = paste0(
-                        "Correct the argument name or pass it to the function that supports it; remove it only ",
-                        "after confirming it is unnecessary."
-                    )
+                    diagnosticId = "validation.unused_argument"
                 )
             }
         }
@@ -2361,10 +2164,7 @@ NULL
             " will be ignored",
             parameter = argName,
             value = arg,
-            userInstructions = paste0(
-                "Correct the argument name or pass it to the function that supports it; remove it only after ",
-                "confirming it is unnecessary."
-            )
+            diagnosticId = "validation.unused_argument"
         )
     }
 }
@@ -2375,9 +2175,7 @@ NULL
     if ("twoSidedPower" %in% argNames) {
         warnArgumentIgnored("'twoSidedPower' can only be defined in 'design'",
             parameter = "twoSidedPower",
-            userInstructions = paste0(
-                "Set twoSidedPower when constructing the design, and pass that design to the calculation."
-            )
+            diagnosticId = "design.two_sided_power_set_in_design"
         )
     }
 }
@@ -2386,10 +2184,7 @@ NULL
     if (design$sided == 2 && !is.na(design$twoSidedPower) && !design$twoSidedPower &&
             design$isUserDefinedParameter("twoSidedPower")) {
         warnArgumentIgnored("design$twoSidedPower = FALSE will be ignored because design$sided = 2",
-            userInstructions = paste0(
-                "Check the two-sided design specification; twoSidedPower = FALSE is not used in this ",
-                "calculation for sided = 2."
-            )
+            diagnosticId = "design.two_sided_power_ignored"
         )
     }
 }
@@ -2444,11 +2239,7 @@ NULL
             value = packageName,
             constraint = "installed package namespace",
             functionName = ".assertPackageIsInstalled",
-            reason = "The requested operation requires an optional package that is unavailable to this R session.",
-            userInstructions = paste0(
-                "Install the package identified by packageName in a library accessible to this R session, then ",
-                "rerun the call."
-            )
+            diagnosticId = "runtime.optional_package_missing"
         )
     }
 }
@@ -2635,10 +2426,7 @@ NULL
             warnArgumentIgnored(
                 "Planned allocation ratio ", allocationRatioPlanned, " will be ignored ",
                 "because the specified data has only one group",
-                userInstructions = paste0(
-                    "Supply two-group data if a two-group analysis is intended; otherwise remove the ",
-                    "inapplicable two-group argument."
-                )
+                diagnosticId = "analysis.two_group_argument_ignored"
             )
         }
         return(invisible())
@@ -2677,11 +2465,7 @@ NULL
             parameter = "maxNumberOfSubjects",
             value = maxNumberOfSubjects,
             relatedParameter = "allocationRatioPlanned",
-            reason = "Allocation optimization is unavailable when the subject total is fixed in this calculation.",
-            userInstructions = paste0(
-                "Specify a positive allocationRatioPlanned consistent with the recruitment plan, or remove the ",
-                "fixed subject-total constraint only if it was not intended."
-            )
+            diagnosticId = "planning.allocation_optimization_with_fixed_total"
         )
     }
 
@@ -2879,11 +2663,7 @@ NULL
             functionName = ".assertIsValidHazardRatio",
             parameter = "thetaH0",
             value = thetaH0,
-            reason = "Sample-size planning requires an alternative effect distinct from the null hypothesis.",
-            userInstructions = paste0(
-                "Check the effect scale and null hypothesis. Specify a scientifically justified alternative ",
-                "distinct from thetaH0; do not change the null simply to obtain a finite sample size."
-            )
+            diagnosticId = "planning.alternative_equals_null"
         )
     }
     return(invisible(hazardRatio))
@@ -2921,10 +2701,7 @@ NULL
                 "is not applicable for 'sided' = 2",
                 parameter = "directionUpper",
                 value = directionUpper,
-                userInstructions = paste0(
-                    "Use a one-sided design if a directional alternative is intended; otherwise remove this ",
-                    "argument after confirming two-sided testing."
-                )
+                diagnosticId = "design.direction_not_applicable"
             )
         }
         return(invisible(NA))
@@ -2947,9 +2724,7 @@ NULL
         warnArgumentAdjusted(
             "The default value of 'directionUpper' for survival endpoints has changed ",
             "from TRUE to FALSE. Please specify 'directionUpper' explicitly to avoid this warning.",
-            userInstructions = paste0(
-                "Specify directionUpper explicitly to match the intended alternative for the survival endpoint."
-            )
+            diagnosticId = "design.survival_direction_default"
         )
     }
 }
@@ -2985,14 +2760,7 @@ NULL
             functionName = ".assertIsValidDirectionUpper",
             parameter = "directionUpper",
             value = design$directionUpper,
-            reason = paste0(
-                "The direction specified for the calculation conflicts with the direction of the design or ",
-                "effect assumptions."
-            ),
-            userInstructions = paste0(
-                "Check the effect scale and intended alternative, then use a consistent directionUpper in the ",
-                "design and calculation; recreate the design if its direction was specified incorrectly."
-            )
+            diagnosticId = "design.direction_mismatch"
         )
     }
 
@@ -3095,11 +2863,7 @@ NULL
                 value = fun,
                 constraint = "must contain the three-dots argument '...'",
                 functionName = ".assertIsValidFunction",
-                reason = "The callback must accept additional arguments passed by the simulation engine.",
-                userInstructions = paste0(
-                    "Add ... to the callback signature while retaining the documented named inputs, and verify ",
-                    "that the callback still implements the intended adaptation rule."
-                )
+                diagnosticId = "simulation.callback_requires_dots"
             )
         }
     }
@@ -3255,20 +3019,14 @@ NULL
                     .pQuote(calcSubjectsFunctionName), " is defined",
                     parameter = parameterName,
                     value = parameterValues,
-                    userInstructions = paste0(
-                        "Specify conditionalPower or the supported sample-size/event recalculation function to ",
-                        "use these bounds; otherwise remove them."
-                    )
+                    diagnosticId = "simulation.bounds_require_reassessment"
                 )
             } else {
                 warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
                     "will be ignored because 'conditionalPower' is not defined",
                     parameter = parameterName,
                     value = parameterValues,
-                    userInstructions = paste0(
-                        "Specify conditionalPower if this alternative assumption should be used for ",
-                        "reassessment; otherwise remove the unused argument."
-                    )
+                    diagnosticId = "simulation.alternative_requires_conditional_power"
                 )
             }
         }
@@ -3284,11 +3042,7 @@ NULL
                 parameter = parameterName,
                 relatedParameter = "conditionalPower",
                 relatedValue = conditionalPower,
-                reason = "The requested adaptive calculation requires explicit per-stage limits.",
-                userInstructions = paste0(
-                    "Supply the missing per-stage bound for the intended adaptation rule. Remove ",
-                    "conditionalPower or the custom adaptation function only if adaptation was not intended."
-                )
+                diagnosticId = "simulation.per_stage_bounds_missing"
             )
         } else {
             stopMissingArgument(.pQuote(parameterName), " must be defined ",
@@ -3297,11 +3051,7 @@ NULL
                 parameter = parameterName,
                 relatedParameter = "conditionalPower",
                 relatedValue = conditionalPower,
-                reason = "The requested adaptive calculation requires explicit per-stage limits.",
-                userInstructions = paste0(
-                    "Supply the missing per-stage bound for the intended adaptation rule. Remove ",
-                    "conditionalPower or the custom adaptation function only if adaptation was not intended."
-                )
+                diagnosticId = "simulation.per_stage_bounds_missing"
             )
         }
     }
@@ -3329,11 +3079,7 @@ NULL
             "(", parameterValues[1], ") will be ignored",
             parameter = parameterName,
             value = parameterValues,
-            reason = "The first-stage sample size is fixed by plannedSubjects[1].",
-            userInstructions = paste0(
-                "Set the first bound to plannedSubjects[1]; adaptive sample-size limits apply only after the ",
-                "first stage."
-            )
+            diagnosticId = "simulation.first_stage_bound_adjusted"
         )
     }
 
@@ -3406,10 +3152,7 @@ NULL
             .arrayToString(design$informationRates[1:stage]), ") in ",
             "group sequential design. ",
             "Test procedure might not control Type I error rate",
-            userInstructions = paste0(
-                "Verify stage information and use a design or boundary recalculation appropriate for the ",
-                "observed information before interpreting Type I error control."
-            )
+            diagnosticId = "analysis.information_rates_changed"
         )
     }
 }
@@ -3428,12 +3171,7 @@ NULL
             value = designType,
             relatedParameter = "engineType",
             relatedValue = engineType,
-            reason = "The selected procedure is implemented only for one-sided testing.",
-            userInstructions = paste0(
-                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
-                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
-                "error."
-            )
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
 }
@@ -3604,10 +3342,7 @@ NULL
                 "because conditional Dunnett test was specified as design"
             )
             warnArgumentAdjusted(message,
-                userInstructions = paste0(
-                    "Use intersectionTest = \"Dunnett\" for the conditional Dunnett design, or choose a design ",
-                    "supporting the intended intersection test."
-                )
+                diagnosticId = "analysis.intersection_test_adjusted_to_dunnett"
             )
         }
         intersectionTest <- "Dunnett"
@@ -3639,11 +3374,7 @@ NULL
             value = intersectionTest,
             relatedParameter = "design",
             relatedValue = design,
-            reason = "A conditional Dunnett design requires the corresponding Dunnett intersection test.",
-            userInstructions = paste0(
-                "Use intersectionTest = \"Dunnett\" with this design, or create a design compatible with the ",
-                "intended intersection test."
-            )
+            diagnosticId = "analysis.conditional_dunnett_intersection_test"
         )
     }
 }
@@ -3693,10 +3424,7 @@ NULL
         requirementFailedReason,
         parameter = paramName,
         value = paramValue,
-        userInstructions = paste0(
-            "Satisfy the reported applicability requirement if this argument is intended; otherwise remove it ",
-            "after confirming the current settings."
-        )
+        diagnosticId = "validation.argument_not_applicable"
     )
     return(NA_real_)
 }
@@ -3724,11 +3452,7 @@ NULL
             functionName = ".stopInCaseOfIllegalStageDefinition",
             parameter = "stage",
             value = stage,
-            reason = "The analysis stage is determined when stage or analysis results are created.",
-            userInstructions = paste0(
-                "Pass stage to getStageResults() or getAnalysisResults(), then use the resulting object without ",
-                "specifying stage again here."
-            )
+            diagnosticId = "analysis.stage_argument_misplaced"
         )
     }
 }
@@ -3740,11 +3464,7 @@ NULL
             "getStageResults() or getAnalysisResults()",
             functionName = ".stopInCaseOfIllegalStageDefinition2",
             parameter = "stage",
-            reason = "The analysis stage is determined when stage or analysis results are created.",
-            userInstructions = paste0(
-                "Pass stage to getStageResults() or getAnalysisResults(), then use the resulting object without ",
-                "specifying stage again here."
-            )
+            diagnosticId = "analysis.stage_argument_misplaced"
         )
     }
 }
@@ -3777,11 +3497,7 @@ NULL
             value = varianceOption,
             relatedParameter = "design",
             relatedValue = design,
-            reason = "The conditional Dunnett design requires its designated variance estimator.",
-            userInstructions = paste0(
-                "Use the varianceOption stated in the error for this design, or choose a design compatible with ",
-                "the intended variance model."
-            )
+            diagnosticId = "analysis.conditional_dunnett_variance"
         )
     }
 }
@@ -3807,10 +3523,7 @@ NULL
                 ") will be ignored because data input has only one group",
                 parameter = "stdErrorEstimate",
                 value = stdErrorEstimate,
-                userInstructions = paste0(
-                    "Supply two-group data if a two-group analysis is intended; otherwise remove the ",
-                    "inapplicable two-group argument."
-                )
+                diagnosticId = "analysis.two_group_argument_ignored"
             )
         }
 
@@ -3899,17 +3612,14 @@ NULL
                 "because 'activeArms' or 'populations' = 1",
                 parameter = "typeOfSelection",
                 value = typeOfSelection,
-                userInstructions = paste0(
-                    "Provide multiple active arms/populations if selection is intended; otherwise omit ",
-                    "typeOfSelection."
-                )
+                diagnosticId = "selection.requires_multiple_groups"
             )
         } else if (rValue > activeArms) {
             warnArgumentIgnored("'rValue' (", rValue, ") is larger than activeArms or populations ",
                 "(", activeArms, ") and will be ignored",
                 parameter = "rValue",
                 value = rValue,
-                userInstructions = "Set rValue no larger than the number of active arms/populations."
+                diagnosticId = "selection.r_exceeds_group_count"
             )
         }
     } else if (!is.na(rValue)) {
@@ -3918,10 +3628,7 @@ NULL
             value = rValue,
             relatedParameter = "typeOfSelection",
             relatedValue = typeOfSelection,
-            userInstructions = paste0(
-                "Set typeOfSelection = \"rBest\" to use rValue, or remove rValue after confirming the chosen ",
-                "selection rule."
-            )
+            diagnosticId = "selection.r_requires_r_best"
         )
     }
 
@@ -3939,10 +3646,7 @@ NULL
             value = epsilonValue,
             relatedParameter = "typeOfSelection",
             relatedValue = typeOfSelection,
-            userInstructions = paste0(
-                "Set typeOfSelection = \"epsilon\" to use epsilonValue, or remove epsilonValue after confirming ",
-                "the chosen selection rule."
-            )
+            diagnosticId = "selection.epsilon_requires_epsilon_rule"
         )
     }
 
@@ -4219,10 +3923,7 @@ NULL
                 ") will be ignored because it will be set to first column of 'effectMatrix'",
                 parameter = valueMaxVectorName,
                 value = valueMaxVector,
-                userInstructions = paste0(
-                    "Set the intended effects in the first column of effectMatrix, or choose a shape that uses ",
-                    "the maximum-effect vector."
-                )
+                diagnosticId = "shape.maximum_effect_ignored"
             )
         }
         if (!is.null(doseLevels) && !anyNA(doseLevels)) {
@@ -4231,20 +3932,14 @@ NULL
                 "is defined as ", .pQuote(typeOfShape),
                 parameter = "doseLevels",
                 value = doseLevels,
-                userInstructions = paste0(
-                    "Choose a dose-response shape supporting doseLevels if needed; otherwise remove doseLevels ",
-                    "after confirming typeOfShape."
-                )
+                diagnosticId = "shape.dose_levels_ignored"
             )
         }
     } else if (!is.null(effectMatrix)) {
         warnArgumentIgnored("'effectMatrix' will be ignored because 'typeOfShape' ",
             "is defined as ", .pQuote(typeOfShape),
             parameter = "effectMatrix",
-            userInstructions = paste0(
-                "Set typeOfShape = \"userDefined\" to supply effectMatrix, or remove effectMatrix after ",
-                "confirming the chosen shape."
-            )
+            diagnosticId = "shape.effect_matrix_requires_user_defined"
         )
     }
 
@@ -4390,11 +4085,7 @@ NULL
             functionName = ".isDelayedInformationEnabled",
             parameter = "design",
             relatedParameter = "delayedInformation",
-            reason = "Delayed-response calculations require either a design or explicit delayed information.",
-            userInstructions = paste0(
-                "Supply the intended design or delayedInformation in the documented scale; do not invent ",
-                "pipeline information."
-            )
+            diagnosticId = "design.delayed_information_missing"
         )
     }
 
@@ -4452,11 +4143,7 @@ NULL
                 value = existingParamNames,
                 relatedParameter = "requiredParamNames",
                 relatedValue = requiredParamNames,
-                reason = "The selected count-data parameterization requires additional companion parameters.",
-                userInstructions = paste0(
-                    "Provide the listed required parameters for the chosen parameterization, or remove the ",
-                    "initiating parameters if a different parameterization was intended."
-                )
+                diagnosticId = "counts.companion_parameters_missing"
             )
         }
     }
@@ -4498,11 +4185,7 @@ NULL
         parameter = "existingParamNames", value = existingParamNames,
         relatedParameter = "foundParamNames",
         relatedValue = foundParamNames,
-        reason = "The supplied parameters define mutually exclusive input specifications.",
-        userInstructions = paste0(
-            "Choose one consistent parameterization and remove the conflicting alternative inputs after ",
-            "confirming the intended model."
-        )
+        diagnosticId = "validation.conflicting_parameterizations"
     )
 }
 
@@ -4582,11 +4265,7 @@ NULL
             value = lambda1 / lambda2,
             relatedParameter = "thetaH0",
             relatedValue = thetaH0,
-            reason = "Sample-size planning requires an alternative effect distinct from the null hypothesis.",
-            userInstructions = paste0(
-                "Check the effect scale and null hypothesis. Specify a scientifically justified alternative ",
-                "distinct from thetaH0; do not change the null simply to obtain a finite sample size."
-            )
+            diagnosticId = "planning.alternative_equals_null"
         )
     }
 }
@@ -4628,11 +4307,7 @@ NULL
             functionName = ".assertParametersAreSpecifiedCorrectlyTogether",
             parameter = "paramVector",
             value = paramVector,
-            reason = "The supplied parameters define mutually exclusive input specifications.",
-            userInstructions = paste0(
-                "Choose one consistent parameterization and remove the conflicting alternative inputs after ",
-                "confirming the intended model."
-            )
+            diagnosticId = "validation.conflicting_parameterizations"
         )
     } else if (case == "eitherOr" && all(is.na(params[[1]])) && all(is.na(params[[2]]))) {
         stopMissingArgument("either ",
@@ -4641,8 +4316,7 @@ NULL
             functionName = ".assertParametersAreSpecifiedCorrectlyTogether",
             parameter = "paramNames",
             value = paramNames,
-            reason = "None of the supported alternative input specifications was supplied.",
-            userInstructions = "Supply one of the listed parameter alternatives using the intended model assumptions."
+            diagnosticId = "validation.alternative_parameters_missing"
         )
     }
 }
@@ -4678,11 +4352,7 @@ NULL
             relatedParameter = "accrualTime",
             relatedValue = accrualTime,
             value = accrualIntensity,
-            reason = "Piecewise recruitment needs an intensity for each specified accrual interval.",
-            userInstructions = paste0(
-                "Supply accrualIntensity matching the piecewise accrual schedule, or simplify accrualTime only ",
-                "if constant recruitment was intended."
-            )
+            diagnosticId = "accrual.piecewise_intensities_missing"
         )
     }
 
@@ -4799,14 +4469,7 @@ NULL
             warnArgumentIgnored(
                 "Specification of 'accrualTime' has no ",
                 "influence of calculation and will be ignored",
-                reason = paste0(
-                    "With fixedExposureTime and no accrualIntensity, accrualTime does not enter this count-data ",
-                    "calculation."
-                ),
-                userInstructions = paste0(
-                    "Specify accrualIntensity if calendar-time recruitment should matter; otherwise remove ",
-                    "accrualTime for the fixed-exposure calculation."
-                )
+                diagnosticId = "counts.accrual_ignored_for_fixed_exposure"
             )
         }
     } else {
@@ -4877,11 +4540,7 @@ NULL
             relatedParameter = "kMax",
             relatedValue = kMax,
             functionName = ".assertAreValidCalendarTimes",
-            reason = "Each design stage requires a corresponding planned calendar analysis time.",
-            userInstructions = paste0(
-                "Specify one plannedCalendarTime per stage, aligned with kMax and the intended recruitment and ",
-                "follow-up schedule."
-            )
+            diagnosticId = "simulation.calendar_time_length"
         )
     }
 }
@@ -4970,10 +4629,7 @@ NULL
         "because it is not required for the conversion from ",
         .pQuote(sourceScale), " to ", .pQuote(targetScale),
         parameter = argumentName,
-        userInstructions = paste0(
-            "Remove the unneeded conversion input only after verifying sourceScale and targetScale; choose the ",
-            "intended scales if they are incorrect."
-        )
+        diagnosticId = "futility.conversion_input_ignored"
     )
 }
 
@@ -4987,11 +4643,7 @@ NULL
         parameter = argumentName,
         relatedParameter = scaleName,
         relatedValue = scaleValue,
-        reason = "The chosen futility-bound scale requires additional information for conversion.",
-        userInstructions = paste0(
-            "Supply the missing argument in the units required by the chosen scale, or select the scale that ",
-            "actually describes the supplied bounds."
-        )
+        diagnosticId = "futility.conversion_input_missing"
     )
 }
 
@@ -5187,10 +4839,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
             value = futilityBounds,
             relatedParameter = c("lowerBound", "upperBound"),
             relatedValue = list(lowerBound = lowerBound, upperBound = upperBound),
-            userInstructions = paste0(
-                "Review the design and futility conversion inputs; do not rely on bounds outside the acceptable ",
-                "range."
-            )
+            diagnosticId = "futility.bounds_outside_range"
         )
     }
 
@@ -5202,10 +4851,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
             value = futilityBounds,
             relatedParameter = c("lowerBound", "upperBound"),
             relatedValue = list(lowerBound = lowerBound, upperBound = upperBound),
-            userInstructions = paste0(
-                "Review the design and futility conversion inputs; do not rely on bounds outside the acceptable ",
-                "range."
-            )
+            diagnosticId = "futility.bounds_outside_range"
         )
     }
 }

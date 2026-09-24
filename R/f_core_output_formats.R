@@ -927,11 +927,7 @@ setOutputFormat <- function(
                 functionName = "setOutputFormat",
                 parameter = "file",
                 value = file,
-                reason = "The input file cannot be found at the supplied path.",
-                userInstructions = paste0(
-                    "Resolve the path relative to the current working directory or supply an existing absolute ",
-                    "file path; verify that the file is accessible before retrying."
-                )
+                diagnosticId = "io.input_file_missing"
             )
         }
 
@@ -950,26 +946,17 @@ setOutputFormat <- function(
                             args[[key]] <- value
                         } else {
                             warnInvalidInput('Line "', line, '" contains an invalid value: ', value,
-                                userInstructions = paste0(
-                                    "Correct the output-format definition to use supported keys and values in ",
-                                    "valid key-value pairs."
-                                )
+                                diagnosticId = "output.invalid_format_definition"
                             )
                         }
                     } else {
                         warnInvalidInput('Line "', line, '" contains an invalid key: ', keyValuePair[1],
-                            userInstructions = paste0(
-                                "Correct the output-format definition to use supported keys and values in valid ",
-                                "key-value pairs."
-                            )
+                            diagnosticId = "output.invalid_format_definition"
                         )
                     }
                 } else if (nchar(trimws(line)) > 0) {
                     warnInvalidInput('Line "', line, '" does not contain a valid key-value-pair',
-                        userInstructions = paste0(
-                            "Correct the output-format definition to use supported keys and values in valid ",
-                            "key-value pairs."
-                        )
+                        diagnosticId = "output.invalid_format_definition"
                     )
                 }
                 if (nchar(trimws(line)) > 0) {
@@ -1032,10 +1019,7 @@ setOutputFormat <- function(
                 }
             } else {
                 warnArgumentIgnored("The output format ", key, " affects no parameters",
-                    userInstructions = paste0(
-                        "Use an output-format key matching a parameter to be formatted, or remove the unused ",
-                        "format entry."
-                    )
+                    diagnosticId = "output.unused_format_key"
                 )
             }
         }

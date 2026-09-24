@@ -209,10 +209,7 @@ NULL
         if ("assumedStDev" %in% names(list(...))) {
             warnInvalidInput("For multi-arm analysis the argument for assumed standard deviation ",
                 "is named 'assumedStDevs' and not 'assumedStDev'",
-                userInstructions = paste0(
-                    "Rename assumedStDev to assumedStDevs and provide the standard deviations required by the ",
-                    "populations or treatment arms."
-                )
+                diagnosticId = "analysis.assumed_standard_deviations_argument_name"
             )
         }
 
@@ -507,10 +504,7 @@ getClosedCombinationTestResults <- function(stageResults) {
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
             warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = ",
                 .vQuote(C_TYPE_OF_DESIGN_AS_USER),
-                userInstructions = paste0(
-                    "Use a design/method supporting repeated p-values if these are required; do not interpret ",
-                    "missing repeated p-values as calculated results."
-                )
+                diagnosticId = "analysis.repeated_p_values_unsupported"
             )
             return(repeatedPValues)
         }
@@ -518,10 +512,7 @@ getClosedCombinationTestResults <- function(stageResults) {
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
             warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = ",
                 .vQuote(C_TYPE_OF_DESIGN_WT_OPTIMUM),
-                userInstructions = paste0(
-                    "Use a design/method supporting repeated p-values if these are required; do not interpret ",
-                    "missing repeated p-values as calculated results."
-                )
+                diagnosticId = "analysis.repeated_p_values_unsupported"
             )
             return(repeatedPValues)
         }
@@ -530,10 +521,7 @@ getClosedCombinationTestResults <- function(stageResults) {
     if (.isTrialDesignFisher(design) && design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
         warnResultUnavailable("Repeated p-values not available for 'method' = ",
             .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
-            userInstructions = paste0(
-                "Use a design/method supporting repeated p-values if these are required; do not interpret ",
-                "missing repeated p-values as calculated results."
-            )
+            diagnosticId = "analysis.repeated_p_values_unsupported"
         )
         return(repeatedPValues)
     }
@@ -865,10 +853,7 @@ getClosedConditionalDunnettTestResults <- function(
             },
             error = function(e) {
                 warnNumericalIssue("Failed to calculate conditionalErrorRate[", i, ", 1]: ", e$message,
-                    userInstructions = paste0(
-                        "Inspect the reported calculation error and the affected arm/stage before using ",
-                        "conditional error rates or second-stage p-values."
-                    )
+                    diagnosticId = "analysis.conditional_error_calculation_failed"
                 )
             }
         )
@@ -913,10 +898,7 @@ getClosedConditionalDunnettTestResults <- function(
             },
             error = function(e) {
                 warnNumericalIssue("Failed to calculate secondStagePValues[", i, ", 2]: ", e$message,
-                    userInstructions = paste0(
-                        "Inspect the reported calculation error and the affected arm/stage before using ",
-                        "conditional error rates or second-stage p-values."
-                    )
+                    diagnosticId = "analysis.conditional_error_calculation_failed"
                 )
             }
         )
@@ -1074,11 +1056,7 @@ getClosedConditionalDunnettTestResults <- function(
         "TrialDesignFisher, or TrialDesignDunnett",
         functionName = ".getConditionalRejectionProbabilitiesMultiArm",
         parameter = "design",
-        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
-        userInstructions = paste0(
-            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-            "supporting the intended design. Do not change the object class manually."
-        )
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1282,11 +1260,7 @@ getClosedConditionalDunnettTestResults <- function(
     if (stage < 1 || kMax == 1) {
         stopIllegalArgument("cannot plot conditional power of a fixed design",
             functionName = ".getConditionalPowerPlotMultiArm",
-            reason = "A fixed design has no interim stage or early stopping decision to display.",
-            userInstructions = paste0(
-                "Choose a plot supported for the fixed design. Use a multi-stage design only if interim ",
-                "analyses are part of the intended trial."
-            )
+            diagnosticId = "plot.fixed_design_has_no_interims"
         )
     }
     if (stage >= kMax) {

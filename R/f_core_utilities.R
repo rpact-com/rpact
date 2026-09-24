@@ -743,10 +743,7 @@ getTestLabel <- function(x) {
                 unirootResult$f.root, ") that differs from target 0 ",
                 "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
                 ", last function argument was ", unirootResult$root, ")",
-                userInstructions = paste0(
-                    "Check root-search bounds, target feasibility and tolerance; verify numerical convergence ",
-                    "before using the result."
-                )
+                diagnosticId = "numerical.root_search_failed"
             )
         }
         return(NA_real_)
@@ -756,10 +753,7 @@ getTestLabel <- function(x) {
             "that differs from target 0 ",
             "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
             ", last function argument was ", unirootResult$root, ")",
-            userInstructions = paste0(
-                "Check root-search bounds, target feasibility and tolerance; verify numerical convergence ",
-                "before using the result."
-            )
+            diagnosticId = "numerical.root_search_failed"
         )
     }
 
@@ -832,10 +826,7 @@ getTestLabel <- function(x) {
                 warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                     "Root search via 'bisection' stopped: maximum number of search iterations reached. ",
                     "Check if lower and upper search bounds were calculated correctly",
-                    userInstructions = paste0(
-                        "Check root-search bounds, target feasibility and tolerance; verify numerical ",
-                        "convergence before using the result."
-                    )
+                    diagnosticId = "numerical.root_search_failed"
                 )
             }
             .plotMonotoneFunctionRootSearch(fun, lowerStart, upperStart)
@@ -854,10 +845,7 @@ getTestLabel <- function(x) {
                     "NA returned because root search via 'bisection' produced a function result (",
                     result, ") that differs from target 0 ",
                     "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                    userInstructions = paste0(
-                        "Check root-search bounds, target feasibility and tolerance; verify numerical ",
-                        "convergence before using the result."
-                    )
+                    diagnosticId = "numerical.root_search_failed"
                 )
             }
             return(NA_real_)
@@ -866,10 +854,7 @@ getTestLabel <- function(x) {
                 "Root search via 'bisection' produced a function result (", result, ") ",
                 "that differs from target 0 ",
                 "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                userInstructions = paste0(
-                    "Check root-search bounds, target feasibility and tolerance; verify numerical convergence ",
-                    "before using the result."
-                )
+                diagnosticId = "numerical.root_search_failed"
             )
         }
     }
@@ -1611,10 +1596,7 @@ getParameterName <- function(obj, parameterCaption) {
         epsilon = C_QNORM_EPSILON) {
     if (any(p < -1e-07 | p > 1 + 1e-07, na.rm = TRUE)) {
         warnNumericalIssue("Tried to get qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)",
-            userInstructions = paste0(
-                "Supply probabilities strictly between 0 and 1 for a finite normal quantile; check the upstream ",
-                "probability calculation."
-            )
+            diagnosticId = "numerical.infinite_normal_quantile"
         )
     }
 
@@ -1643,10 +1625,7 @@ getParameterName <- function(obj, parameterCaption) {
 
     if (any(p < -1e-07 | p > 1 + 1e-07, na.rm = TRUE)) {
         warnNumericalIssue("Tried to get 1 - qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)",
-            userInstructions = paste0(
-                "Supply probabilities strictly between 0 and 1 for a finite normal quantile; check the upstream ",
-                "probability calculation."
-            )
+            diagnosticId = "numerical.infinite_normal_quantile"
         )
     }
 
@@ -2258,10 +2237,7 @@ saveOptions <- function() {
         },
         error = function(e) {
             warnRuntimeIssue("Failed to save rpact options: ", e$message,
-                userInstructions = paste0(
-                    "Check access to the rpact options file and the reported error, then retry saving or ",
-                    "resetting the options."
-                )
+                diagnosticId = "io.options_write_failed"
             )
             return(invisible(FALSE))
         }
@@ -2315,10 +2291,7 @@ resetOptions <- function(persist = TRUE) {
         },
         error = function(e) {
             warnRuntimeIssue("Failed to reset rpact options: ", e$message,
-                userInstructions = paste0(
-                    "Check access to the rpact options file and the reported error, then retry saving or ",
-                    "resetting the options."
-                )
+                diagnosticId = "io.options_write_failed"
             )
             return(invisible(FALSE))
         }

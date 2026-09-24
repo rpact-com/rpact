@@ -305,14 +305,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
                 functionName = ".getEffectData",
                 parameter = "F",
                 relatedParameter = "R",
-                reason = paste0(
-                    "The full population overlaps its subsets and cannot be used as an additional disjoint ",
-                    "subgroup."
-                ),
-                userInstructions = paste0(
-                    "Specify disjoint subgroups and the remaining population R, rather than combining the full ",
-                    "population F with its subsets."
-                )
+                diagnosticId = "enrichment.overlapping_full_population"
             )
         }
         expectedSubGroups <- .createSubsetsByGMax(gMax, stratifiedInput = TRUE, all = FALSE)
@@ -438,12 +431,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         stopIllegalArgument(sQuote("effectList$prevalences"), " must sum to 1",
             functionName = ".getEffectData",
             parameter = "effectList$prevalences", value = effectList$prevalences,
-            reason = "Prevalences describe a partition of the full population into disjoint subgroups.",
-            userInstructions = paste0(
-                "Specify subgroup proportions summing to 1, including the remaining population R where ",
-                "applicable; verify percentages versus proportions and do not normalize overlapping ",
-                "populations."
-            )
+            diagnosticId = "enrichment.prevalences_not_partition"
         )
     }
     for (i in indices) {
@@ -522,11 +510,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
                 parameter = ignore,
                 relatedParameter = "endpoint",
                 relatedValue = endpoint,
-                reason = "These effect parameters do not belong to the selected endpoint.",
-                userInstructions = paste0(
-                    "Supply effect parameters matching the selected endpoint, or correct the endpoint before ",
-                    "removing these parameters."
-                )
+                diagnosticId = "simulation.endpoint_effects_ignored"
             )
         }
     }
@@ -690,11 +674,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
                 parameter = ignore,
                 relatedParameter = "endpoint",
                 relatedValue = endpoint,
-                reason = "These effect parameters do not belong to the selected endpoint.",
-                userInstructions = paste0(
-                    "Supply effect parameters matching the selected endpoint, or correct the endpoint before ",
-                    "removing these parameters."
-                )
+                diagnosticId = "simulation.endpoint_effects_ignored"
             )
         }
     }
@@ -1155,12 +1135,7 @@ getRawData <- function(x, aggregate = FALSE) {
                 parameter = "simulationType",
                 value = x$simulationType,
                 relatedParameter = "maxNumberOfRawDatasetsPerStage",
-                reason = "Test-statistic-based simulations do not generate patient-level raw data.",
-                userInstructions = paste0(
-                    "Use simulationType = \"patientWise\" with the required survival inputs and ",
-                    "maxNumberOfRawDatasetsPerStage > 0 if patient data are needed; otherwise omit the raw-data ",
-                    "request."
-                )
+                diagnosticId = "simulation.raw_data_requires_patient_wise"
             )
         }
         simulationFunction <- if (inherits(x, "SimulationResultsMultiArmSurvival")) {
@@ -1176,11 +1151,7 @@ getRawData <- function(x, aggregate = FALSE) {
             simulationFunction, "(..., maxNumberOfRawDatasetsPerStage = 1)",
             functionName = "getRawData",
             parameter = "maxNumberOfRawDatasetsPerStage",
-            reason = "Raw datasets were not retained in the existing simulation result.",
-            userInstructions = paste0(
-                "Rerun the supported simulation with maxNumberOfRawDatasetsPerStage > 0. Retained patient-level ",
-                "data cannot be reconstructed from summary results alone."
-            )
+            diagnosticId = "simulation.raw_data_not_retained"
         )
     }
 
@@ -1282,11 +1253,7 @@ getRawData <- function(x, aggregate = FALSE) {
                 "is defined as ", .vQuote(typeOfShape),
                 parameter = "gED50",
                 value = gED50,
-                reason = "The linear dose-response shape does not use gED50 or slope.",
-                userInstructions = paste0(
-                    "Set typeOfShape = \"sigmoidEmax\" to use this parameter, or remove it after confirming the ",
-                    "linear shape."
-                )
+                diagnosticId = "shape.linear_parameters_ignored"
             )
         }
         if (!is.null(slope) && !is.na(slope) && slope != 1) {
@@ -1294,11 +1261,7 @@ getRawData <- function(x, aggregate = FALSE) {
                 "is defined as ", .vQuote(typeOfShape),
                 parameter = "slope",
                 value = slope,
-                reason = "The linear dose-response shape does not use gED50 or slope.",
-                userInstructions = paste0(
-                    "Set typeOfShape = \"sigmoidEmax\" to use this parameter, or remove it after confirming the ",
-                    "linear shape."
-                )
+                diagnosticId = "shape.linear_parameters_ignored"
             )
         }
 
@@ -1347,10 +1310,7 @@ getRawData <- function(x, aggregate = FALSE) {
             "Increase the maximum number of subjects (",
             accrualSetup$maxNumberOfSubjects, ") ",
             "to avoid this situation",
-            userInstructions = paste0(
-                "Increase maxNumberOfSubjects to allow the target event count despite dropouts, and rerun the ",
-                "simulation."
-            )
+            diagnosticId = "simulation.dropout_prevents_event_target"
         )
     } else {
         simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_NOT_APPLICABLE)

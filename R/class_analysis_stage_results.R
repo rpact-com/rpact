@@ -1720,11 +1720,7 @@ plot.StageResults <- function(
     if (x$.design$kMax == 1) {
         stopIllegalArgument("cannot plot stage results of a fixed design",
             functionName = ".plot.StageResults",
-            reason = "A fixed design has no interim stage or early stopping decision to display.",
-            userInstructions = paste0(
-                "Choose a plot supported for the fixed design. Use a multi-stage design only if interim ",
-                "analyses are part of the intended trial."
-            )
+            diagnosticId = "plot.fixed_design_has_no_interims"
         )
     }
 

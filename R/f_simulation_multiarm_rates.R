@@ -282,12 +282,7 @@ NULL
                         "the output must be a single numeric value",
                         functionName = ".getSimulatedStageRatesMultiArm",
                         parameter = "calcSubjectsFunction", value = calcSubjectsFunction,
-                        reason = "The custom sample-size adaptation function returned an unsupported result.",
-                        userInstructions = paste0(
-                            "Correct calcSubjectsFunction so every execution path returns a single finite ",
-                            "numeric sample-size value within the documented bounds; test zero, missing and ",
-                            "extreme interim inputs."
-                        )
+                        diagnosticId = "simulation.subject_callback_result_invalid"
                     )
                 }
 

@@ -339,11 +339,7 @@ getDesignOptimalConditionalError <- function(
             value = distribution,
             constraint = "a probability distribution: fixed, normal, exp or unif",
             functionName = ".getOptimalDesignExpectedInformation",
-            reason = "Expected information requires a probability distribution; maxlr does not supply one.",
-            userInstructions = paste0(
-                "Choose fixed, normal, exp or unif with its required parameters if that distribution matches ",
-                "the intended effect assumptions."
-            )
+            diagnosticId = "optimal.expected_information_requires_distribution"
         )
     }
     # Integrate over a helper function from efficacyBounds to futilityBounds

@@ -158,14 +158,7 @@ NULL
             stopIllegalArgument("at least one sample size specification too small to create simulation results, ",
                 "e.g., due to small prevalences of subsets",
                 functionName = ".getSimulatedStageRatesEnrichment",
-                reason = paste0(
-                    "At least one simulated subset is too small for the required calculation under the ",
-                    "sample-size and prevalence assumptions."
-                ),
-                userInstructions = paste0(
-                    "Check subset prevalences and per-stage sample sizes together; increase feasible ",
-                    "recruitment if needed without altering justified prevalences simply to avoid the error."
-                )
+                diagnosticId = "simulation.subset_sample_size_insufficient"
             )
         }
 
@@ -863,12 +856,7 @@ NULL
                         functionName = ".getSimulatedStageRatesEnrichment",
                         parameter = "calcSubjectsFunction",
                         value = calcSubjectsFunction,
-                        reason = "The custom sample-size adaptation function returned an unsupported result.",
-                        userInstructions = paste0(
-                            "Correct calcSubjectsFunction so every execution path returns a single finite ",
-                            "numeric sample-size value within the documented bounds; test zero, missing and ",
-                            "extreme interim inputs."
-                        )
+                        diagnosticId = "simulation.subject_callback_result_invalid"
                     )
                 }
 

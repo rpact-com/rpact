@@ -590,10 +590,7 @@ print.SummaryFactory <- function(
                 .arrayToString(values), ") stored in ",
                 .getClassName(parameterSet), " because the ",
                 "parameter has type C_PARAM_NOT_APPLICABLE",
-                userInstructions = paste0(
-                    "Inspect the affected parameter and its format or dimensions; correct the reported ",
-                    "formatting or extraction problem before using the incomplete output."
-                )
+                diagnosticId = "output.parameter_formatting_failed"
             )
         }
 
@@ -932,10 +929,7 @@ print.SummaryFactory <- function(
                         "Failed to get varied parameter from ", .getClassName(parameterSet),
                         " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ";",
                         length(variedParameter), " varied parameter values)",
-                        userInstructions = paste0(
-                            "Inspect the affected parameter and its format or dimensions; correct the reported ",
-                            "formatting or extraction problem before using the incomplete output."
-                        )
+                        diagnosticId = "output.parameter_formatting_failed"
                     )
                 }
                 return(invisible())

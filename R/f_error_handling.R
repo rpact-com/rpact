@@ -53,8 +53,8 @@ NULL
         category = NULL,
         class = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     factory <- getOption(factoryKey)
     if (!is.function(factory)) {
         factory <- getOption("rpact.error.factory.condition")
@@ -69,11 +69,11 @@ NULL
                     message = message, ..., code = code, category = category,
                     call = call, class = class
                 )
-                if (!is.null(reason)) {
-                    factoryArguments$reason <- reason
+                if (!is.null(diagnosticId)) {
+                    factoryArguments$diagnosticId <- diagnosticId
                 }
-                if (!is.null(userInstructions)) {
-                    factoryArguments$userInstructions <- userInstructions
+                if (!is.null(context)) {
+                    factoryArguments$context <- context
                 }
                 do.call(factory, factoryArguments, quote = TRUE)
             },
@@ -101,8 +101,8 @@ NULL
         category,
         class,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     message <- .stripErrorExceptionType(message, exceptionType)
     condition <- .createCondition(
         message = paste0(exceptionType, message),
@@ -112,8 +112,8 @@ NULL
         category = category,
         class = class,
         call = call,
-        reason = reason,
-        userInstructions = userInstructions
+        diagnosticId = diagnosticId,
+        context = context
     )
     stop(condition)
 }
@@ -133,8 +133,8 @@ stopRuntimeIssue <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -145,8 +145,8 @@ stopRuntimeIssue <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         exceptionType = C_EXCEPTION_TYPE_RUNTIME_ISSUE,
         factoryKey = "rpact.error.factory.runtime.issue.condition",
         code = "RUNTIME_ISSUE",
@@ -171,8 +171,8 @@ stopIllegalArgument <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -183,8 +183,8 @@ stopIllegalArgument <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         exceptionType = C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         factoryKey = "rpact.error.factory.illegal.argument.condition",
         code = "ILLEGAL_ARGUMENT",
@@ -203,8 +203,8 @@ stopIllegalDataInput <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -215,8 +215,8 @@ stopIllegalDataInput <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         exceptionType = C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
         factoryKey = "rpact.error.factory.illegal.data.input.condition",
         code = "ILLEGAL_DATA_INPUT",
@@ -235,8 +235,8 @@ stopConflictingArguments <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -247,8 +247,8 @@ stopConflictingArguments <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         exceptionType = C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
         factoryKey = "rpact.error.factory.conflicting.arguments.condition",
         code = "CONFLICTING_ARGUMENTS",
@@ -269,8 +269,8 @@ stopArgumentOutOfRange <- function(
         lowerBound = NULL,
         upperBound = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -281,8 +281,8 @@ stopArgumentOutOfRange <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         lowerBound = lowerBound,
         upperBound = upperBound,
         exceptionType = C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_RANGE,
@@ -307,8 +307,8 @@ stopArgumentLengthOutOfBounds <- function(
         expectedLength = NULL,
         actualLength = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -319,8 +319,8 @@ stopArgumentLengthOutOfBounds <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         lowerBound = lowerBound,
         upperBound = upperBound,
         expectedLength = expectedLength,
@@ -346,8 +346,8 @@ stopIndexOutOfBounds <- function(
         upperBound = NULL,
         index = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -358,8 +358,8 @@ stopIndexOutOfBounds <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         lowerBound = lowerBound,
         upperBound = upperBound,
         index = index,
@@ -381,8 +381,8 @@ stopMissingArgument <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -393,8 +393,8 @@ stopMissingArgument <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         exceptionType = C_EXCEPTION_TYPE_MISSING_ARGUMENT,
         factoryKey = "rpact.error.factory.missing.argument.condition",
         code = "MISSING_ARGUMENT",
@@ -413,8 +413,8 @@ stopArgumentUnknown <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -425,8 +425,8 @@ stopArgumentUnknown <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         exceptionType = C_EXCEPTION_TYPE_UNKNOWN_ARGUMENT,
         factoryKey = "rpact.error.factory.unknown.argument.condition",
         code = "UNKNOWN_ARGUMENT",
@@ -447,8 +447,8 @@ stopIncompleteArguments <- function(
         missingParameters = NULL,
         definedParameters = NULL,
         call = NULL,
-        reason = NULL,
-        userInstructions = NULL) {
+        diagnosticId = NULL,
+        context = NULL) {
     call <- .getErrorCall(call = call)
     message <- .getErrorMessage(...)
     .stopWithError(
@@ -459,8 +459,8 @@ stopIncompleteArguments <- function(
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        reason = reason,
-        userInstructions = userInstructions,
+        diagnosticId = diagnosticId,
+        context = context,
         missingParameters = missingParameters,
         definedParameters = definedParameters,
         exceptionType = C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS,

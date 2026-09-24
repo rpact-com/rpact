@@ -92,11 +92,7 @@ NULL
                 relatedParameter = "gMax",
                 relatedValue = gMax,
                 functionName = ".selectTreatmentArms",
-                reason = "The treatment-selection callback must return one logical decision per treatment arm.",
-                userInstructions = paste0(
-                    "Correct selectArmsFunction to return a logical vector of length gMax in the documented arm ",
-                    "order for every possible interim input."
-                )
+                diagnosticId = "simulation.arm_selection_result_invalid"
             )
         }
         if (!is.logical(selectedArms)) {
@@ -105,11 +101,7 @@ NULL
                 relatedParameter = "class of selected arms",
                 relatedValue = .getClassName(selectedArms),
                 functionName = ".selectTreatmentArms",
-                reason = "The treatment-selection callback must return one logical decision per treatment arm.",
-                userInstructions = paste0(
-                    "Correct selectArmsFunction to return a logical vector of length gMax in the documented arm ",
-                    "order for every possible interim input."
-                )
+                diagnosticId = "simulation.arm_selection_result_invalid"
             )
         }
     }
@@ -129,12 +121,7 @@ NULL
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stopIllegalArgument("Group sequential design cannot be used for designs with treatment arm selection",
             functionName = ".performClosedCombinationTestForSimulationMultiArm",
-            reason = "This group-sequential design does not support the requested adaptive selection.",
-            userInstructions = paste0(
-                "Choose a design supporting the intended population or treatment-arm selection, such as an ",
-                "appropriate combination-test design; retain the original design only if selection is not ",
-                "intended."
-            )
+            diagnosticId = "simulation.group_sequential_selection_unsupported"
         )
     }
 
@@ -305,11 +292,7 @@ NULL
     if (length(allocationRatioPlanned) > 1 && allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
         stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages",
             functionName = ".getCriticalValuesDunnettForSimulation",
-            reason = "The conditional Dunnett procedure assumes a constant allocation ratio across stages.",
-            userInstructions = paste0(
-                "Use equal allocationRatioPlanned values over stages, or choose a design supporting the ",
-                "intended varying allocation ratios."
-            )
+            diagnosticId = "simulation.dunnett_allocation_varies"
         )
     }
 
@@ -678,10 +661,7 @@ NULL
             value = threshold,
             relatedParameter = "typeOfSelection",
             relatedValue = typeOfSelection,
-            userInstructions = paste0(
-                "Implement the threshold inside the custom selection function, or choose a built-in selection ",
-                "rule supporting threshold."
-            )
+            diagnosticId = "selection.threshold_ignored_for_callback"
         )
         threshold <- -Inf
     }
@@ -691,10 +671,7 @@ NULL
             parameter = "selectArmsFunction",
             relatedParameter = "typeOfSelection",
             relatedValue = typeOfSelection,
-            userInstructions = paste0(
-                "Set typeOfSelection = \"userDefined\" to use selectArmsFunction, or remove the function after ",
-                "confirming the selection rule."
-            )
+            diagnosticId = "selection.arm_callback_requires_user_defined"
         )
     } else if (!is.null(selectArmsFunction) && is.function(selectArmsFunction)) {
         simulationResults$selectArmsFunction <- selectArmsFunction
@@ -776,10 +753,7 @@ NULL
                     "because 'typeOfShape' = \"userDefined\"",
                     parameter = "piMaxVector",
                     value = piMaxVector,
-                    userInstructions = paste0(
-                        "Specify effects in effectMatrix for typeOfShape = \"userDefined\", or choose a supported ",
-                        "parametric shape to use piMaxVector."
-                    )
+                    diagnosticId = "shape.maximum_probability_ignored"
                 )
             }
             piMaxVector <- effectMatrix[, gMax]
@@ -948,12 +922,7 @@ NULL
                     .arrayToString(minNumberOfSubjectsPerStage), ")",
                     functionName = ".createSimulationResultsMultiArmObject",
                     parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage,
-                    reason = "At least one per-stage maximum sample size is below its corresponding minimum.",
-                    userInstructions = paste0(
-                        "Check the stage order and units of minNumberOfSubjectsPerStage and ",
-                        "maxNumberOfSubjectsPerStage; make each minimum no greater than its corresponding ",
-                        "maximum."
-                    )
+                    diagnosticId = "simulation.subject_bounds_inverted"
                 )
             }
             .setValueAndParameterType(
@@ -1015,11 +984,7 @@ NULL
                     parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage,
                     relatedParameter = "minNumberOfEventsPerStage",
                     relatedValue = minNumberOfEventsPerStage,
-                    reason = "At least one per-stage maximum event count is below its corresponding minimum.",
-                    userInstructions = paste0(
-                        "Check the stage order of minNumberOfEventsPerStage and maxNumberOfEventsPerStage; make ",
-                        "each minimum no greater than its corresponding maximum."
-                    )
+                    diagnosticId = "simulation.event_bounds_inverted"
                 )
             }
             .setValueAndParameterType(
@@ -1056,10 +1021,7 @@ NULL
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
                 parameter = "minNumberOfSubjectsPerStage",
                 value = minNumberOfSubjectsPerStage,
-                userInstructions = paste0(
-                    "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or ",
-                    "remove this argument after confirming reassessment is not intended."
-                )
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$minNumberOfSubjectsPerStage <- NA_real_
         }
@@ -1071,10 +1033,7 @@ NULL
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
                 parameter = "maxNumberOfSubjectsPerStage",
                 value = maxNumberOfSubjectsPerStage,
-                userInstructions = paste0(
-                    "Define conditionalPower or calcSubjectsFunction to enable sample-size reassessment, or ",
-                    "remove this argument after confirming reassessment is not intended."
-                )
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$maxNumberOfSubjectsPerStage <- NA_real_
         }
@@ -1089,10 +1048,7 @@ NULL
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
                 parameter = "minNumberOfEventsPerStage",
                 value = minNumberOfEventsPerStage,
-                userInstructions = paste0(
-                    "Define conditionalPower or calcEventsFunction to enable event-number reassessment, or ",
-                    "remove this argument after confirming reassessment is not intended."
-                )
+                diagnosticId = "simulation.argument_requires_event_reassessment"
             )
             simulationResults$minNumberOfEventsPerStage <- NA_real_
         }
@@ -1104,10 +1060,7 @@ NULL
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
                 parameter = "maxNumberOfEventsPerStage",
                 value = maxNumberOfEventsPerStage,
-                userInstructions = paste0(
-                    "Define conditionalPower or calcEventsFunction to enable event-number reassessment, or ",
-                    "remove this argument after confirming reassessment is not intended."
-                )
+                diagnosticId = "simulation.argument_requires_event_reassessment"
             )
             simulationResults$maxNumberOfEventsPerStage <- NA_real_
         }
@@ -1274,11 +1227,7 @@ NULL
         stopIllegalArgument("'adaptations' must have length ", (kMax - 1), " (kMax - 1)",
             functionName = ".createSimulationResultsMultiArmObject",
             parameter = "adaptations", value = adaptations,
-            reason = "This vector describes interim stages only; the final analysis is excluded.",
-            userInstructions = paste0(
-                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
-                "entry intended solely for the final analysis."
-            )
+            diagnosticId = "validation.interim_vector_length"
         )
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))

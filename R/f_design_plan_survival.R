@@ -51,14 +51,7 @@ NULL
             stopIllegalArgument("Weibull distribution cannot ",
                 "be used together with specified dropout rate (use simulation instead)",
                 functionName = ".getEventProbabilityFunction",
-                reason = paste0(
-                    "This analytical event-probability calculation does not combine a non-unit Weibull shape ",
-                    "with dropout."
-                ),
-                userInstructions = paste0(
-                    "Use survival simulation for the intended Weibull model with dropout. Set kappa = 1 or ",
-                    "remove dropout only if those assumptions are scientifically justified."
-                )
+                diagnosticId = "survival.weibull_dropout_analytical_unsupported"
             )
         }
 
@@ -84,14 +77,7 @@ NULL
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise survival definition",
             functionName = ".getEventProbabilityFunction",
-            reason = paste0(
-                "Piecewise exponential survival and a non-unit Weibull shape are incompatible in this ",
-                "calculation."
-            ),
-            userInstructions = paste0(
-                "Use kappa = 1 for a piecewise exponential model, or remove the piecewise specification for a ",
-                "Weibull model. Choose according to the intended survival assumptions."
-            )
+            diagnosticId = "survival.weibull_piecewise_incompatible"
         )
     }
     len <- length(piecewiseSurvivalTime)
@@ -510,19 +496,13 @@ NULL
             warnInvalidInput("Accrual duration longer than maximum study ",
                 "duration (time to maximum number of events); followUpTime = ",
                 .arrayToString(designPlan$followUpTime),
-                userInstructions = paste0(
-                    "Check accrual duration, target events and follow-up assumptions; ensure the intended ",
-                    "recruitment schedule is consistent with the calculated study duration."
-                )
+                diagnosticId = "survival.accrual_duration_inconsistent"
             )
         }
     } else {
         warnNumericalIssue("Follow-up time could not be calculated for hazardRatio = ",
             .arrayToString(designPlan$hazardRatio),
-            userInstructions = paste0(
-                "Check event hazards, target events and the maximum sample size for the reported hazard ratios; ",
-                "verify that the target can be reached."
-            )
+            diagnosticId = "survival.event_target_calculation_failed"
         )
     }
 
@@ -657,12 +637,7 @@ NULL
         if (design$sided == 2 && thetaH0 != 1) {
             stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
                 functionName = ".createDesignPlanSurvival",
-                reason = "The implemented two-sided sample-size calculation supports superiority testing only.",
-                userInstructions = paste0(
-                    "Check the null on the selected effect scale. Use the superiority null only if ",
-                    "scientifically intended; for non-inferiority or another null, select a supported procedure ",
-                    "consistent with the hypothesis."
-                )
+                diagnosticId = "planning.two_sided_requires_superiority"
             )
         }
 
@@ -685,11 +660,7 @@ NULL
         if (typeOfComputation != "Schoenfeld" && thetaH0 != 1) {
             stopIllegalArgument("Freedman test calculation is possible only for superiority testing (thetaH0 != 1)",
                 functionName = ".createDesignPlanSurvival",
-                reason = "The Freedman-based calculations support only the superiority null thetaH0 = 1.",
-                userInstructions = paste0(
-                    "Use typeOfComputation = \"Schoenfeld\" for a supported non-superiority null, or set thetaH0 ",
-                    "= 1 only if superiority is the intended hypothesis."
-                )
+                diagnosticId = "survival.freedman_requires_superiority"
             )
         }
     }
@@ -837,10 +808,7 @@ NULL
         warnArgumentAdjusted("Only the first default 'pi1' (", designPlan$.piecewiseSurvivalTime$pi1, ") was used ",
             "because the accrual intensities (", .arrayToString(accrualSetup$accrualIntensity), ") ",
             "were defined relative (all accrual intensities are < 1)",
-            userInstructions = paste0(
-                "Choose pi1 explicitly for relative accrual intensities, or run separate calculations for each ",
-                "intended survival scenario."
-            )
+            diagnosticId = "survival.relative_accrual_scenario_selected"
         )
     }
 
@@ -871,11 +839,7 @@ NULL
                 length(followUpTime) == 1 && !is.na(followUpTime)) {
             warnArgumentIgnored("Follow-up time will be calculated, value entered (",
                 followUpTime, ") is not taken into account",
-                reason = "With a user-defined maximum number of subjects, the required follow-up time is calculated.",
-                userInstructions = paste0(
-                    "Remove maxNumberOfSubjects if followUpTime should determine sample size; otherwise remove ",
-                    "followUpTime after confirming the fixed maximum sample size."
-                )
+                diagnosticId = "survival.follow_up_derived_from_subject_cap"
             )
         } else if (is.na(followUpTime)) {
             designPlan$followUpTime <- C_FOLLOW_UP_TIME_DEFAULT
@@ -973,10 +937,7 @@ NULL
             warnArgumentAdjusted("'accountForObservationTimes' was set to TRUE ",
                 "because piecewise exponential survival function is enabled",
                 parameter = "accountForObservationTimes",
-                userInstructions = paste0(
-                    "Use accountForObservationTimes = TRUE with piecewise exponential survival; verify the ",
-                    "specified observation-time model."
-                )
+                diagnosticId = "survival.observation_times_enabled"
             )
         }
     } else {
@@ -988,11 +949,7 @@ NULL
                     functionName = ".initDesignPlanSurvival",
                     parameter = "accountForObservationTimes",
                     relatedParameter = "maxNumberOfSubjects",
-                    reason = "A fixed maximum subject count requires accounting for observation times.",
-                    userInstructions = paste0(
-                        "Set accountForObservationTimes = TRUE when maxNumberOfSubjects is specified, or remove ",
-                        "the subject cap only if it was not intended."
-                    )
+                    diagnosticId = "survival.subject_cap_requires_observation_times"
                 )
             }
 
@@ -1067,11 +1024,7 @@ NULL
             parameter = "allocationRatioPlanned",
             relatedParameter = "maxNumberOfSubjects",
             relatedValue = designPlan$maxNumberOfSubjects,
-            reason = "Allocation optimization is unavailable when the subject total is fixed in this calculation.",
-            userInstructions = paste0(
-                "Specify a positive allocationRatioPlanned consistent with the recruitment plan, or remove the ",
-                "fixed subject-total constraint only if it was not intended."
-            )
+            diagnosticId = "planning.allocation_optimization_with_fixed_total"
         )
     }
 
@@ -1173,15 +1126,7 @@ NULL
                         ),
                         functionName = ".getSampleSizeFixedSurvival",
                         parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects,
-                        reason = paste0(
-                            "The required event total exceeds the number of subjects available to experience an ",
-                            "event."
-                        ),
-                        userInstructions = paste0(
-                            "Increase maxNumberOfSubjects to a feasible planned total or revisit the planning ",
-                            "assumptions. Account for censoring and dropout; do not lower observed event ",
-                            "counts."
-                        )
+                        diagnosticId = "survival.events_exceed_subject_cap"
                     )
                 } else {
                     stopIllegalArgument(
@@ -1195,15 +1140,7 @@ NULL
                         functionName = ".getSampleSizeFixedSurvival",
                         parameter = "maxNumberOfSubjects",
                         value = maxNumberOfSubjects,
-                        reason = paste0(
-                            "The required event total exceeds the number of subjects available to experience an ",
-                            "event."
-                        ),
-                        userInstructions = paste0(
-                            "Increase maxNumberOfSubjects to a feasible planned total or revisit the planning ",
-                            "assumptions. Account for censoring and dropout; do not lower observed event ",
-                            "counts."
-                        )
+                        diagnosticId = "survival.events_exceed_subject_cap"
                     )
                 }
             }
@@ -1224,15 +1161,7 @@ NULL
                         "the number of subjects is too small to reach maximum number of events ",
                         "(presumably due to drop-out rates), search algorithm failed",
                         functionName = ".getSampleSizeFixedSurvival",
-                        reason = paste0(
-                            "The current subject total did not yield the required event count; dropout may ",
-                            "contribute."
-                        ),
-                        userInstructions = paste0(
-                            "Review maxNumberOfSubjects, accrual, follow-up and dropout assumptions together. ",
-                            "Use a feasible recruitment plan while preserving justified effect and error-rate ",
-                            "assumptions."
-                        )
+                        diagnosticId = "survival.event_target_unreachable"
                     )
                 }
             }
@@ -1367,15 +1296,7 @@ NULL
                             designPlan$maxNumberOfSubjects[i], designPlan$cumulativeEventsPerStage[kMax, i], i
                         ),
                         functionName = ".getSampleSizeSequentialSurvival",
-                        reason = paste0(
-                            "The required event total exceeds the number of subjects available to experience an ",
-                            "event."
-                        ),
-                        userInstructions = paste0(
-                            "Increase maxNumberOfSubjects to a feasible planned total or revisit the planning ",
-                            "assumptions. Account for censoring and dropout; do not lower observed event ",
-                            "counts."
-                        )
+                        diagnosticId = "survival.events_exceed_subject_cap"
                     )
                 }
 
@@ -1399,15 +1320,7 @@ NULL
                             "the number of subjects is too small to reach maximum number of events ",
                             "(presumably due to drop-out rates)",
                             functionName = ".getSampleSizeSequentialSurvival",
-                            reason = paste0(
-                                "The current subject total did not yield the required event count; dropout may ",
-                                "contribute."
-                            ),
-                            userInstructions = paste0(
-                                "Review maxNumberOfSubjects, accrual, follow-up and dropout assumptions ",
-                                "together. Use a feasible recruitment plan while preserving justified effect ",
-                                "and error-rate assumptions."
-                            )
+                            diagnosticId = "survival.event_target_unreachable"
                         )
                     }
                 }
@@ -1529,10 +1442,7 @@ NULL
                 warnResultUnavailable("Expected number of subjects H1 and study duration H1 ",
                     "cannot be calculated because the futility probabilities ",
                     "are not applicable for the specified design",
-                    userInstructions = paste0(
-                        "Use a design with applicable futility probabilities if expected sample size and study ",
-                        "duration under H1 are required."
-                    )
+                    diagnosticId = "survival.expected_h1_results_unavailable"
                 )
             }
 
@@ -1792,10 +1702,7 @@ getEventProbabilities <- function(
             setting$isUserDefinedParameter("lambda1")) {
         warnArgumentAdjusted("Only the first 'lambda1' (", lambda1[1], ") ",
             "was used to calculate event probabilities",
-            userInstructions = paste0(
-                "Supply one lambda1 scenario, or calculate event probabilities separately for each intended ",
-                "lambda1."
-            )
+            diagnosticId = "survival.event_probability_scenario_selected"
         )
         setting <- getPiecewiseSurvivalTime(
             piecewiseSurvivalTime = piecewiseSurvivalTime,
@@ -1845,14 +1752,7 @@ getEventProbabilities <- function(
     if (kappa != 1 && any(phi > 0)) {
         stopIllegalArgument("for Weibull distribution (kappa != 1) drop-out rates (phi) cannot be specified",
             functionName = "getEventProbabilities",
-            reason = paste0(
-                "This analytical event-probability calculation does not combine a non-unit Weibull shape with ",
-                "dropout."
-            ),
-            userInstructions = paste0(
-                "Use survival simulation for the intended Weibull model with dropout. Set kappa = 1 or remove ",
-                "dropout only if those assumptions are scientifically justified."
-            )
+            diagnosticId = "survival.weibull_dropout_analytical_unsupported"
         )
     }
 
@@ -2581,10 +2481,7 @@ getSampleSizeSurvival <- function(
                 sampleSizeSurvival$.setParameterType("followUpTime", C_PARAM_GENERATED)
                 warnArgumentIgnored("User defined 'followUpTime' (", followUpTime, ") ignored because ",
                     "follow-up time is ", round(sampleSizeSurvival$followUpTime, 4),
-                    userInstructions = paste0(
-                        "Use the follow-up time from the sample-size result, or recompute that result with the ",
-                        "intended survival assumptions."
-                    )
+                    diagnosticId = "survival.follow_up_argument_ignored"
                 )
             }
         }
@@ -2827,15 +2724,7 @@ getPowerSurvival <- function(
                     functionName = "getPowerSurvival",
                     parameter = "maxNumberOfSubjects",
                     value = designPlan$maxNumberOfSubjects,
-                    reason = paste0(
-                        "The current subject total did not yield the required event count; dropout may ",
-                        "contribute."
-                    ),
-                    userInstructions = paste0(
-                        "Review maxNumberOfSubjects, accrual, follow-up and dropout assumptions together. Use a ",
-                        "feasible recruitment plan while preserving justified effect and error-rate ",
-                        "assumptions."
-                    )
+                    diagnosticId = "survival.event_target_unreachable"
                 )
             }
         }
@@ -2863,10 +2752,7 @@ getPowerSurvival <- function(
                     "small to reach maximum number of events",
                     parameter = "maxNumberOfSubjects",
                     value = designPlan$maxNumberOfSubjects,
-                    userInstructions = paste0(
-                        "Increase maxNumberOfSubjects or revise event/accrual assumptions so the required ",
-                        "number of events can be reached."
-                    )
+                    diagnosticId = "survival.subject_cap_insufficient"
                 )
             }
         }

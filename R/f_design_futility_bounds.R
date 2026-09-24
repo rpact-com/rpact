@@ -62,14 +62,7 @@ NULL
             value = if (is(information, "FisherInformation")) information$information else information,
             relatedParameter = "type",
             relatedValue = informationType,
-            reason = paste0(
-                "The conversion requires a different information type, such as cumulative rather than ",
-                "stage-wise information."
-            ),
-            userInstructions = paste0(
-                "Recompute information in the required type using the originating design plan; do not relabel ",
-                "the metadata without converting its values."
-            )
+            diagnosticId = "futility.information_type_mismatch"
         )
     }
 
@@ -94,11 +87,7 @@ NULL
                 functionName = ".getFutilityBoundInformations",
                 parameter = "information",
                 value = information$information,
-                reason = "A single conversion cannot unambiguously select among multiple planning situations.",
-                userInstructions = paste0(
-                    "Pipe the information object into getFutilityBounds() as sourceValue to convert all ",
-                    "situations, or supply numeric information for one explicitly selected situation."
-                )
+                diagnosticId = "futility.ambiguous_planning_situations"
             )
         }
         information <- as.numeric(information)
@@ -123,10 +112,7 @@ NULL
                         "'information[1]' (", information1, ") will be ignored ",
                         "because it is not required for the conversion from ",
                         .vQuote(sourceScale), " to ", .vQuote(targetScale),
-                        userInstructions = paste0(
-                            "Remove the unneeded conversion input only after verifying sourceScale and ",
-                            "targetScale; choose the intended scales if they are incorrect."
-                        )
+                        diagnosticId = "futility.conversion_input_ignored"
                     )
                 }
                 information1 <- NA_real_
@@ -137,10 +123,7 @@ NULL
                         "'information[2]' (", information2, ") will be ignored ",
                         "because it is not required for the conversion from ",
                         .vQuote(sourceScale), " to ", .vQuote(targetScale),
-                        userInstructions = paste0(
-                            "Remove the unneeded conversion input only after verifying sourceScale and ",
-                            "targetScale; choose the intended scales if they are incorrect."
-                        )
+                        diagnosticId = "futility.conversion_input_ignored"
                     )
                 }
                 information2 <- NA_real_
@@ -181,10 +164,7 @@ NULL
                 "because it will only be taken into account if the information is provided for both stages",
                 parameter = "information1",
                 value = information1,
-                userInstructions = paste0(
-                    "Provide information for both stages, or omit both information inputs if information-based ",
-                    "conversion is not intended."
-                )
+                diagnosticId = "futility.stage_information_incomplete"
             )
         }
         if (isTRUE(showWarnings) && !is.na(information2)) {
@@ -193,10 +173,7 @@ NULL
                 "because it will only be taken into account if the information is provided for both stages",
                 parameter = "information2",
                 value = information2,
-                userInstructions = paste0(
-                    "Provide information for both stages, or omit both information inputs if information-based ",
-                    "conversion is not intended."
-                )
+                diagnosticId = "futility.stage_information_incomplete"
             )
         }
 
@@ -593,11 +570,7 @@ summary.FutilityBounds <- function(object, ...) {
             functionName = ".getFutilityBoundsFromDesignPlanWithoutFisherInformation",
             parameter = "sourceValue",
             value = design$kMax,
-            reason = "Futility-bound conversion requires at least one interim analysis.",
-            userInstructions = paste0(
-                "Supply a multi-stage design with interim futility bounds if interim stopping is intended; omit ",
-                "this conversion for a fixed design."
-            )
+            diagnosticId = "futility.interim_analysis_required"
         )
     }
 
@@ -696,11 +669,7 @@ summary.FutilityBounds <- function(object, ...) {
             value = fisherInformation$information,
             relatedParameter = "type",
             relatedValue = fisherInformation$type,
-            reason = "Treatment-effect conversion uses cumulative Fisher information.",
-            userInstructions = paste0(
-                "Recreate fisherInformation with cumulative information from the intended design plan before ",
-                "converting to the treatment-effect scale."
-            )
+            diagnosticId = "futility.treatment_effect_requires_cumulative_information"
         )
     }
 
@@ -711,11 +680,7 @@ summary.FutilityBounds <- function(object, ...) {
             functionName = ".getFisherInformationForTreatmentEffectScale",
             parameter = "fisherInformation",
             value = fisherInformation$information,
-            reason = "This conversion needs the originating design plan, not just bare information values.",
-            userInstructions = paste0(
-                "Recreate the information object from its design plan, or explicitly supply the required design ",
-                "plan through the supported conversion interface."
-            )
+            diagnosticId = "futility.originating_plan_missing"
         )
     }
     if (!identical(informationDesignPlan, designPlan)) {
@@ -725,11 +690,7 @@ summary.FutilityBounds <- function(object, ...) {
             functionName = ".getFisherInformationForTreatmentEffectScale",
             parameter = "fisherInformation",
             value = fisherInformation$information,
-            reason = "Information values and treatment-effect assumptions must come from the same planning scenario.",
-            userInstructions = paste0(
-                "Recompute fisherInformation from the supplied designPlan or pass its actual originating plan; ",
-                "do not combine unrelated planning objects."
-            )
+            diagnosticId = "futility.originating_plan_mismatch"
         )
     }
 
@@ -778,11 +739,7 @@ summary.FutilityBounds <- function(object, ...) {
             functionName = ".getFutilityBoundsOnTreatmentEffectScale",
             parameter = "stage",
             value = stages,
-            reason = "Futility-bound conversion requires at least one interim analysis.",
-            userInstructions = paste0(
-                "Supply a multi-stage design with interim futility bounds if interim stopping is intended; omit ",
-                "this conversion for a fixed design."
-            )
+            diagnosticId = "futility.interim_analysis_required"
         )
     }
 
@@ -838,11 +795,7 @@ summary.FutilityBounds <- function(object, ...) {
             functionName = ".getFutilityBoundsFromFisherInformation",
             parameter = "information",
             value = fisherInformation$information,
-            reason = "This conversion needs the originating design plan, not just bare information values.",
-            userInstructions = paste0(
-                "Recreate the information object from its design plan, or explicitly supply the required design ",
-                "plan through the supported conversion interface."
-            )
+            diagnosticId = "futility.originating_plan_missing"
         )
     }
 
@@ -855,10 +808,7 @@ summary.FutilityBounds <- function(object, ...) {
         warnArgumentIgnored(
             "Fisher information is not required for conversion from ",
             .vQuote("zValue"), " to ", .vQuote(targetScale), " and will be ignored",
-            userInstructions = paste0(
-                "Remove the unneeded conversion input only after verifying sourceScale and targetScale; choose ",
-                "the intended scales if they are incorrect."
-            )
+            diagnosticId = "futility.conversion_input_ignored"
         )
         return(.getFutilityBoundsFromDesignPlanWithoutFisherInformation(
             designPlan = designPlan,
@@ -892,11 +842,7 @@ summary.FutilityBounds <- function(object, ...) {
             value = fisherInformation$information,
             relatedParameter = "stage",
             relatedValue = informationData$stage,
-            reason = "Futility-bound conversion requires at least one interim analysis.",
-            userInstructions = paste0(
-                "Supply a multi-stage design with interim futility bounds if interim stopping is intended; omit ",
-                "this conversion for a fixed design."
-            )
+            diagnosticId = "futility.interim_analysis_required"
         )
     }
 
@@ -934,14 +880,7 @@ summary.FutilityBounds <- function(object, ...) {
                 value = fisherInformation$information,
                 relatedParameter = "stage",
                 relatedValue = informationData$stage,
-                reason = paste0(
-                    "This target scale requires information for all design stages, including the final ",
-                    "analysis."
-                ),
-                userInstructions = paste0(
-                    "Supply information for every stage of the intended design rather than only the ",
-                    "interim-stage subset."
-                )
+                diagnosticId = "futility.complete_stage_information_required"
             )
         }
         for (situationIndex in seq_len(nSituations)) {
@@ -1504,14 +1443,7 @@ getFutilityBounds <- function(
                 "from or to the treatment-effect scale",
                 functionName = "getFutilityBounds",
                 parameter = "design",
-                reason = paste0(
-                    "The treatment-effect scale depends on endpoint-specific assumptions stored in a trial ",
-                    "design plan."
-                ),
-                userInstructions = paste0(
-                    "Create a TrialDesignPlan using the appropriate getSampleSize*() or getPower*() function ",
-                    "and pass that plan as design."
-                )
+                diagnosticId = "futility.treatment_effect_requires_plan"
             )
         }
         .assertIsTrialDesignPlan(sourceDesignPlan)
@@ -1683,15 +1615,7 @@ getFutilityBounds <- function(
                     functionName = ".assertIsValidDirectionUpper",
                     parameter = "directionUpper",
                     value = design$directionUpper,
-                    reason = paste0(
-                        "The direction specified for the calculation conflicts with the direction of the design ",
-                        "or effect assumptions."
-                    ),
-                    userInstructions = paste0(
-                        "Check the effect scale and intended alternative, then use a consistent directionUpper ",
-                        "in the design and calculation; recreate the design if its direction was specified ",
-                        "incorrectly."
-                    )
+                    diagnosticId = "design.direction_mismatch"
                 )
             } else if (is.na(design$directionUpper) && isFALSE(directionUpper) &&
                     .isTrialDesignInverseNormalOrGroupSequential(design)) {
@@ -1873,10 +1797,7 @@ getFutilityBounds <- function(
             } else {
                 warnResultUnavailable(
                     "Source scale ", .vQuote(sourceScale), " not implemented for Fisher's combination test design",
-                    userInstructions = paste0(
-                        "Choose a source scale supported for Fisher combination designs, or a different design ",
-                        "if scientifically appropriate."
-                    )
+                    diagnosticId = "futility.fisher_source_scale_unsupported"
                 )
                 return(NA_real_)
             }
@@ -1884,19 +1805,13 @@ getFutilityBounds <- function(
         warning = function(w) {
             warnNumericalIssue("Failed to calculate ", sQuote(sourceScale), " source value from ",
                 sourceValue, ": ", w$message,
-                userInstructions = paste0(
-                    "Check sourceScale and sourceValue and resolve the reported conversion problem before using ",
-                    "the converted bounds."
-                )
+                diagnosticId = "futility.conversion_failed"
             )
         },
         error = function(e) {
             warnNumericalIssue("Failed to calculate ", sQuote(sourceScale), " source value from ",
                 sourceValue, ": ", e$message,
-                userInstructions = paste0(
-                    "Check sourceScale and sourceValue and resolve the reported conversion problem before using ",
-                    "the converted bounds."
-                )
+                diagnosticId = "futility.conversion_failed"
             )
         }
     )
@@ -3164,11 +3079,7 @@ getFisherInformation <- function(
                 functionName = ".getFutilityBoundsTreatmentEffectMatrix",
                 parameter = "sourceValue",
                 value = zValues,
-                reason = "The conversion aligns rows with stages and columns with planning situations.",
-                userInstructions = paste0(
-                    "Arrange the supplied values with one row per required stage and one column per planning ",
-                    "situation, preserving their correspondence to the information object."
-                )
+                diagnosticId = "futility.stage_situation_dimensions"
             )
         }
     }
@@ -3179,11 +3090,7 @@ getFisherInformation <- function(
             functionName = ".getFutilityBoundsTreatmentEffectMatrix",
             parameter = "sourceValue",
             value = zValues,
-            reason = "The conversion aligns rows with stages and columns with planning situations.",
-            userInstructions = paste0(
-                "Arrange the supplied values with one row per required stage and one column per planning ",
-                "situation, preserving their correspondence to the information object."
-            )
+            diagnosticId = "futility.stage_situation_dimensions"
         )
     }
 
@@ -3332,11 +3239,7 @@ getFisherInformation <- function(
             functionName = ".getFutilityBoundsValuesMatrix",
             parameter = parameterName,
             value = values,
-            reason = "The conversion aligns rows with stages and columns with planning situations.",
-            userInstructions = paste0(
-                "Arrange the supplied values with one row per required stage and one column per planning ",
-                "situation, preserving their correspondence to the information object."
-            )
+            diagnosticId = "futility.stage_situation_dimensions"
         )
     }
     if (nrow(result) != nStages || ncol(result) != nSituations) {
@@ -3346,11 +3249,7 @@ getFisherInformation <- function(
             functionName = ".getFutilityBoundsValuesMatrix",
             parameter = parameterName,
             value = values,
-            reason = "The conversion aligns rows with stages and columns with planning situations.",
-            userInstructions = paste0(
-                "Arrange the supplied values with one row per required stage and one column per planning ",
-                "situation, preserving their correspondence to the information object."
-            )
+            diagnosticId = "futility.stage_situation_dimensions"
         )
     }
     return(result)

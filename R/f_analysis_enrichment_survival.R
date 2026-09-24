@@ -159,25 +159,14 @@ NULL
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
             functionName = ".getStageResultsSurvivalEnrichment",
             parameter = "gMax", value = gMax,
-            reason = paste0(
-                "The implemented Spiessens-Debois intersection test is restricted to one subset and the full ",
-                "population."
-            ),
-            userInstructions = paste0(
-                "Use a supported intersection test for the intended number of populations; reduce the ",
-                "population set only if it matches the trial objectives."
-            )
+            diagnosticId = "enrichment.spiessens_debois_population_limit"
         )
     }
 
     if (!stratifiedAnalysis) {
         stopIllegalArgument("only stratified analysis can be performed for enrichment survival designs",
             functionName = ".getStageResultsSurvivalEnrichment",
-            reason = "This enrichment procedure supports only stratified analysis.",
-            userInstructions = paste0(
-                "Use stratifiedAnalysis = TRUE and the corresponding stratified data or assumptions; otherwise ",
-                "choose a procedure supporting the intended analysis."
-            )
+            diagnosticId = "enrichment.stratification_required"
         )
     }
 
@@ -694,7 +683,7 @@ NULL
         warnResultUnavailable(
             "Repeated confidence intervals not because ", sum(is.na(criticalValues)),
             " critical values are NA (", .arrayToString(criticalValues), ")",
-            userInstructions = "Resolve the missing critical values before requesting repeated confidence intervals."
+            diagnosticId = "analysis.repeated_intervals_missing_critical_values"
         )
         return(repeatedConfidenceIntervals)
     }
@@ -1025,11 +1014,7 @@ NULL
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalPowerSurvivalEnrichment",
         parameter = "design",
-        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
-        userInstructions = paste0(
-            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-            "supporting the intended design. Do not change the object class manually."
-        )
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1210,10 +1195,7 @@ NULL
 
                 if (result <= 0 || result >= 1) {
                     warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax,
-                        userInstructions = paste0(
-                            "Check the stage data, design boundaries and planned future sample sizes/events; ",
-                            "conditional power for the reported stage could not be calculated."
-                        )
+                        diagnosticId = "analysis.conditional_power_calculation_failed"
                     )
                     results$conditionalPower[population, kMax] <- NA_real_
                 } else {

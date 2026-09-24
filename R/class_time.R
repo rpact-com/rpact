@@ -98,10 +98,7 @@ TimeDefinition <- R6::R6Class("TimeDefinition",
                 if (!accrualTimeMode && n == 1 && !grepl("(0 *- ?)?<?\\?|x|\\.", timePeriod)) {
                     warnArgumentIgnored("Defined time period \"", timePeriod, "\" will be ignored ",
                         "because 'piecewiseSurvivalTime' list has only 1 entry",
-                        userInstructions = paste0(
-                            "Use multiple piecewiseSurvivalTime entries to define time intervals, or omit the ",
-                            "interval label for a single constant hazard."
-                        )
+                        diagnosticId = "survival.single_interval_label_ignored"
                     )
                 }
             } else if (i == n) {
@@ -241,14 +238,7 @@ getPiecewiseSurvivalTime <- function(
                 "pi based defintion is not allowed",
                 functionName = "getPiecewiseSurvivalTime",
                 parameter = "piecewiseSurvivalTime", value = piecewiseSurvivalTime,
-                reason = paste0(
-                    "Piecewise survival construction requires hazard rates or medians rather than this ",
-                    "probability-based definition."
-                ),
-                userInstructions = paste0(
-                    "Express the intended survival assumptions using lambda or median inputs and preserve their ",
-                    "time units."
-                )
+                diagnosticId = "survival.piecewise_probability_input_unsupported"
             )
         }
 
@@ -391,14 +381,7 @@ getAccrualTime <- function(
                 value = accrualIntensityType,
                 relatedParameter = "accrualIntensity",
                 relatedValue = accrualIntensity,
-                reason = paste0(
-                    "Absolute accrual intensities use subject counts per time unit; the supplied values violate ",
-                    "this mode."
-                ),
-                userInstructions = paste0(
-                    "Check the units of accrualIntensity. Use relative intensities only if proportions were ",
-                    "intended; otherwise supply valid absolute intensities."
-                )
+                diagnosticId = "accrual.absolute_intensity_invalid"
             )
         }
     } else if (accrualIntensityType == "relative") {
@@ -599,14 +582,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                         ") has no influence on simulated results",
                         parameter = "eventTime",
                         value = self$eventTime,
-                        reason = paste0(
-                            "The simulation is parameterized without user-defined survival probabilities, so ",
-                            "eventTime does not affect the simulated hazards."
-                        ),
-                        userInstructions = paste0(
-                            "Specify survival probabilities with eventTime if that parameterization is ",
-                            "intended; otherwise remove eventTime."
-                        )
+                        diagnosticId = "survival.event_time_without_probabilities"
                     )
                 }
                 self$.setParameterType("eventTime", C_PARAM_NOT_APPLICABLE)
@@ -756,11 +732,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     value = argName1,
                     relatedParameter = "argName2",
                     relatedValue = argName2,
-                    reason = "These arguments are alternative parameterizations of the same survival assumptions.",
-                    userInstructions = paste0(
-                        "Keep one of the conflicting parameterizations and remove the other after confirming ",
-                        "which represents the intended survival model."
-                    )
+                    diagnosticId = "survival.conflicting_parameterizations"
                 )
             }
         },
@@ -912,10 +884,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     ") will be ignored because 'piecewiseSurvivalTime' is a list",
                     parameter = "lambda2",
                     value = self$lambda2,
-                    userInstructions = paste0(
-                        "Specify control hazards inside the piecewiseSurvivalTime list, or use a numeric time ",
-                        "vector with lambda2 if that parameterization is intended."
-                    )
+                    diagnosticId = "survival.control_hazard_overridden"
                 )
             }
 
@@ -958,10 +927,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     warnArgumentAdjusted("Only the first 'hazardRatio' (", round(self$hazardRatio[1], 4),
                         ") was used for piecewise survival time definition ",
                         "(use a loop over the function to simulate different hazard ratios)",
-                        userInstructions = paste0(
-                            "Use one hazard ratio for this calculation, or loop over separate calls to evaluate ",
-                            "different hazard ratios."
-                        )
+                        diagnosticId = "survival.multiple_hazard_ratios_reduced"
                     )
                     self$hazardRatio <- self$hazardRatio[1]
                 } else {
@@ -1028,11 +994,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 if (!is.na(pwSurvTime)) {
                     warnArgumentIgnored("'piecewiseSurvivalTime' (", pwSurvTime, ") will be ignored",
                         parameter = "piecewiseSurvivalTime",
-                        reason = "Piecewise survival is disabled for this survival parameterization.",
-                        userInstructions = paste0(
-                            "Use a supported piecewise hazard specification if time-varying hazards are ",
-                            "intended; otherwise remove piecewiseSurvivalTime."
-                        )
+                        diagnosticId = "survival.piecewise_input_disabled"
                     )
                 }
 
@@ -1071,11 +1033,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                             relatedValue = self$pi2,
                             parameter = "median2",
                             value = self$median2,
-                            reason = "The specified pi2 takes precedence over median2.",
-                            userInstructions = paste0(
-                                "Remove pi2 if median2 should define control survival; otherwise remove median2 ",
-                                "after checking pi2."
-                            )
+                            diagnosticId = "survival.control_median_overridden"
                         )
                         self$median2 <- NA_real_
                     }
@@ -1134,16 +1092,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                                     value = self$lambda2,
                                     relatedParameter = "unique(lambda1 / hazardRatio)",
                                     relatedValue = unique(round(self$lambda2, 8)),
-                                    reason = paste0(
-                                        "This conversion requires a constant derived control hazard or hazard ",
-                                        "ratio across the supplied intervals."
-                                    ),
-                                    userInstructions = paste0(
-                                        "Check the interval-specific hazards and the intended ",
-                                        "proportional-hazards assumption. Use a workflow supporting the ",
-                                        "intended time-varying effects rather than forcing incompatible values ",
-                                        "into this conversion."
-                                    )
+                                    diagnosticId = "survival.nonconstant_derived_hazard"
                                 )
                             }
 
@@ -1187,11 +1136,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                             relatedValue = self$pi1,
                             parameter = "median1",
                             value = self$median1,
-                            reason = "The specified pi1 takes precedence over median1.",
-                            userInstructions = paste0(
-                                "Remove pi1 if median1 should define treatment survival; otherwise remove ",
-                                "median1 after checking pi1."
-                            )
+                            diagnosticId = "survival.treatment_median_overridden"
                         )
                         self$median1 <- NA_real_
                     }
@@ -1203,10 +1148,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                             ") will be ignored because it will be calculated",
                             parameter = "hazardRatio",
                             value = self$hazardRatio,
-                            userInstructions = paste0(
-                                "Check the survival inputs from which hazardRatio is calculated; remove ",
-                                "redundant hazardRatio only after confirming those inputs."
-                            )
+                            diagnosticId = "survival.hazard_ratio_derived"
                         )
                     }
 
@@ -1285,11 +1227,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 if (!all(is.na(pwSurvTime)) && !identical(pwSurvTime, 0)) {
                     warnArgumentIgnored("'piecewiseSurvivalTime' (", .arrayToString(pwSurvTime), ") will be ignored",
                         parameter = "piecewiseSurvivalTime",
-                        reason = "Piecewise survival is disabled for this survival parameterization.",
-                        userInstructions = paste0(
-                            "Use a supported piecewise hazard specification if time-varying hazards are ",
-                            "intended; otherwise remove piecewiseSurvivalTime."
-                        )
+                        diagnosticId = "survival.piecewise_input_disabled"
                     )
                 }
                 self$piecewiseSurvivalTime <- 0
@@ -1324,11 +1262,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                             .arrayToString(self$piecewiseSurvivalTime), ") will be ignored",
                             parameter = "piecewiseSurvivalTime",
                             value = self$piecewiseSurvivalTime,
-                            reason = "Piecewise survival is disabled for this survival parameterization.",
-                            userInstructions = paste0(
-                                "Use a supported piecewise hazard specification if time-varying hazards are ",
-                                "intended; otherwise remove piecewiseSurvivalTime."
-                            )
+                            diagnosticId = "survival.piecewise_input_disabled"
                         )
                     }
 
@@ -1393,10 +1327,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                                 "was converted to 'lambda", group, "' ",
                                 "and is not available in output because piecewise ",
                                 "exponential survival time is enabled",
-                                userInstructions = paste0(
-                                    "Use the converted lambda values in the output; verify that piecewise ",
-                                    "exponential survival is intended."
-                                )
+                                diagnosticId = "survival.hazard_parameterization_converted"
                             )
                         }
                     }
@@ -1413,10 +1344,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 if (!is.na(self$eventTime) && self$eventTime != C_EVENT_TIME_DEFAULT) {
                     warnArgumentIgnored("Event time (", self$eventTime, ") will be ignored because it is not ",
                         "applicable for piecewise exponential survival time",
-                        userInstructions = paste0(
-                            "Use the piecewise hazards to specify survival, or change the survival model if ",
-                            "event probabilities at a single event time are intended."
-                        )
+                        diagnosticId = "survival.probabilities_ignored_for_piecewise_hazards"
                     )
                     self$eventTime <- C_EVENT_TIME_DEFAULT
                 }
@@ -1456,11 +1384,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 warnArgumentIgnored("'eventTime' (", round(self$eventTime, 3), ") will be ignored",
                     parameter = "eventTime",
                     value = self$eventTime,
-                    reason = "This survival initialization uses hazard parameters and clears pi1, pi2 and eventTime.",
-                    userInstructions = paste0(
-                        "Specify survival through the hazard parameters in this mode; remove the ",
-                        "probability/eventTime inputs only after confirming this parameterization."
-                    )
+                    diagnosticId = "survival.probability_inputs_ignored"
                 )
             }
             if (isFALSE(.isPi1Default(self$pi1, type = "sampleSize", endpoint = "survival")) &&
@@ -1468,22 +1392,14 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 warnArgumentIgnored("'pi1' (", .arrayToString(self$pi1), ") will be ignored",
                     parameter = "pi1",
                     value = self$pi1,
-                    reason = "This survival initialization uses hazard parameters and clears pi1, pi2 and eventTime.",
-                    userInstructions = paste0(
-                        "Specify survival through the hazard parameters in this mode; remove the ",
-                        "probability/eventTime inputs only after confirming this parameterization."
-                    )
+                    diagnosticId = "survival.probability_inputs_ignored"
                 )
             }
             if (isFALSE(.isPi2Default(self$pi2, endpoint = "survival"))) {
                 warnArgumentIgnored("'pi2' (", self$pi2, ") will be ignored",
                     parameter = "pi2",
                     value = self$pi2,
-                    reason = "This survival initialization uses hazard parameters and clears pi1, pi2 and eventTime.",
-                    userInstructions = paste0(
-                        "Specify survival through the hazard parameters in this mode; remove the ",
-                        "probability/eventTime inputs only after confirming this parameterization."
-                    )
+                    diagnosticId = "survival.probability_inputs_ignored"
                 )
             }
 
@@ -1550,10 +1466,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                         ") will be ignored because it will be calculated",
                         parameter = "hazardRatio",
                         value = self$hazardRatio,
-                        userInstructions = paste0(
-                            "Check the survival inputs from which hazardRatio is calculated; remove redundant ",
-                            "hazardRatio only after confirming those inputs."
-                        )
+                        diagnosticId = "survival.hazard_ratio_derived"
                     )
                 }
             }
@@ -1622,15 +1535,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 value = hr,
                 relatedParameter = "unique(lambda1 / lambda2)",
                 relatedValue = unique(round(hr, 4)),
-                reason = paste0(
-                    "This conversion requires a constant derived control hazard or hazard ratio across the ",
-                    "supplied intervals."
-                ),
-                userInstructions = paste0(
-                    "Check the interval-specific hazards and the intended proportional-hazards assumption. Use ",
-                    "a workflow supporting the intended time-varying effects rather than forcing incompatible ",
-                    "values into this conversion."
-                )
+                diagnosticId = "survival.nonconstant_derived_hazard"
             )
         },
         .validateInitialization = function() {
@@ -1698,10 +1603,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                         } else {
                             warnArgumentAdjusted("Only the first 'hazardRatio' (", round(self$hazardRatio[1], 4),
                                 ") was used for piecewise survival time definition",
-                                userInstructions = paste0(
-                                    "Use one hazard ratio for this calculation, or loop over separate calls to ",
-                                    "evaluate different hazard ratios."
-                                )
+                                diagnosticId = "survival.multiple_hazard_ratios_reduced"
                             )
                             self$hazardRatio <- self$hazardRatio[1]
                         }
@@ -1714,14 +1616,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                             ") will be ignored",
                             parameter = "lambda1",
                             value = self$lambda1,
-                            reason = paste0(
-                                "Multiple lambda1 values are not applicable in this configuration without ",
-                                "delayed response."
-                            ),
-                            userInstructions = paste0(
-                                "Check lambda2 and hazardRatio and supply compatible scalar or piecewise hazard ",
-                                "values before relying on the derived lambda1."
-                            )
+                            diagnosticId = "survival.multiple_treatment_hazards_ignored"
                         )
                     }
                     self$lambda1 <- NA_real_
@@ -1997,14 +1892,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     functionName = ".validateFormula",
                     parameter = "maxNumberOfSubjects",
                     value = self$maxNumberOfSubjects,
-                    reason = paste0(
-                        "The specified subject total conflicts with the total implied by accrual durations and ",
-                        "intensities."
-                    ),
-                    userInstructions = paste0(
-                        "Reconcile maxNumberOfSubjects with the accrual schedule and its time units; adjust ",
-                        "only inputs that do not represent the intended recruitment plan."
-                    )
+                    diagnosticId = "accrual.subject_total_mismatch"
                 )
             }
         },
@@ -2021,10 +1909,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                 warnInvalidInput("The specified accrual time and intensity cannot be ",
                     "supplemented automatically with the missing information; ",
                     "therefore further calculations are not possible",
-                    userInstructions = paste0(
-                        "Provide sufficient compatible accrualTime, accrualIntensity and maxNumberOfSubjects ",
-                        "information to determine the accrual schedule."
-                    )
+                    diagnosticId = "accrual.schedule_underdetermined"
                 )
             }
         },
@@ -2273,14 +2158,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     parameter = "followUpTime",
                     relatedParameter = "maxNumberOfSubjects",
                     relatedValue = self$maxNumberOfSubjects,
-                    reason = paste0(
-                        "Relative accrual intensities do not determine an absolute recruitment duration without ",
-                        "an end of accrual."
-                    ),
-                    userInstructions = paste0(
-                        "Specify the end of accrual in accrualTime, or provide a consistent absolute accrual ",
-                        "schedule."
-                    )
+                    diagnosticId = "accrual.end_required_for_relative_intensities"
                 )
             }
 
@@ -2294,14 +2172,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     functionName = ".validate",
                     parameter = "maxNumberOfSubjects",
                     relatedParameter = "followUpTime",
-                    reason = paste0(
-                        "Relative accrual intensities do not determine an absolute recruitment duration without ",
-                        "an end of accrual."
-                    ),
-                    userInstructions = paste0(
-                        "Specify the end of accrual in accrualTime, or provide a consistent absolute accrual ",
-                        "schedule."
-                    )
+                    diagnosticId = "accrual.end_required_for_relative_intensities"
                 )
             }
         },
@@ -2357,10 +2228,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     ") will be ignored because 'accrualTime' is a list",
                     parameter = "accrualIntensity",
                     value = self$accrualIntensity,
-                    userInstructions = paste0(
-                        "Define intensities within the accrualTime list, or use numeric accrualTime with a ",
-                        "separate accrualIntensity vector."
-                    )
+                    diagnosticId = "accrual.list_intensities_override_vector"
                 )
             }
 
@@ -2445,15 +2313,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                                 functionName = ".initAccrualIntensityAbsolute",
                                 parameter = "maxNumberOfSubjects",
                                 value = self$maxNumberOfSubjects,
-                                reason = paste0(
-                                    "The specified subject total conflicts with the total implied by accrual ",
-                                    "durations and intensities."
-                                ),
-                                userInstructions = paste0(
-                                    "Reconcile maxNumberOfSubjects with the accrual schedule and its time ",
-                                    "units; adjust only inputs that do not represent the intended recruitment ",
-                                    "plan."
-                                )
+                                diagnosticId = "accrual.subject_total_mismatch"
                             )
                         }
                     } else {
@@ -2465,15 +2325,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                                 warnArgumentIgnored("'accrualIntensity' (", self$accrualIntensity, ") will be ignored",
                                     parameter = "accrualIntensity",
                                     value = self$accrualIntensity,
-                                    reason = paste0(
-                                        "With default accrualTime and a specified maximum sample size, the ",
-                                        "absolute accrual intensity is derived."
-                                    ),
-                                    userInstructions = paste0(
-                                        "Define accrualTime explicitly if relative accrual intensities should ",
-                                        "determine the schedule; otherwise remove the redundant ",
-                                        "accrualIntensity."
-                                    )
+                                    diagnosticId = "accrual.relative_intensity_derived"
                                 )
                             }
                             self$accrualIntensityRelative <- C_ACCRUAL_INTENSITY_DEFAULT
@@ -2673,15 +2525,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                                         functionName = ".init",
                                         parameter = "maxNumberOfSubjects",
                                         value = self$maxNumberOfSubjects,
-                                        reason = paste0(
-                                            "The specified subject total conflicts with the total implied by ",
-                                            "accrual durations and intensities."
-                                        ),
-                                        userInstructions = paste0(
-                                            "Reconcile maxNumberOfSubjects with the accrual schedule and its ",
-                                            "time units; adjust only inputs that do not represent the intended ",
-                                            "recruitment plan."
-                                        )
+                                        diagnosticId = "accrual.subject_total_mismatch"
                                     )
                                 } else {
                                     stopIllegalArgument(
@@ -2784,42 +2628,26 @@ AccrualTime <- R6::R6Class("AccrualTime",
                         if (n1 == 1) {
                             warnArgumentAdjusted("Last accrual time value (",
                                 accrualTimeTemp[length(accrualTimeTemp)], ") ignored",
-                                reason = "The accrual schedule is truncated after reaching the required sample size.",
-                                userInstructions = paste0(
-                                    "Check the maximum sample size and accrual schedule; remove intervals ",
-                                    "beyond the end of recruitment if that end is intended."
-                                )
+                                diagnosticId = "accrual.schedule_truncated"
                             )
                         } else if (n1 > 1) {
                             warnArgumentAdjusted("Last ", n1, " accrual time values (",
                                 .arrayToString(accrualTimeTemp[(length(accrualTimeTemp) - n1 + 1):length(accrualTimeTemp)]),
                                 ") ignored",
-                                reason = "The accrual schedule is truncated after reaching the required sample size.",
-                                userInstructions = paste0(
-                                    "Check the maximum sample size and accrual schedule; remove intervals ",
-                                    "beyond the end of recruitment if that end is intended."
-                                )
+                                diagnosticId = "accrual.schedule_truncated"
                             )
                         }
 
                         if (n2 == 1) {
                             warnArgumentAdjusted("Last accrual intensity value (",
                                 accrualIntensityTemp[length(accrualIntensityTemp)], ") ignored",
-                                reason = "The accrual schedule is truncated after reaching the required sample size.",
-                                userInstructions = paste0(
-                                    "Check the maximum sample size and accrual schedule; remove intervals ",
-                                    "beyond the end of recruitment if that end is intended."
-                                )
+                                diagnosticId = "accrual.schedule_truncated"
                             )
                         } else if (n2 > 1) {
                             warnArgumentAdjusted("Last ", n2, " accrual intensity values (",
                                 .arrayToString(accrualIntensityTemp[i2:length(accrualIntensityTemp)]),
                                 ") ignored",
-                                reason = "The accrual schedule is truncated after reaching the required sample size.",
-                                userInstructions = paste0(
-                                    "Check the maximum sample size and accrual schedule; remove intervals ",
-                                    "beyond the end of recruitment if that end is intended."
-                                )
+                                diagnosticId = "accrual.schedule_truncated"
                             )
                         }
                     }
@@ -2845,11 +2673,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     functionName = ".calculateRemainingTime",
                     parameter = "maxNumberOfSubjects",
                     value = self$maxNumberOfSubjects,
-                    reason = "The defined accrual periods already imply more subjects than the supplied maximum.",
-                    userInstructions = paste0(
-                        "Check maxNumberOfSubjects and the recruitment schedule together; use a feasible ",
-                        "subject cap or revise the intended accrual duration or intensity."
-                    )
+                    diagnosticId = "accrual.subject_cap_below_recruited_total"
                 )
             }
 
@@ -2883,11 +2707,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     functionName = ".calculateRemainingTime",
                     parameter = "maxNumberOfSubjects",
                     value = self$maxNumberOfSubjects,
-                    reason = "The defined accrual periods already imply more subjects than the supplied maximum.",
-                    userInstructions = paste0(
-                        "Check maxNumberOfSubjects and the recruitment schedule together; use a feasible ",
-                        "subject cap or revise the intended accrual duration or intensity."
-                    )
+                    diagnosticId = "accrual.subject_cap_below_recruited_total"
                 )
             }
         },
@@ -2925,10 +2745,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                 warnInvalidInput(
                     "It makes no sense to start 'accrualIntensity' (",
                     .arrayToString(self$accrualIntensity), ") with 0",
-                    userInstructions = paste0(
-                        "Start accrualIntensity with a positive recruitment rate, or revise the time origin to ",
-                        "account for the initial period without recruitment."
-                    )
+                    diagnosticId = "accrual.initial_intensity_zero"
                 )
             }
         },

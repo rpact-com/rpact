@@ -48,10 +48,7 @@ NULL
                 !results$isGeneratedParameter(paramName)) {
             warnArgumentIgnored(.pQuote(paramName), " (", .arrayToString(paramValues), ") ",
                 "will be ignored because 'nPlanned' is not defined",
-                userInstructions = paste0(
-                    "Specify nPlanned for future stages to use this argument, or remove it if future-stage ",
-                    "calculations are not intended."
-                )
+                diagnosticId = "analysis.argument_requires_n_planned"
             )
         }
         return(invisible())
@@ -367,11 +364,7 @@ NULL
             stopIllegalArgument(.pQuote(argName), " is NA at first stage; a valid numeric value must be specified at stage 1",
                 functionName = ".createDataFrame",
                 parameter = argName,
-                reason = "All groups require observed first-stage data before selection can occur.",
-                userInstructions = paste0(
-                    "Supply the actual first-stage observations for this group; use NA only for subsequently ",
-                    "deselected stages according to the dataset conventions."
-                )
+                diagnosticId = "dataset.first_stage_observations_missing"
             )
         }
 
@@ -424,11 +417,7 @@ NULL
                 parameter = argName,
                 relatedParameter = "argValues",
                 relatedValue = argValues,
-                reason = "The control group is required at every analyzed stage.",
-                userInstructions = paste0(
-                    "Supply complete control-group observations for all analyzed stages; verify the stage ",
-                    "labels against the source data."
-                )
+                diagnosticId = "dataset.control_observations_missing"
             )
         }
 
@@ -442,11 +431,7 @@ NULL
                     parameter = argName,
                     relatedParameter = "stageIndex",
                     relatedValue = stageIndex,
-                    reason = "Missing stage data may occur only at the end of a data vector.",
-                    userInstructions = paste0(
-                        "Check the observed stages and any deselection decisions. Use trailing NA values for ",
-                        "unobserved stages; do not fill gaps with fabricated observations."
-                    )
+                    diagnosticId = "dataset.nontrailing_missing_values"
                 )
             }
         }
@@ -460,11 +445,7 @@ NULL
                         "NA's must be the last values",
                         functionName = ".createDataFrame",
                         parameter = argName, value = argValues,
-                        reason = "Missing stage data may occur only at the end of a data vector.",
-                        userInstructions = paste0(
-                            "Check the observed stages and any deselection decisions. Use trailing NA values for ",
-                            "unobserved stages; do not fill gaps with fabricated observations."
-                        )
+                        diagnosticId = "dataset.nontrailing_missing_values"
                     )
                 }
                 indexBefore <- index
@@ -478,14 +459,7 @@ NULL
                         stopConflictingArguments("inconsistent NA definition; ",
                             "if NA's exist, then they are mandatory for each group at the same stage",
                             functionName = ".createDataFrame",
-                            reason = paste0(
-                                "Missing stage data must be represented consistently across groups in this ",
-                                "dataset."
-                            ),
-                            userInstructions = paste0(
-                                "Check which stages were observed and align the NA pattern across all groups; ",
-                                "do not impute observations merely to pass validation."
-                            )
+                            diagnosticId = "dataset.inconsistent_missing_stages"
                         )
                     }
                 }
@@ -500,15 +474,7 @@ NULL
                             "if NA's exist, then they are mandatory for each parameter at the same stage",
                             functionName = ".createDataFrame",
                             parameter = "groupNumber", value = groupNumber,
-                            reason = paste0(
-                                "Deselection is represented by missing values consistently across all ",
-                                "parameters of the same group and stage."
-                            ),
-                            userInstructions = paste0(
-                                "Check the source data and selection decisions. Mark all parameters of a ",
-                                "deselected group as NA at that stage; keep complete observations for retained ",
-                                "groups."
-                            )
+                            diagnosticId = "dataset.inconsistent_deselection"
                         )
                     }
                 }
@@ -561,14 +527,7 @@ NULL
                             "if NA's exist, then they are mandatory for each group at the same stage",
                             functionName = ".createDataFrame",
                             parameter = "groupNumber", value = groupNumber,
-                            reason = paste0(
-                                "Missing stage data must be represented consistently across groups in this ",
-                                "dataset."
-                            ),
-                            userInstructions = paste0(
-                                "Check which stages were observed and align the NA pattern across all groups; ",
-                                "do not impute observations merely to pass validation."
-                            )
+                            diagnosticId = "dataset.inconsistent_missing_stages"
                         )
                     }
                 }
@@ -606,9 +565,7 @@ NULL
     if (dataFrameCounter > 1) {
         warnArgumentIgnored("Found ", dataFrameCounter, ", data.frame arguments; ",
             "only the first data.frame will be used for the initialization of the dataset",
-            userInstructions = paste0(
-                "Combine the intended data into one data.frame and pass that single data.frame to getDataset()."
-            )
+            diagnosticId = "dataset.multiple_data_frames"
         )
     }
 
@@ -728,22 +685,14 @@ NULL
             stopIllegalArgument("the argument ", .pQuote(unknownArgs), " is not a valid dataset argument",
                 functionName = ".assertIsValidDatasetArgument",
                 parameter = "unknownArgs", value = unknownArgs,
-                reason = "The supplied argument name is not supported by the receiving function.",
-                userInstructions = paste0(
-                    "Check the documented argument names and spelling for this function. Remove the unsupported ",
-                    "argument or move it to the correct function after confirming its intended role."
-                )
+                diagnosticId = "validation.unknown_argument"
             )
         } else {
             stopIllegalArgument("the arguments ", .arrayToString(unknownArgs, encapsulate = TRUE),
                 " are no valid dataset arguments",
                 functionName = ".assertIsValidDatasetArgument",
                 parameter = "unknownArgs", value = unknownArgs,
-                reason = "The supplied argument name is not supported by the receiving function.",
-                userInstructions = paste0(
-                    "Check the documented argument names and spelling for this function. Remove the unsupported ",
-                    "argument or move it to the correct function after confirming its intended role."
-                )
+                diagnosticId = "validation.unknown_argument"
             )
         }
     }
@@ -1052,10 +1001,7 @@ getLongFormat <- function(dataInput) {
                     "will be ignored because the specified data has only one group",
                     parameter = "allocationRatioPlanned",
                     value = allocationRatioPlanned,
-                    userInstructions = paste0(
-                        "Supply two-group data if a two-group analysis is intended; otherwise remove the ",
-                        "inapplicable two-group argument."
-                    )
+                    diagnosticId = "analysis.two_group_argument_ignored"
                 )
             }
         } else if (!identical(allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)) {
@@ -1063,10 +1009,7 @@ getLongFormat <- function(dataInput) {
                 "will be ignored because 'nPlanned' is not defined",
                 parameter = "allocationRatioPlanned",
                 value = allocationRatioPlanned,
-                userInstructions = paste0(
-                    "Specify nPlanned for future stages to use this argument, or remove it if future-stage ",
-                    "calculations are not intended."
-                )
+                diagnosticId = "analysis.argument_requires_n_planned"
             )
         }
         results$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)

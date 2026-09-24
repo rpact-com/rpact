@@ -84,10 +84,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         ),
         variableName, numberOfNAs, 100 * numberOfNAs / length(results)
     ),
-        userInstructions = paste0(
-            "Inspect the missing group-sequential probabilities and design inputs before using the resulting ",
-            "operating characteristics."
-        )
+        diagnosticId = "design.group_sequential_probabilities_unavailable"
     )
     return(FALSE)
 }
@@ -193,11 +190,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             (design$informationRates[length(design$informationRates)] != 1)) {
         stopIllegalArgument("For specified design, last information rate should be equal 1",
             functionName = ".validateTypeOfDesign",
-            reason = "This design specification requires the final analysis at the full planned information.",
-            userInstructions = paste0(
-                "Set the last informationRates entry to 1 after checking the normalization of all cumulative ",
-                "information fractions."
-            )
+            diagnosticId = "design.final_information_rate_not_one"
         )
     }
 
@@ -254,10 +247,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
                 value = design$typeBetaSpending,
                 relatedParameter = "Available alpha-spending types of design",
                 relatedValue = .getAlphaSpendingDesignTypeList(),
-                userInstructions = paste0(
-                    "Choose an alpha-spending typeOfDesign to use beta spending, or remove the beta-spending ",
-                    "arguments after confirming the chosen design."
-                )
+                diagnosticId = "design.beta_spending_requires_alpha_spending"
             )
             design$typeBetaSpending <- C_TYPE_OF_DESIGN_BS_NONE
             design$.setParameterType("typeBetaSpending", C_PARAM_DEFAULT_VALUE)
@@ -271,10 +261,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
                 value = design$userBetaSpending,
                 relatedParameter = "Available alpha-spending types of design",
                 relatedValue = .getAlphaSpendingDesignTypeList(),
-                userInstructions = paste0(
-                    "Choose an alpha-spending typeOfDesign to use beta spending, or remove the beta-spending ",
-                    "arguments after confirming the chosen design."
-                )
+                diagnosticId = "design.beta_spending_requires_alpha_spending"
             )
         }
     }
@@ -361,11 +348,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
                 relatedParameter = "kMax",
                 relatedValue = kMax,
                 functionName = ".createDesign",
-                reason = "User-defined alpha spending needs one cumulative amount per analysis stage.",
-                userInstructions = paste0(
-                    "Supply kMax cumulative userAlphaSpending values aligned with informationRates; do not ",
-                    "supply stage-wise increments."
-                )
+                diagnosticId = "design.user_alpha_spending_length"
             )
         }
         kMax <- length(userAlphaSpending)
@@ -459,10 +442,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             "'typeOfDesign' = \"", C_TYPE_OF_DESIGN_WT_OPTIMUM, "\"",
             parameter = "optimizationCriterion",
             value = optimizationCriterion,
-            userInstructions = paste0(
-                "Set typeOfDesign = \"WToptimum\" to use optimizationCriterion, or remove it after confirming the ",
-                "chosen design."
-            )
+            diagnosticId = "design.optimization_requires_wt_optimum"
         )
     }
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_HP) {
@@ -476,10 +456,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             "'typeOfDesign' = \"", C_TYPE_OF_DESIGN_HP, "\"",
             parameter = "constantBoundsHP",
             value = constantBoundsHP,
-            userInstructions = paste0(
-                "Set typeOfDesign = \"HP\" to use constantBoundsHP, or remove it after confirming the chosen ",
-                "design."
-            )
+            diagnosticId = "design.constant_bounds_requires_hp"
         )
     }
     if (design$sided == 1) {
@@ -490,10 +467,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
                 "only applicable for two-sided testing",
                 parameter = "twoSidedPower",
                 value = twoSidedPower,
-                userInstructions = paste0(
-                    "Set sided = 2 if two-sided testing and twoSidedPower are intended; otherwise remove ",
-                    "twoSidedPower."
-                )
+                diagnosticId = "design.two_sided_power_requires_two_sided"
             )
         }
     } else {
@@ -526,10 +500,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             "for two-sided beta-spending designs",
             parameter = "betaAdjustment",
             value = betaAdjustment,
-            userInstructions = paste0(
-                "Use a two-sided beta-spending design to apply betaAdjustment, or remove it after confirming ",
-                "the chosen design."
-            )
+            diagnosticId = "design.beta_adjustment_requires_two_sided_spending"
         )
     }
 
@@ -669,10 +640,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         },
         error = function(e) {
             warnNumericalIssue("Failed to calculate 'alphaSpent': ", e,
-                userInstructions = paste0(
-                    "Check the critical values and information rates and resolve the reported error before ",
-                    "relying on alphaSpent."
-                )
+                diagnosticId = "design.alpha_spent_calculation_failed"
             )
         }
     )
@@ -944,11 +912,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             parameter = "typeBetaSpending",
             value = design$typeBetaSpending,
             relatedParameter = ") must be ",
-            reason = "The user-defined beta-spending calculation requires the bsUser design type.",
-            userInstructions = paste0(
-                "Use typeBetaSpending = \"bsUser\" for explicit userBetaSpending, or use the calculation matching ",
-                "the intended beta-spending function."
-            )
+            diagnosticId = "design.user_beta_spending_type_required"
         )
     }
 
@@ -1328,10 +1292,7 @@ getDesignInverseNormal <- function(
                 "when 'efficacyStops' or 'futilityStops' are specified",
                 parameter = "delayedInformation",
                 value = delayedInformation,
-                userInstructions = paste0(
-                    "Omit efficacyStops and futilityStops if delayed information is intended, or remove ",
-                    "delayedInformation after confirming the stopping specification."
-                )
+                diagnosticId = "design.interim_stops_ignored_with_delayed_information"
             )
         }
 
@@ -1526,11 +1487,7 @@ getDesignInverseNormal <- function(
             parameter = "typeOfDesign",
             relatedParameter = "efficacyStops",
             value = typeOfDesign,
-            reason = "Selective interim stopping is supported only for the listed alpha-spending designs.",
-            userInstructions = paste0(
-                "Choose typeOfDesign from asOF, asP, asKD, asHSD or asUser if selective interim stopping is ",
-                "intended; otherwise remove efficacyStops and futilityStops after confirming the design choice."
-            )
+            diagnosticId = "design.interim_stops_require_alpha_spending"
         )
     }
     if (identical(typeBetaSpending, C_TYPE_OF_DESIGN_BS_USER)) {
@@ -1540,11 +1497,7 @@ getDesignInverseNormal <- function(
             parameter = "typeBetaSpending",
             relatedParameter = C_TYPE_OF_DESIGN_BS_USER,
             value = typeBetaSpending,
-            reason = "Selective interim stopping cannot be combined with user-defined beta spending.",
-            userInstructions = paste0(
-                "Choose a supported beta-spending function for the intended stopping scheme, or remove ",
-                "efficacyStops and futilityStops if the user-defined beta-spending design should be retained."
-            )
+            diagnosticId = "design.interim_stops_with_user_beta_spending"
         )
     }
 
@@ -1581,11 +1534,7 @@ getDesignInverseNormal <- function(
             functionName = ".getDesignWithInterimStops",
             parameter = "efficacyStops",
             value = efficacyStops,
-            reason = "This vector describes interim stages only; the final analysis is excluded.",
-            userInstructions = paste0(
-                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
-                "entry intended solely for the final analysis."
-            )
+            diagnosticId = "validation.interim_vector_length"
         )
     }
 
@@ -1599,11 +1548,7 @@ getDesignInverseNormal <- function(
             functionName = ".getDesignWithInterimStops",
             parameter = "futilityStops",
             value = futilityStops,
-            reason = "This vector describes interim stages only; the final analysis is excluded.",
-            userInstructions = paste0(
-                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
-                "entry intended solely for the final analysis."
-            )
+            diagnosticId = "validation.interim_vector_length"
         )
     }
 
@@ -1741,10 +1686,7 @@ getDesignInverseNormal <- function(
     } else if (.isDefinedArgument(informationRates, argumentExistsValidationEnabled = userFunctionCallEnabled) &&
             length(informationRates) > 10) {
         warnNotValidated("The usage of 'kMax' (", length(informationRates), ") > 10 is not validated",
-            userInstructions = paste0(
-                "Use at most 10 stages within the validated scope, or independently validate the design with ",
-                "more stages."
-            )
+            diagnosticId = "validation.stage_count_outside_validated_range"
         )
     }
 
@@ -1760,10 +1702,7 @@ getDesignInverseNormal <- function(
                 "because 'futilityBounds' is not defined",
                 parameter = "bindingFutility",
                 value = bindingFutility,
-                userInstructions = paste0(
-                    "Specify non-default futilityBounds if binding futility is intended; otherwise remove ",
-                    "bindingFutility."
-                )
+                diagnosticId = "design.binding_futility_without_bounds"
             )
         } else if (!.anyFutilityBoundsAreInvalid(futilityBounds, directionUpper)) {
             warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
@@ -1771,10 +1710,7 @@ getDesignInverseNormal <- function(
                 "is set to default values",
                 parameter = "bindingFutility",
                 value = bindingFutility,
-                userInstructions = paste0(
-                    "Specify non-default futilityBounds if binding futility is intended; otherwise remove ",
-                    "bindingFutility."
-                )
+                diagnosticId = "design.binding_futility_without_bounds"
             )
         }
     }
@@ -1832,11 +1768,8 @@ getDesignInverseNormal <- function(
                     relatedParameter = "typeOfDesign",
                     relatedValue = typeOfDesign,
                     constraint = 'typeOfDesign must be "PT"',
-                    reason = 'deltaPT1 is used only when typeOfDesign is "PT".',
-                    userInstructions = paste0(
-                        'Change typeOfDesign to "PT", or remove deltaPT1 only if you are sure the chosen ',
-                        'typeOfDesign is correct.'
-                    )
+                    diagnosticId = "design.deltaPT1.requires_pt",
+                    context = list(allowedDesignTypes = c("PT"))
                 )
             }
             if (!is.na(deltaPT0)) {
@@ -1846,11 +1779,8 @@ getDesignInverseNormal <- function(
                     relatedParameter = "typeOfDesign",
                     relatedValue = typeOfDesign,
                     constraint = 'typeOfDesign must be "PT"',
-                    reason = 'deltaPT0 is used only when typeOfDesign is "PT".',
-                    userInstructions = paste0(
-                        'Change typeOfDesign to "PT", or remove deltaPT0 only if you are sure the chosen ',
-                        'typeOfDesign is correct.'
-                    )
+                    diagnosticId = "design.deltaPT0.requires_pt",
+                    context = list(allowedDesignTypes = c("PT"))
                 )
             }
         }
@@ -1861,11 +1791,8 @@ getDesignInverseNormal <- function(
                 relatedParameter = "typeOfDesign",
                 relatedValue = typeOfDesign,
                 constraint = 'typeOfDesign must be "WT"',
-                reason = 'deltaWT is used only when typeOfDesign is "WT".',
-                userInstructions = paste0(
-                    'Change typeOfDesign to "WT", or remove deltaWT only if you are sure the chosen typeOfDesign ',
-                    'is correct.'
-                )
+                diagnosticId = "design.deltaWT.requires_wt",
+                context = list(allowedDesignTypes = c("WT"))
             )
         }
         if (typeOfDesign != C_TYPE_OF_DESIGN_AS_KD &&
@@ -1876,11 +1803,8 @@ getDesignInverseNormal <- function(
                 relatedParameter = "typeOfDesign",
                 relatedValue = typeOfDesign,
                 constraint = 'typeOfDesign must be "asKD" or "asHSD"',
-                reason = 'gammaA is used only when typeOfDesign is "asKD" or "asHSD".',
-                userInstructions = paste0(
-                    'Change typeOfDesign to "asKD" or "asHSD", or remove gammaA only if you are sure the chosen ',
-                    'typeOfDesign is correct.'
-                )
+                diagnosticId = "design.gammaA.requires_alpha_spending_family",
+                context = list(allowedDesignTypes = c("asKD", "asHSD"))
             )
         }
         if (typeBetaSpending != C_TYPE_OF_DESIGN_BS_KD &&
@@ -1891,11 +1815,8 @@ getDesignInverseNormal <- function(
                 relatedParameter = "typeBetaSpending",
                 relatedValue = typeBetaSpending,
                 constraint = 'typeBetaSpending must be "bsKD" or "bsHSD"',
-                reason = 'gammaB is used only when typeBetaSpending is "bsKD" or "bsHSD".',
-                userInstructions = paste0(
-                    'Change typeBetaSpending to "bsKD" or "bsHSD", or remove gammaB only if you are sure the chosen ',
-                    "typeBetaSpending is correct."
-                )
+                diagnosticId = "design.gammaB.requires_beta_spending_family",
+                context = list(allowedDesignTypes = c("bsKD", "bsHSD"))
             )
         }
         if (typeBetaSpending != C_TYPE_OF_DESIGN_BS_USER && !all(is.na(userBetaSpending))) {
@@ -1906,11 +1827,8 @@ getDesignInverseNormal <- function(
                 relatedParameter = "typeBetaSpending",
                 relatedValue = typeBetaSpending,
                 constraint = 'typeBetaSpending must be "bsUser"',
-                reason = 'userBetaSpending is used only when typeBetaSpending is "bsUser".',
-                userInstructions = paste0(
-                    'Change typeBetaSpending to "bsUser", or remove userBetaSpending only if you are sure the ',
-                    'chosen typeBetaSpending is correct.'
-                )
+                diagnosticId = "design.userBetaSpending.requires_bs_user",
+                context = list(allowedDesignTypes = c("bsUser"))
             )
         }
         if (!(typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER)) &&
@@ -1922,11 +1840,8 @@ getDesignInverseNormal <- function(
                 relatedParameter = "typeOfDesign",
                 relatedValue = typeOfDesign,
                 constraint = 'typeOfDesign must be "asUser"',
-                reason = 'userAlphaSpending is used only when typeOfDesign is "asUser".',
-                userInstructions = paste0(
-                    'Change typeOfDesign to "asUser", or remove userAlphaSpending only if you are sure the chosen ',
-                    'typeOfDesign is correct.'
-                )
+                diagnosticId = "design.userAlphaSpending.requires_as_user",
+                context = list(allowedDesignTypes = c("asUser"))
             )
         }
     }
@@ -1936,10 +1851,7 @@ getDesignInverseNormal <- function(
         warnArgumentIgnored("'bindingFutility' will be ignored because ",
             "the test is defined as two-sided",
             parameter = "bindingFutility",
-            userInstructions = paste0(
-                "Use a supported one-sided design if binding futility is intended here; otherwise remove ",
-                "bindingFutility after confirming two-sided testing."
-            )
+            diagnosticId = "fisher.binding_futility_requires_one_sided"
         )
         design$bindingFutility <- FALSE
     }
@@ -1948,10 +1860,7 @@ getDesignInverseNormal <- function(
         warnArgumentIgnored("'twoSidedPower' will be ignored because ",
             "the test is defined as one-sided",
             parameter = "twoSidedPower",
-            userInstructions = paste0(
-                "Set sided = 2 if two-sided testing and twoSidedPower are intended; otherwise remove ",
-                "twoSidedPower."
-            )
+            diagnosticId = "design.two_sided_power_requires_two_sided"
         )
         design$twoSidedPower <- FALSE
     }
@@ -2031,12 +1940,7 @@ getDesignInverseNormal <- function(
                 "too extreme for this situation",
                 functionName = ".getDesignGroupSequential",
                 parameter = "futilityBounds", value = design$futilityBounds,
-                reason = "The requested futility boundaries are numerically too extreme for this calculation.",
-                userInstructions = paste0(
-                    "Review the futility stopping assumptions and their scale. Use feasible bounds supported by ",
-                    "the intended design; if valid bounds still fail, report a reproducible example to the ",
-                    "rpact developers."
-                )
+                diagnosticId = "design.futility_bounds_too_extreme"
             )
         }
     }
@@ -2067,11 +1971,7 @@ getDesignInverseNormal <- function(
                     value = design$informationRates,
                     relatedParameter = "kMax",
                     relatedValue = design$kMax,
-                    reason = "A fixed design has one analysis at the full information.",
-                    userInstructions = paste0(
-                        "Use informationRates = 1 for a fixed design; choose multiple stages only if a ",
-                        "sequential design is intended."
-                    )
+                    diagnosticId = "design.fixed_information_rate_adjusted"
                 )
             }
             design$informationRates <- 1
@@ -2100,10 +2000,7 @@ getDesignInverseNormal <- function(
             "will be ignored",
             parameter = "delayedInformation",
             value = delayedInformation,
-            userInstructions = paste0(
-                "Supply at least one delayedInformation value >= 0.001 if delayed response is intended; ",
-                "otherwise omit delayedInformation."
-            )
+            diagnosticId = "design.delayed_information_below_threshold"
         )
 
         return(design)
@@ -2115,12 +2012,7 @@ getDesignInverseNormal <- function(
         stopIllegalArgument("decision critical values for delayed response design ",
             "are only available for one-sided designs",
             functionName = ".getDesignGroupSequential",
-            reason = "The selected procedure is implemented only for one-sided testing.",
-            userInstructions = paste0(
-                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
-                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
-                "error."
-            )
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
 
@@ -2136,11 +2028,7 @@ getDesignInverseNormal <- function(
         stopIllegalArgument("decision critical values for delayed response design are ",
             "only available for designs with valid futility bounds",
             functionName = ".getDesignGroupSequential",
-            reason = "Delayed-response decision critical values require valid interim futility boundaries.",
-            userInstructions = paste0(
-                "Provide the intended valid futilityBounds before requesting delayed-response decision critical ",
-                "values."
-            )
+            diagnosticId = "design.delayed_decision_requires_futility"
         )
     }
 
@@ -2154,11 +2042,7 @@ getDesignInverseNormal <- function(
             functionName = ".getDesignGroupSequential",
             parameter = "delayedInformation",
             value = delayedInformation,
-            reason = "This vector describes interim stages only; the final analysis is excluded.",
-            userInstructions = paste0(
-                "Supply one entry for each of the kMax - 1 interim stages. Check stage order and remove any ",
-                "entry intended solely for the final analysis."
-            )
+            diagnosticId = "validation.interim_vector_length"
         )
     }
 
@@ -2169,10 +2053,7 @@ getDesignInverseNormal <- function(
             " delayed information value", ifelse(n == 1, "", "s"), " ",
             .arrayToString(delayedInformation[indices], mode = "and"),
             " will be replaced by 1e-03 to achieve reasonable results",
-            userInstructions = paste0(
-                "Check the delayed information assumptions; use values >= 0.001 to avoid replacement by the ",
-                "numerical minimum."
-            )
+            diagnosticId = "design.delayed_information_adjusted"
         )
         delayedInformation[indices] <- 1e-03
     }
@@ -2193,15 +2074,7 @@ getDesignInverseNormal <- function(
             value = delayedInformation,
             relatedParameter = "informationRates",
             relatedValue = informationRates,
-            reason = paste0(
-                "Interim recruitment-stop information plus pipeline information must remain below final trial ",
-                "information."
-            ),
-            userInstructions = paste0(
-                "Check the normalization and stage alignment of delayedInformation and informationRates. ",
-                "Specify interim analyses whose combined information is below 1, or revise the analysis ",
-                "schedule if no separate interim analysis remains."
-            )
+            diagnosticId = "design.pipeline_information_exceeds_total"
         )
     }
 
@@ -2309,10 +2182,7 @@ getDesignInverseNormal <- function(
     
     warnNotValidated("The delayed information design feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
-        userInstructions = paste0(
-            "Validate this experimental feature independently for the intended use before relying on its ",
-            "results."
-        )
+        diagnosticId = "validation.experimental_feature"
     )
 
     return(design)

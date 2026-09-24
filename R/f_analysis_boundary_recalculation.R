@@ -223,10 +223,7 @@ getObservedInformationRates <- function(
             .arrayToString(which(informationRates > 1)), " is over-running, ",
             "i.e., the information rate (", .arrayToString(informationRates[informationRates > 1]), ") ",
             "is larger than the planned maximum information rate (1)",
-            userInstructions = paste0(
-                "Verify observed information against the planned maximum and use an appropriate boundary ",
-                "recalculation before interpreting inference."
-            )
+            diagnosticId = "analysis.observed_information_exceeds_planned"
         )
     }
 
@@ -279,10 +276,7 @@ getObservedInformationRates <- function(
             " will be ignored because they are not applicable ",
             "for automatic recalculation of the boundaries",
             parameter = parametersToIgnore,
-            userInstructions = paste0(
-                "Review the automatic boundary recalculation settings; omit parameters not applicable to this ",
-                "method only after confirming the chosen method."
-            )
+            diagnosticId = "analysis.recalculation_argument_ignored"
         )
     }
 
@@ -327,10 +321,7 @@ getObservedInformationRates <- function(
                 " only applicable for alpha spending", "\n",
                 "group sequential designs with no futility bounds and a single hypothesis",
                 parameter = arguments,
-                userInstructions = paste0(
-                    "Use an alpha-spending group sequential design with no futility bounds and one hypothesis ",
-                    "if automatic recalculation is intended; otherwise omit these arguments."
-                )
+                diagnosticId = "analysis.recalculation_design_unsupported"
             )
         }
         return(result)
@@ -342,10 +333,7 @@ getObservedInformationRates <- function(
                 ") will be ignored because 'maxInformation' is undefined",
                 parameter = "informationEpsilon",
                 value = informationEpsilon,
-                userInstructions = paste0(
-                    "Specify maxInformation to use informationEpsilon, or remove informationEpsilon if no ",
-                    "maximum information is intended."
-                )
+                diagnosticId = "analysis.information_epsilon_requires_maximum"
             )
         }
         return(result)
@@ -355,14 +343,7 @@ getObservedInformationRates <- function(
         stopIllegalArgument("recalculation of the information rates not possible ",
             "for user-defined alpha spending designs",
             functionName = ".getDesignWithRecalculatedBoundaries",
-            reason = paste0(
-                "User-defined alpha spending fixes spending amounts at the planned analyses and does not ",
-                "support this information-rate recalculation."
-            ),
-            userInstructions = paste0(
-                "Retain the planned information rates, or choose an alpha-spending function that supports ",
-                "recalculation if that matches the prespecified design."
-            )
+            diagnosticId = "analysis.user_spending_recalculation_unsupported"
         )
     }
 
@@ -400,8 +381,7 @@ getObservedInformationRates <- function(
     if (stageFromData == 1) {
         stopIllegalArgument("recalculation of the information rates not possible at stage 1",
             functionName = ".getDesignWithRecalculatedBoundaries",
-            reason = "There is no completed interim stage before stage 1 for this recalculation.",
-            userInstructions = "Request recalculation only at a supported later stage with the required observed information."
+            diagnosticId = "analysis.first_stage_recalculation_unsupported"
         )
     }
 
@@ -473,10 +453,7 @@ getObservedInformationRates <- function(
     base::options("rpact.analysis.repeated.p.values.warnings.enabled" = "FALSE")
     warnResultUnavailable("Repeated p-values not available for automatic ",
         "recalculation of boundaries at final stage",
-        userInstructions = paste0(
-            "Use the available final-stage inference; repeated p-values are unavailable with automatic boundary ",
-            "recalculation at the final stage."
-        )
+        diagnosticId = "analysis.final_recalculation_repeated_p_unavailable"
     )
 
     return(list(

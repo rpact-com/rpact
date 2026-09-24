@@ -432,10 +432,7 @@ NULL
         if (is.null(totalNumberOfGroups) || is.na(totalNumberOfGroups)) {
             warnResultUnavailable("Unable to identify 'totalNumberOfGroups' from ",
                 .pQuote(parameterName), "in ", .getClassName(designPlan),
-                userInstructions = paste0(
-                    "Check the design plan and group-defining parameters before using a summary that depends on ",
-                    "totalNumberOfGroups."
-                )
+                diagnosticId = "summary.group_count_unavailable"
             )
         }
 

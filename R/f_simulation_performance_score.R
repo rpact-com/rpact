@@ -52,28 +52,14 @@ getPerformanceScore <- function(simulationResult) {
     if (!inherits(simulationResult, "SimulationResultsMeans") && !inherits(simulationResult, "SimulationResultsRates")) {
         stopIllegalArgument("performance score so far implemented only for single comparisons with continuous and binary endpoints",
             functionName = "getPerformanceScore",
-            reason = paste0(
-                "The performance score is restricted to supported two-stage, single-comparison designs with ",
-                "continuous or binary endpoints."
-            ),
-            userInstructions = paste0(
-                "Use the score only for supported results. For a different endpoint or design, evaluate other ",
-                "appropriate performance measures without changing the trial solely to obtain this score."
-            )
+            diagnosticId = "simulation.performance_score_unsupported"
         )
     }
 
     if (design$kMax != 2) {
         stopIllegalArgument("performance score so far implemented only for two-stage designs",
             functionName = "getPerformanceScore",
-            reason = paste0(
-                "The performance score is restricted to supported two-stage, single-comparison designs with ",
-                "continuous or binary endpoints."
-            ),
-            userInstructions = paste0(
-                "Use the score only for supported results. For a different endpoint or design, evaluate other ",
-                "appropriate performance measures without changing the trial solely to obtain this score."
-            )
+            diagnosticId = "simulation.performance_score_unsupported"
         )
     }
 
@@ -118,14 +104,7 @@ getPerformanceScore <- function(simulationResult) {
         stopIllegalArgument("performance score is not available for class ",
             .getClassName(simulationResult),
             functionName = "getPerformanceScore",
-            reason = paste0(
-                "The performance score is restricted to supported two-stage, single-comparison designs with ",
-                "continuous or binary endpoints."
-            ),
-            userInstructions = paste0(
-                "Use the score only for supported results. For a different endpoint or design, evaluate other ",
-                "appropriate performance measures without changing the trial solely to obtain this score."
-            )
+            diagnosticId = "simulation.performance_score_unsupported"
         )
     }
     alternativeValues <- simulationResult[[alternativeParamName]]
@@ -198,10 +177,7 @@ getPerformanceScore <- function(simulationResult) {
     if (inherits(simulationResult, "SimulationResultsRates")) {
         warnNotValidated("The performance score function is experimental and hence not fully validated ",
             "(see www.rpact.com/experimental)",
-            userInstructions = paste0(
-                "Validate this experimental feature independently for the intended use before relying on its ",
-                "results."
-            )
+            diagnosticId = "validation.experimental_feature"
         )
     }
 

@@ -174,10 +174,7 @@ NULL
             ") will be ignored because the design is two-sided",
             parameter = parameterName,
             value = parameterValues,
-            userInstructions = paste0(
-                "Use a one-sided design if a directional alternative is intended; otherwise remove this ",
-                "argument after confirming two-sided testing."
-            )
+            diagnosticId = "design.direction_not_applicable"
         )
         parameterValues <- rep(defaultValue, design$kMax - 1)
     }
@@ -276,10 +273,7 @@ NULL
             ") will be ignored because it will be calculated",
             parameter = parameterName,
             value = design[[parameterName]],
-            userInstructions = paste0(
-                "Specify the spending/design inputs that determine these bounds; remove explicit bounds only ",
-                "after confirming the intended beta-spending or Pampallona-Tsiatis design."
-            )
+            diagnosticId = "design.explicit_futility_bounds_ignored"
         )
     } else if (design$isGeneratedParameter(parameterName)) {
         return(FALSE)
@@ -402,11 +396,7 @@ NULL
             relatedParameter = "informationRates",
             relatedValue = length(design$informationRates),
             functionName = ".validateUserAlphaSpending",
-            reason = "User-defined alpha spending needs one cumulative amount per analysis stage.",
-            userInstructions = paste0(
-                "Supply kMax cumulative userAlphaSpending values aligned with informationRates; do not supply ",
-                "stage-wise increments."
-            )
+            diagnosticId = "design.user_alpha_spending_length"
         )
     }
 
@@ -420,11 +410,7 @@ NULL
             relatedParameter = "kMax",
             relatedValue = design$kMax,
             functionName = ".validateUserAlphaSpending",
-            reason = "User-defined alpha spending needs one cumulative amount per analysis stage.",
-            userInstructions = paste0(
-                "Supply kMax cumulative userAlphaSpending values aligned with informationRates; do not supply ",
-                "stage-wise increments."
-            )
+            diagnosticId = "design.user_alpha_spending_length"
         )
     }
 
@@ -453,21 +439,14 @@ NULL
             relatedParameter = c("kMax", "alpha"),
             relatedValue = list(kMax = design$kMax, alpha = design$alpha),
             functionName = ".validateUserAlphaSpending",
-            reason = "userAlphaSpending contains cumulative error probabilities bounded by alpha.",
-            userInstructions = paste0(
-                "Supply nondecreasing cumulative spending amounts between 0 and alpha. Convert stage-wise ",
-                "increments to cumulative amounts if needed; preserve the intended total type I error."
-            )
+            diagnosticId = "design.user_alpha_spending_not_cumulative"
         )
     }
 
     if (design$kMax > 2 && (any(design$userAlphaSpending[2:design$kMax] - design$userAlphaSpending[1:(design$kMax - 1)] < design$tolerance))) {
         warnNumericalIssue("Chosen 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = FALSE),
             ") might yield imprecise critical values due to numerical inaccuracy",
-            userInstructions = paste0(
-                "Review the spending increments and verify numerical stability of the resulting boundaries ",
-                "before using this spending specification."
-            )
+            diagnosticId = "design.spending_numerical_precision"
         )
     }
 }
@@ -492,11 +471,7 @@ NULL
             relatedParameter = "informationRates",
             relatedValue = length(design$informationRates),
             functionName = ".validateUserBetaSpending",
-            reason = "User-defined beta spending needs one cumulative amount per analysis stage.",
-            userInstructions = paste0(
-                "Supply kMax cumulative userBetaSpending values aligned with informationRates; do not supply ",
-                "stage-wise increments."
-            )
+            diagnosticId = "design.user_beta_spending_length"
         )
     }
 
@@ -510,11 +485,7 @@ NULL
             relatedParameter = "kMax",
             relatedValue = design$kMax,
             functionName = ".validateUserBetaSpending",
-            reason = "User-defined beta spending needs one cumulative amount per analysis stage.",
-            userInstructions = paste0(
-                "Supply kMax cumulative userBetaSpending values aligned with informationRates; do not supply ",
-                "stage-wise increments."
-            )
+            diagnosticId = "design.user_beta_spending_length"
         )
     }
 
@@ -555,21 +526,14 @@ NULL
             relatedParameter = c("kMax", "beta"),
             relatedValue = list(kMax = design$kMax, beta = design$beta),
             functionName = ".validateUserBetaSpending",
-            reason = "userBetaSpending contains cumulative error probabilities bounded by beta.",
-            userInstructions = paste0(
-                "Supply nondecreasing cumulative spending amounts between 0 and beta, preserving the intended ",
-                "power target."
-            )
+            diagnosticId = "design.user_beta_spending_not_cumulative"
         )
     }
 
     if (design$kMax > 2 && (any(design$userBetaSpending[2:design$kMax] - design$userBetaSpending[1:(design$kMax - 1)] < design$tolerance))) {
         warnNumericalIssue("Chosen 'userBetaSpending' (", .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = FALSE),
             ") might yield imprecise futility bounds due to numerical inaccuracy",
-            userInstructions = paste0(
-                "Review the spending increments and verify numerical stability of the resulting boundaries ",
-                "before using this spending specification."
-            )
+            diagnosticId = "design.spending_numerical_precision"
         )
     }
 }
@@ -654,14 +618,7 @@ NULL
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise survival definition",
             functionName = ".getPiecewiseExponentialDistributionSingleTime",
-            reason = paste0(
-                "Piecewise exponential survival and a non-unit Weibull shape are incompatible in this ",
-                "calculation."
-            ),
-            userInstructions = paste0(
-                "Use kappa = 1 for a piecewise exponential model, or remove the piecewise specification for a ",
-                "Weibull model. Choose according to the intended survival assumptions."
-            )
+            diagnosticId = "survival.weibull_piecewise_incompatible"
         )
     }
 
@@ -707,14 +664,7 @@ NULL
     if (kappa != 1) {
         stopIllegalArgument("Weibull distribution cannot be used for piecewise exponential survival definition",
             functionName = ".getPiecewiseExponentialSingleQuantile",
-            reason = paste0(
-                "Piecewise exponential survival and a non-unit Weibull shape are incompatible in this ",
-                "calculation."
-            ),
-            userInstructions = paste0(
-                "Use kappa = 1 for a piecewise exponential model, or remove the piecewise specification for a ",
-                "Weibull model. Choose according to the intended survival assumptions."
-            )
+            diagnosticId = "survival.weibull_piecewise_incompatible"
         )
     }
 
@@ -785,14 +735,7 @@ NULL
             parameter = "piecewiseSurvivalTime",
             relatedParameter = "piecewiseLambda",
             relatedValue = piecewiseLambda, value = piecewiseSurvivalTime,
-            reason = paste0(
-                "Separate hazard inputs cannot be combined with a list that already specifies piecewise ",
-                "survival parameters."
-            ),
-            userInstructions = paste0(
-                "Use a numeric piecewiseSurvivalTime vector with separate hazard vectors, or keep the ",
-                "self-contained list and remove redundant separate hazards."
-            )
+            diagnosticId = "survival.list_and_separate_hazards_conflict"
         )
     }
 
@@ -805,10 +748,7 @@ NULL
         warnArgumentIgnored("Argument 'piecewiseSurvivalTime' will be ignored because ",
             "length of 'piecewiseLambda' is 1",
             parameter = "piecewiseSurvivalTime",
-            userInstructions = paste0(
-                "Supply multiple piecewiseLambda values for piecewise hazards, or remove piecewiseSurvivalTime ",
-                "for a constant hazard."
-            )
+            diagnosticId = "survival.piecewise_times_with_constant_hazard"
         )
     }
 
@@ -1225,10 +1165,7 @@ getPiByLambda <- function(
         warnNumericalIssue("Calculation of pi (1) by lambda (", .arrayToString(round(lambda, 4)),
             ") results in a possible loss of precision ",
             "because pi = 1 was returned but pi is not exactly 1",
-            userInstructions = paste0(
-                "Check lambda and eventTime; the event probability rounds to 1, so avoid treating it as an ",
-                "exact probability of 1 in downstream calculations."
-            )
+            diagnosticId = "survival.event_probability_rounded_to_one"
         )
     }
     return(1 - x)

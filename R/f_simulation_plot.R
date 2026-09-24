@@ -25,11 +25,7 @@ NULL
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
                 parameter = "alternative",
-                reason = "The requested plot compares multiple effect scenarios but only one is available.",
-                userInstructions = paste0(
-                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
-                    "type available for a single scenario."
-                )
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsRates")) {
@@ -39,11 +35,7 @@ NULL
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
                 parameter = "pi1",
-                reason = "The requested plot compares multiple effect scenarios but only one is available.",
-                userInstructions = paste0(
-                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
-                    "type available for a single scenario."
-                )
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsSurvival")) {
@@ -53,11 +45,7 @@ NULL
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined or derived",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
                 parameter = "hazardRatio",
-                reason = "The requested plot compares multiple effect scenarios but only one is available.",
-                userInstructions = paste0(
-                    "Calculate results for multiple scientifically relevant effect values, or choose a plot ",
-                    "type available for a single scenario."
-                )
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
         if (length(simulationResults$hazardRatio) != length(simulationResults$overallReject)) {
@@ -808,11 +796,7 @@ NULL
                 "is not available for 'kMax' = 1",
                 functionName = ".plotSimulationResults",
                 parameter = "kMax",
-                reason = "A fixed design has no interim stage or early stopping decision to display.",
-                userInstructions = paste0(
-                    "Choose a plot supported for the fixed design. Use a multi-stage design only if interim ",
-                    "analyses are part of the intended trial."
-                )
+                diagnosticId = "plot.fixed_design_has_no_interims"
             )
         }
 

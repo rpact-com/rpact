@@ -20,7 +20,7 @@ NULL
 .warnWithContext <- function(
         ..., code, category, parameter = NULL, value = NULL,
         constraint = NULL, functionName = NULL, relatedParameter = NULL,
-        relatedValue = NULL, reason = NULL, userInstructions = NULL,
+        relatedValue = NULL, diagnosticId = NULL, context = NULL,
         call = NULL, call. = TRUE) {
     message <- .getErrorMessage(...)
     warningClass <- c(paste0("rpact_", tolower(code), "_warning"), "rpact_warning")
@@ -35,17 +35,17 @@ NULL
         if (is.null(functionName) && !is.null(call)) {
             functionName <- paste(deparse(call[[1L]]), collapse = "")
         }
-        context <- list(message = message, code = code, category = category,
+        diagnosticContext <- list(message = message, code = code, category = category,
             functionName = functionName, parameter = parameter, value = value,
             constraint = constraint, relatedParameter = relatedParameter,
-            relatedValue = relatedValue, reason = if (is.null(reason)) message else reason,
-            userInstructions = userInstructions, call = call)
-        condition$context <- context
+            relatedValue = relatedValue, diagnosticId = diagnosticId,
+            context = context, call = call)
+        condition$context <- diagnosticContext
         if (is.function(factory)) {
             # Quote language-valued context (especially call) so factories receive
             # diagnostic data rather than re-evaluating the originating call.
             customCondition <- tryCatch(
-                do.call(factory, c(context, list(class = warningClass)), quote = TRUE),
+                do.call(factory, c(diagnosticContext, list(class = warningClass)), quote = TRUE),
                 error = function(e) {
                     message("Error in warning condition factory: ", conditionMessage(e))
                     NULL
@@ -66,13 +66,13 @@ NULL
 warnArgumentIgnored <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
-        reason = NULL, userInstructions = NULL, call = sys.call(-1L),
+        diagnosticId = NULL, context = NULL, call = sys.call(-1L),
         call. = FALSE) {
     .warnWithContext(..., code = "ARGUMENT_IGNORED", category = "ignored_input",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
-        relatedValue = relatedValue, reason = reason,
-        userInstructions = userInstructions, call = call, call. = call.)
+        relatedValue = relatedValue, diagnosticId = diagnosticId,
+        context = context, call = call, call. = call.)
 }
 
 #' @noRd
@@ -84,13 +84,8 @@ warnArgumentIgnoredFixedDesign <- function(
         parameter = parameter, value = value,
         relatedParameter = "kMax", relatedValue = 1L,
         constraint = "kMax must be greater than 1",
-        reason = "A fixed sample design has only one stage and no interim adaptation.",
-        userInstructions = paste0(
-            "Use a multi-stage design if interim adaptation is intended; otherwise remove ",
-            if (length(parameter) == 1L) "this argument " else "these arguments ",
-            "after confirming the fixed-sample design."
-        ),
-        call = call, call. = call.
+        call = call, call. = call.,
+        diagnosticId = "design.argument_ignored_fixed_design"
     )
 }
 
@@ -98,90 +93,90 @@ warnArgumentIgnoredFixedDesign <- function(
 warnArgumentAdjusted <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
-        reason = NULL, userInstructions = NULL, call = sys.call(-1L),
+        diagnosticId = NULL, context = NULL, call = sys.call(-1L),
         call. = FALSE) {
     .warnWithContext(..., code = "ARGUMENT_ADJUSTED", category = "adjusted_input",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
-        relatedValue = relatedValue, reason = reason,
-        userInstructions = userInstructions, call = call, call. = call.)
+        relatedValue = relatedValue, diagnosticId = diagnosticId,
+        context = context, call = call, call. = call.)
 }
 
 #' @noRd
 warnInvalidInput <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
-        reason = NULL, userInstructions = NULL, call = sys.call(-1L),
+        diagnosticId = NULL, context = NULL, call = sys.call(-1L),
         call. = FALSE) {
     .warnWithContext(..., code = "INVALID_INPUT", category = "invalid_input",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
-        relatedValue = relatedValue, reason = reason,
-        userInstructions = userInstructions, call = call, call. = call.)
+        relatedValue = relatedValue, diagnosticId = diagnosticId,
+        context = context, call = call, call. = call.)
 }
 
 #' @noRd
 warnNumericalIssue <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
-        reason = NULL, userInstructions = NULL, call = sys.call(-1L),
+        diagnosticId = NULL, context = NULL, call = sys.call(-1L),
         call. = FALSE) {
     .warnWithContext(..., code = "NUMERICAL_ISSUE", category = "numerical_issue",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
-        relatedValue = relatedValue, reason = reason,
-        userInstructions = userInstructions, call = call, call. = call.)
+        relatedValue = relatedValue, diagnosticId = diagnosticId,
+        context = context, call = call, call. = call.)
 }
 
 #' @noRd
 warnResultUnavailable <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
-        reason = NULL, userInstructions = NULL, call = sys.call(-1L),
+        diagnosticId = NULL, context = NULL, call = sys.call(-1L),
         call. = FALSE) {
     .warnWithContext(..., code = "RESULT_UNAVAILABLE", category = "unavailable_result",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
-        relatedValue = relatedValue, reason = reason,
-        userInstructions = userInstructions, call = call, call. = call.)
+        relatedValue = relatedValue, diagnosticId = diagnosticId,
+        context = context, call = call, call. = call.)
 }
 
 #' @noRd
 warnNotValidated <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
-        reason = NULL, userInstructions = NULL, call = sys.call(-1L),
+        diagnosticId = NULL, context = NULL, call = sys.call(-1L),
         call. = FALSE) {
     .warnWithContext(..., code = "NOT_VALIDATED", category = "validation_limitation",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
-        relatedValue = relatedValue, reason = reason,
-        userInstructions = userInstructions, call = call, call. = call.)
+        relatedValue = relatedValue, diagnosticId = diagnosticId,
+        context = context, call = call, call. = call.)
 }
 
 #' @noRd
 warnRuntimeIssue <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
-        reason = NULL, userInstructions = NULL, call = sys.call(-1L),
+        diagnosticId = NULL, context = NULL, call = sys.call(-1L),
         call. = TRUE) {
     .warnWithContext(..., code = "RUNTIME_ISSUE", category = "runtime_issue",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
-        relatedValue = relatedValue, reason = reason,
-        userInstructions = userInstructions, call = call, call. = call.)
+        relatedValue = relatedValue, diagnosticId = diagnosticId,
+        context = context, call = call, call. = call.)
 }
 
 #' @noRd
 warnDataIssue <- function(
         ..., parameter = NULL, value = NULL, constraint = NULL,
         functionName = NULL, relatedParameter = NULL, relatedValue = NULL,
-        reason = NULL, userInstructions = NULL, call = sys.call(-1L),
+        diagnosticId = NULL, context = NULL, call = sys.call(-1L),
         call. = FALSE) {
     .warnWithContext(..., code = "DATA_ISSUE", category = "data_issue",
         parameter = parameter, value = value, constraint = constraint,
         functionName = functionName, relatedParameter = relatedParameter,
-        relatedValue = relatedValue, reason = reason,
-        userInstructions = userInstructions, call = call, call. = call.)
+        relatedValue = relatedValue, diagnosticId = diagnosticId,
+        context = context, call = call, call. = call.)
 }
 

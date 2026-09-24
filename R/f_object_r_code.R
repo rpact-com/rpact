@@ -793,11 +793,7 @@ getObjectRCode <- function(
                 parameter = "illegalArgumentValueNames", value = illegalArgumentValueNames,
                 relatedParameter = "functionName",
                 relatedValue = functionName,
-                reason = "The supplied argument name is not supported by the receiving function.",
-                userInstructions = paste0(
-                    "Check the documented argument names and spelling for this function. Remove the unsupported ",
-                    "argument or move it to the correct function after confirming its intended role."
-                )
+                diagnosticId = "validation.unknown_argument"
             )
         }
 

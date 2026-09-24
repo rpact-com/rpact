@@ -236,12 +236,7 @@ getDesignFisher <- function(
     if (sided != 1) {
         stopIllegalArgument("Fisher's combination test only available for one-sided testing",
             functionName = ".getDesignFisher",
-            reason = "The selected procedure is implemented only for one-sided testing.",
-            userInstructions = paste0(
-                "Use a one-sided design only if it matches the prespecified hypothesis. If two-sided testing is ",
-                "required, choose a procedure supporting it rather than changing sided solely to bypass this ",
-                "error."
-            )
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
 
@@ -255,10 +250,7 @@ getDesignFisher <- function(
                 "because 'alpha0Vec' is not defined",
                 parameter = "bindingFutility",
                 value = bindingFutility,
-                userInstructions = paste0(
-                    "Specify non-default alpha0Vec futility bounds if binding futility is intended; otherwise ",
-                    "remove bindingFutility."
-                )
+                diagnosticId = "fisher.binding_futility_requires_bounds"
             )
         } else if (all(alpha0Vec == C_ALPHA_0_VEC_DEFAULT, na.rm = TRUE)) {
             warnArgumentIgnored("'bindingFutility' (", bindingFutility, ") will be ignored ",
@@ -266,10 +258,7 @@ getDesignFisher <- function(
                 "is set to default values",
                 parameter = "bindingFutility",
                 value = bindingFutility,
-                userInstructions = paste0(
-                    "Specify non-default alpha0Vec futility bounds if binding futility is intended; otherwise ",
-                    "remove bindingFutility."
-                )
+                diagnosticId = "fisher.binding_futility_requires_bounds"
             )
         }
     }
@@ -316,10 +305,7 @@ getDesignFisher <- function(
 
     if (design$sided == 2 && design$bindingFutility && any(design$alpha0Vec < 1)) {
         warnArgumentIgnored("Binding futility will be ignored because the test is defined as two-sided",
-            userInstructions = paste0(
-                "Use a supported one-sided design if binding futility is intended here; otherwise remove ",
-                "bindingFutility after confirming two-sided testing."
-            )
+            diagnosticId = "fisher.binding_futility_requires_one_sided"
         )
     }
 
@@ -331,10 +317,7 @@ getDesignFisher <- function(
             warnArgumentIgnored("'userAlphaSpending' will be ignored because 'method' is not ",
                 .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
                 parameter = "userAlphaSpending",
-                userInstructions = paste0(
-                    "Choose the user-defined alpha-spending Fisher method to use userAlphaSpending, or remove ",
-                    "it after confirming the intended method."
-                )
+                diagnosticId = "fisher.user_spending_method_required"
             )
         }
     }
@@ -363,11 +346,7 @@ getDesignFisher <- function(
             functionName = ".getDesignFisher",
             parameter = "C_FISHER_METHOD_NO_INTERACTION",
             value = C_FISHER_METHOD_NO_INTERACTION,
-            reason = "The no-interaction Fisher method requires more than two stages.",
-            userInstructions = paste0(
-                "Choose a Fisher method supported for the intended kMax; increase the number of stages only if ",
-                "additional analyses are part of the trial plan."
-            )
+            diagnosticId = "fisher.no_interaction_requires_three_stages"
         )
     }
 
@@ -394,11 +373,7 @@ getDesignFisher <- function(
             parameter = "method",
             relatedParameter = "alpha0Vec",
             relatedValue = alpha0Vec, value = method,
-            reason = "The no-interaction method requires binding futility with nontrivial alpha0Vec thresholds.",
-            userInstructions = paste0(
-                "Specify bindingFutility = TRUE and the intended nontrivial alpha0Vec thresholds, or choose ",
-                "another Fisher method if binding futility is not planned."
-            )
+            diagnosticId = "fisher.no_interaction_requires_binding_futility"
         )
     }
 
@@ -466,9 +441,7 @@ getDesignFisher <- function(
         },
         error = function(e) {
             warnNumericalIssue("Output may be wrong because an error occured: ", e$message,
-                userInstructions = paste0(
-                    "Resolve the reported design calculation error and recompute before relying on the output."
-                )
+                diagnosticId = "fisher.design_calculation_failed"
             )
         }
     )

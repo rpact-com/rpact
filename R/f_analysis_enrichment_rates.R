@@ -146,15 +146,7 @@ NULL
                     stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
                         functionName = ".calcRatesTestStatistics",
                         parameter = "thetaH0", value = thetaH0,
-                        reason = paste0(
-                            "The implemented two-sample exact test requires equality of the rates under the ",
-                            "null hypothesis."
-                        ),
-                        userInstructions = paste0(
-                            "Use thetaH0 = 0 only if equality of rates is the intended null. For a different ",
-                            "null, choose a supported approximate analysis consistent with the scientific ",
-                            "question."
-                        )
+                        diagnosticId = "analysis.exact_test_requires_equality_null"
                     )
                 }
 
@@ -244,14 +236,7 @@ NULL
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
             functionName = ".getStageResultsRatesEnrichment",
             parameter = "gMax", value = gMax,
-            reason = paste0(
-                "The implemented Spiessens-Debois intersection test is restricted to one subset and the full ",
-                "population."
-            ),
-            userInstructions = paste0(
-                "Use a supported intersection test for the intended number of populations; reduce the ",
-                "population set only if it matches the trial objectives."
-            )
+            diagnosticId = "enrichment.spiessens_debois_population_limit"
         )
     }
 
@@ -259,33 +244,21 @@ NULL
         stopIllegalArgument("Spiessens & Debois test cannot be used with Fisher's ",
             "exact test (normalApproximation = FALSE)",
             functionName = ".getStageResultsRatesEnrichment",
-            reason = "This intersection test is not implemented with Fisher's exact test.",
-            userInstructions = paste0(
-                "Use normalApproximation = TRUE if the approximate method is appropriate, or choose an ",
-                "intersection test compatible with exact testing."
-            )
+            diagnosticId = "analysis.intersection_test_exact_unsupported"
         )
     }
 
     if (stratifiedAnalysis && !normalApproximation) {
         stopConflictingArguments("stratified version is not available for Fisher's exact test",
             functionName = ".getStageResultsRatesEnrichment",
-            reason = "A stratified version of Fisher's exact test is not implemented here.",
-            userInstructions = paste0(
-                "Choose a supported stratified approximate analysis, or use unstratified exact testing only if ",
-                "that matches the analysis plan."
-            )
+            diagnosticId = "analysis.stratified_exact_unsupported"
         )
     }
 
     if (stratifiedAnalysis && !dataInput$isStratified()) {
         stopIllegalArgument("stratified analysis is only possible for stratified data input",
             functionName = ".getStageResultsRatesEnrichment",
-            reason = "Stratified analysis requires stratified input data.",
-            userInstructions = paste0(
-                "Supply the appropriate stratified dataset or disable stratifiedAnalysis only if an ",
-                "unstratified analysis is intended."
-            )
+            diagnosticId = "analysis.stratified_data_required"
         )
     }
 
@@ -1008,10 +981,7 @@ NULL
             warnArgumentIgnored(sQuote("piTreatments"), " will be ignored because ",
                 sQuote("piTreatmentsH1"), " is defined",
                 parameter = "piTreatments",
-                userInstructions = paste0(
-                    "Use piTreatmentsH1 for the alternative treatment probabilities, or remove piTreatmentsH1 ",
-                    "if piTreatments is intended."
-                )
+                diagnosticId = "analysis.treatment_probabilities_overridden"
             )
         }
         piTreatments <- piTreatmentsH1
@@ -1027,10 +997,7 @@ NULL
             warnArgumentIgnored(sQuote("piControl"), " will be ignored because ",
                 sQuote("piControlH1"), " is defined",
                 parameter = "piControl",
-                userInstructions = paste0(
-                    "Use piControlH1 for the alternative control probability, or remove piControlH1 if ",
-                    "piControl is intended."
-                )
+                diagnosticId = "analysis.control_alternative_probability_overridden"
             )
         }
         piControl <- piControlH1
@@ -1152,11 +1119,7 @@ NULL
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalPowerRatesEnrichment",
         parameter = "design",
-        reason = "The selected analysis or operation requires one of the trial design classes listed in the error.",
-        userInstructions = paste0(
-            "Create the design with the corresponding getDesign*() constructor, or choose an operation ",
-            "supporting the intended design. Do not change the object class manually."
-        )
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1384,10 +1347,7 @@ NULL
                 if (result <= 0 || result >= 1) {
                     warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ",
                         kMax,
-                        userInstructions = paste0(
-                            "Check the stage data, design boundaries and planned future sample sizes/events; ",
-                            "conditional power for the reported stage could not be calculated."
-                        )
+                        diagnosticId = "analysis.conditional_power_calculation_failed"
                     )
                     results$conditionalPower[population, kMax] <- NA_real_
                 } else {
