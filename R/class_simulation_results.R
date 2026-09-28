@@ -1699,6 +1699,8 @@ SimulationResultsEnrichmentRates <- R6::R6Class(
 #' @template field_seed
 #' @template field_selectedPopulations
 #' @template field_selectPopulationsFunction
+#' @template field_singleEventsPerStage
+#' @template field_singleEventsPerSubsetAndStage
 #' @template field_singleNumberOfEventsPerStage
 #' @template field_simulationType
 #' @template field_stratifiedAnalysis
@@ -1756,7 +1758,8 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
         numberOfSubjects = NULL,
         populations = NULL,
         populationEventsPerStage = NULL,
-        singleEventsPerSubsetAndStage = NULL, # deprecated
+        singleEventsPerStage = NULL,
+        singleEventsPerSubsetAndStage = NULL,
         singleNumberOfEventsPerStage = NULL, # deprecated
         rejectAtLeastOne = NULL,
         rejectedPopulationsPerStage = NULL,
@@ -1775,6 +1778,8 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
             for (generatedParam in c(
                 "eventsNotAchieved",
                 "populationEventsPerStage",
+                "singleEventsPerStage",
+                "singleEventsPerSubsetAndStage",
                 "rejectAtLeastOne",
                 "selectedPopulations",
                 "numberOfPopulations",
