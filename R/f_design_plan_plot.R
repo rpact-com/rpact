@@ -880,13 +880,7 @@
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
         }
 
-        if (survivalDesignPlanEnabled) {
-            xParameterName <- "hazardRatio"
-        } else if (.isTrialDesignPlanCountData(designPlan)) {
-            xParameterName <- "theta"
-        } else {
-            xParameterName <- "effect"
-        }
+        xParameterName <- .getEndpointDependentEffectParameterName(designPlan)
         yParameterNames <- "overallReject"
         if (is.na(legendPosition)) {
             legendPosition <- C_POSITION_RIGHT_CENTER

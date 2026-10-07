@@ -381,27 +381,71 @@ plotTypes <- function(
     )
 }
 
-.getEndpointDependentEffectParamName <- function(designPlan) {
-    endpoint <- .getEndpointName(designPlan)
-    multiArmEnabled <- grepl("MultiArm", .getClassName(designPlan))
-    paramName <- NA_character_
-    if (identical(endpoint, "means")) {
-        paramName <- ifelse(multiArmEnabled, "muMaxVector", "alternative")
-    } else if (identical(endpoint, "rates")) {
-        paramName <- ifelse(multiArmEnabled, "piMaxVector", "pi1")
-    } else if (identical(endpoint, "survival")) {
-        paramName <- ifelse(multiArmEnabled, "omegaMaxVector", "pi1")
-    } else if (identical(endpoint, "counts")) {
-        paramName <- "lambda1"
-    } else {
-        stopRuntimeIssue(
-            "get parameter name function not yet implemented for endpoint ", sQuote(endpoint),
-            functionName = ".getEndpointDependentParamName",
-            parameter = "designPlan", 
-            value = designPlan
-        )
+# With userDefined = TRUE, return NA if no effect input was explicitly defined.
+.getEndpointDependentEffectParameterName <- function(designPlan, userDefined = FALSE) {
+    if (userDefined) {
+        endpoint <- .getEndpointName(designPlan)
+        if (is.na(endpoint)) {
+            return(NA_character_)
+        }
+
+        if (grepl("Enrichment", .getClassName(designPlan))) {
+            candidateNames <- "effectList"
+        } else if (grepl("MultiArm", .getClassName(designPlan))) {
+            candidateNames <- switch(endpoint,
+                means = c("effectMatrix", "muMaxVector"),
+                rates = c("effectMatrix", "piMaxVector"),
+                survival = c("effectMatrix", "omegaMaxVector"),
+                character()
+            )
+        } else {
+            candidateNames <- switch(endpoint,
+                means = "alternative",
+                rates = "pi1",
+                survival = c("hazardRatio", "pi1", "lambda1", "median1"),
+                counts = c("theta", "lambda1", "lambda"),
+                character()
+            )
+        }
+
+        # Prefer a directly specified effect over inputs used to derive it.
+        candidateNames <- candidateNames[
+            candidateNames %in% designPlan$.getUserDefinedParameters()
+        ]
+        if (length(candidateNames) == 0) {
+            return(NA_character_)
+        }
+        
+        return(candidateNames[1])
     }
-    return(paramName)
+    
+    if (inherits(designPlan, "SimulationResults")) {
+        return(.getSimulationPlotXAxisParameterName(designPlan))
+    }
+
+    endpoint <- .getEndpointName(designPlan)
+    if (is.na(endpoint)) {
+        return(NA_character_)
+    }
+
+    if (endpoint %in% c("means", "rates")) {
+        return("effect")
+    }
+
+    if (identical(endpoint, "survival")) {
+        return("hazardRatio")
+    }
+
+    if (identical(endpoint, "counts")) {
+        return("theta")
+    }
+
+    stopRuntimeIssue(
+        "get parameter name function not yet implemented for endpoint ", sQuote(endpoint),
+        functionName = ".getEndpointDependentEffectParameterName",
+        parameter = "designPlan",
+        value = designPlan
+    )
 }
 
 #'
@@ -483,7 +527,7 @@ getAvailablePlotTypes <- function(
                 types <- c(types, 5, 6)
             }
             if (obj$.design$kMax > 1) {
-                paramName <- .getEndpointDependentEffectParamName(obj)
+                paramName <- .getEndpointDependentEffectParameterName(obj)
                 if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
                     types <- c(types, 7)
                 }
@@ -520,14 +564,22 @@ getAvailablePlotTypes <- function(
                 types <- c(types, 2:3)
             }
         }
-        types <- c(types, 4)
+        if (!grepl("CountData", .getClassName(obj)) || obj$.design$kMax > 1) {
+            types <- c(types, 4)
+        }
         if (!grepl("MultiArm", .getClassName(obj)) || obj$.design$kMax > 1) {
-            types <- c(types, 5)
+            paramName <- .getEndpointDependentEffectParameterName(obj)
+            if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+                types <- c(types, 5)
+            }
             if (!grepl("CountData", .getClassName(obj))) {
                 types <- c(types, 6)
             }
         }
-        types <- c(types, 7)
+        paramName <- .getEndpointDependentEffectParameterName(obj)
+        if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+            types <- c(types, 7)
+        }
         if (obj$.design$kMax > 1) {
             types <- c(types, 8)
         }

@@ -2,8 +2,30 @@
 
 ## Required Windows preflight check
 
-On Windows, perform this check at the beginning of every task, before making
-changes or running development, build, or test workflows:
+On Windows, at the beginning of the first task, before making changes or running
+development, build, or test workflows, compare the current environment with the
+last successful preflight check stored in `_dev/windows-preflight.json` relative
+to the repository root. This is a local cache: do not commit it or include it in
+the built package (`_dev` is already excluded from both).
+
+- Always obtain the active R installation's `R.version.string` and `R.home()`
+  from the R installation actually used by the current session or task.
+  Do not infer them from another installed R executable.
+- Obtain a system ID consisting of the computer name and the Windows version,
+  including its build and update revision. For example, use `$env:COMPUTERNAME`
+  and `DisplayVersion`, `CurrentBuildNumber`, and `UBR` from
+  `HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion` in PowerShell.
+- Read the cache and compare `rVersion`, `rHome`, and `systemId` with these
+  current values. If all values match and `status` is `passed`, reuse the
+  successful result and skip the full Rtools compatibility and compilation
+  checks. Do not repeat those checks merely because a new task or session starts.
+- Run the full check below only if the cache is missing, unreadable, incomplete,
+  or not marked `passed`, or if the R version, R installation path, or system ID
+  has changed. A changed R version always requires a new full check.
+- If the current environment cannot be identified, stop and explain what could
+  not be verified; do not reuse an unverifiable cached result.
+
+For a required full check:
 
 - Identify the R installation actually used by the current session or task.
   Obtain its full version from `R.version.string` and its installation path
@@ -24,6 +46,16 @@ changes or running development, build, or test workflows:
 - If compatibility or usability cannot be established, stop and explain what
   could not be verified rather than proceeding with an unverified toolchain.
 
+After the full check succeeds, create `_dev` if needed and write the JSON cache
+with `status = "passed"`, `rVersion`, `rHome`, `systemId`, the verified
+`rtoolsRelease`, `rtoolsHome`, and `checkedAt` (an ISO 8601 UTC timestamp).
+Use the values actually verified, and replace the cache only after all required
+checks succeed. On failure, invalidate any existing successful cache by setting
+`status = "failed"`; never record an unsuccessful or unverified check as passed.
+If saving the cache fails, report that limitation; the next task must perform
+the full check again. If a later build reveals a toolchain failure, invalidate
+the cache so that the next task checks the toolchain again.
+
 ## Task-specific guidance
 
 Read and follow the applicable instruction files before starting work. If a task
@@ -40,6 +72,17 @@ spans multiple categories, apply all relevant files:
   [.github/agents/rpact_github.agent.md](.github/agents/rpact_github.agent.md).
 
 ## Unit tests and test templates
+
+The rpact-specific rules in this section, including the optional
+`rpact.validator` template workflow, apply only to direct development of the
+`rpact` package and its tests. When working on another package, such as
+`rpact.code.api` or `rpact.cloud`, create and maintain that package's tests in
+its own `tests/testthat` directory, following its applicable instructions and
+existing test conventions. Do not create or modify tests for another package
+in `rpact.tests` or apply the rpact-specific template rules to those tests.
+Using `rpact` as a dependency does not make a package's tests rpact tests.
+For tasks spanning multiple packages, apply these rules only to tests of
+`rpact`; keep tests of each other package in that package.
 
 All rpact unit tests are hosted and developed in the separate `rpact.tests`
 package, except for the small example test `test-pkgname.R` in the `rpact`
