@@ -2562,6 +2562,9 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
     defaultValue <- ifelse(identical(endpoint, "survival"),
         C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT
     )
+    if (identical(objectType, "sampleSize")) {
+        defaultValue <- NA
+    }
     forceUserDefinedDirectionUpper <- !is.na(directionUpper)
     if (isTRUE(userFunctionCallEnabled)) {
         directionUpper <- .assertIsValidDirectionUpper(

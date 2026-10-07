@@ -17,10 +17,11 @@
 .getDirectionUpper <- function(designPlan, nParameters = 1, ..., setDefault = TRUE) {
     design <- designPlan$.design
     directionUpper <- design$directionUpper
+    
     if (is.null(directionUpper) || length(directionUpper) == 0 || all(is.na(directionUpper))) {
         directionUpper <- designPlan$directionUpper
     }
-    
+
     directionUpperDefault <- ifelse(.isTrialDesignPlanSurvival(designPlan), 
         C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT)
     if (setDefault) {
@@ -798,8 +799,8 @@
 .addEffectScaleBoundaryDataToDesignPlan <- function(designPlan) {
     .assertIsTrialDesignPlan(designPlan)
 
-    design <- designPlan$.design
     .setDirectionUpperDesignPlan(designPlan)
+    design <- designPlan$.design
     if (.isTrialDesignPlanMeans(designPlan)) {
         if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
             designPlan$maxNumberOfSubjects <- designPlan$nFixed
