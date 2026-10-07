@@ -355,6 +355,55 @@ plotTypes <- function(
     return(validPlotTypes)
 }
 
+.getEndpointName <- function(obj) {
+    if (!inherits(obj, "ParameterSet")) {
+        return(NA_character_)
+    }
+    if (!inherits(obj, "TrialDesignPlan") && 
+            inherits(obj, "SimulationResults") && 
+            inherits(obj, "Dataset")) {
+        return(NA_character_)
+    }
+    
+    className <- .getClassName(obj)
+    endpoint <- gsub("^TrialDesignPlan|^SimulationResults|^Dataset", "", className)
+    if (grepl("Means|Rates|Survival|CountData|General", endpoint)) {
+        endpoint <- gsub(".*(Means|Rates|Survival|CountData|General).*", "\\1", endpoint)
+        endpoint <- sub("CountData", "Counts", endpoint)
+        endpoint <- tolower(endpoint)
+        return(endpoint)
+    }
+    
+    stopRuntimeIssue("could not identify endpoint for ", .getClassName(obj),
+        functionName = ".getEndpointName",
+        parameter = "obj", 
+        value = obj
+    )
+}
+
+.getEndpointDependentEffectParamName <- function(designPlan) {
+    endpoint <- .getEndpointName(designPlan)
+    multiArmEnabled <- grepl("MultiArm", .getClassName(designPlan))
+    paramName <- NA_character_
+    if (identical(endpoint, "means")) {
+        paramName <- ifelse(multiArmEnabled, "muMaxVector", "alternative")
+    } else if (identical(endpoint, "rates")) {
+        paramName <- ifelse(multiArmEnabled, "piMaxVector", "pi1")
+    } else if (identical(endpoint, "survival")) {
+        paramName <- ifelse(multiArmEnabled, "omegaMaxVector", "pi1")
+    } else if (identical(endpoint, "counts")) {
+        paramName <- "lambda1"
+    } else {
+        stopRuntimeIssue(
+            "get parameter name function not yet implemented for endpoint ", sQuote(endpoint),
+            functionName = ".getEndpointDependentParamName",
+            parameter = "designPlan", 
+            value = designPlan
+        )
+    }
+    return(paramName)
+}
+
 #'
 #' @title
 #' Get Available Plot Types
@@ -433,7 +482,12 @@ getAvailablePlotTypes <- function(
             if (obj$.design$kMax > 1) {
                 types <- c(types, 5, 6)
             }
-            types <- c(types, 7)
+            if (obj$.design$kMax > 1) {
+                paramName <- .getEndpointDependentEffectParamName(obj)
+                if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+                    types <- c(types, 7)
+                }
+            }
             if (obj$.design$kMax > 1) {
                 types <- c(types, 8)
                 if (!.isTrialDesignPlanCountData(obj) ||
