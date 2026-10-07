@@ -50,6 +50,7 @@
 * In all simulation raw data, the `armNumber` column was renamed to `activeArm`
 * For consistency with other result objects, the `direction` field in `getStageResults()` result objects was renamed to `directionUpper`.
 * Error and warning context now identifies diagnostic situations with stable IDs and factual metadata. Authored explanations and corrective instructions are maintained separately by consuming applications; ordinary condition messages remain unchanged.
+* Fixed inconsistent naming of variables and class fields, e.g., `getSimulationEnrichmentSurvival()`: field `singleEventsPerSubsetAndStage` replaced by `singleEventsPerArmAndStage` 
 
 # rpact 4.4.0
 

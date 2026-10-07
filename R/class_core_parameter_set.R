@@ -1421,7 +1421,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
 
 .getCategoryCaptionEnrichment <- function(parameterSet, parameterName, categoryNumber) {
     categoryCaption <- categoryNumber
-    if (parameterName %in% c("sampleSizes", "singleEventsPerSubsetAndStage")) {
+    if (parameterName %in% c("sampleSizes", "singleEventsPerArmAndStage")) {
         categoryCaption <- parameterSet$effectList$subGroups[categoryNumber]
         maxNumberOfDigits <- max(nchar(sub("\\D*", "", parameterSet$effectList$subGroups)))
         if (parameterSet$populations > 2 && grepl(paste0("^S\\d{1,", maxNumberOfDigits - 1, "}$"), categoryCaption)) {

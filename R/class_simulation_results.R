@@ -272,7 +272,7 @@ SimulationResults <- R6::R6Class(
                             "numberOfEvents",
                             "numberOfSubjects",
                             "singleEventsPerArmAndStage",
-                            "singleEventsPerSubsetAndStage",
+                            "singleEventsPerSubsetAndStage", # deprecated
                             "testStatistic",
                             "conditionalCriticalValue",
                             "rejectPerStage",
@@ -1417,7 +1417,6 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         selectedArms = NULL,
         singleEventsPerArmAndStage = NULL,
         singleEventsPerStage = NULL, # only necessary for old simulation routine
-        singleNumberOfEventsPerStage = NULL, # only necessary for old simulation routine
         simulationType = NULL,
         slope = NULL,
         successCriterion = NULL,
@@ -1756,8 +1755,8 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
         numberOfSubjects = NULL,
         populations = NULL,
         populationEventsPerStage = NULL,
+        singleEventsPerArmAndStage = NULL, 
         singleEventsPerSubsetAndStage = NULL, # deprecated
-        singleNumberOfEventsPerStage = NULL, # deprecated
         rejectAtLeastOne = NULL,
         rejectedPopulationsPerStage = NULL,
         rValue = NULL,

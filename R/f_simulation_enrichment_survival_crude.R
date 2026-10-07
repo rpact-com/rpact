@@ -830,11 +830,11 @@ NULL
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
 
-    simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
-    simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
+    simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
+    simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
     .addDeprecatedFieldValues(
-        simulationResults, "singleNumberOfEventsPerStage",
-        simulatedSingleEventsPerStage, "2024-06-10"
+        simulationResults, "singleEventsPerSubsetAndStage",
+        simulatedSingleEventsPerStage, "2026-10-07"
     )
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents

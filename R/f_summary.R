@@ -855,8 +855,13 @@ NULL
         if (outputSize %in% c("medium", "large")) {
             if (survivalEnabled) {
                 if (enrichmentEnabled) {
-                    parameterName <- "singleEventsPerSubsetAndStage"
-                    parameterCaption <- "Single number of events"
+                    if (!identical(designPlan$simulationType, "testStatisticBased")) { 
+                        parameterName <- "populationEventsPerStage" 
+                        parameterCaption <- "Number of events per population"
+                    } else {
+                        parameterName <- "singleEventsPerArmAndStage"
+                        parameterCaption <- "Single number of events"
+                    }
                 } else {
                     parameterName <- "cumulativeEventsPerStage"
                     parameterCaption <- "Cumulative number of events"
