@@ -727,8 +727,8 @@ NULL
     }
     simulationResults$singleEventsPerStage <- .removeLastEntryFromArray(simulationResults$singleEventsPerStage)
 
-    simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
-    simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
+    simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
+    simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 

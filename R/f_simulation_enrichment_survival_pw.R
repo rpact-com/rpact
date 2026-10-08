@@ -345,7 +345,9 @@ NULL
     simulatedRejections <- loopResult$simulatedRejections
     simulatedNumberOfPopulations <- loopResult$simulatedNumberOfPopulations
     simulatedPopulationEventsPerStage <- loopResult$simulatedPopulationEventsPerStage
+    simulatedSubsetEventsPerStage <- loopResult$simulatedSubsetEventsPerStage
     simulatedNumberOfEvents <- loopResult$simulatedNumberOfEvents
+    simulatedSingleEventsPerStage <- loopResult$simulatedSingleEventsPerStage
     simulatedSuccessStopping <- loopResult$simulatedSuccessStopping
     simulatedFutilityStopping <- loopResult$simulatedFutilityStopping
     simulatedConditionalPower <- loopResult$simulatedConditionalPower
@@ -367,6 +369,7 @@ NULL
     simulationResults$numberOfPopulations <- simulatedNumberOfPopulations / iterations
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$populationEventsPerStage <- simulatedPopulationEventsPerStage
+    simulationResults$singleEventsPerSubsetAndStage <- simulatedSubsetEventsPerStage
     simulationResults$analysisTime <- simulatedAnalysisTime
     .setEventsNotAchieved(simulationResults, accrualSetup, 
         eventsNotAchieved = simulatedNumberEventsNotAchieved / maxNumberOfIterations)
@@ -383,6 +386,7 @@ NULL
     simulationResults$expectedNumberOfSubjects <- expectedNumberOfSubjects
     simulationResults$studyDuration <- expectedStudyDuration
     simulationResults$cumulativeEventsPerStage <- simulatedNumberOfEvents
+    simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
     simulationResults$iterations <- iterations
     if (kMax > 1) {
         simulationResults$earlyStop <- simulationResults$futilityPerStage +
@@ -490,6 +494,9 @@ NULL
 #' are simulated instead. The default \code{simulationType = "auto"} selects the patient-wise
 #' approach if patient-wise-specific arguments were explicitly specified; otherwise the
 #' test-statistic-based approach is used for backward compatibility.
+#' After a population selection, each subsequent patient-wise analysis targets
+#' the planned increase in events among the selected subgroups. Events already
+#' observed in those subgroups at the preceding analysis count toward the target.
 #'
 #' The definition of \code{thetaH1} makes only sense if \code{kMax} > 1
 #' and if \code{conditionalPower}, \code{minNumberOfEventsPerStage}, and

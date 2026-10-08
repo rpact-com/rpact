@@ -1,3 +1,4 @@
 #' Field description: population events per stage
-#' @field populationEventsPerStage The cumulative number of events per stage Is a numeric matrix.
+#' @field populationEventsPerStage Mean number of events within each population
+#' and stage. Is a numeric array with dimensions stage, scenario, and population.
 #' @keywords internal

@@ -812,7 +812,7 @@ print.SummaryFactory <- function(
                         "expectedNumberOfSubjects",
                         "expectedNumberOfEvents",
                         "singleEventsPerArmAndStage",
-                        "singleEventsPerSubsetAndStage", # deprecated
+                        "singleEventsPerSubsetAndStage", 
                         "numberOfSelectedArms",
                         "numberOfPopulations",
                         "conditionalPowerAchieved",

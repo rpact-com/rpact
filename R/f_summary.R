@@ -856,10 +856,10 @@ NULL
             if (survivalEnabled) {
                 if (enrichmentEnabled) {
                     if (!identical(designPlan$simulationType, "testStatisticBased")) { 
-                        parameterName <- "populationEventsPerStage" 
+                        parameterName <- "populationEventsPerStage" # TODO check: singleEventsPerSubsetAndStage instead?
                         parameterCaption <- "Number of events per population"
                     } else {
-                        parameterName <- "singleEventsPerArmAndStage"
+                        parameterName <- "singleEventsPerSubsetAndStage"
                         parameterCaption <- "Single number of events"
                     }
                 } else {
