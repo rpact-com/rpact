@@ -215,7 +215,8 @@ NULL
                         "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
                         "the output must be a single numeric value",
                         functionName = ".getSimulatedStageSurvivalMultiArm",
-                        parameter = "calcEventsFunction", value = calcEventsFunction
+                        parameter = "calcEventsFunction", value = calcEventsFunction,
+                        diagnosticId = "simulation.event_callback_result_invalid"
                     )
                 }
 
@@ -266,8 +267,7 @@ NULL
 #' In contrast to \code{getSimulationSurvival()} (where survival times are simulated), normally
 #' distributed logrank test statistics are simulated.
 #'
-#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
-#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.
+#' @inheritParams param_omegaMaxVector
 #' @inheritParams param_intersectionTest_MultiArm
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_effectMeasure
@@ -727,12 +727,8 @@ NULL
     }
     simulationResults$singleEventsPerStage <- .removeLastEntryFromArray(simulationResults$singleEventsPerStage)
 
-    simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
-    simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(
-        simulationResults, "singleNumberOfEventsPerStage",
-        simulatedSingleEventsPerStage, "2024-06-10"
-    )
+    simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
+    simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 

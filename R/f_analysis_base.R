@@ -468,9 +468,11 @@ getStageResults <- function(
         if (showWarnings) {
             .assertIsDataset(dataInput)
             if (stage > dataInput$getNumberOfStages()) {
-                warning("'stage' (", stage, ") will be ignored because 'dataInput' ",
+                warnArgumentIgnored("'stage' (", stage, ") will be ignored because 'dataInput' ",
                     "has only ", dataInput$getNumberOfStages(), " stages defined",
-                    call. = FALSE
+                    parameter = "stage",
+                    value = stage,
+                    diagnosticId = "analysis.unavailable_stage"
                 )
             }
         }
@@ -1102,9 +1104,9 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
             type = "logical"
         )
         if (showWarnings) {
-            warning("Repeated p-values not available for 'typeOfDesign' = '",
+            warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = '",
                 design$typeOfDesign, "'",
-                call. = FALSE
+                diagnosticId = "analysis.repeated_p_values_unsupported"
             )
         }
         return(rep(NA_real_, design$kMax))
@@ -1124,9 +1126,9 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
 
     if (.isTrialDesignFisher(design)) {
         if (design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
-            warning("Repeated p-values not available for 'method' = ",
+            warnResultUnavailable("Repeated p-values not available for 'method' = ",
                 .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
-                call. = FALSE
+                diagnosticId = "analysis.repeated_p_values_unsupported"
             )
             return(rep(NA_real_, design$kMax))
         }
@@ -1517,7 +1519,9 @@ getFinalPValue <- function(stageResults, ...) {
     .assertIsStageResultsNonMultiHypotheses(stageResults)
 
     if (stageResults$.design$kMax == 1) {
-        warning("Final p-value is not available for fixed designs", call. = FALSE)
+        warnResultUnavailable("Final p-value is not available for fixed designs",
+            diagnosticId = "analysis.fixed_design_inference"
+        )
         return(list(finalStage = NA_integer_, pFinal = NA_real_))
     }
 
@@ -1537,7 +1541,9 @@ getFinalPValue <- function(stageResults, ...) {
     if (stageResults$.design$kMax > 1 && is.na(finalPValue$finalStage) &&
             (length(finalPValue$pFinal) == 0 || all(is.na(finalPValue$pFinal)))) {
         if (.getOptionalArgument("showWarnings", optionalArgumentDefaultValue = TRUE, ...)) {
-            warning("Final p-value not calculated because final stage not reached", call. = FALSE)
+            warnResultUnavailable("Final p-value not calculated because final stage not reached",
+                diagnosticId = "analysis.final_stage_data_required"
+            )
         }
     }
 
@@ -1632,13 +1638,15 @@ getFinalConfidenceInterval <- function(
     on.exit(dataInput$.trim())
 
     if (design$kMax == 1) {
-        warning("Final confidence interval is not available for fixed sample designs", call. = FALSE)
+        warnResultUnavailable("Final confidence interval is not available for fixed sample designs",
+            diagnosticId = "analysis.fixed_design_inference"
+        )
     }
 
     if (design$kMax > 1 && design$bindingFutility && !.isTrialDesignFisher(design)) {
-        warning("Two-sided final confidence bounds are not appropriate for binding futility case, ",
+        warnNotValidated("Two-sided final confidence bounds are not appropriate for binding futility case, ",
             "use one-sided version (i.e., one bound) only",
-            call. = FALSE
+            diagnosticId = "analysis.binding_futility_confidence_bound"
         )
     }
 
@@ -1708,7 +1716,9 @@ getFinalConfidenceInterval <- function(
     if (design$kMax > 1 && is.na(finalConfidenceInterval$finalStage) &&
             (length(finalConfidenceInterval$finalConfidenceInterval) == 0 ||
                 all(is.na(finalConfidenceInterval$finalConfidenceInterval)))) {
-        warning("Final confidence interval not calculated because final stage not reached", call. = FALSE)
+        warnResultUnavailable("Final confidence interval not calculated because final stage not reached",
+            diagnosticId = "analysis.final_stage_data_required"
+        )
     }
 
     return(finalConfidenceInterval)
@@ -2301,7 +2311,9 @@ getFinalConfidenceInterval <- function(
                 crpFisherSimulated[k] <- reject / iterations
             }
         } else {
-            warning("Simulation of CRP Fisher stopped: 'kMax' must be >= 2", call. = FALSE)
+            warnResultUnavailable("Simulation of CRP Fisher stopped: 'kMax' must be >= 2",
+                diagnosticId = "analysis.conditional_rejection_simulation_requires_fisher"
+            )
         }
     }
 

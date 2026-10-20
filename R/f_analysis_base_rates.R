@@ -267,12 +267,14 @@ NULL
         }
     } else {
         if (!all(is.na(pi2))) {
-            warning(
+            warnArgumentIgnored(
                 "'pi2' (",
                 .arrayToString(pi2),
                 ") will be ignored ",
                 "because the specified data has only one group",
-                call. = FALSE
+                parameter = "pi2",
+                value = pi2,
+                diagnosticId = "analysis.two_group_argument_ignored"
             )
         }
         results$pi2 <- NA_real_
@@ -606,7 +608,8 @@ NULL
             } else {
                 if (thetaH0 != 0) {
                     stopConflictingArguments("thetaH0 must be equal 0 for performing Fisher's exact test",
-                        functionName = ".getStageResultsRates"
+                        functionName = ".getStageResultsRates",
+                        diagnosticId = "analysis.exact_test_requires_equality_null"
                     )
                 }
 
@@ -1504,7 +1507,9 @@ NULL
         divisor <- prod(pValues[1:(kMax - 1)]^weightsFisher[1:(kMax - 1)])
         result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
         if (result <= 0 || result >= 1) {
-            warning("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE)
+            warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax,
+                diagnosticId = "analysis.conditional_power_calculation_failed"
+            )
             conditionalPower[kMax] <- NA_real_
         } else {
             conditionalPower[kMax] <- 1 - stats::pnorm(.getQNorm(result) - thetaH1 * sqrt(nPlanned[kMax]))
@@ -1534,7 +1539,10 @@ NULL
     pi1H1 <- .getOptionalArgument("pi1H1", ...)
     if (!is.null(pi1H1) && !is.na(pi1H1)) {
         if (!is.na(pi1)) {
-            warning(sQuote("pi1"), " will be ignored because ", sQuote("pi1H1"), " is defined", call. = FALSE)
+            warnArgumentIgnored(sQuote("pi1"), " will be ignored because ", sQuote("pi1H1"), " is defined",
+                parameter = "pi1",
+                diagnosticId = "analysis.treatment_probability_overridden"
+            )
         }
         pi1 <- pi1H1
     }
@@ -1542,7 +1550,10 @@ NULL
     pi2H1 <- .getOptionalArgument("pi2H1", ...)
     if (!is.null(pi2H1) && !is.na(pi2H1)) {
         if (!is.na(pi2)) {
-            warning(sQuote("pi2"), " will be ignored because ", sQuote("pi2H1"), " is defined", call. = FALSE)
+            warnArgumentIgnored(sQuote("pi2"), " will be ignored because ", sQuote("pi2H1"), " is defined",
+                parameter = "pi2",
+                diagnosticId = "analysis.control_probability_overridden"
+            )
         }
         pi2 <- pi2H1
     }
@@ -1765,7 +1776,9 @@ NULL
 
     if (length(warningMessages) > 0) {
         for (m in warningMessages) {
-            warning(m, call. = FALSE)
+            warnNumericalIssue(m,
+                diagnosticId = "plot.conditional_power_calculation_warning"
+            )
         }
     }
 

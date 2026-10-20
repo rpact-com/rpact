@@ -176,10 +176,10 @@ NULL
                     rmOverall <- (allocationRatioPlanned[k] * overallRates[treatmentArm, k] +
                         overallRatesControl[k]) / (allocationRatioPlanned[k] + 1)
                     overallTestStatistics[treatmentArm, k] <- overallEffectSizes[treatmentArm, k] /
-                        sqrt(rmOverall * (1 - rmOverall) * sqrt(
+                        sqrt(rmOverall * (1 - rmOverall) * (
                             1 / sum(subjectsPerStage[treatmentArm, 1:k]) +
-                                1 / sum(subjectsPerStage[gMax + 1, 1:k])
-                        ))
+                            1 / sum(subjectsPerStage[gMax + 1, 1:k])
+                            ))
                 } else {
                     activeSubjects <- sum(subjectsPerStage[treatmentArm, 1:k])
                     controlSubjects <- sum(subjectsPerStage[gMax + 1, 1:k])
@@ -281,7 +281,8 @@ NULL
                         "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
                         "the output must be a single numeric value",
                         functionName = ".getSimulatedStageRatesMultiArm",
-                        parameter = "calcSubjectsFunction", value = calcSubjectsFunction
+                        parameter = "calcSubjectsFunction", value = calcSubjectsFunction,
+                        diagnosticId = "simulation.subject_callback_result_invalid"
                     )
                 }
 

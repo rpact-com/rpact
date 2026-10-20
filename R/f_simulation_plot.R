@@ -24,7 +24,8 @@ NULL
                 length(simulationResults$alternative) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
-                parameter = "alternative"
+                parameter = "alternative",
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsRates")) {
@@ -33,7 +34,8 @@ NULL
                 length(simulationResults$pi1) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
-                parameter = "pi1"
+                parameter = "pi1",
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsSurvival")) {
@@ -42,7 +44,8 @@ NULL
                 length(simulationResults$hazardRatio) <= 1) {
             stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined or derived",
                 functionName = ".assertIsValidVariedParameterVectorForSimulationResultsPlotting",
-                parameter = "hazardRatio"
+                parameter = "hazardRatio",
+                diagnosticId = "plot.multiple_effect_scenarios_required"
             )
         }
         if (length(simulationResults$hazardRatio) != length(simulationResults$overallReject)) {
@@ -792,7 +795,8 @@ NULL
             stopIllegalArgument("plot type 8 (Early Stopping) ",
                 "is not available for 'kMax' = 1",
                 functionName = ".plotSimulationResults",
-                parameter = "kMax"
+                parameter = "kMax",
+                diagnosticId = "plot.fixed_design_has_no_interims"
             )
         }
 

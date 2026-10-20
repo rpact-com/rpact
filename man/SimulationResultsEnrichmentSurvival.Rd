@@ -77,7 +77,7 @@ to create an object of this type.
 
 \item{\code{populations}}{The number of populations in an enrichment design. Is a single numeric value representing a  whole number.}
 
-\item{\code{populationEventsPerStage}}{The cumulative number of events per stage Is a numeric matrix.}
+\item{\code{populationEventsPerStage}}{Mean number of events within each population and stage. Is a numeric array with dimensions stage, scenario, and population.}
 
 \item{\code{rejectAtLeastOne}}{The probability to reject at least one of the (multiple) hypotheses. Is a numeric vector.}
 
@@ -90,6 +90,10 @@ to create an object of this type.
 \item{\code{selectedPopulations}}{The selected populations in enrichment designs.}
 
 \item{\code{selectPopulationsFunction}}{An optional function that can be entered to define the way of how populations are selected.}
+
+\item{\code{singleEventsPerStage}}{The mean number of events within each stage. Is a numeric matrix.}
+
+\item{\code{singleEventsPerSubsetAndStage}}{Mean number of events within each subgroup and stage. Is a numeric array with dimensions stage, scenario, and subgroup.}
 
 \item{\code{singleNumberOfEventsPerStage}}{Deprecated: use \code{singleEventsPerArmAndStage} or \code{singleEventsPerSubsetAndStage} instead}
 

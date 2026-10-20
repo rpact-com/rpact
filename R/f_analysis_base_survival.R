@@ -1144,7 +1144,9 @@ NULL
         divisor <- prod(pValues[1:(kMax - 1)]^weightsFisher[1:(kMax - 1)])
         result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
         if (result <= 0 || result >= 1) {
-            warning("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE)
+            warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax,
+                diagnosticId = "analysis.conditional_power_calculation_failed"
+            )
             conditionalPower[kMax] <- NA_real_
         } else {
             conditionalPower[kMax] <- 1 - stats::pnorm(.getQNorm(result) - thetaH1 * sqrt(nPlanned[kMax]))
@@ -1316,7 +1318,9 @@ NULL
     )
     if (length(warningMessages) > 0) {
         for (m in warningMessages) {
-            warning(m, call. = FALSE)
+            warnNumericalIssue(m,
+                diagnosticId = "plot.conditional_power_calculation_warning"
+            )
         }
     }
 

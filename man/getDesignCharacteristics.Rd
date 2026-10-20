@@ -7,13 +7,24 @@
 getDesignCharacteristics(design = NULL, ...)
 }
 \arguments{
-\item{design}{The trial design.}
+\item{design}{A conventional \code{TrialDesign} object or an optimal conditional
+error design created with \code{\link[=getDesignOptimalConditionalError]{getDesignOptimalConditionalError()}}. If omitted,
+a default conventional design is created.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 }
 \value{
-Returns a \code{\link{TrialDesignCharacteristics}} object.
+For an optimal conditional error design, a
+\code{TrialDesignOptimalConditionalErrorCharacteristics} parameter set with
+\code{theta}, \code{overallReject}, \code{rejectPerStage} (two rows, one per stage), and
+\code{futilityPerStage} (one row for interim futility). Matrix columns correspond
+to entries in \code{theta}, including for a single effect. Final non-rejection
+is not counted as early futility. \code{overallReject} is overall power under
+an alternative and the type I error probability at \code{theta = 0}.
+See \code{\link[=getDesignOptimalConditionalError]{getDesignOptimalConditionalError()}} for the method and its assumptions.
+
+For conventional designs, returns a \code{\link{TrialDesignCharacteristics}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
 \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
@@ -33,6 +44,10 @@ Calculates the inflation factor (IF),
 the expected reduction in sample size under H1, under H0, and under a value in between H0 and H1.
 Furthermore, absolute information values are calculated
 under the prototype case testing H0: mu = 0 against H1: mu = 1.
+
+For an optimal conditional error design, supply \code{theta} through \code{...} as a
+finite numeric vector of treatment effects on the mean difference scale.
+The design is evaluated at those effects without recalibration.
 }
 \section{How to get help for generic functions}{
 
@@ -46,6 +61,13 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
+design <- getDesignOptimalConditionalError(
+    alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
+    thetaH1 = 0.5, useInterimEstimate = FALSE, firstStageInformation = 4,
+    likelihoodRatioDistribution = "maxlr"
+)
+getDesignCharacteristics(design, theta = c(0, 0.25, 0.5))
+
 \dontrun{
 # Calculate design characteristics for a three-stage O'Brien & Fleming 
 # design at power 90\% and compare it with Pocock's design.  
@@ -54,7 +76,16 @@ getDesignCharacteristics(getDesignGroupSequential(beta = 0.1, typeOfDesign = "P"
 }
 
 }
+\references{
+Brannath, W. & Bauer, P. (2004). Optimal conditional error functions for the control of conditional power. Biometrics, 60(3), 715-723. \doi{10.1111/j.0006-341X.2004.00221.x}
+
+Brannath, W., zur Verth, J., Dreher, M. & Scharpenberg, M. (2024; revised 2026). Optimal monotone conditional error functions. \doi{10.48550/arXiv.2402.00814}
+
+The related R package \href{https://CRAN.R-project.org/package=optconerrf}{optconerrf: Optimal Monotone Conditional Error Functions} provides a standalone implementation of this methodology. The rpact implementation uses rpact design objects and interfaces; optconerrf is not required to run these functions.
+}
 \seealso{
+\href{https://www.rpact.org/vignettes/planning/rpact_optimal_conditional_error/}{Optimal Conditional Error Designs with rpact} for a worked example with stopping rules, information constraints, interim estimates, and conditional power functions.
+
 Other design functions:
 \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}},
 \code{\link[=getDesignFisher]{getDesignFisher()}},

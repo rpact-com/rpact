@@ -17,7 +17,9 @@
 
 .writeLinesToFile <- function(lines, fileName) {
     if (is.null(lines) || length(lines) == 0 || !is.character(lines)) {
-        warning("Empty lines. Stop to write ", .vQuote(fileName))
+        warnRuntimeIssue("Empty lines. Stop to write ", .vQuote(fileName),
+            diagnosticId = "io.empty_output"
+        )
         return(invisible(fileName))
     }
 
@@ -153,7 +155,8 @@ writeKeyValueFile <- function(
     if (file.exists(filePath) && !overwrite) {
         stopIllegalArgument("file exists and overwrite = FALSE: ", sQuote(filePath),
             functionName = "writeKeyValueFile",
-            parameter = filePath
+            parameter = filePath,
+            diagnosticId = "io.overwrite_disabled"
         )
     }
 
@@ -330,7 +333,8 @@ readKeyValueFile <- function(
     if (!file.exists(filePath)) {
         stopIllegalArgument("file not found: ", sQuote(filePath),
             functionName = "readKeyValueFile",
-            parameter = filePath
+            parameter = filePath,
+            diagnosticId = "io.input_file_missing"
         )
     }
 

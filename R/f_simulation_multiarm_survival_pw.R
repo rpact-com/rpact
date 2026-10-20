@@ -36,7 +36,6 @@ NULL
 #' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
 #' than 1 can be used, for example, to simulate non-inferiority designs.
 #'
-#' @inheritParams param_omegaMaxVector
 #' @inheritParams param_intersectionTest_MultiArm
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_effectMeasure
@@ -82,6 +81,7 @@ NULL
 #' @inheritParams param_maxNumberOfRawDatasetsPerStage
 #' @inheritParams param_simulationType_multiarm_survival
 #' @inheritParams param_piControl
+#' @inheritParams param_omegaMaxVector
 #'
 #' @details
 #' At given design the function simulates the analysis times, power, stopping
@@ -208,7 +208,8 @@ getSimulationMultiArmSurvival <- function(
                 "simulation types were specified",
                 functionName = "getSimulationMultiArmSurvival",
                 parameter = "testStatisticBased",
-                relatedParameter = "patientWise"
+                relatedParameter = "patientWise",
+                diagnosticId = "simulation.engine_inputs_conflict"
             )
         }
         if (usesBasicOnlyArgs) {
@@ -228,7 +229,8 @@ getSimulationMultiArmSurvival <- function(
                 parameter = "maxNumberOfRawDatasetsPerStage",
                 value = maxNumberOfRawDatasetsPerStage,
                 relatedParameter = "simulationType",
-                relatedValue = simulationType
+                relatedValue = simulationType,
+                diagnosticId = "simulation.raw_data_requires_patient_wise"
             )
         }
         if (usesPatientWiseOnlyArgs) {
@@ -237,7 +239,8 @@ getSimulationMultiArmSurvival <- function(
                 "if 'simulationType' = \"testStatisticBased\"",
                 functionName = "getSimulationMultiArmSurvival",
                 parameter = "simulationType", 
-                value = simulationType
+                value = simulationType,
+                diagnosticId = "simulation.patient_inputs_with_statistic_engine"
             )
         }
 
@@ -292,7 +295,8 @@ getSimulationMultiArmSurvival <- function(
                 functionName = "getSimulationMultiArmSurvival",
                 parameter = "correlationComputation",
                 relatedParameter = "simulationType",
-                value = correlationComputation
+                value = correlationComputation,
+                diagnosticId = "simulation.correlation_ignored_for_patient_wise"
             )
         }
         return(.getSimulationMultiArmSurvivalPatientWise(

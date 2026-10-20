@@ -51,7 +51,8 @@ jobs:
       - name: Add private tests
         run: |
           find ./private-tests/tests -maxdepth 1 -name \*.R -exec cp {} ./tests \;
-          find ./private-tests/tests/testthat -maxdepth 1 -name \*.R -exec cp {} ./tests/testthat \;
+          # Keep fixtures and other supporting files in their original subdirectories.
+          cp -R ./private-tests/tests/testthat/. ./tests/testthat/
         shell: bash
 
       - name: Test coverage

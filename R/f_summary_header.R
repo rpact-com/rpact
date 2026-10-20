@@ -409,8 +409,9 @@ NULL
 
         if (length(designPlan[[userDefinedParam]]) == 1) {
             treatmentRateText <- paste0("H1: ", paramName, " = ", round(designPlan[[userDefinedParam]], 3))
-        } else if (!is.null(designPlan[["omegaMaxVector"]]) && length(designPlan$omegaMaxVector) == 1) {
-            treatmentRateText <- paste0("H1: omega_max = ", round(designPlan$omegaMaxVector, 3))
+        } else if (!is.null(designPlan[["omegaMaxVector"]]) && length(designPlan$omegaMaxVector) >= 1) {
+            treatmentRateText <- paste0("H1: omega_max = ", 
+                .arrayToString(designPlan$omegaMaxVector, mode = "vector", digits = 3))
         } else if (!is.null(designPlan[["hazardRatio"]]) && (length(designPlan$hazardRatio) == 1) ||
                 (inherits(designPlan, "SimulationResults") && !is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
                     designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled)) {
@@ -457,6 +458,14 @@ NULL
                 )
             )
         }
+        
+        print("settings$multiArmEnabled") # TODO remove
+        print(settings$multiArmEnabled)
+
+        if (!is.null(designPlan[["piControl"]]) && length(designPlan$piControl) == 1 && !is.na(designPlan$piControl)) {
+            treatmentRateText <- paste0(treatmentRateText, ", control rate pi(control) = ", round(designPlan$piControl, 3))
+        }
+        
         header <- paste0(header, ", \n", .createSummaryHypothesisText(designPlan, summaryFactory))
         header <- .concatenateSummaryText(header, treatmentRateText)
         header <- .addEnrichmentEffectListToHeader(header, designPlan)
@@ -477,12 +486,12 @@ NULL
 
     if ("effectMatrix" %in% names(designPlan) && 
             !is.null(designPlan$effectMatrix) && 
-            designPlan$isUserDefinedParameter("effectMatrix")) {
+            (designPlan$isUserDefinedParameter("effectMatrix") || designPlan$isDerivedParameter("effectMatrix"))) {
         effectMatrixLines <- .formatSummaryEffectMatrix(designPlan$effectMatrix, consoleOutputEnabled)
 
         header <- paste0(
             header, "\n\n",
-            "User defined effect shape:",
+            ifelse(designPlan$isUserDefinedParameter("effectMatrix"), "User defined effect shape:", "Effect shape:"),
             ifelse(consoleOutputEnabled, "\n", "\n\n"), paste(effectMatrixLines, collapse = "\n")
         )
     }

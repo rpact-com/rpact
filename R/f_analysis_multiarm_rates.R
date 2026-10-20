@@ -363,9 +363,10 @@ NULL
     if (.isTrialDesignConditionalDunnett(design)) {
         if (!normalApproximation) {
             if (userFunctionCallEnabled) {
-                warning("'normalApproximation' was set to TRUE ",
+                warnArgumentAdjusted("'normalApproximation' was set to TRUE ",
                     "because conditional Dunnett test was specified as design",
-                    call. = FALSE
+                    parameter = "normalApproximation",
+                    diagnosticId = "analysis.conditional_dunnett_requires_normal"
                 )
             }
             normalApproximation <- TRUE
@@ -378,7 +379,8 @@ NULL
 
     if (intersectionTest == "Dunnett" && !normalApproximation) {
         stopIllegalArgument("Dunnett test cannot be used with Fisher's exact test (normalApproximation = FALSE)",
-            functionName = ".getStageResultsRatesMultiArm"
+            functionName = ".getStageResultsRatesMultiArm",
+            diagnosticId = "analysis.intersection_test_exact_unsupported"
         )
     }
 
@@ -458,7 +460,8 @@ NULL
                 if (thetaH0 != 0) {
                     stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
                         functionName = ".getStageResultsRatesMultiArm",
-                        parameter = "thetaH0", value = thetaH0
+                        parameter = "thetaH0", value = thetaH0,
+                        diagnosticId = "analysis.exact_test_requires_equality_null"
                     )
                 }
 
@@ -523,7 +526,8 @@ NULL
                 if (thetaH0 != 0) {
                     stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
                         functionName = ".getStageResultsRatesMultiArm",
-                        parameter = "thetaH0", value = thetaH0
+                        parameter = "thetaH0", value = thetaH0,
+                        diagnosticId = "analysis.exact_test_requires_equality_null"
                     )
                 }
 
@@ -785,9 +789,10 @@ NULL
         # Repeated onfidence intervals when using combination tests
 
         if (intersectionTest == "Hierarchical") {
-            warning("Repeated confidence intervals not available for ",
+            warnResultUnavailable("Repeated confidence intervals not available for ",
                 "'intersectionTest' = \"Hierarchical\"",
-                call. = FALSE
+                parameter = "intersectionTest",
+                diagnosticId = "analysis.hierarchical_repeated_intervals_unsupported"
             )
             return(repeatedConfidenceIntervals)
         }
@@ -1057,9 +1062,10 @@ NULL
     piTreatmentsH1 <- .getOptionalArgument("piTreatmentsH1", ...)
     if (!is.null(piTreatmentsH1) && !is.na(piTreatmentsH1)) {
         if (!is.na(piTreatments)) {
-            warning(sQuote("piTreatments"), " will be ignored because ",
+            warnArgumentIgnored(sQuote("piTreatments"), " will be ignored because ",
                 sQuote("piTreatmentsH1"), " is defined",
-                call. = FALSE
+                parameter = "piTreatments",
+                diagnosticId = "analysis.treatment_probabilities_overridden"
             )
         }
         piTreatments <- piTreatmentsH1
@@ -1068,9 +1074,10 @@ NULL
     piControlH1 <- .getOptionalArgument("piControlH1", ...)
     if (!is.null(piControlH1) && !is.na(piControlH1)) {
         if (!is.na(piControl)) {
-            warning(sQuote("piControl"), " will be ignored because ",
+            warnArgumentIgnored(sQuote("piControl"), " will be ignored because ",
                 sQuote("piControlH1"), " is defined",
-                call. = FALSE
+                parameter = "piControl",
+                diagnosticId = "analysis.control_alternative_probability_overridden"
             )
         }
         piControl <- piControlH1
@@ -1194,7 +1201,8 @@ NULL
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
         "or TrialDesignConditionalDunnett",
         functionName = ".getConditionalPowerRatesMultiArm",
-        parameter = "design"
+        parameter = "design",
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1416,7 +1424,9 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warning("Calculation not possible: could not calculate conditional power for stage ", kMax, call. = FALSE)
+                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ", kMax,
+                        diagnosticId = "analysis.conditional_power_calculation_failed"
+                    )
                     results$conditionalPower[treatmentArm, kMax] <- NA_real_
                 } else {
                     results$conditionalPower[treatmentArm, kMax] <- 1 - stats::pnorm(.getQNorm(result) -
@@ -1467,7 +1477,9 @@ NULL
     )
 
     if (stage > 1) {
-        warning("Conditional power is only calculated for the first (interim) stage", call. = FALSE)
+        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage",
+            diagnosticId = "analysis.conditional_power_later_stage_unsupported"
+        )
     }
 
     gMax <- stageResults$getGMax()

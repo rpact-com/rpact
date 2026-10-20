@@ -45,13 +45,13 @@
 #'
 .warnInCaseOfExtremeAllocationRatios <- function(allocation1, allocation2) {
     if (abs(allocation1 - allocation2) > 4) {
-        warning(
+        warnNotValidated(
             "Choice of allocation scheme ('allocation1' = ",
             allocation1,
             ", 'allocation2' = ",
             allocation2,
             ") might yield unreliable results",
-            call. = FALSE
+            diagnosticId = "counts.allocation_not_validated"
         )
     }
 }
@@ -331,10 +331,10 @@
             )
         },
         error = function(e) {
-            warning(
+            warnNumericalIssue(
                 "Failed to calculate the calendar time. ",
                 "Fisher information might be bounded, e.g., due to overdispersion > 0",
-                call. = FALSE
+                diagnosticId = "counts.information_target_unreachable"
             )
         }
     )
@@ -471,7 +471,8 @@
 
     if (design$sided == 2 && thetaH0 != 1) {
         stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
-            functionName = ".getDesignPlanCountData"
+            functionName = ".getDesignPlanCountData",
+            diagnosticId = "planning.two_sided_requires_superiority"
         )
     }
 

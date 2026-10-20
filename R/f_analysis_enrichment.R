@@ -195,9 +195,9 @@ NULL
 
     if (stageResults$isDatasetMeans()) {
         if ("assumedStDev" %in% names(list(...))) {
-            warning("For enrichment analysis the argument for assumed standard deviation ",
+            warnInvalidInput("For enrichment analysis the argument for assumed standard deviation ",
                 "is named 'assumedStDevs' and not 'assumedStDev'",
-                call. = FALSE
+                diagnosticId = "analysis.assumed_standard_deviations_argument_name"
             )
         }
 
@@ -267,7 +267,8 @@ NULL
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalRejectionProbabilitiesEnrichment",
-        parameter = "design"
+        parameter = "design",
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -439,7 +440,8 @@ NULL
     }
     if (stage < 1 || kMax == 1) {
         stopIllegalArgument("cannot plot conditional power of a fixed design",
-            functionName = ".getConditionalPowerPlotEnrichment"
+            functionName = ".getConditionalPowerPlotEnrichment",
+            diagnosticId = "plot.fixed_design_has_no_interims"
         )
     }
     if (stage >= kMax) {

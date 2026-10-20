@@ -304,7 +304,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
                 " makes no sense and is not allowed (use remaining population 'R' instead of 'F')",
                 functionName = ".getEffectData",
                 parameter = "F",
-                relatedParameter = "R"
+                relatedParameter = "R",
+                diagnosticId = "enrichment.overlapping_full_population"
             )
         }
         expectedSubGroups <- .createSubsetsByGMax(gMax, stratifiedInput = TRUE, all = FALSE)
@@ -429,7 +430,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (abs(sum(prevalences) - 1) > 1e-04) {
         stopIllegalArgument(sQuote("effectList$prevalences"), " must sum to 1",
             functionName = ".getEffectData",
-            parameter = "effectList$prevalences", value = effectList$prevalences
+            parameter = "effectList$prevalences", value = effectList$prevalences,
+            diagnosticId = "enrichment.prevalences_not_partition"
         )
     }
     for (i in indices) {
@@ -502,9 +504,13 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             ignore <- effectListNames[!(effectListNames %in% C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL)]
         }
         if (length(ignore) > 0) {
-            warning("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
+            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", 
+                .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
-                call. = FALSE
+                parameter = ignore,
+                relatedParameter = "endpoint",
+                relatedValue = endpoint,
+                diagnosticId = "simulation.endpoint_effects_ignored"
             )
         }
     }
@@ -662,9 +668,13 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
             ignore <- effectDataNames[!(effectDataNames %in% gsub("s$", "", C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL))]
         }
         if (length(ignore) > 0) {
-            warning("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
+            warnArgumentIgnored("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", 
+                .arrayToString(ignore, encapsulate = TRUE),
                 " will be ignored",
-                call. = FALSE
+                parameter = ignore,
+                relatedParameter = "endpoint",
+                relatedValue = endpoint,
+                diagnosticId = "simulation.endpoint_effects_ignored"
             )
         }
     }
@@ -1131,7 +1141,8 @@ getRawData <- function(x, aggregate = FALSE) {
                 functionName = "getRawData",
                 parameter = "simulationType",
                 value = x$simulationType,
-                relatedParameter = "maxNumberOfRawDatasetsPerStage"
+                relatedParameter = "maxNumberOfRawDatasetsPerStage",
+                diagnosticId = "simulation.raw_data_requires_patient_wise"
             )
         }
         simulationFunction <- if (inherits(x, "SimulationResultsMultiArmSurvival")) {
@@ -1146,7 +1157,8 @@ getRawData <- function(x, aggregate = FALSE) {
             "choose a 'maxNumberOfRawDatasetsPerStage' > 0, e.g., ",
             simulationFunction, "(..., maxNumberOfRawDatasetsPerStage = 1)",
             functionName = "getRawData",
-            parameter = "maxNumberOfRawDatasetsPerStage"
+            parameter = "maxNumberOfRawDatasetsPerStage",
+            diagnosticId = "simulation.raw_data_not_retained"
         )
     }
 
@@ -1244,15 +1256,19 @@ getRawData <- function(x, aggregate = FALSE) {
         }
         simulationResults$.setParameterType("effectMatrix", C_PARAM_DERIVED)
         if (!is.null(gED50) && !is.na(gED50)) {
-            warning("'gED50' (", gED50, ") will be ignored because 'typeOfShape' ",
+            warnArgumentIgnored("'gED50' (", gED50, ") will be ignored because 'typeOfShape' ",
                 "is defined as ", .vQuote(typeOfShape),
-                call. = FALSE
+                parameter = "gED50",
+                value = gED50,
+                diagnosticId = "shape.linear_parameters_ignored"
             )
         }
         if (!is.null(slope) && !is.na(slope) && slope != 1) {
-            warning("'slope' (", slope, ") will be ignored because 'typeOfShape' ",
+            warnArgumentIgnored("'slope' (", slope, ") will be ignored because 'typeOfShape' ",
                 "is defined as ", .vQuote(typeOfShape),
-                call. = FALSE
+                parameter = "slope",
+                value = slope,
+                diagnosticId = "shape.linear_parameters_ignored"
             )
         }
 
@@ -1296,12 +1312,12 @@ getRawData <- function(x, aggregate = FALSE) {
     simulationResults$eventsNotAchieved <- eventsNotAchieved
     if (any(simulationResults$eventsNotAchieved > 0)) { 
         simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_GENERATED)
-        warning("Presumably due to drop-outs, required number of events ",
+        warnResultUnavailable("Presumably due to drop-outs, required number of events ",
             "were not achieved for at least one situation. ",
             "Increase the maximum number of subjects (",
             accrualSetup$maxNumberOfSubjects, ") ",
             "to avoid this situation",
-            call. = FALSE
+            diagnosticId = "simulation.dropout_prevents_event_target"
         )
     } else {
         simulationResults$.setParameterType("eventsNotAchieved", C_PARAM_NOT_APPLICABLE)

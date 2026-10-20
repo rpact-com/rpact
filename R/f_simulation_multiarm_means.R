@@ -227,7 +227,8 @@ NULL
                         "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
                         "the output must be a single numeric value >= 0",
                         functionName = ".getSimulatedStageMeansMultiArm",
-                        parameter = "calcSubjectsFunction", value = calcSubjectsFunction
+                        parameter = "calcSubjectsFunction", value = calcSubjectsFunction,
+                        diagnosticId = "simulation.subject_callback_result_invalid"
                     )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {

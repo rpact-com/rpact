@@ -792,7 +792,8 @@ getObjectRCode <- function(
                 functionName = "getObjectRCode",
                 parameter = "illegalArgumentValueNames", value = illegalArgumentValueNames,
                 relatedParameter = "functionName",
-                relatedValue = functionName
+                relatedValue = functionName,
+                diagnosticId = "validation.unknown_argument"
             )
         }
 

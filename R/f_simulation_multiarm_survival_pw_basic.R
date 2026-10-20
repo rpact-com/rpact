@@ -603,7 +603,8 @@ NULL
                         "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
                         "the output must be a single numeric value",
                         functionName = ".getSimulatedStageResultsSurvivalMultiArmPatientWise",
-                        parameter = "calcEventsFunction", value = calcEventsFunction
+                        parameter = "calcEventsFunction", value = calcEventsFunction,
+                        diagnosticId = "simulation.event_callback_result_invalid"
                     )
                 }
 

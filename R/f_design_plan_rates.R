@@ -394,7 +394,8 @@ NULL
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1", value = pi1,
                 relatedParameter = "thetaH0",
-                relatedValue = thetaH0
+                relatedValue = thetaH0,
+                diagnosticId = "planning.alternative_equals_null"
             )
         }
 
@@ -402,14 +403,16 @@ NULL
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
             stopIllegalArgument("exact sample size calculation not available for two-sided testing",
-                functionName = ".createDesignPlanRates"
+                functionName = ".createDesignPlanRates",
+                diagnosticId = "rates.two_sided_exact_sample_size_unsupported"
             )
         }
 
         if (normalApproximation && !conservative && (objectType == "sampleSize")) {
             stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation",
                 functionName = ".createDesignPlanRates",
-                parameter = "conservative", value = conservative
+                parameter = "conservative", value = conservative,
+                diagnosticId = "rates.conservative_not_applicable"
             )
         }
     } else if (groups == 2L) {
@@ -424,7 +427,8 @@ NULL
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1 - pi2", value = pi1 - pi2,
                 relatedParameter = "thetaH0",
-                relatedValue = thetaH0
+                relatedValue = thetaH0,
+                diagnosticId = "planning.alternative_equals_null"
             )
         }
 
@@ -439,7 +443,8 @@ NULL
                 functionName = ".createDesignPlanRates",
                 parameter = "pi1 / pi2", value = pi1 / pi2,
                 relatedParameter = "thetaH0",
-                relatedValue = thetaH0
+                relatedValue = thetaH0,
+                diagnosticId = "planning.alternative_equals_null"
             )
         }
 
@@ -450,13 +455,15 @@ NULL
             ) {
             stopIllegalArgument("two-sided case ",
                 "is implemented only for superiority testing",
-                functionName = ".createDesignPlanRates"
+                functionName = ".createDesignPlanRates",
+                diagnosticId = "planning.two_sided_requires_superiority"
             )
         }
 
         if (!normalApproximation) {
             stopIllegalArgument("only normal approximation case is implemented for two groups",
-                functionName = ".createDesignPlanRates"
+                functionName = ".createDesignPlanRates",
+                diagnosticId = "rates.two_group_normal_approximation_required"
             )
         }
 
@@ -464,7 +471,8 @@ NULL
             stopIllegalArgument("'conservative' (", conservative, ") ",
                 "has no effect on sample size calculation for two groups",
                 functionName = ".createDesignPlanRates",
-                parameter = "conservative", value = conservative
+                parameter = "conservative", value = conservative,
+                diagnosticId = "rates.conservative_not_applicable"
             )
         }
 
@@ -518,33 +526,48 @@ NULL
     if (groups == 1) {
         .setValueAndParameterType(designPlan, "pi2", pi2, NA_real_, notApplicableIfNA = TRUE)
         if (designPlan$isUserDefinedParameter("pi2")) {
-            warning(
+            warnArgumentIgnored(
                 "'pi2' (",
                 pi2,
                 ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "pi2",
+                value = pi2,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         designPlan$.setParameterType("pi2", C_PARAM_NOT_APPLICABLE)
 
         if (isTRUE(riskRatio)) {
-            warning(
+            warnArgumentIgnored(
                 "'riskRatio' (",
                 riskRatio,
                 ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "riskRatio",
+                value = riskRatio,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         designPlan$.setParameterType("riskRatio", C_PARAM_NOT_APPLICABLE)
 
         if (length(allocationRatioPlanned) == 1 && !is.na(allocationRatioPlanned)) {
-            warning(
+            warnArgumentIgnored(
                 "'allocationRatioPlanned' (",
                 allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         designPlan$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)

@@ -340,9 +340,9 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                         )
                     }
 
-                    warning("Only the parent design of ", .getClassName(d),
+                    warnArgumentAdjusted("Only the parent design of ", .getClassName(d),
                         " was added to trial design set",
-                        call. = FALSE
+                        diagnosticId = "design_set.delayed_design_replaced"
                     )
                     designsToAddValidated <- c(designsToAddValidated, parentDesign)
                 }
@@ -355,10 +355,10 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
             args <- args[!(names(args) %in% c("designs", "variedParameters"))]
             if (length(args) > 0) {
-                warning("Argument", ifelse(length(args) > 1, "s", ""), " ",
+                warnArgumentIgnored("Argument", ifelse(length(args) > 1, "s", ""), " ",
                     .arrayToString(args, encapsulate = TRUE), " will be ignored ",
                     "because for 'designs' only argument 'variedParameters' will be respected",
-                    call. = FALSE
+                    diagnosticId = "design_set.variant_parameters_ignored"
                 )
             }
 
@@ -402,7 +402,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             if (is.null(design) && optionalArgumentsDefined && length(self$designs) == 0) {
                 stopIncompleteArguments("at least one design (master) must be defined in this ",
                     "design set to respect any design parameters",
-                    functionName = ".validateOptionalArguments"
+                    functionName = ".validateOptionalArguments",
+                    diagnosticId = "design_set.master_missing"
                 )
             }
 
@@ -437,7 +438,9 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
             argumentNames <- names(args)
             if (length(argumentNames) == 0) {
-                warning("No argument names available for ", paste(args, collapse = ", "), call. = FALSE)
+                warnInvalidInput("No argument names available for ", paste(args, collapse = ", "),
+                    diagnosticId = "design_set.invalid_variant_parameters"
+                )
                 return(character())
             }
 
@@ -490,7 +493,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                     stopConflictingArguments(
                         "designs have different directions of alternative (design master is ",
                         ifelse(sided == 1, "one", "two"), " sided)",
-                        functionName = "assertHaveEqualSidedValues"
+                        functionName = "assertHaveEqualSidedValues",
+                        diagnosticId = "design_set.sidedness_mismatch"
                     )
                 }
             }
@@ -500,7 +504,9 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             argumentNames <- self$.getArgumentNames(validatedDesign = validatedDesign, ...)
 
             if (length(argumentNames) == 0) {
-                warning("Creation of design variants stopped: no valid design parameters found", call. = FALSE)
+                warnInvalidInput("Creation of design variants stopped: no valid design parameters found",
+                    diagnosticId = "design_set.invalid_variant_parameters"
+                )
                 return(list())
             }
 
@@ -571,15 +577,23 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                         parameterNameBefore, parameterValueBefore
                     )) {
                     if (!is.null(parameterNameBefore) && !is.null(parameterValueBefore)) {
-                        warning(sprintf(
+                        warnArgumentIgnored(sprintf(
                             "Argument ignored: there exists already a design with %s = %s (%s = %s)",
                             argumentName, argumentValue, parameterNameBefore, parameterValueBefore
-                        ), call. = FALSE)
+                        ),
+                            parameter = argumentName,
+                            value = argumentValue,
+                            diagnosticId = "design_set.duplicate_design"
+                        )
                     } else {
-                        warning(sprintf(
+                        warnArgumentIgnored(sprintf(
                             "Argument ignored: there exists already a design with %s = %s",
                             argumentName, argumentValue
-                        ), call. = FALSE)
+                        ),
+                            parameter = argumentName,
+                            value = argumentValue,
+                            diagnosticId = "design_set.duplicate_design"
+                        )
                     }
                 } else {
                     designMaster2 <- self$.createDesignVariant(
@@ -1289,7 +1303,9 @@ plot.TrialDesignSet <- function(
                 )
             },
             error = function(e) {
-                warning("Failed to format delayed information rates on x-axis: ", e$message)
+                warnRuntimeIssue("Failed to format delayed information rates on x-axis: ", e$message,
+                    diagnosticId = "plot.axis_formatting_failed"
+                )
             }
         )
     }

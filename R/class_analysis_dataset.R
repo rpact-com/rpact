@@ -183,7 +183,8 @@ readDataset <- function(
         stopIllegalArgument("the file ", .vQuote(file), " does not exist",
             functionName = "readDataset",
             parameter = "file",
-            value = file
+            value = file,
+            diagnosticId = "io.input_file_missing"
         )
     }
 
@@ -336,7 +337,8 @@ readDatasets <- function(
         stopIllegalArgument("the file ", .vQuote(file), " does not exist",
             functionName = "readDatasets",
             parameter = "file",
-            value = file
+            value = file,
+            diagnosticId = "io.input_file_missing"
         )
     }
 
@@ -348,7 +350,8 @@ readDatasets <- function(
     if (is.null(data[["datasetId"]])) {
         stopIllegalArgument("data file must contain the column 'datasetId'",
             functionName = "readDatasets",
-            parameter = "datasetId"
+            parameter = "datasetId",
+            diagnosticId = "dataset.dataset_id_missing"
         )
     }
 
@@ -628,7 +631,8 @@ writeDatasets <- function(
     }
 
     stopIllegalArgument("failed to identify dataset type",
-        functionName = ".getDataset"
+        functionName = ".getDataset",
+        diagnosticId = "dataset.endpoint_unrecognized"
     )
 }
 
@@ -730,10 +734,10 @@ writeDatasets <- function(
 getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
     dataset <- .getDataset(floatingPointNumbersEnabled = floatingPointNumbersEnabled, ...)
     if (dataset$.enrichmentEnabled && dataset$getNumberOfGroups() != 2) {
-        warning("Only population enrichment data with 2 groups can be analyzed but ",
+        warnDataIssue("Only population enrichment data with 2 groups can be analyzed but ",
             dataset$getNumberOfGroups(), " group",
             ifelse(dataset$getNumberOfGroups() == 1, " is", "s are"), " defined",
-            call. = FALSE
+            diagnosticId = "dataset.enrichment_requires_two_groups"
         )
     }
     dataset <- .resetPipeOperatorQueue(dataset)
@@ -771,9 +775,10 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 argInfo <- paste0(sQuote(argName), " ")
             }
             argInfo <- paste0(argInfo, "(", .arrayToString(arg), ")")
-            warning(
+            warnArgumentIgnored(
                 "Argument ", argInfo, " will be ignored ",
-                "because only 'emmGrid' objects will be respected"
+                "because only 'emmGrid' objects will be respected",
+                diagnosticId = "dataset.emmeans_extra_arguments"
             )
         }
     }
@@ -885,7 +890,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         levelsList <- methods::slot(emmeansResultPerStage, "levels")
         if (!is.null(levelsList) && length(levelsList) > 1) {
             stopIllegalArgument("models with covariates are not yet supported by getDataset()",
-                functionName = ".getDatasetMeansFromModelsByStage"
+                functionName = ".getDatasetMeansFromModelsByStage",
+                diagnosticId = "dataset.covariate_models_unsupported"
             )
         }
     }
@@ -911,24 +917,24 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
             }
 
             if (lmEnabled) {
-                warning("When using ", modelFunction, "() ",
+                warnNumericalIssue("When using ", modelFunction, "() ",
                     "the estimated marginal means and standard deviations can be inaccurate ",
                     "and analysis results based on this values may be imprecise",
-                    call. = FALSE
+                    diagnosticId = "dataset.marginal_means_inconsistent"
                 )
             } else {
-                warning("Using ", modelFunction, " emmeans result objects as ",
+                warnNotValidated("Using ", modelFunction, " emmeans result objects as ",
                     "arguments of getDataset() is experminental in this rpact ",
                     "version and not fully validated",
-                    call. = FALSE
+                    diagnosticId = "validation.experimental_feature"
                 )
             }
         },
         error = function(e) {
-            warning("Using emmeans result objects as ",
+            warnNotValidated("Using emmeans result objects as ",
                 "arguments of getDataset() is experminental in this rpact ",
                 "version and not fully validated",
-                call. = FALSE
+                diagnosticId = "validation.experimental_feature"
             )
         }
     )
@@ -1162,15 +1168,17 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         }
 
         if (length(emptySubsetNames) == 1) {
-            warning("The undefined subset ", emptySubsetNames,
+            warnDataIssue("The undefined subset ", emptySubsetNames,
                 " was defined as empty subset",
-                call. = FALSE
+                diagnosticId = "dataset.subsets_missing"
             )
         } else {
-            warning(gettextf(
+            warnDataIssue(gettextf(
                 "The %s undefined subsets %s were defined as empty subsets",
                 length(emptySubsetNames), .arrayToString(emptySubsetNames)
-            ), call. = FALSE)
+            ),
+                diagnosticId = "dataset.subsets_missing"
+            )
         }
     }
 
@@ -1228,7 +1236,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                     paste0("inconsistent deselection in group %s at stage %s (", "%s: all or none must be NA)"),
                     dataFrame$group[i], dataFrame$stage[i], .arrayToString(paramNames, maxCharacters = 40)
                 ),
-                functionName = ".validateEnrichmentDataFrameDeselection"
+                functionName = ".validateEnrichmentDataFrameDeselection",
+                diagnosticId = "dataset.inconsistent_deselection"
             )
         }
     }
@@ -1245,7 +1254,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                         "%s was deselected at stage %s ", "and therefore must be also deselected in the following stages, ",
                         "but is no longer deselected in stage %s"
                     ), s, deselectedStage, stage),
-                    functionName = ".validateEnrichmentDataFrameDeselection"
+                    functionName = ".validateEnrichmentDataFrameDeselection",
+                    diagnosticId = "dataset.deselected_group_reentry"
                 )
             }
 
@@ -1305,7 +1315,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                                 .arrayToString(sampleSizeFull), s, .arrayToString(sampleSizeSubset), group, stage
                             ),
                             functionName = ".validateEnrichmentDataFrameMeans",
-                            parameter = "sampleSize"
+                            parameter = "sampleSize",
+                            diagnosticId = "dataset.subset_exceeds_full_sample_size"
                         )
                     }
                 }
@@ -1345,7 +1356,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                                 .arrayToString(eventFull), s, .arrayToString(eventSubset), group, stage
                             ),
                             functionName = ".validateEnrichmentDataFrameSurvival",
-                            parameter = "event"
+                            parameter = "event",
+                            diagnosticId = "dataset.subset_exceeds_full_events"
                         )
                     }
                 }
@@ -1387,7 +1399,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                                 .arrayToString(sampleSizeFull), s, .arrayToString(sampleSizeSubset), group, stage
                             ),
                             functionName = ".validateEnrichmentDataFrameRates",
-                            parameter = "sampleSize"
+                            parameter = "sampleSize",
+                            diagnosticId = "dataset.subset_exceeds_full_sample_size"
                         )
                     }
                 }
@@ -1410,7 +1423,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                     "subset %s has incomplete stages (%s)",
                     s, .arrayToString(subsetStages)
                 ),
-                functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages"
+                functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages",
+                diagnosticId = "dataset.subset_stage_mismatch"
             )
         }
 
@@ -1422,7 +1436,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         stopConflictingArguments(
             "all subsets must have the identical number of ",
             "stages defined (kMax: ", .listToString(kMaxList), ")",
-            functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages"
+            functionName = ".validateEnrichmentDataFrameHasConsistentNumberOfStages",
+            diagnosticId = "dataset.subset_stage_mismatch"
         )
     }
 }
@@ -1472,7 +1487,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                                         group, stage
                                     ),
                                     functionName = ".validateEnrichmentDataFrame",
-                                    parameter = paramName
+                                    parameter = paramName,
+                                    diagnosticId = "dataset.remaining_population_deselection"
                                 )
                             }
                         }
@@ -1951,9 +1967,10 @@ Dataset <- R6::R6Class("Dataset",
 
             nToCheck <- stats::na.omit(x)
             if (any(nToCheck != as.integer(nToCheck))) {
-                warning(parameterName, " specified as floating-point ",
+                warnArgumentAdjusted(parameterName, " specified as floating-point ",
                     "numbers were truncated",
-                    call. = FALSE
+                    parameter = parameterName,
+                    diagnosticId = "dataset.counts_truncated"
                 )
             }
 
@@ -2457,9 +2474,9 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
             denom <- (sampleSizes[k] - 1)
             value <- (numK - numBeforeK + numSumBeforeK - numSumK) / denom
             if (is.null(value) || length(value) != 1 || is.na(value) || value < 0) {
-                warning("No calculation of stage-wise standard deviation from ",
+                warnResultUnavailable("No calculation of stage-wise standard deviation from ",
                     "overall standard deviations possible at stage ", k,
-                    call. = FALSE
+                    diagnosticId = "dataset.stage_standard_deviation_unavailable"
                 )
                 return(NA_real_)
             }
@@ -3106,7 +3123,10 @@ plot.Dataset <- function(
     }
 
     if (!is.logical(showSource) || isTRUE(showSource)) {
-        warning("'showSource' != FALSE is not yet implemented for class ", .getClassName(x))
+        warnResultUnavailable("'showSource' != FALSE is not yet implemented for class ", .getClassName(x),
+            parameter = "showSource",
+            diagnosticId = "dataset.source_display_unavailable"
+        )
     }
 
     if (is.null(plotSettings)) {
@@ -4278,7 +4298,8 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
             if (any(stats::na.omit(result) <= 0)) {
                 stopIllegalArgument("overall allocation ratios not correctly specified: ",
                     "one or more calculated stage-wise allocation ratios <= 0",
-                    functionName = ".getStageWiseAllocationRatios"
+                    functionName = ".getStageWiseAllocationRatios",
+                    diagnosticId = "dataset.invalid_derived_allocation"
                 )
             }
             return(result)
@@ -4931,9 +4952,11 @@ print.Dataset <- function(
 
     if (isTRUE(markdown)) {
         if (output != "list") {
-            warning("'output' (\"", output, "\") will be ignored ",
+            warnArgumentIgnored("'output' (\"", output, "\") will be ignored ",
                 "because only \"list\" is supported yet if markdown is enabled",
-                call. = FALSE
+                parameter = "output",
+                value = output,
+                diagnosticId = "output.markdown_requires_list"
             )
         }
 

@@ -335,14 +335,17 @@ getSimulationCounts <- function(
                         "followUpTime"
                     ),
                     relatedValue = list(accrualTime = accrualTime, followUpTime = followUpTime),
-                    functionName = "getSimulationCounts"
+                    functionName = "getSimulationCounts",
+                    diagnosticId = "counts.final_calendar_time_mismatch"
                 )
             }
         }
     } else if (!all(is.na(plannedCalendarTime))) {
-        warning("'plannedCalendarTime' (", .arrayToString(plannedCalendarTime), ") ",
+        warnArgumentIgnored("'plannedCalendarTime' (", .arrayToString(plannedCalendarTime), ") ",
             "has no influence on simulation",
-            call. = FALSE
+            parameter = "plannedCalendarTime",
+            value = plannedCalendarTime,
+            diagnosticId = "simulation.fixed_calendar_time_ignored"
         )
     }
 
@@ -804,9 +807,9 @@ getSimulationCounts <- function(
     data <- data[!is.na(data$iterationNumber), ]
     simulationResults$.data <- data
 
-    warning("The simulation count data feature is experimental and ",
+    warnNotValidated("The simulation count data feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
-        call. = FALSE
+        diagnosticId = "validation.experimental_feature"
     )
 
     return(simulationResults)

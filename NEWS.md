@@ -1,3 +1,5 @@
+# rpact 4.5.0
+
 ## New features
 
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
@@ -19,9 +21,20 @@
   `getFutilityBounds()`; the required Fisher information and its cumulative or
   stage-wise type are then determined internally from the requested target scale.
 * For survival endpoints, the default value of `directionUpper` has changed from `TRUE` to `FALSE`. Accordingly, the default event rates have been adjusted to provide meaningful examples for an alternative in the lower direction: `pi2` (and `piControl`) now defaults to `0.5`, while the sample size default for `pi1` is now `c(0.1, 0.2, 0.3)`; the power and simulation default for `pi1` remains `seq(0.2, 0.5, 0.1)`. One-sided power calculations and simulations issue a warning if `directionUpper` is not specified explicitly, making users aware of the changed default. No warning is issued for sample size calculations because the `directionUpper` argument has only been added to these functions in this version. For sample size calculations, the direction is always derived from the specified alternative; the argument is provided solely to validate that this derived direction is consistent with a `directionUpper` value that may already have been set in the design.
-* Added optimal conditional error designs for adaptive two-stage trials, including
-  conditional error, second-stage information, expected information, overall power,
-  and diagnostic plots.
+* Added `getDesignOptimalConditionalError()` for adaptive two-stage trials,
+  with p-value boundaries `efficacyBounds` and `futilityBounds`, planning effects
+  `thetaH1` and `thetaLR`, and explicit boundary scales. `getConditionalError()`
+  evaluates interim conditional errors; `getStageInformation()` provides conditional
+  or expected additional information. `getDesignCharacteristics()` evaluates power
+  and stage-wise stopping probabilities at specified `theta` values. Diagnostic
+  plots have descriptive type names. The methods follow Brannath and Bauer (2004)
+  [doi:10.1111/j.0006-341X.2004.00221.x](https://doi.org/10.1111/j.0006-341X.2004.00221.x)
+  and Brannath et al. (2024)
+  [doi:10.48550/arXiv.2402.00814](https://doi.org/10.48550/arXiv.2402.00814),
+  also available in [optconerrf on CRAN](https://CRAN.R-project.org/package=optconerrf).
+  The new vignette `rpact_optimal_conditional_error` and expanded help examples
+  cover trial decisions, information constraints, interim estimates, weighted
+  alternatives, and conditional power functions.
 
 ## Improvements, issues, and changes
 
@@ -36,6 +49,8 @@
 * `getSampleSizeCounts()`: field 'expectedStudyDurationH1' in result object was replaced by 'studyDuration', i.e., 'expectedStudyDurationH1' is deprecated 
 * In all simulation raw data, the `armNumber` column was renamed to `activeArm`
 * For consistency with other result objects, the `direction` field in `getStageResults()` result objects was renamed to `directionUpper`.
+* Error and warning context now identifies diagnostic situations with stable IDs and factual metadata. Authored explanations and corrective instructions are maintained separately by consuming applications; ordinary condition messages remain unchanged.
+* Fixed inconsistent naming of variables and class fields, e.g., `getSimulationEnrichmentSurvival()`: field `singleEventsPerSubsetAndStage` replaced by `singleEventsPerArmAndStage` 
 
 # rpact 4.4.0
 
@@ -579,3 +594,11 @@ note that this is a novel implementation, hence experimental
 # rpact 1.0.0
 
 * First release of rpact
+
+## Optimal conditional error updates
+
+* Applied the constraint-related fixes from optconerrf 1.0.3: bounds now enter
+  the selection between competing conditional error solutions at high conditional
+  power, and infeasible integrated bounds are detected before calibration.
+* Clarified that conditional power functions do not guarantee optimality and
+  that conditional power also limits the conditional error in the continuation region.

@@ -681,9 +681,11 @@ NULL
         # Repeated onfidence intervals when using combination tests
 
         if (intersectionTest == "Hierarchical") {
-            warning(
+            warnResultUnavailable(
                 "Repeated confidence intervals not available for ",
-                "'intersectionTest' = \"Hierarchical\""
+                "'intersectionTest' = \"Hierarchical\"",
+                parameter = "intersectionTest",
+                diagnosticId = "analysis.hierarchical_repeated_intervals_unsupported"
             )
             return(repeatedConfidenceIntervals)
         }
@@ -703,9 +705,9 @@ NULL
         }
 
         if (anyNA(criticalValues[1:stage])) {
-            warning("Repeated confidence intervals not because ", sum(is.na(criticalValues)),
+            warnResultUnavailable("Repeated confidence intervals not because ", sum(is.na(criticalValues)),
                 " critical values are NA (", .arrayToString(criticalValues), ")",
-                call. = FALSE
+                diagnosticId = "analysis.repeated_intervals_missing_critical_values"
             )
             return(repeatedConfidenceIntervals)
         }
@@ -1074,7 +1076,8 @@ NULL
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
         "or TrialDesignConditionalDunnett",
         functionName = ".getConditionalPowerSurvivalMultiArm",
-        parameter = "design"
+        parameter = "design",
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1244,9 +1247,9 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warning("Calculation not possible: ",
+                    warnNumericalIssue("Calculation not possible: ",
                         "could not calculate conditional power for stage ", kMax,
-                        call. = FALSE
+                        diagnosticId = "analysis.conditional_power_calculation_failed"
                     )
                     results$conditionalPower[treatmentArm, kMax] <- NA_real_
                 } else {
@@ -1295,7 +1298,9 @@ NULL
     )
 
     if (stage > 1) {
-        warning("Conditional power is only calculated for the first (interim) stage", call. = FALSE)
+        warnResultUnavailable("Conditional power is only calculated for the first (interim) stage",
+            diagnosticId = "analysis.conditional_power_later_stage_unsupported"
+        )
     }
 
     gMax <- stageResults$getGMax()

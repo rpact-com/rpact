@@ -451,7 +451,8 @@ NULL
                     parameter = "alternative",
                     value = alternative,
                     relatedParameter = "thetaH0",
-                    relatedValue = thetaH0
+                    relatedValue = thetaH0,
+                    diagnosticId = "planning.alternative_equals_null"
                 )
             }
         }
@@ -482,7 +483,8 @@ NULL
                 (thetaH0 != 1 && meanRatio))) {
             stopIllegalArgument("two-sided case is implemented only for superiority testing ",
                 "(i.e., thetaH0 = ", ifelse(meanRatio, 1, 0), ")",
-                functionName = ".createDesignPlanMeans"
+                functionName = ".createDesignPlanMeans",
+                diagnosticId = "planning.two_sided_requires_superiority"
             )
         }
 
@@ -546,17 +548,27 @@ NULL
     .setValueAndParameterType(designPlan, "groups", groups, 2)
     if (groups == 1) {
         if (isTRUE(meanRatio)) {
-            warning("'meanRatio' (", meanRatio, ") will be ignored ",
+            warnArgumentIgnored("'meanRatio' (", meanRatio, ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "meanRatio",
+                value = meanRatio,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         designPlan$.setParameterType("meanRatio", C_PARAM_NOT_APPLICABLE)
 
         if (length(allocationRatioPlanned) == 1 && !is.na(allocationRatioPlanned)) {
-            warning("'allocationRatioPlanned' (", allocationRatioPlanned,
+            warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
-                call. = FALSE
+                parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned,
+                relatedParameter = "groups",
+                relatedValue = groups,
+                constraint = "groups must be 2",
+                diagnosticId = "planning.two_group_argument_ignored"
             )
         }
         designPlan$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)

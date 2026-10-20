@@ -351,7 +351,9 @@ NULL
     simulatedRejections <- loopResult$simulatedRejections
     simulatedNumberOfPopulations <- loopResult$simulatedNumberOfPopulations
     simulatedPopulationEventsPerStage <- loopResult$simulatedPopulationEventsPerStage
+    simulatedSubsetEventsPerStage <- loopResult$simulatedSubsetEventsPerStage
     simulatedNumberOfEvents <- loopResult$simulatedNumberOfEvents
+    simulatedSingleEventsPerStage <- loopResult$simulatedSingleEventsPerStage
     simulatedSuccessStopping <- loopResult$simulatedSuccessStopping
     simulatedFutilityStopping <- loopResult$simulatedFutilityStopping
     simulatedConditionalPower <- loopResult$simulatedConditionalPower
@@ -373,6 +375,7 @@ NULL
     simulationResults$numberOfPopulations <- simulatedNumberOfPopulations / iterations
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$populationEventsPerStage <- simulatedPopulationEventsPerStage
+    simulationResults$singleEventsPerSubsetAndStage <- simulatedSubsetEventsPerStage
     simulationResults$analysisTime <- simulatedAnalysisTime
     .setEventsNotAchieved(simulationResults, accrualSetup, 
         eventsNotAchieved = simulatedNumberEventsNotAchieved / maxNumberOfIterations)
@@ -389,6 +392,7 @@ NULL
     simulationResults$expectedNumberOfSubjects <- expectedNumberOfSubjects
     simulationResults$studyDuration <- expectedStudyDuration
     simulationResults$cumulativeEventsPerStage <- simulatedNumberOfEvents
+    simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
     simulationResults$iterations <- iterations
     if (kMax > 1) {
         simulationResults$earlyStop <- simulationResults$futilityPerStage +
@@ -496,6 +500,9 @@ NULL
 #' are simulated instead. The default \code{simulationType = "auto"} selects the patient-wise
 #' approach if patient-wise-specific arguments were explicitly specified; otherwise the
 #' test-statistic-based approach is used for backward compatibility.
+#' After a population selection, each subsequent patient-wise analysis targets
+#' the planned increase in events among the selected subgroups. Events already
+#' observed in those subgroups at the preceding analysis count toward the target.
 #'
 #' For piecewise exponential event times, include a
 #' \code{PiecewiseEnrichmentSurvivalTime} object in
@@ -642,13 +649,15 @@ getSimulationEnrichmentSurvival <- function(
                 parameter = "maxNumberOfRawDatasetsPerStage",
                 value = maxNumberOfRawDatasetsPerStage,
                 relatedParameter = "simulationType",
-                relatedValue = simulationType
+                relatedValue = simulationType,
+                diagnosticId = "simulation.raw_data_requires_patient_wise"
             )
         }
         if (usesPatientWiseOnlyArgs) {
             stopIllegalArgument("patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"",
                 functionName = "getSimulationEnrichmentSurvival",
-                parameter = "simulationType", value = simulationType
+                parameter = "simulationType", value = simulationType,
+                diagnosticId = "simulation.patient_inputs_with_statistic_engine"
             )
         }
 

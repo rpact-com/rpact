@@ -255,6 +255,10 @@ C_TYPE_OF_DESIGN_LIST <- createDictionary("C_TYPE_OF_DESIGN_LIST", list(
     "noEarlyEfficacy" = "No early efficacy stop"
 ))
 
+.getAlphaSpendingDesignTypeList <- function() {
+    return(as.list(C_TYPE_OF_DESIGN_LIST)[grep("^as", names(C_TYPE_OF_DESIGN_LIST))])
+}
+
 C_TYPE_OF_FISHER_LIST <- createDictionary("C_TYPE_OF_FISHER_LIST", list(
     "equalAlpha" = "Constant levels",
     "fullAlpha" = "Full last stage level",
@@ -289,14 +293,18 @@ C_PLOT_YLAB_CONDITIONAL_POWER_WITH_LIKELIHOOD <- "Conditional power / Likelihood
 }
 
 .isAlphaSpendingDesignType <- function(typeOfDesign, userDefinedAlphaSpendingIncluded = TRUE) {
-    if (userDefinedAlphaSpendingIncluded &&
-            ((typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) || (typeOfDesign == C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY))) {
+    if (userDefinedAlphaSpendingIncluded && (
+            (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) || 
+            (typeOfDesign == C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY)
+            )) {
         return(TRUE)
     }
 
     return(typeOfDesign %in% c(
-        C_TYPE_OF_DESIGN_AS_P, C_TYPE_OF_DESIGN_AS_OF,
-        C_TYPE_OF_DESIGN_AS_KD, C_TYPE_OF_DESIGN_AS_HSD
+        C_TYPE_OF_DESIGN_AS_P, 
+        C_TYPE_OF_DESIGN_AS_OF,
+        C_TYPE_OF_DESIGN_AS_KD, 
+        C_TYPE_OF_DESIGN_AS_HSD
     ))
 }
 
@@ -334,6 +342,10 @@ C_CIPHERS <- list(token = "310818669631424001", secret = "9318655074497250732")
         C_TYPE_OF_DESIGN_BS_HSD,
         C_TYPE_OF_DESIGN_BS_USER
     ))
+}
+
+.getBetaSpendingDesignTypeList <- function() {
+    return(as.list(C_TYPE_OF_DESIGN_BS_LIST)[grep("^bs", names(C_TYPE_OF_DESIGN_BS_LIST))])
 }
 
 .printBetaSpendingDesignTypes <- function() {

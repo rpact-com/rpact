@@ -226,14 +226,16 @@ NULL
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
             functionName = ".getStageResultsMeansEnrichment",
-            parameter = "gMax", value = gMax
+            parameter = "gMax", value = gMax,
+            diagnosticId = "enrichment.spiessens_debois_population_limit"
         )
     }
     if (varianceOption == "pooledFromFull") {
         if (gMax > 2) {
             stopIllegalArgument("gMax (", gMax, ") > 2: varianceOption 'pooledFromFull' can only be used for one subset",
                 functionName = ".getStageResultsMeansEnrichment",
-                parameter = "pooledFromFull"
+                parameter = "pooledFromFull",
+                diagnosticId = "enrichment.pooled_variance_population_limit"
             )
         }
     }
@@ -242,7 +244,8 @@ NULL
         stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ",
             "residual (stratified) variance from full population,\n\t\t\t select 'varianceOption' = \"pooledFromFull\"",
             parameter = "varianceOption", value = varianceOption, constraint = "pooledFromFull",
-            functionName = ".getStageResultsMeansEnrichment"
+            functionName = ".getStageResultsMeansEnrichment",
+            diagnosticId = "enrichment.spiessens_debois_variance"
         )
     }
 
@@ -250,7 +253,8 @@ NULL
         stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ",
             "residual (stratified) variance from full population,\n\t\t\tselect 'stratifiedAnalysis' = TRUE",
             parameter = "stratifiedAnalysis", value = stratifiedAnalysis, constraint = TRUE,
-            functionName = ".getStageResultsMeansEnrichment"
+            functionName = ".getStageResultsMeansEnrichment",
+            diagnosticId = "enrichment.spiessens_debois_stratification"
         )
     }
 
@@ -1128,9 +1132,11 @@ NULL
     stDevsH1 <- .getOptionalArgument("stDevsH1", ...)
     if (!is.null(stDevsH1) && !is.na(stDevsH1)) {
         if (!is.na(assumedStDevs)) {
-            warning(
+            warnArgumentIgnored(
                 sQuote("assumedStDevs"), " will be ignored because ",
-                sQuote("stDevsH1"), " is defined"
+                sQuote("stDevsH1"), " is defined",
+                parameter = "assumedStDevs",
+                diagnosticId = "analysis.alternative_standard_deviations_overridden"
             )
         }
         assumedStDevs <- stDevsH1
@@ -1234,7 +1240,8 @@ NULL
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
         functionName = ".getConditionalPowerMeansEnrichment",
-        parameter = "design"
+        parameter = "design",
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1426,9 +1433,9 @@ NULL
                 result <- 1 - (criticalValues[kMax] / divisor)^(1 / weightsFisher[kMax])
 
                 if (result <= 0 || result >= 1) {
-                    warning("Calculation not possible: could not calculate conditional power for stage ",
+                    warnNumericalIssue("Calculation not possible: could not calculate conditional power for stage ",
                         kMax,
-                        call. = FALSE
+                        diagnosticId = "analysis.conditional_power_calculation_failed"
                     )
                     results$conditionalPower[population, kMax] <- NA_real_
                 } else {

@@ -738,22 +738,22 @@ getTestLabel <- function(x) {
 
     if (!acceptResultsOutOfTolerance) {
         if (!suppressWarnings) {
-            warning(.getCallingFunctionInformation(callingFunctionInformation),
+            warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                 "NA returned because root search by 'uniroot' produced a function result (",
                 unirootResult$f.root, ") that differs from target 0 ",
                 "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
                 ", last function argument was ", unirootResult$root, ")",
-                call. = FALSE
+                diagnosticId = "numerical.root_search_failed"
             )
         }
         return(NA_real_)
     } else if (!suppressWarnings) {
-        warning(.getCallingFunctionInformation(callingFunctionInformation),
+        warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
             "Root search by 'uniroot' produced a function result (", unirootResult$f.root, ") ",
             "that differs from target 0 ",
             "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
             ", last function argument was ", unirootResult$root, ")",
-            call. = FALSE
+            diagnosticId = "numerical.root_search_failed"
         )
     }
 
@@ -823,10 +823,10 @@ getTestLabel <- function(x) {
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
             if (!suppressWarnings) {
-                warning(.getCallingFunctionInformation(callingFunctionInformation),
+                warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                     "Root search via 'bisection' stopped: maximum number of search iterations reached. ",
                     "Check if lower and upper search bounds were calculated correctly",
-                    call. = FALSE
+                    diagnosticId = "numerical.root_search_failed"
                 )
             }
             .plotMonotoneFunctionRootSearch(fun, lowerStart, upperStart)
@@ -841,20 +841,20 @@ getTestLabel <- function(x) {
 
         if (!acceptResultsOutOfTolerance) {
             if (!suppressWarnings) {
-                warning(.getCallingFunctionInformation(callingFunctionInformation),
+                warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                     "NA returned because root search via 'bisection' produced a function result (",
                     result, ") that differs from target 0 ",
                     "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                    call. = FALSE
+                    diagnosticId = "numerical.root_search_failed"
                 )
             }
             return(NA_real_)
         } else if (!suppressWarnings) {
-            warning(.getCallingFunctionInformation(callingFunctionInformation),
+            warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                 "Root search via 'bisection' produced a function result (", result, ") ",
                 "that differs from target 0 ",
                 "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                call. = FALSE
+                diagnosticId = "numerical.root_search_failed"
             )
         }
     }
@@ -1595,7 +1595,9 @@ getParameterName <- function(obj, parameterCaption) {
         log.p = FALSE,
         epsilon = C_QNORM_EPSILON) {
     if (any(p < -1e-07 | p > 1 + 1e-07, na.rm = TRUE)) {
-        warning("Tried to get qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)")
+        warnNumericalIssue("Tried to get qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)",
+            diagnosticId = "numerical.infinite_normal_quantile"
+        )
     }
 
     p[p <= 0] <- epsilon
@@ -1622,7 +1624,9 @@ getParameterName <- function(obj, parameterCaption) {
     }
 
     if (any(p < -1e-07 | p > 1 + 1e-07, na.rm = TRUE)) {
-        warning("Tried to get 1 - qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)")
+        warnNumericalIssue("Tried to get 1 - qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)",
+            diagnosticId = "numerical.infinite_normal_quantile"
+        )
     }
 
     p[p <= 0] <- epsilon
@@ -2232,7 +2236,9 @@ saveOptions <- function() {
             return(invisible(file.exists(optionsFile)))
         },
         error = function(e) {
-            warning("Failed to save rpact options: ", e$message, call. = FALSE)
+            warnRuntimeIssue("Failed to save rpact options: ", e$message,
+                diagnosticId = "io.options_write_failed"
+            )
             return(invisible(FALSE))
         }
     )
@@ -2284,7 +2290,9 @@ resetOptions <- function(persist = TRUE) {
             return(invisible(TRUE))
         },
         error = function(e) {
-            warning("Failed to reset rpact options: ", e$message, call. = FALSE)
+            warnRuntimeIssue("Failed to reset rpact options: ", e$message,
+                diagnosticId = "io.options_write_failed"
+            )
             return(invisible(FALSE))
         }
     )
@@ -2554,6 +2562,9 @@ equals <- function(x, y, ..., tolerance = 1e-12) {
     defaultValue <- ifelse(identical(endpoint, "survival"),
         C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT
     )
+    if (identical(objectType, "sampleSize")) {
+        defaultValue <- NA
+    }
     forceUserDefinedDirectionUpper <- !is.na(directionUpper)
     if (isTRUE(userFunctionCallEnabled)) {
         directionUpper <- .assertIsValidDirectionUpper(

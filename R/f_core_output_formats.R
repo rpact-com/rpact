@@ -926,7 +926,8 @@ setOutputFormat <- function(
             stopIllegalArgument("'file' (", file, ") does not exist",
                 functionName = "setOutputFormat",
                 parameter = "file",
-                value = file
+                value = file,
+                diagnosticId = "io.input_file_missing"
             )
         }
 
@@ -944,13 +945,19 @@ setOutputFormat <- function(
                         if (grepl("digits|nsmall|trimSingleZeros|futilityProbabilityEnabled|roundFunction", value)) {
                             args[[key]] <- value
                         } else {
-                            warning('Line "', line, '" contains an invalid value: ', value)
+                            warnInvalidInput('Line "', line, '" contains an invalid value: ', value,
+                                diagnosticId = "output.invalid_format_definition"
+                            )
                         }
                     } else {
-                        warning('Line "', line, '" contains an invalid key: ', keyValuePair[1])
+                        warnInvalidInput('Line "', line, '" contains an invalid key: ', keyValuePair[1],
+                            diagnosticId = "output.invalid_format_definition"
+                        )
                     }
                 } else if (nchar(trimws(line)) > 0) {
-                    warning('Line "', line, '" does not contain a valid key-value-pair')
+                    warnInvalidInput('Line "', line, '" does not contain a valid key-value-pair',
+                        diagnosticId = "output.invalid_format_definition"
+                    )
                 }
                 if (nchar(trimws(line)) > 0) {
                     counter <- counter + 1
@@ -1011,7 +1018,9 @@ setOutputFormat <- function(
                     )
                 }
             } else {
-                warning("The output format ", key, " affects no parameters", call. = FALSE)
+                warnArgumentIgnored("The output format ", key, " affects no parameters",
+                    diagnosticId = "output.unused_format_key"
+                )
             }
         }
     }

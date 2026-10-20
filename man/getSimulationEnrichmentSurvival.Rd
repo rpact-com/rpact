@@ -262,6 +262,9 @@ the specified accrual, event-time, and dropout assumptions. If
 are simulated instead. The default \code{simulationType = "auto"} selects the patient-wise
 approach if patient-wise-specific arguments were explicitly specified; otherwise the
 test-statistic-based approach is used for backward compatibility.
+After a population selection, each subsequent patient-wise analysis targets
+the planned increase in events among the selected subgroups. Events already
+observed in those subgroups at the preceding analysis count toward the target.
 
 For piecewise exponential event times, include a
 \code{PiecewiseEnrichmentSurvivalTime} object in

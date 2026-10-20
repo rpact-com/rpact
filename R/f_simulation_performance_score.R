@@ -51,13 +51,15 @@ getPerformanceScore <- function(simulationResult) {
 
     if (!inherits(simulationResult, "SimulationResultsMeans") && !inherits(simulationResult, "SimulationResultsRates")) {
         stopIllegalArgument("performance score so far implemented only for single comparisons with continuous and binary endpoints",
-            functionName = "getPerformanceScore"
+            functionName = "getPerformanceScore",
+            diagnosticId = "simulation.performance_score_unsupported"
         )
     }
 
     if (design$kMax != 2) {
         stopIllegalArgument("performance score so far implemented only for two-stage designs",
-            functionName = "getPerformanceScore"
+            functionName = "getPerformanceScore",
+            diagnosticId = "simulation.performance_score_unsupported"
         )
     }
 
@@ -101,7 +103,8 @@ getPerformanceScore <- function(simulationResult) {
     } else {
         stopIllegalArgument("performance score is not available for class ",
             .getClassName(simulationResult),
-            functionName = "getPerformanceScore"
+            functionName = "getPerformanceScore",
+            diagnosticId = "simulation.performance_score_unsupported"
         )
     }
     alternativeValues <- simulationResult[[alternativeParamName]]
@@ -172,9 +175,9 @@ getPerformanceScore <- function(simulationResult) {
     }
 
     if (inherits(simulationResult, "SimulationResultsRates")) {
-        warning("The performance score function is experimental and hence not fully validated ",
+        warnNotValidated("The performance score function is experimental and hence not fully validated ",
             "(see www.rpact.com/experimental)",
-            call. = FALSE
+            diagnosticId = "validation.experimental_feature"
         )
     }
 

@@ -207,9 +207,9 @@ NULL
 
     if (stageResults$isDatasetMeans()) {
         if ("assumedStDev" %in% names(list(...))) {
-            warning("For multi-arm analysis the argument for assumed standard deviation ",
+            warnInvalidInput("For multi-arm analysis the argument for assumed standard deviation ",
                 "is named 'assumedStDevs' and not 'assumedStDev'",
-                call. = FALSE
+                diagnosticId = "analysis.assumed_standard_deviations_argument_name"
             )
         }
 
@@ -502,26 +502,26 @@ getClosedCombinationTestResults <- function(stageResults) {
 
     if (.isTrialDesignInverseNormal(design)) {
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
-            warning("Repeated p-values not available for 'typeOfDesign' = ",
+            warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = ",
                 .vQuote(C_TYPE_OF_DESIGN_AS_USER),
-                call. = FALSE
+                diagnosticId = "analysis.repeated_p_values_unsupported"
             )
             return(repeatedPValues)
         }
 
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
-            warning("Repeated p-values not available for 'typeOfDesign' = ",
+            warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = ",
                 .vQuote(C_TYPE_OF_DESIGN_WT_OPTIMUM),
-                call. = FALSE
+                diagnosticId = "analysis.repeated_p_values_unsupported"
             )
             return(repeatedPValues)
         }
     }
 
     if (.isTrialDesignFisher(design) && design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
-        warning("Repeated p-values not available for 'method' = ",
+        warnResultUnavailable("Repeated p-values not available for 'method' = ",
             .vQuote(C_FISHER_METHOD_USER_DEFINED_ALPHA),
-            call. = FALSE
+            diagnosticId = "analysis.repeated_p_values_unsupported"
         )
         return(repeatedPValues)
     }
@@ -852,7 +852,9 @@ getClosedConditionalDunnettTestResults <- function(
                 conditionalErrorRate[i, 1] <- 1 - stats::integrate(integrandFunction, lower = -Inf, upper = Inf)$value
             },
             error = function(e) {
-                warning("Failed to calculate conditionalErrorRate[", i, ", 1]: ", e$message)
+                warnNumericalIssue("Failed to calculate conditionalErrorRate[", i, ", 1]: ", e$message,
+                    diagnosticId = "analysis.conditional_error_calculation_failed"
+                )
             }
         )
 
@@ -895,7 +897,9 @@ getClosedConditionalDunnettTestResults <- function(
                 }
             },
             error = function(e) {
-                warning("Failed to calculate secondStagePValues[", i, ", 2]: ", e$message)
+                warnNumericalIssue("Failed to calculate secondStagePValues[", i, ", 2]: ", e$message,
+                    diagnosticId = "analysis.conditional_error_calculation_failed"
+                )
             }
         )
     }
@@ -1051,7 +1055,8 @@ getClosedConditionalDunnettTestResults <- function(
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, ",
         "TrialDesignFisher, or TrialDesignDunnett",
         functionName = ".getConditionalRejectionProbabilitiesMultiArm",
-        parameter = "design"
+        parameter = "design",
+        diagnosticId = "validation.design_class_incompatible"
     )
 }
 
@@ -1254,7 +1259,8 @@ getClosedConditionalDunnettTestResults <- function(
     }
     if (stage < 1 || kMax == 1) {
         stopIllegalArgument("cannot plot conditional power of a fixed design",
-            functionName = ".getConditionalPowerPlotMultiArm"
+            functionName = ".getConditionalPowerPlotMultiArm",
+            diagnosticId = "plot.fixed_design_has_no_interims"
         )
     }
     if (stage >= kMax) {

@@ -1719,7 +1719,8 @@ plot.StageResults <- function(
 
     if (x$.design$kMax == 1) {
         stopIllegalArgument("cannot plot stage results of a fixed design",
-            functionName = ".plot.StageResults"
+            functionName = ".plot.StageResults",
+            diagnosticId = "plot.fixed_design_has_no_interims"
         )
     }
 

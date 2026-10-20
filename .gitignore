@@ -7,6 +7,7 @@ doc
 /doc/
 /Meta/
 .Rdata
+/AGENTS.md
 .httr-oauth
 .DS_Store
 /.settings

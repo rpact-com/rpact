@@ -155,7 +155,8 @@ NULL
                 value = selectedPopulations, constraint = paste0("logical vector of length ", gMax),
                 relatedParameter = "gMax",
                 relatedValue = gMax,
-                functionName = ".selectPopulations"
+                functionName = ".selectPopulations",
+                diagnosticId = "simulation.population_selection_result_invalid"
             )
         }
         if (!is.logical(selectedPopulations)) {
@@ -164,7 +165,8 @@ NULL
                 parameter = "selectPopulationsFunction", value = selectedPopulations, constraint = "logical vector",
                 relatedParameter = "class of selected populations",
                 relatedValue = .getClassName(selectedPopulations),
-                functionName = ".selectPopulations"
+                functionName = ".selectPopulations",
+                diagnosticId = "simulation.population_selection_result_invalid"
             )
         }
     }
@@ -181,7 +183,8 @@ NULL
         successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stopIllegalArgument("Group sequential design cannot be used for enrichment designs with population selection",
-            functionName = ".performClosedCombinationTestForSimulationEnrichment"
+            functionName = ".performClosedCombinationTestForSimulationEnrichment",
+            diagnosticId = "simulation.group_sequential_selection_unsupported"
         )
     }
 
@@ -506,7 +509,8 @@ NULL
         stopIllegalArgument(
             "Spiessen & Debois intersection test cannot generally ",
             "be used for enrichment designs with more than two populations",
-            functionName = ".createSimulationResultsEnrichmentObject"
+            functionName = ".createSimulationResultsEnrichmentObject",
+            diagnosticId = "enrichment.spiessens_debois_population_limit"
         )
     }
 
@@ -518,19 +522,26 @@ NULL
             length(threshold) == 1 &&
             threshold != -Inf
         ) {
-        warning(
+        warnArgumentIgnored(
             "'threshold' (",
             threshold,
             ") will be ignored because 'typeOfSelection' = \"userDefined\"",
-            call. = FALSE
+            parameter = "threshold",
+            value = threshold,
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            diagnosticId = "selection.threshold_ignored_for_callback"
         )
         threshold <- -Inf
     }
 
     if (length(typeOfSelection) == 1 && typeOfSelection != "userDefined" && !is.null(selectPopulationsFunction)) {
-        warning(
+        warnArgumentIgnored(
             "'selectPopulationsFunction' will be ignored because 'typeOfSelection' is not \"userDefined\"",
-            call. = FALSE
+            parameter = "selectPopulationsFunction",
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            diagnosticId = "selection.population_callback_requires_user_defined"
         )
     } else if (!is.null(selectPopulationsFunction) && is.function(selectPopulationsFunction)) {
         simulationResults$selectPopulationsFunction <- selectPopulationsFunction
@@ -548,7 +559,8 @@ NULL
 
     if (!stratifiedAnalysis && endpoint %in% c("means")) {
         stopIllegalArgument("For testing means, only stratified analysis is supported",
-            functionName = ".createSimulationResultsEnrichmentObject"
+            functionName = ".createSimulationResultsEnrichmentObject",
+            diagnosticId = "enrichment.stratification_required"
         )
     }
 
@@ -683,7 +695,8 @@ NULL
                     ") must be not smaller than minNumberOfSubjectsPerStage' (",
                     .arrayToString(minNumberOfSubjectsPerStage), ")",
                     functionName = ".createSimulationResultsEnrichmentObject",
-                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage
+                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage,
+                    diagnosticId = "simulation.subject_bounds_inverted"
                 )
             }
             .setValueAndParameterType(
@@ -743,7 +756,8 @@ NULL
                     functionName = ".createSimulationResultsEnrichmentObject",
                     parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage,
                     relatedParameter = "minNumberOfEventsPerStage",
-                    relatedValue = minNumberOfEventsPerStage
+                    relatedValue = minNumberOfEventsPerStage,
+                    diagnosticId = "simulation.event_bounds_inverted"
                 )
             }
             .setValueAndParameterType(
@@ -762,33 +776,37 @@ NULL
     }
 
     if (kMax == 1 && !is.na(conditionalPower)) {
-        warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("conditionalPower")
     }
     if (endpoint %in% c("means", "rates") && kMax == 1 && !is.null(calcSubjectsFunction)) {
-        warning("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("calcSubjectsFunction")
     }
     if (endpoint == "survival" && kMax == 1 && !is.null(calcEventsFunction)) {
-        warning("'calcEventsFunction' will be ignored for fixed sample design", call. = FALSE)
+        warnArgumentIgnoredFixedDesign("calcEventsFunction")
     }
 
     if (endpoint %in% c("means", "rates") && is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(minNumberOfSubjectsPerStage) != 1 || !is.na(minNumberOfSubjectsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'minNumberOfSubjectsPerStage' (",
                 .arrayToString(minNumberOfSubjectsPerStage),
                 ") will be ignored because ",
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
-                call. = FALSE
+                parameter = "minNumberOfSubjectsPerStage",
+                value = minNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$minNumberOfSubjectsPerStage <- NA_real_
         }
         if (length(maxNumberOfSubjectsPerStage) != 1 || !is.na(maxNumberOfSubjectsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'maxNumberOfSubjectsPerStage' (",
                 .arrayToString(maxNumberOfSubjectsPerStage),
                 ") will be ignored because ",
                 "neither 'conditionalPower' nor 'calcSubjectsFunction' is defined",
-                call. = FALSE
+                parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage,
+                diagnosticId = "simulation.argument_requires_subject_reassessment"
             )
             simulationResults$maxNumberOfSubjectsPerStage <- NA_real_
         }
@@ -796,22 +814,26 @@ NULL
 
     if (endpoint == "survival" && is.na(conditionalPower) && is.null(calcEventsFunction)) {
         if (length(minNumberOfEventsPerStage) != 1 || !is.na(minNumberOfEventsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'minNumberOfEventsPerStage' (",
                 .arrayToString(minNumberOfEventsPerStage),
                 ") ",
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
-                call. = FALSE
+                parameter = "minNumberOfEventsPerStage",
+                value = minNumberOfEventsPerStage,
+                diagnosticId = "simulation.argument_requires_event_reassessment"
             )
             simulationResults$minNumberOfEventsPerStage <- NA_real_
         }
         if (length(maxNumberOfEventsPerStage) != 1 || !is.na(maxNumberOfEventsPerStage)) {
-            warning(
+            warnArgumentIgnored(
                 "'maxNumberOfEventsPerStage' (",
                 .arrayToString(maxNumberOfEventsPerStage),
                 ") ",
                 "will be ignored because neither 'conditionalPower' nor 'calcEventsFunction' is defined",
-                call. = FALSE
+                parameter = "maxNumberOfEventsPerStage",
+                value = maxNumberOfEventsPerStage,
+                diagnosticId = "simulation.argument_requires_event_reassessment"
             )
             simulationResults$maxNumberOfEventsPerStage <- NA_real_
         }
@@ -967,7 +989,8 @@ NULL
         stopIllegalArgument(
             "'adaptations' must have length ", (kMax - 1), " (kMax - 1)",
             functionName = ".createSimulationResultsEnrichmentObject",
-            parameter = "adaptations", value = adaptations
+            parameter = "adaptations", value = adaptations,
+            diagnosticId = "validation.interim_vector_length"
         )
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))

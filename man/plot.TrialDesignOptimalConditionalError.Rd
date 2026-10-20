@@ -4,7 +4,14 @@
 \alias{plot.TrialDesignOptimalConditionalError}
 \title{Plot the optimal conditional error function}
 \usage{
-\method{plot}{TrialDesignOptimalConditionalError}(x, y, ..., range = c(0, 1), type = 1, plotNonMonotoneFunction = FALSE)
+\method{plot}{TrialDesignOptimalConditionalError}(
+  x,
+  y,
+  ...,
+  range = c(0, 1),
+  type = "conditionalError",
+  plotNonMonotoneFunction = FALSE
+)
 }
 \arguments{
 \item{x}{Design object of class \code{TrialDesignOptimalConditionalError}.}
@@ -16,13 +23,13 @@
 \item{range}{Numeric vector with two entries specifying the range of the x-axis of the plot.}
 
 \item{type}{Type of plot to be created. Options are: \itemize{
-\item \code{type = 1}: Plot the values of the optimal conditional error function against the first-stage p-value.
-\item \code{type = 2}: Plot the second-stage information resulting from the optimal conditional error function against the first-stage p-value.
-\item \code{type = 3}: Plot the likelihood ratio of the given specification of the optimal conditional error function against the first-stage p-value.
-\item \code{type = 4}: Plot the function Q of the given specification of the optimal conditional error function against the first-stage p-value.
+\item \code{type = "conditionalError"} (or \code{1}): Plot the values of the optimal conditional error function against the first-stage p-value.
+\item \code{type = "stageInformation"} (or \code{2}): Plot the second-stage information resulting from the optimal conditional error function against the first-stage p-value.
+\item \code{type = "likelihoodRatio"} (or \code{3}): Plot the likelihood ratio of the given specification of the optimal conditional error function against the first-stage p-value.
+\item \code{type = "qFunction"} (or \code{4}): Plot the function Q of the given specification of the optimal conditional error function against the first-stage p-value.
 }}
 
-\item{plotNonMonotoneFunction}{Logical. Should the non-monotone version of the plot be drawn? Not applicable for plot type 3. Default: \code{FALSE}.}
+\item{plotNonMonotoneFunction}{Logical. Should the non-monotone version of the plot be drawn? Not applicable for \code{type = "likelihoodRatio"}. Default: \code{FALSE}.}
 }
 \value{
 A \code{ggplot} object.

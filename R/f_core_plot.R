@@ -276,7 +276,9 @@ NULL
                 return(eval(parse(text = plotCmd)))
             },
             error = function(e) {
-                warning("Failed to create grid plot using command ", .sQuote(plotCmd), ": ", e$message)
+                warnRuntimeIssue("Failed to create grid plot using command ", .sQuote(plotCmd), ": ", e$message,
+                    diagnosticId = "plot.grid_failed"
+                )
             }
         )
     }
@@ -351,6 +353,99 @@ plotTypes <- function(
         }
     }
     return(validPlotTypes)
+}
+
+.getEndpointName <- function(obj) {
+    if (!inherits(obj, "ParameterSet")) {
+        return(NA_character_)
+    }
+    if (!inherits(obj, "TrialDesignPlan") && 
+            inherits(obj, "SimulationResults") && 
+            inherits(obj, "Dataset")) {
+        return(NA_character_)
+    }
+    
+    className <- .getClassName(obj)
+    endpoint <- gsub("^TrialDesignPlan|^SimulationResults|^Dataset", "", className)
+    if (grepl("Means|Rates|Survival|CountData|General", endpoint)) {
+        endpoint <- gsub(".*(Means|Rates|Survival|CountData|General).*", "\\1", endpoint)
+        endpoint <- sub("CountData", "Counts", endpoint)
+        endpoint <- tolower(endpoint)
+        return(endpoint)
+    }
+    
+    stopRuntimeIssue("could not identify endpoint for ", .getClassName(obj),
+        functionName = ".getEndpointName",
+        parameter = "obj", 
+        value = obj
+    )
+}
+
+# With userDefined = TRUE, return NA if no effect input was explicitly defined.
+.getEndpointDependentEffectParameterName <- function(designPlan, userDefined = FALSE) {
+    if (userDefined) {
+        endpoint <- .getEndpointName(designPlan)
+        if (is.na(endpoint)) {
+            return(NA_character_)
+        }
+
+        if (grepl("Enrichment", .getClassName(designPlan))) {
+            candidateNames <- "effectList"
+        } else if (grepl("MultiArm", .getClassName(designPlan))) {
+            candidateNames <- switch(endpoint,
+                means = c("effectMatrix", "muMaxVector"),
+                rates = c("effectMatrix", "piMaxVector"),
+                survival = c("effectMatrix", "omegaMaxVector"),
+                character()
+            )
+        } else {
+            candidateNames <- switch(endpoint,
+                means = "alternative",
+                rates = "pi1",
+                survival = c("hazardRatio", "pi1", "lambda1", "median1"),
+                counts = c("theta", "lambda1", "lambda"),
+                character()
+            )
+        }
+
+        # Prefer a directly specified effect over inputs used to derive it.
+        candidateNames <- candidateNames[
+            candidateNames %in% designPlan$.getUserDefinedParameters()
+        ]
+        if (length(candidateNames) == 0) {
+            return(NA_character_)
+        }
+        
+        return(candidateNames[1])
+    }
+    
+    if (inherits(designPlan, "SimulationResults")) {
+        return(.getSimulationPlotXAxisParameterName(designPlan))
+    }
+
+    endpoint <- .getEndpointName(designPlan)
+    if (is.na(endpoint)) {
+        return(NA_character_)
+    }
+
+    if (endpoint %in% c("means", "rates")) {
+        return("effect")
+    }
+
+    if (identical(endpoint, "survival")) {
+        return("hazardRatio")
+    }
+
+    if (identical(endpoint, "counts")) {
+        return("theta")
+    }
+
+    stopRuntimeIssue(
+        "get parameter name function not yet implemented for endpoint ", sQuote(endpoint),
+        functionName = ".getEndpointDependentEffectParameterName",
+        parameter = "designPlan",
+        value = designPlan
+    )
 }
 
 #'
@@ -431,7 +526,12 @@ getAvailablePlotTypes <- function(
             if (obj$.design$kMax > 1) {
                 types <- c(types, 5, 6)
             }
-            types <- c(types, 7)
+            if (obj$.design$kMax > 1) {
+                paramName <- .getEndpointDependentEffectParameterName(obj)
+                if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+                    types <- c(types, 7)
+                }
+            }
             if (obj$.design$kMax > 1) {
                 types <- c(types, 8)
                 if (!.isTrialDesignPlanCountData(obj) ||
@@ -464,14 +564,22 @@ getAvailablePlotTypes <- function(
                 types <- c(types, 2:3)
             }
         }
-        types <- c(types, 4)
+        if (!grepl("CountData", .getClassName(obj)) || obj$.design$kMax > 1) {
+            types <- c(types, 4)
+        }
         if (!grepl("MultiArm", .getClassName(obj)) || obj$.design$kMax > 1) {
-            types <- c(types, 5)
+            paramName <- .getEndpointDependentEffectParameterName(obj)
+            if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+                types <- c(types, 5)
+            }
             if (!grepl("CountData", .getClassName(obj))) {
                 types <- c(types, 6)
             }
         }
-        types <- c(types, 7)
+        paramName <- .getEndpointDependentEffectParameterName(obj)
+        if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+            types <- c(types, 7)
+        }
         if (obj$.design$kMax > 1) {
             types <- c(types, 8)
         }
@@ -614,7 +722,11 @@ getAvailablePlotTypes <- function(
         }
 
         if (!(showSource %in% C_PLOT_SHOW_SOURCE_ARGUMENTS)) {
-            warning("'showSource' (", showSource, ") is not allowed and will be ignored", call. = FALSE)
+            warnArgumentIgnored("'showSource' (", showSource, ") is not allowed and will be ignored",
+                parameter = "showSource",
+                value = showSource,
+                diagnosticId = "plot.invalid_source_display"
+            )
             return(invisible())
         }
     } else if (!isTRUE(showSource)) {
@@ -1132,7 +1244,9 @@ getAvailablePlotTypes <- function(
                 data$xValues <- as.numeric(.formatSampleSizes(data$xValues))
             },
             error = function(e) {
-                warning("Failed to format sample sizes on x-axis: ", e$message)
+                warnRuntimeIssue("Failed to format sample sizes on x-axis: ", e$message,
+                    diagnosticId = "plot.axis_formatting_failed"
+                )
             }
         )
     }
@@ -1401,10 +1515,12 @@ getAvailablePlotTypes <- function(
     removedRows2 <- nRow - nrow(data)
 
     if (getLogLevel() == C_LOG_LEVEL_WARN && (removedRows1 > 0 || removedRows2 > 0)) {
-        warning(sprintf(
+        warnDataIssue(sprintf(
             "Removed %s rows containing (0, 0)-points and %s rows containing missing values",
             removedRows1, removedRows2
-        ), call. = FALSE)
+        ),
+            diagnosticId = "plot.rows_omitted"
+        )
     }
 
     categoryEnabled <- !is.null(data[["categories"]]) && !all(is.na(data$categories))
@@ -1757,7 +1873,8 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         stopIllegalArgument("'filename' seems to be a path. ", "Please specify 'outputPath' separately",
             functionName = "saveLastPlot",
             parameter = "filename",
-            relatedParameter = "outputPath", value = filename
+            relatedParameter = "outputPath", value = filename,
+            diagnosticId = "io.filename_contains_directory"
         )
     }
 
@@ -1844,9 +1961,11 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     showFutilityBounds <- .getOptionalArgument("showFutilityBounds", ...)
     if ((all(type != 3, na.rm = TRUE) || (!is.null(obj) && !inherits(obj, "TrialDesignPlan"))) && !is.null(showFutilityBounds)) {
         objTypeInfo <- ifelse(!is.null(obj) && !inherits(obj, "TrialDesignPlan"), " design plan", "")
-        warning("Argument 'showFutilityBounds' (", showFutilityBounds, ") is only available for", objTypeInfo, " plot type 3; ",
+        warnArgumentIgnored("Argument 'showFutilityBounds' (", showFutilityBounds, ") is only available for", objTypeInfo, " plot type 3; ",
             "it will be ignored",
-            call. = FALSE
+            parameter = "showFutilityBounds",
+            value = showFutilityBounds,
+            diagnosticId = "plot.futility_display_ignored"
         )
     }
 
@@ -1855,19 +1974,23 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     if (all(type != 4, na.rm = TRUE) && all(type != "all", na.rm = TRUE) &&
             (!is.null(showAlphaSpent) || !is.null(showBetaSpent))) {
         if (!is.null(showAlphaSpent) && !is.null(showBetaSpent)) {
-            warning("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
+            warnArgumentIgnored("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
                 "are only available for plot type 4; they will be ignored",
-                call. = FALSE
+                diagnosticId = "plot.spending_display_ignored"
             )
         } else if (!is.null(showAlphaSpent)) {
-            warning("Argument 'showAlphaSpent' (", showAlphaSpent, ") is only available for plot type 4; ",
+            warnArgumentIgnored("Argument 'showAlphaSpent' (", showAlphaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
-                call. = FALSE
+                parameter = "showAlphaSpent",
+                value = showAlphaSpent,
+                diagnosticId = "plot.spending_display_ignored"
             )
         } else {
-            warning("Argument 'showBetaSpent' (", showBetaSpent, ") is only available for plot type 4; ",
+            warnArgumentIgnored("Argument 'showBetaSpent' (", showBetaSpent, ") is only available for plot type 4; ",
                 "it will be ignored",
-                call. = FALSE
+                parameter = "showBetaSpent",
+                value = showBetaSpent,
+                diagnosticId = "plot.spending_display_ignored"
             )
         }
     }

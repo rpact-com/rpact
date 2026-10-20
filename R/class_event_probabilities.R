@@ -591,10 +591,12 @@ plot.NumberOfSubjects <- function(
     }
 
     if (!is.na(allocationRatioPlanned)) {
-        warning("'allocationRatioPlanned' (", allocationRatioPlanned,
+        warnArgumentIgnored("'allocationRatioPlanned' (", allocationRatioPlanned,
             ") will be ignored because 'y' is undefined ",
             "(for more information see ?plot.NumberOfSubjects)",
-            call. = FALSE
+            parameter = "allocationRatioPlanned",
+            value = allocationRatioPlanned,
+            diagnosticId = "plot.allocation_requires_y"
         )
     }
 

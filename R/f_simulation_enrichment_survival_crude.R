@@ -390,7 +390,8 @@ NULL
                         "the output must be a single numeric value",
                         functionName = ".getSimulatedStageSurvivalEnrichment",
                         parameter = "calcEventsFunction",
-                        value = calcEventsFunction
+                        value = calcEventsFunction,
+                        diagnosticId = "simulation.event_callback_result_invalid"
                     )
                 }
 
@@ -423,6 +424,7 @@ NULL
 
     return(list(
         cumulativeEventsPerStage = cumulativeEventsPerStage,
+        eventsByPopulationForSummary = populationEventsPerStage,
         plannedEvents = plannedEvents,
         allocationRatioPlanned = allocationRatioPlanned,
         overallEffects = overallEffects,
@@ -630,6 +632,7 @@ NULL
     simulatedRejections <- array(0, dim = c(kMax, cols, gMax))
     simulatedNumberOfPopulations <- matrix(0, nrow = kMax, ncol = cols)
     simulatedSingleEventsPerStage <- array(0, dim = c(kMax, cols, 2^(gMax - 1)))
+    simulatedPopulationEventsPerStage <- array(0, dim = c(kMax, cols, gMax))
     simulatedOverallEventsPerStage <- matrix(0, nrow = kMax, ncol = cols)
     simulatedSuccessStopping <- matrix(0, nrow = kMax, ncol = cols)
     simulatedFutilityStopping <- matrix(0, nrow = kMax - 1, ncol = cols)
@@ -703,6 +706,10 @@ NULL
 
                 simulatedSingleEventsPerStage[k, i, ] <- simulatedSingleEventsPerStage[k, i, ] +
                     stageResults$cumulativeEventsPerStage[, k]
+                simulatedPopulationEventsPerStage[k, i, ] <-
+                    simulatedPopulationEventsPerStage[k, i, ] +
+                    replace(stageResults$eventsByPopulationForSummary[, k],
+                        is.na(stageResults$eventsByPopulationForSummary[, k]), 0)
 
                 simulatedNumberOfPopulations[k, i] <- simulatedNumberOfPopulations[k, i] +
                     sum(closedTest$selectedPopulations[, k])
@@ -786,6 +793,8 @@ NULL
         }
 
         simulatedSingleEventsPerStage[, i, ] <- simulatedSingleEventsPerStage[, i, ] / iterations[, i]
+        simulatedPopulationEventsPerStage[, i, ] <-
+            simulatedPopulationEventsPerStage[, i, ] / iterations[, i]
 
         simulatedOverallEventsPerStage[, i] <- simulatedOverallEventsPerStage[, i] / iterations[, i]
 
@@ -830,11 +839,15 @@ NULL
     }
 
     simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
-    simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(
-        simulationResults, "singleNumberOfEventsPerStage",
-        simulatedSingleEventsPerStage, "2024-06-10"
+    simulationResults$populationEventsPerStage <- simulatedPopulationEventsPerStage
+    simulationResults$singleEventsPerStage <- simulatedOverallEventsPerStage
+    simulationResults$cumulativeEventsPerStage <- apply(
+        simulatedOverallEventsPerStage, 2, cumsum
     )
+    dim(simulationResults$cumulativeEventsPerStage) <- c(kMax, cols)
+    simulationResults$.setParameterType("singleEventsPerStage", C_PARAM_GENERATED)
+    simulationResults$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
+    simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 
