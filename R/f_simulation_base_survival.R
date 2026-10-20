@@ -248,6 +248,8 @@ NULL
 #'
 #' As a result, the number specified is the **maximum possible** datasets saved *per stage*, not the exact number.
 #'
+#' @template details_survival_conditional_power
+#'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'

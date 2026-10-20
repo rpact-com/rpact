@@ -110,6 +110,11 @@ Returns a \code{ggplot2} object.
 Plots simulation results.
 }
 \details{
+For piecewise multi-arm and enrichment survival simulations, scenario plots
+use situation positions on the x-axis, labeled with the specification's
+situation names, including simulations with one arm or one subgroup.
+First-interval hazard ratios are not used as scenario coordinates.
+
 Generic function to plot all kinds of simulation results.
 }
 \examples{

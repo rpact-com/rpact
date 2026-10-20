@@ -180,6 +180,7 @@ SimulationResults <- R6::R6Class(
                         orderByParameterName = FALSE,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
+                    .showPiecewiseSimulationParameters(self, consoleOutputEnabled = consoleOutputEnabled)
                     self$.showParametersOfOneGroup(
                         self$.getDefaultParameters(),
                         "Default parameters",
@@ -388,6 +389,11 @@ SimulationResults <- R6::R6Class(
                     }
                     if (self$.design$kMax > 1) {
                         self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
+                    }
+                    if (inherits(self[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+                        self$.cat("  Situations: ",
+                            paste(dimnames(self$piecewiseSurvivalTime$hazardRatios)[[3]], collapse = ", "),
+                            " (in this order)\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
 
                     if (enrichmentEnabled) {
@@ -1410,6 +1416,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         numberOfSubjects = NULL,
         omegaMaxVector = NULL,
         piControl = NULL,
+        piecewiseSurvivalTime = NULL,
         rejectAtLeastOne = NULL,
         rejectedArmsPerStage = NULL,
         rValue = NULL,
@@ -1755,6 +1762,7 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
         maxNumberOfSubjects = NULL,
         numberOfPopulations = NULL,
         numberOfSubjects = NULL,
+        piecewiseSurvivalTime = NULL,
         populations = NULL,
         populationEventsPerStage = NULL,
         singleEventsPerStage = NULL,

@@ -831,7 +831,12 @@ print.SummaryFactory <- function(
                     legendEntry <- .addLegendEntry("treatmentArm", legendEntry)
                 }
 
-                if (grepl("SimulationResultsEnrichment", .getClassName(parameterSet))) {
+                if (inherits(parameterSet[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+                    userDefinedEffectMatrix <- FALSE
+                    variedParameterValues <- dimnames(parameterSet$piecewiseSurvivalTime$hazardRatios)[[3]]
+                    variedParameterCaption <- "situation"
+                    numberOfVariants <- length(variedParameterValues)
+                } else if (grepl("SimulationResultsEnrichment", .getClassName(parameterSet))) {
                     variedParameterName <- .getSummaryVariedParameterNameEnrichment(parameterSet)
                     variedParameterValues <- parameterSet$effectList[[variedParameterName]]
                     if (variedParameterName == "piTreatments") {

@@ -1236,6 +1236,13 @@ getAvailablePlotTypes <- function(
         }
     }
 
+    piecewiseSpecification <- if (.isParameterSet(parameterSet)) parameterSet[["piecewiseSurvivalTime"]] else NULL
+    if (!inherits(piecewiseSpecification, "PiecewisePatientWiseSurvivalTime")) piecewiseSpecification <- NULL
+    if (!is.null(piecewiseSpecification)) {
+        # Scenario order is repeated for each plotted arm, stage, or response series.
+        data$xValues <- rep(seq_len(piecewiseSpecification$getNumberOfSituations()), length.out = nrow(data))
+    }
+
     if (!is.na(nMax) && is.null(yParameterName3) && xParameterName == "informationRates") {
         xAxisLabel <- "Sample Size"
         data$xValues <- data$xValues * nMax
@@ -1357,7 +1364,11 @@ getAvailablePlotTypes <- function(
         ...
     )
 
-    if (xParameterName == "informationRates") {
+    if (!is.null(piecewiseSpecification)) {
+        p <- p + ggplot2::scale_x_continuous(
+            breaks = seq_len(piecewiseSpecification$getNumberOfSituations()),
+            labels = dimnames(piecewiseSpecification$hazardRatios)[[3]])
+    } else if (xParameterName == "informationRates") {
         p <- p + ggplot2::scale_x_continuous(breaks = c(0, round(data$xValues, 3)))
     } else if (xParameterName == "situation") { # simulation enrichment
         p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
@@ -1494,6 +1505,7 @@ getAvailablePlotTypes <- function(
         plotSettings = NULL,
         sided = 1,
         discreteXAxis = FALSE,
+        xAxisTickLabels = NULL,
         directionUpper = NA) {
     if (!is.data.frame(data)) {
         stopRuntimeIssue("'data' must be a data.frame (is ", .getClassName(data), ")",
@@ -1561,7 +1573,9 @@ getAvailablePlotTypes <- function(
     p <- plotSettings$setTheme(p)
     p <- plotSettings$hideGridLines(p)
 
-    if (discreteXAxis) {
+    if (!is.null(xAxisTickLabels)) {
+        p <- p + ggplot2::scale_x_continuous(breaks = seq_along(xAxisTickLabels), labels = xAxisTickLabels)
+    } else if (discreteXAxis) {
         p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
     }
 
