@@ -533,6 +533,8 @@ NULL
 #' \code{overallEffects}.
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
+#' @template details_survival_conditional_power
+#'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'
