@@ -39,6 +39,34 @@
     invisible(NULL)
 }
 
+.getPiecewiseSurvivalSummaryText <- function(specification) {
+    formatVector <- function(values) {
+        .arrayToString(values, digits = 4, vectorLookAndFeelEnabled = TRUE)
+    }
+    text <- paste0("H1: piecewise exponential survival distribution with interval start times = ",
+        formatVector(specification$piecewiseSurvivalTime), " (last interval open-ended)")
+    if (specification$groupType == "multi-arm") {
+        text <- .concatenateSummaryText(text, paste0("common control hazards = ",
+            formatVector(specification$lambdaControls[1, ])))
+    } else {
+        for (group in seq_len(specification$getNumberOfGroups())) {
+            text <- .concatenateSummaryText(text, paste0("control hazards (",
+                rownames(specification$lambdaControls)[group], ") = ",
+                formatVector(specification$lambdaControls[group, ])))
+        }
+    }
+    groupNames <- dimnames(specification$hazardRatios)[[1]]
+    situationNames <- dimnames(specification$hazardRatios)[[3]]
+    for (situation in seq_along(situationNames)) {
+        ratios <- vapply(seq_along(groupNames), function(group) {
+            paste0(groupNames[group], " = ", formatVector(specification$hazardRatios[group, , situation]))
+        }, character(1))
+        text <- .concatenateSummaryText(text, paste0("hazard ratios for ", situationNames[situation],
+            " (in interval order): ", paste(ratios, collapse = "; ")))
+    }
+    text
+}
+
 .getPiecewiseInitialHazardRatios <- function(piecewiseSurvivalTime) {
     hazardRatios <- piecewiseSurvivalTime$hazardRatios
     t(matrix(hazardRatios[, 1, , drop = FALSE],
