@@ -832,6 +832,7 @@ getSimulationMultiArmSurvival <- function(
         ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
+    simulationResults$.setParameterType("rejectedArmsPerStage", C_PARAM_GENERATED)
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
     if (gMax == 1 || kMax == 1) {
         simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
