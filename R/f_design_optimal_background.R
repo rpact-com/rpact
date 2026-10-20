@@ -12,18 +12,21 @@
 #' @include parameter_descriptions.R
 NULL
 
+#' 
 #' Internal variation of \code{.getOptimalDesignPsi()} used by \code{.getOptimalDesignLevelConstant()}
 #'
 #' @description Calculate psi for the given scenario, incl. constant
-#' @details Internal function called by \code{.getOptimalDesignLevelResidual()} that calculates a point value of \code{.getOptimalDesignPsi()}.
+#' @details Internal function called by \code{.getOptimalDesignLevelResidual()} 
+#' that calculates a point value of \code{.getOptimalDesignPsi()}.
 #'
 #' @inheritParams param_pValueIntegralOCEF
 #' @inheritParams param_constantOCEF
 #' @inheritParams param_designOCEF
 #'
 #' @return Point value of \code{.getOptimalDesignPsi()}.
+#' 
 #' @noRd
-
+#' 
 .getOptimalDesignConditionalError <- function(pValue, constant, design) {
     # If monotonisation constants provided, perform non-increasing transformation
     if (design$enforceMonotonicity) {
@@ -60,18 +63,22 @@ NULL
     return(conditionalErrorWithConstraints)
 }
 
+#' 
 #' Internal calculation of the integral over psi
 #'
-#' @description Helper function that integrates over the optimal conditional error function. Used to find appropriate level constant.
+#' @description Helper function that integrates over the optimal 
+#' conditional error function. Used to find appropriate level constant.
 #'
-#' @details Internal function called by \code{.getOptimalDesignLevelConstant()} that should be solved (i.e., root should be found).
+#' @details Internal function called by \code{.getOptimalDesignLevelConstant()} 
+#' that should be solved (i.e., root should be found).
 #'
 #' @inheritParams param_constantOCEF
 #' @inheritParams param_designOCEF
 #'
 #' @return Distance of integral over psi to (alpha-efficacyBounds).
+#' 
 #' @noRd
-
+#' 
 .getOptimalDesignLevelResidual <- function(constant, design) {
     # Introduce an option which allows consistent use of standard integration
     enforceBasicIntegration <- isTRUE(as.logical(getOption("rpact.design.optimal.enforce.basic.integration", FALSE)))
@@ -114,18 +121,20 @@ NULL
     return(integral - (design$alpha - design$efficacyBounds))
 }
 
+#' 
 #' Calculate the integral over a partially constant function
 #'
-#' @description This function aims to provide a more accurate integration routine than the \code{integrate()} function
+#' @description This function aims to provide a more accurate 
+#' integration routine than the \code{integrate()} function
 #' for a partially constant function.
 #'
 #' @inheritParams param_constantOCEF
 #' @inheritParams param_designOCEF
 #'
 #' @return Integral over the partially constant function.
+#' 
 #' @noRd
 #'
-
 .integrateOptimalDesignConditionalError <- function(constant, design) {
     # Routine is only used for constant conditional power
     conditionalPower <- design$conditionalPower
@@ -301,6 +310,7 @@ NULL
     return(constraintList)
 }
 
+#' 
 #' Get Level Constant for Optimal Conditional Error Function
 #'
 #' @description Find the constant required such that the conditional error function meets the overall level condition.
@@ -321,10 +331,9 @@ NULL
 #'
 #' @noRd
 #'
-#'
 #' @template reference_optimal
 #' @template reference_monotone
-
+#' 
 .getOptimalDesignLevelConstant <- function(design) {
     # Check basic condition for decision rules
     # Fixed conditional power
@@ -445,8 +454,8 @@ NULL
     )
 }
 
+#' 
 #' Calculate Likelihood Ratio
-#'
 #'
 #' @description Calculate the likelihood ratio of a p-value for a given distribution.
 #'
@@ -470,11 +479,12 @@ NULL
 #' @inheritParams param_designOCEF
 #'
 #' @return The value of the likelihood ratio for the given specification.
+#' 
 #' @noRd
 #'
 #' @template reference_optimal
 #' @references Hung, H. M. J., O<U+2019>Neill, R. T., Bauer, P. & Kohne, K. (1997). The behavior of the p-value when the theta hypothesis is true. Biometrics. http://www.jstor.org/stable/2533093
-
+#' 
 .getOptimalDesignLikelihoodRatio <- function(pValue, design) {
     # Initialise likelihood ratio
     likelihoodRatio <- NA
@@ -654,12 +664,18 @@ NULL
 
 .getOptimalDesignLikelihoodRatio <- Vectorize(.getOptimalDesignLikelihoodRatio, "pValue")
 
+#' 
 #' Return Monotone Function Values
 #'
-#' @description Applies the provided monotonisation constants to a specified, possibly non-monotone function. The returned function values are non-increasing.
+#' @description Applies the provided monotonisation constants to a specified, 
+#' possibly non-monotone function. The returned function values are non-increasing.
 #'
-#' @details The exact monotonisation process is outlined in Brannath et al. (2024), but specified in terms of the first-stage test statistic \eqn{z_1} rather than the first-stage p-value \eqn{p_1}. \cr
-#' The algorithm can easily be translated to the use of p-values by switching the maximum and minimum functions, i.e., replacing \eqn{\min\{q, Q(z_1)\}} by \eqn{\max\{q, Q(p_1)\}} and \eqn{\min\{q, Q(z_1)\}} by \eqn{\max\{q, Q(p_1\}}.
+#' @details The exact monotonisation process is outlined in Brannath et al. (2024), 
+#' but specified in terms of the first-stage test statistic \eqn{z_1} rather than 
+#' the first-stage p-value \eqn{p_1}. \cr
+#' The algorithm can easily be translated to the use of p-values by switching the 
+#' maximum and minimum functions, i.e., replacing \eqn{\min\{q, Q(z_1)\}} by 
+#' \eqn{\max\{q, Q(p_1)\}} and \eqn{\min\{q, Q(z_1)\}} by \eqn{\max\{q, Q(p_1\}}.
 #'
 #' @param x Argument values.
 #' @inheritParams param_funOCEF
@@ -672,11 +688,11 @@ NULL
 #' @inheritParams param_designOCEF
 #'
 #' @return Monotone function values.
+#' 
 #' @noRd
 #'
-#'
 #' @template reference_monotone
-
+#' 
 .getOptimalDesignMonotoneValues <- function(
     x,
     fun,
@@ -711,10 +727,15 @@ NULL
     return(modFunctionValues)
 }
 
+#' 
 #' Calculate the Constants for Monotonisation
 #'
-#' @description Computes the constants required to make a function non-increasing on the specified interval. The output of this function is necessary to calculate the monotone optimal conditional error function.
-#' The output object is a list that contains the intervals on which constant values are required, specified by the minimum \code{dls} and maximum \code{dus} of the interval and the respective constants, \code{qs}.
+#' @description Computes the constants required to make a function non-increasing 
+#' on the specified interval. The output of this function is necessary to calculate 
+#' the monotone optimal conditional error function.
+#' The output object is a list that contains the intervals on which constant values 
+#' are required, specified by the minimum \code{dls} and maximum \code{dus} of the 
+#' interval and the respective constants, \code{qs}.
 #'
 #' @inheritParams param_funOCEF
 #' @inheritParams param_lowerOCEF
@@ -725,11 +746,13 @@ NULL
 #' @inheritParams param_maxIterationsOCEF
 #' @inheritParams param_designOCEF
 #'
-#' @return A list containing the monotonisation constants (element \code{qs}) and the intervals on which they must be applied, specified via minimum (element \code{dls}) and maximum (element \code{dus}).
+#' @return A list containing the monotonisation constants (element \code{qs}) and 
+#'         the intervals on which they must be applied, specified via minimum 
+#'         (element \code{dls}) and maximum (element \code{dus}).
 #' @noRd
 #'
 #' @template reference_monotone
-
+#' 
 .getOptimalDesignMonotonisationConstants <- function(
     fun,
     lower = 0,
@@ -890,15 +913,19 @@ NULL
 
 #' Calculate Nu
 #'
-#' @description Calculate the factor which relates \eqn{\alpha_2} to the second-stage information for given conditional power.
+#' @description Calculate the factor which relates \eqn{\alpha_2} 
+#' to the second-stage information for given conditional power.
 #'
-#' @details Note that this function uses factor 1 instead of factor 2 (Brannath & Bauer 2004). This has no impact on the optimal conditional error function, as constant factors are absorbed by the level constant \eqn{c_0}. \cr
+#' @details Note that this function uses factor 1 instead of factor 2 
+#' (Brannath & Bauer 2004). This has no impact on the optimal conditional 
+#' error function, as constant factors are absorbed by the level constant \eqn{c_0}. \cr
 #' The calculation is:
 #' \deqn{\nu(\alpha_2(p_1)) = (\Phi^{-1}(1-\alpha_2(p_1)) + \Phi^{-1}(CP))^2.}
 #' @inheritParams param_alphaGenericOCEF
 #' @inheritParams param_conditionalPowerOCEF
 #'
 #' @return Factor linking information and \eqn{\alpha_2}.
+#' 
 #' @noRd
 #'
 #' @examples
@@ -908,7 +935,7 @@ NULL
 #' .getOptimalDesignNu(alpha = 0.8, conditionalPower = 0.7)
 #'
 #' @template reference_optimal
-
+#' 
 .getOptimalDesignNu <- function(alpha, conditionalPower) {
     nu <- 0
     if (any(alpha > conditionalPower)) {
@@ -929,13 +956,18 @@ NULL
 #'
 #' @details The function \eqn{\nu'} is defined as
 #' \deqn{\nu'(p_1) = -2 \cdot (\Phi^{-1}(1-\alpha_2(p_1)) + \Phi^{-1}(CP))/\phi(\Phi^{-1}(1-\alpha_2(p_1))).}
-#' Note that in this implementation, the factor -2 is used instead of -4, which is used in by Brannath & Bauer (2004), who explicitly investigate the setting of a balanced two-group trial.
-#' The argument \code{conditionalPower} is either the fixed target conditional power or the value of the conditional power function at the corresponding first-stage p-value.
+#' Note that in this implementation, the factor -2 is used instead of -4, 
+#' which is used in by Brannath & Bauer (2004), who explicitly investigate 
+#' the setting of a balanced two-group trial.
+#' The argument \code{conditionalPower} is either the fixed target conditional 
+#' power or the value of the conditional power function at the corresponding 
+#' first-stage p-value.
 #'
 #' @inheritParams param_alphaGenericOCEF
 #' @inheritParams param_conditionalPowerOCEF
 #'
 #' @return Value for nu prime.
+#' 
 #' @noRd
 #'
 #' @examples
@@ -950,6 +982,7 @@ NULL
 
 .getOptimalDesignNuPrime <- Vectorize(FUN = .getOptimalDesignNuPrime, vectorize.args = "alpha")
 
+#' 
 #' Calculate Psi, the Inverse of Nu Prime
 #'
 #' @description Get point-wise values of psi (inverse of nu prime)
@@ -960,17 +993,21 @@ NULL
 #' @inheritParams param_conditionalPowerOCEF
 #'
 #' @return The value of alpha which corresponds to nuPrime and lies between 0 and \code{conditionalPower}.
+#' 
 #' @noRd
 #'
 #' @details
 #' The function \eqn{\psi} is the inverse of:
 #' \deqn{\nu'(\alpha) = -2 \cdot(\Phi^{-1}(1-\alpha) + \Phi^{-1}(CP)) / \phi(\Phi^{-1}(1-\alpha))}.
-#' If the conditional power \eqn{CP} lies outside of the range \eqn{1-\Phi(2) \leq CP \leq \Phi(2)}, the calculation is slightly more complicated.
-#' The argument \code{conditionalPower} is either the fixed target conditional power or the value of the conditional power function at the corresponding first-stage p-value.
+#' If the conditional power \eqn{CP} lies outside of the range \eqn{1-\Phi(2) \leq CP \leq \Phi(2)}, 
+#' the calculation is slightly more complicated.
+#' The argument \code{conditionalPower} is either the fixed target conditional power or the value of 
+#' the conditional power function at the corresponding first-stage p-value.
 #'
 #' @examples
 #' # Returns 0.05
 #' .getOptimalDesignPsi(.getOptimalDesignNuPrime(alpha = 0.05, conditionalPower = 0.9), conditionalPower = 0.9)
+#' 
 .getOptimalDesignPsi <- function(nuPrime, conditionalPower, lower = 0, upper = conditionalPower) {
     upper <- min(upper, conditionalPower)
     constrain <- function(alpha) max(lower, min(upper, alpha))
@@ -1058,8 +1095,15 @@ NULL
     }
 }
 
-.getOptimalDesignPsi <- Vectorize(FUN = .getOptimalDesignPsi, vectorize.args = c("nuPrime", "conditionalPower", "lower", "upper"))
+# The implementation above handles scalar inputs. Vectorize is required because
+# stats::integrate() passes vectors of p-values to .getOptimalDesignConditionalError(),
+# which calls this function with the corresponding nuPrime values, conditional
+# powers, and bounds. Evaluate these arguments elementwise, recycling scalar inputs.
+.getOptimalDesignPsi <- Vectorize(
+    FUN = .getOptimalDesignPsi, 
+    vectorize.args = c("nuPrime", "conditionalPower", "lower", "upper"))
 
+#' 
 #' Calculate Q
 #'
 #' @description Calculate the ratio of likelihood ratio and squared effect size.
@@ -1076,10 +1120,11 @@ NULL
 #' The effect size may also depend on the interim data (i.e., on \eqn{p_1}) in case \code{useInterimEstimate = TRUE} was specified for the design object.
 #'
 #' @return Ratio of likelihood ratio and squared effect size.
+#' 
 #' @noRd
 #'
 #' @template reference_monotone
-
+#' 
 .getOptimalDesignQ <- function(pValue, design) {
     # Initialise effect and likelihood ratio
     effect <- NA
@@ -1087,7 +1132,8 @@ NULL
 
     # When using interim estimate, apply the restrictions given in the design
     if (design$useInterimEstimate) {
-        effect <- min(max(design$minNonCentralityParameterH1, stats::qnorm(pValue, lower.tail = FALSE)), design$maxNonCentralityParameterH1) /
+        effect <- min(max(design$minNonCentralityParameterH1, 
+            stats::qnorm(pValue, lower.tail = FALSE)), design$maxNonCentralityParameterH1) /
             sqrt(design$firstStageInformation)
     } else {
         # Fixed effect case
@@ -1107,6 +1153,7 @@ NULL
 
 .getOptimalDesignQ <- Vectorize(.getOptimalDesignQ, vectorize.args = "pValue")
 
+#' 
 #' Integrate over information
 #'
 #' @description Internal function used by \code{.getOptimalDesignExpectedInformation()} to calculate the integral over the information.
@@ -1119,7 +1166,7 @@ NULL
 #' @return Integral over the information of the second stage
 #'
 #' @noRd
-
+#' 
 .getOptimalDesignExpectedInformationIntegrand <- function(pValue, design, likelihoodRatioDistribution, ...) {
     # Calculate optimal conditional error function
     conditionalError <- getConditionalError(

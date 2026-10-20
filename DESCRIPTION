@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.5.0.9322
-Date: 2026-10-09
+Version: 4.5.0.9323
+Date: 2026-10-20
 Authors@R: c(
 	person(
 		given = "Gernot",
@@ -42,12 +42,6 @@ Authors@R: c(
     	family = "Muetze",
     	email = "tobias.muetze@novartis.com",
     	comment = c(ORCID = "0000-0002-4111-1941"),
-    	role = c("ctb")
-	),
-    person(
-    	given = "Morton",
-    	family = "Dreher",
-    	email = "morten.dreher@outlook.de",
     	role = c("ctb")
 	),
     person(

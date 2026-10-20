@@ -21,6 +21,7 @@ NULL
     return(.getGroupSequentialProbabilitiesCpp(decisionMatrix, informationRates))
 }
 
+#' 
 #' @title
 #' Get Group Sequential Probabilities
 #'
