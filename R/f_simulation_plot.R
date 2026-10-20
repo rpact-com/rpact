@@ -62,6 +62,12 @@ NULL
         simulationResults,
         showSource = FALSE,
         simulationResultsName = NA_character_) {
+    if (inherits(simulationResults[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+        if (!isFALSE(showSource)) {
+            return(paste0("seq_len(", simulationResults$piecewiseSurvivalTime$getNumberOfSituations(), ")"))
+        }
+        return(if (grepl("MultiArm", .getClassName(simulationResults))) "effectMatrix" else "situation")
+    }
     if (grepl("SimulationResultsEnrichment", .getClassName(simulationResults))) {
         effectDataList <- .getSimulationEnrichmentEffectData(simulationResults)
         if (ncol(effectDataList$effectData) == 1) {
@@ -103,6 +109,9 @@ NULL
 }
 
 .getSimulationPlotXAxisLabel <- function(simulationResults, xlab = NULL, ..., situationEnabled = TRUE) {
+    if (inherits(simulationResults[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+        return(if (!is.null(xlab) && !is.na(xlab)) xlab else "Situation")
+    }
     if (grepl("SimulationResultsEnrichment", .getClassName(simulationResults))) {
         effectDataList <- .getSimulationEnrichmentEffectData(simulationResults)
         if (ncol(effectDataList$effectData) == 1) {
@@ -223,8 +232,11 @@ NULL
     enrichmentEnabled <- grepl("Enrichment", .getClassName(simulationResults))
     countDataEnabled <- grepl("CountData", .getClassName(simulationResults))
     patienWiseSimulationEnabled <- equals(simulationResults[["simulationType"]], "patientWise")
+    piecewiseSpecification <- simulationResults[["piecewiseSurvivalTime"]]
+    if (!inherits(piecewiseSpecification, "PiecewisePatientWiseSurvivalTime")) piecewiseSpecification <- NULL
+    scenarioLabels <- if (!is.null(piecewiseSpecification)) dimnames(piecewiseSpecification$hazardRatios)[[3]] else NULL
     userDefinedEffectMatrix <- multiArmEnabled &&
-        simulationResults$isUserDefinedParameter("effectMatrix")
+        (simulationResults$isUserDefinedParameter("effectMatrix") || !is.null(piecewiseSpecification))
 
     gMax <- NA_integer_
     if (multiArmEnabled || enrichmentEnabled) {
@@ -258,7 +270,9 @@ NULL
         effectData <- simulationResults$effectMatrix
         effectDataParamName <- paste0("effectMatrix", "[", gMax, ", ]")
         xParameterNameSrc <- paste0(simulationResultsName, "$", effectDataParamName)
-        xValues <- effectData[gMax, ]
+        xValues <- if (!is.null(piecewiseSpecification)) seq_along(scenarioLabels) else effectData[gMax, ]
+        discreteXAxis <- !is.null(piecewiseSpecification)
+        if (!is.null(piecewiseSpecification)) xParameterNameSrc <- paste0("seq_len(", length(scenarioLabels), ")")
     } else {
         if (enrichmentEnabled) {
             effectDataList <- .getSimulationEnrichmentEffectData(simulationResults)
@@ -327,7 +341,8 @@ NULL
             sided = designMaster$sided,
             palette = palette, 
             plotSettings = plotSettings,
-            discreteXAxis = discreteXAxis
+            discreteXAxis = discreteXAxis,
+            xAxisTickLabels = scenarioLabels
         ))
     } else if (type == 2) { # Multi-arm, Success per Stage
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
@@ -395,7 +410,8 @@ NULL
             sided = designMaster$sided,
             palette = palette, 
             plotSettings = plotSettings,
-            discreteXAxis = discreteXAxis
+            discreteXAxis = discreteXAxis,
+            xAxisTickLabels = scenarioLabels
         ))
     } else if (type == 3) { # Multi-arm, Selected Arms/Populations per Stage
 
@@ -490,7 +506,8 @@ NULL
             sided = designMaster$sided,
             palette = palette, 
             plotSettings = plotSettings,
-            discreteXAxis = discreteXAxis
+            discreteXAxis = discreteXAxis,
+            xAxisTickLabels = scenarioLabels
         ))
     } else if (type == 4) { # Multi-arm, Rejected Arms/Populations per Stage
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
@@ -622,7 +639,8 @@ NULL
             sided = designMaster$sided,
             palette = palette, 
             plotSettings = plotSettings,
-            discreteXAxis = discreteXAxis
+            discreteXAxis = discreteXAxis,
+            xAxisTickLabels = scenarioLabels
         ))
     } else if (type == 5) { # Power and Stopping Probabilities
 
@@ -688,7 +706,8 @@ NULL
                 sided = designMaster$sided,
                 palette = palette, 
                 plotSettings = plotSettings,
-                discreteXAxis = discreteXAxis
+                discreteXAxis = discreteXAxis,
+                xAxisTickLabels = scenarioLabels
             ))
         } else {
             if (is.null(list(...)[["ylim"]])) {
@@ -906,8 +925,8 @@ NULL
         data <- NULL
         xParameterNameSrc <- xParameterName
         for (k in 1:designMaster$kMax) {
-            xData <- simulationResults[[xParameterName]]
-            if (identical(xParameterName, "effectMatrix")) {
+            xData <- if (!is.null(piecewiseSpecification)) xValues else simulationResults[[xParameterName]]
+            if (identical(xParameterName, "effectMatrix") && is.null(piecewiseSpecification)) {
                 xData <- seq_len(ncol(xData))
                 xParameterNameSrc <- paste0("seq_len(", max(xData), ")")
             }
@@ -953,7 +972,8 @@ NULL
             legendPosition = legendPosition,
             sided = designMaster$sided,
             plotSettings = plotSettings,
-            discreteXAxis = discreteXAxis
+            discreteXAxis = discreteXAxis,
+            xAxisTickLabels = scenarioLabels
         ))
     } else if (type == 13 || type == 14) { 
         # Cumulative Distribution Function / Survival function
@@ -1001,6 +1021,12 @@ NULL
     ))
 }
 
+#'
+#' @details
+#' For piecewise multi-arm and enrichment survival simulations, scenario plots
+#' use situation positions on the x-axis, labeled with the specification's
+#' situation names, including simulations with one arm or one subgroup.
+#' First-interval hazard ratios are not used as scenario coordinates.
 #'
 #' @title
 #' Simulation Results Plotting

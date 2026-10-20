@@ -549,7 +549,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     effectMatrixName <- .getSimulationEnrichmentEffectMatrixName(simulationResults)
     effectData <- simulationResults$effectList[[effectMatrixName]]
     discreteXAxis <- FALSE
-    if (ncol(effectData) == 1) {
+    if (ncol(effectData) == 1 && is.null(simulationResults[["piecewiseSurvivalTime"]])) {
         xValues <- effectData[, 1]
     } else {
         xValues <- 1:nrow(effectData)
