@@ -211,8 +211,15 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
         },
         show = function() {
             cat("Piecewise exponential ", self$groupType, " survival time\n\n", sep = "")
-            cat("Control hazards:\n")
-            print(self$lambdaControls)
+            if (self$groupType == "multi-arm") {
+                cat("Control hazards (common to all treatment arms):\n")
+                controls <- self$lambdaControls[1, , drop = FALSE]
+                rownames(controls) <- "Control"
+                print(controls)
+            } else {
+                cat("Control hazards:\n")
+                print(self$lambdaControls)
+            }
             for (i in seq_len(dim(self$hazardRatios)[3])) {
                 cat("\nHazard ratios - ", dimnames(self$hazardRatios)[[3]][i], ":\n", sep = "")
                 print(matrix(
