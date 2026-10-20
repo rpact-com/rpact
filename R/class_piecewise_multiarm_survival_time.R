@@ -2,6 +2,43 @@
 ## |  *Piecewise survival specifications for patient-wise simulations*
 ## |
 
+.showPiecewiseSimulationParameters <- function(simulationResults, consoleOutputEnabled = TRUE) {
+    specification <- simulationResults$piecewiseSurvivalTime
+    if (!inherits(specification, "PiecewisePatientWiseSurvivalTime")) {
+        return(invisible(NULL))
+    }
+    captions <- "Interval start times"
+    values <- list(specification$piecewiseSurvivalTime)
+    if (specification$groupType == "multi-arm") {
+        captions <- c(captions, "Control hazards (common)")
+        values <- c(values, list(.formatRatios(specification$lambdaControls[1, ])))
+    } else {
+        for (group in seq_len(specification$getNumberOfGroups())) {
+            captions <- c(captions, paste0("Control hazards (", rownames(specification$lambdaControls)[group], ")"))
+            values <- c(values, list(.formatRatios(specification$lambdaControls[group, ])))
+        }
+    }
+    groupNames <- dimnames(specification$hazardRatios)[[1]]
+    situationNames <- dimnames(specification$hazardRatios)[[3]]
+    for (situation in seq_along(situationNames)) {
+        for (group in seq_along(groupNames)) {
+            captions <- c(captions, paste0("Hazard ratios (", groupNames[group], "), ", situationNames[situation]))
+            values <- c(values, list(.formatRatios(specification$hazardRatios[group, , situation])))
+        }
+    }
+    simulationResults$.cat(if (consoleOutputEnabled) "  " else "", "Piecewise survival parameters:\n",
+        heading = if (consoleOutputEnabled) 0 else 3,
+        consoleOutputEnabled = consoleOutputEnabled)
+    width <- max(simulationResults$.getNChar(), nchar(captions))
+    for (i in seq_along(captions)) {
+        simulationResults$.cat(if (consoleOutputEnabled) "  " else "",
+            .getFormattedVariableName(captions[i], n = width), " ",
+            paste(values[[i]], collapse = ", "), "\n", consoleOutputEnabled = consoleOutputEnabled)
+    }
+    simulationResults$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+    invisible(NULL)
+}
+
 .getPiecewiseInitialHazardRatios <- function(piecewiseSurvivalTime) {
     hazardRatios <- piecewiseSurvivalTime$hazardRatios
     t(matrix(hazardRatios[, 1, , drop = FALSE],
