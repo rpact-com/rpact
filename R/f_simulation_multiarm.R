@@ -71,7 +71,8 @@ NULL
         }
         selectedArms[effectVector <= threshold] <- FALSE
     } else {
-        functionArgumentNames <- .getFunctionArgumentNames(selectArmsFunction, ignoreThreeDots = TRUE)
+        functionArgumentNames <- .getFunctionArgumentNames(
+            selectArmsFunction, ignoreThreeDots = TRUE, funArgName = "selectArmsFunction")
         .assertIsValidFunction(
             fun = selectArmsFunction,
             funArgName = "selectArmsFunction",

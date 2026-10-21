@@ -1,15 +1,17 @@
-<!-- badges: start -->
-[![](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact)
-[![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml)
-[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
-[![Monthly downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://cran.r-project.org/web/licenses/LGPL-3)
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+ <!-- badges: start -->
+[![](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact) 
+[![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml) 
+[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact) 
+[![Monthly downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact) 
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) 
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://cran.r-project.org/web/licenses/LGPL-3) 
 [![Codecov test coverage](https://codecov.io/gh/rpact-com/rpact/branch/main/graph/badge.svg)](https://app.codecov.io/gh/rpact-com/rpact?branch=main)
-[![](https://img.shields.io/badge/DOI-10.1007/978--3--031--89669--9-yellow.svg?logo=doi)](https://doi.org/10.1007/978-3-031-89669-9)
+[![](https://img.shields.io/badge/DOI-10.1007/978--3--031--89669--9-yellow.svg?logo=doi)](https://doi.org/10.1007/978-3-031-89669-9) 
 [![](https://img.shields.io/badge/RPACT-Cloud-blue.svg?logo=r)](https://demo.rpact.cloud)
 [![](https://img.shields.io/badge/RPACT-Connect-669999.svg?labelColor=336699)](https://connect.rpact.app)
-<!-- badges: end -->
+ <!-- badges: end -->
 
 # rpact <a href="https://www.rpact.com"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
@@ -76,7 +78,7 @@ simulation, and analysis:
 
 Install the latest stable release from CRAN:
 
-```r
+``` r
 install.packages("rpact")
 ```
 
@@ -86,7 +88,7 @@ To try features that are not yet available in the CRAN release, install
 the development version of `rpact` from
 [GitHub](https://github.com/rpact-com/rpact):
 
-```r
+``` r
 # install.packages("pak")
 pak::pak("rpact-com/rpact")
 ```
@@ -97,20 +99,20 @@ Plan a two-arm trial with a continuous endpoint and three analyses. This
 example uses a one-sided significance level of 0.025, 90% power, an
 expected mean difference of 0.5, and a common standard deviation of 1.
 
-```r
+``` r
 library(rpact)
 getDesignGroupSequential(
-    kMax = 3, 
+    kMax = 3,
     informationRates = c(0.5, 0.75, 1),
-    alpha = 0.025, 
-    beta = 0.1, 
-    sided = 1, 
-    typeOfDesign = "OF" 
+    alpha = 0.025,
+    beta = 0.1,
+    sided = 1,
+    typeOfDesign = "OF"
 ) |>
     getSampleSizeMeans(
-        groups = 2, 
+        groups = 2,
         alternative = 0.5,
-        stDev = 1,  
+        stDev = 1,
         allocationRatioPlanned = 1
     ) |>
     summary()

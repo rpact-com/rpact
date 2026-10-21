@@ -901,8 +901,8 @@ getData.SimulationResults <- function(x) {
             data$accrualTime + data$dropoutTime < analysisTime &
             data$dropoutTime < data$survivalTime
         timeUnderObservation <- analysisTime - data$accrualTime
-        timeUnderObservation[event] <- data$survivalTime[event]
-        timeUnderObservation[dropoutEvent] <- data$dropoutTime[dropoutEvent]
+        timeUnderObservation[na.omit(event)] <- data$survivalTime[na.omit(event)]
+        timeUnderObservation[na.omit(dropoutEvent)] <- data$dropoutTime[na.omit(dropoutEvent)]
 
         result <- data.frame(
             scenario = as.integer(rawDataSet$scenario),

@@ -2787,18 +2787,18 @@ NULL
     return(directionUpper)
 }
 
-.assertIsFunction <- function(fun) {
+.assertIsFunction <- function(fun, funArgName = "fun") {
     if (is.null(fun)) {
-        stopIllegalArgument("'fun' must be a valid function",
+        stopIllegalArgument(.sQuote(funArgName), " must be a valid function",
             functionName = ".assertIsFunction",
-            parameter = "fun",
+            parameter = funArgName,
             value = fun
         )
     }
     if (!is.function(fun)) {
-        stopIllegalArgument("'fun' must be a function (is ", .getClassName(fun), ")",
+        stopIllegalArgument(.sQuote(funArgName), " must be a function (is ", .getClassName(fun), ")",
             functionName = ".assertIsFunction",
-            parameter = "fun",
+            parameter = funArgName,
             value = fun
         )
     }

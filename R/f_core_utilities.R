@@ -1164,8 +1164,8 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
     return(as.character(x))
 }
 
-.getFunctionAsString <- function(fun, stringWrapPrefix = " ") {
-    .assertIsFunction(fun)
+.getFunctionAsString <- function(fun, stringWrapPrefix = " ", funArgName = "fun") {
+    .assertIsFunction(fun, funArgName = funArgName)
 
     s <- utils::capture.output(print(fun))
     s <- s[!grepl("bytecode", s)]
@@ -1177,8 +1177,8 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
     return(s)
 }
 
-.getFunctionArgumentNames <- function(fun, ignoreThreeDots = FALSE) {
-    .assertIsFunction(fun)
+.getFunctionArgumentNames <- function(fun, ignoreThreeDots = FALSE, funArgName = "fun") {
+    .assertIsFunction(fun, funArgName = funArgName)
     args <- methods::formalArgs(fun)
     if (ignoreThreeDots) {
         args <- args[args != "..."]

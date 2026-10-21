@@ -667,9 +667,12 @@ print.SummaryFactory <- function(
             }
         } else {
             values <- t(values)
+            if (identical(parameterName, "numberOfSubjects") && .isSimulationResults(parameterSet)) {
+                transposed <- TRUE
+            }
         }
     }
-
+    
     if (is.list(parameterSet) && is.matrix(values)) {
         parameterSet <- parameterSet[["parameterSet"]]
         if (is.null(parameterSet)) {
@@ -809,6 +812,7 @@ print.SummaryFactory <- function(
                         "earlyStop",
                         "futilityPerStage",
                         "successPerStage",
+                        "numberOfSubjects",
                         "expectedNumberOfSubjects",
                         "expectedNumberOfEvents",
                         "singleEventsPerArmAndStage",

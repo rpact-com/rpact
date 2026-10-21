@@ -467,7 +467,7 @@ getObjectRCode <- function(
     }
 
     if (!is.null(obj) && is.function(obj)) {
-        lines <- .getFunctionAsString(obj, stringWrapPrefix = stringWrapPrefix)
+        lines <- .getFunctionAsString(obj, stringWrapPrefix = stringWrapPrefix, funArgName = "obj")
         if (length(lines) == 0) {
             return("")
         }
@@ -483,6 +483,7 @@ getObjectRCode <- function(
                 lines <- c(lines, paste0(postfix, collapse = ""))
             }
         }
+        
         return(lines)
     }
 
@@ -633,6 +634,29 @@ getObjectRCode <- function(
         leadingArguments <- c(leadingArguments, "selectArmsFunction = selectArmsFunction")
     }
     if (
+        !is.null(obj[["selectPopulationsFunction"]]) &&
+            (is.null(leadingArguments) || !any(grepl("selectPopulationsFunction", leadingArguments))) &&
+            !is.null(obj[["typeOfSelection"]]) &&
+            obj$typeOfSelection == "userDefined"
+        ) {
+        precond <- getObjectRCode(
+            obj$selectPopulationsFunction,
+            prefix = "selectPopulationsFunction <- ",
+            includeDefaultParameters = includeDefaultParameters,
+            stringWrapParagraphWidth = stringWrapParagraphWidth,
+            stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
+            pipeOperator = pipeOperator,
+            output = "internal"
+        )
+        if (pipeOperator == "none") {
+            precondition <- c(precondition, precond)
+        } else {
+            precondition <- c(precond, precondition)
+        }
+        leadingArguments <- c(leadingArguments, "selectPopulationsFunction = selectPopulationsFunction")
+    }
+    if (
         inherits(obj, "ConditionalPowerResults") &&
             !is.null(obj[[".stageResults"]]) &&
             (is.null(leadingArguments) || !any(grepl("stageResults", leadingArguments)))
@@ -667,8 +691,10 @@ getObjectRCode <- function(
             precondition <- c(precond, precondition)
         }
     }
+    
+    print(precondition) # TODO remove this line after debugging
 
-    precondition <- unique(precondition)
+    #precondition <- unique(precondition)
 
     if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
         return(getObjectRCode(
@@ -1132,7 +1158,7 @@ getObjectRCode <- function(
             rCode <- paste0(rCode, paste0(postfix, collapse = ""))
         }
     }
-
+    
     if (output != "internal" && explicitPrint) {
         if (pipeOperator == "none") {
             rCode <- paste0("print(", rCode, ")")

@@ -131,7 +131,8 @@ NULL
         }
         selectedPopulations[effectVector <= threshold] <- FALSE
     } else {
-        functionArgumentNames <- .getFunctionArgumentNames(selectPopulationsFunction, ignoreThreeDots = TRUE)
+        functionArgumentNames <- .getFunctionArgumentNames(
+            selectPopulationsFunction, ignoreThreeDots = TRUE, funArgName = "selectPopulationsFunction")
         .assertIsValidFunction(
             fun = selectPopulationsFunction,
             funArgName = "selectPopulationsFunction",
