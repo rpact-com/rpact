@@ -2466,9 +2466,8 @@ getDesignGroupSequential <- function(
 #' @description
 #' Calculates the characteristics of a design and returns it.
 #'
-#' @param design A conventional `TrialDesign` object or an optimal conditional
-#'   error design created with [getDesignOptimalConditionalError()]. If omitted,
-#'   a default conventional design is created.
+#' @param design A design object. If omitted,
+#'   a default design is created.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -2481,16 +2480,7 @@ getDesignGroupSequential <- function(
 #' finite numeric vector of treatment effects on the mean difference scale.
 #' The design is evaluated at those effects without recalibration.
 #'
-#' @return For an optimal conditional error design, a
-#'   `TrialDesignOptimalConditionalErrorCharacteristics` parameter set with
-#'   `theta`, `overallReject`, `rejectPerStage` (two rows, one per stage), and
-#'   `futilityPerStage` (one row for interim futility). Matrix columns correspond
-#'   to entries in `theta`, including for a single effect. Final non-rejection
-#'   is not counted as early futility. `overallReject` is overall power under
-#'   an alternative and the type I error probability at `theta = 0`.
-#'   See [getDesignOptimalConditionalError()] for the method and its assumptions.
-#'
-#' @return For conventional designs, returns a \code{\link{TrialDesignCharacteristics}} object.
+#' @return Returns a \code{\link{TrialDesignCharacteristics}} object.
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
 #'   \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,

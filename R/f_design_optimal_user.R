@@ -35,7 +35,7 @@
 #' futility if \eqn{p_1 > \alpha_0}. Futility is binding: continuing beyond
 #' this boundary is not part of the calibrated design. In the continuation
 #' region, reject at stage two if its p-value is no larger than
-#' [getConditionalError()]. The second-stage p-value must be based on
+#' `getConditionalError()`. The second-stage p-value must be based on
 #' the new, independent second-stage data, not the cumulative data.
 #' Setting `efficacyBounds = 0` disables early efficacy and 
 #' `futilityBounds = 1` disables early futility.
@@ -215,7 +215,7 @@
 #'   `kappaLR`, and `maxThetaLR`, as described under Likelihood ratio distribution.
 #'
 #' @return An object of class \code{TrialDesignOptimalConditionalError}, 
-#' which can be passed to [getConditionalError()], [getStageInformation()],
+#' which can be passed to `getConditionalError()`, `getStageInformation()`,
 #' and [getDesignCharacteristics()].
 #' This adaptive design is not interchangeable with a conventional `TrialDesign`.
 #'
@@ -380,7 +380,7 @@ getDesignOptimalConditionalError <- function(
 #' @template reference_monotone
 #' @template reference_optconerrf
 #'
-#' @seealso [getDesignOptimalConditionalError()]
+#' @seealso `getDesignOptimalConditionalError()`
 #'
 #' @examples
 #' # Create a design
@@ -554,7 +554,7 @@ getConditionalError <- function(design, pValue, stage = 1) {
 #' # Required additional information given the interim results
 #' getStageInformation(design, pValue = c(0.05, 0.1, 0.3))
 #'
-#' @seealso [getDesignOptimalConditionalError()], [getConditionalError()],
+#' @seealso `getDesignOptimalConditionalError()`, `getConditionalError()`,
 #'   [getFisherInformation()] for information at planned analyses of conventional designs.
 #' 
 #' @template reference_optimal

@@ -7,24 +7,14 @@
 getDesignCharacteristics(design = NULL, ...)
 }
 \arguments{
-\item{design}{A conventional \code{TrialDesign} object or an optimal conditional
-error design created with \code{\link[=getDesignOptimalConditionalError]{getDesignOptimalConditionalError()}}. If omitted,
-a default conventional design is created.}
+\item{design}{A design object. If omitted,
+a default design is created.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 }
 \value{
-For an optimal conditional error design, a
-\code{TrialDesignOptimalConditionalErrorCharacteristics} parameter set with
-\code{theta}, \code{overallReject}, \code{rejectPerStage} (two rows, one per stage), and
-\code{futilityPerStage} (one row for interim futility). Matrix columns correspond
-to entries in \code{theta}, including for a single effect. Final non-rejection
-is not counted as early futility. \code{overallReject} is overall power under
-an alternative and the type I error probability at \code{theta = 0}.
-See \code{\link[=getDesignOptimalConditionalError]{getDesignOptimalConditionalError()}} for the method and its assumptions.
-
-For conventional designs, returns a \code{\link{TrialDesignCharacteristics}} object.
+Returns a \code{\link{TrialDesignCharacteristics}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
 \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,

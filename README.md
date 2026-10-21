@@ -1,17 +1,15 @@
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
- <!-- badges: start -->
-[![](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact) 
-[![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml) 
-[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact) 
-[![Monthly downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact) 
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) 
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://cran.r-project.org/web/licenses/LGPL-3) 
+<!-- badges: start -->
+[![](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact)
+[![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml)
+[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
+[![Monthly downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://cran.r-project.org/web/licenses/LGPL-3)
 [![Codecov test coverage](https://codecov.io/gh/rpact-com/rpact/branch/main/graph/badge.svg)](https://app.codecov.io/gh/rpact-com/rpact?branch=main)
-[![](https://img.shields.io/badge/DOI-10.1007/978--3--031--89669--9-yellow.svg?logo=doi)](https://doi.org/10.1007/978-3-031-89669-9) 
+[![](https://img.shields.io/badge/DOI-10.1007/978--3--031--89669--9-yellow.svg?logo=doi)](https://doi.org/10.1007/978-3-031-89669-9)
 [![](https://img.shields.io/badge/RPACT-Cloud-blue.svg?logo=r)](https://demo.rpact.cloud)
 [![](https://img.shields.io/badge/RPACT-Connect-669999.svg?labelColor=336699)](https://connect.rpact.app)
- <!-- badges: end -->
+<!-- badges: end -->
 
 # rpact <a href="https://www.rpact.com"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
@@ -19,7 +17,8 @@
 confirmatory clinical trials. It supports common tasks such as sample
 size and power calculations for standard fixed-sample trials, as well as
 classical group sequential designs with interim analyses. Methods are
-available for continuous, binary, survival, and count data endpoints.
+available for continuous, binary, survival (time-to-event), and count
+data endpoints.
 
 For innovative trial designs, `rpact` provides simulation-based
 evaluation of power and other operating characteristics, multi-stage
@@ -41,8 +40,8 @@ simulation, and analysis:
 - Sample size and power calculations for
   - means (continuous endpoints)
   - rates (binary endpoints)
-  - survival endpoints with flexible recruitment and survival-time
-    options
+  - survival (time-to-event) endpoints with flexible recruitment and
+    survival-time options
   - count data endpoints
 
 ### Simulation and adaptive trial design
@@ -54,14 +53,19 @@ simulation, and analysis:
 - Multi-stage adaptive hypothesis testing based on the combination
   testing principle
 - Assessment of treatment selection strategies in multi-arm trials,
-  including multi-arm multi-stage (MAMS) settings
+  including multi-arm multi-stage (MAMS) settings for means, rates, and
+  survival endpoints
 - Simulation and analysis methods for population enrichment designs with
   means, rates, and hazard ratios
 
 ### Analysis and trial conduct
 
-- Confirmatory analysis for means, rates, and survival endpoints in
-  one-arm, two-arm, and multi-arm trials
+- Confirmatory analysis for means and rates in one-arm and two-arm
+  trials, and for survival endpoints in treatment comparisons
+- Multi-arm and population enrichment analysis for means, rates, and
+  survival endpoints
+- Analysis of general estimates and standard errors supplied through
+  `getDataset(est = ..., se = ...)` (development version)
 - Support for fixed-sample designs, classical group sequential designs,
   and adaptive multi-arm multi-stage (MAMS) designs based on the inverse
   normal or Fisher combination test
@@ -72,7 +76,7 @@ simulation, and analysis:
 
 Install the latest stable release from CRAN:
 
-``` r
+```r
 install.packages("rpact")
 ```
 
@@ -82,15 +86,71 @@ To try features that are not yet available in the CRAN release, install
 the development version of `rpact` from
 [GitHub](https://github.com/rpact-com/rpact):
 
-``` r
+```r
 # install.packages("pak")
 pak::pak("rpact-com/rpact")
 ```
 
+## Quick start
+
+Plan a two-arm trial with a continuous endpoint and three analyses. This
+example uses a one-sided significance level of 0.025, 90% power, an
+expected mean difference of 0.5, and a common standard deviation of 1.
+
+```r
+library(rpact)
+getDesignGroupSequential(
+    kMax = 3, 
+    informationRates = c(0.5, 0.75, 1),
+    alpha = 0.025, 
+    beta = 0.1, 
+    sided = 1, 
+    typeOfDesign = "OF" 
+) |>
+    getSampleSizeMeans(
+        groups = 2, 
+        alternative = 0.5,
+        stDev = 1,  
+        allocationRatioPlanned = 1
+    ) |>
+    summary()
+```
+
+*Sample size calculation for a continuous endpoint*
+
+Sequential analysis with a maximum of three looks (group sequential
+design), one-sided overall significance level 2.5%, power 90%. The
+results were calculated for a two-sample t-test, H0: mu(1) - mu(2) = 0,
+H1: effect = 0.5, standard deviation = 1.
+
+| Stage                                             | 1      | 2      | 3      |
+|---------------------------------------------------|--------|--------|--------|
+| Planned information rate                          | 50%    | 75%    | 100%   |
+| Cumulative alpha spent                            | 0.0021 | 0.0105 | 0.0250 |
+| Stage levels (one-sided)                          | 0.0021 | 0.0097 | 0.0215 |
+| Efficacy boundary (z-value scale)                 | 2.863  | 2.337  | 2.024  |
+| Efficacy boundary (t)                             | 0.631  | 0.415  | 0.309  |
+| Cumulative power                                  | 0.2928 | 0.6960 | 0.9000 |
+| Number of subjects                                | 86.9   | 130.4  | 173.8  |
+| Expected number of subjects under H1              | 130.9  |        |        |
+| Stopping probability                              | 0.6960 |        |        |
+| Efficacy stopping probability by stage (under H0) | 0.0021 | 0.0084 |        |
+| Efficacy stopping probability by stage            | 0.2928 | 0.4033 |        |
+
+Legend:
+
+- *(t)*: treatment effect scale
+
+The result includes the required sample sizes at each analysis. To
+evaluate power for a specified maximum sample size, use
+`getPowerMeans()`.
+
 ## Documentation
 
-The complete package documentation is available at
-[www.rpact.org](https://www.rpact.org).
+Package information and tutorials are available at
+[www.rpact.org](https://www.rpact.org). For function arguments, return
+values, and examples, see the [function
+reference](https://docs.rpact.org).
 
 ## Vignettes
 
@@ -127,14 +187,14 @@ provides guided, browser-based access to selected `rpact` functionality,
 including study design, sample size calculation, simulation, and
 reporting, without requiring users to write R code.
 
-[rpact.cloud](https://demo.rpact.cloud)
+[demo.rpact.cloud](https://demo.rpact.cloud)
 
 ## RPACT Connect
 
 **RPACT Connect** provides access to insights, downloads, and premium
 support for users and organizations working with RPACT software.
 
-[connect.rpact.com](https://connect.rpact.app)
+[connect.rpact.app](https://connect.rpact.app)
 
 ## The RPACT User Group
 
@@ -156,43 +216,30 @@ licensed for exclusive use by your company to support applicable
 regulatory requirements.
 
 The validation documentation also contains the personal access data
-required to perform the installation qualification with `testPackage()`.
+required to run the full test suite for installation qualification with
+`testPackage()`.
 
 > [Contact RPACT](https://www.rpact.com/contact/) to learn more.
 
 ## About
 
-- **rpact** is a comprehensive R package for clinical trial planning,
-  design, simulation, and analysis.
+**rpact** is free of charge and open source, licensed under
+[LGPL-3](https://cran.r-project.org/web/licenses/LGPL-3). It implements
+a broad range of methods described in the monograph by [Wassmer and
+Brannath (2025)](https://doi.org/10.1007/978-3-031-89669-9). Formal
+validation documentation is available to customers and supporting
+members through the [RPACT service level
+agreement](https://www.rpact.com/services/service-level-agreement/).
 
-  It supports standard fixed-sample and classical group sequential
-  designs, sample size and power calculations, simulation-based
-  evaluation of operating characteristics, multi-stage adaptive designs,
-  multi-arm and enrichment methods, and confirmatory trial analysis.
+**RPACT GmbH** develops **Statistical Tools for Drug Development**. We
+develop and support R packages, Shiny applications, and cloud-based
+tools for clinical research, with services covering software
+development, validation, technical support, consulting, and training.
 
-  `rpact` is free of charge and open source, licensed under
-  [LGPL-3](https://cran.r-project.org/web/licenses/LGPL-3). It
-  implements a broad range of methods described in the monograph by
-  [Wassmer and Brannath
-  (2025)](https://doi.org/10.1007%2F978-3-031-89669-9).
+Our products include [rpact](https://cran.r-project.org/package=rpact)
+and [RPACT Cloud](https://demo.rpact.cloud). We also maintain and
+support [crmPack](https://www.rpact.com/products/r-package-crmpack/),
+the open-source package for dose escalation trial design, simulation,
+and analysis.
 
-  Formal validation documentation is available to customers and
-  supporting members. For more information, visit
-  [www.rpact.com/services/sla](https://www.rpact.com/services/service-level-agreement/).
-
-> For package documentation, examples, and vignettes, visit
-> [www.rpact.org](https://www.rpact.org).
-
-- **RPACT** develops **Statistical Tools for Drug Development**.
-
-  We build and support open-source and commercial software solutions for
-  clinical research, including R packages, Shiny applications, validated
-  workflows, and cloud-based tools for trial planning, simulation, dose
-  finding, analysis, and reporting.
-
-  RPACT is the team behind tools such as
-  [rpact](https://cran.r-project.org/package=rpact),
-  [crmPack](https://cran.r-project.org/package=crmPack), and [RPACT
-  Cloud](https://rpact-cloud.share.connect.posit.cloud).
-
-> For more information, visit [www.rpact.com](https://www.rpact.com).
+For more information, visit [www.rpact.com](https://www.rpact.com).

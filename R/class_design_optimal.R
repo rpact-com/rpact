@@ -9,23 +9,25 @@
 ## |  License text: https://www.r-project.org/Licenses/LGPL-3
 ## |
 
-#'
-#' Optimal Conditional Error Design
-#'
-#' @description R6 parameter set for an adaptive two-stage design based on an
-#' optimal conditional error function.
-#'
-#' @details Create objects with [getDesignOptimalConditionalError()].
-#' This class inherits from `ParameterSet`, not `TrialDesign`: its second-stage
-#' information depends on the interim result. Functions accepting conventional
-#' group sequential or combination-test designs cannot use this object.
-#'
-#' @include class_core_parameter_set.R
-#'
-#' @keywords internal
-#'
-#' @seealso [getDesignOptimalConditionalError()]
-#'
+##
+## Optimal Conditional Error Design
+##
+## @description R6 parameter set for an adaptive two-stage design based on an
+## optimal conditional error function.
+##
+## @details Create objects with [getDesignOptimalConditionalError()].
+## This class inherits from `ParameterSet`, not `TrialDesign`: its second-stage
+## information depends on the interim result. Functions accepting conventional
+## group sequential or combination-test designs cannot use this object.
+##
+## @include class_core_parameter_set.R
+##
+## @keywords internal
+##
+## @seealso [getDesignOptimalConditionalError()]
+## 
+## @noRd 
+##
 TrialDesignOptimalConditionalError <- R6::R6Class(
     "TrialDesignOptimalConditionalError",
     inherit = ParameterSet,
@@ -574,16 +576,21 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
     )
 )
 
-#' Characteristics of an Optimal Conditional Error Design
-#'
-#' @description Operating characteristics returned by [getDesignCharacteristics()]
-#'   for an optimal conditional error design. Inherits from `ParameterSet`.
-#' @details `theta` contains the evaluated effects and `overallReject` the overall
-#'   rejection probabilities. `rejectPerStage` has two rows (stages one and two),
-#'   and `futilityPerStage` one row (interim futility). Columns correspond to `theta`.
-#'   Final non-rejection is not classified as early futility.
-#' @include class_core_parameter_set.R
-#' @keywords internal
+## Characteristics of an Optimal Conditional Error Design
+##
+## @description Operating characteristics returned by [getDesignCharacteristics()]
+##   for an optimal conditional error design. Inherits from `ParameterSet`.
+## @details `theta` contains the evaluated effects and `overallReject` the overall
+##   rejection probabilities. `rejectPerStage` has two rows (stages one and two),
+##   and `futilityPerStage` one row (interim futility). Columns correspond to `theta`.
+##   Final non-rejection is not classified as early futility.
+## 
+## @include class_core_parameter_set.R
+## 
+## @keywords internal
+## 
+## @noRd 
+## 
 TrialDesignOptimalConditionalErrorCharacteristics <- R6::R6Class(
     "TrialDesignOptimalConditionalErrorCharacteristics",
     inherit = ParameterSet,
