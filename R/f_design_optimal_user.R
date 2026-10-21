@@ -9,6 +9,7 @@
 ## |  License text: https://www.r-project.org/Licenses/LGPL-3
 ## |
 
+#' 
 #' Create an Optimal Conditional Error Design
 #'
 #' @description This function returns a design object which contains all 
@@ -259,7 +260,7 @@
 #' )
 #' getConditionalError(pValue = c(0.05, 0.1, 0.3), design = flexibleDesign)
 #'
-#' @export
+#' @noRd 
 #'
 #' @template reference_optimal
 #' @template reference_monotone
@@ -355,6 +356,7 @@ getDesignOptimalConditionalError <- function(
     )
 }
 
+#' 
 #' Calculate the Optimal Conditional Error
 #'
 #' @details The optimal conditional error \eqn{\alpha_2} given a 
@@ -373,7 +375,6 @@ getDesignOptimalConditionalError <- function(
 #' @inheritParams param_designOCEF
 #'
 #' @return A numeric vector of conditional errors, one per first-stage p-value.
-#' @export
 #'
 #' @template reference_optimal
 #' @template reference_monotone
@@ -394,11 +395,13 @@ getDesignOptimalConditionalError <- function(
 #' getConditionalError(
 #'     pValue = c(0.0005, 0.1, 0.3, 0.8), design = design
 #' )
-#'
-
+#' 
 #' @param stage Completed interim stage. Currently only `1` is supported.
+#' 
 #' @rdname getConditionalError
-#' @export
+#' 
+#' @noRd 
+#' 
 getConditionalError <- function(design, pValue, stage = 1) {
     .assertIsOptimalDesignStage(stage, supportedStage = 1, functionName = "getConditionalError")
     .assertIsOptimalDesign(design)
@@ -470,6 +473,7 @@ getConditionalError <- function(design, pValue, stage = 1) {
     ))
 }
 
+#' 
 #' Calculate Stage Information for an Adaptive Design
 #'
 #' @description Calculate the additional information required after an interim
@@ -552,10 +556,13 @@ getConditionalError <- function(design, pValue, stage = 1) {
 #'
 #' @seealso [getDesignOptimalConditionalError()], [getConditionalError()],
 #'   [getFisherInformation()] for information at planned analyses of conventional designs.
+#' 
 #' @template reference_optimal
 #' @template reference_monotone
 #' @template reference_optconerrf
-#' @export
+#' 
+#' @noRd 
+#' 
 getStageInformation <- function(design, stage = 2, type = c("conditional", "expected"),
         pValue = NULL, likelihoodRatioDistribution = NULL, ...) {
     .assertIsOptimalDesign(design)

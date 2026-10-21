@@ -16,11 +16,14 @@
 #'
 #' @param x Design object of class \code{TrialDesignOptimalConditionalError}
 #' @param ... Additional arguments for the generic method.
-#'
-#'
 #' @param markdown Logical; use the rpact Markdown output setting by default.
+#' 
 #' @return The design, invisibly.
+#' 
 #' @export
+#' 
+#' @noRd
+#' 
 print.TrialDesignOptimalConditionalError <- function(x, ..., markdown = NA) {
     return(print.ParameterSet(x, ..., markdown = markdown))
 }
@@ -161,6 +164,9 @@ print.TrialDesignOptimalConditionalError <- function(x, ..., markdown = NA) {
 #' @param ... Additional arguments for the generic method.
 #'
 #' @export
+#' 
+#' @noRd
+#' 
 plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), type = "conditionalError", plotNonMonotoneFunction = FALSE) {
     .assertIsOptimalDesign(x)
     .assertIsNumericVector(range, "range", len = 2)
@@ -256,6 +262,7 @@ plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), 
     return(result)
 }
 
+#' 
 #' Summary of the optimal conditional error trial design
 #'
 #' @description
@@ -264,9 +271,12 @@ plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), 
 #' @param object Design object of class \code{TrialDesignOptimalConditionalError}
 #' @param ... Additional arguments for the generic method.
 #'
-#'
 #' @return The design, invisibly, after printing its operating characteristics.
+#' 
 #' @export
+#' 
+#' @noRd
+#' 
 summary.TrialDesignOptimalConditionalError <- function(object, ...) {
     .assertIsOptimalDesign(object)
     cat("Summary of the Optimal Conditional Error Design: \n \n")

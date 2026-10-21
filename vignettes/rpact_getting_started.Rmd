@@ -22,14 +22,14 @@ knitr::opts_chunk$set(
 
 *	Fixed sample design and designs with interim analysis stages
 *	Sample size and power calculation for
-    +	means (continuous endpoint)
-    +	rates (binary endpoint)
-    +	survival trials with flexible recruitment and survival time options
-    +	count data 
+    +	 means (continuous endpoint)
+    +	 rates (binary endpoint)
+    +	 survival trials with flexible recruitment and survival time options
+    +	 count data 
 *	Simulation tool for means, rates, survival data, and count data
-    +	Assessment of adaptive sample size/event number recalculations based on
+    +	 Assessment of adaptive sample size/event number recalculations based on
         conditional power
-    +   Assessment of treatment selection strategies in multi-arm trials
+    + Assessment of treatment selection strategies in multi-arm trials
 *	Adaptive analysis of means, rates, and survival data
 *	Adaptive designs and analysis for multi-arm trials
 *	Adaptive analysis and simulation tools for enrichment design testing means,
