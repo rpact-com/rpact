@@ -24,6 +24,7 @@
 
 ## Improvements, issues, and changes
 
+* `getObjectRCode()` now removes duplicate precondition blocks while preserving complete user-defined function bodies and pipe chains.
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
 * Several improvements and refactorings, focusing on enhanced error handling, improved naming conventions, and more consistent function signatures
 * Updates to the documentation

@@ -375,6 +375,44 @@ rcmd <- function(
     return(invisible(rCode))
 }
 
+.isFunctionPreconditionRequired <- function(obj, functionName, leadingArguments) {
+    if (is.null(obj[[functionName]]) || any(grepl(functionName, leadingArguments, fixed = TRUE))) {
+        return(FALSE)
+    }
+
+    if (functionName %in% c("selectArmsFunction", "selectPopulationsFunction")) {
+        return(identical(obj[["typeOfSelection"]], "userDefined"))
+    }
+
+    return(obj$isUserDefinedParameter(functionName))
+}
+
+.getUniquePreconditionRCode <- function(precondition) {
+    if (length(precondition) == 0) {
+        return(precondition)
+    }
+
+    # Complete a possible trailing pipe only for parsing. Source references let us
+    # compare whole expressions while preserving their original code and layout.
+    expressions <- tryCatch(
+        parse(text = c(precondition, "identity()"), keep.source = TRUE),
+        error = function(e) NULL
+    )
+    if (is.null(expressions)) {
+        return(precondition)
+    }
+
+    refs <- Filter(function(ref) ref[1] <= length(precondition), attr(expressions, "srcref"))
+    blockLines <- lapply(refs, function(ref) seq.int(ref[1], min(ref[3], length(precondition))))
+    # Do not remove a line shared by multiple top-level expressions.
+    if (anyDuplicated(unlist(blockLines))) {
+        return(precondition)
+    }
+    blocks <- lapply(blockLines, function(lines) precondition[lines])
+    duplicateLines <- unlist(blockLines[duplicated(blocks)], use.names = FALSE)
+    return(precondition[!(seq_along(precondition) %in% duplicateLines)])
+}
+
 #'
 #' @title
 #' Get Object R Code
@@ -568,14 +606,15 @@ getObjectRCode <- function(
             leadingArguments <- c(leadingArguments, "dataInput = data")
         }
     }
-    if (
-        !is.null(obj[["calcSubjectsFunction"]]) &&
-            (is.null(leadingArguments) || !any(grepl("calcSubjectsFunction", leadingArguments))) &&
-            obj$isUserDefinedParameter("calcSubjectsFunction")
-        ) {
+    for (functionName in c(
+        "calcSubjectsFunction", "calcEventsFunction", "selectArmsFunction", "selectPopulationsFunction"
+    )) {
+        if (!.isFunctionPreconditionRequired(obj, functionName, leadingArguments)) {
+            next
+        }
         precond <- getObjectRCode(
-            obj$calcSubjectsFunction,
-            prefix = "calcSubjectsFunction <- ",
+            obj[[functionName]],
+            prefix = paste0(functionName, " <- "),
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
             stringWrapPrefix = stringWrapPrefix,
@@ -588,73 +627,9 @@ getObjectRCode <- function(
         } else {
             precondition <- c(precond, precondition)
         }
-    }
-    if (
-        !is.null(obj[["calcEventsFunction"]]) &&
-            (is.null(leadingArguments) || !any(grepl("calcEventsFunction", leadingArguments))) &&
-            obj$isUserDefinedParameter("calcEventsFunction")
-        ) {
-        precond <- getObjectRCode(
-            obj$calcEventsFunction,
-            prefix = "calcEventsFunction <- ",
-            includeDefaultParameters = includeDefaultParameters,
-            stringWrapParagraphWidth = stringWrapParagraphWidth,
-            stringWrapPrefix = stringWrapPrefix,
-            newArgumentValues = newArgumentValues,
-            pipeOperator = pipeOperator,
-            output = "internal"
-        )
-        if (pipeOperator == "none") {
-            precondition <- c(precondition, precond)
-        } else {
-            precondition <- c(precond, precondition)
+        if (functionName %in% c("selectArmsFunction", "selectPopulationsFunction")) {
+            leadingArguments <- c(leadingArguments, paste0(functionName, " = ", functionName))
         }
-    }
-    if (
-        !is.null(obj[["selectArmsFunction"]]) &&
-            (is.null(leadingArguments) || !any(grepl("selectArmsFunction", leadingArguments))) &&
-            !is.null(obj[["typeOfSelection"]]) &&
-            obj$typeOfSelection == "userDefined"
-        ) {
-        precond <- getObjectRCode(
-            obj$selectArmsFunction,
-            prefix = "selectArmsFunction <- ",
-            includeDefaultParameters = includeDefaultParameters,
-            stringWrapParagraphWidth = stringWrapParagraphWidth,
-            stringWrapPrefix = stringWrapPrefix,
-            newArgumentValues = newArgumentValues,
-            pipeOperator = pipeOperator,
-            output = "internal"
-        )
-        if (pipeOperator == "none") {
-            precondition <- c(precondition, precond)
-        } else {
-            precondition <- c(precond, precondition)
-        }
-        leadingArguments <- c(leadingArguments, "selectArmsFunction = selectArmsFunction")
-    }
-    if (
-        !is.null(obj[["selectPopulationsFunction"]]) &&
-            (is.null(leadingArguments) || !any(grepl("selectPopulationsFunction", leadingArguments))) &&
-            !is.null(obj[["typeOfSelection"]]) &&
-            obj$typeOfSelection == "userDefined"
-        ) {
-        precond <- getObjectRCode(
-            obj$selectPopulationsFunction,
-            prefix = "selectPopulationsFunction <- ",
-            includeDefaultParameters = includeDefaultParameters,
-            stringWrapParagraphWidth = stringWrapParagraphWidth,
-            stringWrapPrefix = stringWrapPrefix,
-            newArgumentValues = newArgumentValues,
-            pipeOperator = pipeOperator,
-            output = "internal"
-        )
-        if (pipeOperator == "none") {
-            precondition <- c(precondition, precond)
-        } else {
-            precondition <- c(precond, precondition)
-        }
-        leadingArguments <- c(leadingArguments, "selectPopulationsFunction = selectPopulationsFunction")
     }
     if (
         inherits(obj, "ConditionalPowerResults") &&
@@ -692,10 +667,6 @@ getObjectRCode <- function(
         }
     }
     
-    print(precondition) # TODO remove this line after debugging
-
-    #precondition <- unique(precondition)
-
     if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
         return(getObjectRCode(
             obj$object,
@@ -1168,7 +1139,7 @@ getObjectRCode <- function(
         }
     }
 
-    rCode <- c(precondition, rCode)
+    rCode <- c(.getUniquePreconditionRCode(precondition), rCode)
 
     if (
         !is.null(stringWrapParagraphWidth) &&
