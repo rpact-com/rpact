@@ -366,9 +366,11 @@ NULL
     simulatedConditionalPower[1, ] <- NA_real_
     if (kMax > 1) {
         for (k in 2:kMax) {
+            # Average over trials continuing from the preceding completed analysis.
+            # (Missing-event counts also include trials that failed at earlier stages.)
             simulatedConditionalPower[k, ] <- simulatedConditionalPower[k, ] /
-                (iterations[k, ] +
-                    simulatedNumberEventsNotAchieved[k, ])
+                (iterations[k - 1, ] - simulatedSuccessStopping[k - 1, ] -
+                    simulatedFutilityStopping[k - 1, ])
         }
     }
 
