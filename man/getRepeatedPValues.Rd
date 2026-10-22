@@ -51,9 +51,15 @@ Repeated p-values are calculated by identifying the smallest global
 significance level for which the observed test statistic would lead to
 rejection under the same design rule. Therefore, they require that the
 design can be re-created for arbitrary values of the global significance
-level. For user-defined designs with fixed userAlphaSpending values,
-this alpha-dependent design family is not uniquely defined.
-Consequently, repeated p-values are not available for such designs.
+level. For single-hypothesis group sequential and inverse normal designs
+with \code{typeOfDesign = "asUser"}, this family is defined by proportional
+scaling: at candidate level \code{a}, the cumulative spending is
+\code{userAlphaSpending * a / alpha}, where \code{alpha} is the original
+design's significance level. Thus the spending proportions are held fixed,
+even when spending times differ from information rates. This does not
+reconstruct a spending function whose shape changes with alpha.
+Repeated p-values remain unavailable for \code{typeOfDesign = "WToptimum"}
+and for multi-arm or enrichment designs with \code{typeOfDesign = "asUser"}.
 }
 
 \examples{
@@ -65,6 +71,15 @@ data <- getDataset(
     stDevs = c(130, 140)
 )
 getRepeatedPValues(getStageResults(design, dataInput = data))
+
+# User-defined cumulative spending: keep spending proportions fixed
+# when varying alpha to calculate repeated p-values.
+userDesign <- getDesignGroupSequential(
+    kMax = 2, typeOfDesign = "asUser",
+    userAlphaSpending = c(0.005, 0.025)
+)
+generalData <- getDataset(est = c(2, 1), se = c(1, 1))
+getRepeatedPValues(getStageResults(userDesign, generalData))
 }
 
 }

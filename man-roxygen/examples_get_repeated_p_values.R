@@ -7,5 +7,14 @@
 #'     stDevs = c(130, 140)
 #' )
 #' getRepeatedPValues(getStageResults(design, dataInput = data))
+#'
+#' # User-defined cumulative spending: keep spending proportions fixed
+#' # when varying alpha to calculate repeated p-values.
+#' userDesign <- getDesignGroupSequential(
+#'     kMax = 2, typeOfDesign = "asUser",
+#'     userAlphaSpending = c(0.005, 0.025)
+#' )
+#' generalData <- getDataset(est = c(2, 1), se = c(1, 1))
+#' getRepeatedPValues(getStageResults(userDesign, generalData))
 #' }
 #'

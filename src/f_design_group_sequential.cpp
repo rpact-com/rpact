@@ -900,7 +900,8 @@ NumericVector getDesignGroupSequentialAlphaSpending(int kMax, NumericVector user
 NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(int kMax, NumericVector userAlphaSpending,
 	double sided, NumericVector informationRates, bool bindingFutility, NumericVector futilityBounds,
 	double tolerance) {
-	return getDesignGroupSequentialAlphaSpending(kMax, userAlphaSpending, NA_REAL, NA_REAL, C_TYPE_OF_DESIGN_AS_USER,
+	// User spending can exceed 0.5 and then requires negative one-sided boundaries.
+	return getDesignGroupSequentialAlphaSpending(kMax, userAlphaSpending, max(userAlphaSpending), NA_REAL, C_TYPE_OF_DESIGN_AS_USER,
 		sided, informationRates, bindingFutility, futilityBounds, tolerance);
 }
 

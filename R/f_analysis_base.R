@@ -154,9 +154,15 @@ NULL
 #' significance level for which the observed test statistic would lead to
 #' rejection under the same design rule. Therefore, they require that the
 #' design can be re-created for arbitrary values of the global significance
-#' level. For user-defined designs with fixed userAlphaSpending values,
-#' this alpha-dependent design family is not uniquely defined.
-#' Consequently, repeated p-values are not available for such designs.
+#' level. For single-hypothesis group sequential and inverse normal designs
+#' with \code{typeOfDesign = "asUser"}, this family is defined by proportional
+#' scaling: at candidate level \code{a}, the cumulative spending is
+#' \code{userAlphaSpending * a / alpha}, where \code{alpha} is the original
+#' design's significance level. Thus the spending proportions are held fixed,
+#' even when spending times differ from information rates. This does not
+#' reconstruct a spending function whose shape changes with alpha.
+#' Repeated p-values remain unavailable for \code{typeOfDesign = "WToptimum"}
+#' and for multi-arm or enrichment designs with \code{typeOfDesign = "asUser"}.
 #'
 #' @return Returns an \code{\link{AnalysisResults}} object.
 #' The following generics (R generic functions) are available for this result object:
@@ -1069,9 +1075,15 @@ getConditionalPower <- function(
 #' significance level for which the observed test statistic would lead to
 #' rejection under the same design rule. Therefore, they require that the
 #' design can be re-created for arbitrary values of the global significance
-#' level. For user-defined designs with fixed userAlphaSpending values,
-#' this alpha-dependent design family is not uniquely defined.
-#' Consequently, repeated p-values are not available for such designs.
+#' level. For single-hypothesis group sequential and inverse normal designs
+#' with \code{typeOfDesign = "asUser"}, this family is defined by proportional
+#' scaling: at candidate level \code{a}, the cumulative spending is
+#' \code{userAlphaSpending * a / alpha}, where \code{alpha} is the original
+#' design's significance level. Thus the spending proportions are held fixed,
+#' even when spending times differ from information rates. This does not
+#' reconstruct a spending function whose shape changes with alpha.
+#' Repeated p-values remain unavailable for \code{typeOfDesign = "WToptimum"}
+#' and for multi-arm or enrichment designs with \code{typeOfDesign = "asUser"}.
 #'
 #' @return Returns a \code{\link[base]{numeric}} vector of length \code{kMax} or in case of multi-arm stage results
 #' a \code{\link[base]{matrix}} (each column represents a stage, each row a comparison)
@@ -1108,7 +1120,7 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
     }
 
     if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
-            design$typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER, C_TYPE_OF_DESIGN_WT_OPTIMUM)) {
+            design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
         showWarnings <- .getEnvironmentVariable(
             "RPACT_ANALYSIS_REPEATED_P_VALUES_WARNINGS_ENABLED",
             "rpact.analysis.repeated.p.values.warnings.enabled",
@@ -1859,6 +1871,11 @@ getFinalConfidenceInterval <- function(
                             deltaPT1 = design$deltaPT1,
                             beta = .getRepeatedPValuesBeta(design, typeOfDesign, typeBetaSpending),
                             gammaA = design$gammaA,
+                            userAlphaSpending = if (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
+                                design$userAlphaSpending * level / design$alpha
+                            } else {
+                                NA_real_
+                            },
                             futilityBounds = futilityBounds,
                             bindingFutility = design$bindingFutility
                         )
@@ -1976,6 +1993,11 @@ getFinalConfidenceInterval <- function(
                             deltaPT1 = design$deltaPT1,
                             beta = .getRepeatedPValuesBeta(design, typeOfDesign, typeBetaSpending),
                             gammaA = design$gammaA,
+                            userAlphaSpending = if (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
+                                design$userAlphaSpending * level / design$alpha
+                            } else {
+                                NA_real_
+                            },
                             futilityBounds = futilityBounds,
                             bindingFutility = design$bindingFutility
                         )
