@@ -183,7 +183,8 @@ to create an object of this type.
 
 - `populationEventsPerStage`:
 
-  The cumulative number of events per stage Is a numeric matrix.
+  Mean number of events within each population and stage. Is a numeric
+  array with dimensions stage, scenario, and population.
 
 - `rejectAtLeastOne`:
 
@@ -211,6 +212,15 @@ to create an object of this type.
 
   An optional function that can be entered to define the way of how
   populations are selected.
+
+- `singleEventsPerStage`:
+
+  The single number of events per stage. Is a numeric matrix.
+
+- `singleEventsPerSubsetAndStage`:
+
+  Mean number of events within each subgroup and stage. Is a numeric
+  array with dimensions stage, scenario, and subgroup.
 
 - `singleNumberOfEventsPerStage`:
 

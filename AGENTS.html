@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9321</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9323</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,13 +39,20 @@
 
 <div class="section level2">
 <h2 id="required-windows-preflight-check">Required Windows preflight check<a class="anchor" aria-label="anchor" href="#required-windows-preflight-check"></a></h2>
-<p>On Windows, perform this check at the beginning of every task, before making changes or running development, build, or test workflows:</p>
+<p>On Windows, at the beginning of the first task, before making changes or running development, build, or test workflows, compare the current environment with the last successful preflight check stored in <code>_dev/windows-preflight.json</code> relative to the repository root. This is a local cache: do not commit it or include it in the built package (<code>_dev</code> is already excluded from both).</p>
+<ul><li>Always obtain the active R installation’s <code>R.version.string</code> and <code><a href="https://rdrr.io/r/base/Rhome.html" class="external-link">R.home()</a></code> from the R installation actually used by the current session or task. Do not infer them from another installed R executable.</li>
+<li>Obtain a system ID consisting of the computer name and the Windows version, including its build and update revision. For example, use <code>$env:COMPUTERNAME</code> and <code>DisplayVersion</code>, <code>CurrentBuildNumber</code>, and <code>UBR</code> from <code>HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion</code> in PowerShell.</li>
+<li>Read the cache and compare <code>rVersion</code>, <code>rHome</code>, and <code>systemId</code> with these current values. If all values match and <code>status</code> is <code>passed</code>, reuse the successful result and skip the full Rtools compatibility and compilation checks. Do not repeat those checks merely because a new task or session starts.</li>
+<li>Run the full check below only if the cache is missing, unreadable, incomplete, or not marked <code>passed</code>, or if the R version, R installation path, or system ID has changed. A changed R version always requires a new full check.</li>
+<li>If the current environment cannot be identified, stop and explain what could not be verified; do not reuse an unverifiable cached result.</li>
+</ul><p>For a required full check:</p>
 <ul><li>Identify the R installation actually used by the current session or task. Obtain its full version from <code>R.version.string</code> and its installation path from <code><a href="https://rdrr.io/r/base/Rhome.html" class="external-link">R.home()</a></code> using that same R installation. Do not infer the active version from another installed R executable.</li>
 <li>Determine the Rtools release required for that R version using the official Rtools compatibility guidance. Do not assume that the newest installed Rtools release is compatible.</li>
 <li>Verify that the matching Rtools installation is usable by that R session, including its build tools and C/C++ compilers. Use a toolchain diagnostic that verifies compilation with the active R installation; finding an installation directory alone is not sufficient.</li>
 <li>If matching Rtools is missing, incompatible, or unusable, stop the task and notify the user. The message must state the active R version and installation path, the expected Rtools release, and the reason the check failed. Ask the user to install or configure the matching Rtools and make it accessible to the active R installation before work resumes.</li>
 <li>If compatibility or usability cannot be established, stop and explain what could not be verified rather than proceeding with an unverified toolchain.</li>
-</ul></div>
+</ul><p>After the full check succeeds, create <code>_dev</code> if needed and write the JSON cache with <code>status = "passed"</code>, <code>rVersion</code>, <code>rHome</code>, <code>systemId</code>, the verified <code>rtoolsRelease</code>, <code>rtoolsHome</code>, and <code>checkedAt</code> (an ISO 8601 UTC timestamp). Use the values actually verified, and replace the cache only after all required checks succeed. On failure, invalidate any existing successful cache by setting <code>status = "failed"</code>; never record an unsuccessful or unverified check as passed. If saving the cache fails, report that limitation; the next task must perform the full check again. If a later build reveals a toolchain failure, invalidate the cache so that the next task checks the toolchain again.</p>
+</div>
 <div class="section level2">
 <h2 id="task-specific-guidance">Task-specific guidance<a class="anchor" aria-label="anchor" href="#task-specific-guidance"></a></h2>
 <p>Read and follow the applicable instruction files before starting work. If a task spans multiple categories, apply all relevant files:</p>
@@ -60,6 +67,7 @@
 </ul></div>
 <div class="section level2">
 <h2 id="unit-tests-and-test-templates">Unit tests and test templates<a class="anchor" aria-label="anchor" href="#unit-tests-and-test-templates"></a></h2>
+<p>The rpact-specific rules in this section, including the optional <code>rpact.validator</code> template workflow, apply only to direct development of the <code>rpact</code> package and its tests. When working on another package, such as <code>rpact.code.api</code> or <code>rpact.cloud</code>, create and maintain that package’s tests in its own <code>tests/testthat</code> directory, following its applicable instructions and existing test conventions. Do not create or modify tests for another package in <code>rpact.tests</code> or apply the rpact-specific template rules to those tests. Using <code>rpact</code> as a dependency does not make a package’s tests rpact tests. For tasks spanning multiple packages, apply these rules only to tests of <code>rpact</code>; keep tests of each other package in that package.</p>
 <p>All rpact unit tests are hosted and developed in the separate <code>rpact.tests</code> package, except for the small example test <code>test-pkgname.R</code> in the <code>rpact</code> package.</p>
 <ul><li>Create all new rpact unit tests in <code>rpact.tests/tests/testthat</code>. Do not create new unit tests in the <code>rpact</code> repository.</li>
 <li>When improving existing tests, check whether they have a corresponding template in <code>rpact.tests/tests-raw/testthat</code>. Update that template as needed to keep the tests and their source templates consistent.</li>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9321</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9323</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -179,7 +179,8 @@ to create an object of this type.</p>
 
 
 <dt><code>populationEventsPerStage</code></dt>
-<dd><p>The cumulative number of events per stage Is a numeric matrix.</p></dd>
+<dd><p>Mean number of events within each population
+and stage. Is a numeric array with dimensions stage, scenario, and population.</p></dd>
 
 
 <dt><code>rejectAtLeastOne</code></dt>
@@ -204,6 +205,16 @@ to create an object of this type.</p>
 
 <dt><code>selectPopulationsFunction</code></dt>
 <dd><p>An optional function that can be entered to define the way of how populations are selected.</p></dd>
+
+
+<dt><code>singleEventsPerStage</code></dt>
+<dd><p>The single number of events per stage. Is a numeric matrix.</p></dd>
+
+
+<dt><code>singleEventsPerSubsetAndStage</code></dt>
+<dd><p>Mean number of events within each
+subgroup and stage. Is a numeric array with dimensions stage, scenario,
+and subgroup.</p></dd>
 
 
 <dt><code>singleNumberOfEventsPerStage</code></dt>

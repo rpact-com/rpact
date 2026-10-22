@@ -7,6 +7,6 @@ Parameter Description: Design Object (optimal conditional error design)
 - design:
 
   An object of class `TrialDesignOptimalConditionalError` created by
-  [`getDesignOptimalConditionalError()`](https://docs.rpact.org/reference/getDesignOptimalConditionalError.md).
-  Contains all necessary arguments to calculate the optimal conditional
-  error function for the specified case.
+  `getDesignOptimalConditionalError()`. Contains all necessary arguments
+  to calculate the optimal conditional error function for the specified
+  case.

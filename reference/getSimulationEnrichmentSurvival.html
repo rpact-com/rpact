@@ -21,7 +21,7 @@ than 1 can be used, for example, to simulate non-inferiority designs.'><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9321</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9323</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -147,8 +147,15 @@ simulation is used for backward compatibility.</p></dd>
 
 
 <dt id="arg-effectlist">effectList<a class="anchor" aria-label="anchor" href="#arg-effectlist"></a></dt>
-<dd><p>List of subsets, prevalences, and effect sizes with columns and number of rows
-reflecting the different situations to consider (see examples).</p></dd>
+<dd><p>List of subsets, prevalences, and effect sizes with columns
+and number of rows reflecting the different situations to consider (see
+examples). For a piecewise exponential patient-wise survival simulation,
+specify
+<code>subGroups</code>, <code>prevalences</code>, and <code>piecewiseSurvivalTime</code>,
+where the latter is a <code>PiecewiseEnrichmentSurvivalTime</code> object created
+by <code><a href="getPiecewiseEnrichmentSurvivalTime.html">getPiecewiseEnrichmentSurvivalTime()</a></code>. Its subgroup names and the
+order of <code>subGroups</code> must agree. In this case, do not also specify
+<code>piControls</code>, <code>piTreatments</code>, or <code>hazardRatios</code>.</p></dd>
 
 
 <dt id="arg-kappa">kappa<a class="anchor" aria-label="anchor" href="#arg-kappa"></a></dt>
@@ -373,7 +380,17 @@ the specified accrual, event-time, and dropout assumptions. If
 <code>simulationType = "testStatisticBased"</code>, normally distributed log-rank test statistics
 are simulated instead. The default <code>simulationType = "auto"</code> selects the patient-wise
 approach if patient-wise-specific arguments were explicitly specified; otherwise the
-test-statistic-based approach is used for backward compatibility.</p>
+test-statistic-based approach is used for backward compatibility.
+After a population selection, each subsequent patient-wise analysis targets
+the planned increase in events among the selected subgroups. Events already
+observed in those subgroups at the preceding analysis count toward the target.</p>
+<p>For piecewise exponential event times, include a
+<code>PiecewiseEnrichmentSurvivalTime</code> object in
+<code>effectList$piecewiseSurvivalTime</code>. Its hazard ratios are represented
+as a subgroup-by-interval-by-situation array; equivalently, they can be
+supplied to the constructor as a named list of subgroup-by-interval matrices.
+The situation dimension changes slowest, so printing the object displays one
+subgroup-by-interval matrix for each situation.</p>
 <p>The definition of <code>thetaH1</code> makes only sense if <code>kMax</code> &gt; 1
 and if <code>conditionalPower</code>, <code>minNumberOfEventsPerStage</code>, and
 <code>maxNumberOfEventsPerStage</code> (or <code>calcEventsFunction</code>) are defined.</p>
@@ -393,6 +410,24 @@ The function might depend on the variables
 <code>conditionalCriticalValue</code>, and
 <code>overallEffects</code>.
 The function has to contain the three-dots argument '...' (see examples).</p>
+    </div>
+    <div class="section level2">
+    <h2 id="conditional-power-under-piecewise-hazards">Conditional power under piecewise hazards<a class="anchor" aria-label="anchor" href="#conditional-power-under-piecewise-hazards"></a></h2>
+
+
+<p>Conditional power is calculated using a scalar hazard ratio estimated from
+the interim data or specified through <code>thetaH1</code>. The calculation uses
+a proportional-hazards working model, including when survival times are
+generated from piecewise hazards with interval-specific hazard ratios.
+The interval-specific hazards are not used to project future test-statistic
+drift in this calculation.</p>
+<p>Accordingly, <code>conditionalPowerAchieved</code> reports conditional power under
+the scalar effect assumption for the selected number of events. It is not
+an empirical rejection probability and, when hazard ratios vary over time,
+need not equal the conditional rejection probability under the specified
+piecewise survival model. The default event-number recalculation uses the
+same working model; a custom <code>calcEventsFunction</code> can define a different
+recalculation rule.</p>
     </div>
     <div class="section level2">
     <h2 id="how-to-get-help-for-generic-functions">How to get help for generic functions<a class="anchor" aria-label="anchor" href="#how-to-get-help-for-generic-functions"></a></h2>
@@ -457,6 +492,25 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 <span class="r-in"><span>    maxNumberOfSubjects <span class="op">=</span> <span class="fl">400</span>, accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fl">20</span>, maxNumberOfIterations <span class="op">=</span> <span class="fl">50</span>,</span></span>
 <span class="r-in"><span>    simulationType <span class="op">=</span> <span class="st">"patientWise"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Piecewise exponential event times in two disjoint subgroups</span></span></span>
+<span class="r-in"><span><span class="va">piecewiseTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="getPiecewiseEnrichmentSurvivalTime.html">getPiecewiseEnrichmentSurvivalTime</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    piecewiseSurvivalTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    lambdaControls <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>S <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.08</span>, <span class="fl">0.12</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.09</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    hazardRatios <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        favorable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>S <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.65</span>, <span class="fl">0.55</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        conservative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>S <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.7</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">effectListPiecewise</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    subGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"S"</span>, <span class="st">"R"</span><span class="op">)</span>, prevalences <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.6</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    piecewiseSurvivalTime <span class="op">=</span> <span class="va">piecewiseTime</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">simulationResultsPiecewise</span> <span class="op">&lt;-</span> <span class="fu">getSimulationEnrichmentSurvival</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    design <span class="op">=</span> <span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span><span class="op">)</span>, simulationType <span class="op">=</span> <span class="st">"patientWise"</span>,</span></span>
+<span class="r-in"><span>    effectList <span class="op">=</span> <span class="va">effectListPiecewise</span>, directionUpper <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>    plannedEvents <span class="op">=</span> <span class="fl">80</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">300</span>,</span></span>
+<span class="r-in"><span>    accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">12</span><span class="op">)</span>, accrualIntensity <span class="op">=</span> <span class="fl">25</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfIterations <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

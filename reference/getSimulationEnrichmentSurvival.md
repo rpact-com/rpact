@@ -111,7 +111,14 @@ getSimulationEnrichmentSurvival(
 
   List of subsets, prevalences, and effect sizes with columns and number
   of rows reflecting the different situations to consider (see
-  examples).
+  examples). For a piecewise exponential patient-wise survival
+  simulation, specify `subGroups`, `prevalences`, and
+  `piecewiseSurvivalTime`, where the latter is a
+  `PiecewiseEnrichmentSurvivalTime` object created by
+  [`getPiecewiseEnrichmentSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseEnrichmentSurvivalTime.md).
+  Its subgroup names and the order of `subGroups` must agree. In this
+  case, do not also specify `piControls`, `piTreatments`, or
+  `hazardRatios`.
 
 - kappa:
 
@@ -385,7 +392,19 @@ assumptions. If `simulationType = "testStatisticBased"`, normally
 distributed log-rank test statistics are simulated instead. The default
 `simulationType = "auto"` selects the patient-wise approach if
 patient-wise-specific arguments were explicitly specified; otherwise the
-test-statistic-based approach is used for backward compatibility.
+test-statistic-based approach is used for backward compatibility. After
+a population selection, each subsequent patient-wise analysis targets
+the planned increase in events among the selected subgroups. Events
+already observed in those subgroups at the preceding analysis count
+toward the target.
+
+For piecewise exponential event times, include a
+`PiecewiseEnrichmentSurvivalTime` object in
+`effectList$piecewiseSurvivalTime`. Its hazard ratios are represented as
+a subgroup-by-interval-by-situation array; equivalently, they can be
+supplied to the constructor as a named list of subgroup-by-interval
+matrices. The situation dimension changes slowest, so printing the
+object displays one subgroup-by-interval matrix for each situation.
 
 The definition of `thetaH1` makes only sense if `kMax` \> 1 and if
 `conditionalPower`, `minNumberOfEventsPerStage`, and
@@ -400,6 +419,23 @@ function might depend on the variables `stage`, `selectedPopulations`,
 `conditionalPower`, `conditionalCriticalValue`, and `overallEffects`.
 The function has to contain the three-dots argument '...' (see
 examples).
+
+## Conditional power under piecewise hazards
+
+Conditional power is calculated using a scalar hazard ratio estimated
+from the interim data or specified through `thetaH1`. The calculation
+uses a proportional-hazards working model, including when survival times
+are generated from piecewise hazards with interval-specific hazard
+ratios. The interval-specific hazards are not used to project future
+test-statistic drift in this calculation.
+
+Accordingly, `conditionalPowerAchieved` reports conditional power under
+the scalar effect assumption for the selected number of events. It is
+not an empirical rejection probability and, when hazard ratios vary over
+time, need not equal the conditional rejection probability under the
+specified piecewise survival model. The default event-number
+recalculation uses the same working model; a custom `calcEventsFunction`
+can define a different recalculation rule.
 
 ## How to get help for generic functions
 
@@ -464,5 +500,24 @@ simulationResultsNonInferiority <- getSimulationEnrichmentSurvival(
     maxNumberOfSubjects = 400, accrualTime = c(0, 20),
     accrualIntensity = 20, maxNumberOfIterations = 50,
     simulationType = "patientWise")
+
+# Piecewise exponential event times in two disjoint subgroups
+piecewiseTime <- getPiecewiseEnrichmentSurvivalTime(
+    piecewiseSurvivalTime = c(0, 6),
+    lambdaControls = rbind(S = c(0.08, 0.12), R = c(0.05, 0.09)),
+    hazardRatios = list(
+        favorable = rbind(S = c(0.65, 0.55), R = c(0.9, 0.8)),
+        conservative = rbind(S = c(0.8, 0.7), R = c(1, 0.9))
+    )
+)
+effectListPiecewise <- list(
+    subGroups = c("S", "R"), prevalences = c(0.4, 0.6),
+    piecewiseSurvivalTime = piecewiseTime)
+simulationResultsPiecewise <- getSimulationEnrichmentSurvival(
+    design = getDesignFixed(), simulationType = "patientWise",
+    effectList = effectListPiecewise, directionUpper = FALSE,
+    plannedEvents = 80, maxNumberOfSubjects = 300,
+    accrualTime = c(0, 12), accrualIntensity = 25,
+    maxNumberOfIterations = 50)
 } # }
 ```

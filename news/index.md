@@ -75,30 +75,12 @@
   provided solely to validate that this derived direction is consistent
   with a `directionUpper` value that may already have been set in the
   design.
-- Added
-  [`getDesignOptimalConditionalError()`](https://docs.rpact.org/reference/getDesignOptimalConditionalError.md)
-  for adaptive two-stage trials, with p-value boundaries
-  `efficacyBounds` and `futilityBounds`, planning effects `thetaH1` and
-  `thetaLR`, and explicit boundary scales.
-  [`getConditionalError()`](https://docs.rpact.org/reference/getConditionalError.md)
-  evaluates interim conditional errors;
-  [`getStageInformation()`](https://docs.rpact.org/reference/getStageInformation.md)
-  provides conditional or expected additional information.
-  [`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.md)
-  evaluates power and stage-wise stopping probabilities at specified
-  `theta` values. Diagnostic plots have descriptive type names. The
-  methods follow Brannath and Bauer (2004)
-  [doi:10.1111/j.0006-341X.2004.00221.x](https://doi.org/10.1111/j.0006-341X.2004.00221.x)
-  and Brannath et al. (2024)
-  [doi:10.48550/arXiv.2402.00814](https://doi.org/10.48550/arXiv.2402.00814),
-  also available in [optconerrf on
-  CRAN](https://CRAN.R-project.org/package=optconerrf). The new vignette
-  `rpact_optimal_conditional_error` and expanded help examples cover
-  trial decisions, information constraints, interim estimates, weighted
-  alternatives, and conditional power functions.
 
 ### Improvements, issues, and changes
 
+- [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md)
+  now removes duplicate precondition blocks while preserving complete
+  user-defined function bodies and pipe chains.
 - Issue [\#118](https://github.com/rpact-com/rpact/issues/118) fixed
 - Several improvements and refactorings, focusing on enhanced error
   handling, improved naming conventions, and more consistent function

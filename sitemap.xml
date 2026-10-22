@@ -74,8 +74,6 @@
 <url><loc>https://docs.rpact.org/reference/TrialDesignFixed.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignGroupSequential.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignInverseNormal.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/TrialDesignOptimalConditionalError.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/TrialDesignOptimalConditionalErrorCharacteristics.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignPlan.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignPlanCountData.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignPlanMeans.html</loc></url>
@@ -114,7 +112,6 @@
 <url><loc>https://docs.rpact.org/reference/getAvailablePlotTypes.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getClosedCombinationTestResults.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getClosedConditionalDunnettTestResults.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/getConditionalError.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getConditionalPower.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getConditionalRejectionProbabilities.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getData.html</loc></url>
@@ -125,7 +122,6 @@
 <url><loc>https://docs.rpact.org/reference/getDesignFixed.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getDesignGroupSequential.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getDesignInverseNormal.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/getDesignOptimalConditionalError.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getDesignSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getEventProbabilities.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getFinalConfidenceInterval.html</loc></url>
@@ -144,6 +140,9 @@
 <url><loc>https://docs.rpact.org/reference/getParameterName.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getParameterType.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getPerformanceScore.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/getPiecewiseEnrichmentSurvivalTime.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/getPiecewiseHazardRatioArray.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/getPiecewiseMultiArmSurvivalTime.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getPiecewiseSurvivalTime.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getPlotSettings.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getPowerAndAverageSampleNumber.html</loc></url>
@@ -168,7 +167,6 @@
 <url><loc>https://docs.rpact.org/reference/getSimulationMultiArmSurvival.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationRates.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationSurvival.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/getStageInformation.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getStageResults.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSystemIdentifier.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getTestActions.html</loc></url>
@@ -223,6 +221,7 @@
 <url><loc>https://docs.rpact.org/reference/param_dropoutRate2.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_dropoutTime.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_effectList.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/param_effectList_enrichment_survival.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_effectMatrix.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_effectMeasure.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_efficacyBoundsOCEF.html</loc></url>
@@ -292,6 +291,7 @@
 <url><loc>https://docs.rpact.org/reference/param_pi2_survival.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_piControl.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_piecewiseSurvivalTime.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/param_piecewiseSurvivalTime_multiarm.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_plannedCalendarTime.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_plannedEvents.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_plannedSubjects.html</loc></url>
@@ -345,7 +345,6 @@
 <url><loc>https://docs.rpact.org/reference/plot.StageResults.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/plot.SummaryFactory.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/plot.TrialDesign.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/plot.TrialDesignOptimalConditionalError.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/plot.TrialDesignPlan.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/plot.TrialDesignSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/plot.TrialDesignSummaries.html</loc></url>
@@ -356,7 +355,6 @@
 <url><loc>https://docs.rpact.org/reference/print.ParameterSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/print.SummaryFactory.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/print.TrialDesignCharacteristics.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/print.TrialDesignOptimalConditionalError.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/print.TrialDesignSummaries.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/printCitation.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/rawDataTwoArmNormal.html</loc></url>
@@ -374,7 +372,6 @@
 <url><loc>https://docs.rpact.org/reference/summary.Dataset.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/summary.FutilityBounds.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/summary.ParameterSet.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/summary.TrialDesignOptimalConditionalError.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/summary.TrialDesignSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/testPackage.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/test_plan_section.html</loc></url>

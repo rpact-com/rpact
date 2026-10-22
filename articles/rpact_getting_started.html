@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9321</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9323</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,7 @@
                         <h4 data-toc-skip class="author">Friedrich
 Pahlke and Gernot Wassmer</h4>
             
-            <h4 data-toc-skip class="date">2026-09-24</h4>
+            <h4 data-toc-skip class="date">2026-10-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/main/vignettes/rpact_getting_started.Rmd" class="external-link"><code>vignettes/rpact_getting_started.Rmd</code></a></small>
       <div class="d-none name"><code>rpact_getting_started.Rmd</code></div>
@@ -71,37 +71,69 @@ Pahlke and Gernot Wassmer</h4>
 
     
     
-<p><strong>Confirmatory Adaptive Clinical Trial Design, Simulation, and
+<p><strong>Confirmatory Adaptive Clinical Trial Design and
 Analysis</strong></p>
+<p><code>rpact</code> supports the design, simulation, and analysis of
+confirmatory clinical trials, from standard fixed-sample planning to
+group sequential and adaptive methods. Sample size and power planning
+and simulation are available for continuous, binary, survival
+(time-to-event), and count data endpoints.</p>
 <div class="section level2">
 <h2 id="functional-range">Functional Range<a class="anchor" aria-label="anchor" href="#functional-range"></a>
 </h2>
+<div class="section level3">
+<h3 id="sample-size-and-power-planning">Sample size and power planning<a class="anchor" aria-label="anchor" href="#sample-size-and-power-planning"></a>
+</h3>
 <ul>
-<li>Fixed sample design and designs with interim analysis stages</li>
-<li>Sample size and power calculation for
+<li>Standard fixed-sample designs without interim analyses</li>
+<li>Classical group sequential designs with planned interim
+analyses</li>
+<li>Sample size and power calculations for
 <ul>
-<li>means (continuous endpoint)</li>
-<li>rates (binary endpoint)</li>
-<li>survival trials with flexible recruitment and survival time
-options</li>
-<li>count data</li>
+<li>means (continuous endpoints)</li>
+<li>rates (binary endpoints)</li>
+<li>survival (time-to-event) endpoints with flexible recruitment and
+survival-time options</li>
+<li>count data endpoints</li>
 </ul>
 </li>
-<li>Simulation tool for means, rates, survival data, and count data
+</ul>
+</div>
+<div class="section level3">
+<h3 id="simulation-and-adaptive-trial-design">Simulation and adaptive trial design<a class="anchor" aria-label="anchor" href="#simulation-and-adaptive-trial-design"></a>
+</h3>
 <ul>
-<li>Assessment of adaptive sample size/event number recalculations based
-on conditional power</li>
-<li>Assessment of treatment selection strategies in multi-arm
-trials</li>
+<li>Power and operating-characteristic simulations for means, rates,
+survival data, and count data</li>
+<li>Assessment of adaptive sample size or event-number reassessment
+based on conditional power</li>
+<li>Multi-stage adaptive hypothesis testing based on the combination
+testing principle</li>
+<li>Assessment of treatment selection strategies in multi-arm trials,
+including multi-arm multi-stage (MAMS) settings for means, rates, and
+survival endpoints</li>
+<li>Simulation and analysis methods for population enrichment designs
+with means, rates, and hazard ratios</li>
 </ul>
+</div>
+<div class="section level3">
+<h3 id="analysis-and-trial-conduct">Analysis and trial conduct<a class="anchor" aria-label="anchor" href="#analysis-and-trial-conduct"></a>
+</h3>
+<ul>
+<li>Confirmatory analysis for means and rates in one-arm and two-arm
+trials, and for survival endpoints in treatment comparisons</li>
+<li>Multi-arm and population enrichment analysis for means, rates, and
+survival endpoints</li>
+<li>Analysis of general estimates and standard errors supplied through
+<code>getDataset(est = ..., se = ...)</code>
 </li>
-<li>Adaptive analysis of means, rates, and survival data</li>
-<li>Adaptive designs and analysis for multi-arm trials</li>
-<li>Adaptive analysis and simulation tools for enrichment design testing
-means, rates, and hazard ratios</li>
-<li>Automatic boundary recalculations during the trial for analysis with
-alpha spending approach, including under- and over-running</li>
+<li>Support for fixed-sample designs, classical group sequential
+designs, and adaptive multi-arm multi-stage (MAMS) designs based on the
+inverse normal or Fisher combination test</li>
+<li>Automatic boundary recalculation during a trial using alpha-spending
+approaches, including under- and over-running</li>
 </ul>
+</div>
 </div>
 <div class="section level2">
 <h2 id="learn-to-use-rpact">Learn to use rpact<a class="anchor" aria-label="anchor" href="#learn-to-use-rpact"></a>
@@ -109,7 +141,7 @@ alpha spending approach, including under- and over-running</li>
 <p>We recommend three ways to learn how to use <code>rpact</code>:</p>
 <blockquote>
 <ol style="list-style-type: decimal">
-<li>Use RPACT Cloud: <a href="https://rpact-cloud.share.connect.posit.cloud" class="external-link">rpact.cloud</a>
+<li>Use RPACT Cloud: <a href="https://demo.rpact.cloud" class="external-link">demo.rpact.cloud</a>
 </li>
 <li>Use the Vignettes: <a href="https://www.rpact.org/vignettes/" class="external-link">rpact.org/vignettes</a>
 </li>
@@ -120,14 +152,16 @@ alpha spending approach, including under- and over-running</li>
 <div class="section level3">
 <h3 id="rpact-cloud">RPACT Cloud<a class="anchor" aria-label="anchor" href="#rpact-cloud"></a>
 </h3>
-<p>A graphical user interface (GUI) for the rpact R package, designed to
-simplify its use through an intuitive interface: <a href="https://rpact-cloud.share.connect.posit.cloud" class="external-link">rpact.cloud</a></p>
+<p><strong>RPACT Cloud</strong> provides guided, browser-based access to
+selected <code>rpact</code> functionality, including study design,
+sample size calculation, simulation, and reporting, without requiring
+users to write R code: <a href="https://demo.rpact.cloud" class="external-link">demo.rpact.cloud</a>.</p>
 </div>
 <div class="section level3">
-<h3 id="vignettes">Vignettes<a class="anchor" aria-label="anchor" href="#vignettes"></a>
+<h3 id="vignettes-and-function-reference">Vignettes and function reference<a class="anchor" aria-label="anchor" href="#vignettes-and-function-reference"></a>
 </h3>
-<p>Developed for practical use: our collection of practical examples and
-use-cases, the so-called rpact vignettes, are hosted at <a href="https://www.rpact.org/vignettes/" class="external-link">rpact.org/vignettes</a></p>
+<p>Practical examples and tutorials are available at <a href="https://www.rpact.org/vignettes/" class="external-link">rpact.org/vignettes</a>. For
+function arguments, return values, and examples, see the <a href="https://docs.rpact.org">function reference</a>.</p>
 </div>
 </div>
 <div class="section level2">
@@ -136,35 +170,280 @@ use-cases, the so-called rpact vignettes, are hosted at <a href="https://www.rpa
 <div class="section level3">
 <h3 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
 </h3>
+<ol style="list-style-type: decimal">
+<li>Create a fixed-sample, group sequential, or adaptive design.</li>
+<li>Compare alternative designs with <code><a href="../reference/getDesignSet.html">getDesignSet()</a></code>.</li>
+<li>Calculate the required sample size with, for example,
+<code><a href="../reference/getSampleSizeMeans.html">getSampleSizeMeans()</a></code>, or evaluate power for a specified
+sample size with <code><a href="../reference/getPowerMeans.html">getPowerMeans()</a></code>.</li>
+<li>Assess operating characteristics and adaptation strategies using
+simulation, for example, <code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code>.</li>
+<li>Prepare aggregated trial data with <code><a href="../reference/getDataset.html">getDataset()</a></code> and
+analyze them with <code><a href="../reference/getAnalysisResults.html">getAnalysisResults()</a></code>.</li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="planning-example">Planning example<a class="anchor" aria-label="anchor" href="#planning-example"></a>
+</h3>
+<p>Plan a two-arm trial with a continuous endpoint, a one-sided
+significance level of 0.025, 90% power, and three analyses at 50%, 75%,
+and 100% of the planned information. Assume a mean difference of 0.5 and
+a common standard deviation of 1.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.rpact.org" class="external-link">rpact</a></span><span class="op">)</span></span>
+<span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span></span>
+<span>    kMax <span class="op">=</span> <span class="fl">3</span>, informationRates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.025</span>, beta <span class="op">=</span> <span class="fl">0.1</span>, sided <span class="op">=</span> <span class="fl">1</span>, typeOfDesign <span class="op">=</span> <span class="st">"OF"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">sampleSize</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getSampleSizeMeans.html">getSampleSizeMeans</a></span><span class="op">(</span></span>
+<span>    design <span class="op">=</span> <span class="va">design</span>, groups <span class="op">=</span> <span class="fl">2</span>, alternative <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>    stDev <span class="op">=</span> <span class="fl">1</span>, allocationRatioPlanned <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sampleSize</span><span class="op">)</span></span></code></pre></div>
+<p><em>Sample size calculation for a continuous endpoint</em></p>
+<p>Sequential analysis with a maximum of three looks (group sequential
+design), one-sided overall significance level 2.5%, power 90%. The
+results were calculated for a two-sample t-test, H0: mu(1) - mu(2) = 0,
+H1: effect = 0.5, standard deviation = 1.</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th>Stage</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Planned information rate</td>
+<td>50%</td>
+<td>75%</td>
+<td>100%</td>
+</tr>
+<tr class="even">
+<td>Cumulative alpha spent</td>
+<td>0.0021</td>
+<td>0.0105</td>
+<td>0.0250</td>
+</tr>
+<tr class="odd">
+<td>Stage levels (one-sided)</td>
+<td>0.0021</td>
+<td>0.0097</td>
+<td>0.0215</td>
+</tr>
+<tr class="even">
+<td>Efficacy boundary (z-value scale)</td>
+<td>2.863</td>
+<td>2.337</td>
+<td>2.024</td>
+</tr>
+<tr class="odd">
+<td>Efficacy boundary (t)</td>
+<td>0.631</td>
+<td>0.415</td>
+<td>0.309</td>
+</tr>
+<tr class="even">
+<td>Cumulative power</td>
+<td>0.2928</td>
+<td>0.6960</td>
+<td>0.9000</td>
+</tr>
+<tr class="odd">
+<td>Number of subjects</td>
+<td>86.9</td>
+<td>130.4</td>
+<td>173.8</td>
+</tr>
+<tr class="even">
+<td>Expected number of subjects under H1</td>
+<td>130.9</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Stopping probability</td>
+<td>0.6960</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Efficacy stopping probability by stage (under H0)</td>
+<td>0.0021</td>
+<td>0.0084</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Efficacy stopping probability by stage</td>
+<td>0.2928</td>
+<td>0.4033</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Legend:</p>
 <ul>
-<li>Everything is starting with a design, e.g.:
-<code>design &lt;- getDesignGroupSequential()</code>
-</li>
-<li>Find the optimal design parameters with help of <a href="https://cran.r-project.org/package=rpact" class="external-link">rpact</a> comparison
-tools: <code>getDesignSet</code>
-</li>
-<li>Calculate the required sample size, e.g.:
-<code><a href="../reference/getSampleSizeMeans.html">getSampleSizeMeans()</a></code>, <code><a href="../reference/getPowerMeans.html">getPowerMeans()</a></code>
-</li>
-<li>Simulate specific characteristics of an adaptive design, e.g.:
-<code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code>
-</li>
-<li>Collect your data, import it into R and create a dataset:
-<code>data &lt;- getDataset()</code>
-</li>
-<li>Analyze your data:
-<code>getAnalysisResults(design, data)</code>
-</li>
+<li>
+<em>(t)</em>: treatment effect scale</li>
 </ul>
+<p>For a design without interim analyses, use
+<code><a href="../reference/getDesignFixed.html">getDesignFixed()</a></code> instead.</p>
+</div>
+<div class="section level3">
+<h3 id="analysis-example">Analysis example<a class="anchor" aria-label="anchor" href="#analysis-example"></a>
+</h3>
+<p>The following illustrative data represent two independent groups at
+each of three stages. Sample sizes, means, and standard deviations are
+<strong>stage-wise</strong>: each entry describes only the new
+observations collected in that stage. The sample sizes are chosen for
+illustration, independently of the planning result above.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trialData</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDataset.html">getDataset</a></span><span class="op">(</span></span>
+<span>    sampleSizes1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">20</span>, <span class="fl">20</span><span class="op">)</span>, sampleSizes2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">20</span>, <span class="fl">20</span><span class="op">)</span>,</span>
+<span>    means1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">0.5</span><span class="op">)</span>, means2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    stDevs1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, stDevs2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">analysisResults</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getAnalysisResults.html">getAnalysisResults</a></span><span class="op">(</span></span>
+<span>    design <span class="op">=</span> <span class="va">design</span>, dataInput <span class="op">=</span> <span class="va">trialData</span>, directionUpper <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">analysisResults</span><span class="op">)</span></span></code></pre></div>
+<p><em>Analysis results for a continuous endpoint</em></p>
+<p>Sequential analysis with three looks (group sequential design),
+one-sided overall significance level 2.5%. The results were calculated
+using a two-sample t-test, equal variances option. H0: mu(1) - mu(2) = 0
+against H1: mu(1) - mu(2) &gt; 0.</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th>Stage</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Planned information rate</td>
+<td>50%</td>
+<td>75%</td>
+<td>100%</td>
+</tr>
+<tr class="even">
+<td>Cumulative alpha spent</td>
+<td>0.0021</td>
+<td>0.0105</td>
+<td>0.0250</td>
+</tr>
+<tr class="odd">
+<td>Stage levels (one-sided)</td>
+<td>0.0021</td>
+<td>0.0097</td>
+<td>0.0215</td>
+</tr>
+<tr class="even">
+<td>Efficacy boundary (z-value scale)</td>
+<td>2.863</td>
+<td>2.337</td>
+<td>2.024</td>
+</tr>
+<tr class="odd">
+<td>Cumulative effect size</td>
+<td>0.200</td>
+<td>0.233</td>
+<td>0.300</td>
+</tr>
+<tr class="even">
+<td>Cumulative (pooled) standard deviation</td>
+<td>1.000</td>
+<td>0.992</td>
+<td>0.991</td>
+</tr>
+<tr class="odd">
+<td>Overall test statistic</td>
+<td>0.894</td>
+<td>1.288</td>
+<td>1.914</td>
+</tr>
+<tr class="even">
+<td>Overall p-value</td>
+<td>0.1869</td>
+<td>0.1001</td>
+<td>0.0287</td>
+</tr>
+<tr class="odd">
+<td>Test action</td>
+<td>continue</td>
+<td>continue</td>
+<td>accept</td>
+</tr>
+<tr class="even">
+<td>Conditional rejection probability</td>
+<td>0.0252</td>
+<td>0.0337</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>95% repeated confidence interval</td>
+<td>[-0.459; 0.859]</td>
+<td>[-0.196; 0.663]</td>
+<td>[-0.020; 0.620]</td>
+</tr>
+<tr class="even">
+<td>Repeated p-value</td>
+<td>0.3515</td>
+<td>0.1719</td>
+<td>0.0338</td>
+</tr>
+<tr class="odd">
+<td>Final p-value</td>
+<td></td>
+<td></td>
+<td>0.0314</td>
+</tr>
+<tr class="even">
+<td>Final confidence interval</td>
+<td></td>
+<td></td>
+<td>[-0.016; 0.602]</td>
+</tr>
+<tr class="odd">
+<td>Median unbiased estimate</td>
+<td></td>
+<td></td>
+<td>0.294</td>
+</tr>
+</tbody>
+</table>
+<p>If the available summaries are cumulative, use the corresponding
+<code>cumulative</code> prefixes, such as
+<code>cumulativeSampleSizes1</code>, <code>cumulativeMeans1</code>, and
+<code>cumulativeStDevs1</code>. For survival data, cumulative event
+counts and log-rank statistics are commonly used; see
+<code><a href="../reference/getDataset.html">getDataset()</a></code> for the required inputs. Analysis results and
+the availability of confidence intervals depend on the chosen design and
+endpoint; see <code><a href="../reference/getAnalysisResults.html">getAnalysisResults()</a></code> for details.</p>
 </div>
 <div class="section level3">
 <h3 id="focus-on-usability">Focus on Usability<a class="anchor" aria-label="anchor" href="#focus-on-usability"></a>
 </h3>
+<p>The terms <em>survival</em> and <em>time-to-event</em> refer to the
+same endpoint type here. The corresponding function names use the suffix
+<code>Survival</code>.</p>
 <p>The most important <a href="https://cran.r-project.org/package=rpact" class="external-link">rpact</a> functions have
 intuitive names:</p>
 <ul>
 <li>
-<code>getDesign</code>[<code>GroupSequential</code>/<code>InverseNormal</code>/<code>Fisher</code>]<code>()</code>
+<code>getDesign</code>[<code>Fixed</code>/<code>GroupSequential</code>/<code>InverseNormal</code>/<code>Fisher</code>]<code>()</code>
 </li>
 <li><a href="https://docs.rpact.org/reference/getDesignCharacteristics.html"><code>getDesignCharacteristics()</code></a></li>
 <li>
@@ -174,8 +453,17 @@ intuitive names:</p>
 <code>getPower</code>[<code>Means</code>/<code>Rates</code>/<code>Survival</code>/<code>Counts</code>]<code>()</code>
 </li>
 <li>
-<code>getSimulation</code>[<code>MultiArm</code>/<code>Enrichment</code>][<code>Means</code>/<code>Rates</code>/<code>Survival</code>/<code>Counts</code>]<code>()</code>
+<code>getSimulation</code>[<code>Means</code>/<code>Rates</code>/<code>Survival</code>/<code>Counts</code>]<code>()</code>
 </li>
+<li>
+<code>getSimulationMultiArm</code>[<code>Means</code>/<code>Rates</code>/<code>Survival</code>]<code>()</code>
+</li>
+<li>
+<code>getSimulationEnrichment</code>[<code>Means</code>/<code>Rates</code>/<code>Survival</code>]<code>()</code>
+</li>
+<li>
+<code><a href="../reference/getDesignConditionalDunnett.html">getDesignConditionalDunnett()</a></code> for adaptive two-stage
+multi-arm designs</li>
 <li><a href="https://docs.rpact.org/reference/getDataset.html"><code>getDataset()</code></a></li>
 <li><a href="https://docs.rpact.org/reference/getAnalysisResults.html"><code>getAnalysisResults()</code></a></li>
 <li><a href="https://docs.rpact.org/reference/getStageResults.html"><code>getStageResults()</code></a></li>
@@ -186,10 +474,11 @@ it easy to use these functions.</p>
 <div class="section level3">
 <h3 id="r-generics">R generics<a class="anchor" aria-label="anchor" href="#r-generics"></a>
 </h3>
-<p>In general, everything runs with the R standard functions which are
-always present in R: so-called R generics, e.g., <code>print</code>,
-<code>summary</code>, <code>plot</code>, <code>as.data.frame</code>,
-<code>names</code>, <code>length</code></p>
+<p>Result objects support familiar R functions such as
+<code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>,
+<code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code>, <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code>, and
+<code><a href="https://rdrr.io/r/base/length.html" class="external-link">length()</a></code>. The available methods depend on the object class;
+see the corresponding function reference.</p>
 </div>
 <div class="section level3">
 <h3 id="utilities">Utilities<a class="anchor" aria-label="anchor" href="#utilities"></a>
@@ -215,57 +504,45 @@ Qualification of rpact</a>)</li>
 <div class="section level2">
 <h2 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a>
 </h2>
-<p>Please <a href="https://www.rpact.com/contact/" class="external-link">contact</a> us to
-learn how to use <code>rpact</code> on FDA/GxP-compliant validated
-corporate computer systems and how to get a copy of the formal
-validation documentation that is customized and licensed for exclusive
-use by your company, e.g., to fulfill regulatory requirements.</p>
+<p>For organizations using <code>rpact</code> in FDA/GxP-regulated
+environments, RPACT offers support and formal validation documentation
+for use on validated corporate computer systems. The documentation can
+be customized and licensed for exclusive use by your company to support
+applicable regulatory requirements.</p>
+<p>The validation documentation also contains the personal access data
+required to run the full test suite for installation qualification with
+<code><a href="../reference/testPackage.html">testPackage()</a></code>.</p>
+<blockquote>
+<p><a href="https://www.rpact.com/contact/" class="external-link">Contact RPACT</a> to learn
+more.</p>
+</blockquote>
 </div>
 <div class="section level2">
 <h2 id="rpact-connect">RPACT Connect<a class="anchor" aria-label="anchor" href="#rpact-connect"></a>
 </h2>
-<p>Connecting you to insights, downloads, and premium support: <a href="https://rpact-connect.share.connect.posit.cloud" class="external-link">connect.rpact.com</a></p>
+<p><strong>RPACT Connect</strong> provides access to insights,
+downloads, and premium support for users and organizations working with
+RPACT software: <a href="https://connect.rpact.app" class="external-link">connect.rpact.app</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="about">About<a class="anchor" aria-label="anchor" href="#about"></a>
 </h2>
-<ul>
-<li>
-<strong>rpact</strong> is a comprehensive validated<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The rpact validation documentation is available
-exclusively for our customers and supporting companies. For more
-information visit &lt;a href="https://www.rpact.com/services/service-level-agreement/" class="external-link"&gt;rpact.com/services/service-level-agreement&lt;/a&gt;&lt;/p&gt;'><sup>1</sup></a> R package for clinical
-research which
-<ul>
-<li>enables the design and analysis of confirmatory adaptive group
-sequential designs</li>
-<li>is a powerful sample size calculator</li>
-<li>is a free of charge open-source software licensed under <a href="https://cran.r-project.org/web/licenses/LGPL-3" class="external-link">LGPL-3</a>
-</li>
-<li>particularly, implements the methods described in the recent
-monograph by <a href="https://doi.org/10.1007%2F978-3-031-89669-9" class="external-link">Wassmer and Brannath
-(2025)</a>
-</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>For more information please visit <a href="https://www.rpact.org" class="external-link">rpact.org</a></p>
-</blockquote>
-<ul>
-<li>
-<strong>RPACT</strong> is a company which offers
-<ul>
-<li>enterprise software development services</li>
-<li>technical support for the <code>rpact</code> package</li>
-<li>consultancy and user training for clinical research using R</li>
-<li>validated software solutions and R package development for clinical
-research</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>For more information please visit <a href="https://www.rpact.com" class="external-link">rpact.com</a></p>
-</blockquote>
+<p><strong>rpact</strong> is free of charge and open source, licensed
+under <a href="https://cran.r-project.org/web/licenses/LGPL-3" class="external-link">LGPL-3</a>. It
+implements a broad range of methods described in the monograph by <a href="https://doi.org/10.1007/978-3-031-89669-9" class="external-link">Wassmer and Brannath
+(2025)</a>. Formal validation documentation is available to customers
+and supporting members through the <a href="https://www.rpact.com/services/service-level-agreement/" class="external-link">RPACT
+service level agreement</a>.</p>
+<p><strong>RPACT GmbH</strong> develops <strong>Statistical Tools for
+Drug Development</strong>. We develop and support R packages, Shiny
+applications, and cloud-based tools for clinical research, with services
+covering software development, validation, technical support,
+consulting, and training.</p>
+<p>Our products include <a href="https://cran.r-project.org/package=rpact" class="external-link">rpact</a> and <a href="https://demo.rpact.cloud" class="external-link">RPACT Cloud</a>. We also maintain and
+support <a href="https://www.rpact.com/products/r-package-crmpack/" class="external-link">crmPack</a>,
+the open-source package for dose escalation trial design, simulation,
+and analysis.</p>
+<p>For more information, visit <a href="https://www.rpact.com" class="external-link">www.rpact.com</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
@@ -275,7 +552,6 @@ research</li>
 <li><a href="https://www.rpact.com/contact/" class="external-link">rpact.com/contact</a></li>
 </ul>
 </div>
-
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

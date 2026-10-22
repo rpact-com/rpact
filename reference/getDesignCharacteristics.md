@@ -12,10 +12,7 @@ getDesignCharacteristics(design = NULL, ...)
 
 - design:
 
-  A conventional `TrialDesign` object or an optimal conditional error
-  design created with
-  [`getDesignOptimalConditionalError()`](https://docs.rpact.org/reference/getDesignOptimalConditionalError.md).
-  If omitted, a default conventional design is created.
+  A design object. If omitted, a default design is created.
 
 - ...:
 
@@ -24,18 +21,7 @@ getDesignCharacteristics(design = NULL, ...)
 
 ## Value
 
-For an optimal conditional error design, a
-`TrialDesignOptimalConditionalErrorCharacteristics` parameter set with
-`theta`, `overallReject`, `rejectPerStage` (two rows, one per stage),
-and `futilityPerStage` (one row for interim futility). Matrix columns
-correspond to entries in `theta`, including for a single effect. Final
-non-rejection is not counted as early futility. `overallReject` is
-overall power under an alternative and the type I error probability at
-`theta = 0`. See
-[`getDesignOptimalConditionalError()`](https://docs.rpact.org/reference/getDesignOptimalConditionalError.md)
-for the method and its assumptions.
-
-For conventional designs, returns a
+Returns a
 [`TrialDesignCharacteristics`](https://docs.rpact.org/reference/TrialDesignCharacteristics.md)
 object. The following generics (R generic functions) are available for
 this result object:
@@ -118,22 +104,6 @@ Other design functions:
 ## Examples
 
 ``` r
-design <- getDesignOptimalConditionalError(
-    alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
-    thetaH1 = 0.5, useInterimEstimate = FALSE, firstStageInformation = 4,
-    likelihoodRatioDistribution = "maxlr"
-)
-getDesignCharacteristics(design, theta = c(0, 0.25, 0.5))
-#> User defined parameters:
-#>   Effect                      : 0.00, 0.25, 0.50 
-#> 
-#> Operating characteristics:
-#>   Overall reject              : 0.0250, 0.2927, 0.7590 
-#>   Reject per stage [1]        : 0.001000, 0.004796, 0.018298 
-#>   Reject per stage [2]        : 0.024000, 0.287861, 0.740742 
-#>   Futility stop per stage     : 0.5000, 0.3085, 0.1587 
-#> 
-
 if (FALSE) { # \dontrun{
 # Calculate design characteristics for a three-stage O'Brien & Fleming 
 # design at power 90% and compare it with Pocock's design.  

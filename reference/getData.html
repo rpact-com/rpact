@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9321</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9323</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,7 +99,12 @@ the arm to continue, conditional on the trial not stopping; it is <code>NA</code
 the final stage. In contrast,
 <code>rejectPerStage</code> indicates rejection of the arm's null hypothesis, while
 <code>futilityPerStage</code> is a trial-level futility-stopping decision repeated for
-the arm rows of the stage.</p>
+the arm rows of the stage.
+For piecewise multi-arm survival simulations, <code>scenario</code> identifies the
+situation by its one-based position in <code>piecewiseSurvivalTime$hazardRatios</code>.
+It matches <code>scenario</code> in <code><a href="getRawData.html">getRawData()</a></code> and remains distinct when
+situations have identical first-interval effects. The <code>effect</code> and
+<code>omegaMax</code> columns describe the first interval only.</p>
     </div>
 
     <div class="section level2">

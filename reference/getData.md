@@ -99,7 +99,12 @@ selected the arm to continue, conditional on the trial not stopping; it
 is `NA` at the final stage. In contrast, `rejectPerStage` indicates
 rejection of the arm's null hypothesis, while `futilityPerStage` is a
 trial-level futility-stopping decision repeated for the arm rows of the
-stage.
+stage. For piecewise multi-arm survival simulations, `scenario`
+identifies the situation by its one-based position in
+`piecewiseSurvivalTime$hazardRatios`. It matches `scenario` in
+[`getRawData()`](https://docs.rpact.org/reference/getRawData.md) and
+remains distinct when situations have identical first-interval effects.
+The `effect` and `omegaMax` columns describe the first interval only.
 
 ## Examples
 

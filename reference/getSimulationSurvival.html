@@ -9,7 +9,7 @@ for testing the hazard ratio in a two treatment groups survival design."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9321</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9323</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -435,6 +435,24 @@ You can later retrieve these datasets with <code><a href="getRawData.html">getRa
 <p>The value is an <em>upper bound per stage</em>, not a fixed count. The actual number of datasets stored can be smaller because:</p><ul><li><p>Some iterations stop early (e.g., at stage 1), so later stages receive fewer datasets.</p></li>
 <li><p>The simulation might finish before reaching the cap due to other stopping or iteration limits.</p></li>
 </ul><p>As a result, the number specified is the <strong>maximum possible</strong> datasets saved <em>per stage</em>, not the exact number.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="conditional-power-under-piecewise-hazards">Conditional power under piecewise hazards<a class="anchor" aria-label="anchor" href="#conditional-power-under-piecewise-hazards"></a></h2>
+
+
+<p>Conditional power is calculated using a scalar hazard ratio estimated from
+the interim data or specified through <code>thetaH1</code>. The calculation uses
+a proportional-hazards working model, including when survival times are
+generated from piecewise hazards with interval-specific hazard ratios.
+The interval-specific hazards are not used to project future test-statistic
+drift in this calculation.</p>
+<p>Accordingly, <code>conditionalPowerAchieved</code> reports conditional power under
+the scalar effect assumption for the selected number of events. It is not
+an empirical rejection probability and, when hazard ratios vary over time,
+need not equal the conditional rejection probability under the specified
+piecewise survival model. The default event-number recalculation uses the
+same working model; a custom <code>calcEventsFunction</code> can define a different
+recalculation rule.</p>
     </div>
     <div class="section level2">
     <h2 id="how-to-get-help-for-generic-functions">How to get help for generic functions<a class="anchor" aria-label="anchor" href="#how-to-get-help-for-generic-functions"></a></h2>
