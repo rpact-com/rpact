@@ -2,6 +2,8 @@
 
 ## New features
 
+* The expert option `rpact.repeated.pvalues.cap.enabled = FALSE` (or environment variable `RPACT_REPEATED_PVALUES_CAP_ENABLED=FALSE`) extends the repeated p-value search from 0.5 to `1 - tolerance`. The cap remains enabled by default. One-sided boundary searches now support negative critical values at alpha above 0.5.
+
 * The expert option `rpact.validate.alpha.enabled = FALSE` (or environment variable `RPACT_VALIDATE_ALPHA_ENABLED=FALSE`) disables the alpha validated-range check and its warning. The default remains enabled, and alpha must still be strictly between 0 and 1.
 
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.

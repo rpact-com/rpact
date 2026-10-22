@@ -1830,8 +1830,8 @@ getParameterName <- function(obj, parameterCaption) {
                     sigma = sigma, eps = 1e-06
                 )[1] - (1 - alpha))
             },
-            lower = -8,
-            upper = 8,
+            lower = -C_UPPER_BOUNDS_DEFAULT,
+            upper = C_UPPER_BOUNDS_DEFAULT,
             tolerance = 1e-06,
             callingFunctionInformation = ".getMultivariateDistribution",
             suppressWarnings = FALSE,
@@ -1851,8 +1851,8 @@ getParameterName <- function(obj, parameterCaption) {
                     eps = eps, sigma = sigma, df = df
                 )[1] - (1 - alpha))
             },
-            lower = -8,
-            upper = 8,
+            lower = -C_UPPER_BOUNDS_DEFAULT,
+            upper = C_UPPER_BOUNDS_DEFAULT,
             tolerance = 1e-06,
             callingFunctionInformation = ".getMultivariateDistribution",
             suppressWarnings = FALSE,
@@ -1956,8 +1956,28 @@ getParameterName <- function(obj, parameterCaption) {
     ))
 }
 
-.getCriticalValues <- function(design, indices = NULL) {
-    criticalValues <- abs(design$criticalValues)
+.usesSignedCriticalValues <- function(sided, alpha) {
+    return(isTRUE(sided == 1 && alpha > 0.5))
+}
+
+.getCriticalValueSearchLowerBound <- function(design) {
+    if (.usesSignedCriticalValues(design$sided, design$alpha)) {
+        return(-C_UPPER_BOUNDS_DEFAULT)
+    }
+    return(0)
+}
+
+.getCriticalValues <- function(design, indices = NULL, normalizeDirection = TRUE) {
+    criticalValues <- design$criticalValues
+    if (!.usesSignedCriticalValues(design$sided, design$alpha)) {
+        criticalValues <- abs(criticalValues)
+    } else if (normalizeDirection) {
+        # Large one-sided alpha can require negative boundaries. Preserve their
+        # signs, reversing only the display direction of a lower alternative.
+        criticalValues <- .applyDirectionOfAlternative(criticalValues,
+            design$directionUpper, type = "negateIfLower"
+        )
+    }
     if (!is.null(indices)) {
         return(criticalValues[indices])
     }

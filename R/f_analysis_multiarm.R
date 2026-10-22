@@ -540,7 +540,7 @@ getClosedCombinationTestResults <- function(stageResults) {
             if (!is.na(stageResults$testStatistics[g, 2])) {
                 prec <- 1
                 lower <- tolerance
-                upper <- 0.5
+                upper <- .getRepeatedPValuesUpperBound(tolerance)
                 maxSearchIterations <- 30
                 while (prec > tolerance && maxSearchIterations >= 0) {
                     alpha <- (lower + upper) / 2
@@ -596,7 +596,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                         futilityBounds = futilityBounds,
                         bindingFutility = design$bindingFutility
                     )$alphaSpent[kMax - 1] + tolerance
-                    upper <- 0.5
+                    upper <- .getRepeatedPValuesUpperBound(tolerance)
                     maxSearchIterations <- 30
                     while (prec > tolerance && maxSearchIterations >= 0) {
                         alpha <- (lower + upper) / 2
@@ -656,7 +656,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                 if (!is.na(stageResults$testStatistics[g, k])) {
                     prec <- 1
                     lower <- tolerance
-                    upper <- 0.5
+                    upper <- .getRepeatedPValuesUpperBound(tolerance)
                     maxSearchIterations <- 30
                     while (prec > tolerance && maxSearchIterations >= 0) {
                         alpha <- (lower + upper) / 2
@@ -680,7 +680,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                                 gammaB = design$gammaB,
                                 deltaPT0 = design$deltaPT0,
                                 deltaPT1 = design$deltaPT1,
-                                beta = design$beta,
+                                beta = .getRepeatedPValuesBeta(design, typeOfDesign, typeBetaSpending),
                                 gammaA = design$gammaA,
                                 futilityBounds = futilityBounds,
                                 sided = design$sided,

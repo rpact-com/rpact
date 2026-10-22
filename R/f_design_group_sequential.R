@@ -592,7 +592,11 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 }
 
 .calculateAlphaSpent <- function(design) {
-    criticalValues <- .getCriticalValues(design)
+    # Spending constructors have already applied the direction at this point;
+    # other constructors still contain boundaries for the upper alternative.
+    criticalValues <- .getCriticalValues(design,
+        normalizeDirection = .isAlphaSpendingDesignType(design$typeOfDesign)
+    )
     futilityBounds <- .getFutilityBounds(design)
 
     if (design$sided == 2) {
@@ -676,7 +680,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
                 return(sum(probs[3, ] - probs[2, ]) - design$alpha)
             }
         },
-        lower = 0, upper = 8, tolerance = design$tolerance,
+        lower = .getCriticalValueSearchLowerBound(design),
+        upper = C_UPPER_BOUNDS_DEFAULT, tolerance = design$tolerance,
         callingFunctionInformation = ".getDesignGroupSequentialHaybittleAndPeto"
     )
 
@@ -1921,7 +1926,9 @@ getDesignInverseNormal <- function(
         }
     }
 
-    design$stageLevels <- 1 - stats::pnorm(.getCriticalValues(design))
+    design$stageLevels <- 1 - stats::pnorm(.getCriticalValues(design,
+        normalizeDirection = .isAlphaSpendingDesignType(design$typeOfDesign)
+    ))
     design$.setParameterType("stageLevels", C_PARAM_GENERATED)
 
     if (design$kMax == 1) {
@@ -1954,6 +1961,11 @@ getDesignInverseNormal <- function(
     design$criticalValues[!is.na(design$criticalValues) & design$criticalValues <= -7.5] <- -Inf
     design$criticalValues[!is.na(design$criticalValues) & design$criticalValues >= 7.5] <- Inf
 
+    if (.usesSignedCriticalValues(design$sided, design$alpha) &&
+            .isAlphaSpendingDesignType(design$typeOfDesign)) {
+        # Spending constructors have already applied the alternative direction.
+        design$criticalValues <- .getCriticalValues(design)
+    }
     design$criticalValues <- .applyDirectionOfAlternative(design$criticalValues,
         directionUpper,
         type = "negateIfLower", phase = "design"

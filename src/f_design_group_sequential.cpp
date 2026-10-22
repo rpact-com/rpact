@@ -49,6 +49,11 @@ const String C_TYPE_OF_DESIGN_AS_HSD = "asHSD";
 const String C_TYPE_OF_DESIGN_BS_HSD = "bsHSD";
 const String C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY = "noEarlyEfficacy";
 
+// One-sided designs above alpha = 0.5 may need negative critical values.
+double getCriticalValueSearchLowerBound(double sided, double alpha) {
+    return sided == 1 && alpha > 0.5 ? -C_UPPER_BOUNDS_DEFAULT : 0.0;
+}
+
 //' @title Normal density (fast internal)
 //' @description Compute the Gaussian probability density function (PDF) for a
 //'              single point using a minimal implementation (no R overhead).
@@ -557,7 +562,7 @@ List getDesignGroupSequentialPampallonaTsiatisCpp(double tolerance, double beta,
 				}
 
 				return size - alpha;
-			}, 0, 10, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+			}, getCriticalValueSearchLowerBound(sided, alpha), 10, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 
 			for (int i = 0; i < rows; i++) {
 				helper.row(i) = sqrtInformationRates * delst;
@@ -839,7 +844,7 @@ double getCriticalValue(int k, NumericVector criticalValues, NumericVector userA
 		NumericMatrix decisionMatrix = getDecisionMatrix(criticalValuesTemp, futilityBounds, bindingFutility, sided, k);
 		NumericMatrix probs = getGroupSequentialProbabilitiesCpp(decisionMatrix, rangeVector(informationRates, 0, k - 1));
 		return getZeroApproximation(probs, alphaSpendingValue, sided);
-	}, 0.0, 8.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+	}, getCriticalValueSearchLowerBound(sided, alpha), C_UPPER_BOUNDS_DEFAULT, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 
 	return criticalValue;
 }
@@ -954,7 +959,7 @@ NumericVector getDesignGroupSequentialDeltaWTCpp(int kMax, double alpha, double 
 		NumericMatrix decisionMatrix = getDecisionMatrix(criticalValues, futilityBounds, bindingFutility, sided);
 		NumericMatrix probs = getGroupSequentialProbabilitiesCpp(decisionMatrix, informationRates);
 		return getZeroApproximation(probs, alpha, sided);
-	}, 0.0, 8.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+	}, getCriticalValueSearchLowerBound(sided, alpha), C_UPPER_BOUNDS_DEFAULT, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 
 	for (int k = 0; k < kMax; k++) {
 		criticalValues[k] = scale * pow((double) informationRates[k], deltaWT - 0.5);
@@ -1300,7 +1305,7 @@ double getFutilityBoundTwoSided(int k, NumericVector betaSpendingValues, Numeric
 			[&](double u) {
 				return getNormalDistribution(u - sqrt((double) informationRates[0]) * shift)
 					- getNormalDistribution(-u - sqrt((double) informationRates[0]) * shift) - betaSpendingValues[0];
-			}, -8.0, 8.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+			}, -C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 		if (futilityBound > criticalValues[0]) {
 			futilityBound = criticalValues[0];
 		}
@@ -1411,7 +1416,7 @@ double getCriticalValueTwoSided(int kMax, int k, NumericVector criticalValues, N
 		decisionMatrix(3, _) = criticalValuesTemp;
 		NumericMatrix probs = getGroupSequentialProbabilitiesCpp(decisionMatrix(_, Range(0, k - 1)), informationRates[Range(0, k - 1)]);
 		return sum(probs(4, _) - probs(3, _) + probs(0, _)) - alphaSpendingValue;
-	}, 0.0, 8.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+	}, 0.0, C_UPPER_BOUNDS_DEFAULT, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 
 	return criticalValue;
 }

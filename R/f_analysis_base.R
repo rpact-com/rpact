@@ -1049,6 +1049,18 @@ getConditionalPower <- function(
 #'
 #' The repeated p-values are provided up to the specified stage.
 #'
+#' By default, sequential repeated p-value searches are capped at 0.5.
+#' Experts can extend the search to \code{1 - tolerance} with
+#' \code{options(rpact.repeated.pvalues.cap.enabled = FALSE)} or the environment
+#' variable \code{RPACT_REPEATED_PVALUES_CAP_ENABLED=FALSE}. The environment
+#' variable takes precedence over the option. This does not extend the validated
+#' alpha range; see \code{options(rpact.validate.alpha.enabled = FALSE)} to
+#' disable the corresponding validated-range warnings separately. Values near
+#' the numerical search limits need not correspond to an attained root. In particular,
+#' some spending rules cannot reject a given observed result at an interim stage
+#' for any global alpha below 1. The returned value near 1 is then a numerical
+#' endpoint approximation, rather than a solution of the boundary equation.
+#'
 #' In multi-arm trials, the repeated p-values are defined separately for each
 #' treatment comparison within the closed testing procedure.
 #'
@@ -1725,6 +1737,35 @@ getFinalConfidenceInterval <- function(
 }
 
 #
+# Numerical search limit shared by the repeated p-value methods.
+#
+.getRepeatedPValuesUpperBound <- function(tolerance) {
+    if (.getEnvironmentVariable(
+        "RPACT_REPEATED_PVALUES_CAP_ENABLED",
+        "rpact.repeated.pvalues.cap.enabled",
+        default = TRUE,
+        type = "logical"
+    )) {
+        return(0.5)
+    }
+    return(1 - tolerance)
+}
+
+#
+# Get the beta parameter for repeated p-value calculations based on the design type.
+#
+.getRepeatedPValuesBeta <- function(design, typeOfDesign, typeBetaSpending) {
+    # Repeated p-values vary alpha while retaining the design's boundary rule.
+    # Beta defines that rule for PT and beta-spending designs. Elsewhere it is
+    # irrelevant: passing it would trigger alpha + beta range warnings when
+    # the uncapped alpha search exceeds 1 - beta.    
+    if (typeOfDesign == C_TYPE_OF_DESIGN_PT || typeBetaSpending != C_TYPE_OF_DESIGN_BS_NONE) {
+        return(design$beta)
+    }
+    return(NA_real_)
+}
+
+#
 # Get repeated p-values based on group sequential test
 #
 .getRepeatedPValuesGroupSequential <- function(
@@ -1753,7 +1794,7 @@ getFinalConfidenceInterval <- function(
                 futilityBounds = futilityBounds,
                 bindingFutility = design$bindingFutility
             )$alphaSpent[design$kMax - 1] + tolerance
-            upper <- 0.5
+            upper <- .getRepeatedPValuesUpperBound(tolerance)
             repeatedPValues[design$kMax] <- .getOneDimensionalRootBisectionMethod(
                 fun = function(level) {
                     y <- .getDesignGroupSequential(
@@ -1803,7 +1844,7 @@ getFinalConfidenceInterval <- function(
                 repeatedPValues[k] <- tolerance
             } else {
                 startTime <- Sys.time()
-                upper <- 0.5
+                upper <- .getRepeatedPValuesUpperBound(tolerance)
                 repeatedPValues[k] <- .getOneDimensionalRootBisectionMethod(
                     fun = function(level) {
                         y <- .getDesignGroupSequential(
@@ -1816,7 +1857,7 @@ getFinalConfidenceInterval <- function(
                             deltaWT = deltaWT,
                             deltaPT0 = design$deltaPT0,
                             deltaPT1 = design$deltaPT1,
-                            beta = design$beta,
+                            beta = .getRepeatedPValuesBeta(design, typeOfDesign, typeBetaSpending),
                             gammaA = design$gammaA,
                             futilityBounds = futilityBounds,
                             bindingFutility = design$bindingFutility
@@ -1869,7 +1910,7 @@ getFinalConfidenceInterval <- function(
                 futilityBounds = futilityBounds,
                 bindingFutility = design$bindingFutility
             )$alphaSpent[design$kMax - 1] + tolerance
-            upper <- 0.5
+            upper <- .getRepeatedPValuesUpperBound(tolerance)
             repeatedPValues[design$kMax] <- .getOneDimensionalRootBisectionMethod(
                 fun = function(level) {
                     y <- .getDesignGroupSequential(
@@ -1919,7 +1960,7 @@ getFinalConfidenceInterval <- function(
                 repeatedPValues[k] <- tolerance
             } else {
                 startTime <- Sys.time()
-                upper <- 0.5
+                upper <- .getRepeatedPValuesUpperBound(tolerance)
                 repeatedPValues[k] <- .getOneDimensionalRootBisectionMethod(
                     fun = function(level) {
                         y <- .getDesignGroupSequential(
@@ -1933,7 +1974,7 @@ getFinalConfidenceInterval <- function(
                             deltaWT = deltaWT,
                             deltaPT0 = design$deltaPT0,
                             deltaPT1 = design$deltaPT1,
-                            beta = design$beta,
+                            beta = .getRepeatedPValuesBeta(design, typeOfDesign, typeBetaSpending),
                             gammaA = design$gammaA,
                             futilityBounds = futilityBounds,
                             bindingFutility = design$bindingFutility
@@ -1996,7 +2037,7 @@ getFinalConfidenceInterval <- function(
                     return(y$criticalValues[k] - stageResults$combFisher[k])
                 },
                 lower = tolerance, 
-                upper = 0.5, 
+                upper = .getRepeatedPValuesUpperBound(tolerance),
                 tolerance = tolerance, 
                 direction = 1,
                 acceptResultsOutOfTolerance = TRUE, 
@@ -2506,8 +2547,8 @@ getConditionalRejectionProbabilities <- function(stageResults, ...) {
                 )
             }
         },
-        lower = -8,
-        upper = 8,
+        lower = -C_UPPER_BOUNDS_DEFAULT,
+        upper = C_UPPER_BOUNDS_DEFAULT,
         tolerance = tolerance,
         callingFunctionInformation = ".getDecisionMatrixRoot"
     )

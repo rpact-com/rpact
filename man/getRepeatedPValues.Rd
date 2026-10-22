@@ -30,6 +30,18 @@ stage of the trial and can thus be used as a monitoring tool.
 
 The repeated p-values are provided up to the specified stage.
 
+By default, sequential repeated p-value searches are capped at 0.5.
+Experts can extend the search to \code{1 - tolerance} with
+\code{options(rpact.repeated.pvalues.cap.enabled = FALSE)} or the environment
+variable \code{RPACT_REPEATED_PVALUES_CAP_ENABLED=FALSE}. The environment
+variable takes precedence over the option. This does not extend the validated
+alpha range; see \code{options(rpact.validate.alpha.enabled = FALSE)} to
+disable the corresponding validated-range warnings separately. Values near
+the numerical search limits need not correspond to an attained root. In particular,
+some spending rules cannot reject a given observed result at an interim stage
+for any global alpha below 1. The returned value near 1 is then a numerical
+endpoint approximation, rather than a solution of the boundary equation.
+
 In multi-arm trials, the repeated p-values are defined separately for each
 treatment comparison within the closed testing procedure.
 }
