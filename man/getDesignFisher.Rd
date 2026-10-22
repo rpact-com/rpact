@@ -30,7 +30,11 @@ Must be a positive integer of length 1 (default value is \code{3}).
 The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 \code{6} for Fisher combination test designs.}
 
-\item{alpha}{The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.}
+\item{alpha}{The significance level alpha, default is \code{0.025}. Must be a numeric of length 1 strictly between 0 and 1.
+The validated range is \code{1e-06 <= alpha < 0.5}; values outside this range produce a warning.
+Experts can disable this validated-range check with \code{options(rpact.validate.alpha.enabled = FALSE)}
+or the environment variable \code{RPACT_VALIDATE_ALPHA_ENABLED=FALSE}, which takes precedence.
+This does not extend the validated range or disable the requirement \code{0 < alpha < 1}.}
 
 \item{method}{\code{"equalAlpha"}, \code{"fullAlpha"}, \code{"noInteraction"}, or \code{"userDefinedAlpha"},
 default is \code{"equalAlpha"} (for details, see Wassmer, 1999).}

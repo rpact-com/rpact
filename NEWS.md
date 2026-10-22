@@ -2,6 +2,8 @@
 
 ## New features
 
+* The expert option `rpact.validate.alpha.enabled = FALSE` (or environment variable `RPACT_VALIDATE_ALPHA_ENABLED=FALSE`) disables the alpha validated-range check and its warning. The default remains enabled, and alpha must still be strictly between 0 and 1.
+
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
 * `getSimulationMultiArmSurvival()` and `getSimulationEnrichmentSurvival()` now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument `simulationType` can be used to choose between the new C++ implementation (`"patientWise"`), the previous test-statistic-based approach (`"testStatisticBased"`), and a basic R reference implementation (`"patientWiseBasic"`) intended for validation and testing. The default `"auto"` setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.
 * `getDataset()` now supports datasets of general, endpoint-independent estimates through the new `DatasetGeneral` class. Stage-wise estimates and standard errors can be provided using `est` and `se`; degrees of freedom (`df`) are optional and default internally to `Inf`, corresponding to a normal approximation.

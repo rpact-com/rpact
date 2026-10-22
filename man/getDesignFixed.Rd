@@ -13,7 +13,11 @@ getDesignFixed(
 )
 }
 \arguments{
-\item{alpha}{The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.}
+\item{alpha}{The significance level alpha, default is \code{0.025}. Must be a numeric of length 1 strictly between 0 and 1.
+The validated range is \code{1e-06 <= alpha < 0.5}; values outside this range produce a warning.
+Experts can disable this validated-range check with \code{options(rpact.validate.alpha.enabled = FALSE)}
+or the environment variable \code{RPACT_VALIDATE_ALPHA_ENABLED=FALSE}, which takes precedence.
+This does not extend the validated range or disable the requirement \code{0 < alpha < 1}.}
 
 \item{beta}{Type II error rate, necessary for providing sample size calculations
 (e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs,

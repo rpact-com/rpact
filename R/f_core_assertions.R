@@ -1465,10 +1465,17 @@ NULL
 .assertIsValidAlpha <- function(alpha, ..., naAllowed = FALSE) {
     .assertIsSingleNumber(alpha, "alpha", naAllowed = naAllowed)
     .assertIsInOpenInterval(alpha, "alpha", lower = 0, upper = 1, naAllowed = naAllowed)
-    .showParameterOutOfValidatedBoundsMessage(alpha, "alpha",
-        lowerBound = 1e-06, upperBound = 0.5,
-        closedUpperBound = FALSE, naAllowed = naAllowed
-    )
+    if (.getEnvironmentVariable(
+        "RPACT_VALIDATE_ALPHA_ENABLED",
+        "rpact.validate.alpha.enabled",
+        default = TRUE,
+        type = "logical"
+    )) {
+        .showParameterOutOfValidatedBoundsMessage(alpha, "alpha",
+            lowerBound = 1e-06, upperBound = 0.5,
+            closedUpperBound = FALSE, naAllowed = naAllowed
+        )
+    }
 }
 
 .assertIsValidBeta <- function(beta, alpha, ..., naAllowed = FALSE) {
