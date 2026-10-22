@@ -1321,7 +1321,15 @@ List performSimulationEnrichmentSurvivalLoop(
 			// Loop over stages
 			for (int k = 0; k < kMax; k++) {
 				if (eventsNotAchieved[k]) {
-					simulatedNumberEventsNotAchieved(k, i)++;
+					// No later analysis is available, but earlier rejections remain valid.
+					for (int futureK = k; futureK < kMax; futureK++) {
+						simulatedNumberEventsNotAchieved(futureK, i)++;
+						for (int g = 0; g < gMax; g++) {
+							simulatedRejections[futureK + i * kMax + g * kMax * cols] +=
+								(rejectedPopulationsBefore[g] ? 1.0 : 0.0);
+						}
+					}
+					break;
 				} else {
 					simulatedAnalysisTime(k, i) += analysisTime[k];
 					simulatedNumberOfSubjects(k, i) += numberOfSubjects[k];

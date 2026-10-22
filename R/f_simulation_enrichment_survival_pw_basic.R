@@ -886,7 +886,14 @@ updateSubGroupVector <- function(
 
             for (k in 1:kMax) {
                 if (stageResults$eventsNotAchieved[k]) {
-                    simulatedNumberEventsNotAchieved[k, i] <- simulatedNumberEventsNotAchieved[k, i] + 1
+                    # No later analysis is available, but earlier rejections remain valid.
+                    for (futureK in k:kMax) {
+                        simulatedNumberEventsNotAchieved[futureK, i] <-
+                            simulatedNumberEventsNotAchieved[futureK, i] + 1
+                        simulatedRejections[futureK, i, ] <-
+                            simulatedRejections[futureK, i, ] + rejectedPopulationsBefore
+                    }
+                    break
                 } else {
                     simulatedAnalysisTime[k, i] <- simulatedAnalysisTime[k, i] + stageResults$analysisTime[k]
                     simulatedNumberOfSubjects[k, i] <- simulatedNumberOfSubjects[k, i] +
@@ -1028,9 +1035,11 @@ updateSubGroupVector <- function(
     simulatedConditionalPower[1, ] <- NA_real_
     if (kMax > 1) {
         for (k in 2:kMax) {
+            # Average over trials continuing from the preceding completed analysis.
+            # Missing-event counts also include trials that failed at earlier stages.
             simulatedConditionalPower[k, ] <- simulatedConditionalPower[k, ] /
-                (iterations[k, ] +
-                    simulatedNumberEventsNotAchieved[k, ])
+                (iterations[k - 1, ] - simulatedSuccessStopping[k - 1, ] -
+                    simulatedFutilityStopping[k - 1, ])
         }
     }
 
