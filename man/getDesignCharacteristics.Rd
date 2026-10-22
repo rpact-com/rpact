@@ -51,13 +51,6 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-design <- getDesignOptimalConditionalError(
-    alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
-    thetaH1 = 0.5, useInterimEstimate = FALSE, firstStageInformation = 4,
-    likelihoodRatioDistribution = "maxlr"
-)
-getDesignCharacteristics(design, theta = c(0, 0.25, 0.5))
-
 \dontrun{
 # Calculate design characteristics for a three-stage O'Brien & Fleming 
 # design at power 90\% and compare it with Pocock's design.  

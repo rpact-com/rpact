@@ -225,7 +225,7 @@ plot.TrialDesignOptimalConditionalError <- function(x, y, ..., range = c(0, 1), 
     getValues <- function(design) {
         switch(
             type,
-            getConditionalError(pValue = pValues, design = design),
+            getOptimalConditionalError(pValue = pValues, design = design),
             getStageInformation(pValue = pValues, design = design),
             .getOptimalDesignLikelihoodRatio(pValues, design),
             .getOptimalDesignMonotoneValues(pValues, fun = .getOptimalDesignQ, design = design)

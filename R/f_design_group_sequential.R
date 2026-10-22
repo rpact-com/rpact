@@ -2460,6 +2460,7 @@ getDesignGroupSequential <- function(
     return(n)
 }
 
+#' 
 #' @title
 #' Get Design Characteristics
 #'
@@ -2494,14 +2495,6 @@ getDesignGroupSequential <- function(
 #' @template how_to_get_help_for_generics
 #'
 #' @family design functions
-#'
-#' @examples
-#' design <- getDesignOptimalConditionalError(
-#'     alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
-#'     thetaH1 = 0.5, useInterimEstimate = FALSE, firstStageInformation = 4,
-#'     likelihoodRatioDistribution = "maxlr"
-#' )
-#' getDesignCharacteristics(design, theta = c(0, 0.25, 0.5))
 #'
 #' @template reference_optimal
 #' @template reference_monotone

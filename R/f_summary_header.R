@@ -1052,9 +1052,9 @@ NULL
         }
         if (settings$survivalEnabled &&
                 !is.null(designPlan[["dropoutTime"]]) &&
-                !is.na(designPlan$dropoutTime)) {
-            if ((!is.na(designPlan$dropoutRate1) && designPlan$dropoutRate1 > 0) ||
-                    (!is.na(designPlan$dropoutRate2) && designPlan$dropoutRate2 > 0)) {
+                !anyNA(designPlan$dropoutTime)) {
+            if ((!anyNA(designPlan$dropoutRate1) && any(designPlan$dropoutRate1 > 0)) ||
+                    (!anyNA(designPlan$dropoutRate2) && any(designPlan$dropoutRate2 > 0))) {
                 header <- .concatenateSummaryText(header, paste0(
                     "dropout rate(1) = ",
                     .arrayToString(designPlan$dropoutRate1,
