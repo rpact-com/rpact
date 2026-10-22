@@ -178,8 +178,14 @@ scaling: at candidate level \code{a}, the cumulative spending is
 design's significance level. Thus the spending proportions are held fixed,
 even when spending times differ from information rates. This does not
 reconstruct a spending function whose shape changes with alpha.
-Repeated p-values remain unavailable for \code{typeOfDesign = "WToptimum"}
-and for multi-arm or enrichment designs with \code{typeOfDesign = "asUser"}.
+For single-hypothesis group sequential and inverse normal designs with
+\code{typeOfDesign = "WToptimum"}, the originally optimized \code{deltaWT}
+is held fixed as the candidate significance level varies. Repeated p-values
+therefore equal those of a \code{"WT"} design with that \code{deltaWT}.
+The shape is not re-optimized during inversion, preserving a nested family
+of rejection boundaries (re-optimizing could lead to type I error inflation).
+Repeated p-values remain unavailable for multi-arm or enrichment designs
+with \code{typeOfDesign = "asUser"} or \code{"WToptimum"}.
 }
 
 \section{How to get help for generic functions}{

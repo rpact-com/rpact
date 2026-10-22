@@ -161,8 +161,14 @@ NULL
 #' design's significance level. Thus the spending proportions are held fixed,
 #' even when spending times differ from information rates. This does not
 #' reconstruct a spending function whose shape changes with alpha.
-#' Repeated p-values remain unavailable for \code{typeOfDesign = "WToptimum"}
-#' and for multi-arm or enrichment designs with \code{typeOfDesign = "asUser"}.
+#' For single-hypothesis group sequential and inverse normal designs with
+#' \code{typeOfDesign = "WToptimum"}, the originally optimized \code{deltaWT}
+#' is held fixed as the candidate significance level varies. Repeated p-values
+#' therefore equal those of a \code{"WT"} design with that \code{deltaWT}.
+#' The shape is not re-optimized during inversion, preserving a nested family
+#' of rejection boundaries (re-optimizing could lead to type I error inflation).
+#' Repeated p-values remain unavailable for multi-arm or enrichment designs
+#' with \code{typeOfDesign = "asUser"} or \code{"WToptimum"}.
 #'
 #' @return Returns an \code{\link{AnalysisResults}} object.
 #' The following generics (R generic functions) are available for this result object:
@@ -1082,8 +1088,14 @@ getConditionalPower <- function(
 #' design's significance level. Thus the spending proportions are held fixed,
 #' even when spending times differ from information rates. This does not
 #' reconstruct a spending function whose shape changes with alpha.
-#' Repeated p-values remain unavailable for \code{typeOfDesign = "WToptimum"}
-#' and for multi-arm or enrichment designs with \code{typeOfDesign = "asUser"}.
+#' For single-hypothesis group sequential and inverse normal designs with
+#' \code{typeOfDesign = "WToptimum"}, the originally optimized \code{deltaWT}
+#' is held fixed as the candidate significance level varies. Repeated p-values
+#' therefore equal those of a \code{"WT"} design with that \code{deltaWT}.
+#' The shape is not re-optimized during inversion, preserving a nested family
+#' of rejection boundaries.
+#' Repeated p-values remain unavailable for multi-arm or enrichment designs
+#' with \code{typeOfDesign = "asUser"} or \code{"WToptimum"}.
 #'
 #' @return Returns a \code{\link[base]{numeric}} vector of length \code{kMax} or in case of multi-arm stage results
 #' a \code{\link[base]{matrix}} (each column represents a stage, each row a comparison)
@@ -1117,23 +1129,6 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
         return(ifelse(design$sided == 1, stageResults$pValues[1],
             2 * min(stageResults$pValues[1], 1 - stageResults$pValues[1])
         ))
-    }
-
-    if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
-            design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
-        showWarnings <- .getEnvironmentVariable(
-            "RPACT_ANALYSIS_REPEATED_P_VALUES_WARNINGS_ENABLED",
-            "rpact.analysis.repeated.p.values.warnings.enabled",
-            default = TRUE,
-            type = "logical"
-        )
-        if (showWarnings) {
-            warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = '",
-                design$typeOfDesign, "'",
-                diagnosticId = "analysis.repeated_p_values_unsupported"
-            )
-        }
-        return(rep(NA_real_, design$kMax))
     }
 
     if (.isTrialDesignInverseNormal(design)) {
@@ -1835,7 +1830,13 @@ getFinalConfidenceInterval <- function(
             .logProgress("Repeated p-values for final stage calculated", startTime = startTime)
         }
     } else {
-        typeOfDesign <- design$typeOfDesign
+        # WToptimum selects the shape once at the original alpha. Vary only
+        # the scale during inversion so that the testing family stays nested.
+        typeOfDesign <- if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
+            C_TYPE_OF_DESIGN_WT
+        } else {
+            design$typeOfDesign
+        }
         deltaWT <- design$deltaWT
         typeBetaSpending <- design$typeBetaSpending
 
@@ -1956,7 +1957,13 @@ getFinalConfidenceInterval <- function(
             .logProgress("Repeated p-values for final stage calculated", startTime = startTime)
         }
     } else {
-        typeOfDesign <- design$typeOfDesign
+        # WToptimum selects the shape once at the original alpha. Vary only
+        # the scale during inversion so that the testing family stays nested.
+        typeOfDesign <- if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
+            C_TYPE_OF_DESIGN_WT
+        } else {
+            design$typeOfDesign
+        }
         deltaWT <- design$deltaWT
         typeBetaSpending <- design$typeBetaSpending
 

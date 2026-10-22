@@ -16,5 +16,12 @@
 #' )
 #' generalData <- getDataset(est = c(2, 1), se = c(1, 1))
 #' getRepeatedPValues(getStageResults(userDesign, generalData))
+#'
+#' # Optimize the Wang-Tsiatis shape once, then keep deltaWT fixed
+#' # when varying alpha to calculate repeated p-values.
+#' optimumDesign <- getDesignGroupSequential(
+#'     kMax = 2, typeOfDesign = "WToptimum", optimizationCriterion = "ASNsum"
+#' )
+#' getRepeatedPValues(getStageResults(optimumDesign, generalData))
 #' }
 #'

@@ -2,6 +2,8 @@
 
 ## New features
 
+* `getRepeatedPValues()` now supports single-hypothesis group sequential and inverse normal `"WToptimum"` designs. The originally optimized `deltaWT` is held fixed during inversion, giving the same repeated p-values as a `"WT"` design with that shape parameter.
+
 * `getRepeatedPValues()` now supports single-hypothesis group sequential and inverse normal `"asUser"` designs. Cumulative user-defined alpha spending is scaled proportionally as the candidate significance level varies, retaining the original spending proportions.
 
 * The expert option `rpact.repeated.pvalues.cap.enabled = FALSE` (or environment variable `RPACT_REPEATED_PVALUES_CAP_ENABLED=FALSE`) extends the repeated p-value search from 0.5 to `1 - tolerance`. The cap remains enabled by default. One-sided boundary searches now support negative critical values at alpha above 0.5.
