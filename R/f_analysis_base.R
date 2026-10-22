@@ -1125,7 +1125,8 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
     .assertIsStageResults(stageResults)
     design <- stageResults$.design
 
-    if (design$kMax == 1) {
+    if (design$kMax == 1 && !(.isTrialDesignGroupSequential(design) &&
+            .hasSeparateSpendingTime(design))) {
         return(ifelse(design$sided == 1, stageResults$pValues[1],
             2 * min(stageResults$pValues[1], 1 - stageResults$pValues[1])
         ))
@@ -1775,6 +1776,24 @@ getFinalConfidenceInterval <- function(
 #
 # Get repeated p-values based on group sequential test
 #
+# Rebuild separate-time spending designs with their interim stopping decisions.
+.getRepeatedPValueGroupSequentialDesign <- function(design, ...) {
+    if (.hasSeparateSpendingTime(design) &&
+            (.isBoundaryStoppingActivated(design$efficacyStops) ||
+                .isBoundaryStoppingActivated(design$futilityStops))) {
+        args <- utils::modifyList(.getDesignGroupSequentialDefaultValues(), list(...))
+        if (!design$bindingFutility && design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE &&
+                !.hasApplicableFutilityBounds(design)) {
+            args$bindingFutility <- NA
+        }
+        args$designClass <- C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL
+        args$efficacyStops <- design$efficacyStops
+        args$futilityStops <- design$futilityStops
+        return(do.call(.getDesignGroupSequentialOrWithInterimStops, args))
+    }
+    return(.getDesignGroupSequential(...))
+}
+
 .getRepeatedPValuesGroupSequential <- function(
         ...,
         stageResults,
@@ -1786,7 +1805,7 @@ getFinalConfidenceInterval <- function(
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
 
     repeatedPValues <- rep(NA_real_, design$kMax)
-    futilityBounds <- .getFutilityBounds(design)
+    futilityBounds <- if (design$kMax == 1) NA_real_ else .getFutilityBounds(design)
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_HP && stageResults$stage == design$kMax) {
         if (!is.na(stageResults$overallPValues[design$kMax]) &&
                 .getOneMinusQNorm(stageResults$overallPValues[design$kMax]) == Inf) {
@@ -1860,10 +1879,11 @@ getFinalConfidenceInterval <- function(
                 upper <- .getRepeatedPValuesUpperBound(tolerance)
                 repeatedPValues[k] <- .getOneDimensionalRootBisectionMethod(
                     fun = function(level) {
-                        y <- .getDesignGroupSequential(
+                        y <- .getRepeatedPValueGroupSequentialDesign(design,
                             kMax = design$kMax, alpha = level,
                             sided = design$sided,
                             informationRates = design$informationRates,
+                            spendingTime = if (is.null(design$spendingTime)) NA_real_ else design$spendingTime,
                             typeOfDesign = typeOfDesign,
                             typeBetaSpending = typeBetaSpending,
                             gammaB = design$gammaB,

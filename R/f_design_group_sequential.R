@@ -783,18 +783,70 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #'
 #' @noRd
 #'
+.hasSeparateSpendingTime <- function(design) {
+    return(!is.null(design$spendingTime) && !anyNA(design$spendingTime) &&
+        .isAlphaSpendingDesignType(design$typeOfDesign, userDefinedAlphaSpendingIncluded = FALSE) &&
+        !isTRUE(all.equal(design$spendingTime, design$informationRates, tolerance = 0)))
+}
+
+.validateSpendingTime <- function(design) {
+    spendingTime <- design$spendingTime
+    if (is.numeric(spendingTime) && length(spendingTime) == 1 && is.na(spendingTime) && !is.nan(spendingTime)) {
+        if (.isTrialDesignGroupSequential(design) && .isAlphaSpendingDesignType(design$typeOfDesign)) {
+            design$spendingTime <- design$informationRates
+        }
+        design$.setParameterType("spendingTime", if (.isTrialDesignGroupSequential(design) &&
+                .isAlphaSpendingDesignType(design$typeOfDesign)) {
+            C_PARAM_DEFAULT_VALUE
+        } else {
+            C_PARAM_NOT_APPLICABLE
+        })
+        return(invisible(design))
+    }
+    .assertIsNumericVector(spendingTime, "spendingTime", naAllowed = FALSE)
+    if (!.isAlphaSpendingDesignType(design$typeOfDesign)) {
+        stopIllegalArgument("'spendingTime' is only available for alpha-spending designs",
+            parameter = "spendingTime", value = spendingTime)
+    }
+    if (length(spendingTime) != design$kMax) {
+        stopIllegalArgument("'spendingTime' must have length 'kMax' (", design$kMax, ")",
+            parameter = "spendingTime", value = spendingTime)
+    }
+    .assertIsInClosedInterval(spendingTime, "spendingTime", lower = 0, upper = 1)
+    if (any(diff(spendingTime) < 0)) {
+        stopIllegalArgument("'spendingTime' must be non-decreasing",
+            parameter = "spendingTime", value = spendingTime)
+    }
+    design$.setParameterType("spendingTime", C_PARAM_USER_DEFINED)
+    return(invisible(design))
+}
+
+.getAlphaSpendingCalibration <- function(design) {
+    if (.hasSeparateSpendingTime(design)) {
+        return(list(
+            typeOfDesign = C_TYPE_OF_DESIGN_AS_USER,
+            userAlphaSpending = .getAlphaSpendingValuesCpp(
+                design$alpha, design$spendingTime, design$sided, design$typeOfDesign, design$gammaA
+            )
+        ))
+    }
+    return(list(typeOfDesign = design$typeOfDesign, userAlphaSpending = design$userAlphaSpending))
+}
+
 .getDesignGroupSequentialAlphaSpending <- function(design, userFunctionCallEnabled) {
-    design$criticalValues <- .getDesignGroupSequentialAlphaSpendingCpp(
-        design$kMax,
-        design$alpha,
-        design$gammaA,
-        design$typeOfDesign,
-        design$sided,
-        design$informationRates,
-        design$bindingFutility,
-        .getFutilityBounds(design),
-        design$tolerance
-    )
+    spending <- .getAlphaSpendingCalibration(design)
+    if (.hasSeparateSpendingTime(design)) {
+        design$criticalValues <- .getDesignGroupSequentialUserDefinedAlphaSpendingCpp(
+            design$kMax, spending$userAlphaSpending, design$sided,
+            design$informationRates, design$bindingFutility, .getFutilityBounds(design), design$tolerance
+        )
+    } else {
+        design$criticalValues <- .getDesignGroupSequentialAlphaSpendingCpp(
+            design$kMax, design$alpha, design$gammaA, design$typeOfDesign,
+            design$sided, design$informationRates, design$bindingFutility,
+            .getFutilityBounds(design), design$tolerance
+        )
+    }
     design$criticalValues <- .applyDirectionOfAlternative(design$criticalValues,
         design$directionUpper,
         type = "negateIfLower", phase = "design"
@@ -864,15 +916,16 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #' @noRd
 #'
 .getDesignGroupSequentialBetaSpending <- function(design, userFunctionCallEnabled) {
+    spending <- .getAlphaSpendingCalibration(design)
     cppResult <- .getDesignGroupSequentialBetaSpendingCpp(
         .getCriticalValues(design),
         design$kMax,
-        design$userAlphaSpending,
+        spending$userAlphaSpending,
         design$userBetaSpending,
         design$informationRates,
         design$bindingFutility,
         design$tolerance,
-        design$typeOfDesign,
+        spending$typeOfDesign,
         design$typeBetaSpending,
         design$gammaA,
         design$gammaB,
@@ -922,16 +975,17 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         )
     }
 
+    spending <- .getAlphaSpendingCalibration(design)
     cppResult <- .getDesignGroupSequentialUserDefinedBetaSpendingCpp(
         .getCriticalValues(design),
         design$kMax,
-        design$userAlphaSpending,
+        spending$userAlphaSpending,
         design$userBetaSpending,
         design$sided,
         design$informationRates,
         design$bindingFutility,
         design$tolerance,
-        design$typeOfDesign,
+        spending$typeOfDesign,
         design$gammaA,
         design$alpha,
         design$betaAdjustment,
@@ -1270,6 +1324,7 @@ getDesignInverseNormal <- function(
         beta,
         sided,
         informationRates,
+        spendingTime = NA_real_,
         futilityBounds,
         typeOfDesign,
         deltaWT,
@@ -1309,6 +1364,7 @@ getDesignInverseNormal <- function(
             beta = beta,
             sided = sided,
             informationRates = informationRates,
+            spendingTime = spendingTime,
             futilityBounds = futilityBounds,
             typeOfDesign = typeOfDesign,
             gammaA = gammaA,
@@ -1331,6 +1387,7 @@ getDesignInverseNormal <- function(
         beta = beta,
         sided = sided,
         informationRates = informationRates,
+        spendingTime = spendingTime,
         futilityBounds = futilityBounds,
         typeOfDesign = typeOfDesign,
         deltaWT = deltaWT,
@@ -1429,6 +1486,7 @@ getDesignInverseNormal <- function(
         beta = NA_real_,
         sided = C_SIDED_DEFAULT,
         informationRates = NA_real_,
+        spendingTime = NA_real_,
         futilityBounds = NA_real_,
         futilityBoundsScale = "zValue",
         typeOfDesign = C_DEFAULT_TYPE_OF_DESIGN,
@@ -1471,6 +1529,7 @@ getDesignInverseNormal <- function(
         beta = NA_real_,
         sided = C_SIDED_DEFAULT,
         informationRates = NA_real_,
+        spendingTime = NA_real_,
         futilityBounds = NA_real_,
         typeOfDesign = C_DEFAULT_TYPE_OF_DESIGN,
         gammaA = NA_real_,
@@ -1514,6 +1573,7 @@ getDesignInverseNormal <- function(
         beta = beta,
         sided = sided,
         informationRates = informationRates,
+        spendingTime = spendingTime,
         futilityBounds = futilityBounds,
         typeOfDesign = typeOfDesign,
         gammaA = gammaA,
@@ -1579,6 +1639,7 @@ getDesignInverseNormal <- function(
         beta = beta,
         sided = coreDesign$sided,
         informationRates = informationRates,
+        spendingTime = spendingTime,
         futilityBounds = futilityBounds,
         typeOfDesign = "asUser",
         userAlphaSpending = newAlphaSpending,
@@ -1660,6 +1721,7 @@ getDesignInverseNormal <- function(
         beta = NA_real_,
         sided = C_SIDED_DEFAULT,
         informationRates = NA_real_,
+        spendingTime = NA_real_,
         futilityBounds = NA_real_,
         typeOfDesign = C_DEFAULT_TYPE_OF_DESIGN,
         deltaWT = NA_real_,
@@ -1751,6 +1813,8 @@ getDesignInverseNormal <- function(
         delayedInformation = delayedInformation,
         tolerance = tolerance
     )
+
+    design$spendingTime <- spendingTime
 
     if (userFunctionCallEnabled) {
         .validateBaseParameters(design, twoSidedWarningForDefaultValues = FALSE)
@@ -1875,6 +1939,8 @@ getDesignInverseNormal <- function(
         .validateAlphaAndBeta(design)
     }
 
+    .validateSpendingTime(design)
+
     design$alphaSpent <- rep(NA_real_, design$kMax)
     design$betaSpent <- rep(NA_real_, design$kMax)
     design$power <- rep(NA_real_, design$kMax)
@@ -1886,7 +1952,7 @@ getDesignInverseNormal <- function(
         design$.setParameterType("criticalValues", C_PARAM_GENERATED)
     }
 
-    if (design$kMax == 1) {
+    if (design$kMax == 1 && !.hasSeparateSpendingTime(design)) {
         .getDesignGroupSequentialKMax1(design)
     } else {
         # Wang and Tsiatis design
@@ -1988,6 +2054,9 @@ getDesignInverseNormal <- function(
                 )
             }
             design$informationRates <- 1
+            if (design$isDefaultParameter("spendingTime")) {
+                design$spendingTime <- 1
+            }
         }
         design$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
         design$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
@@ -2207,7 +2276,12 @@ getDesignInverseNormal <- function(
         return(invisible())
     }
 
-    if (design$informationRates[design$kMax] != 1) {
+    finalSpendingTime <- if (.hasSeparateSpendingTime(design)) {
+        design$spendingTime[design$kMax]
+    } else {
+        design$informationRates[design$kMax]
+    }
+    if (finalSpendingTime != 1) {
         return(invisible())
     }
 
@@ -2258,6 +2332,15 @@ getDesignInverseNormal <- function(
 #' @inheritParams param_sided
 #' @inheritParams param_typeOfDesign
 #' @inheritParams param_informationRates
+#' @param spendingTime Cumulative alpha-spending times, a non-decreasing numeric vector
+#'     of length \code{kMax} with values between 0 and 1 (inclusive). Defaults to \code{informationRates}.
+#'     Available for alpha-spending designs (\code{asOF}, \code{asP}, \code{asKD},
+#'     \code{asHSD}, and \code{asUser}). The information rates determine correlations;
+#'     spending times determine cumulative alpha spending. For \code{asUser},
+#'     \code{userAlphaSpending} remains authoritative. Repeated p-values re-evaluate
+#'     the original spending function at these times for each candidate alpha;
+#'     explicit \code{asUser} spending continues to scale proportionally.
+#'     Beta spending continues to use \code{informationRates}.
 #' @param futilityBounds The futility bounds, defined on the scale defined by \code{futilityBoundsScale}.
 #'        (numeric vector of length \code{kMax - 1}).
 #' @param futilityBoundsScale Character. The scale of the futility bounds.
@@ -2317,6 +2400,7 @@ getDesignGroupSequential <- function(
         beta = NA_real_,
         sided = 1L,
         informationRates = NA_real_,
+        spendingTime = NA_real_,
         futilityBounds = NA_real_,
         typeOfDesign = c(
             "OF",
@@ -2387,6 +2471,7 @@ getDesignGroupSequential <- function(
             beta = beta,
             sided = sided,
             informationRates = informationRates,
+            spendingTime = spendingTime,
             futilityBounds = NA_real_,
             typeOfDesign = typeOfDesign,
             deltaWT = deltaWT,
@@ -2426,6 +2511,7 @@ getDesignGroupSequential <- function(
         beta = beta,
         sided = sided,
         informationRates = informationRates,
+        spendingTime = spendingTime,
         futilityBounds = futilityBounds,
         typeOfDesign = typeOfDesign,
         deltaWT = deltaWT,

@@ -636,6 +636,11 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             for (userDefinedParamName in designMaster$.getUserDefinedParameters()) {
                 defaultValues[[userDefinedParamName]] <- designMaster[[userDefinedParamName]]
             }
+            if (.isTrialDesignGroupSequential(designMaster) &&
+                    designMaster$isUserDefinedParameter("spendingTime")) {
+                defaultValues$kMax <- designMaster$kMax
+                defaultValues$informationRates <- designMaster$informationRates
+            }
             defaultValues[[argumentName]] <- argumentValue
 
             if (.isTrialDesignGroupSequential(designMaster)) {
@@ -645,6 +650,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                     beta = defaultValues$beta,
                     sided = defaultValues$sided,
                     informationRates = defaultValues$informationRates,
+                    spendingTime = defaultValues$spendingTime,
                     futilityBounds = defaultValues$futilityBounds,
                     typeOfDesign = defaultValues$typeOfDesign,
                     deltaWT = defaultValues$deltaWT,

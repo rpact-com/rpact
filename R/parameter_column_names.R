@@ -41,6 +41,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     alpha = "Significance level",
     finalStage = "Final stage",
     informationRates = "Information rate",
+    spendingTime = "Spending time",
     criticalValues = "Critical value",
     criticalValuesDelayedInformation = "Upper bounds of continuation",
     stageLevels = "Stage level",

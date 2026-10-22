@@ -801,6 +801,20 @@ double getSpendingValueCpp(double alpha, double x, double sided, String typeOfDe
 	return NA_REAL;
 }
 
+//' @title Evaluate cumulative alpha spending at separate spending times
+//' @keywords internal
+//' @noRd
+// [[Rcpp::export(name = ".getAlphaSpendingValuesCpp")]]
+NumericVector getAlphaSpendingValuesCpp(double alpha, NumericVector spendingTime, double sided,
+    String typeOfDesign, double gamma) {
+    NumericVector values(spendingTime.size());
+    for (int k = 0; k < spendingTime.size(); k++) {
+        values[k] = spendingTime[k] == 0 ? 0 :
+            getSpendingValueCpp(alpha, spendingTime[k], sided, typeOfDesign, gamma);
+    }
+    return values;
+}
+
 //' @title Calibrate one-sided critical value at stage k
 //' @description Compute/adjust the critical value at stage `k` so that the incremental (or cumulative) spent alpha matches the target spending.
 //' @details

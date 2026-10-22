@@ -657,6 +657,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
         deltaPT1 = NULL,
         deltaPT0 = NULL,
         futilityBounds = NULL,
+        spendingTime = NULL,
         gammaA = NULL,
         gammaB = NULL,
         optimizationCriterion = NULL,
@@ -720,6 +721,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             self$.initParameterTypes()
             self$.initStages()
 
+            self$.setParameterType("spendingTime", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("betaAdjustment", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("delayedInformation", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("decisionCriticalValues", C_PARAM_NOT_APPLICABLE)
@@ -753,6 +755,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 deltaPT1,
                 deltaPT0,
                 informationRates,
+                spendingTime = NA_real_,
                 futilityBounds,
                 optimizationCriterion,
                 typeBetaSpending,
@@ -771,6 +774,13 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             informationRatesTemp <- informationRates
             if (anyNA(informationRatesTemp)) {
                 informationRatesTemp <- .getInformationRatesDefault(kMax)
+            }
+            if (all(is.na(spendingTime))) {
+                spendingTime <- informationRatesTemp
+            }
+            if (.isTrialDesignGroupSequential(self) && .isAlphaSpendingDesignType(typeOfDesign) &&
+                    !isTRUE(all.equal(spendingTime, self$spendingTime, tolerance = 0))) {
+                return(self$.pasteComparisonResult("spendingTime", spendingTime, self$spendingTime))
             }
             futilityBoundsTemp <- futilityBounds[1:(kMax - 1)]
             if (anyNA(futilityBoundsTemp)) {
@@ -930,6 +940,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
 #' @template field_alpha
 #' @template field_stages
 #' @template field_informationRates
+#' @template field_spendingTime
 #' @template field_userAlphaSpending
 #' @template field_criticalValues
 #' @template field_stageLevels

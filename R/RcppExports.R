@@ -545,6 +545,13 @@ NULL
     .Call(`_rpact_getDesignGroupSequentialPampallonaTsiatisCpp`, tolerance, beta, alpha, kMax, deltaPT0, deltaPT1, informationRates, sided, bindingFutility)
 }
 
+#' @title Evaluate cumulative alpha spending at separate spending times
+#' @keywords internal
+#' @noRd
+.getAlphaSpendingValuesCpp <- function(alpha, spendingTime, sided, typeOfDesign, gamma) {
+    .Call(`_rpact_getAlphaSpendingValuesCpp`, alpha, spendingTime, sided, typeOfDesign, gamma)
+}
+
 #' @title User-defined alpha-spending critical values
 #' @description Compute critical values for a group sequential design from user-supplied cumulative alpha-spending values.
 #' @details

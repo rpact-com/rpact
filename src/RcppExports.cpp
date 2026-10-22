@@ -168,6 +168,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getAlphaSpendingValuesCpp
+NumericVector getAlphaSpendingValuesCpp(double alpha, NumericVector spendingTime, double sided, String typeOfDesign, double gamma);
+RcppExport SEXP _rpact_getAlphaSpendingValuesCpp(SEXP alphaSEXP, SEXP spendingTimeSEXP, SEXP sidedSEXP, SEXP typeOfDesignSEXP, SEXP gammaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type spendingTime(spendingTimeSEXP);
+    Rcpp::traits::input_parameter< double >::type sided(sidedSEXP);
+    Rcpp::traits::input_parameter< String >::type typeOfDesign(typeOfDesignSEXP);
+    Rcpp::traits::input_parameter< double >::type gamma(gammaSEXP);
+    rcpp_result_gen = Rcpp::wrap(getAlphaSpendingValuesCpp(alpha, spendingTime, sided, typeOfDesign, gamma));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getDesignGroupSequentialUserDefinedAlphaSpendingCpp
 NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(int kMax, NumericVector userAlphaSpending, double sided, NumericVector informationRates, bool bindingFutility, NumericVector futilityBounds, double tolerance);
 RcppExport SEXP _rpact_getDesignGroupSequentialUserDefinedAlphaSpendingCpp(SEXP kMaxSEXP, SEXP userAlphaSpendingSEXP, SEXP sidedSEXP, SEXP informationRatesSEXP, SEXP bindingFutilitySEXP, SEXP futilityBoundsSEXP, SEXP toleranceSEXP) {
@@ -1071,6 +1086,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_getDesignFisherTryCpp", (DL_FUNC) &_rpact_getDesignFisherTryCpp, 8},
     {"_rpact_getGroupSequentialProbabilitiesCpp", (DL_FUNC) &_rpact_getGroupSequentialProbabilitiesCpp, 2},
     {"_rpact_getDesignGroupSequentialPampallonaTsiatisCpp", (DL_FUNC) &_rpact_getDesignGroupSequentialPampallonaTsiatisCpp, 9},
+    {"_rpact_getAlphaSpendingValuesCpp", (DL_FUNC) &_rpact_getAlphaSpendingValuesCpp, 5},
     {"_rpact_getDesignGroupSequentialUserDefinedAlphaSpendingCpp", (DL_FUNC) &_rpact_getDesignGroupSequentialUserDefinedAlphaSpendingCpp, 7},
     {"_rpact_getDesignGroupSequentialAlphaSpendingCpp", (DL_FUNC) &_rpact_getDesignGroupSequentialAlphaSpendingCpp, 9},
     {"_rpact_getDesignGroupSequentialDeltaWTCpp", (DL_FUNC) &_rpact_getDesignGroupSequentialDeltaWTCpp, 8},

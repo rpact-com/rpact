@@ -2,6 +2,8 @@
 
 ## New features
 
+* `getDesignGroupSequential()` accepts separate `spendingTime` values for alpha-spending designs. Information rates still determine correlations, while spending times determine cumulative alpha spending and are retained during repeated p-value inversion. By default the schedules coincide; explicit `asUser` spending retains proportional scaling.
+
 * `getRepeatedPValues()` now supports single-hypothesis group sequential and inverse normal `"WToptimum"` designs. The originally optimized `deltaWT` is held fixed during inversion, giving the same repeated p-values as a `"WT"` design with that shape parameter.
 
 * `getRepeatedPValues()` now supports single-hypothesis group sequential and inverse normal `"asUser"` designs. Cumulative user-defined alpha spending is scaled proportionally as the candidate significance level varies, retaining the original spending proportions.

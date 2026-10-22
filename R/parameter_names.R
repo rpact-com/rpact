@@ -41,6 +41,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     alpha = "Significance level",
     finalStage = "Final stage",
     informationRates = "Information rates",
+    spendingTime = "Spending time",
     criticalValues = "Critical values",
     criticalValuesDelayedInformation = "Upper bounds of continuation",
     stageLevels = "Stage levels (one-sided)",

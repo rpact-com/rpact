@@ -57,6 +57,7 @@ C_PARAMETER_ORDER_DESIGN_GS_AND_IN <- c(
     "kMax",
     "stages",
     "informationRates",
+    "spendingTime",
     "alpha",
     "beta",
     "power",

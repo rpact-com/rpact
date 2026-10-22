@@ -11,6 +11,7 @@ getDesignGroupSequential(
   beta = NA_real_,
   sided = 1L,
   informationRates = NA_real_,
+  spendingTime = NA_real_,
   futilityBounds = NA_real_,
   typeOfDesign = c("OF", "P", "WT", "PT", "HP", "WToptimum", "asP", "asOF", "asKD",
     "asHSD", "asUser", "noEarlyEfficacy"),
@@ -62,6 +63,16 @@ Must be a positive integer of length 1.}
 default is \code{(1:kMax) / kMax}. For the weighted inverse normal design, the weights are derived
 through w_1 = sqrt(t_1), and w_k = sqrt(t_k - t_(k-1)). For the weighted Fisher's combination test, the
 weights (scales) are w_k = sqrt((t_k - t_(k-1)) / t_1) (see the documentation).}
+
+\item{spendingTime}{Cumulative alpha-spending times, a non-decreasing numeric vector
+of length \code{kMax} with values between 0 and 1 (inclusive). Defaults to \code{informationRates}.
+Available for alpha-spending designs (\code{asOF}, \code{asP}, \code{asKD},
+\code{asHSD}, and \code{asUser}). The information rates determine correlations;
+spending times determine cumulative alpha spending. For \code{asUser},
+\code{userAlphaSpending} remains authoritative. Repeated p-values re-evaluate
+the original spending function at these times for each candidate alpha;
+explicit \code{asUser} spending continues to scale proportionally.
+Beta spending continues to use \code{informationRates}.}
 
 \item{futilityBounds}{The futility bounds, defined on the scale defined by \code{futilityBoundsScale}.
 (numeric vector of length \code{kMax - 1}).}
