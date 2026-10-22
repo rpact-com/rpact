@@ -392,8 +392,8 @@ rcmd <- function(
         return(precondition)
     }
 
-    # Complete a possible trailing pipe only for parsing. Source references let us
-    # compare whole expressions while preserving their original code and layout.
+    # Complete a possible trailing pipe only for parsing. Split outer pipe chains
+    # into steps, but keep expressions inside function bodies in the same block.
     expressions <- tryCatch(
         parse(text = c(precondition, "identity()"), keep.source = TRUE),
         error = function(e) NULL
@@ -402,8 +402,34 @@ rcmd <- function(
         return(precondition)
     }
 
-    refs <- Filter(function(ref) ref[1] <= length(precondition), attr(expressions, "srcref"))
-    blockLines <- lapply(refs, function(ref) seq.int(ref[1], min(ref[3], length(precondition))))
+    parseData <- utils::getParseData(expressions)
+    getPipeEnds <- function(id) {
+        children <- parseData[parseData$parent == id, ]
+        pipe <- children[children$terminal & children$text %in% c("|>", "%>%"), ]
+        if (nrow(pipe) != 1) {
+            return(integer())
+        }
+        left <- children[children$token == "expr" & (
+            children$line2 < pipe$line1 |
+                (children$line2 == pipe$line1 & children$col2 < pipe$col1)
+        ), ]
+        if (nrow(left) != 1) {
+            return(integer())
+        }
+        return(c(getPipeEnds(left$id), pipe$line2))
+    }
+    roots <- parseData[parseData$parent == 0 & parseData$token == "expr", ]
+    blockLines <- unlist(lapply(seq_len(nrow(roots)), function(i) {
+        start <- roots$line1[i]
+        end <- min(roots$line2[i], length(precondition))
+        if (start > end) {
+            return(list())
+        }
+        ends <- unique(c(getPipeEnds(roots$id[i]), end))
+        ends <- ends[ends <= end]
+        starts <- c(start, head(ends, -1) + 1L)
+        return(Map(seq.int, starts, ends))
+    }), recursive = FALSE)
     # Do not remove a line shared by multiple top-level expressions.
     if (anyDuplicated(unlist(blockLines))) {
         return(precondition)
