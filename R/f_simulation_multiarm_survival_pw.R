@@ -44,6 +44,7 @@ NULL
 #' @inheritParams param_effectMatrix
 #' @inheritParams param_activeArms
 #' @inheritParams param_piControl
+#' @inheritParams param_piecewiseSurvivalTime_multiarm
 #' @inheritParams param_successCriterion
 #' @inheritParams param_correlationComputation
 #' @inheritParams param_typeOfShapeSurvival
@@ -99,6 +100,13 @@ NULL
 #' legacy test-statistic-based approach for backward compatibility if no patient-wise-specific
 #' arguments are provided.
 #'
+#' For piecewise exponential event times, create \code{piecewiseSurvivalTime}
+#' with \code{getPiecewiseMultiArmSurvivalTime()}. Hazard ratios are represented
+#' as an active-arm-by-interval-by-situation array; equivalently, they can be
+#' supplied to the constructor as a named list of active-arm-by-interval
+#' matrices. The situation dimension changes slowest, so printing the object
+#' displays one active-arm-by-interval matrix for each situation.
+#'
 #' The definition of \code{thetaH1} makes only sense if \code{kMax} > 1
 #' and if \code{conditionalPower}, \code{minNumberOfEventsPerStage}, and
 #' \code{maxNumberOfEventsPerStage} (or \code{calcEventsFunction}) are defined.
@@ -120,6 +128,8 @@ NULL
 #' \code{overallEffects}.
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
+#' @template details_survival_conditional_power
+#'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'
@@ -134,6 +144,7 @@ getSimulationMultiArmSurvival <- function(
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         activeArms = NA_integer_,
         piControl = NA_real_,
+        piecewiseSurvivalTime = NULL,
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
         omegaMaxVector = NA_real_,
@@ -183,7 +194,8 @@ getSimulationMultiArmSurvival <- function(
         c(
             "piControl", "eventTime", "accrualTime", "accrualIntensity",
             "accrualIntensityType", "dropoutRate1", "dropoutRate2",
-            "dropoutTime", "maxNumberOfSubjects", "kappa"
+            "dropoutTime", "maxNumberOfSubjects", "kappa",
+            "piecewiseSurvivalTime"
         ),
         hasArg,
         FALSE
@@ -295,6 +307,7 @@ getSimulationMultiArmSurvival <- function(
             thetaH0 = thetaH0,
             activeArms = activeArms,
             piControl = piControl,
+            piecewiseSurvivalTime = piecewiseSurvivalTime,
             effectMatrix = effectMatrix,
             typeOfShape = typeOfShape,
             omegaMaxVector = omegaMaxVector,
@@ -432,6 +445,7 @@ getSimulationMultiArmSurvival <- function(
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         activeArms = NA_integer_,
         piControl = NA_real_,
+        piecewiseSurvivalTime = NULL,
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
         omegaMaxVector = NA_real_,
@@ -470,6 +484,35 @@ getSimulationMultiArmSurvival <- function(
         showStatistics = FALSE,
         cppEnabled = TRUE,
         simulationTypeIsUserDefined = FALSE) {
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseMultiArmSurvivalTime")
+    if (!is.null(piecewiseSurvivalTime) && !piecewiseEnabled) {
+        stopIllegalArgument("'piecewiseSurvivalTime' must be a PiecewiseMultiArmSurvivalTime object",
+            functionName = "getSimulationMultiArmSurvival", parameter = "piecewiseSurvivalTime")
+    }
+    if (piecewiseEnabled) {
+        if (!is.na(kappa) && kappa != 1) {
+            stopIllegalArgument("'kappa' must be 1 for piecewise exponential survival times",
+                functionName = "getSimulationMultiArmSurvival", parameter = "kappa")
+        }
+        if (!all(is.na(piControl))) {
+            stopConflictingArguments("'piControl' and 'piecewiseSurvivalTime' cannot both be specified",
+                functionName = "getSimulationMultiArmSurvival", parameter = "piControl",
+                relatedParameter = "piecewiseSurvivalTime")
+        }
+        if (!is.null(effectMatrix)) {
+            stopConflictingArguments("'effectMatrix' and 'piecewiseSurvivalTime' cannot both be specified",
+                functionName = "getSimulationMultiArmSurvival", parameter = "effectMatrix",
+                relatedParameter = "piecewiseSurvivalTime")
+        }
+        if (!is.na(activeArms) && activeArms != piecewiseSurvivalTime$getNumberOfGroups()) {
+            stopIllegalArgument("'activeArms' does not match the piecewise survival specification",
+                functionName = "getSimulationMultiArmSurvival", parameter = "activeArms")
+        }
+        activeArms <- piecewiseSurvivalTime$getNumberOfGroups()
+        typeOfShape <- "userDefined"
+        effectMatrix <- .getPiecewiseInitialHazardRatios(piecewiseSurvivalTime)
+        kappa <- 1
+    }
     if (is.null(design)) {
         design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
@@ -567,7 +610,8 @@ getSimulationMultiArmSurvival <- function(
         showStatistics = showStatistics,
         endpoint = "survival",
         simulationType = "patientWise",
-        simulationTypeIsUserDefined = simulationTypeIsUserDefined
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined,
+        piecewiseSurvivalTime = piecewiseSurvivalTime
     )
 
     design <- simulationResults$.design
@@ -704,7 +748,8 @@ getSimulationMultiArmSurvival <- function(
             successCriterion = successCriterion,
             gMax = gMax,
             kMax = kMax,
-            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
+            piecewiseSurvivalScenarios = .getPiecewiseSurvivalScenarios(piecewiseSurvivalTime)
         )
     } else {
         .performSimulationMultiArmSurvivalLoop(
@@ -746,7 +791,8 @@ getSimulationMultiArmSurvival <- function(
             successCriterion = successCriterion,
             gMax = gMax,
             kMax = kMax,
-            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
+            piecewiseSurvivalTime = piecewiseSurvivalTime
         )
     }
 
@@ -788,6 +834,7 @@ getSimulationMultiArmSurvival <- function(
         ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
+    simulationResults$.setParameterType("rejectedArmsPerStage", C_PARAM_GENERATED)
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
     if (gMax == 1 || kMax == 1) {
         simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)

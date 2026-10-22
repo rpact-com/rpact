@@ -355,6 +355,99 @@ plotTypes <- function(
     return(validPlotTypes)
 }
 
+.getEndpointName <- function(obj) {
+    if (!inherits(obj, "ParameterSet")) {
+        return(NA_character_)
+    }
+    if (!inherits(obj, "TrialDesignPlan") && 
+            inherits(obj, "SimulationResults") && 
+            inherits(obj, "Dataset")) {
+        return(NA_character_)
+    }
+    
+    className <- .getClassName(obj)
+    endpoint <- gsub("^TrialDesignPlan|^SimulationResults|^Dataset", "", className)
+    if (grepl("Means|Rates|Survival|CountData|General", endpoint)) {
+        endpoint <- gsub(".*(Means|Rates|Survival|CountData|General).*", "\\1", endpoint)
+        endpoint <- sub("CountData", "Counts", endpoint)
+        endpoint <- tolower(endpoint)
+        return(endpoint)
+    }
+    
+    stopRuntimeIssue("could not identify endpoint for ", .getClassName(obj),
+        functionName = ".getEndpointName",
+        parameter = "obj", 
+        value = obj
+    )
+}
+
+# With userDefined = TRUE, return NA if no effect input was explicitly defined.
+.getEndpointDependentEffectParameterName <- function(designPlan, userDefined = FALSE) {
+    if (userDefined) {
+        endpoint <- .getEndpointName(designPlan)
+        if (is.na(endpoint)) {
+            return(NA_character_)
+        }
+
+        if (grepl("Enrichment", .getClassName(designPlan))) {
+            candidateNames <- "effectList"
+        } else if (grepl("MultiArm", .getClassName(designPlan))) {
+            candidateNames <- switch(endpoint,
+                means = c("effectMatrix", "muMaxVector"),
+                rates = c("effectMatrix", "piMaxVector"),
+                survival = c("effectMatrix", "omegaMaxVector"),
+                character()
+            )
+        } else {
+            candidateNames <- switch(endpoint,
+                means = "alternative",
+                rates = "pi1",
+                survival = c("hazardRatio", "pi1", "lambda1", "median1"),
+                counts = c("theta", "lambda1", "lambda"),
+                character()
+            )
+        }
+
+        # Prefer a directly specified effect over inputs used to derive it.
+        candidateNames <- candidateNames[
+            candidateNames %in% designPlan$.getUserDefinedParameters()
+        ]
+        if (length(candidateNames) == 0) {
+            return(NA_character_)
+        }
+        
+        return(candidateNames[1])
+    }
+    
+    if (inherits(designPlan, "SimulationResults")) {
+        return(.getSimulationPlotXAxisParameterName(designPlan))
+    }
+
+    endpoint <- .getEndpointName(designPlan)
+    if (is.na(endpoint)) {
+        return(NA_character_)
+    }
+
+    if (endpoint %in% c("means", "rates")) {
+        return("effect")
+    }
+
+    if (identical(endpoint, "survival")) {
+        return("hazardRatio")
+    }
+
+    if (identical(endpoint, "counts")) {
+        return("theta")
+    }
+
+    stopRuntimeIssue(
+        "get parameter name function not yet implemented for endpoint ", sQuote(endpoint),
+        functionName = ".getEndpointDependentEffectParameterName",
+        parameter = "designPlan",
+        value = designPlan
+    )
+}
+
 #'
 #' @title
 #' Get Available Plot Types
@@ -433,7 +526,12 @@ getAvailablePlotTypes <- function(
             if (obj$.design$kMax > 1) {
                 types <- c(types, 5, 6)
             }
-            types <- c(types, 7)
+            if (obj$.design$kMax > 1) {
+                paramName <- .getEndpointDependentEffectParameterName(obj)
+                if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+                    types <- c(types, 7)
+                }
+            }
             if (obj$.design$kMax > 1) {
                 types <- c(types, 8)
                 if (!.isTrialDesignPlanCountData(obj) ||
@@ -466,14 +564,22 @@ getAvailablePlotTypes <- function(
                 types <- c(types, 2:3)
             }
         }
-        types <- c(types, 4)
+        if (!grepl("CountData", .getClassName(obj)) || obj$.design$kMax > 1) {
+            types <- c(types, 4)
+        }
         if (!grepl("MultiArm", .getClassName(obj)) || obj$.design$kMax > 1) {
-            types <- c(types, 5)
+            paramName <- .getEndpointDependentEffectParameterName(obj)
+            if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+                types <- c(types, 5)
+            }
             if (!grepl("CountData", .getClassName(obj))) {
                 types <- c(types, 6)
             }
         }
-        types <- c(types, 7)
+        paramName <- .getEndpointDependentEffectParameterName(obj)
+        if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+            types <- c(types, 7)
+        }
         if (obj$.design$kMax > 1) {
             types <- c(types, 8)
         }
@@ -1130,6 +1236,13 @@ getAvailablePlotTypes <- function(
         }
     }
 
+    piecewiseSpecification <- if (.isParameterSet(parameterSet)) parameterSet[["piecewiseSurvivalTime"]] else NULL
+    if (!inherits(piecewiseSpecification, "PiecewisePatientWiseSurvivalTime")) piecewiseSpecification <- NULL
+    if (!is.null(piecewiseSpecification)) {
+        # Scenario order is repeated for each plotted arm, stage, or response series.
+        data$xValues <- rep(seq_len(piecewiseSpecification$getNumberOfSituations()), length.out = nrow(data))
+    }
+
     if (!is.na(nMax) && is.null(yParameterName3) && xParameterName == "informationRates") {
         xAxisLabel <- "Sample Size"
         data$xValues <- data$xValues * nMax
@@ -1251,7 +1364,11 @@ getAvailablePlotTypes <- function(
         ...
     )
 
-    if (xParameterName == "informationRates") {
+    if (!is.null(piecewiseSpecification)) {
+        p <- p + ggplot2::scale_x_continuous(
+            breaks = seq_len(piecewiseSpecification$getNumberOfSituations()),
+            labels = dimnames(piecewiseSpecification$hazardRatios)[[3]])
+    } else if (xParameterName == "informationRates") {
         p <- p + ggplot2::scale_x_continuous(breaks = c(0, round(data$xValues, 3)))
     } else if (xParameterName == "situation") { # simulation enrichment
         p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
@@ -1388,6 +1505,7 @@ getAvailablePlotTypes <- function(
         plotSettings = NULL,
         sided = 1,
         discreteXAxis = FALSE,
+        xAxisTickLabels = NULL,
         directionUpper = NA) {
     if (!is.data.frame(data)) {
         stopRuntimeIssue("'data' must be a data.frame (is ", .getClassName(data), ")",
@@ -1455,7 +1573,9 @@ getAvailablePlotTypes <- function(
     p <- plotSettings$setTheme(p)
     p <- plotSettings$hideGridLines(p)
 
-    if (discreteXAxis) {
+    if (!is.null(xAxisTickLabels)) {
+        p <- p + ggplot2::scale_x_continuous(breaks = seq_along(xAxisTickLabels), labels = xAxisTickLabels)
+    } else if (discreteXAxis) {
         p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
     }
 

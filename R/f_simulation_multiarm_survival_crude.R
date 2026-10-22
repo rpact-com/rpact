@@ -729,10 +729,6 @@ NULL
 
     simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
     simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(
-        simulationResults, "singleNumberOfEventsPerStage",
-        simulatedSingleEventsPerStage, "2024-06-10"
-    )
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 

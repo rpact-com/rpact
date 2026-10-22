@@ -11,6 +11,7 @@
 ^_version$
 ^doc$
 ^docs$
+^misc$
 ^man-raw$
 ^bin$
 ^cran-comments\.md$

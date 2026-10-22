@@ -357,7 +357,8 @@ List getSurvDropoutTimes(int numberOfSubjects,
 						NumericVector lambdaControl,
 						NumericVector lambdaActive,
 						double kappa,
-						NumericVector phi) {
+						NumericVector phi,
+                        const PiecewiseSurvivalSampler& piecewise) {
 	// This is important to ensure that R's random number generator state is properly managed.
 	Rcpp::RNGScope scope; 
 
@@ -369,8 +370,12 @@ List getSurvDropoutTimes(int numberOfSubjects,
 		int subGroupIndex = firstMatch(subGroups, Rcpp::as<std::string>(subGroupVector[i]));
 
 		// Generate survival time
-		double thisLambda = treatments[i] == 1 ? lambdaActive[subGroupIndex] : lambdaControl[subGroupIndex];
-		survivalTime[i] = pow(-log(1 - R::runif(0.0, 1.0)), 1.0 / kappa) / thisLambda;
+        if (piecewise.enabled) {
+            survivalTime[i] = piecewise.draw(subGroupIndex, treatments[i] == 1);
+        } else {
+            double thisLambda = treatments[i] == 1 ? lambdaActive[subGroupIndex] : lambdaControl[subGroupIndex];
+            survivalTime[i] = pow(-log(1 - R::runif(0.0, 1.0)), 1.0 / kappa) / thisLambda;
+        }
 		
 		// Generate dropout time
 		bool anyPhiPositive = Rcpp::as<bool>(any(phi > 0));		
@@ -507,7 +512,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		Nullable<Function> calcEventsFunction = R_NilValue,
 		bool calcEventsFunctionIsUserDefined = false,
 		Nullable<Function> selectPopulationsFunction = R_NilValue,
-		bool returnRawData = false) {
+		bool returnRawData = false,
+        Nullable<List> piecewiseSurvival = R_NilValue) {
+    const PiecewiseSurvivalSampler piecewise(piecewiseSurvival);
 	
 	// Clone plannedEvents to avoid modifying the input parameter
 	NumericVector plannedEvents = clone(plannedEvents_);
@@ -525,6 +532,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	std::fill(overallEventsPerStage.begin(), overallEventsPerStage.end(), NA_REAL);
 	NumericMatrix populationEventsPerStage(gMax, kMax);
 	std::fill(populationEventsPerStage.begin(), populationEventsPerStage.end(), NA_REAL);
+	NumericMatrix subsetEventsPerStage(pMax, kMax);
+	std::fill(subsetEventsPerStage.begin(), subsetEventsPerStage.end(), 0.0);
 	NumericMatrix populationEventsPerStageCumulated(gMax, kMax);
 	std::fill(populationEventsPerStageCumulated.begin(), populationEventsPerStageCumulated.end(), NA_REAL);
 	NumericMatrix overallEffects(gMax, kMax);
@@ -562,8 +571,12 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	CharacterVector subGroupVector = tmp["subGroups"];
 
 	// Calculate hazards for control and active treatment
-	NumericVector lambdaControl = getLambdasByPis(piControls, eventTime, kappa);
-	NumericVector lambdaActive = hazardRatios * lambdaControl;
+    NumericVector lambdaControl;
+    NumericVector lambdaActive;
+    if (!piecewise.enabled) {
+        lambdaControl = getLambdasByPis(piControls, eventTime, kappa);
+        lambdaActive = hazardRatios * lambdaControl;
+    }
 
 	// Generate random survival and dropout times
 	tmp = getSurvDropoutTimes(
@@ -574,7 +587,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		lambdaControl,
 		lambdaActive,
 		kappa,
-		phi
+		phi,
+        piecewise
 	);
 	NumericVector survivalTime = clone(as<NumericVector>(tmp["survivalTime"]));
 	NumericVector dropoutTime = clone(as<NumericVector>(tmp["dropoutTime"]));
@@ -603,6 +617,21 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				break;
 			} else {
 				numberOfSubjects[k] = sum(recruitmentTimes <= analysisTime[k]);
+				for (int subject = 0; subject < maxNumberOfSubjects; subject++) {
+					double observedTime = recruitmentTimes[subject] + survivalTime[subject];
+					if (R_IsNA(dropoutTime[subject]) || survivalTime[subject] <= dropoutTime[subject]) {
+						if (observedTime <= analysisTime[k] &&
+							(k == 0 || observedTime > analysisTime[k - 1])) {
+							for (int subset = 0; subset < pMax; subset++) {
+								if (selectedsubGroupsIndices(subset, k) &&
+									subGroupVector[subject] == subGroups[subset]) {
+									subsetEventsPerStage(subset, k)++;
+									break;
+								}
+							}
+						}
+					}
+				}
 				
 				for (int g = 0; g < gMax; g++) {
 					if (selectedPopulations(g, k)) {
@@ -676,7 +705,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					lambdaControl,
 					lambdaActive,
 					kappa,
-					phi
+					phi,
+                    piecewise
 				);
 				NumericVector newSurvivalTime = tmp["survivalTime"];
 				NumericVector newDropoutTime = tmp["dropoutTime"];
@@ -702,12 +732,24 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				_["survivalTime"] = as<NumericVector>(survivalDataSet["survivalTime"])[selectedSubjects],
 				_["dropoutTime"] = as<NumericVector>(survivalDataSet["dropoutTime"])[selectedSubjects]
 			);
+			NumericVector selectedAccrualTime = survivalDatasetSelected["accrualTime"];
+			NumericVector selectedSurvivalTime = survivalDatasetSelected["survivalTime"];
+			NumericVector selectedDropoutTime = survivalDatasetSelected["dropoutTime"];
+			int previousSelectedEvents = 0;
+			for (int subject = 0; subject < selectedAccrualTime.size(); subject++) {
+				if (selectedAccrualTime[subject] + selectedSurvivalTime[subject] <= analysisTime[k - 1] &&
+					(R_IsNA(selectedDropoutTime[subject]) ||
+						selectedSurvivalTime[subject] <= selectedDropoutTime[subject])) {
+					previousSelectedEvents++;
+				}
+			}
+			double requiredEvents = previousSelectedEvents + plannedEvents[k] - plannedEvents[k - 1];
 
 			analysisTime[k] = findObservationTime(
-				survivalDatasetSelected["accrualTime"], 
-				survivalDatasetSelected["survivalTime"], 
-				survivalDatasetSelected["dropoutTime"], 
-				plannedEvents[k]
+				selectedAccrualTime,
+				selectedSurvivalTime,
+				selectedDropoutTime,
+				requiredEvents
 			);
 			
 			if (R_IsNA(analysisTime[k])) {
@@ -715,6 +757,20 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				break;
 			} else {
 				numberOfSubjects[k] = sum(recruitmentTimes <= analysisTime[k]);
+				for (int subject = 0; subject < maxNumberOfSubjects; subject++) {
+					double observedTime = recruitmentTimes[subject] + survivalTime[subject];
+					if (R_IsNA(dropoutTime[subject]) || survivalTime[subject] <= dropoutTime[subject]) {
+						if (observedTime <= analysisTime[k] && observedTime > analysisTime[k - 1]) {
+							for (int subset = 0; subset < pMax; subset++) {
+								if (selectedsubGroupsIndices(subset, k) &&
+									subGroupVector[subject] == subGroups[subset]) {
+									subsetEventsPerStage(subset, k)++;
+									break;
+								}
+							}
+						}
+					}
+				}
 				
 				for (int g = 0; g < gMax; g++) {
 					if (selectedPopulations(g, k)) {
@@ -974,6 +1030,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	List result = List::create(
 		_["eventsNotAchieved"] = eventsNotAchieved,
 		_["populationEventsPerStage"] = populationEventsPerStage,
+		_["subsetEventsPerStage"] = subsetEventsPerStage,
 		_["plannedEvents"] = plannedEvents,
 		_["analysisTime"] = analysisTime,
 		_["numberOfSubjects"] = numberOfSubjects,
@@ -1062,7 +1119,10 @@ List performSimulationEnrichmentSurvivalLoop(
 		std::string successCriterion,
 		int gMax,
 		int kMax,
-		int maxNumberOfRawDatasetsPerStage = 0) {
+		int maxNumberOfRawDatasetsPerStage = 0,
+        Nullable<List> piecewiseSurvivalScenarios = R_NilValue) {
+    List piecewiseScenarios = piecewiseSurvivalScenarios.isNotNull() ?
+        List(piecewiseSurvivalScenarios.get()) : List();
 	// Initialize simulation result matrices
 	IntegerMatrix simulatedNumberEventsNotAchieved(kMax, cols);
 	NumericMatrix simulatedAnalysisTime(kMax, cols);
@@ -1075,7 +1135,11 @@ List performSimulationEnrichmentSurvivalLoop(
 	NumericMatrix simulatedNumberOfPopulations(kMax, cols);
 	NumericVector simulatedPopulationEventsPerStage(kMax * cols * gMax);
 	simulatedPopulationEventsPerStage.attr("dim") = IntegerVector::create(kMax, cols, gMax);
+	int pMax = 1 << (gMax - 1);
+	NumericVector simulatedSubsetEventsPerStage(kMax * cols * pMax);
+	simulatedSubsetEventsPerStage.attr("dim") = IntegerVector::create(kMax, cols, pMax);
 	NumericMatrix simulatedNumberOfEvents(kMax, cols);
+	NumericMatrix simulatedSingleEventsPerStage(kMax, cols);
 	NumericMatrix simulatedSuccessStopping(kMax, cols);
 	NumericMatrix simulatedFutilityStopping(kMax - 1, cols);
 	NumericMatrix simulatedConditionalPower(kMax, cols);
@@ -1095,7 +1159,9 @@ List performSimulationEnrichmentSurvivalLoop(
 	std::fill(simulatedRejections.begin(), simulatedRejections.end(), 0.0);
 	std::fill(simulatedNumberOfPopulations.begin(), simulatedNumberOfPopulations.end(), 0.0);
 	std::fill(simulatedPopulationEventsPerStage.begin(), simulatedPopulationEventsPerStage.end(), 0.0);
+	std::fill(simulatedSubsetEventsPerStage.begin(), simulatedSubsetEventsPerStage.end(), 0.0);
 	std::fill(simulatedNumberOfEvents.begin(), simulatedNumberOfEvents.end(), 0.0);
+	std::fill(simulatedSingleEventsPerStage.begin(), simulatedSingleEventsPerStage.end(), 0.0);
 	std::fill(simulatedSuccessStopping.begin(), simulatedSuccessStopping.end(), 0.0);
 	std::fill(simulatedFutilityStopping.begin(), simulatedFutilityStopping.end(), 0.0);
 	std::fill(simulatedConditionalPower.begin(), simulatedConditionalPower.end(), 0.0);
@@ -1127,13 +1193,30 @@ List performSimulationEnrichmentSurvivalLoop(
 	// Extract effect list components
 	CharacterVector subGroups = effectList["subGroups"];
 	NumericVector prevalences = effectList["prevalences"];
-	NumericVector piControls = effectList["piControls"];
+    NumericVector piControls = piecewiseSurvivalScenarios.isNotNull() ?
+        NumericVector(0) : as<NumericVector>(effectList["piControls"]);
 	NumericMatrix hazardRatios = effectList["hazardRatios"];
+	LogicalMatrix subsetInPopulation(gMax, pMax);
+	for (int g = 0; g < gMax; g++) {
+		CharacterVector populationSubGroups = createSubGroupsFromPopulation(gMax, g + 1);
+		for (int subset = 0; subset < pMax; subset++) {
+			for (int member = 0; member < populationSubGroups.size(); member++) {
+				if (subGroups[subset] == populationSubGroups[member]) {
+					subsetInPopulation(g, subset) = true;
+					break;
+				}
+			}
+		}
+	}
 	
 	int index = 0;
 	
 	// Main simulation loop
 	for (int i = 0; i < cols; i++) {
+        Nullable<List> piecewiseSurvival = R_NilValue;
+        if (piecewiseSurvivalScenarios.isNotNull()) {
+            piecewiseSurvival = Nullable<List>(piecewiseScenarios[i]);
+        }
 		for (int j = 0; j < maxNumberOfIterations; j++) {
 			bool returnRawData = false;
 			if (maxNumberOfRawDatasetsPerStage > 0) {
@@ -1177,7 +1260,8 @@ List performSimulationEnrichmentSurvivalLoop(
 				calcEventsFunction,
 				calcEventsFunctionIsUserDefined,
 				selectPopulationsFunction,
-				returnRawData
+				returnRawData,
+                piecewiseSurvival
 			);
 			
 			List closedTest = performClosedCombinationTestForSimulationEnrichment(
@@ -1196,6 +1280,7 @@ List performSimulationEnrichmentSurvivalLoop(
 			NumericVector analysisTime = stageResults["analysisTime"];
 			NumericVector numberOfSubjects = stageResults["numberOfSubjects"];
 			NumericMatrix populationEventsPerStage = stageResults["populationEventsPerStage"];
+			NumericMatrix subsetEventsPerStage = stageResults["subsetEventsPerStage"];
 			NumericVector plannedEventsStage = stageResults["plannedEvents"];
 			NumericMatrix testStatistics = stageResults["testStatistics"];
 			NumericMatrix overallEffects = stageResults["overallEffects"];
@@ -1236,7 +1321,15 @@ List performSimulationEnrichmentSurvivalLoop(
 			// Loop over stages
 			for (int k = 0; k < kMax; k++) {
 				if (eventsNotAchieved[k]) {
-					simulatedNumberEventsNotAchieved(k, i)++;
+					// No later analysis is available, but earlier rejections remain valid.
+					for (int futureK = k; futureK < kMax; futureK++) {
+						simulatedNumberEventsNotAchieved(futureK, i)++;
+						for (int g = 0; g < gMax; g++) {
+							simulatedRejections[futureK + i * kMax + g * kMax * cols] +=
+								(rejectedPopulationsBefore[g] ? 1.0 : 0.0);
+						}
+					}
+					break;
 				} else {
 					simulatedAnalysisTime(k, i) += analysisTime[k];
 					simulatedNumberOfSubjects(k, i) += numberOfSubjects[k];
@@ -1248,8 +1341,17 @@ List performSimulationEnrichmentSurvivalLoop(
 						simulatedSelections[k + i * kMax + g * kMax * cols] += (selectedPopulationsTest(g, k) ? 1.0 : 0.0);
 						
 						if (!R_IsNA(populationEventsPerStage(g, k))) {
-							simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] += populationEventsPerStage(g, k);
+							for (int subset = 0; subset < pMax; subset++) {
+								if (subsetInPopulation(g, subset)) {
+									simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] +=
+										subsetEventsPerStage(subset, k);
+								}
+							}
 						}
+					}
+					for (int subset = 0; subset < pMax; subset++) {
+						simulatedSubsetEventsPerStage[k + i * kMax + subset * kMax * cols] +=
+							subsetEventsPerStage(subset, k);
 					}
 					
 					simulatedNumberOfPopulations(k, i) += sum(selectedPopulationsTest(_, k));
@@ -1272,6 +1374,8 @@ List performSimulationEnrichmentSurvivalLoop(
 					
 					iterations(k, i)++;
 					simulatedNumberOfEvents(k, i) += plannedEventsStage[k];
+					simulatedSingleEventsPerStage(k, i) +=
+						(k == 0 ? plannedEventsStage[k] : plannedEventsStage[k] - plannedEventsStage[k - 1]);
 					
 					// Collect detailed data
 					for (int g = 0; g < gMax; g++) {
@@ -1342,10 +1446,18 @@ List performSimulationEnrichmentSurvivalLoop(
 				}
 			}
 		}
+		for (int subset = 0; subset < pMax; subset++) {
+			for (int k = 0; k < kMax; k++) {
+				if (iterations(k, i) > 0) {
+					simulatedSubsetEventsPerStage[k + i * kMax + subset * kMax * cols] /= iterations(k, i);
+				}
+			}
+		}
 		
 		for (int k = 0; k < kMax; k++) {
 			if (iterations(k, i) > 0) {
 				simulatedNumberOfEvents(k, i) /= iterations(k, i);
+				simulatedSingleEventsPerStage(k, i) /= iterations(k, i);
 				simulatedNumberOfSubjects(k, i) /= iterations(k, i);
 				simulatedAnalysisTime(k, i) /= iterations(k, i);
 			}
@@ -1416,7 +1528,9 @@ List performSimulationEnrichmentSurvivalLoop(
 		_["simulatedRejections"] = simulatedRejections,
 		_["simulatedNumberOfPopulations"] = simulatedNumberOfPopulations,
 		_["simulatedPopulationEventsPerStage"] = simulatedPopulationEventsPerStage,
+		_["simulatedSubsetEventsPerStage"] = simulatedSubsetEventsPerStage,
 		_["simulatedNumberOfEvents"] = simulatedNumberOfEvents,
+		_["simulatedSingleEventsPerStage"] = simulatedSingleEventsPerStage,
 		_["simulatedSuccessStopping"] = simulatedSuccessStopping,
 		_["simulatedFutilityStopping"] = simulatedFutilityStopping,
 		_["simulatedConditionalPower"] = simulatedConditionalPower,

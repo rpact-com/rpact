@@ -21,6 +21,7 @@ NULL
     return(.getGroupSequentialProbabilitiesCpp(decisionMatrix, informationRates))
 }
 
+#' 
 #' @title
 #' Get Group Sequential Probabilities
 #'
@@ -2459,15 +2460,15 @@ getDesignGroupSequential <- function(
     return(n)
 }
 
+#' 
 #' @title
 #' Get Design Characteristics
 #'
 #' @description
 #' Calculates the characteristics of a design and returns it.
 #'
-#' @param design A conventional `TrialDesign` object or an optimal conditional
-#'   error design created with [getDesignOptimalConditionalError()]. If omitted,
-#'   a default conventional design is created.
+#' @param design A design object. If omitted,
+#'   a default design is created.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -2480,16 +2481,7 @@ getDesignGroupSequential <- function(
 #' finite numeric vector of treatment effects on the mean difference scale.
 #' The design is evaluated at those effects without recalibration.
 #'
-#' @return For an optimal conditional error design, a
-#'   `TrialDesignOptimalConditionalErrorCharacteristics` parameter set with
-#'   `theta`, `overallReject`, `rejectPerStage` (two rows, one per stage), and
-#'   `futilityPerStage` (one row for interim futility). Matrix columns correspond
-#'   to entries in `theta`, including for a single effect. Final non-rejection
-#'   is not counted as early futility. `overallReject` is overall power under
-#'   an alternative and the type I error probability at `theta = 0`.
-#'   See [getDesignOptimalConditionalError()] for the method and its assumptions.
-#'
-#' @return For conventional designs, returns a \code{\link{TrialDesignCharacteristics}} object.
+#' @return Returns a \code{\link{TrialDesignCharacteristics}} object.
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
 #'   \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
@@ -2503,14 +2495,6 @@ getDesignGroupSequential <- function(
 #' @template how_to_get_help_for_generics
 #'
 #' @family design functions
-#'
-#' @examples
-#' design <- getDesignOptimalConditionalError(
-#'     alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
-#'     thetaH1 = 0.5, useInterimEstimate = FALSE, firstStageInformation = 4,
-#'     likelihoodRatioDistribution = "maxlr"
-#' )
-#' getDesignCharacteristics(design, theta = c(0, 0.25, 0.5))
 #'
 #' @template reference_optimal
 #' @template reference_monotone

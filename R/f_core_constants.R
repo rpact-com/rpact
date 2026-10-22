@@ -403,3 +403,8 @@ C_SUMMARY_LEGEND_ENTRY_EFFECT_MATRIX <- list("[j]" = "effect shape situation j")
 C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARM <- list("(i)" = "results of treatment arm i vs. control arm")
 C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARMS <- list("(i, j, ...)" = "comparison of treatment arms 'i, j, ...' vs. control arm")
 C_SUMMARY_LEGEND_ENTRY_TREATMENT_EFFECT_SCALE <- list("(t)" = "treatment effect scale")
+
+C_REGEXP_GREATER_OR_EQUAL <- ">= ?"
+C_REGEXP_SMALLER <- "< ?"
+C_REGEXP_SMALLER_OR_EQUAL <- "<= ?"
+C_REGEXP_DECIMAL_NUMBER <- "\\d*(\\.{1}\\d*)?"

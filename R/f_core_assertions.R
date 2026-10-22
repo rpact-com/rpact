@@ -2787,18 +2787,18 @@ NULL
     return(directionUpper)
 }
 
-.assertIsFunction <- function(fun) {
+.assertIsFunction <- function(fun, funArgName = "fun") {
     if (is.null(fun)) {
-        stopIllegalArgument("'fun' must be a valid function",
+        stopIllegalArgument(.sQuote(funArgName), " must be a valid function",
             functionName = ".assertIsFunction",
-            parameter = "fun",
+            parameter = funArgName,
             value = fun
         )
     }
     if (!is.function(fun)) {
-        stopIllegalArgument("'fun' must be a function (is ", .getClassName(fun), ")",
+        stopIllegalArgument(.sQuote(funArgName), " must be a function (is ", .getClassName(fun), ")",
             functionName = ".assertIsFunction",
-            parameter = "fun",
+            parameter = funArgName,
             value = fun
         )
     }
@@ -3825,7 +3825,8 @@ NULL
 }
 
 # Validate the normalized enrichment effect list after list/data.frame conversion.
-.assertIsValidEffectList <- function(effectList, ..., endpoint, simulationType = "auto") {
+.assertIsValidEffectList <- function(effectList, ..., endpoint, simulationType = "auto",
+        requirePiControls = simulationType %in% c("patientWise", "patientWiseBasic")) {
     requiredNames <- c("subGroups", "prevalences")
     if (endpoint == "means") {
         requiredNames <- c(requiredNames, "effects", "stDevs")
@@ -3835,14 +3836,13 @@ NULL
         if (is.null(effectList$hazardRatios)) {
             requiredNames <- c(requiredNames, "piTreatments", "piControls")
         }
-        if (simulationType %in% c("patientWise", "patientWiseBasic")) {
+        if (requirePiControls) {
             requiredNames <- c(requiredNames, "piControls")
         }
     }
     for (name in unique(requiredNames)) {
         if (is.null(effectList[[name]]) || length(effectList[[name]]) == 0) {
-            patientWiseControls <- name == "piControls" && endpoint == "survival" &&
-                simulationType %in% c("patientWise", "patientWiseBasic")
+            patientWiseControls <- name == "piControls" && endpoint == "survival" && requirePiControls
             stopMissingArgument(
                 sQuote(paste0("effectList$", name)),
                 if (patientWiseControls) {

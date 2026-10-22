@@ -48,6 +48,26 @@ updateSubGroupVector <- function(
     subGroupVector[1:maxNumberOfSubjects]
 }
 
+.getPiecewiseEnrichmentSurvivalTimeRandom <- function(
+        treatmentArm,
+        subGroupIndex,
+        piecewiseSurvivalTime,
+        activeHazards,
+        controlHazards) {
+    hazards <- if (treatmentArm == 1) {
+        activeHazards[subGroupIndex, ]
+    } else {
+        controlHazards[subGroupIndex, ]
+    }
+    # The piecewise specification is already validated; avoid constructing and
+    # validating a PiecewiseSurvivalTime object for every patient.
+    .getPiecewiseExponentialRandomNumbersFast(
+        1,
+        piecewiseSurvivalTime = piecewiseSurvivalTime$piecewiseSurvivalTime,
+        piecewiseLambda = hazards
+    )
+}
+
 #'
 #' Calculates stage results for each simulation iteration step
 #'
@@ -64,6 +84,8 @@ updateSubGroupVector <- function(
         phi,
         eventTime,
         hazardRatios,
+        piecewiseSurvivalTime = NULL,
+        piecewiseActiveHazards = NULL,
         directionUpper,
         stratifiedAnalysis,
         plannedEvents,
@@ -93,6 +115,7 @@ updateSubGroupVector <- function(
     simLogRanks <- matrix(NA_real_, nrow = pMax, ncol = kMax)
     overallEventsPerStage <- numeric(kMax)
     populationEventsPerStage <- matrix(NA_real_, nrow = gMax, ncol = kMax)
+    subsetEventsPerStage <- matrix(0, nrow = pMax, ncol = kMax)
     overallEffects <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     testStatistics <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     logRankStatistics <- matrix(NA_real_, nrow = pMax, ncol = kMax)
@@ -121,16 +144,28 @@ updateSubGroupVector <- function(
         treatmentArm = treatments
     )
 
-    lambdaControl <- getLambdaByPi(piControls, eventTime, kappa)
-    lambdaActive <- hazardRatios * lambdaControl
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseEnrichmentSurvivalTime")
+    if (piecewiseEnabled) {
+        lambdaControl <- piecewiseSurvivalTime$lambdaControls
+        lambdaActive <- piecewiseActiveHazards
+    } else {
+        lambdaControl <- getLambdaByPi(piControls, eventTime, kappa)
+        lambdaActive <- hazardRatios * lambdaControl
+    }
 
     for (i in 1:maxNumberOfSubjects) {
-        if (survivalDataSet$treatmentArm[i] == 1) {
+        subGroupIndex <- which(survivalDataSet$subGroup[i] == subGroups)
+        if (piecewiseEnabled) {
+            survivalDataSet$survivalTime[i] <- .getPiecewiseEnrichmentSurvivalTimeRandom(
+                survivalDataSet$treatmentArm[i], subGroupIndex,
+                piecewiseSurvivalTime, lambdaActive, lambdaControl
+            )
+        } else if (survivalDataSet$treatmentArm[i] == 1) {
             survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
-                lambdaActive[which(survivalDataSet$subGroup[i] == subGroups)]
+                lambdaActive[subGroupIndex]
         } else {
             survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
-                lambdaControl[which(survivalDataSet$subGroup[i] == subGroups)]
+                lambdaControl[subGroupIndex]
         }
         if (any(phi > 0)) {
             if (phi[1] > 0) {
@@ -161,6 +196,16 @@ updateSubGroupVector <- function(
                 break
             } else {
                 numberOfSubjects[k] <- sum(survivalDataSet$accrualTime <= analysisTime[k])
+                observedTime <- survivalDataSet$accrualTime + survivalDataSet$survivalTime
+                eventObserved <- observedTime <= analysisTime[k] &
+                    (is.na(survivalDataSet$dropoutTime) |
+                        survivalDataSet$survivalTime <= survivalDataSet$dropoutTime)
+                for (subset in seq_len(pMax)) {
+                    if (selectedsubGroupsIndices[subset, k]) {
+                        subsetEventsPerStage[subset, k] <- sum(eventObserved &
+                            survivalDataSet$subGroup == subGroups[subset])
+                    }
+                }
 
                 for (g in 1:gMax) {
                     if (selectedPopulations[g, k]) {
@@ -214,12 +259,18 @@ updateSubGroupVector <- function(
                     survivalDataSet$subGroup <- subGroupVector[1:maxNumberOfSubjects]
 
                     for (i in numberOfSubjects[k - 1]:maxNumberOfSubjects) {
-                        if (survivalDataSet$treatmentArm[i] == 1) {
+                        subGroupIndex <- which(survivalDataSet$subGroup[i] == subGroups)
+                        if (piecewiseEnabled) {
+                            survivalDataSet$survivalTime[i] <- .getPiecewiseEnrichmentSurvivalTimeRandom(
+                                survivalDataSet$treatmentArm[i], subGroupIndex,
+                                piecewiseSurvivalTime, lambdaActive, lambdaControl
+                            )
+                        } else if (survivalDataSet$treatmentArm[i] == 1) {
                             survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
-                                lambdaActive[which(survivalDataSet$subGroup[i] == subGroups)]
+                                lambdaActive[subGroupIndex]
                         } else {
                             survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
-                                lambdaControl[which(survivalDataSet$subGroup[i] == subGroups)]
+                                lambdaControl[subGroupIndex]
                         }
                         if (any(phi > 0)) {
                             if (phi[1] > 0) {
@@ -242,18 +293,36 @@ updateSubGroupVector <- function(
             selectedsubGroups <- .createSubGroupsCpp(gMax)[selectedsubGroupsIndices[, k]]
 
             survivalDatasetSelected <- survivalDataSet[survivalDataSet$subGroup %in% selectedsubGroups, ]
+            previousSelectedEvents <- sum(
+                survivalDatasetSelected$accrualTime + survivalDatasetSelected$survivalTime <=
+                    analysisTime[k - 1] &
+                    (is.na(survivalDatasetSelected$dropoutTime) |
+                        survivalDatasetSelected$survivalTime <= survivalDatasetSelected$dropoutTime)
+            )
 
             analysisTime[k] <- .findObservationTimeCpp(
                 accrualTime = survivalDatasetSelected$accrualTime,
                 survivalTime = survivalDatasetSelected$survivalTime,
                 dropoutTime = survivalDatasetSelected$dropoutTime,
-                requiredStageEvents = plannedEvents[k]
+                requiredStageEvents = previousSelectedEvents +
+                    plannedEvents[k] - plannedEvents[k - 1]
             )
             if (is.na(analysisTime[k])) {
                 eventsNotAchieved[k] <- TRUE
                 break
             } else {
                 numberOfSubjects[k] <- sum(survivalDataSet$accrualTime <= analysisTime[k])
+                observedTime <- survivalDataSet$accrualTime + survivalDataSet$survivalTime
+                eventObserved <- observedTime > analysisTime[k - 1] &
+                    observedTime <= analysisTime[k] &
+                    (is.na(survivalDataSet$dropoutTime) |
+                        survivalDataSet$survivalTime <= survivalDataSet$dropoutTime)
+                for (subset in seq_len(pMax)) {
+                    if (selectedsubGroupsIndices[subset, k]) {
+                        subsetEventsPerStage[subset, k] <- sum(eventObserved &
+                            survivalDataSet$subGroup == subGroups[subset])
+                    }
+                }
                 for (g in 1:gMax) {
                     if (selectedPopulations[g, k]) {
                         logRank <- .logRankTestEnrichmentCpp(
@@ -456,6 +525,7 @@ updateSubGroupVector <- function(
     result <- list(
         eventsNotAchieved = eventsNotAchieved,
         populationEventsPerStage = populationEventsPerStage,
+        subsetEventsPerStage = subsetEventsPerStage,
         plannedEvents = plannedEvents,
         analysisTime = analysisTime,
         numberOfSubjects = numberOfSubjects,
@@ -483,6 +553,7 @@ updateSubGroupVector <- function(
         ...,
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         effectList = NULL,
+        piecewiseSurvivalTime = NULL,
         kappa = 1,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
@@ -596,8 +667,12 @@ updateSubGroupVector <- function(
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
         endpoint = "survival",
-        simulationType = "patientWiseBasic"
+        simulationType = "patientWiseBasic",
+        piecewiseSurvivalTime = piecewiseSurvivalTime
     )
+    piecewiseSurvivalTime <- .alignPiecewiseSurvivalGroups(
+        piecewiseSurvivalTime, simulationResults$effectList$subGroups)
+    simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
 
     design <- simulationResults$.design
     effectList <- simulationResults$effectList
@@ -622,6 +697,9 @@ updateSubGroupVector <- function(
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
     cols <- nrow(effectList$hazardRatios)
+    populationSubsetIndices <- lapply(seq_len(gMax), function(g) {
+        which(effectList$subGroups %in% .createSubGroupsFromPopulationCpp(gMax, g))
+    })
 
     simulatedNumberEventsNotAchieved <- matrix(0, nrow = kMax, ncol = cols)
     simulatedAnalysisTime <- matrix(0, nrow = kMax, ncol = cols)
@@ -630,7 +708,9 @@ updateSubGroupVector <- function(
     simulatedRejections <- array(0, dim = c(kMax, cols, gMax))
     simulatedNumberOfPopulations <- matrix(0, nrow = kMax, ncol = cols)
     simulatedPopulationEventsPerStage <- array(0, dim = c(kMax, cols, gMax))
+    simulatedSubsetEventsPerStage <- array(0, dim = c(kMax, cols, 2^(gMax - 1)))
     simulatedNumberOfEvents <- matrix(0, nrow = kMax, ncol = cols)
+    simulatedSingleEventsPerStage <- matrix(0, nrow = kMax, ncol = cols)
     simulatedSuccessStopping <- matrix(0, nrow = kMax, ncol = cols)
     simulatedFutilityStopping <- matrix(0, nrow = kMax - 1, ncol = cols)
     simulatedConditionalPower <- matrix(0, nrow = kMax, ncol = cols)
@@ -718,7 +798,22 @@ updateSubGroupVector <- function(
     }
 
     index <- 1
+    allPiecewiseActiveHazards <- if (inherits(
+            piecewiseSurvivalTime, "PiecewiseEnrichmentSurvivalTime")) {
+        piecewiseSurvivalTime$getActiveHazards()
+    } else {
+        NULL
+    }
     for (i in seq_len(cols)) {
+        piecewiseActiveHazards <- if (!is.null(allPiecewiseActiveHazards)) {
+            matrix(
+                allPiecewiseActiveHazards[, , i, drop = FALSE],
+                nrow = length(effectList$subGroups),
+                dimnames = dimnames(piecewiseSurvivalTime$hazardRatios)[1:2]
+            )
+        } else {
+            NULL
+        }
         for (j in seq_len(maxNumberOfIterations)) {
             returnRawData <- maxNumberOfRawDatasetsPerStage > 0 &&
                 any(rawDataPerStage[i, ] < maxNumberOfRawDatasetsPerStage)
@@ -729,6 +824,8 @@ updateSubGroupVector <- function(
                 prevalences = effectList$prevalences,
                 piControls = effectList$piControls,
                 hazardRatios = effectList$hazardRatios[i, ],
+                piecewiseSurvivalTime = piecewiseSurvivalTime,
+                piecewiseActiveHazards = piecewiseActiveHazards,
                 kappa = kappa,
                 phi = phi,
                 eventTime = eventTime,
@@ -789,7 +886,14 @@ updateSubGroupVector <- function(
 
             for (k in 1:kMax) {
                 if (stageResults$eventsNotAchieved[k]) {
-                    simulatedNumberEventsNotAchieved[k, i] <- simulatedNumberEventsNotAchieved[k, i] + 1
+                    # No later analysis is available, but earlier rejections remain valid.
+                    for (futureK in k:kMax) {
+                        simulatedNumberEventsNotAchieved[futureK, i] <-
+                            simulatedNumberEventsNotAchieved[futureK, i] + 1
+                        simulatedRejections[futureK, i, ] <-
+                            simulatedRejections[futureK, i, ] + rejectedPopulationsBefore
+                    }
+                    break
                 } else {
                     simulatedAnalysisTime[k, i] <- simulatedAnalysisTime[k, i] + stageResults$analysisTime[k]
                     simulatedNumberOfSubjects[k, i] <- simulatedNumberOfSubjects[k, i] +
@@ -805,9 +909,12 @@ updateSubGroupVector <- function(
                     for (g in 1:gMax) {
                         if (!is.na(stageResults$populationEventsPerStage[g, k])) {
                             simulatedPopulationEventsPerStage[k, i, g] <- simulatedPopulationEventsPerStage[k, i, g] +
-                                stageResults$populationEventsPerStage[g, k]
+                                sum(stageResults$subsetEventsPerStage[populationSubsetIndices[[g]], k])
                         }
                     }
+                    simulatedSubsetEventsPerStage[k, i, ] <-
+                        simulatedSubsetEventsPerStage[k, i, ] +
+                        stageResults$subsetEventsPerStage[, k]
                     simulatedNumberOfPopulations[k, i] <- simulatedNumberOfPopulations[k, i] +
                         sum(closedTest$selectedPopulations[, k])
 
@@ -828,13 +935,12 @@ updateSubGroupVector <- function(
 
                     iterations[k, i] <- iterations[k, i] + 1
 
-                    if (k == 1) {
-                        simulatedNumberOfEvents[k, i] <- simulatedNumberOfEvents[k, i] +
-                            stageResults$plannedEvents[k]
-                    } else {
-                        simulatedNumberOfEvents[k, i] <- simulatedNumberOfEvents[k, i] +
-                            stageResults$plannedEvents[k]
-                    }
+                    simulatedNumberOfEvents[k, i] <- simulatedNumberOfEvents[k, i] +
+                        stageResults$plannedEvents[k]
+                    simulatedSingleEventsPerStage[k, i] <-
+                        simulatedSingleEventsPerStage[k, i] +
+                        if (k == 1) stageResults$plannedEvents[k] else
+                            stageResults$plannedEvents[k] - stageResults$plannedEvents[k - 1]
 
                     for (g in 1:gMax) {
                         dataIterationNumber[index] <- j
@@ -898,6 +1004,10 @@ updateSubGroupVector <- function(
             )
         }
         simulatedNumberOfEvents[, i] <- simulatedNumberOfEvents[, i] / iterations[, i]
+        simulatedSingleEventsPerStage[, i] <-
+            simulatedSingleEventsPerStage[, i] / iterations[, i]
+        simulatedSubsetEventsPerStage[, i, ] <-
+            simulatedSubsetEventsPerStage[, i, ] / iterations[, i]
         simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / iterations[, i]
         simulatedAnalysisTime[, i] <- simulatedAnalysisTime[, i] / iterations[, i]
 
@@ -925,15 +1035,18 @@ updateSubGroupVector <- function(
     simulatedConditionalPower[1, ] <- NA_real_
     if (kMax > 1) {
         for (k in 2:kMax) {
+            # Average over trials continuing from the preceding completed analysis.
+            # Missing-event counts also include trials that failed at earlier stages.
             simulatedConditionalPower[k, ] <- simulatedConditionalPower[k, ] /
-                (iterations[k, ] +
-                    simulatedNumberEventsNotAchieved[k, ])
+                (iterations[k - 1, ] - simulatedSuccessStopping[k - 1, ] -
+                    simulatedFutilityStopping[k - 1, ])
         }
     }
 
     simulationResults$numberOfPopulations <- simulatedNumberOfPopulations / iterations
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$populationEventsPerStage <- simulatedPopulationEventsPerStage
+    simulationResults$singleEventsPerSubsetAndStage <- simulatedSubsetEventsPerStage
     simulationResults$analysisTime <- simulatedAnalysisTime
     .setEventsNotAchieved(simulationResults, accrualSetup, 
         eventsNotAchieved = simulatedNumberEventsNotAchieved / maxNumberOfIterations)
@@ -950,6 +1063,7 @@ updateSubGroupVector <- function(
     simulationResults$expectedNumberOfSubjects <- expectedNumberOfSubjects
     simulationResults$studyDuration <- expectedStudyDuration
     simulationResults$cumulativeEventsPerStage <- simulatedNumberOfEvents
+    simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
     simulationResults$iterations <- iterations
     if (kMax > 1) {
         simulationResults$earlyStop <- simulationResults$futilityPerStage +

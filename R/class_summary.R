@@ -399,7 +399,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 error = function(e) {
                     stopRuntimeIssue(".getColumnValues(", dQuote(parameterName), "): ",
                         e$message, "; .getClassName(values) = ",
-                        .getClassName(values), "; dim(values) = ",
+                        .dQuote(.getClassName(values)), "; dim(values) = ",
                         .arrayToString(dim(values), vectorLookAndFeelEnabled = TRUE),
                         "; variantIndex = ", variantIndex, "; transposed = ", transposed,
                         parameter = parameterName, value = values,

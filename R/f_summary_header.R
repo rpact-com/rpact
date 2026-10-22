@@ -374,98 +374,98 @@ NULL
         }
     } else if (settings$survivalEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
-        parameterNames <- designPlan$.getVisibleFieldNamesOrdered()
-        numberOfVariants <- .getMultidimensionalNumberOfVariants(designPlan, parameterNames)
-
-        if (grepl("SimulationResultsEnrichment", .getClassName(designPlan))) {
-            userDefinedParam <- "hazardRatios"
-            paramName <- "hazard ratios"
-            paramValue <- designPlan$effectList$hazardRatios
+        if (inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+            treatmentRateText <- .getPiecewiseSurvivalSummaryText(designPlan$piecewiseSurvivalTime)
         } else {
-            userDefinedParam <- "pi1"
-            for (param in c("pi1", "lambda1", "median1", "hazardRatio")) {
-                if (designPlan$isUserDefinedParameter(param) &&
-                        length(designPlan[[param]]) == numberOfVariants) {
-                    userDefinedParam <- param
+            parameterNames <- designPlan$.getVisibleFieldNamesOrdered()
+            numberOfVariants <- .getMultidimensionalNumberOfVariants(designPlan, parameterNames)
+
+            if (grepl("SimulationResultsEnrichment", .getClassName(designPlan))) {
+                userDefinedParam <- "hazardRatios"
+                paramName <- "hazard ratios"
+                paramValue <- designPlan$effectList$hazardRatios
+            } else {
+                userDefinedParam <- "pi1"
+                for (param in c("pi1", "lambda1", "median1", "hazardRatio")) {
+                    if (designPlan$isUserDefinedParameter(param) &&
+                            length(designPlan[[param]]) == numberOfVariants) {
+                        userDefinedParam <- param
+                    }
+                }
+                paramValue <- designPlan[[userDefinedParam]]
+
+                if (is.null(paramValue) || length(paramValue) == 0 || all(is.na(paramValue))) {
+                    userDefinedParam <- "hazardRatio"
+                }
+                paramName <- "treatment pi(1)"
+                if (userDefinedParam == "lambda1") {
+                    paramName <- "treatment lambda(1)"
+                } else if (userDefinedParam == "median1") {
+                    paramName <- "treatment median(1)"
+                } else if (userDefinedParam == "hazardRatio") {
+                    paramName <- ifelse(grepl(
+                        "SimulationResultsMultiArm",
+                        .getClassName(designPlan)
+                    ), "omega_max", "hazard ratio")
                 }
             }
-            paramValue <- designPlan[[userDefinedParam]]
 
-            if (is.null(paramValue) || length(paramValue) == 0 || all(is.na(paramValue))) {
-                userDefinedParam <- "hazardRatio"
-            }
-            paramName <- "treatment pi(1)"
-            if (userDefinedParam == "lambda1") {
-                paramName <- "treatment lambda(1)"
-            } else if (userDefinedParam == "median1") {
-                paramName <- "treatment median(1)"
-            } else if (userDefinedParam == "hazardRatio") {
-                paramName <- ifelse(grepl(
-                    "SimulationResultsMultiArm",
-                    .getClassName(designPlan)
-                ), "omega_max", "hazard ratio")
-            }
-        }
-
-        if (length(designPlan[[userDefinedParam]]) == 1) {
-            treatmentRateText <- paste0("H1: ", paramName, " = ", round(designPlan[[userDefinedParam]], 3))
-        } else if (!is.null(designPlan[["omegaMaxVector"]]) && length(designPlan$omegaMaxVector) >= 1) {
-            treatmentRateText <- paste0("H1: omega_max = ", 
-                .arrayToString(designPlan$omegaMaxVector, mode = "vector", digits = 3))
-        } else if (!is.null(designPlan[["hazardRatio"]]) && (length(designPlan$hazardRatio) == 1) ||
-                (inherits(designPlan, "SimulationResults") && !is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
-                    designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled)) {
-            treatmentRateText <- paste0(
-                "H1: hazard ratio = ",
-                .arrayToString(round(designPlan$hazardRatio, 3), vectorLookAndFeelEnabled = TRUE)
-            )
-        } else if (settings$enrichmentEnabled && !is.null(designPlan[["effectList"]]) &&
-                !is.null(designPlan$effectList[["hazardRatios"]]) &&
-                is.matrix(designPlan$effectList$hazardRatios) &&
-                nrow(designPlan$effectList$hazardRatios) == 1) {
-            treatmentRateText <- paste0(
-                "H1: hazard ratios = ",
-                .arrayToString(round(designPlan$effectList$hazardRatios, 3), vectorLookAndFeelEnabled = TRUE)
-            )
-        } else {
-            treatmentRateText <- paste0("H1: ", paramName, " as specified")
-        }
-        if (userDefinedParam %in% c("hazardRatio", "pi1") &&
-                (designPlan$isUserDefinedParameter("pi2") ||
-                    designPlan$isDefaultParameter("pi2")) &&
-                length(designPlan$pi2) == 1) {
-            treatmentRateText <- paste0(treatmentRateText, ", control pi(2) = ", round(designPlan$pi2, 3))
-        } else if (userDefinedParam %in% c("hazardRatio", "lambda1") &&
-                (designPlan$isUserDefinedParameter("lambda2") ||
-                    designPlan$isDefaultParameter("lambda2")) &&
-                length(designPlan$lambda2) == 1) {
-            treatmentRateText <- paste0(treatmentRateText, ", control lambda(2) = ", round(designPlan$lambda2, 3))
-        } else if (userDefinedParam %in% c("hazardRatio", "median1") &&
-                (designPlan$isUserDefinedParameter("median2") ||
-                    designPlan$isGeneratedOrDerivedParameter("median2")) &&
-                length(designPlan$median2) == 1) {
-            treatmentRateText <- paste0(treatmentRateText, ", control median(2) = ", round(designPlan$median2, 3))
-        } else if (!is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
-                designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
-            treatmentRateText <- paste0(treatmentRateText, ", piecewise survival distribution")
-            treatmentRateText <- paste0(
-                treatmentRateText, ", \n",
-                "piecewise survival time = ", .arrayToString(round(designPlan$piecewiseSurvivalTime, 4),
-                    digits = 4, vectorLookAndFeelEnabled = TRUE
-                ), ", \n",
-                "control lambda(2) = ", .arrayToString(round(designPlan$lambda2, 4),
-                    digits = 4, vectorLookAndFeelEnabled = TRUE
+            if (length(designPlan[[userDefinedParam]]) == 1) {
+                treatmentRateText <- paste0("H1: ", paramName, " = ", round(designPlan[[userDefinedParam]], 3))
+            } else if (!is.null(designPlan[["omegaMaxVector"]]) && length(designPlan$omegaMaxVector) >= 1) {
+                treatmentRateText <- paste0("H1: omega_max = ",
+                    .arrayToString(designPlan$omegaMaxVector, mode = "vector", digits = 3))
+            } else if (!is.null(designPlan[["hazardRatio"]]) && (length(designPlan$hazardRatio) == 1) ||
+                    (inherits(designPlan, "SimulationResults") && !is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
+                        designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled)) {
+                treatmentRateText <- paste0(
+                    "H1: hazard ratio = ",
+                    .arrayToString(round(designPlan$hazardRatio, 3), vectorLookAndFeelEnabled = TRUE)
                 )
-            )
+            } else if (settings$enrichmentEnabled && !is.null(designPlan[["effectList"]]) &&
+                    !is.null(designPlan$effectList[["hazardRatios"]]) &&
+                    is.matrix(designPlan$effectList$hazardRatios) &&
+                    nrow(designPlan$effectList$hazardRatios) == 1) {
+                treatmentRateText <- paste0(
+                    "H1: hazard ratios = ",
+                    .arrayToString(round(designPlan$effectList$hazardRatios, 3), vectorLookAndFeelEnabled = TRUE)
+                )
+            } else {
+                treatmentRateText <- paste0("H1: ", paramName, " as specified")
+            }
+            if (userDefinedParam %in% c("hazardRatio", "pi1") &&
+                    (designPlan$isUserDefinedParameter("pi2") ||
+                        designPlan$isDefaultParameter("pi2")) &&
+                    length(designPlan$pi2) == 1) {
+                treatmentRateText <- paste0(treatmentRateText, ", control pi(2) = ", round(designPlan$pi2, 3))
+            } else if (userDefinedParam %in% c("hazardRatio", "lambda1") &&
+                    (designPlan$isUserDefinedParameter("lambda2") ||
+                        designPlan$isDefaultParameter("lambda2")) &&
+                    length(designPlan$lambda2) == 1) {
+                treatmentRateText <- paste0(treatmentRateText, ", control lambda(2) = ", round(designPlan$lambda2, 3))
+            } else if (userDefinedParam %in% c("hazardRatio", "median1") &&
+                    (designPlan$isUserDefinedParameter("median2") ||
+                        designPlan$isGeneratedOrDerivedParameter("median2")) &&
+                    length(designPlan$median2) == 1) {
+                treatmentRateText <- paste0(treatmentRateText, ", control median(2) = ", round(designPlan$median2, 3))
+            } else if (!is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
+                    designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
+                treatmentRateText <- paste0(treatmentRateText, ", piecewise survival distribution")
+                treatmentRateText <- paste0(
+                    treatmentRateText, ", \n",
+                    "piecewise survival time = ", .arrayToString(round(designPlan$piecewiseSurvivalTime, 4),
+                        digits = 4, vectorLookAndFeelEnabled = TRUE
+                    ), ", \n",
+                    "control lambda(2) = ", .arrayToString(round(designPlan$lambda2, 4),
+                        digits = 4, vectorLookAndFeelEnabled = TRUE
+                    )
+                )
+            }
+            if (!is.null(designPlan[["piControl"]]) && length(designPlan$piControl) == 1 && !is.na(designPlan$piControl)) {
+                treatmentRateText <- paste0(treatmentRateText, ", control rate pi(control) = ", round(designPlan$piControl, 3))
+            }
         }
-        
-        print("settings$multiArmEnabled") # TODO remove
-        print(settings$multiArmEnabled)
 
-        if (!is.null(designPlan[["piControl"]]) && length(designPlan$piControl) == 1 && !is.na(designPlan$piControl)) {
-            treatmentRateText <- paste0(treatmentRateText, ", control rate pi(control) = ", round(designPlan$piControl, 3))
-        }
-        
         header <- paste0(header, ", \n", .createSummaryHypothesisText(designPlan, summaryFactory))
         header <- .concatenateSummaryText(header, treatmentRateText)
         header <- .addEnrichmentEffectListToHeader(header, designPlan)
@@ -974,7 +974,9 @@ NULL
     header <- .addAllocationRatioToHeader(designPlan, header)
 
     if (settings$survivalEnabled || settings$countDataEnabled) {
-        if (settings$survivalEnabled && !is.null(designPlan[["eventTime"]]) &&
+        if (settings$survivalEnabled &&
+                !inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime") &&
+                !is.null(designPlan[["eventTime"]]) &&
                 !all(is.na(designPlan[["eventTime"]]))) {
             header <- .concatenateSummaryText(header, paste0(
                 "event time = ",
@@ -1050,9 +1052,9 @@ NULL
         }
         if (settings$survivalEnabled &&
                 !is.null(designPlan[["dropoutTime"]]) &&
-                !is.na(designPlan$dropoutTime)) {
-            if ((!is.na(designPlan$dropoutRate1) && designPlan$dropoutRate1 > 0) ||
-                    (!is.na(designPlan$dropoutRate2) && designPlan$dropoutRate2 > 0)) {
+                !anyNA(designPlan$dropoutTime)) {
+            if ((!anyNA(designPlan$dropoutRate1) && any(designPlan$dropoutRate1 > 0)) ||
+                    (!anyNA(designPlan$dropoutRate2) && any(designPlan$dropoutRate2 > 0))) {
                 header <- .concatenateSummaryText(header, paste0(
                     "dropout rate(1) = ",
                     .arrayToString(designPlan$dropoutRate1,

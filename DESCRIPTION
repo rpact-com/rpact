@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.5.0.9321
-Date: 2026-09-24
+Version: 4.5.0.9323
+Date: 2026-10-22
 Authors@R: c(
 	person(
 		given = "Gernot",
@@ -42,12 +42,6 @@ Authors@R: c(
     	family = "Muetze",
     	email = "tobias.muetze@novartis.com",
     	comment = c(ORCID = "0000-0002-4111-1941"),
-    	role = c("ctb")
-	),
-    person(
-    	given = "Morton",
-    	family = "Dreher",
-    	email = "morten.dreher@outlook.de",
     	role = c("ctb")
 	),
     person(
@@ -127,6 +121,9 @@ Collate:
     'class_simulation_results.R'
     'class_performance_score.R'
     'class_summary.R'
+    'class_time_accrual.R'
+    'class_time_piecewise_survival.R'
+    'class_time_piecewise_survival_multiarm.R'
     'data.R'
     'f_analysis_base_general.R'
     'f_analysis_base_means.R'
@@ -191,4 +188,4 @@ Collate:
     'parameter_names.R'
     'parameter_order.R'
     'pkgname.R'
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1

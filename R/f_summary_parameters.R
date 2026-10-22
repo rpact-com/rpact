@@ -265,6 +265,13 @@ NULL
             legendEntry = list()
         ))
     }
+    if (inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+        return(list(
+            groupCaption = paste0(parameterCaption, ", situation = ",
+                dimnames(designPlan$piecewiseSurvivalTime$hazardRatios)[[3]][variedParamNumber]),
+            legendEntry = list()
+        ))
+    }
 
     enrichmentEnabled <- grepl("SimulationResultsEnrichment", .getClassName(designPlan))
     if (enrichmentEnabled) {
@@ -363,7 +370,8 @@ NULL
     numberOfVariedParams <- 1
     numberOfGroups <- 1
     arrayDataDim <- dim(arrayData)
-    if (length(arrayDataDim) > 1 && arrayDataDim[1] > 1) {
+    if (length(arrayDataDim) > 1 && (arrayDataDim[1] > 1 ||
+            inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime"))) {
         numberOfVariedParams <- arrayDataDim[2]
         if (length(arrayDataDim) > 2) {
             numberOfGroups <- arrayDataDim[3]
@@ -395,6 +403,8 @@ NULL
             dataPerGroupAndStage <- arrayData
             if (length(arrayDataDim) > 2) {
                 dataPerGroupAndStage <- arrayData[, variedParamNumber, groupNumber]
+            } else if (length(arrayDataDim) == 2) {
+                dataPerGroupAndStage <- arrayData[, variedParamNumber]
             }
             if (numberOfGroups > 1) {
                 groupCaption <- .getSummaryGroupCaption(

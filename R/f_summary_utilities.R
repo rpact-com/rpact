@@ -667,9 +667,12 @@ print.SummaryFactory <- function(
             }
         } else {
             values <- t(values)
+            if (identical(parameterName, "numberOfSubjects") && .isSimulationResults(parameterSet)) {
+                transposed <- TRUE
+            }
         }
     }
-
+    
     if (is.list(parameterSet) && is.matrix(values)) {
         parameterSet <- parameterSet[["parameterSet"]]
         if (is.null(parameterSet)) {
@@ -809,10 +812,11 @@ print.SummaryFactory <- function(
                         "earlyStop",
                         "futilityPerStage",
                         "successPerStage",
+                        "numberOfSubjects",
                         "expectedNumberOfSubjects",
                         "expectedNumberOfEvents",
                         "singleEventsPerArmAndStage",
-                        "singleEventsPerSubsetAndStage",
+                        "singleEventsPerSubsetAndStage", 
                         "numberOfSelectedArms",
                         "numberOfPopulations",
                         "conditionalPowerAchieved",
@@ -831,7 +835,12 @@ print.SummaryFactory <- function(
                     legendEntry <- .addLegendEntry("treatmentArm", legendEntry)
                 }
 
-                if (grepl("SimulationResultsEnrichment", .getClassName(parameterSet))) {
+                if (inherits(parameterSet[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+                    userDefinedEffectMatrix <- FALSE
+                    variedParameterValues <- dimnames(parameterSet$piecewiseSurvivalTime$hazardRatios)[[3]]
+                    variedParameterCaption <- "situation"
+                    numberOfVariants <- length(variedParameterValues)
+                } else if (grepl("SimulationResultsEnrichment", .getClassName(parameterSet))) {
                     variedParameterName <- .getSummaryVariedParameterNameEnrichment(parameterSet)
                     variedParameterValues <- parameterSet$effectList[[variedParameterName]]
                     if (variedParameterName == "piTreatments") {

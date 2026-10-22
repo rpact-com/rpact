@@ -43,5 +43,21 @@
 #'     allocationRatioPlanned = 1, maxNumberOfSubjects = 400,
 #'     accrualTime = c(0, 20), accrualIntensity = 20,
 #'     maxNumberOfIterations = 50, simulationType = "patientWise")
+#'
+#' # Piecewise exponential event times for two active arms and two situations
+#' piecewiseTime <- getPiecewiseMultiArmSurvivalTime(
+#'     piecewiseSurvivalTime = c(0, 6),
+#'     lambdaControl = c(0.08, 0.12),
+#'     hazardRatios = list(
+#'         favorable = rbind(lowDose = c(0.9, 0.8), highDose = c(0.8, 0.6)),
+#'         conservative = rbind(lowDose = c(1, 0.9), highDose = c(0.9, 0.75))
+#'     )
+#' )
+#' simulationResultsPiecewise <- getSimulationMultiArmSurvival(
+#'     design = getDesignFixed(), simulationType = "patientWise",
+#'     piecewiseSurvivalTime = piecewiseTime, directionUpper = FALSE,
+#'     plannedEvents = 80, maxNumberOfSubjects = 300,
+#'     accrualTime = c(0, 12), accrualIntensity = 25,
+#'     maxNumberOfIterations = 50)
 #' }
 #' 

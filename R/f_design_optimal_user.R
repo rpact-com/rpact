@@ -9,6 +9,8 @@
 ## |  License text: https://www.r-project.org/Licenses/LGPL-3
 ## |
 
+#' 
+#' @title 
 #' Create an Optimal Conditional Error Design
 #'
 #' @description This function returns a design object which contains all 
@@ -34,7 +36,7 @@
 #' futility if \eqn{p_1 > \alpha_0}. Futility is binding: continuing beyond
 #' this boundary is not part of the calibrated design. In the continuation
 #' region, reject at stage two if its p-value is no larger than
-#' [getConditionalError()]. The second-stage p-value must be based on
+#' `getConditionalError()`. The second-stage p-value must be based on
 #' the new, independent second-stage data, not the cumulative data.
 #' Setting `efficacyBounds = 0` disables early efficacy and 
 #' `futilityBounds = 1` disables early futility.
@@ -214,52 +216,13 @@
 #'   `kappaLR`, and `maxThetaLR`, as described under Likelihood ratio distribution.
 #'
 #' @return An object of class \code{TrialDesignOptimalConditionalError}, 
-#' which can be passed to [getConditionalError()], [getStageInformation()],
+#' which can be passed to `getConditionalError()`, `getStageInformation()`,
 #' and [getDesignCharacteristics()].
 #' This adaptive design is not interchangeable with a conventional `TrialDesign`.
 #'
-#' @examples
-#' # Create a single-arm design with fixed parameter for the likelihood ratio
-#' # and a fixed effect for conditional power. 80 patients are observed in the
-#' # first-stage (firstStageInformation = 80 in the one-sample test, variance 1).
-#' # The second-stage information is restricted to be between 40 and 160.
-#' getDesignOptimalConditionalError(
-#'     alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
-#'     thetaH1 = 0.25, likelihoodRatioDistribution = "fixed", thetaLR = 0.25,
-#'     firstStageInformation = 80, useInterimEstimate = FALSE,
-#'     minInformationPerStage = 40, maxInformationPerStage = 160
-#' )
+#' @template examples_get_design_optimal
 #'
-#' # Create a design comparing two groups using the maximum likelihood ratio
-#' # and an interim estimate for the effect for conditional power.
-#' # 160 patients per arm are observed in the first stage
-#' # (firstStageInformation = 80 in the balanced two-sample test, variance 1).
-#' getDesignOptimalConditionalError(
-#'     alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
-#'     minThetaH1 = 0.25, likelihoodRatioDistribution = "maxlr",
-#'     firstStageInformation = 80, useInterimEstimate = TRUE
-#' )
-#'
-#' # Weight several effects for the optimisation; retain a separate power target.
-#' weightedDesign <- getDesignOptimalConditionalError(
-#'     alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
-#'     thetaH1 = 0.25, useInterimEstimate = FALSE, firstStageInformation = 80,
-#'     likelihoodRatioDistribution = "fixed", thetaLR = c(0, 0.25, 0.5),
-#'     weightsLR = c(0.25, 0.5, 0.25)
-#' )
-#' getStageInformation(pValue = c(0.05, 0.1, 0.3), design = weightedDesign)
-#'
-#' # Allow a lower conditional power target for less promising interim results.
-#' # Leave conditionalPower unspecified when supplying a callback.
-#' flexibleDesign <- getDesignOptimalConditionalError(
-#'     alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5,
-#'     conditionalPowerFunction = function(p) pnorm(1 - p),
-#'     thetaH1 = 0.25, useInterimEstimate = FALSE, firstStageInformation = 80,
-#'     likelihoodRatioDistribution = "maxlr"
-#' )
-#' getConditionalError(pValue = c(0.05, 0.1, 0.3), design = flexibleDesign)
-#'
-#' @export
+#' @noRd 
 #'
 #' @template reference_optimal
 #' @template reference_monotone
@@ -355,8 +318,14 @@ getDesignOptimalConditionalError <- function(
     )
 }
 
+#'
+#' @title 
 #' Calculate the Optimal Conditional Error
 #'
+#' @inheritParams param_pValueOCEF
+#' @inheritParams param_designOCEF
+#' @param stage Completed interim stage. Currently only `1` is supported.
+#' 
 #' @details The optimal conditional error \eqn{\alpha_2} given a 
 #' first-stage p-value \eqn{p_1} is calculated as:
 #' \deqn{\alpha_2(p_1)=\psi(-e^{c_0} \cdot \frac{\Delta_1^2}{l(p_1)}).}
@@ -368,37 +337,20 @@ getDesignOptimalConditionalError <- function(
 #' with \eqn{\alpha_1 > 0}, the returned conditional error is 1 and for 
 #' \eqn{p_1 > \alpha_0}, the returned conditional error is 0.
 #'
-#'
-#' @inheritParams param_pValueOCEF
-#' @inheritParams param_designOCEF
-#'
 #' @return A numeric vector of conditional errors, one per first-stage p-value.
-#' @export
 #'
 #' @template reference_optimal
 #' @template reference_monotone
 #' @template reference_optconerrf
 #'
-#' @seealso [getDesignOptimalConditionalError()]
+#' @template examples_get_optimal_conditional_error
 #'
-#' @examples
-#' # Create a design
-#' design <- getDesignOptimalConditionalError(
-#'     alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, conditionalPower = 0.9,
-#'     thetaH1 = 0.5, firstStageInformation = 40, useInterimEstimate = FALSE,
-#'     likelihoodRatioDistribution = "fixed", thetaLR = 0.5
-#' )
-#'
-#' # Early efficacy gives 1, continuation gives the stage-two threshold,
-#' # and binding futility gives 0.
-#' getConditionalError(
-#'     pValue = c(0.0005, 0.1, 0.3, 0.8), design = design
-#' )
-#'
-
-#' @param stage Completed interim stage. Currently only `1` is supported.
+#' @seealso `getDesignOptimalConditionalError()`
+#' 
 #' @rdname getConditionalError
-#' @export
+#' 
+#' @noRd 
+#' 
 getConditionalError <- function(design, pValue, stage = 1) {
     .assertIsOptimalDesignStage(stage, supportedStage = 1, functionName = "getConditionalError")
     .assertIsOptimalDesign(design)
@@ -470,6 +422,8 @@ getConditionalError <- function(design, pValue, stage = 1) {
     ))
 }
 
+#' 
+#' @title 
 #' Calculate Stage Information for an Adaptive Design
 #'
 #' @description Calculate the additional information required after an interim
@@ -525,37 +479,18 @@ getConditionalError <- function(design, pValue, stage = 1) {
 #' Add `design$firstStageInformation` to obtain expected total information.
 #' This expectation is unconditional, not conditional on reaching stage two.
 #' Changing the evaluation distribution here does not recalibrate the design.
-#'
-#' @examples
-#' # Get a design
-#' design <- getDesignOptimalConditionalError(
-#'     alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, 
-#'     conditionalPower = 0.9, thetaH1 = 0.25, 
-#'     likelihoodRatioDistribution = "fixed", thetaLR = 0.25,
-#'     firstStageInformation = 80, useInterimEstimate = FALSE
-#' )
-#' # Calculate expected information under correct specification
-#' getStageInformation(type = "expected", design = design)
-#'
-#' # Compare operating characteristics under a different true effect.
-#' getStageInformation(type = "expected", design = design, 
-#'     likelihoodRatioDistribution = "fixed", thetaLR = 0.15)
-#'
-#' # Calculate expected information under the null hypothesis
-#' getStageInformation(type = "expected",
-#'     design = design, likelihoodRatioDistribution = "fixed", thetaLR = 0
-#' )
-#'
-#' @examples
-#' # Required additional information given the interim results
-#' getStageInformation(design, pValue = c(0.05, 0.1, 0.3))
-#'
-#' @seealso [getDesignOptimalConditionalError()], [getConditionalError()],
+#' 
+#' @template examples_get_stage_information
+#' 
+#' @seealso `getDesignOptimalConditionalError()`, `getConditionalError()`,
 #'   [getFisherInformation()] for information at planned analyses of conventional designs.
+#' 
 #' @template reference_optimal
 #' @template reference_monotone
 #' @template reference_optconerrf
-#' @export
+#' 
+#' @noRd 
+#' 
 getStageInformation <- function(design, stage = 2, type = c("conditional", "expected"),
         pValue = NULL, likelihoodRatioDistribution = NULL, ...) {
     .assertIsOptimalDesign(design)

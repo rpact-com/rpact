@@ -180,6 +180,7 @@ SimulationResults <- R6::R6Class(
                         orderByParameterName = FALSE,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
+                    .showPiecewiseSimulationParameters(self, consoleOutputEnabled = consoleOutputEnabled)
                     self$.showParametersOfOneGroup(
                         self$.getDefaultParameters(),
                         "Default parameters",
@@ -388,6 +389,11 @@ SimulationResults <- R6::R6Class(
                     }
                     if (self$.design$kMax > 1) {
                         self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
+                    }
+                    if (inherits(self[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+                        self$.cat("  Situations: ",
+                            paste(dimnames(self$piecewiseSurvivalTime$hazardRatios)[[3]], collapse = ", "),
+                            " (in this order)\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
 
                     if (enrichmentEnabled) {
@@ -1410,6 +1416,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         numberOfSubjects = NULL,
         omegaMaxVector = NULL,
         piControl = NULL,
+        piecewiseSurvivalTime = NULL,
         rejectAtLeastOne = NULL,
         rejectedArmsPerStage = NULL,
         rValue = NULL,
@@ -1417,7 +1424,6 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         selectedArms = NULL,
         singleEventsPerArmAndStage = NULL,
         singleEventsPerStage = NULL, # only necessary for old simulation routine
-        singleNumberOfEventsPerStage = NULL, # only necessary for old simulation routine
         simulationType = NULL,
         slope = NULL,
         successCriterion = NULL,
@@ -1699,6 +1705,8 @@ SimulationResultsEnrichmentRates <- R6::R6Class(
 #' @template field_seed
 #' @template field_selectedPopulations
 #' @template field_selectPopulationsFunction
+#' @template field_singleEventsPerStage
+#' @template field_singleEventsPerSubsetAndStage
 #' @template field_singleNumberOfEventsPerStage
 #' @template field_simulationType
 #' @template field_stratifiedAnalysis
@@ -1754,10 +1762,11 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
         maxNumberOfSubjects = NULL,
         numberOfPopulations = NULL,
         numberOfSubjects = NULL,
+        piecewiseSurvivalTime = NULL,
         populations = NULL,
         populationEventsPerStage = NULL,
-        singleEventsPerSubsetAndStage = NULL, # deprecated
-        singleNumberOfEventsPerStage = NULL, # deprecated
+        singleEventsPerStage = NULL,
+        singleEventsPerSubsetAndStage = NULL,
         rejectAtLeastOne = NULL,
         rejectedPopulationsPerStage = NULL,
         rValue = NULL,
@@ -1775,6 +1784,8 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
             for (generatedParam in c(
                 "eventsNotAchieved",
                 "populationEventsPerStage",
+                "singleEventsPerStage",
+                "singleEventsPerSubsetAndStage",
                 "rejectAtLeastOne",
                 "selectedPopulations",
                 "numberOfPopulations",

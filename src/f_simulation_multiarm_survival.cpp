@@ -236,7 +236,8 @@ List getSurvDropoutTimesMultiArm(
 		NumericVector lambdaVector,
 		double kappa,
 		NumericVector phi1,
-		double phi2) {
+		double phi2,
+        const PiecewiseSurvivalSampler& piecewise) {
 
 	// This is important to ensure that R's random number generator state is properly managed.
 	Rcpp::RNGScope scope; 
@@ -249,8 +250,12 @@ List getSurvDropoutTimesMultiArm(
         int treatmentArm = treatments[i] - 1; // Convert to 0-based
         
         // Generate survival time
-        double u = R::runif(0, 1);
-        survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[treatmentArm];
+        if (piecewise.enabled) {
+            survivalTime[i] = piecewise.draw(treatmentArm < gMax ? treatmentArm : 0, treatmentArm < gMax);
+        } else {
+            double u = R::runif(0, 1);
+            survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[treatmentArm];
+        }
         
         dropoutTime[i] = NA_REAL;
         if (treatmentArm < gMax && phi1[treatmentArm] > 0) {
@@ -377,7 +382,9 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         Nullable<Function> calcEventsFunction = R_NilValue,
         bool calcEventsFunctionIsUserDefined = false,
         Nullable<Function> selectArmsFunction = R_NilValue,
-        bool returnRawData = false) {
+        bool returnRawData = false,
+        Nullable<List> piecewiseSurvival = R_NilValue) {
+    const PiecewiseSurvivalSampler piecewise(piecewiseSurvival);
     
     // This is important to ensure that R's random number generator state is properly managed
     Rcpp::RNGScope scope;
@@ -427,12 +434,14 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
     IntegerVector treatments = getTreatmentsMultiArm(gMax, maxNumberOfSubjects, allocationFraction);
     
     // Calculate hazards
-    double lambdaControl = getLambdaByPi(piControl, eventTime, kappa);
     NumericVector lambdaVector(gMax + 1);
-    for (int g = 0; g < gMax; g++) {
-        lambdaVector[g] = omegaVector[g] * lambdaControl;
+    if (!piecewise.enabled) {
+        double lambdaControl = getLambdaByPi(piControl, eventTime, kappa);
+        for (int g = 0; g < gMax; g++) {
+            lambdaVector[g] = omegaVector[g] * lambdaControl;
+        }
+        lambdaVector[gMax] = lambdaControl;
     }
-    lambdaVector[gMax] = lambdaControl;
 
     // Generate survival and dropout times
     List tmp = getSurvDropoutTimesMultiArm(
@@ -442,7 +451,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         lambdaVector,
         kappa,
         phi1,
-        phi2
+        phi2,
+        piecewise
     );
     NumericVector survivalTime = clone(as<NumericVector>(tmp["survivalTime"]));
 	NumericVector dropoutTime = clone(as<NumericVector>(tmp["dropoutTime"]));
@@ -522,13 +532,21 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                     int treatmentArm = treatments[i] - 1; // 0-based
                     for (int g = 0; g < gMax; g++) {
                         if (treatmentArm == g && selectedArms(g, k)) {
-                            double u = R::runif(0, 1);
-                            survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[g];
+                            if (piecewise.enabled) {
+                                survivalTime[i] = piecewise.draw(g, true);
+                            } else {
+                                double u = R::runif(0, 1);
+                                survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[g];
+                            }
                         }
                     }
                     if (treatmentArm == gMax){
-                        double u = R::runif(0, 1);
-                    	survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[gMax];
+                        if (piecewise.enabled) {
+                            survivalTime[i] = piecewise.draw(0, false);
+                        } else {
+                            double u = R::runif(0, 1);
+                            survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[gMax];
+                        }
                     }
                     dropoutTime[i] = NA_REAL;
                     for (int g = 0; g < gMax; g++) {
@@ -929,7 +947,10 @@ List performSimulationMultiArmSurvivalLoop(
 		std::string successCriterion,
 		int gMax,
 		int kMax,
-		int maxNumberOfRawDatasetsPerStage = 0) {
+		int maxNumberOfRawDatasetsPerStage = 0,
+        Nullable<List> piecewiseSurvivalScenarios = R_NilValue) {
+    List piecewiseScenarios = piecewiseSurvivalScenarios.isNotNull() ?
+        List(piecewiseSurvivalScenarios.get()) : List();
 
 	// Initialize simulation result matrices
 	IntegerMatrix simulatedNumberEventsNotAchieved(kMax, cols);
@@ -975,6 +996,7 @@ List performSimulationMultiArmSurvivalLoop(
 	
 	// Initialize data collection vectors
 	int len = maxNumberOfIterations * kMax * gMax * cols;
+	IntegerVector dataScenario(len, NA_INTEGER);
 	NumericVector dataIterationNumber(len, NA_REAL);
 	NumericVector dataStageNumber(len, NA_REAL);
 	NumericVector dataArmNumber(len, NA_REAL);
@@ -1000,6 +1022,10 @@ List performSimulationMultiArmSurvivalLoop(
 	
 	// Main simulation loop
 	for (int i = 0; i < cols; i++) {
+        Nullable<List> piecewiseSurvival = R_NilValue;
+        if (piecewiseSurvivalScenarios.isNotNull()) {
+            piecewiseSurvival = Nullable<List>(piecewiseScenarios[i]);
+        }
 		for (int j = 0; j < maxNumberOfIterations; j++) {
 			bool returnRawData = false;
 			if (maxNumberOfRawDatasetsPerStage > 0) {
@@ -1040,7 +1066,8 @@ List performSimulationMultiArmSurvivalLoop(
 				calcEventsFunction,
 				calcEventsFunctionIsUserDefined,
 				selectArmsFunction,
-				returnRawData
+				returnRawData,
+                piecewiseSurvival
 			);
 			
 			List closedTest;
@@ -1164,6 +1191,7 @@ List performSimulationMultiArmSurvivalLoop(
 						dataStageNumber[index] = k + 1;
 						dataArmNumber[index] = g + 1;
 						dataAlternative[index] = omegaMaxVector[i];
+						dataScenario[index] = i + 1;
 						dataEffect[index] = effectMatrix(i, g);
 						dataAnalysisTime[index] = analysisTime[k];
 						dataNumberOfSubjects[index] = numberOfSubjects[k];
@@ -1319,6 +1347,10 @@ List performSimulationMultiArmSurvivalLoop(
 		_["futilityPerStage"] = dataFutilityStop[validRows]
 	);
 	
+    if (piecewiseSurvivalScenarios.isNotNull()) {
+        filteredData.push_back(dataScenario[validRows], "scenario");
+    }
+
 	return List::create(
 		_["simulatedNumberEventsNotAchieved"] = simulatedNumberEventsNotAchieved,
 		_["simulatedAnalysisTime"] = simulatedAnalysisTime,

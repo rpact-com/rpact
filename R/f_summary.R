@@ -156,7 +156,6 @@ NULL
 }
 
 
-
 .createSummary <- function(
         object,
         digits = NA_integer_,
@@ -850,64 +849,59 @@ NULL
             )
         }
     }
-
-    if (simulationEnabled && (multiArmEnabled || enrichmentEnabled)) {
-        if (outputSize %in% c("medium", "large")) {
-            if (survivalEnabled) {
-                if (enrichmentEnabled) {
-                    parameterName <- "singleEventsPerSubsetAndStage"
-                    parameterCaption <- "Single number of events"
-                } else {
-                    parameterName <- "cumulativeEventsPerStage"
-                    parameterCaption <- "Cumulative number of events"
-                }
-            } else {
-                parameterName <- "sampleSizes"
-                parameterCaption <- "Stage-wise number of subjects"
-            }
-            .addSimulationArrayToSummary(
-                designPlan,
-                parameterName,
-                parameterCaption,
-                summaryFactory,
-                digitsSampleSize = digitSettings$digitsSampleSize,
-                smoothedZeroFormat = TRUE
+    
+    if (simulationEnabled && (multiArmEnabled || enrichmentEnabled) && outputSize %in% c("medium", "large")) {
+        parameterNameSubjects <- ifelse(survivalEnabled || countDataEnabled,
+            "numberOfSubjects", "sampleSizes"
+        )
+        if (designPlan$isGeneratedParameter(parameterNameSubjects)) {
+            subjectsCaption <- ifelse(design$kMax > 1 && !survivalEnabled,
+                "Stage-wise number of subjects",
+                "Number of subjects"
+            )
+            summaryFactory$addParameter(designPlan,
+                parameterName = parameterNameSubjects,
+                parameterCaption = subjectsCaption,
+                roundDigits = digitSettings$digitsSampleSize,
+                validateParameterType = !countDataEnabled,
+                showNA = TRUE,
+                transpose = TRUE,
+                lastStage = NA_integer_
             )
         }
     } else if (baseEnabled && outputSize %in% c("medium", "large")) {
         parameterNameSubjects <- NULL
         transpose <- FALSE
         lastStage <- NA_integer_
-        if (baseEnabled) {
-            if (inherits(designPlan, "SimulationResults")) {
-                parameterNameSubjects <- ifelse(survivalEnabled || countDataEnabled,
-                    "numberOfSubjects", "sampleSizes"
-                )
-            } else {
-                if (design$kMax == 1 && (
-                        designPlan$.isSampleSizeObject() ||
-                            .isTrialDesignPlanMeans(designPlan) ||
-                            .isTrialDesignPlanRates(designPlan) ||
-                            countDataEnabled
+
+        if (simulationEnabled) {
+            parameterNameSubjects <- ifelse(survivalEnabled || countDataEnabled,
+                "numberOfSubjects", "sampleSizes"
+            )
+        } else {
+            if (design$kMax == 1 && (
+                    designPlan$.isSampleSizeObject() ||
+                    .isTrialDesignPlanMeans(designPlan) ||
+                    .isTrialDesignPlanRates(designPlan) ||
+                    countDataEnabled
                     )) {
-                    parameterNameSubjects <- "nFixed"
-                } else if (countDataEnabled) {
-                    parameterNameSubjects <- "numberOfSubjects"
-                } else if (design$kMax == 1 && designPlan$.isPowerObject()) {
-                    parameterNameSubjects <- "expectedNumberOfSubjects"
-                    transpose <- TRUE
-                    lastStage <- design$kMax
-                } else {
-                    parameterNameSubjects <- "numberOfSubjects"
-                }
+                parameterNameSubjects <- "nFixed"
+            } else if (countDataEnabled) {
+                parameterNameSubjects <- "numberOfSubjects"
+            } else if (design$kMax == 1 && designPlan$.isPowerObject()) {
+                parameterNameSubjects <- "expectedNumberOfSubjects"
+                transpose <- TRUE
+                lastStage <- design$kMax
+            } else {
+                parameterNameSubjects <- "numberOfSubjects"
             }
         }
 
         if (designPlan$isGeneratedParameter(parameterNameSubjects)) {
             subjectsCaption <- ifelse(design$kMax > 1 &&
-                inherits(designPlan, "SimulationResults") && !survivalEnabled,
-            "Stage-wise number of subjects",
-            "Number of subjects"
+                    simulationEnabled && !survivalEnabled,
+                "Stage-wise number of subjects",
+                "Number of subjects"
             )
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterNameSubjects,
@@ -922,7 +916,8 @@ NULL
     }
 
     if (simulationEnabled && (multiArmEnabled || enrichmentEnabled || countDataEnabled)) {
-        if (!survivalEnabled) {
+        if (!is.null(designPlan[["expectedNumberOfSubjects"]]) &&
+                designPlan$isGeneratedParameter("expectedNumberOfSubjects")) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedNumberOfSubjects",
                 parameterCaption = "Expected number of subjects under H1",
@@ -933,9 +928,9 @@ NULL
         }
     } else if (baseEnabled && design$kMax > 1) {
         parameterName <- ifelse(inherits(designPlan, "TrialDesignPlan") &&
-            (designPlan$.isSampleSizeObject() || countDataEnabled),
-        "expectedNumberOfSubjectsH1",
-        "expectedNumberOfSubjects"
+                (designPlan$.isSampleSizeObject() || countDataEnabled),
+            "expectedNumberOfSubjectsH1",
+            "expectedNumberOfSubjects"
         )
         summaryFactory$addParameter(designPlan,
             parameterName = parameterName,
@@ -946,9 +941,9 @@ NULL
             lastStage = design$kMax
         )
         if (countDataEnabled &&
-                (is.null(designPlan[[parameterName]]) || all(is.na(designPlan[[parameterName]]))) &&
-                !is.null(designPlan[["maxNumberOfSubjects"]]) &&
-                designPlan$isGeneratedParameter("maxNumberOfSubjects")) {
+            (is.null(designPlan[[parameterName]]) || all(is.na(designPlan[[parameterName]]))) &&
+            !is.null(designPlan[["maxNumberOfSubjects"]]) &&
+            designPlan$isGeneratedParameter("maxNumberOfSubjects")) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "maxNumberOfSubjects",
                 parameterCaption = "Maximum number of subjects",
@@ -956,6 +951,42 @@ NULL
             )
         }
     }
+
+    if (simulationEnabled && (multiArmEnabled || enrichmentEnabled) && outputSize %in% c("medium", "large")) {
+        parameterName <- NULL
+        parameterCaption <- NULL
+        if (survivalEnabled) {
+            if (enrichmentEnabled) {
+                if (!identical(designPlan$simulationType, "testStatisticBased")) {
+                    if (!is.null(designPlan$populationEventsPerStage) &&
+                            length(dim(designPlan$populationEventsPerStage)) > 2 &&
+                            dim(designPlan$populationEventsPerStage)[3] > 1) {
+                        parameterName <- "populationEventsPerStage" # TODO check: singleEventsPerSubsetAndStage instead?
+                        parameterCaption <- "Number of events per population"
+                    }
+                } else {
+                    parameterName <- "singleEventsPerSubsetAndStage"
+                    parameterCaption <- "Single number of events"
+                }
+            } else {
+                parameterName <- "cumulativeEventsPerStage"
+                parameterCaption <- "Cumulative number of events"
+            }
+        } else {
+            parameterName <- "sampleSizes"
+            parameterCaption <- "Stage-wise number of subjects"
+        }
+        if (!is.null(parameterName) && !is.null(parameterCaption)) {
+            .addSimulationArrayToSummary(
+                designPlan,
+                parameterName,
+                parameterCaption,
+                summaryFactory,
+                digitsSampleSize = digitSettings$digitsSampleSize,
+                smoothedZeroFormat = TRUE
+            )
+        }
+    } 
 
     if (baseEnabled && survivalEnabled && outputSize %in% c("medium", "large")) {
         parameterNameEvents <- "cumulativeEventsPerStage"
@@ -1043,19 +1074,10 @@ NULL
                 transpose = TRUE
             )
         }
-
-        if (outputSize == "large" && design$kMax > 1) {
-            summaryFactory$addParameter(designPlan,
-                parameterName = "conditionalPowerAchieved",
-                parameterCaption = "Conditional power (achieved)",
-                roundDigits = digitSettings$digitsProbabilities,
-                transpose = TRUE
-            )
-        }
     }
-
+    
     if (baseEnabled && countDataEnabled && design$kMax > 1 && outputSize %in% c("medium", "large") &&
-        designPlan$.isSampleSizeObject()) {
+            designPlan$.isSampleSizeObject()) {
         if (outputSize == "large") {
             summaryFactory$addParameter(designPlan,
                 parameterName = "informationOverStages",
@@ -1098,7 +1120,7 @@ NULL
             transpose = TRUE
         )
     }
-    
+
     if (baseEnabled && countDataEnabled && !is.null(designPlan[["calendarTime"]]) &&
             designPlan$isGeneratedParameter("calendarTime")) {
         summaryFactory$addParameter(designPlan,
@@ -1110,15 +1132,15 @@ NULL
     }
 
     if (outputSize == "large" && !is.null(designPlan[["analysisTime"]]) &&
-        designPlan$isGeneratedParameter("analysisTime")) {
+            designPlan$isGeneratedParameter("analysisTime")) {
         summaryFactory$addParameter(designPlan,
-            parameterName = "analysisTime", 
+            parameterName = "analysisTime",
             parameterCaption = "Analysis time",
             roundDigits = digitSettings$digitsTime,
             transpose = multiArmEnabled || enrichmentEnabled
         )
     }
-    
+
     if (baseEnabled && countDataEnabled && !is.null(designPlan[["studyTime"]]) &&
             designPlan$isGeneratedParameter("studyTime")) {
         summaryFactory$addParameter(designPlan,
@@ -1127,16 +1149,25 @@ NULL
             roundDigits = digitSettings$digitsTime
         )
     }
-    
+
     if (!is.null(designPlan[["studyDuration"]]) &&
             designPlan$isGeneratedParameter("studyDuration")) {
         summaryFactory$addParameter(designPlan,
-            parameterName = "studyDuration", 
+            parameterName = "studyDuration",
             parameterCaption = "Expected study duration",
             roundDigits = digitSettings$digitsTime,
             smoothedZeroFormat = TRUE,
             transpose = TRUE,
             lastStage = design$kMax
+        )
+    }
+    
+    if (simulationEnabled && (multiArmEnabled || enrichmentEnabled) && outputSize == "large" && design$kMax > 1) {
+        summaryFactory$addParameter(designPlan,
+            parameterName = "conditionalPowerAchieved",
+            parameterCaption = "Conditional power (achieved)",
+            roundDigits = digitSettings$digitsProbabilities,
+            transpose = TRUE
         )
     }
 
@@ -1149,7 +1180,7 @@ NULL
         )
     }
 
-    if (inherits(designPlan, "SimulationResults") &&
+    if (simulationEnabled &&
             !grepl("SimulationResults(MultiArm|Enrichment|CountData)", .getClassName(designPlan))) {
         summaryFactory$addParameter(designPlan,
             parameterName = "conditionalPowerAchieved",
@@ -1189,30 +1220,34 @@ NULL
         }
     }
 
-    if (design$kMax > 1 && 
+    if (design$kMax > 1 &&
             outputSize %in% c("medium", "large") &&
             !is.null(designPlan[["earlyStop"]])) {
         summaryFactory$addParameter(
             designPlan,
             parameterName = "earlyStop",
-            parameterCaption = paste0("Stopping probability", 
-                ifelse(survivalPatientWiseEnabled, " by stage", "")), # under H1
+            parameterCaption = paste0(
+                "Stopping probability",
+                ifelse(survivalPatientWiseEnabled, " by stage", "")
+            ), # under H1
             roundDigits = digitSettings$digitsProbabilities,
             smoothedZeroFormat = TRUE,
             transpose = !is(designPlan, "SimulationResultsSurvival"),
             lastStage = design$kMax
         )
     }
-    
+
     if (planningEnabled && !is.null(probsH1)) {
         if (design$kMax > 1) {
             if (!is.null(probsH0)) {
                 probsH0$earlyStop <- matrix(
-                    probsH0$earlyStop[1:(design$kMax - 1), 1], 
-                    ncol = 1)
+                    probsH0$earlyStop[1:(design$kMax - 1), 1],
+                    ncol = 1
+                )
                 probsH0$rejectPerStage <- matrix(
-                    probsH0$rejectPerStage[1:(design$kMax - 1), 1], 
-                    ncol = 1)
+                    probsH0$rejectPerStage[1:(design$kMax - 1), 1],
+                    ncol = 1
+                )
             }
 
             if (is.matrix(probsH1$rejectPerStage)) {
@@ -1282,7 +1317,7 @@ NULL
                     smoothedZeroFormat = TRUE
                 )
             }
-            
+
             if (.isTrialDesignWithValidFutilityBounds(design)) {
                 if (!is.null(probsH0)) {
                     summaryFactory$addParameter(probsH0,
@@ -1327,8 +1362,9 @@ NULL
         } else if (!is.null(probsH1) && !simulationEnabled) {
             if (is.matrix(probsH1$rejectPerStage)) {
                 rejectPerStageValues <- matrix(
-                    probsH1$rejectPerStage[1:(design$kMax - 1), ], 
-                    ncol = ncol(probsH1$rejectPerStage))
+                    probsH1$rejectPerStage[1:(design$kMax - 1), ],
+                    ncol = ncol(probsH1$rejectPerStage)
+                )
             } else {
                 rejectPerStageValues <- probsH1$rejectPerStage[1:(design$kMax - 1)]
             }
