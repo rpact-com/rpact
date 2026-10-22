@@ -1161,7 +1161,7 @@ NULL
 #' @inheritParams param_pValueOCEF
 #' @inheritParams param_likelihoodRatioDistributionOCEF
 #' @inheritParams param_designOCEF
-#' @param ... Additional arguments needed for \code{getOptimalConditionalError()} and \code{.getOptimalDesignLikelihoodRatio()}.
+#' @param ... Additional arguments needed for \code{getConditionalError()} and \code{.getOptimalDesignLikelihoodRatio()}.
 #'
 #' @return Integral over the information of the second stage
 #'
@@ -1169,7 +1169,7 @@ NULL
 #' 
 .getOptimalDesignExpectedInformationIntegrand <- function(pValue, design, likelihoodRatioDistribution, ...) {
     # Calculate optimal conditional error function
-    conditionalError <- getOptimalConditionalError(
+    conditionalError <- getConditionalError(
         pValue = pValue,
         design = design
     )
@@ -1466,7 +1466,7 @@ NULL
         }
 
         # Calculate conditional error
-        conditionalError <- getOptimalConditionalError(
+        conditionalError <- getConditionalError(
             pValue = pValue,
             design = design
         )

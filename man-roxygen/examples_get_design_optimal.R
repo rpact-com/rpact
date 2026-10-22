@@ -9,7 +9,7 @@
 #'
 #' # Early efficacy gives 1, continuation gives the stage-two threshold,
 #' # and binding futility gives 0.
-#' getOptimalConditionalError(
+#' getConditionalError(
 #'     pValue = c(0.0005, 0.1, 0.3, 0.8), design = design
 #' )
 #' }

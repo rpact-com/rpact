@@ -38,6 +38,6 @@
 #'     thetaH1 = 0.25, useInterimEstimate = FALSE, firstStageInformation = 80,
 #'     likelihoodRatioDistribution = "maxlr"
 #' )
-#' getOptimalConditionalError(pValue = c(0.05, 0.1, 0.3), design = flexibleDesign)
+#' getConditionalError(pValue = c(0.05, 0.1, 0.3), design = flexibleDesign)
 #' }
 #' 

@@ -36,7 +36,7 @@
 #' futility if \eqn{p_1 > \alpha_0}. Futility is binding: continuing beyond
 #' this boundary is not part of the calibrated design. In the continuation
 #' region, reject at stage two if its p-value is no larger than
-#' `getOptimalConditionalError()`. The second-stage p-value must be based on
+#' `getConditionalError()`. The second-stage p-value must be based on
 #' the new, independent second-stage data, not the cumulative data.
 #' Setting `efficacyBounds = 0` disables early efficacy and 
 #' `futilityBounds = 1` disables early futility.
@@ -216,7 +216,7 @@
 #'   `kappaLR`, and `maxThetaLR`, as described under Likelihood ratio distribution.
 #'
 #' @return An object of class \code{TrialDesignOptimalConditionalError}, 
-#' which can be passed to `getOptimalConditionalError()`, `getStageInformation()`,
+#' which can be passed to `getConditionalError()`, `getStageInformation()`,
 #' and [getDesignCharacteristics()].
 #' This adaptive design is not interchangeable with a conventional `TrialDesign`.
 #'
@@ -347,12 +347,12 @@ getDesignOptimalConditionalError <- function(
 #'
 #' @seealso `getDesignOptimalConditionalError()`
 #' 
-#' @rdname getOptimalConditionalError
+#' @rdname getConditionalError
 #' 
 #' @noRd 
 #' 
-getOptimalConditionalError <- function(design, pValue, stage = 1) {
-    .assertIsOptimalDesignStage(stage, supportedStage = 1, functionName = "getOptimalConditionalError")
+getConditionalError <- function(design, pValue, stage = 1) {
+    .assertIsOptimalDesignStage(stage, supportedStage = 1, functionName = "getConditionalError")
     .assertIsOptimalDesign(design)
     .assertIsNumericVector(pValue, "pValue")
     .assertIsInClosedInterval(pValue, "pValue", lower = 0, upper = 1)
@@ -399,7 +399,7 @@ getOptimalConditionalError <- function(design, pValue, stage = 1) {
         .getOptimalDesignStageRejectionIntegrand <- function(pValue) {
             (1 -
                 stats::pnorm(
-                    stats::qnorm(1 - getOptimalConditionalError(pValue = pValue, design = design)) -
+                    stats::qnorm(1 - getConditionalError(pValue = pValue, design = design)) -
                         sqrt(getStageInformation(pValue = pValue, design = design)) * theta[i]
                 )) *
                 exp(
@@ -479,34 +479,10 @@ getOptimalConditionalError <- function(design, pValue, stage = 1) {
 #' Add `design$firstStageInformation` to obtain expected total information.
 #' This expectation is unconditional, not conditional on reaching stage two.
 #' Changing the evaluation distribution here does not recalibrate the design.
-#'
-#' @examples
-#' # Get a design
-#' design <- getDesignOptimalConditionalError(
-#'     alpha = 0.025, efficacyBounds = 0.001, futilityBounds = 0.5, 
-#'     conditionalPower = 0.9, thetaH1 = 0.25, 
-#'     likelihoodRatioDistribution = "fixed", thetaLR = 0.25,
-#'     firstStageInformation = 80, useInterimEstimate = FALSE
-#' )
-#' # Calculate expected information under correct specification
-#' getStageInformation(type = "expected", design = design)
-#'
-#' # Compare operating characteristics under a different true effect.
-#' getStageInformation(type = "expected", design = design, 
-#'     likelihoodRatioDistribution = "fixed", thetaLR = 0.15)
-#'
-#' # Calculate expected information under the null hypothesis
-#' getStageInformation(type = "expected",
-#'     design = design, likelihoodRatioDistribution = "fixed", thetaLR = 0
-#' )
-#'
-#' @examples
-#' \dontrun{
-#' # Required additional information given the interim results
-#' getStageInformation(design, pValue = c(0.05, 0.1, 0.3))
-#' }
 #' 
-#' @seealso `getDesignOptimalConditionalError()`, `getOptimalConditionalError()`,
+#' @template examples_get_stage_information
+#' 
+#' @seealso `getDesignOptimalConditionalError()`, `getConditionalError()`,
 #'   [getFisherInformation()] for information at planned analyses of conventional designs.
 #' 
 #' @template reference_optimal
