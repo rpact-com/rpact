@@ -412,6 +412,9 @@ double bisection2(std::function<double(double)> f, double lower, double upper, d
     do {
         value = (lower + upper) / 2;
         result = f(value);
+        if (!std::isfinite(result)) {
+            throw std::runtime_error("Bisection failed: non-finite function evaluation.");
+        }
         if (result > 0) {
             lower = value;
         } else {

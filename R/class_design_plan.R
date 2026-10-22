@@ -107,6 +107,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
         .design = NULL,
         .objectType = NULL, 
         initialize = function(design, ..., objectType = c("undefined", "sampleSize", "power")) {
+            .assertSingleStageSpendingSupportedForPlanning(design)
             self$.design <- design
             self$.objectType <- match.arg(objectType)
 

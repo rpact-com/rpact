@@ -1608,6 +1608,9 @@ List getDesignGroupSequentialUserDefinedBetaSpendingCpp(NumericVector criticalVa
 	NumericVector userAlphaSpending, NumericVector userBetaSpending, double sided, NumericVector informationRates,
 	bool bindingFutility, double tolerance, String typeOfDesign, double gammaA, double alpha, bool betaAdjustment,
 	bool twoSidedPower) {
+	if (userBetaSpending.size() != kMax) {
+		throw std::invalid_argument("'userBetaSpending' must have length 'kMax'.");
+	}
 	String typeBetaSpending = C_TYPE_OF_DESIGN_BS_USER;
 	double gammaB = NA_REAL;
 	double beta = NA_REAL;

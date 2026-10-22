@@ -1891,6 +1891,11 @@ getFinalConfidenceInterval <- function(
                             deltaPT0 = design$deltaPT0,
                             deltaPT1 = design$deltaPT1,
                             beta = .getRepeatedPValuesBeta(design, typeOfDesign, typeBetaSpending),
+                            userBetaSpending = design$userBetaSpending,
+                            betaAdjustment = if (design$sided == 2 && typeBetaSpending != "none") {
+                                design$betaAdjustment
+                            } else NA,
+                            twoSidedPower = if (design$sided == 2) design$twoSidedPower else NA,
                             gammaA = design$gammaA,
                             userAlphaSpending = if (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
                                 design$userAlphaSpending * level / design$alpha
@@ -2019,6 +2024,11 @@ getFinalConfidenceInterval <- function(
                             deltaPT0 = design$deltaPT0,
                             deltaPT1 = design$deltaPT1,
                             beta = .getRepeatedPValuesBeta(design, typeOfDesign, typeBetaSpending),
+                            userBetaSpending = design$userBetaSpending,
+                            betaAdjustment = if (design$sided == 2 && typeBetaSpending != "none") {
+                                design$betaAdjustment
+                            } else NA,
+                            twoSidedPower = if (design$sided == 2) design$twoSidedPower else NA,
                             gammaA = design$gammaA,
                             userAlphaSpending = if (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
                                 design$userAlphaSpending * level / design$alpha

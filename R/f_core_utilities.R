@@ -813,6 +813,16 @@ getTestLabel <- function(x) {
         argument <- (lower + upper) / 2
         result <- fun(argument)
 
+        # Infinite boundaries can encode disabled stopping; missing evaluations
+        # cannot determine which half of the search interval contains the root.
+        if (length(result) != 1 || is.na(result)) {
+            warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
+                "NA returned because root search via 'bisection' produced a missing or invalid function result",
+                diagnosticId = "numerical.root_search_failed"
+            )
+            return(NA_real_)
+        }
+
         .logTrace(
             "Root search step: f(%s, lower = %s, upper = %s, direction = %s) = %s",
             argument, lower, upper, direction, result

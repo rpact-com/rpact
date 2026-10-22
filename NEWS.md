@@ -34,6 +34,12 @@
 
 ## Improvements, issues, and changes
 
+* Fixed repeated p-value calculations for group sequential and inverse normal designs with binding user-defined beta spending (`typeBetaSpending = "bsUser"`). The beta-spending schedule and applicable two-sided settings are now retained when reconstructing designs during inversion. The missing schedule could previously cause C++ bounds warnings and spuriously small repeated p-values; this also affected `dev/4.5.0` before the experimental alpha-range and spending-time changes. Invalid numerical evaluations now fail explicitly or return `NA` with a diagnostic instead of being treated as a successful inversion.
+
+* Fixed the direction of one-sided critical values at alpha above 0.5 for user-defined alpha spending and alpha-spending designs with beta spending. Critical values retain the upper-alternative orientation during calibration and are converted to the requested alternative direction once.
+
+* Single-stage designs with partial alpha spending now fail explicitly in design-characteristic and endpoint sample-size/power planning calculations, which otherwise used the full global alpha and could report an underpowered sample size. Analysis remains supported. For positive spending, an equivalent fixed design at the alpha actually spent can be used for planning.
+
 * `getObjectRCode()` now removes duplicate precondition blocks while preserving complete user-defined function bodies and pipe chains.
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
 * Several improvements and refactorings, focusing on enhanced error handling, improved naming conventions, and more consistent function signatures

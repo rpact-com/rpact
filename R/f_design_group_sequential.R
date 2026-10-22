@@ -592,11 +592,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 }
 
 .calculateAlphaSpent <- function(design) {
-    # Spending constructors have already applied the direction at this point;
-    # other constructors still contain boundaries for the upper alternative.
-    criticalValues <- .getCriticalValues(design,
-        normalizeDirection = .isAlphaSpendingDesignType(design$typeOfDesign)
-    )
+    # Constructors keep efficacy boundaries in the upper-alternative orientation.
+    criticalValues <- .getCriticalValues(design, normalizeDirection = FALSE)
     futilityBounds <- .getFutilityBounds(design)
 
     if (design$sided == 2) {
@@ -789,6 +786,18 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         !isTRUE(all.equal(design$spendingTime, design$informationRates, tolerance = 0)))
 }
 
+.assertSingleStageSpendingSupportedForPlanning <- function(design) {
+    if (.isTrialDesignGroupSequential(design) && design$kMax == 1 && .hasSeparateSpendingTime(design)) {
+        stopIllegalArgument(
+            "Single-stage partial alpha spending is not supported for sample-size or power planning. ",
+            "For positive spending, use getDesignFixed() with alpha equal to design$alphaSpent[1] ",
+            "and the same remaining design settings",
+            parameter = "spendingTime", value = design$spendingTime
+        )
+    }
+    return(invisible())
+}
+
 .validateSpendingTime <- function(design) {
     spendingTime <- design$spendingTime
     if (is.numeric(spendingTime) && length(spendingTime) == 1 && is.na(spendingTime) && !is.nan(spendingTime)) {
@@ -847,10 +856,6 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             .getFutilityBounds(design), design$tolerance
         )
     }
-    design$criticalValues <- .applyDirectionOfAlternative(design$criticalValues,
-        design$directionUpper,
-        type = "negateIfLower", phase = "design"
-    )
     .calculateAlphaSpent(design)
     return(.getDesignGroupSequentialBetaSpendingApproaches(design, userFunctionCallEnabled))
 }
@@ -918,7 +923,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 .getDesignGroupSequentialBetaSpending <- function(design, userFunctionCallEnabled) {
     spending <- .getAlphaSpendingCalibration(design)
     cppResult <- .getDesignGroupSequentialBetaSpendingCpp(
-        .getCriticalValues(design),
+        .getCriticalValues(design, normalizeDirection = FALSE),
         design$kMax,
         spending$userAlphaSpending,
         design$userBetaSpending,
@@ -977,7 +982,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     spending <- .getAlphaSpendingCalibration(design)
     cppResult <- .getDesignGroupSequentialUserDefinedBetaSpendingCpp(
-        .getCriticalValues(design),
+        .getCriticalValues(design, normalizeDirection = FALSE),
         design$kMax,
         spending$userAlphaSpending,
         design$userBetaSpending,
@@ -1992,9 +1997,7 @@ getDesignInverseNormal <- function(
         }
     }
 
-    design$stageLevels <- 1 - stats::pnorm(.getCriticalValues(design,
-        normalizeDirection = .isAlphaSpendingDesignType(design$typeOfDesign)
-    ))
+    design$stageLevels <- 1 - stats::pnorm(.getCriticalValues(design, normalizeDirection = FALSE))
     design$.setParameterType("stageLevels", C_PARAM_GENERATED)
 
     if (design$kMax == 1) {
@@ -2008,7 +2011,8 @@ getDesignInverseNormal <- function(
             design$.setParameterType("bindingFutility", C_PARAM_NOT_APPLICABLE)
             design$.setParameterType("futilityBounds", C_PARAM_NOT_APPLICABLE)
         } else if (userFunctionCallEnabled &&
-                any(.getFutilityBounds(design) > .getCriticalValues(design, 1:(design$kMax - 1)) - 0.01, na.rm = TRUE)) {
+                any(.getFutilityBounds(design) > .getCriticalValues(design,
+                    1:(design$kMax - 1), normalizeDirection = FALSE) - 0.01, na.rm = TRUE)) {
             stopIllegalArgument(
                 "'futilityBounds' (", .arrayToString(design$futilityBounds), ") ",
                 "too extreme for this situation",
@@ -2027,11 +2031,6 @@ getDesignInverseNormal <- function(
     design$criticalValues[!is.na(design$criticalValues) & design$criticalValues <= -7.5] <- -Inf
     design$criticalValues[!is.na(design$criticalValues) & design$criticalValues >= 7.5] <- Inf
 
-    if (.usesSignedCriticalValues(design$sided, design$alpha) &&
-            .isAlphaSpendingDesignType(design$typeOfDesign)) {
-        # Spending constructors have already applied the alternative direction.
-        design$criticalValues <- .getCriticalValues(design)
-    }
     design$criticalValues <- .applyDirectionOfAlternative(design$criticalValues,
         directionUpper,
         type = "negateIfLower", phase = "design"
@@ -2341,6 +2340,11 @@ getDesignInverseNormal <- function(
 #'     the original spending function at these times for each candidate alpha;
 #'     explicit \code{asUser} spending continues to scale proportionally.
 #'     Beta spending continues to use \code{informationRates}.
+#'     Single-stage partial-spending designs are supported for analysis, but not
+#'     for sample-size or power planning. For positive spending, plan using
+#'     \code{getDesignFixed(alpha = design$alphaSpent[1])} with the same remaining
+#'     design settings (including \code{beta}, \code{sided}, \code{directionUpper},
+#'     and, where applicable, \code{twoSidedPower}).
 #' @param futilityBounds The futility bounds, defined on the scale defined by \code{futilityBoundsScale}.
 #'        (numeric vector of length \code{kMax - 1}).
 #' @param futilityBoundsScale Character. The scale of the futility bounds.
@@ -2630,6 +2634,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 
 .getDesignCharacteristics <- function(..., design, userFunctionCallEnabled = FALSE) {
     .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
+    .assertSingleStageSpendingSupportedForPlanning(design)
     .assertDesignParameterExists(design, "sided", C_SIDED_DEFAULT)
     .assertIsValidSidedParameter(design$sided)
 
@@ -3019,6 +3024,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 #'
 getPowerAndAverageSampleNumber <- function(design, theta = seq(-1, 1, 0.02), nMax = 100) {
     .assertIsTrialDesign(design)
+    .assertSingleStageSpendingSupportedForPlanning(design)
     .assertIsSingleNumber(nMax, "nMax")
     .assertIsInClosedInterval(nMax, "nMax", lower = 1, upper = NULL)
     return(PowerAndAverageSampleNumberResult$new(design = design, theta = theta, nMax = nMax))

@@ -72,7 +72,12 @@ spending times determine cumulative alpha spending. For \code{asUser},
 \code{userAlphaSpending} remains authoritative. Repeated p-values re-evaluate
 the original spending function at these times for each candidate alpha;
 explicit \code{asUser} spending continues to scale proportionally.
-Beta spending continues to use \code{informationRates}.}
+Beta spending continues to use \code{informationRates}.
+Single-stage partial-spending designs are supported for analysis, but not
+for sample-size or power planning. For positive spending, plan using
+\code{getDesignFixed(alpha = design$alphaSpent[1])} with the same remaining
+design settings (including \code{beta}, \code{sided}, \code{directionUpper},
+and, where applicable, \code{twoSidedPower}).}
 
 \item{futilityBounds}{The futility bounds, defined on the scale defined by \code{futilityBoundsScale}.
 (numeric vector of length \code{kMax - 1}).}
