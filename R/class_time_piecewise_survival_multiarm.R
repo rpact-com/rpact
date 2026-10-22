@@ -139,6 +139,7 @@
 
 #' Create an Array of Piecewise Hazard Ratios
 #'
+#' @description 
 #' Combines one or more group-by-interval hazard-ratio matrices into an array
 #' with dimensions group by interval by situation.
 #'
@@ -148,8 +149,11 @@
 #'   matrices and with these names, including their order. Unnamed matrices are
 #'   interpreted positionally.
 #' @param intervalNames Optional interval names.
+#' 
 #' @return A numeric array with dimensions group by interval by situation.
+#' 
 #' @export
+#' 
 getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames = NULL) {
     situations <- list(...)
     if (length(situations) == 1 && is.list(situations[[1]]) && !is.matrix(situations[[1]]) &&
@@ -301,6 +305,7 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
 
 #' Piecewise Exponential Multi-Arm Survival Time
 #'
+#' @description 
 #' Creates a validated piecewise exponential survival specification for a
 #' patient-wise multi-arm simulation.
 #'
@@ -309,7 +314,9 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
 #' @param hazardRatios One active-arm-by-interval matrix, a named list of such
 #'   matrices (one per situation), or an active-arm-by-interval-by-situation
 #'   array. In the array, situation is the slowest-changing dimension.
+#' 
 #' @return A \code{PiecewiseMultiArmSurvivalTime} object.
+#' 
 #' @examples
 #' hazardRatios <- getPiecewiseHazardRatioArray(
 #'     favorable = rbind(lowDose = c(0.9, 0.8), highDose = c(0.8, 0.6)),
@@ -321,7 +328,9 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
 #'     hazardRatios = hazardRatios
 #' )
 #' piecewiseTime
+#' 
 #' @export
+#' 
 getPiecewiseMultiArmSurvivalTime <- function(piecewiseSurvivalTime, lambdaControl, hazardRatios) {
     if (!is.numeric(lambdaControl) || length(lambdaControl) != length(piecewiseSurvivalTime)) {
         stopIllegalArgument("'lambdaControl' must contain one numeric value per interval",
@@ -340,6 +349,7 @@ getPiecewiseMultiArmSurvivalTime <- function(piecewiseSurvivalTime, lambdaContro
 
 #' Piecewise Exponential Enrichment Survival Time
 #'
+#' @description 
 #' Creates a validated piecewise exponential survival specification for a
 #' patient-wise population-enrichment simulation.
 #'
@@ -364,7 +374,9 @@ getPiecewiseMultiArmSurvivalTime <- function(piecewiseSurvivalTime, lambdaContro
 #'     )
 #' )
 #' as.data.frame(piecewiseTime)
+#' 
 #' @export
+#' 
 getPiecewiseEnrichmentSurvivalTime <- function(piecewiseSurvivalTime, lambdaControls, hazardRatios) {
     obj <- .PiecewisePatientWiseSurvivalTime$new(
         piecewiseSurvivalTime, lambdaControls, hazardRatios, "enrichment"
