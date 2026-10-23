@@ -731,13 +731,17 @@ NULL
 NULL
 
 #' Parameter Description: Type of Selection
-#' @param typeOfSelection The way the treatment arms or populations are selected at interim.
-#'   Five options are available: \code{"best"}, \code{"rbest"}, \code{"epsilon"}, \code{"all"}, and \code{"userDefined"},
-#'   default is \code{"best"}.\cr
-#'   For \code{"rbest"} (select the \code{rValue} best treatment arms/populations), the parameter \code{rValue} has to be specified,
-#'   for \code{"epsilon"} (select treatment arm/population not worse than epsilon compared to the best), the parameter
-#'   \code{epsilonValue} has to be specified.
-#'   If \code{"userDefined"} is selected, \code{"selectArmsFunction"} or \code{"selectPopulationsFunction"} has to be specified.
+#' @param typeOfSelection Rule for selecting treatment arms (multi-arm designs) or
+#'   populations (enrichment designs) for continuation after an interim analysis.
+#'   The default \code{"best"} selects only the single best arm or population;
+#'   \code{"rBest"} (also accepted as \code{"rbest"}) selects the best \code{rValue};
+#'   \code{"epsilon"} selects those within \code{epsilonValue} of the best;
+#'   \code{"all"} retains all remaining arms or populations; and
+#'   \code{"userDefined"} applies \code{selectArmsFunction} or
+#'   \code{selectPopulationsFunction}. Selection is applied at interims with
+#'   \code{adaptations = TRUE}. See the section \emph{Treatment arm and population
+#'   selection} for details and an example of gradual elimination.
+#' @template details_type_of_selection
 #' @name param_typeOfSelection
 #' @keywords internal
 NULL

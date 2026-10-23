@@ -103,34 +103,6 @@ development version of `rpact` from
 pak::pak("rpact-com/rpact")
 ```
 
-## Quick start
-
-Plan a two-arm trial with a continuous endpoint and three analyses. This example
-uses a one-sided significance level of 0.025, 90% power, an expected mean
-difference of 0.5, and a common standard deviation of 1.
-
-```{r quick_start, message=FALSE}
-library(rpact)
-getDesignGroupSequential(
-    kMax = 3,
-    informationRates = c(0.5, 0.75, 1),
-    alpha = 0.025,
-    beta = 0.1,
-    sided = 1,
-    typeOfDesign = "OF"
-) |>
-    getSampleSizeMeans(
-        groups = 2,
-        alternative = 0.5,
-        stDev = 1,
-        allocationRatioPlanned = 1
-    ) |>
-    summary()
-```
-
-The result includes the required sample sizes at each analysis. To evaluate
-power for a specified maximum sample size, use `getPowerMeans()`.
-
 ## Documentation
 
 Package information and tutorials are available at
@@ -141,6 +113,88 @@ and examples, see the [function reference](https://docs.rpact.org/reference/).
 
 Step-by-step examples and tutorials are available in the `rpact` vignettes at
 [www.rpact.org/vignettes](https://www.rpact.org/vignettes/).
+
+## Quick start
+
+### A simple sample size calculation
+
+This deliberately simple example illustrates a basic sample size calculation
+with `rpact`.
+
+Suppose a study compares two treatments for high blood pressure. We expect the
+new treatment to lower systolic blood pressure by **15 mmHg** on average,
+compared with **10 mmHg** under standard treatment—a difference of **5 mmHg**.
+We assume a standard deviation of **12 mmHg** in each group. These numbers are
+illustrative assumptions, not recommendations for a clinical study.
+
+How many participants are needed in two equally sized groups to detect this
+difference with **80% power**?
+
+```{r quick_start, message=FALSE}
+library(rpact)
+
+getSampleSizeMeans(
+    groups = 2, # Two treatment groups
+    alternative = 5, # Expected difference: 15 - 10 mmHg
+    stDev = 12, # Assumed standard deviation in each group
+    alpha = 0.05, # 5% significance level
+    beta = 0.20, # 80% power
+    sided = 2 # Two-sided test
+) |>
+    summary()
+```
+
+This example uses a conventional **two-sided test at the 5% significance level**,
+without interim analyses. The calculated total sample size is approximately
+183 participants. Rounding up to equally sized groups gives **92 participants
+per group**, before allowing for missing data or dropouts. Power of 80% means
+an 80% chance of detecting the assumed difference if it truly exists under
+the planning assumptions.
+
+### A more advanced example: adding an interim analysis
+
+We now make the study objective more explicit: we want to demonstrate that the
+new treatment lowers blood pressure **more than the standard treatment**. We
+therefore use a **one-sided test at the 2.5% significance level**, a common choice
+for confirmatory superiority trials. The direction of benefit is specified
+before the study begins. Blood pressure reductions are recorded as positive
+values, so `alternative = 5` represents the expected additional reduction with
+the new treatment.
+
+We keep the same illustrative assumptions and 80% power, but add **one interim
+analysis**, when approximately half of the total statistical information is
+available. If the evidence is sufficiently strong, the study can stop early for
+efficacy. Otherwise, it continues to the final analysis.
+
+Simply testing twice at the usual significance level would increase the chance
+of a false-positive conclusion. A **group sequential design** accounts for both
+analyses. Here, we use O'Brien–Fleming boundaries, which require particularly
+strong evidence to stop early.
+
+```{r quick_start_interim, message=FALSE}
+getDesignGroupSequential(
+    kMax = 2, # One interim and one final analysis
+    informationRates = c(0.5, 1), # 50% information at interim, 100% at final
+    typeOfDesign = "OF", # O'Brien–Fleming boundaries
+    alpha = 0.025, # One-sided 2.5% significance level
+    beta = 0.20, # 80% power
+    sided = 1 # One-sided test
+) |>
+    getSampleSizeMeans(
+        groups = 2, # Two treatment groups
+        alternative = 5, # Additional blood pressure reduction (mmHg)
+        stDev = 12 # Assumed standard deviation (mmHg)
+    ) |>
+    summary()
+```
+
+The output shows the planned cumulative sample sizes and the efficacy boundaries
+at each analysis. Allowing an early stop usually requires a slightly larger
+**maximum sample size** than a corresponding study without interim analyses,
+but may reduce the number of participants actually needed.
+
+This is an illustration of the workflow; a clinical study requires additional
+planning, including the timing and conduct of the interim analysis.
 
 ## Issues and Feature Requests
 
