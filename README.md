@@ -67,7 +67,7 @@ simulation, and analysis:
 - Multi-arm and population enrichment analysis for means, rates, and
   survival endpoints
 - Analysis of general estimates and standard errors supplied through
-  `getDataset(est = ..., se = ...)` (development version)
+  `getDataset(est = ..., se = ...)`
 - Support for fixed-sample designs, classical group sequential designs,
   and adaptive multi-arm multi-stage (MAMS) designs based on the inverse
   normal or Fisher combination test
@@ -152,7 +152,7 @@ evaluate power for a specified maximum sample size, use
 Package information and tutorials are available at
 [www.rpact.org](https://www.rpact.org). For function arguments, return
 values, and examples, see the [function
-reference](https://docs.rpact.org).
+reference](https://docs.rpact.org/reference/).
 
 ## Vignettes
 
@@ -189,7 +189,7 @@ provides guided, browser-based access to selected `rpact` functionality,
 including study design, sample size calculation, simulation, and
 reporting, without requiring users to write R code.
 
-[demo.rpact.cloud](https://demo.rpact.cloud)
+[rpact.cloud](https://demo.rpact.cloud)
 
 ## RPACT Connect
 
