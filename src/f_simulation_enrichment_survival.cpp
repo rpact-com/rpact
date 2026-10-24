@@ -852,7 +852,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			adjustedPValues[k] = std::min(minPValue * selectedCount, 1.0 - 1e-07);
 
 			// Conditional critical value to reject the null hypotheses at the next stage of the trial
-			NumericVector criticalValues = design.get("criticalValues");
+			NumericVector criticalValues = Rcpp::clone(Rcpp::as<NumericVector>(design.get("criticalValues")));
             criticalValues = Rcpp::abs(criticalValues);
 
 			if (isDesignFisher) {

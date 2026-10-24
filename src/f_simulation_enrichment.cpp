@@ -298,7 +298,7 @@ List performClosedCombinationTestForSimulationEnrichment(
             
             
             // Determine rejection and futility
-            NumericVector criticalValues = design.get("criticalValues");
+            NumericVector criticalValues = Rcpp::clone(Rcpp::as<NumericVector>(design.get("criticalValues")));
             criticalValues = Rcpp::abs(criticalValues);
             
             if (isDesignFisher) {
