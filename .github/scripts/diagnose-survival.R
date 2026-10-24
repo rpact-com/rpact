@@ -2,6 +2,15 @@
 library(rpact)
 outputPath <- commandArgs(trailingOnly = TRUE)[1]
 probeStages <- list()
+probeUpdates <- list()
+trace('updateSubGroupVector', where = asNamespace('rpact'), print = FALSE,
+    tracer = quote(probeUpdateEntry <- list(k = k, probabilities = prevSelected,
+        seedBefore = .Random.seed)),
+    exit = quote({
+        probeUpdates[[length(probeUpdates) + 1L]] <<- c(probeUpdateEntry,
+            list(result = returnValue(), seedAfter = .Random.seed))
+    })
+)
 trace('.getSimulatedStageResultsSurvivalEnrichmentPatientWise',
     where = asNamespace('rpact'), print = FALSE,
     tracer = quote(probeEntrySeed <- .Random.seed),
@@ -24,7 +33,7 @@ for (statement in as.list(case[[3]])[-1]) {
     if (is.call(statement) && identical(statement[[1]], as.name('expect_equal'))) break
     eval(statement)
 }
-saveRDS(list(stages = probeStages,
+saveRDS(list(stages = probeStages, updates = probeUpdates, machine = .Machine,
     cppEvents = simResults2$expectedNumberOfEvents,
     basicEvents = simResults2Basic$expectedNumberOfEvents,
     session = sessionInfo()), outputPath)
