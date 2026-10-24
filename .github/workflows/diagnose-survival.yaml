@@ -1,0 +1,94 @@
+name: diagnose-survival
+
+on:
+  pull_request:
+    branches: [main, 'dev/*']
+    paths:
+      - '.github/workflows/diagnose-survival.yaml'
+      - 'src/**'
+      - 'R/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'daniel-bugfixes'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        optimization: ['-O2', '-O0']
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: rpact-com/rpact.tests
+          # Same tests as the failing coverage run, independent of later updates.
+          ref: 28b667cb4820805207513cb3b80691eebd4d33af
+          token: ${{ secrets.RPACT_TESTS_ACCESS_TOKEN }}
+          path: private-tests
+          sparse-checkout: |
+            tests
+            scripts
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.6.1'
+          use-public-rspm: true
+          Ncpus: 4
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::covr, any::xml2, any::emmeans
+          needs: coverage
+      - name: Record environment
+        shell: Rscript {0}
+        run: |
+          print(sessionInfo())
+          print(RNGkind())
+          print(packageVersion("Rcpp"))
+          system("g++ --version")
+          system("gfortran --version")
+      - name: Install and test with one worker
+        id: serial
+        continue-on-error: true
+        shell: bash
+        run: |
+          Rscript --vanilla private-tests/scripts/run-tests.R \
+            --source="$GITHUB_WORKSPACE" \
+            --library="$RUNNER_TEMP/probe-library" \
+            --compiler-flags="${{ matrix.optimization }}" \
+            --workers=1 \
+            --filter='^f_simulation_enrichment_survival_patient_wise(_compare_basic)?$' \
+            --output="$RUNNER_TEMP/diagnostic/serial" 2>&1 | tee serial.log
+      - name: Test with four workers
+        id: parallel
+        continue-on-error: true
+        shell: bash
+        run: |
+          Rscript --vanilla private-tests/scripts/run-tests.R \
+            --library="$RUNNER_TEMP/probe-library" \
+            --workers=4 \
+            --filter='^f_simulation_enrichment_survival_patient_wise(_compare_basic)?$' \
+            --output="$RUNNER_TEMP/diagnostic/parallel" 2>&1 | tee parallel.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survival-diagnostic${{ matrix.optimization }}
+          path: |
+            ${{ runner.temp }}/diagnostic
+            serial.log
+            parallel.log
+      - name: Check outcomes
+        if: always()
+        env:
+          SERIAL: ${{ steps.serial.outcome }}
+          PARALLEL: ${{ steps.parallel.outcome }}
+        run: |
+          echo "Serial: $SERIAL; parallel: $PARALLEL"
+          test "$SERIAL" = success && test "$PARALLEL" = success
