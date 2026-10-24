@@ -24,6 +24,8 @@
 
 ## Improvements, issues, and changes
 
+* Corrected Weibull hazard ratio conversions for `kappa != 1` in survival planning and simulation, including multi-arm and enrichment simulations. Lambda remains the inverse Weibull scale; the hazard ratio is `(lambda1 / lambda2)^kappa`. Exponential calculations (`kappa = 1`) are unchanged.
+
 * Expanded the documentation of `typeOfSelection` for multi-arm and enrichment simulations, explaining all five selection rules, their interaction with adaptations and thresholds, and how to drop one worst arm at each interim using a custom selection function (issue [#159](https://github.com/rpact-com/rpact/issues/159)).
 * `getObjectRCode()` now removes duplicate precondition blocks while preserving complete user-defined function bodies and pipe chains.
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
