@@ -1308,7 +1308,7 @@ NULL
         simulationResults$lambdaTreatment <- matrix(NA_real_, nrow = numberOfRows, ncol = numberOfCols)
         for (i in 1:numberOfRows) {
             simulationResults$lambdaTreatment[i, ] <- getLambda1ByLambda2AndHazardRatio(
-                simulationResults$lambdaControl, hazardRatio[i, ])
+                simulationResults$lambdaControl, hazardRatio[i, ], kappa = kappa)
         }
         simulationResults$.setParameterType("lambdaTreatment", C_PARAM_DERIVED)
         simulationResults$.setParameterType("lambdaControl", C_PARAM_DERIVED)

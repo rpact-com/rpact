@@ -299,6 +299,7 @@ List performClosedCombinationTestForSimulationEnrichment(
             
             // Determine rejection and futility
             NumericVector criticalValues = design.get("criticalValues");
+            criticalValues = Rcpp::abs(criticalValues);
             
             if (isDesignFisher) {
                 rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= criticalValues[k];
@@ -310,7 +311,10 @@ List performClosedCombinationTestForSimulationEnrichment(
                 rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) >= criticalValues[k];
                 if (k < kMax - 1) {
                     NumericVector futilityBounds = design.get("futilityBounds");
-                    futilityIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= futilityBounds[k];
+                    // Match .getFutilityBounds() on the favorable-direction scale.
+                    bool directionUpper = Rcpp::as<bool>(design.get("directionUpper"));
+                    double futilityBound = directionUpper ? futilityBounds[k] : -futilityBounds[k];
+                    futilityIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= futilityBound;
                 }
             }
             

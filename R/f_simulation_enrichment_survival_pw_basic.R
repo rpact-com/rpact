@@ -150,7 +150,7 @@ updateSubGroupVector <- function(
         lambdaActive <- piecewiseActiveHazards
     } else {
         lambdaControl <- getLambdaByPi(piControls, eventTime, kappa)
-        lambdaActive <- hazardRatios * lambdaControl
+        lambdaActive <- hazardRatios^(1 / kappa) * lambdaControl
     }
 
     for (i in 1:maxNumberOfSubjects) {

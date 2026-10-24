@@ -33,13 +33,13 @@ NULL
     }
 }
 
-.getLambda <- function(..., groupNumber, lambda2, lambda1, hazardRatio) {
+.getLambda <- function(..., groupNumber, lambda2, lambda1, hazardRatio, kappa = 1) {
     if (groupNumber == 2) {
         return(lambda2)
     }
 
     if (anyNA(lambda1)) {
-        lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
+        lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio, kappa = kappa)
     }
 
     return(lambda1)
@@ -217,7 +217,8 @@ NULL
                     groupNumber           = groupNumber,
                     lambda2               = lambda2,
                     lambda1               = lambda1,
-                    hazardRatio           = hazardRatio
+                    hazardRatio           = hazardRatio,
+                    kappa                 = kappa
                 )
 
                 inner <- function(x) {
@@ -257,7 +258,8 @@ NULL
             groupNumber           = groupNumber,
             lambda2               = lambda2,
             lambda1               = lambda1,
-            hazardRatio           = hazardRatio
+            hazardRatio           = hazardRatio,
+            kappa                 = kappa
         )
 
         inner <- function(x) {

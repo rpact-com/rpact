@@ -575,7 +575,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
     NumericVector lambdaActive;
     if (!piecewise.enabled) {
         lambdaControl = getLambdasByPis(piControls, eventTime, kappa);
-        lambdaActive = hazardRatios * lambdaControl;
+        lambdaActive = pow(hazardRatios, 1.0 / kappa) * lambdaControl;
     }
 
 	// Generate random survival and dropout times
@@ -852,7 +852,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			adjustedPValues[k] = std::min(minPValue * selectedCount, 1.0 - 1e-07);
 
 			// Conditional critical value to reject the null hypotheses at the next stage of the trial
-			NumericVector criticalValues = design.get("criticalValues");			
+			NumericVector criticalValues = design.get("criticalValues");
+            criticalValues = Rcpp::abs(criticalValues);
 
 			if (isDesignFisher) {
 				double numerator = criticalValues[k + 1];

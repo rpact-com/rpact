@@ -438,7 +438,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
     if (!piecewise.enabled) {
         double lambdaControl = getLambdaByPi(piControl, eventTime, kappa);
         for (int g = 0; g < gMax; g++) {
-            lambdaVector[g] = omegaVector[g] * lambdaControl;
+            lambdaVector[g] = std::pow(omegaVector[g], 1.0 / kappa) * lambdaControl;
         }
         lambdaVector[gMax] = lambdaControl;
     }
