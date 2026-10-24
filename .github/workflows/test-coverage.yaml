@@ -21,6 +21,15 @@ jobs:
       pull-requests: write
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      # Inherited by covr's test process and testthat workers.
+      TESTTHAT_PARALLEL: 'TRUE'
+      TESTTHAT_CPUS: '4'
+      RPACT_COMPLETE_UNIT_TEST_SET_ENABLED: 'TRUE'
+      RPACT_LOG_LEVEL: DISABLED
+      # Use file-level parallelism without nested numerical-library threads.
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
 
     steps:
       # Set the GitHub username and email for commits
@@ -67,6 +76,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+          Ncpus: 4
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -80,10 +90,35 @@ jobs:
           cp -R ./private-tests/tests/testthat/. ./tests/testthat/
         shell: bash
 
+      - name: Configure coverage test runtime
+        shell: Rscript {0}
+        run: |
+          configPath <- file.path(Sys.getenv("RUNNER_TEMP"), "rpact-test-config")
+          dir.create(configPath, recursive = TRUE, showWarnings = FALSE)
+          cat(
+            paste0("RPACT_CONFIG_DIR_LOAD=", configPath, "\n"),
+            paste0("RPACT_CONFIG_DIR_SAVE=", configPath, "\n"),
+            file = Sys.getenv("GITHUB_ENV"), append = TRUE, sep = ""
+          )
+          # Use scheduling priorities from the selected tests branch.
+          priorityField <- "Config/testthat/start-first"
+          testsDescription <- read.dcf("private-tests/DESCRIPTION")
+          if (priorityField %in% colnames(testsDescription)) {
+            description <- read.dcf("DESCRIPTION")
+            description <- as.list(description[1, ])
+            description[[priorityField]] <- testsDescription[1, priorityField]
+            write.dcf(as.data.frame(description, check.names = FALSE),
+              file = "DESCRIPTION", keep.white = names(description))
+          }
+          cat("Available CPUs:", parallel::detectCores(), "\n")
+          cat("Test workers:", Sys.getenv("TESTTHAT_CPUS"), "\n")
+          cat("testthat:", as.character(packageVersion("testthat")), "\n")
+
       - name: Test coverage
         id: coverage
         run: |
-          Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
+          options(Ncpus = as.integer(Sys.getenv("TESTTHAT_CPUS")))
+          started <- proc.time()[["elapsed"]]
           coverage <- covr::package_coverage(
             quiet = FALSE,
             clean = FALSE,
@@ -91,7 +126,8 @@ jobs:
           )
           cat(
             sprintf("percent=%.2f\n", covr::percent_coverage(coverage)),
-            file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE
+            sprintf("elapsed_minutes=%.2f\n", (proc.time()[["elapsed"]] - started) / 60),
+            file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE, sep = ""
           )
           covr::codecov(
             coverage = coverage,
@@ -123,6 +159,7 @@ jobs:
           TESTS_BRANCH: ${{ steps.tests-branch.outputs.branch }}
           TESTS_SHA: ${{ steps.tests-branch.outputs.sha }}
           COVERAGE_PERCENT: ${{ steps.coverage.outputs.percent }}
+          COVERAGE_MINUTES: ${{ steps.coverage.outputs.elapsed_minutes }}
           COVERAGE_OUTCOME: ${{ steps.coverage.outcome }}
           JOB_STATUS: ${{ job.status }}
         with:
@@ -139,6 +176,8 @@ jobs:
               `Coverage: **${percent ? percent + '%' : 'unavailable'}**`,
               `rpact.tests branch: ${branch ? '`' + branch + '`' : 'selection failed'}`,
               `rpact.tests commit: ${sha ? '`' + sha + '`' : 'unavailable'}`,
+              `Test workers: **${process.env.TESTTHAT_CPUS}**`,
+              `Coverage execution (installation and tests): **${process.env.COVERAGE_MINUTES ? process.env.COVERAGE_MINUTES + ' minutes' : 'unavailable'}**`,
               `Coverage step: **${process.env.COVERAGE_OUTCOME}**`,
               `Job status: **${process.env.JOB_STATUS}**`,
               '',
