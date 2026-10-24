@@ -7,19 +7,17 @@ on:
       - '.github/workflows/diagnose-survival.yaml'
       - 'src/**'
       - 'R/**'
+      - '.github/scripts/diagnose-survival.R'
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   diagnostic:
     if: github.event_name == 'workflow_dispatch' || github.head_ref == 'daniel-bugfixes'
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        optimization: ['-O2', '-O0']
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       OPENBLAS_NUM_THREADS: '1'
@@ -54,41 +52,19 @@ jobs:
           print(packageVersion("Rcpp"))
           system("g++ --version")
           system("gfortran --version")
-      - name: Install and test with one worker
-        id: serial
-        continue-on-error: true
-        shell: bash
+      - name: Reuse the original failing coverage installation
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          Rscript --vanilla private-tests/scripts/run-tests.R \
-            --source="$GITHUB_WORKSPACE" \
-            --library="$RUNNER_TEMP/probe-library" \
-            --compiler-flags="${{ matrix.optimization }}" \
-            --workers=1 \
-            --filter='^f_simulation_enrichment_survival_patient_wise(_compare_basic)?$' \
-            --output="$RUNNER_TEMP/diagnostic/serial" 2>&1 | tee serial.log
-      - name: Test with four workers
-        id: parallel
-        continue-on-error: true
-        shell: bash
-        run: |
-          Rscript --vanilla private-tests/scripts/run-tests.R \
-            --library="$RUNNER_TEMP/probe-library" \
-            --workers=4 \
-            --filter='^f_simulation_enrichment_survival_patient_wise(_compare_basic)?$' \
-            --output="$RUNNER_TEMP/diagnostic/parallel" 2>&1 | tee parallel.log
+          gh run download 40078617937 --repo rpact-com/rpact \
+            --name coverage-test-failures --dir "$RUNNER_TEMP/probe-library"
+      - name: Capture the first regression case
+        env:
+          R_LIBS_USER: ${{ runner.temp }}/probe-library:${{ env.R_LIBS_USER }}
+          RPACT_LOG_LEVEL: DISABLED
+        run: Rscript --vanilla .github/scripts/diagnose-survival.R "$RUNNER_TEMP/linux-probe.rds"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: survival-diagnostic${{ matrix.optimization }}
-          path: |
-            ${{ runner.temp }}/diagnostic
-            serial.log
-            parallel.log
-      - name: Check outcomes
-        if: always()
-        env:
-          SERIAL: ${{ steps.serial.outcome }}
-          PARALLEL: ${{ steps.parallel.outcome }}
-        run: |
-          echo "Serial: $SERIAL; parallel: $PARALLEL"
-          test "$SERIAL" = success && test "$PARALLEL" = success
+          name: survival-trace
+          path: ${{ runner.temp }}/linux-probe.rds
