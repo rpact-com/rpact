@@ -24,6 +24,8 @@
 
 ## Improvements, issues, and changes
 
+* Patient-wise enrichment survival simulations now use a platform-independent size-one multinomial sampler for adaptive subgroup allocation, with one uniform draw per allocation block. This removes an ARM versus x86 difference in random-number consumption. Seeded results involving subgroup adaptation change; the intended subgroup probabilities are unchanged.
+
 * Corrected Weibull hazard ratio conversions for `kappa != 1` in survival planning and simulation, including multi-arm and enrichment simulations. Lambda remains the inverse Weibull scale; the hazard ratio is `(lambda1 / lambda2)^kappa`. Exponential calculations (`kappa = 1`) are unchanged.
 
 * Expanded the documentation of `typeOfSelection` for multi-arm and enrichment simulations, explaining all five selection rules, their interaction with adaptations and thresholds, and how to drop one worst arm at each interim using a custom selection function (issue [#159](https://github.com/rpact-com/rpact/issues/159)).

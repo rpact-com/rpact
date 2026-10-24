@@ -23,13 +23,17 @@ jobs:
       OPENBLAS_NUM_THREADS: '1'
       OMP_NUM_THREADS: '1'
       MKL_NUM_THREADS: '1'
+      TESTTHAT_PARALLEL: 'TRUE'
+      TESTTHAT_CPUS: '4'
+      RPACT_COMPLETE_UNIT_TEST_SET_ENABLED: 'TRUE'
+      RPACT_LOG_LEVEL: DISABLED
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
           repository: rpact-com/rpact.tests
-          # Same tests as the failing coverage run, independent of later updates.
-          ref: 28b667cb4820805207513cb3b80691eebd4d33af
+          # Pin the paired tests, including the portable sampler baselines.
+          ref: 24056ce1ba7432eea294d3427c346cb09a932205
           token: ${{ secrets.RPACT_TESTS_ACCESS_TOKEN }}
           path: private-tests
           sparse-checkout: |
@@ -52,19 +56,30 @@ jobs:
           print(packageVersion("Rcpp"))
           system("g++ --version")
           system("gfortran --version")
-      - name: Reuse the original failing coverage installation
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add the focused private tests
+        shell: bash
         run: |
-          gh run download 40078617937 --repo rpact-com/rpact \
-            --name coverage-test-failures --dir "$RUNNER_TEMP/probe-library"
-      - name: Capture the first regression case
-        env:
-          R_LIBS_USER: ${{ runner.temp }}/probe-library:${{ env.R_LIBS_USER }}
-          RPACT_LOG_LEVEL: DISABLED
-        run: Rscript --vanilla .github/scripts/diagnose-survival.R "$RUNNER_TEMP/linux-probe.rds"
-      - uses: actions/upload-artifact@v4
+          cp -R private-tests/tests/testthat/. tests/testthat/
+          find tests/testthat -maxdepth 1 -name 'test-*.R' \
+            ! -name 'test-f_simulation_subgroup_sampling.R' \
+            ! -name 'test-f_simulation_enrichment_survival_patient_wise.R' \
+            ! -name 'test-f_simulation_enrichment_survival_patient_wise_compare_basic.R' -delete
+      - name: Verify portable sampling with coverage at O0
+        shell: Rscript {0}
+        run: |
+          configPath <- file.path(Sys.getenv("RUNNER_TEMP"), "rpact-test-config")
+          dir.create(configPath, showWarnings = FALSE)
+          Sys.setenv(RPACT_CONFIG_DIR_LOAD = configPath, RPACT_CONFIG_DIR_SAVE = configPath)
+          coverage <- covr::package_coverage(
+            quiet = FALSE, clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+          print(covr::percent_coverage(coverage))
+      - name: Show test output
         if: always()
+        run: find "$RUNNER_TEMP/package" -name 'testthat.Rout*' -exec cat '{}' \; || true
+      - uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          name: survival-trace
-          path: ${{ runner.temp }}/linux-probe.rds
+          name: portable-sampler-failures
+          path: ${{ runner.temp }}/package

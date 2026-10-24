@@ -749,6 +749,10 @@ NULL
     .Call(`_rpact_getTreatmentsSubgroups`, maxNumberOfSubjects, allocationFraction, subGroups, prevalences)
 }
 
+.sampleMultinomOneCpp <- function(probabilities) {
+    .Call(`_rpact_sampleMultinomOne`, probabilities)
+}
+
 .updateSubGroupVectorCpp <- function(k, maxNumberOfSubjects, numberOfSubjects, subGroupVector, subGroups, prevSelected, allocationFraction) {
     .Call(`_rpact_updateSubGroupVector`, k, maxNumberOfSubjects, numberOfSubjects, subGroupVector, subGroups, prevSelected, allocationFraction)
 }
