@@ -15,8 +15,6 @@ name: test-coverage
 
 jobs:
   test-coverage:
-    # Temporarily pause this PR while the targeted survival diagnostic runs.
-    if: github.head_ref != 'daniel-bugfixes'
     runs-on: ubuntu-latest
     permissions:
       contents: read
