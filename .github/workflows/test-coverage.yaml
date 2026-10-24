@@ -16,6 +16,9 @@ name: test-coverage
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
@@ -29,11 +32,33 @@ jobs:
       - name: Checkout this package repository 
         uses: actions/checkout@v4
 
+      - name: Select private tests branch
+        id: tests-branch
+        uses: actions/github-script@v7
+        env:
+          RPACT_BRANCH: ${{ github.head_ref || github.ref_name }}
+        with:
+          github-token: ${{ secrets.RPACT_TESTS_ACCESS_TOKEN }}
+          script: |
+            const branches = await github.paginate(github.rest.repos.listBranches, {
+              owner: 'rpact-com', repo: 'rpact.tests', per_page: 100
+            });
+            const requested = process.env.RPACT_BRANCH;
+            const selected = branches.find(branch => branch.name === requested)
+              || branches.find(branch => branch.name === 'main');
+            if (!selected) {
+              throw new Error('Neither the matching rpact.tests branch nor main exists.');
+            }
+            core.info(`Using rpact.tests branch ${selected.name} at ${selected.commit.sha}`);
+            core.setOutput('branch', selected.name);
+            core.setOutput('sha', selected.commit.sha);
+
       - name: Checkout the private tests repository
         uses: actions/checkout@v4
         with:
           repository: 'rpact-com/rpact.tests'
-          ref: main
+          # Pin the commit found during branch selection for reproducibility.
+          ref: ${{ steps.tests-branch.outputs.sha }}
           token: ${{ secrets.RPACT_TESTS_ACCESS_TOKEN }}
           path: 'private-tests'
           sparse-checkout: |
@@ -56,13 +81,22 @@ jobs:
         shell: bash
 
       - name: Test coverage
+        id: coverage
         run: |
           Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
-          covr::codecov(
+          coverage <- covr::package_coverage(
             quiet = FALSE,
             clean = FALSE,
-            token = Sys.getenv("CODECOV_TOKEN"),
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
+          )
+          cat(
+            sprintf("percent=%.2f\n", covr::percent_coverage(coverage)),
+            file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE
+          )
+          covr::codecov(
+            coverage = coverage,
+            quiet = FALSE,
+            token = Sys.getenv("CODECOV_TOKEN")
           )
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -82,3 +116,57 @@ jobs:
           name: coverage-test-failures
           path: ${{ runner.temp }}/package
 
+      - name: Report coverage and tests branch
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          TESTS_BRANCH: ${{ steps.tests-branch.outputs.branch }}
+          TESTS_SHA: ${{ steps.tests-branch.outputs.sha }}
+          COVERAGE_PERCENT: ${{ steps.coverage.outputs.percent }}
+          COVERAGE_OUTCOME: ${{ steps.coverage.outcome }}
+          JOB_STATUS: ${{ job.status }}
+        with:
+          script: |
+            const marker = '<!-- rpact-test-coverage -->';
+            const branch = process.env.TESTS_BRANCH;
+            const sha = process.env.TESTS_SHA;
+            const percent = process.env.COVERAGE_PERCENT;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              marker,
+              '### rpact test coverage',
+              '',
+              `Coverage: **${percent ? percent + '%' : 'unavailable'}**`,
+              `rpact.tests branch: ${branch ? '`' + branch + '`' : 'selection failed'}`,
+              `rpact.tests commit: ${sha ? '`' + sha + '`' : 'unavailable'}`,
+              `Coverage step: **${process.env.COVERAGE_OUTCOME}**`,
+              `Job status: **${process.env.JOB_STATUS}**`,
+              '',
+              `[Workflow run](${runUrl})`
+            ].join('\n');
+            await core.summary.addRaw(body).write();
+            if (!context.payload.pull_request) return;
+            // Fork PRs do not normally have a token that can write comments.
+            if (context.payload.pull_request.head.repo.full_name !== `${context.repo.owner}/${context.repo.repo}`) {
+              core.info('Skipping PR comment for a fork; see the workflow summary.');
+              return;
+            }
+            try {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                ...context.repo, issue_number: context.issue.number, per_page: 100
+              });
+              const previous = comments.find(comment =>
+                comment.user.login === 'github-actions[bot]' && comment.body.includes(marker)
+              );
+              if (previous) {
+                await github.rest.issues.updateComment({
+                  ...context.repo, comment_id: previous.id, body
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  ...context.repo, issue_number: context.issue.number, body
+                });
+              }
+            } catch (error) {
+              core.warning(`Could not post coverage comment: ${error.message}`);
+            }
