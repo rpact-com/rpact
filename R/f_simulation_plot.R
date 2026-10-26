@@ -311,7 +311,7 @@ NULL
         if (userDefinedEffectMatrix) {
             data$xValues <- 1:nrow(data)
         }
-
+        
         legendPosition <- ifelse(is.na(legendPosition), C_POSITION_LEFT_CENTER, legendPosition)
 
         srcCmd <- .showPlotSourceInformation(
@@ -327,7 +327,7 @@ NULL
             }
             return(srcCmd)
         }
-
+        
         return(.plotDataFrame(data,
             mainTitle = main,
             xlab = NA_character_, 

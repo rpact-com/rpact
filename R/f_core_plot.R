@@ -1570,6 +1570,13 @@ getAvailablePlotTypes <- function(
         p <- ggplot2::ggplot(data, ggplot2::aes(x = .data[["xValues"]], y = .data[["yValues"]]))
     }
 
+    xValues <- data$xValues
+    if (any(!is.na(xValues)) && all(xValues[!is.na(xValues)] == round(xValues[!is.na(xValues)]))) {
+        p <- p + ggplot2::scale_x_continuous(
+            breaks = sort(unique(xValues[!is.na(xValues)]))
+        )
+    }
+    
     p <- plotSettings$setTheme(p)
     p <- plotSettings$hideGridLines(p)
 
