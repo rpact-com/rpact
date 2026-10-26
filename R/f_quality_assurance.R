@@ -996,10 +996,34 @@ setupPackageTests <- function(token, secret) {
 
 .testInstalledBasicPackages <- function(scope = c("basic", "devel", "both", "internet", "all"), ..., headingLevel = 4) {
     scope <- match.arg(scope)
+    # Keep locale/environment changes outside the testthat host, and avoid
+    # standard-stream pipes affected by Windows R bug 19104.
+    stdout <- tempfile("rpact-basic-stdout-")
+    stderr <- tempfile("rpact-basic-stderr-")
+    on.exit(unlink(c(stdout, stderr)), add = TRUE)
+    tryCatch(
+        callr::r(function(scope, headingLevel) {
+            rpact:::.testInstalledBasicPackagesInProcess(scope = scope, headingLevel = headingLevel)
+        }, args = list(scope = scope, headingLevel = headingLevel), libpath = .libPaths(),
+        stdout = stdout, stderr = stderr, stdin = NULL, poll_connection = FALSE,
+        user_profile = FALSE),
+        error = function(error) paste0("Failed to test installed R basic packages: ", conditionMessage(error)),
+        finally = {
+            for (path in c(stdout, stderr)) if (file.exists(path)) writeLines(readLines(path, warn = FALSE))
+        }
+    )
+}
+
+.testInstalledBasicPackagesInProcess <- function(scope = c("basic", "devel", "both", "internet", "all"), ..., headingLevel = 4) {
+    scope <- match.arg(scope)
+    basicTestDirectory <- tempfile("rpact-basic-tests-")
+    dir.create(basicTestDirectory)
+    on.exit(unlink(basicTestDirectory, recursive = TRUE), add = TRUE)
     tryCatch(
         {
             result <- utils::capture.output(
-                tools::testInstalledBasic(scope = scope, outDir = file.path(R.home(), "tests")),
+                tools::testInstalledBasic(scope = scope, outDir = basicTestDirectory,
+                    testSrcdir = file.path(R.home(), "tests")),
                 type = "message"
             )
             if (length(result) == 0) {
@@ -1172,6 +1196,95 @@ setupPackageTests <- function(token, secret) {
     )
 )
 
+# Windows R has an intermittent access violation when inspecting standard-stream
+# pipes (R bug 19104, testthat issue 2284). File-backed standard streams avoid
+# that path; each file returns reporter events through callr's result file.
+.runPackageTestFile <- function(testDirectory, testFile, package) {
+    events <- list()
+    record <- function(method, args) {
+        events[[length(events) + 1L]] <<- list(method = method, args = args)
+    }
+    collectorClass <- R6::R6Class("PackageTestFileReporter", inherit = testthat::Reporter,
+        public = list(
+            start_file = function(file) record("start_file", list(file)),
+            end_file = function() record("end_file", list()),
+            start_context = function(context) record("start_context", list(context)),
+            end_context = function(context) record("end_context", list(context)),
+            start_test = function(context, test) record("start_test", list(context, test)),
+            end_test = function(context, test) record("end_test", list(context, test)),
+            add_result = function(context, test, result) {
+                if (inherits(result, "expectation_success")) result$srcref <- NULL
+                record("add_result", list(context, test, result))
+            }
+        )
+    )
+    results <- testthat::test_file(file.path(testDirectory, testFile), package = package,
+        load_package = "installed", reporter = collectorClass$new(), stop_on_failure = FALSE)
+    list(events = events, results = results)
+}
+
+.runPackageTestFilesInProcesses <- function(test_dir, test_paths, test_package, load_package,
+        reporter, parallel, stop_on_failure) {
+    testDirectory <- normalizePath(test_dir, winslash = "/")
+    workers <- .getPackageTestWorkers(getOption("Ncpus", 1L), length(test_paths))
+    workDirectory <- tempfile("rpact-test-processes-")
+    dir.create(workDirectory)
+    active <- list()
+    on.exit({
+        for (job in active) if (job$process$is_alive()) job$process$kill()
+        unlink(workDirectory, recursive = TRUE)
+    }, add = TRUE)
+    cat("Starting ", workers, " test processes with file-backed output (Windows R bug 19104 workaround).\n", sep = "")
+    results <- vector("list", length(test_paths))
+    nextFile <- 1L
+    reporter$start_reporter()
+    repeat {
+        while (nextFile <= length(test_paths) && length(active) < workers) {
+            index <- nextFile
+            prefix <- file.path(workDirectory, as.character(index))
+            config <- paste0(prefix, "-config")
+            dir.create(config)
+            stdout <- paste0(prefix, "-stdout.txt")
+            stderr <- paste0(prefix, "-stderr.txt")
+            process <- callr::r_bg(.runPackageTestFile,
+                args = list(testDirectory = testDirectory, testFile = test_paths[index], package = test_package),
+                libpath = .libPaths(), stdout = stdout, stderr = stderr, stdin = NULL,
+                poll_connection = FALSE, supervise = TRUE, user_profile = FALSE,
+                env = c(callr::rcmd_safe_env(), RPACT_CONFIG_DIR_LOAD = config, RPACT_CONFIG_DIR_SAVE = config))
+            active[[as.character(index)]] <- list(process = process, stdout = stdout, stderr = stderr)
+            nextFile <- nextFile + 1L
+        }
+        if (!length(active)) break
+        for (key in names(active)) {
+            job <- active[[key]]
+            if (job$process$is_alive()) next
+            index <- as.integer(key)
+            for (path in c(job$stdout, job$stderr)) {
+                if (file.exists(path)) {
+                    output <- readLines(path, warn = FALSE)
+                    if (length(output)) writeLines(paste0("> ", test_paths[index], ": ", output))
+                }
+            }
+            value <- tryCatch(job$process$get_result(), error = function(error) {
+                exitCode <- job$process$get_exit_status()
+                if (is.null(exitCode)) exitCode <- "unknown"
+                stop(structure(list(
+                    message = paste0("Test process exited in file '", test_paths[index],
+                        "' with exit code ", exitCode, ": ", conditionMessage(error)),
+                    call = NULL, test_file = test_paths[index]
+                ), class = c("rpact_test_process_error", "error", "condition")))
+            })
+            for (event in value$events) do.call(reporter[[event$method]], event$args)
+            results[[index]] <- unclass(value$results)
+            active[[key]] <- NULL
+        }
+        # No standard-stream pipes are opened for polling or result transport.
+        if (length(active)) active[[1]]$process$wait(timeout = 50)
+    }
+    reporter$end_reporter()
+    structure(unlist(results, recursive = FALSE), class = "testthat_results")
+}
+
 # Runs in the isolated R CMD BATCH process, using its installed rpact namespace.
 .runPackageUnitTests <- function(files, workers, reporterArguments, resultFile) {
     oldOptions <- options(
@@ -1204,11 +1317,22 @@ setupPackageTests <- function(token, secret) {
     # Implicit plots must not make parallel workers write the same Rplots.pdf.
     # Helpers are sourced in both serial and parallel installed-package sessions.
     graphicsHelper <- tempfile("helper-rpact-qa-graphics-", tmpdir = "testthat", fileext = ".R")
-    writeLines("options(device = function(...) grDevices::pdf(file = NULL, ...))", graphicsHelper)
+    writeLines(c(
+        "options(device = function(...) grDevices::pdf(file = NULL, ...))",
+        "local({",
+        "    config <- file.path(Sys.getenv('RPACT_CONFIG_DIR_SAVE'), paste0('process-', Sys.getpid()))",
+        "    dir.create(config, recursive = TRUE, showWarnings = FALSE)",
+        "    Sys.setenv(RPACT_CONFIG_DIR_LOAD = config, RPACT_CONFIG_DIR_SAVE = config)",
+        "})"
+    ), graphicsHelper)
     on.exit(unlink(graphicsHelper), add = TRUE)
     # This guarded internal interface permits local file priorities while loading
     # the installed package in every worker (test_dir reads installed priorities).
-    testFiles <- getFromNamespace("test_files", "testthat")
+    testFiles <- if (.Platform$OS.type == "windows" && workers > 1L) {
+        .runPackageTestFilesInProcesses
+    } else {
+        getFromNamespace("test_files", "testthat")
+    }
     required <- c(
         "test_dir", "test_paths", "test_package", "load_package",
         "reporter", "parallel", "stop_on_failure"
@@ -1235,11 +1359,35 @@ setupPackageTests <- function(token, secret) {
     counter <- .PackageTestCounter$new()
     executionReporter <- testthat::MultiReporter$new(reporters = list(reporter, counter))
     started <- proc.time()[["elapsed"]]
-    results <- testFiles(
-        test_dir = "testthat", test_paths = files, test_package = "rpact",
-        load_package = "installed", reporter = executionReporter, parallel = workers > 1L,
-        stop_on_failure = FALSE
+    # The worker queue starts before start_reporter(). Run basic R tests first,
+    # so synchronous R CMD tests cannot stall communication with live workers.
+    if (reportType != "Rout") reporter$prepareBasicPackageTests()
+    executionError <- NULL
+    failedTestFile <- NULL
+    # A missing final checkpoint must never be mistaken for a successful run.
+    saveRDS(list(completed = FALSE, workers = workers, totals = counter$totals,
+        executionError = "The test process did not write a final completion record."), resultFile)
+    results <- tryCatch(
+        testFiles(
+            test_dir = "testthat", test_paths = files, test_package = "rpact",
+            load_package = "installed", reporter = executionReporter, parallel = workers > 1L,
+            stop_on_failure = FALSE
+        ),
+        error = function(error) {
+            executionError <<- conditionMessage(error)
+            failedTestFile <<- error$test_file
+            NULL
+        }
     )
+    if (!is.null(executionError)) {
+        cat("\nTest execution aborted:\n", executionError, "\n", sep = "")
+        if (reportType != "Rout" && !reporter$reportFinalized) {
+            reporter$executionError <- executionError
+            tryCatch(reporter$end_reporter(), error = function(error) {
+                cat("Failed to finalize the partial report: ", conditionMessage(error), "\n", sep = "")
+            })
+        }
+    }
     totals <- counter$totals
     timings <- if (reportType == "Rout") {
         c(tests = proc.time()[["elapsed"]] - started, basicPackages = 0, html = 0, pdf = 0)
@@ -1256,10 +1404,12 @@ setupPackageTests <- function(token, secret) {
     )
     saveRDS(list(
         workers = workers, timings = timings, totals = totals,
-        resultMessage = resultMessage
+        resultMessage = resultMessage, completed = is.null(executionError),
+        executionError = executionError, failedTestFile = failedTestFile
     ), resultFile)
     cat("\n", resultMessage, "\n", sep = "")
     for (name in names(timings)) cat(sprintf("Runtime %s: %.2f seconds\n", name, timings[[name]]))
+    if (!is.null(executionError)) stop("Test execution aborted; the counts above are partial results.", call. = FALSE)
     if (totals[["failed"]] > 0 || totals[["error"]] > 0) stop("Test failures.", call. = FALSE)
     invisible(results)
 }
@@ -1318,10 +1468,16 @@ setupPackageTests <- function(token, secret) {
 #' resource and executed. Results are saved in the file \code{testthat.Rout}, located in the
 #' \code{rpact-tests} directory.
 #'
-#' Unit test files are distributed across separate R processes. Scheduling priorities
+#' Unit test files are distributed across separate R processes.
+#' On Windows, standard output and error use files to avoid the pipe-related access
+#' violation in R bug 19104. Linux and macOS use the testthat parallel runner. Scheduling priorities
 #' are read from the \code{DESCRIPTION} above a local test directory, when present,
 #' and otherwise from the installed rpact package. Report sections follow file
 #' completion order. Personal rpact configuration files are isolated for the run.
+#' R basic package tests run in a separate R process before parallel workers start,
+#' using a temporary output directory. If execution aborts, partial results are marked
+#' as incomplete and the diagnostic log path is printed; use \code{workers = 1} to
+#' investigate persistent parallel-worker failures.
 #' The returned object includes \code{workers} and \code{timings}, with elapsed
 #' seconds for unit tests (including worker startup), R basic package tests,
 #' HTML rendering, and PDF rendering.
@@ -1528,7 +1684,7 @@ testPackage <- function(
         if (completeUnitTestSetEnabled) {
             cat("Run all tests. Please wait...\n")
             cat("Test runtime depends on the worker count and the test workload.\n")
-            cat("Exceution of all available unit tests startet at ",
+            cat("Execution of all available unit tests started at ",
                 format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
                 sep = ""
             )
@@ -1576,6 +1732,8 @@ testPackage <- function(
     files <- .getPackageTestFiles(testFileTargetDirectory)
     if (!length(files)) stop("No test files found in 'testthat'.")
     workers <- .getPackageTestWorkers(workers, length(files))
+    minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
+    cat("Expected number of unit tests in the complete set (META): ", minNumberOfExpectedTests, "\n", sep = "")
     cat("Test files: ", length(files), "; workers: ", workers, "\n", sep = "")
     testFileTargetDirectory <- normalizePath(testFileTargetDirectory, winslash = "/")
     resultFile <- tempfile("rpact-test-run-", tmpdir = testFileTargetDirectory, fileext = ".rds")
@@ -1656,7 +1814,7 @@ testPackage <- function(
     endTime <- Sys.time()
 
     if (completeUnitTestSetEnabled) {
-        cat("Test exceution ended at ",
+        cat("Test execution ended at ",
             format(endTime, "%H:%M (%d-%B-%Y)"), "\n",
             sep = ""
         )
@@ -1671,16 +1829,21 @@ testPackage <- function(
         keepSourceFiles, testFileTargetDirectory, resultDir, reportFileBaseName
     )
 
-    minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
     totalNumberOfTests <- NA_integer_
     numberOfFailedTests <- 0
     numberOfSkippedTests <- 0
-    resultOuputFile <- "testthat.Rout"
+    executionCompleted <- !is.null(runDetails) && isTRUE(runDetails$completed)
+    executionError <- if (is.null(runDetails)) NULL else runDetails$executionError
+    resultOuputFile <- if (file.exists(file.path(resultDir, "testthat.Rout.fail"))) {
+        "testthat.Rout.fail"
+    } else {
+        "testthat.Rout"
+    }
     inputFileName <- file.path(resultDir, resultOuputFile)
     resultMessage <- NA_character_
     statusMessage <- NA_character_
     status <- "incomplete"
-    if (file.exists(inputFileName)) {
+    if (file.exists(inputFileName) && identical(executionStatus, 0L) && executionCompleted) {
         fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
         totalNumberOfTests <- if (is.null(runDetails)) {
             .getTestthatResultNumberOfTests(fileContent)
@@ -1710,7 +1873,7 @@ testPackage <- function(
         cat("\n")
 
         cat("Results:\n")
-        resultMessage <- if (is.null(runDetails)) .getTestthatResultLine(fileContent) else runDetails$resultMessage
+        resultMessage <- if (is.null(runDetails$resultMessage)) .getTestthatResultLine(fileContent) else runDetails$resultMessage
         cat(resultMessage, "\n")
         cat("\n")
         .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
@@ -1736,18 +1899,19 @@ testPackage <- function(
             sep = ""
         )
     } else {
-        inputFileName <- file.path(resultDir, "testthat.Rout.fail")
         status <- "failed"
         if (file.exists(inputFileName)) {
             fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
             numberOfFailedTests <- if (is.null(runDetails)) {
+                totalNumberOfTests <- .getTestthatResultNumberOfTests(fileContent)
+                numberOfSkippedTests <- .getTestthatResultNumberOfSkippedTests(fileContent)
                 .getTestthatResultNumberOfFailures(fileContent)
             } else {
                 totalNumberOfTests <- sum(runDetails$totals)
                 numberOfSkippedTests <- unname(runDetails$totals[["skipped"]])
                 unname(runDetails$totals[["failed"]] + runDetails$totals[["error"]])
             }
-            if (completeUnitTestSetEnabled) {
+            if (completeUnitTestSetEnabled && executionCompleted) {
                 if (numberOfFailedTests > 0) {
                     cat(numberOfFailedTests,
                         " unit test", ifelse(numberOfFailedTests == 1, "", "s"),
@@ -1759,20 +1923,31 @@ testPackage <- function(
                     cat("Unexpected failures, i.e., the installation qualification was not successful.\n")
                     statusMessage <- "Installation qualification was not successful (unexpected failures)"
                 }
-            } else {
+            } else if (executionCompleted) {
                 cat(numberOfFailedTests, " unit test",
                     ifelse(numberOfFailedTests == 1, "", "s"), " failed :(\n",
                     sep = ""
                 )
                 statusMessage <- paste0("Installation qualification was not successful (subset with ", numberOfFailedTests, " failures)")
             }
+            if (!executionCompleted) {
+                statusMessage <- "Installation qualification was not successful (test execution aborted)"
+                cat("The test execution did not complete. Results below are partial.\n")
+                if (!is.null(executionError)) cat("Execution error: ", executionError, "\n", sep = "")
+                cat("Results received: ", totalNumberOfTests, "; expected complete test set (META): ",
+                    minNumberOfExpectedTests, ".\n", sep = "")
+                if (workers > 1L) {
+                    cat("If the problem persists, try testPackage(..., workers = 1) for serial execution.\n")
+                }
+            }
             cat("Results:\n")
-            resultMessage <- if (is.null(runDetails)) .getTestthatResultLine(fileContent) else runDetails$resultMessage
+            resultMessage <- if (is.null(runDetails$resultMessage)) .getTestthatResultLine(fileContent) else runDetails$resultMessage
             cat(resultMessage, "\n")
             .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
         } else {
             cat("No test results found in directory ", .vQuote(resultDir), "\n", sep = "")
             statusMessage <- "Installation qualification was not successful (no test results found)"
+            .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
         }
     }
     if (!credentialsAvailable) {
@@ -1795,6 +1970,9 @@ testPackage <- function(
         scope = scope,
         resultDir = resultDir,
         resultOuputFile = resultOuputFile,
+        logFile = normalizePath(inputFileName, winslash = "/", mustWork = FALSE),
+        executionCompleted = executionCompleted,
+        executionError = executionError,
         workers = workers,
         timings = if (is.null(runDetails)) NULL else runDetails$timings,
         reportFileNames = reportFileNames,
@@ -1837,6 +2015,9 @@ testPackage <- function(
 #'   \item{scope}{Scope of the qualification (`"basic"`, `"devel"`, `"both"`, `"internet"`, or `"all"`)}
 #'   \item{resultDir}{Directory where the result reports are stored}
 #'   \item{resultOuputFile}{Main output report filename}
+#'   \item{logFile}{Absolute path to the test log, including \code{testthat.Rout.fail} on failure}
+#'   \item{executionCompleted}{Whether all scheduled test files completed, independently of assertion failures}
+#'   \item{executionError}{Execution or worker-process error message, or \code{NULL}}
 #'   \item{workers}{Number of R test processes used}
 #'   \item{timings}{Named numeric vector of elapsed seconds for \code{tests},
 #'       \code{basicPackages}, \code{html}, and \code{pdf}; \code{NULL} if execution failed before results were collected}
@@ -1907,15 +2088,13 @@ print.InstallationQualificationResult <- function(x, ...) {
 }
 
 .showResultsWereWrittenToDirectoryMessage <- function(resultDir, reportFileName, resultOuputFile) {
-    cat("Test results were written to directory \n")
-    if (!is.null(reportFileName)) {
-        cat(.vQuote(resultDir), " (see file", ifelse(length(reportFileName) == 1, "", "s"), " ",
-            .arrayToString(sQuote(reportFileName), mode = "and"), ")\n",
-            sep = ""
-        )
-    } else {
-        cat(.vQuote(resultDir), " (see file ", sQuote(resultOuputFile), ")\n", sep = "")
+    cat("Test results were written to directory\n", .vQuote(resultDir), "\n", sep = "")
+    reportFileName <- reportFileName[!is.na(reportFileName) & nzchar(reportFileName)]
+    if (length(reportFileName)) {
+        cat("Report files: ", .arrayToString(sQuote(reportFileName), mode = "and"), "\n", sep = "")
     }
+    cat("Log file: ", normalizePath(file.path(resultDir, resultOuputFile),
+        winslash = "/", mustWork = FALSE), "\n", sep = "")
 }
 
 .testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", Ropts = character()) {
@@ -2107,6 +2286,10 @@ MarkdownReporter <- R6::R6Class(
         startTime = NULL,
         endTime = NULL,
         testStartTime = NULL,
+        executionError = NULL,
+        reportFinalized = FALSE,
+        basicPackageTestsPrepared = FALSE,
+        basicPackageTestResult = NULL,
         timings = c(tests = 0, basicPackages = 0, html = 0, pdf = 0),
         output = character(),
         outputSize = "compact",
@@ -2240,12 +2423,8 @@ MarkdownReporter <- R6::R6Class(
             self$log(.getSessionInfoMarkdown())
             self$log("")
 
-            basicPackageTestResult <- NULL
-            basicStarted <- proc.time()[["elapsed"]]
-            if (self$testInstalledBasicPackages) {
-                basicPackageTestResult <- .testInstalledBasicPackages(scope = self$scope, headingLevel = 4)
-            }
-            self$timings[["basicPackages"]] <- proc.time()[["elapsed"]] - basicStarted
+            self$prepareBasicPackageTests()
+            basicPackageTestResult <- self$basicPackageTestResult
 
             if (!is.null(basicPackageTestResult)) {
                 self$log("## R Basic Package Test Results")
@@ -2257,6 +2436,16 @@ MarkdownReporter <- R6::R6Class(
             self$log("## Test Results")
             self$log("")
             self$testStartTime <- proc.time()[["elapsed"]]
+        },
+        prepareBasicPackageTests = function() {
+            if (self$basicPackageTestsPrepared) return(invisible())
+            self$basicPackageTestsPrepared <- TRUE
+            basicStarted <- proc.time()[["elapsed"]]
+            if (self$testInstalledBasicPackages) {
+                self$basicPackageTestResult <- .testInstalledBasicPackages(scope = self$scope, headingLevel = 4)
+            }
+            self$timings[["basicPackages"]] <- proc.time()[["elapsed"]] - basicStarted
+            invisible()
         },
         start_file = function(file) {
             self$fileName <- file
@@ -2359,8 +2548,10 @@ MarkdownReporter <- R6::R6Class(
             self$log("")
         },
         end_reporter = function() {
+            if (self$reportFinalized) return(invisible())
+            self$reportFinalized <- TRUE
             self$endTime <- Sys.time()
-            self$timings[["tests"]] <- proc.time()[["elapsed"]] - self$testStartTime
+            self$timings[["tests"]] <- if (is.null(self$testStartTime)) 0 else proc.time()[["elapsed"]] - self$testStartTime
 
             self$log("")
             self$log("## Summary")
@@ -2394,7 +2585,15 @@ MarkdownReporter <- R6::R6Class(
 
             self$log("- **", self$getTestText(self$numberOfSkips), " were skipped.**")
             self$log("")
-            if (self$numberOfFailures == 0) {
+            if (!is.null(self$executionError)) {
+                self$log("**Test execution aborted. The results above are incomplete; installation qualification failed.**")
+                self$log("")
+                self$log("Expected complete test set (META): ", self$minNumberOfExpectedTests, ".")
+                self$log("")
+                self$log("Execution error: ", self$executionError)
+                self$log("")
+                self$log("Inspect testthat.Rout.fail for details. If the problem persists, try workers = 1.")
+            } else if (self$numberOfFailures == 0) {
                 if (self$counter > self$minNumberOfExpectedTests - 100) {
                     self$log(
                         "The successful completion of all tests confirms that ", self$rpactCranReference, " is ",

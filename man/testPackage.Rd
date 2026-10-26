@@ -94,10 +94,16 @@ is created within the specified output directory, where all test files are downl
 resource and executed. Results are saved in the file \code{testthat.Rout}, located in the
 \code{rpact-tests} directory.
 
-Unit test files are distributed across separate R processes. Scheduling priorities
+Unit test files are distributed across separate R processes.
+On Windows, standard output and error use files to avoid the pipe-related access
+violation in R bug 19104. Linux and macOS use the testthat parallel runner. Scheduling priorities
 are read from the \code{DESCRIPTION} above a local test directory, when present,
 and otherwise from the installed rpact package. Report sections follow file
 completion order. Personal rpact configuration files are isolated for the run.
+R basic package tests run in a separate R process before parallel workers start,
+using a temporary output directory. If execution aborts, partial results are marked
+as incomplete and the diagnostic log path is printed; use \code{workers = 1} to
+investigate persistent parallel-worker failures.
 The returned object includes \code{workers} and \code{timings}, with elapsed
 seconds for unit tests (including worker startup), R basic package tests,
 HTML rendering, and PDF rendering.

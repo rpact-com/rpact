@@ -17,6 +17,9 @@ An S3 object of class \code{InstallationQualificationResult} with the following 
 \item{scope}{Scope of the qualification (\code{"basic"}, \code{"devel"}, \code{"both"}, \code{"internet"}, or \code{"all"})}
 \item{resultDir}{Directory where the result reports are stored}
 \item{resultOuputFile}{Main output report filename}
+\item{logFile}{Absolute path to the test log, including \code{testthat.Rout.fail} on failure}
+\item{executionCompleted}{Whether all scheduled test files completed, independently of assertion failures}
+\item{executionError}{Execution or worker-process error message, or \code{NULL}}
 \item{workers}{Number of R test processes used}
 \item{timings}{Named numeric vector of elapsed seconds for \code{tests},
 \code{basicPackages}, \code{html}, and \code{pdf}; \code{NULL} if execution failed before results were collected}

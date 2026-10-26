@@ -25,6 +25,9 @@
 
 ## Improvements, issues, and changes
 
+* On Windows, `testPackage()` now uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.
+* `testPackage()` now runs R basic package tests in a separate R process before starting parallel workers and isolates configuration writes per test process. Worker crashes preserve partial results and are explicitly reported as incomplete execution, with the expected test count from `META`, the full diagnostic log path, and a hint to retry with `workers = 1`. Partial reports cannot claim successful installation qualification.
+
 * Corrected Weibull hazard ratio conversions for `kappa != 1` in survival planning and simulation, including multi-arm and enrichment simulations. Lambda remains the inverse Weibull scale; the hazard ratio is `(lambda1 / lambda2)^kappa`. Exponential calculations (`kappa = 1`) are unchanged.
 
 * Expanded the documentation of `typeOfSelection` for multi-arm and enrichment simulations, explaining all five selection rules, their interaction with adaptations and thresholds, and how to drop one worst arm at each interim using a custom selection function (issue [#159](https://github.com/rpact-com/rpact/issues/159)).
