@@ -17,6 +17,9 @@ An S3 object of class \code{InstallationQualificationResult} with the following 
 \item{scope}{Scope of the qualification (\code{"basic"}, \code{"devel"}, \code{"both"}, \code{"internet"}, or \code{"all"})}
 \item{resultDir}{Directory where the result reports are stored}
 \item{resultOuputFile}{Main output report filename}
+\item{workers}{Number of R test processes used}
+\item{timings}{Named numeric vector of elapsed seconds for \code{tests},
+\code{basicPackages}, \code{html}, and \code{pdf}; \code{NULL} if execution failed before results were collected}
 \item{reportFileNames}{Vector of report files generated}
 \item{minNumberOfExpectedTests}{Minimum number of expected tests}
 \item{totalNumberOfTests}{Number of tests actually run}

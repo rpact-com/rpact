@@ -69,6 +69,8 @@ Language: en-US
 Depends:
 	R (>= 4.1.0)
 Imports:
+    grDevices,
+    parallel,
 	methods,
 	stats,
 	utils,
@@ -80,6 +82,7 @@ Imports:
 	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
 Suggests:
+    parallelly,
 	ggplot2 (>= 3.5.0),
 	testthat (>= 3.0.0),
 	rmarkdown (>= 1.10),

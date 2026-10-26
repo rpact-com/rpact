@@ -711,7 +711,7 @@ NULL
         ))) {
         return(FALSE)
     }
-    
+
     cfg <- system.file("STARTUP_MESSAGE", package = "rpact")
     if (file.exists(cfg)) {
         cfgContent <- readLines(cfg, warn = FALSE)
@@ -734,8 +734,8 @@ NULL
 
     lastShownTime <- as.POSIXct(lastShownTime, tz = "UTC")
     timeDiff <- as.numeric(difftime(currentTime, lastShownTime, units = "mins"))
-    
-    # If the time difference is greater than a random value 
+
+    # If the time difference is greater than a random value
     # between 72 and 144 hours (3 to 6 days), show the message again
     if (timeDiff > floor(runif(1, 72, 144)) * 60) {
         base::options("rpact.startup.message.timestamp" = currentTime)
@@ -822,10 +822,14 @@ enableStartupMessages <- function() {
 
 .getInstallationQualificationMissingText <- function() {
     return(c(
-        paste0("Installation qualification for rpact ", .getPackageVersionString(),
-            " could not be verified on this system."),
-        paste0("Before using the package in a GxP-relevant environment, please ensure that installation ",
-            "qualification has been successfully performed."),
+        paste0(
+            "Installation qualification for rpact ", .getPackageVersionString(),
+            " could not be verified on this system."
+        ),
+        paste0(
+            "Before using the package in a GxP-relevant environment, please ensure that installation ",
+            "qualification has been successfully performed."
+        ),
         "If required, run testPackage()."
     ))
 }
@@ -1107,7 +1111,7 @@ setupPackageTests <- function(token, secret) {
         }
         workers <- min(16L, max(1L, available - 2L))
     }
-    if (!is.numeric(workers) || length(workers) != 1L || is.na(workers) ||
+    if (!is.numeric(workers) || is.complex(workers) || length(workers) != 1L || is.na(workers) ||
             !is.finite(workers) || workers < 1 || workers != floor(workers) ||
             workers > .Machine$integer.max) {
         stopIllegalArgument("'workers' must be NULL or a positive integer",
@@ -1140,28 +1144,75 @@ setupPackageTests <- function(token, secret) {
     unique(c(first, files))
 }
 
+# Count the same expectation events as the report, including expectations outside
+# test_that() and repeated skips/errors that ListReporter summaries can omit.
+.PackageTestCounter <- R6::R6Class("PackageTestCounter",
+    inherit = testthat::Reporter,
+    public = list(
+        totals = c(failed = 0L, error = 0L, warning = 0L, skipped = 0L, passed = 0L),
+        initialize = function(...) {
+            super$initialize(...)
+            self$capabilities$parallel_support <- TRUE
+            self$capabilities$parallel_updates <- FALSE
+        },
+        add_result = function(context, test, result) {
+            type <- if (inherits(result, "expectation_error")) {
+                "error"
+            } else if (.isTestExpectationBroken(result)) {
+                "failed"
+            } else if (.isTestExpectationWarning(result)) {
+                "warning"
+            } else if (.isTestExpectationSkip(result)) {
+                "skipped"
+            } else {
+                "passed"
+            }
+            self$totals[[type]] <- self$totals[[type]] + 1L
+        }
+    )
+)
+
 # Runs in the isolated R CMD BATCH process, using its installed rpact namespace.
 .runPackageUnitTests <- function(files, workers, reporterArguments, resultFile) {
-    oldOptions <- options(Ncpus = workers, testthat.progress.max_fails = Inf)
+    oldOptions <- options(
+        Ncpus = workers, testthat.progress.max_fails = Inf,
+        device = function(...) grDevices::pdf(file = NULL, ...)
+    )
     on.exit(options(oldOptions), add = TRUE)
     configPath <- tempfile("rpact-test-config-")
     dir.create(configPath)
     on.exit(unlink(configPath, recursive = TRUE), add = TRUE)
-    variables <- c("RPACT_CONFIG_DIR_LOAD", "RPACT_CONFIG_DIR_SAVE", "RPACT_LOG_LEVEL",
-        "TESTTHAT_PARALLEL", "TESTTHAT_CPUS", "TESTTHAT_IS_CHECKING")
+    variables <- c(
+        "RPACT_CONFIG_DIR_LOAD", "RPACT_CONFIG_DIR_SAVE", "RPACT_LOG_LEVEL",
+        "TESTTHAT_PARALLEL", "TESTTHAT_CPUS", "TESTTHAT_IS_CHECKING"
+    )
     oldEnvironment <- Sys.getenv(variables, unset = NA_character_)
-    on.exit({
-        Sys.unsetenv(variables[is.na(oldEnvironment)])
-        do.call(Sys.setenv, as.list(oldEnvironment[!is.na(oldEnvironment)]))
-    }, add = TRUE)
-    Sys.setenv(RPACT_CONFIG_DIR_LOAD = configPath, RPACT_CONFIG_DIR_SAVE = configPath,
-        RPACT_LOG_LEVEL = "DISABLED", TESTTHAT_PARALLEL = if (workers > 1L) "TRUE" else "FALSE",
-        TESTTHAT_CPUS = workers, TESTTHAT_IS_CHECKING = "true")
+    on.exit(
+        {
+            Sys.unsetenv(variables[is.na(oldEnvironment)])
+            if (any(!is.na(oldEnvironment))) {
+                do.call(Sys.setenv, as.list(oldEnvironment[!is.na(oldEnvironment)]))
+            }
+        },
+        add = TRUE
+    )
+    Sys.setenv(
+        RPACT_CONFIG_DIR_LOAD = configPath, RPACT_CONFIG_DIR_SAVE = configPath,
+        TESTTHAT_PARALLEL = if (workers > 1L) "TRUE" else "FALSE",
+        TESTTHAT_CPUS = workers, TESTTHAT_IS_CHECKING = "true"
+    )
+    # Implicit plots must not make parallel workers write the same Rplots.pdf.
+    # Helpers are sourced in both serial and parallel installed-package sessions.
+    graphicsHelper <- tempfile("helper-rpact-qa-graphics-", tmpdir = "testthat", fileext = ".R")
+    writeLines("options(device = function(...) grDevices::pdf(file = NULL, ...))", graphicsHelper)
+    on.exit(unlink(graphicsHelper), add = TRUE)
     # This guarded internal interface permits local file priorities while loading
     # the installed package in every worker (test_dir reads installed priorities).
     testFiles <- getFromNamespace("test_files", "testthat")
-    required <- c("test_dir", "test_paths", "test_package", "load_package",
-        "reporter", "parallel", "stop_on_failure")
+    required <- c(
+        "test_dir", "test_paths", "test_package", "load_package",
+        "reporter", "parallel", "stop_on_failure"
+    )
     if (!all(required %in% names(formals(testFiles)))) {
         stop("Unsupported testthat file-runner interface; cannot run package tests safely.")
     }
@@ -1178,22 +1229,36 @@ setupPackageTests <- function(token, secret) {
         "\nrpact: ", as.character(utils::packageVersion("rpact")),
         "\nPackage path: ", find.package("rpact"),
         "\ntestthat: ", as.character(utils::packageVersion("testthat")),
-        "\nTest files: ", length(files), "\nWorkers: ", workers, "\n", sep = "")
+        "\nTest files: ", length(files), "\nWorkers: ", workers, "\n",
+        sep = ""
+    )
+    counter <- .PackageTestCounter$new()
+    executionReporter <- testthat::MultiReporter$new(reporters = list(reporter, counter))
     started <- proc.time()[["elapsed"]]
-    results <- testFiles(test_dir = "testthat", test_paths = files, test_package = "rpact",
-        load_package = "installed", reporter = reporter, parallel = workers > 1L,
-        stop_on_failure = FALSE)
-    summary <- as.data.frame(results)
-    totals <- colSums(summary[, c("failed", "error", "warning", "skipped", "passed"), drop = FALSE])
+    results <- testFiles(
+        test_dir = "testthat", test_paths = files, test_package = "rpact",
+        load_package = "installed", reporter = executionReporter, parallel = workers > 1L,
+        stop_on_failure = FALSE
+    )
+    totals <- counter$totals
     timings <- if (reportType == "Rout") {
         c(tests = proc.time()[["elapsed"]] - started, basicPackages = 0, html = 0, pdf = 0)
     } else {
         reporter$timings
     }
-    saveRDS(list(workers = workers, timings = timings, totals = totals), resultFile)
-    cat("\n[ FAIL ", totals[["failed"]] + totals[["error"]],
-        " | WARN ", totals[["warning"]], " | SKIP ", totals[["skipped"]],
-        " | PASS ", totals[["passed"]], " ]\n", sep = "")
+    # Include worker startup and result collection in the unit test timing.
+    timings[["tests"]] <- max(0, proc.time()[["elapsed"]] - started -
+        sum(timings[c("basicPackages", "html", "pdf")]))
+    resultMessage <- sprintf(
+        "[ FAIL %d | WARN %d | SKIP %d | PASS %d ]",
+        totals[["failed"]] + totals[["error"]], totals[["warning"]],
+        totals[["skipped"]], totals[["passed"]]
+    )
+    saveRDS(list(
+        workers = workers, timings = timings, totals = totals,
+        resultMessage = resultMessage
+    ), resultFile)
+    cat("\n", resultMessage, "\n", sep = "")
     for (name in names(timings)) cat(sprintf("Runtime %s: %.2f seconds\n", name, timings[[name]]))
     if (totals[["failed"]] > 0 || totals[["error"]] > 0) stop("Test failures.", call. = FALSE)
     invisible(results)
@@ -1252,6 +1317,14 @@ setupPackageTests <- function(token, secret) {
 #' is created within the specified output directory, where all test files are downloaded from a secure
 #' resource and executed. Results are saved in the file \code{testthat.Rout}, located in the
 #' \code{rpact-tests} directory.
+#'
+#' Unit test files are distributed across separate R processes. Scheduling priorities
+#' are read from the \code{DESCRIPTION} above a local test directory, when present,
+#' and otherwise from the installed rpact package. Report sections follow file
+#' completion order. Personal rpact configuration files are isolated for the run.
+#' The returned object includes \code{workers} and \code{timings}, with elapsed
+#' seconds for unit tests (including worker startup), R basic package tests,
+#' HTML rendering, and PDF rendering.
 #'
 #' Installation qualification is a critical step in the validation process. Without successful IQ,
 #' the package cannot be considered fully validated. To gain access to the full set of unit tests,
@@ -1377,11 +1450,18 @@ testPackage <- function(
         )
     }
 
-    if (isTRUE(addWarningDetailsToReport)) {
-        valueBefore <- Sys.getenv("NOT_CRAN")
-        on.exit(Sys.setenv(NOT_CRAN = valueBefore), add = TRUE)
-        Sys.setenv(NOT_CRAN = "true")
-    }
+    inheritedVariables <- c("NOT_CRAN", "LANGUAGE", "RPACT_COMPLETE_UNIT_TEST_SET_ENABLED", "RPACT_LOG_LEVEL")
+    inheritedEnvironment <- Sys.getenv(inheritedVariables, unset = NA_character_)
+    on.exit(
+        {
+            Sys.unsetenv(inheritedVariables[is.na(inheritedEnvironment)])
+            if (any(!is.na(inheritedEnvironment))) {
+                do.call(Sys.setenv, as.list(inheritedEnvironment[!is.na(inheritedEnvironment)]))
+            }
+        },
+        add = TRUE
+    )
+    if (isTRUE(addWarningDetailsToReport)) Sys.setenv(NOT_CRAN = "true")
 
     startTime <- Sys.time()
 
@@ -1396,10 +1476,6 @@ testPackage <- function(
     }
 
     Sys.setenv("LANGUAGE" = "EN")
-    on.exit(Sys.unsetenv("LANGUAGE"), add = TRUE)
-
-    temp <- .isCompleteUnitTestSetEnabled()
-    on.exit(Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = temp), add = TRUE)
     Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = completeUnitTestSetEnabled)
 
     debug <- .getOptionalArgument("debug", ...)
@@ -1408,7 +1484,6 @@ testPackage <- function(
     } else {
         setLogLevel(C_LOG_LEVEL_DISABLED)
     }
-    on.exit(resetLogLevel(), add = TRUE)
 
     author <- NA_character_
     if (credentialsAvailable) {
@@ -1471,7 +1546,10 @@ testPackage <- function(
         }
     }
 
-    oldResultFiles <- .getExistingTestResultFiles(outDir)
+    oldResultFiles <- unique(c(
+        .getExistingTestResultFiles(outDir),
+        .getExistingTestResultFiles(testFileTargetDirectory)
+    ))
     for (oldResultFile in oldResultFiles) {
         if (file.exists(oldResultFile)) {
             file.remove(oldResultFile)
@@ -1495,41 +1573,72 @@ testPackage <- function(
         }
     }
 
-    markdownReportFileName <- NULL
-    if (reportType %in% c("compact", "detailed")) {
-        testthatMainFile <- file.path(testFileTargetDirectory, "testthat.R")
-        if (file.exists(testthatMainFile)) {
-            testthatMainFileBak <- paste0(testthatMainFile, ".bak")
-            file.rename(testthatMainFile, testthatMainFileBak)
-            on.exit(file.rename(testthatMainFileBak, testthatMainFile))
-        }
-
-        markdownReportFileName <- paste0(reportFileBaseName, ".md")
-        testFileTargetDirectory <- gsub("\\\\", "/", testFileTargetDirectory)
-        testthatCommands <- paste0(
-            "\n",
-            "library(testthat)\n",
-            "library(rpact)\n\n",
-            'test_check("rpact", ',
-            "reporter = MarkdownReporter$new(",
-            "outputFile = file.path(", .dQuote(testFileTargetDirectory), ", ", .dQuote(markdownReportFileName), "), ",
-            'outputSize = "', reportType, '", ',
-            "openHtmlReport = ", openHtmlReport, ", ",
-            "keepSourceFiles = ", keepSourceFiles, ", ",
-            "testInstalledBasicPackages = ", testInstalledBasicPackages, ", ",
-            "author = ", .dQuote(author), ", ",
-            "scope = ", .dQuote(scope), ", ",
-            'metaDataFile = "', metaDataFile, '"',
-            ")",
-            ")\n\n"
+    files <- .getPackageTestFiles(testFileTargetDirectory)
+    if (!length(files)) stop("No test files found in 'testthat'.")
+    workers <- .getPackageTestWorkers(workers, length(files))
+    cat("Test files: ", length(files), "; workers: ", workers, "\n", sep = "")
+    testFileTargetDirectory <- normalizePath(testFileTargetDirectory, winslash = "/")
+    resultFile <- tempfile("rpact-test-run-", tmpdir = testFileTargetDirectory, fileext = ".rds")
+    on.exit(unlink(resultFile), add = TRUE)
+    markdownReportFileName <- if (reportType == "Rout") NULL else paste0(reportFileBaseName, ".md")
+    testthatMainFile <- file.path(testFileTargetDirectory, "testthat.R")
+    if (file.exists(testthatMainFile)) {
+        testthatMainFileBak <- tempfile("testthat-backup-", tmpdir = testFileTargetDirectory)
+        if (!file.rename(testthatMainFile, testthatMainFileBak)) stop("Cannot back up testthat.R.")
+        on.exit(
+            {
+                unlink(testthatMainFile)
+                file.rename(testthatMainFileBak, testthatMainFile)
+            },
+            add = TRUE
         )
-        cat(testthatCommands, file = testthatMainFile)
+    } else {
+        on.exit(unlink(testthatMainFile), add = TRUE)
     }
-
-    .testInstalledPackage(
-        testFileDirectory = testFileTargetDirectory,
-        pkgName = pkgName
+    reporterArguments <- list(
+        outputFile = file.path(testFileTargetDirectory, markdownReportFileName),
+        outputSize = reportType, openHtmlReport = openHtmlReport,
+        keepSourceFiles = keepSourceFiles, testInstalledBasicPackages = testInstalledBasicPackages,
+        addWarningDetailsToReport = addWarningDetailsToReport,
+        author = author, scope = scope, metaDataFile = metaDataFile
     )
+    # Serialize R expressions instead of interpolating paths, names, or metadata.
+    commands <- c(
+        deparse(substitute(.libPaths(paths), list(paths = .libPaths())), width.cutoff = 500L),
+        deparse(
+            substitute(rpact:::.runPackageUnitTests(
+                files = testFiles, workers = count, reporterArguments = arguments, resultFile = path
+            ), list(testFiles = files, count = workers, arguments = reporterArguments, path = resultFile)),
+            width.cutoff = 500L
+        )
+    )
+    writeLines(commands, testthatMainFile)
+    # Isolate configuration before rpact is loaded in the batch process.
+    configPath <- tempfile("rpact-test-config-")
+    dir.create(configPath)
+    on.exit(unlink(configPath, recursive = TRUE), add = TRUE)
+    variables <- c("RPACT_CONFIG_DIR_LOAD", "RPACT_CONFIG_DIR_SAVE")
+    oldEnvironment <- Sys.getenv(variables, unset = NA_character_)
+    on.exit(
+        {
+            Sys.unsetenv(variables[is.na(oldEnvironment)])
+            if (any(!is.na(oldEnvironment))) {
+                do.call(Sys.setenv, as.list(oldEnvironment[!is.na(oldEnvironment)]))
+            }
+        },
+        add = TRUE
+    )
+    Sys.setenv(RPACT_CONFIG_DIR_LOAD = configPath, RPACT_CONFIG_DIR_SAVE = configPath)
+    executionStatus <- .testInstalledPackage(
+        testFileDirectory = testFileTargetDirectory, pkgName = pkgName
+    )
+    # Qualification persistence belongs to the caller's configuration, not the
+    # temporary configuration used only by the test processes.
+    Sys.unsetenv(variables[is.na(oldEnvironment)])
+    if (any(!is.na(oldEnvironment))) {
+        do.call(Sys.setenv, as.list(oldEnvironment[!is.na(oldEnvironment)]))
+    }
+    runDetails <- if (file.exists(resultFile)) readRDS(resultFile) else NULL
 
     newResultFiles <- .getExistingTestResultFiles(outDir)
     if (length(newResultFiles) == 0) {
@@ -1573,8 +1682,13 @@ testPackage <- function(
     status <- "incomplete"
     if (file.exists(inputFileName)) {
         fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
-        totalNumberOfTests <- .getTestthatResultNumberOfTests(fileContent)
-        if (completeUnitTestSetEnabled && minNumberOfExpectedTests <= totalNumberOfTests) {
+        totalNumberOfTests <- if (is.null(runDetails)) {
+            .getTestthatResultNumberOfTests(fileContent)
+        } else {
+            sum(runDetails$totals)
+        }
+        if (completeUnitTestSetEnabled && minNumberOfExpectedTests <= totalNumberOfTests &&
+                identical(executionStatus, 0L)) {
             statusMessage <- "Installation qualification successfully completed"
             status <- "success"
             .setSystemIdentifier()
@@ -1596,11 +1710,15 @@ testPackage <- function(
         cat("\n")
 
         cat("Results:\n")
-        resultMessage <- .getTestthatResultLine(fileContent)
+        resultMessage <- if (is.null(runDetails)) .getTestthatResultLine(fileContent) else runDetails$resultMessage
         cat(resultMessage, "\n")
         cat("\n")
         .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
-        numberOfSkippedTests <- .getTestthatResultNumberOfSkippedTests(fileContent)
+        numberOfSkippedTests <- if (is.null(runDetails)) {
+            .getTestthatResultNumberOfSkippedTests(fileContent)
+        } else {
+            unname(runDetails$totals[["skipped"]])
+        }
         if (numberOfSkippedTests > 0) {
             cat("-------------------------------------------------------------------------\n")
             cat("Note that ", numberOfSkippedTests, " tests were skipped; ",
@@ -1622,7 +1740,13 @@ testPackage <- function(
         status <- "failed"
         if (file.exists(inputFileName)) {
             fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
-            numberOfFailedTests <- .getTestthatResultNumberOfFailures(fileContent)
+            numberOfFailedTests <- if (is.null(runDetails)) {
+                .getTestthatResultNumberOfFailures(fileContent)
+            } else {
+                totalNumberOfTests <- sum(runDetails$totals)
+                numberOfSkippedTests <- unname(runDetails$totals[["skipped"]])
+                unname(runDetails$totals[["failed"]] + runDetails$totals[["error"]])
+            }
             if (completeUnitTestSetEnabled) {
                 if (numberOfFailedTests > 0) {
                     cat(numberOfFailedTests,
@@ -1643,7 +1767,7 @@ testPackage <- function(
                 statusMessage <- paste0("Installation qualification was not successful (subset with ", numberOfFailedTests, " failures)")
             }
             cat("Results:\n")
-            resultMessage <- .getTestthatResultLine(fileContent)
+            resultMessage <- if (is.null(runDetails)) .getTestthatResultLine(fileContent) else runDetails$resultMessage
             cat(resultMessage, "\n")
             .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
         } else {
@@ -1671,6 +1795,8 @@ testPackage <- function(
         scope = scope,
         resultDir = resultDir,
         resultOuputFile = resultOuputFile,
+        workers = workers,
+        timings = if (is.null(runDetails)) NULL else runDetails$timings,
         reportFileNames = reportFileNames,
         minNumberOfExpectedTests = minNumberOfExpectedTests,
         totalNumberOfTests = totalNumberOfTests,
@@ -1711,6 +1837,9 @@ testPackage <- function(
 #'   \item{scope}{Scope of the qualification (`"basic"`, `"devel"`, `"both"`, `"internet"`, or `"all"`)}
 #'   \item{resultDir}{Directory where the result reports are stored}
 #'   \item{resultOuputFile}{Main output report filename}
+#'   \item{workers}{Number of R test processes used}
+#'   \item{timings}{Named numeric vector of elapsed seconds for \code{tests},
+#'       \code{basicPackages}, \code{html}, and \code{pdf}; \code{NULL} if execution failed before results were collected}
 #'   \item{reportFileNames}{Vector of report files generated}
 #'   \item{minNumberOfExpectedTests}{Minimum number of expected tests}
 #'   \item{totalNumberOfTests}{Number of tests actually run}
@@ -1977,6 +2106,8 @@ MarkdownReporter <- R6::R6Class(
     public = list(
         startTime = NULL,
         endTime = NULL,
+        testStartTime = NULL,
+        timings = c(tests = 0, basicPackages = 0, html = 0, pdf = 0),
         output = character(),
         outputSize = "compact",
         current = list(
@@ -2016,8 +2147,9 @@ MarkdownReporter <- R6::R6Class(
                 author = "RPACT",
                 scope = "basic",
                 metaDataFile = NULL) {
-            # self$capabilities$parallel_support <- TRUE
             super$initialize(...)
+            self$capabilities$parallel_support <- TRUE
+            self$capabilities$parallel_updates <- FALSE
             self$outputSize <- match.arg(outputSize)
             self$outputFile <- outputFile
             self$addWarningDetailsToReport <- addWarningDetailsToReport
@@ -2092,6 +2224,7 @@ MarkdownReporter <- R6::R6Class(
             self$log("- **Date of creation**: ", format(self$startTime, "%B %d, %Y, %X"))
             self$log("- **Creator**: rpact function *testPackage()*")
             self$log("- **rpact package version**: ", .getPackageVersionString())
+            self$log("- **R test processes**: ", getOption("Ncpus", 1L))
             self$log("- **rpact package release date**: ", format(packageDate("rpact"), "%B %d, %Y"))
             self$log("- **System user**: *", Sys.info()[["user"]], "*")
             self$log("- **System ID**: ", getSystemIdentifier(), "")
@@ -2108,9 +2241,11 @@ MarkdownReporter <- R6::R6Class(
             self$log("")
 
             basicPackageTestResult <- NULL
+            basicStarted <- proc.time()[["elapsed"]]
             if (self$testInstalledBasicPackages) {
                 basicPackageTestResult <- .testInstalledBasicPackages(scope = self$scope, headingLevel = 4)
             }
+            self$timings[["basicPackages"]] <- proc.time()[["elapsed"]] - basicStarted
 
             if (!is.null(basicPackageTestResult)) {
                 self$log("## R Basic Package Test Results")
@@ -2121,9 +2256,11 @@ MarkdownReporter <- R6::R6Class(
 
             self$log("## Test Results")
             self$log("")
+            self$testStartTime <- proc.time()[["elapsed"]]
         },
         start_file = function(file) {
             self$fileName <- file
+            self$current$test <- NULL
         },
         getContext = function() {
             if (is.null(self$fileName)) {
@@ -2205,7 +2342,8 @@ MarkdownReporter <- R6::R6Class(
 
             self$log(
                 "- ", ifelse(failureEnabled, "Error", "Warning"), " in ",
-                self$fileName, ", line ", result$srcref[1], "."
+                self$fileName, ", line ",
+                if (length(result$srcref)) result$srcref[1] else "unknown", "."
             )
             msgParts <- strsplit(result$message, "\n")[[1]]
             tabStr <- ""
@@ -2222,11 +2360,15 @@ MarkdownReporter <- R6::R6Class(
         },
         end_reporter = function() {
             self$endTime <- Sys.time()
+            self$timings[["tests"]] <- proc.time()[["elapsed"]] - self$testStartTime
 
             self$log("")
             self$log("## Summary")
             self$log("")
             self$log("The test ended at ", format(self$endTime, "%X"), " on ", format(self$endTime, "%B %d, %Y"), ".")
+            self$log("")
+            self$log(sprintf("- **Unit test runtime**: %.2f seconds", self$timings[["tests"]]))
+            self$log(sprintf("- **R basic package test runtime**: %.2f seconds", self$timings[["basicPackages"]]))
             self$log("")
             self$log("A total of ", self$counter, " tests were executed during the Installation Qualification:")
             self$log("")
@@ -2374,6 +2516,7 @@ MarkdownReporter <- R6::R6Class(
                 }
             }
 
+            htmlStarted <- proc.time()[["elapsed"]]
             tryCatch(
                 {
                     .assertPackageIsInstalled("rmarkdown")
@@ -2399,6 +2542,8 @@ MarkdownReporter <- R6::R6Class(
                 }
             )
 
+            self$timings[["html"]] <- proc.time()[["elapsed"]] - htmlStarted
+            pdfStarted <- proc.time()[["elapsed"]]
             mdFileForTex <- sub("\\.md$", "_tex.md", self$outputFile)
             tryCatch(
                 {
@@ -2431,6 +2576,7 @@ MarkdownReporter <- R6::R6Class(
                     )
                 }
             )
+            self$timings[["pdf"]] <- proc.time()[["elapsed"]] - pdfStarted
         }
     )
 )

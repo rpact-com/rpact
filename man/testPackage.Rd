@@ -19,7 +19,8 @@ testPackage(
   keepSourceFiles = FALSE,
   reportFileBaseName = "rpact_test_result_report",
   metaData = list(),
-  metaDataFile = NULL
+  metaDataFile = NULL,
+  workers = NULL
 )
 }
 \arguments{
@@ -70,6 +71,13 @@ For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKe
 
 \item{metaDataFile}{An optional path to a text file containing metadata: one entry per line in the form \code{KEY=VALUE}.
 For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.}
+
+\item{workers}{Number of parallel R test processes. The default \code{NULL} uses
+the available logical CPUs minus two, with a minimum of one and a maximum of
+16, limited to the number of test files. Uses \code{parallelly::availableCores()}
+when installed (including resource limits), otherwise \code{parallel::detectCores()}.
+An explicit positive integer overrides the automatic selection; use \code{1}
+for serial execution. Parallel tests are supported on Windows, Linux, and macOS.}
 }
 \value{
 Invisibly returns an \code{\link[=InstallationQualificationResult]{InstallationQualificationResult}}) object.
@@ -85,6 +93,14 @@ ensuring it meets quality standards and functions as expected. A directory named
 is created within the specified output directory, where all test files are downloaded from a secure
 resource and executed. Results are saved in the file \code{testthat.Rout}, located in the
 \code{rpact-tests} directory.
+
+Unit test files are distributed across separate R processes. Scheduling priorities
+are read from the \code{DESCRIPTION} above a local test directory, when present,
+and otherwise from the installed rpact package. Report sections follow file
+completion order. Personal rpact configuration files are isolated for the run.
+The returned object includes \code{workers} and \code{timings}, with elapsed
+seconds for unit tests (including worker startup), R basic package tests,
+HTML rendering, and PDF rendering.
 
 Installation qualification is a critical step in the validation process. Without successful IQ,
 the package cannot be considered fully validated. To gain access to the full set of unit tests,
