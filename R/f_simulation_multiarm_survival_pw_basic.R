@@ -333,7 +333,7 @@ NULL
         activeHazards <- piecewiseActiveHazards
     } else {
         lambdaControl <- getLambdaByPi(piControl, eventTime, kappa)
-        lambdaVector <- c(omegaVector * lambdaControl, lambdaControl)
+        lambdaVector <- c(omegaVector^(1 / kappa) * lambdaControl, lambdaControl)
     }
 
     for (i in 1:maxNumberOfSubjects) {

@@ -551,6 +551,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sampleMultinomOne
+int sampleMultinomOne(NumericVector probabilities);
+RcppExport SEXP _rpact_sampleMultinomOne(SEXP probabilitiesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type probabilities(probabilitiesSEXP);
+    rcpp_result_gen = Rcpp::wrap(sampleMultinomOne(probabilities));
+    return rcpp_result_gen;
+END_RCPP
+}
 // updateSubGroupVector
 CharacterVector updateSubGroupVector(int k, int maxNumberOfSubjects, IntegerVector numberOfSubjects, const CharacterVector& subGroupVector, CharacterVector subGroups, NumericVector prevSelected, IntegerVector allocationFraction);
 RcppExport SEXP _rpact_updateSubGroupVector(SEXP kSEXP, SEXP maxNumberOfSubjectsSEXP, SEXP numberOfSubjectsSEXP, SEXP subGroupVectorSEXP, SEXP subGroupsSEXP, SEXP prevSelectedSEXP, SEXP allocationFractionSEXP) {
@@ -1090,6 +1101,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_logRankTestEnrichment", (DL_FUNC) &_rpact_logRankTestEnrichment, 7},
     {"_rpact_getSimulationSurvivalEnrichmentStageEvents", (DL_FUNC) &_rpact_getSimulationSurvivalEnrichmentStageEvents, 12},
     {"_rpact_getTreatmentsSubgroups", (DL_FUNC) &_rpact_getTreatmentsSubgroups, 4},
+    {"_rpact_sampleMultinomOne", (DL_FUNC) &_rpact_sampleMultinomOne, 1},
     {"_rpact_updateSubGroupVector", (DL_FUNC) &_rpact_updateSubGroupVector, 7},
     {"_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased", (DL_FUNC) &_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased, 30},
     {"_rpact_performSimulationEnrichmentSurvivalLoop", (DL_FUNC) &_rpact_performSimulationEnrichmentSurvivalLoop, 34},
