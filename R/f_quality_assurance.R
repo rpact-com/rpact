@@ -1730,11 +1730,15 @@ testPackage <- function(
     }
 
     files <- .getPackageTestFiles(testFileTargetDirectory)
-    if (!length(files)) stop("No test files found in 'testthat'.")
+    if (!length(files)) {
+        stop("No test files found in directory 'testthat'")
+    }
+    
     workers <- .getPackageTestWorkers(workers, length(files))
     minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
-    cat("Expected number of unit tests in the complete set (META): ", minNumberOfExpectedTests, "\n", sep = "")
-    cat("Test files: ", length(files), "; workers: ", workers, "\n", sep = "")
+    cat("Expected number of unit tests in the complete set: ", minNumberOfExpectedTests, "\n", sep = "")
+    cat("Number of test files: ", length(files), "\n", sep = "")
+    cat("Number of workers: ", workers, "\n", sep = "")
     testFileTargetDirectory <- normalizePath(testFileTargetDirectory, winslash = "/")
     resultFile <- tempfile("rpact-test-run-", tmpdir = testFileTargetDirectory, fileext = ".rds")
     on.exit(unlink(resultFile), add = TRUE)
@@ -1742,7 +1746,9 @@ testPackage <- function(
     testthatMainFile <- file.path(testFileTargetDirectory, "testthat.R")
     if (file.exists(testthatMainFile)) {
         testthatMainFileBak <- tempfile("testthat-backup-", tmpdir = testFileTargetDirectory)
-        if (!file.rename(testthatMainFile, testthatMainFileBak)) stop("Cannot back up testthat.R.")
+        if (!file.rename(testthatMainFile, testthatMainFileBak)) {
+            stop("Cannot back up testthat.R")
+        }
         on.exit(
             {
                 unlink(testthatMainFile)

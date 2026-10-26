@@ -992,6 +992,24 @@ getAvailablePlotTypes <- function(
     return(TRUE)
 }
 
+.setXAxisScale <- function(p, data, ..., addZero = FALSE, digits = 0) {
+    if (is.null(data$xValues) || !is.numeric(data$xValues) || length(na.omit(data$xValues)) == 0) {
+        return(p)
+    }
+    
+#    if (!is.null(p$scales$get_scales("x"))) {
+#        return(p)
+#    }
+    
+    breaks <- sort(unique(round(na.omit(data$xValues), digits = digits)))
+    if (addZero && !any(breaks == 0)) {
+        breaks <- c(0, breaks)
+    }
+
+    p <- p + ggplot2::scale_x_continuous(breaks = breaks)
+    return(p)
+}
+
 .plotParameterSet <- function(
         ...,
         parameterSet,
@@ -1369,9 +1387,7 @@ getAvailablePlotTypes <- function(
             breaks = seq_len(piecewiseSpecification$getNumberOfSituations()),
             labels = dimnames(piecewiseSpecification$hazardRatios)[[3]])
     } else if (xParameterName == "informationRates") {
-        p <- p + ggplot2::scale_x_continuous(breaks = c(0, round(data$xValues, 3)))
-    } else if (xParameterName == "situation") { # simulation enrichment
-        p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
+        p <- .setXAxisScale(p, data, addZero = TRUE, digits = 3)
     }
 
     # add mirrored lines
@@ -1569,12 +1585,14 @@ getAvailablePlotTypes <- function(
     } else {
         p <- ggplot2::ggplot(data, ggplot2::aes(x = .data[["xValues"]], y = .data[["yValues"]]))
     }
-
-    xValues <- data$xValues
-    if (any(!is.na(xValues)) && all(xValues[!is.na(xValues)] == round(xValues[!is.na(xValues)]))) {
-        p <- p + ggplot2::scale_x_continuous(
-            breaks = sort(unique(xValues[!is.na(xValues)]))
-        )
+    
+    if (isFALSE(discreteXAxis) && !is.null(xlab) && 
+            grepl("situation", xlab, ignore.case = TRUE)) {
+        discreteXAxis <- TRUE
+    }
+    if (isFALSE(discreteXAxis) && !is.null(xAxisLabel) && 
+            grepl("situation", xAxisLabel, ignore.case = TRUE)) {
+        discreteXAxis <- TRUE
     }
     
     p <- plotSettings$setTheme(p)
@@ -1583,7 +1601,7 @@ getAvailablePlotTypes <- function(
     if (!is.null(xAxisTickLabels)) {
         p <- p + ggplot2::scale_x_continuous(breaks = seq_along(xAxisTickLabels), labels = xAxisTickLabels)
     } else if (discreteXAxis) {
-        p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
+        p <- .setXAxisScale(p, data)
     }
 
     # set main title
