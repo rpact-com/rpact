@@ -95,8 +95,8 @@ mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
 #' @param sigma Values defining correlation structure. Array of N dimensions
 #' @inheritParams param_three_dots
 #' @param eps desired accuracy. Defaults to 1e-06
-#' @param errorControl error control. If set to 1, strict error control based on
-#'        fourth derivative is used. If set to zero, error control based on halving intervals is used
+#' @param errorControl error control. If set to \code{"strict"} (default), strict error control based on
+#'        fourth derivative is used. If set to \code{"halvingIntervals"}, error control based on halving intervals is used
 #' @param intervalSimpsonsRule Interval width for Simpson's rule. Value of zero caused a default .24 to be used
 #'
 #' @export
@@ -223,8 +223,8 @@ mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0)
 #' @inheritParams param_three_dots
 #' @param df Degrees of Freedom. Use 0 for infinite D.F.
 #' @param eps desired accuracy. Defaults to 1e-06
-#' @param errorControl error control. If set to 1, strict error control based on
-#'        fourth derivative is used. If set to zero, error control based on halving intervals is used
+#' @param errorControl error control. If set to \code{"strict"} (default), strict error control based on
+#'        fourth derivative is used. If set to \code{"halvingIntervals"}, error control based on halving intervals is used
 #' @param intervalSimpsonsRule Interval width for Simpson's rule. Value of zero caused a default .24 to be used
 #'
 #' @export

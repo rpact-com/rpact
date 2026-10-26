@@ -954,7 +954,7 @@ NULL
 #' @inheritParams param_effectList
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_enrichment
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_plannedSubjects

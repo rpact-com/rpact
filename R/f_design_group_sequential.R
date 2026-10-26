@@ -2254,9 +2254,11 @@ getDesignInverseNormal <- function(
 #'        Default is \code{"zValue"}.
 #' @inheritParams param_bindingFutility
 #' @inheritParams param_directionUpper
-#' @param deltaWT Delta for Wang & Tsiatis Delta class.
+#' @param deltaWT Delta for Wang & Tsiatis Delta class. Required for \code{typeOfDesign = "WT"}.
 #' @param deltaPT1 Delta1 for Pampallona & Tsiatis class rejecting H0 boundaries.
+#'        Required (together with \code{deltaPT0}) for \code{typeOfDesign = "PT"}.
 #' @param deltaPT0 Delta0 for Pampallona & Tsiatis class rejecting H1 boundaries.
+#'        Required (together with \code{deltaPT1}) for \code{typeOfDesign = "PT"}.
 #' @param constantBoundsHP The constant bounds up to stage \code{kMax - 1} for the
 #'        Haybittle & Peto design (default is \code{3}).
 #' @param optimizationCriterion Optimization criterion for optimum design within
@@ -2267,8 +2269,10 @@ getDesignInverseNormal <- function(
 #'        Kim & DeMets beta spending, Hwang, Shi & DeCani beta spending, user defined
 #'        beta spending (\code{"bsOF"}, \code{"bsP"}, \code{"bsKD"},
 #'        \code{"bsHSD"}, \code{"bsUser"}, default is \code{"none"}).
-#' @param gammaA Parameter for alpha spending function.
-#' @param gammaB Parameter for beta spending function.
+#' @param gammaA Parameter for alpha spending function. Required for \code{typeOfDesign = "asKD"}
+#'        (validated range \code{[0.4, 8]}) and \code{typeOfDesign = "asHSD"}.
+#' @param gammaB Parameter for beta spending function. Required for \code{typeBetaSpending = "bsKD"}
+#'        (validated range \code{[0.4, 8]}) and \code{typeBetaSpending = "bsHSD"}.
 #' @inheritParams param_userAlphaSpending
 #' @param delayedInformation Delay of information for delayed response designs. Can be a numeric value or a
 #' 		  numeric vector of length \code{kMax - 1}

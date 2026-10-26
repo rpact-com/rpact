@@ -673,7 +673,7 @@ getSampleSizeMeans <- function(
 #' @param normalApproximation The type of computation of the p-values. If \code{TRUE}, the variance is
 #'        assumed to be known, default is \code{FALSE}, i.e., the calculations are performed
 #'        with the t distribution.
-#' @param meanRatio If \code{TRUE}, the sample size for
+#' @param meanRatio If \code{TRUE}, the power for
 #'        one-sided testing of H0: \code{mu1 / mu2 = thetaH0} is calculated, default is \code{FALSE}.
 #' @inheritParams param_thetaH0
 #' @inheritParams param_alternative

@@ -102,6 +102,32 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Design with Default for Multi-Arm Designs
+#' @param design The trial design. If no trial design is specified, a fixed sample size design is used.
+#'   In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
+#'   and \code{sided} can be directly entered as argument where necessary.
+#'   Must be created with \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+#'   \code{\link[=getDesignFisher]{getDesignFisher()}},
+#'   \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}, or
+#'   \code{\link[=getDesignFixed]{getDesignFixed()}};
+#'   designs created with \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} are not supported.
+#' @name param_design_multiarm
+#' @keywords internal
+NULL
+
+#' Parameter Description: Design with Default for Enrichment Designs
+#' @param design The trial design. If no trial design is specified, a fixed sample size design is used.
+#'   In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
+#'   and \code{sided} can be directly entered as argument where necessary.
+#'   Must be created with \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+#'   \code{\link[=getDesignFisher]{getDesignFisher()}}, or
+#'   \code{\link[=getDesignFixed]{getDesignFixed()}};
+#'   designs created with \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} or
+#'   \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}} are not supported.
+#' @name param_design_enrichment
+#' @keywords internal
+NULL
+
 #' Parameter Description: N_max
 #' @param nMax The maximum sample size. Must be a positive integer of length 1.
 #' @name param_nMax
@@ -154,7 +180,9 @@ NULL
 #' Parameter Description: Lambda (1)
 #' @param lambda1 The assumed hazard rate in the treatment group, there is no default.
 #'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
-#'   Must be a positive numeric of length 1.
+#'   Must be a positive numeric value or vector: without \code{piecewiseSurvivalTime}, a vector defines
+#'   alternative hazard rates to be considered; with \code{piecewiseSurvivalTime}, it contains one hazard rate
+#'   per time interval. \code{getEventProbabilities()} uses only the first value of a non-piecewise vector.
 #' @name param_lambda1
 #' @keywords internal
 NULL
@@ -162,7 +190,8 @@ NULL
 #' Parameter Description: Lambda (2)
 #' @param lambda2 The assumed hazard rate in the reference group, there is no default.
 #'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
-#'   Must be a positive numeric of length 1.
+#'   Must be a positive numeric of length 1, or a vector with one hazard rate per time interval
+#'   if \code{piecewiseSurvivalTime} is specified.
 #' @name param_lambda2
 #' @keywords internal
 NULL
@@ -213,7 +242,8 @@ NULL
 #' Parameter Description: Hazard Ratio
 #' @param hazardRatio The vector of hazard ratios under consideration.
 #'   If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
-#'   not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.
+#'   not to be specified as it is calculated, there is no default. Must be a positive numeric value or vector;
+#'   \code{getEventProbabilities()} accepts a single value only.
 #' @name param_hazardRatio
 #' @keywords internal
 NULL
@@ -323,19 +353,23 @@ NULL
 
 #' Parameter Description: overdispersion for Counts
 #' @param overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution,
-#' default is \code{0}.
+#' default is \code{0}. Must be \code{>= 0}.
 #' @name param_overdispersion_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: fixedExposureTime for Counts
 #' @param fixedExposureTime If specified, the fixed time of exposure per subject for count data, there is no default.
+#'   Exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
 #' @name param_fixedExposureTime_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: accrualTime for Counts
 #' @param accrualTime If specified, the assumed accrual time interval(s) for the study, there is no default.
+#'   A single value defines the end of accrual; if a vector is specified, its first value must be \code{0}.
+#'   If \code{followUpTime} is specified, \code{accrualTime} can have at most two elements.
+#'   Required for \code{getSimulationCounts()}.
 #' @name param_accrualTime_counts
 #' @keywords internal
 NULL
@@ -349,6 +383,7 @@ NULL
 #' Parameter Description: followUpTime for Counts
 #' @param followUpTime If specified, the assumed (additional) follow-up time for the study, there is no default.
 #'        The total study duration is \code{accrualTime + followUpTime}.
+#'        Exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
 #' @name param_followUpTime_counts
 #' @keywords internal
 NULL
@@ -401,8 +436,12 @@ NULL
 
 #' Parameter Description: Direction Upper
 #' @param directionUpper Logical. Specifies the direction of the alternative,
-#'   only applicable for one-sided testing; default is \code{TRUE}
-#'   which means that larger values of the test statistics yield smaller p-values.
+#'   only applicable for one-sided testing; \code{TRUE}
+#'   means that larger values of the test statistics yield smaller p-values.
+#'   The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+#'   (power calculations, simulations, and analyses).
+#'   In sample size calculations, the direction is derived from the specified alternative;
+#'   a specified \code{directionUpper} must agree with it.
 #' @name param_directionUpper
 #' @keywords internal
 NULL
@@ -555,7 +594,9 @@ NULL
 #'   for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
 #'   It is defined as the power for the subsequent stage given the current data. By default,
 #'   the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
-#'   \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
+#'   \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates;
+#'   \code{piTreatmentsH1} and \code{piControlH1} in multi-arm designs, \code{piTreatmentH1} and
+#'   \code{piControlH1} in enrichment designs), or \code{thetaH1} (for simulating
 #'   hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.
 #' @name param_conditionalPowerSimulation
 #' @keywords internal
@@ -807,6 +848,7 @@ NULL
 
 #' Parameter Description: Active Arms
 #' @param activeArms The number of active treatment arms to be compared with control, default is \code{3}.
+#'   Must not exceed \code{8}.
 #' @name param_activeArms
 #' @keywords internal
 NULL
@@ -990,7 +1032,7 @@ NULL
 
 #' Parameter Description: Planned Calendar Time
 #' @param plannedCalendarTime For simulating count data, the time points where an analysis is planned to be performed.
-#'     Should be a vector of length \code{kMax}
+#'     Required for group sequential designs as a vector of length \code{kMax}; ignored for a fixed design.
 #' @name param_plannedCalendarTime
 #' @keywords internal
 NULL
@@ -1055,7 +1097,9 @@ NULL
 NULL
 
 #' Parameter Description: Pi Control
-#' @param piControl The assumed probability in the control arm, default is \code{0.5}.
+#' @param piControl The assumed event probability in the control arm by \code{eventTime}, default is \code{0.5}.
+#'   If specified and \code{simulationType = "auto"}, the patient-wise simulation is used, which requires
+#'   \code{maxNumberOfSubjects} or an absolute \code{accrualIntensity}.
 #' @name param_piControl
 #' @keywords internal
 NULL

@@ -48,7 +48,7 @@ NULL
 #' @inheritParams param_successCriterion
 #' @inheritParams param_correlationComputation
 #' @inheritParams param_typeOfShapeSurvival
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_multiarm
 #' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned

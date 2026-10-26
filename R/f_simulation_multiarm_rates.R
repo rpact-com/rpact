@@ -377,7 +377,7 @@ NULL
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfShapeRates
 #' @inheritParams param_typeOfSelection
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_multiarm
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_plannedSubjects
