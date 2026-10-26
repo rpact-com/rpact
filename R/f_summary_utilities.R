@@ -889,7 +889,7 @@ print.SummaryFactory <- function(
                     variedParameterValues <- c(paste0("S", 1:(numberOfVariants - 1)), "F")
                 }
                 numberOfVariants <- length(variedParameterValues)
-                legendEntry[["S[i]"]] <- "population i"
+                legendEntry[["S[i]"]] <- "subpopulation i"
                 legendEntry[["F"]] <- "full population"
             } else if (!inherits(parameterSet, "ClosedCombinationTestResults") ||
                     parameterName %in% c("rejected", "separatePValues")) {

@@ -303,7 +303,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     maxInformation = "Maximum information",
     informationEpsilon = "Information epsilon",
     effectList = "Effect list",
-    subGroups = "Sub-group",
+    subGroups = "Subgroup",
     prevalences = "Prevalence",
     effects = "Effect",
     situation = "Situation",

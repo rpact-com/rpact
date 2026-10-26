@@ -375,7 +375,7 @@ NULL
 #'   the combined sample size from both treatment groups if two groups are considered. For survival outcomes,
 #'   it should contain the planned number of additional events.
 #'   For multi-arm designs, it is the per-comparison (combined) sample size.
-#'   For enrichment designs, it is the (combined) sample size for the considered sub-population.
+#'   For enrichment designs, it is the (combined) sample size for the considered subpopulation.
 #' @name param_nPlanned
 #' @keywords internal
 NULL

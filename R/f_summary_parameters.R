@@ -332,7 +332,7 @@ NULL
         categoryCaption <- .getCategoryCaptionEnrichment(designPlan, parameterName, groupNumber)
         categoryCaption <- sub("^F$", "Full population F", categoryCaption)
         categoryCaption <- sub("^R$", "Remaining population R", categoryCaption)
-        categoryCaption <- sub("^S", "Subset S", categoryCaption)
+        categoryCaption <- sub("^S", "Subpopulation S", categoryCaption)
 
         return(paste0(listItemPrefix, categoryCaption))
     }

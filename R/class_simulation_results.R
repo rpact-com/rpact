@@ -397,16 +397,7 @@ SimulationResults <- R6::R6Class(
                     }
 
                     if (enrichmentEnabled) {
-                        if (length(self$effectList$subGroups) > 1) {
-                            self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
-                        }
-                        self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
-                        if (length(self$effectList$subGroups) > 1) {
-                            self$.cat(
-                                paste0("  R: remaining population\n"),
-                                consoleOutputEnabled = consoleOutputEnabled
-                            )
-                        }
+                        .catLegendEnrichment(self, consoleOutputEnabled)
                     }
 
                     self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)

@@ -98,7 +98,7 @@ The argument must be a vector with length equal to the number of remaining stage
 the combined sample size from both treatment groups if two groups are considered. For survival outcomes,
 it should contain the planned number of additional events.
 For multi-arm designs, it is the per-comparison (combined) sample size.
-For enrichment designs, it is the (combined) sample size for the considered sub-population.}
+For enrichment designs, it is the (combined) sample size for the considered subpopulation.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
@@ -262,7 +262,7 @@ if (require(ggplot2)) plot(y, thetaRange = c(0, 0.4))
 
 # Example 4 Enrichment Design
 # Perform an two-stage enrichment design analysis with O'Brien & Fleming boundaries
-# where one sub-population (S1) and a full population (F) are considered as primary
+# where one subpopulation (S1) and a full population (F) are considered as primary
 # analysis sets. At interim, S1 is selected for further analysis and the sample
 # size is increased accordingly. With the Spiessens & Debois intersection test,
 # the results of a closed adaptive test procedure together with the CRP, repeated

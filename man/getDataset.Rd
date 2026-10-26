@@ -91,8 +91,8 @@ was dropped at interim. Number of events and logrank statistics are entered for 
 comparison to control (see Examples).
 
 For enrichment designs, the comparison of two samples is provided for an unstratified
-(sub-population wise) or stratified data input.\cr
-For non-stratified (sub-population wise) data input the data sets are defined for the sub-populations
+(subpopulation wise) or stratified data input.\cr
+For non-stratified (subpopulation wise) data input the data sets are defined for the sub-populations
 S1, S2, ..., F, where F refers to the full populations. Use of \code{getDataset(S1 = , S2, ..., F = )}
 defines the data set to be used in \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 For stratified data input the data sets are defined for the strata S1, S12, S2, ..., R, where R

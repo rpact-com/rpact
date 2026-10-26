@@ -148,7 +148,7 @@ StageResults <- R6::R6Class("StageResults",
 
                 if (grepl("Enrichment", .getClassName(self))) {
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  S: subpopulation\n"), consoleOutputEnabled = consoleOutputEnabled)
                     self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                 } else if (grepl("MultiArm", .getClassName(self))) {
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)

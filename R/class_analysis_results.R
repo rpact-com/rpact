@@ -645,7 +645,7 @@ ClosedCombinationTestResults <- R6::R6Class("ClosedCombinationTestResults",
 
                 self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                 if (isTRUE(self$.enrichment)) {
-                    self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  S: subpopulation\n"), consoleOutputEnabled = consoleOutputEnabled)
                     self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                 } else {
                     self$.cat(paste0(
@@ -939,7 +939,7 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
                     )
                 } else if (.isEnrichmentAnalysisResults(self)) {
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  S: subpopulation\n"), consoleOutputEnabled = consoleOutputEnabled)
                     self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                 } else if (grepl("Rates", .getClassName(self$.dataInput)) && self$.dataInput$getNumberOfGroups() == 2) {
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)

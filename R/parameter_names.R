@@ -314,7 +314,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     maxInformation = "Maximum information",
     informationEpsilon = "Information epsilon",
     effectList = "Effect list",
-    subGroups = "Sub-groups",
+    subGroups = "Subgroups",
     prevalences = "Prevalences",
     effects = "Effects",
     situation = "Situation",

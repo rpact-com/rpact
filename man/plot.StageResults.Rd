@@ -51,7 +51,7 @@ The argument must be a vector with length equal to the number of remaining stage
 the combined sample size from both treatment groups if two groups are considered. For survival outcomes,
 it should contain the planned number of additional events.
 For multi-arm designs, it is the per-comparison (combined) sample size.
-For enrichment designs, it is the (combined) sample size for the considered sub-population.}
+For enrichment designs, it is the (combined) sample size for the considered subpopulation.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.

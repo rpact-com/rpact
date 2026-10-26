@@ -1095,6 +1095,110 @@ setupPackageTests <- function(token, secret) {
     return(reportFileNames)
 }
 
+.getPackageTestWorkers <- function(workers = NULL, numberOfFiles = Inf) {
+    if (is.null(workers)) {
+        available <- if (requireNamespace("parallelly", quietly = TRUE)) {
+            parallelly::availableCores()
+        } else {
+            parallel::detectCores(logical = TRUE)
+        }
+        if (length(available) != 1L || is.na(available) || !is.finite(available)) {
+            available <- 1L
+        }
+        workers <- min(16L, max(1L, available - 2L))
+    }
+    if (!is.numeric(workers) || length(workers) != 1L || is.na(workers) ||
+            !is.finite(workers) || workers < 1 || workers != floor(workers) ||
+            workers > .Machine$integer.max) {
+        stopIllegalArgument("'workers' must be NULL or a positive integer",
+            functionName = "testPackage", parameter = "workers", value = workers
+        )
+    }
+    as.integer(max(1L, min(workers, numberOfFiles)))
+}
+
+.getPackageTestFiles <- function(testFileDirectory) {
+    files <- list.files(file.path(testFileDirectory, "testthat"), pattern = "^test.*\\.[rR]$")
+    # Local scheduling metadata takes precedence over the installed rpact metadata.
+    descriptionFile <- file.path(dirname(normalizePath(testFileDirectory)), "DESCRIPTION")
+    priorities <- NULL
+    if (file.exists(descriptionFile)) {
+        description <- read.dcf(descriptionFile)
+        field <- "Config/testthat/start-first"
+        if (field %in% colnames(description)) {
+            priorities <- trimws(strsplit(description[1, field], ",", fixed = TRUE)[[1]])
+        }
+    }
+    if (is.null(priorities)) {
+        priorities <- utils::packageDescription("rpact")[["Config/testthat/start-first"]]
+        if (!is.null(priorities)) priorities <- trimws(strsplit(priorities, ",", fixed = TRUE)[[1]])
+    }
+    contexts <- sub("\\.[rR]$", "", sub("^test[-_.]?", "", files))
+    first <- unlist(lapply(priorities, function(pattern) {
+        files[grepl(utils::glob2rx(pattern), contexts)]
+    }), use.names = FALSE)
+    unique(c(first, files))
+}
+
+# Runs in the isolated R CMD BATCH process, using its installed rpact namespace.
+.runPackageUnitTests <- function(files, workers, reporterArguments, resultFile) {
+    oldOptions <- options(Ncpus = workers, testthat.progress.max_fails = Inf)
+    on.exit(options(oldOptions), add = TRUE)
+    configPath <- tempfile("rpact-test-config-")
+    dir.create(configPath)
+    on.exit(unlink(configPath, recursive = TRUE), add = TRUE)
+    variables <- c("RPACT_CONFIG_DIR_LOAD", "RPACT_CONFIG_DIR_SAVE", "RPACT_LOG_LEVEL",
+        "TESTTHAT_PARALLEL", "TESTTHAT_CPUS", "TESTTHAT_IS_CHECKING")
+    oldEnvironment <- Sys.getenv(variables, unset = NA_character_)
+    on.exit({
+        Sys.unsetenv(variables[is.na(oldEnvironment)])
+        do.call(Sys.setenv, as.list(oldEnvironment[!is.na(oldEnvironment)]))
+    }, add = TRUE)
+    Sys.setenv(RPACT_CONFIG_DIR_LOAD = configPath, RPACT_CONFIG_DIR_SAVE = configPath,
+        RPACT_LOG_LEVEL = "DISABLED", TESTTHAT_PARALLEL = if (workers > 1L) "TRUE" else "FALSE",
+        TESTTHAT_CPUS = workers, TESTTHAT_IS_CHECKING = "true")
+    # This guarded internal interface permits local file priorities while loading
+    # the installed package in every worker (test_dir reads installed priorities).
+    testFiles <- getFromNamespace("test_files", "testthat")
+    required <- c("test_dir", "test_paths", "test_package", "load_package",
+        "reporter", "parallel", "stop_on_failure")
+    if (!all(required %in% names(formals(testFiles)))) {
+        stop("Unsupported testthat file-runner interface; cannot run package tests safely.")
+    }
+    reportType <- reporterArguments$outputSize
+    reporter <- if (reportType == "Rout") {
+        testthat::CheckReporter$new()
+    } else {
+        do.call(MarkdownReporter$new, reporterArguments)
+    }
+    if (workers > 1L && !isTRUE(reporter$capabilities$parallel_support)) {
+        stop("The testthat reporter does not support parallel tests; use workers = 1.")
+    }
+    cat("R: ", R.version.string, "\nR home: ", R.home(),
+        "\nrpact: ", as.character(utils::packageVersion("rpact")),
+        "\nPackage path: ", find.package("rpact"),
+        "\ntestthat: ", as.character(utils::packageVersion("testthat")),
+        "\nTest files: ", length(files), "\nWorkers: ", workers, "\n", sep = "")
+    started <- proc.time()[["elapsed"]]
+    results <- testFiles(test_dir = "testthat", test_paths = files, test_package = "rpact",
+        load_package = "installed", reporter = reporter, parallel = workers > 1L,
+        stop_on_failure = FALSE)
+    summary <- as.data.frame(results)
+    totals <- colSums(summary[, c("failed", "error", "warning", "skipped", "passed"), drop = FALSE])
+    timings <- if (reportType == "Rout") {
+        c(tests = proc.time()[["elapsed"]] - started, basicPackages = 0, html = 0, pdf = 0)
+    } else {
+        reporter$timings
+    }
+    saveRDS(list(workers = workers, timings = timings, totals = totals), resultFile)
+    cat("\n[ FAIL ", totals[["failed"]] + totals[["error"]],
+        " | WARN ", totals[["warning"]], " | SKIP ", totals[["skipped"]],
+        " | PASS ", totals[["passed"]], " ]\n", sep = "")
+    for (name in names(timings)) cat(sprintf("Runtime %s: %.2f seconds\n", name, timings[[name]]))
+    if (totals[["failed"]] > 0 || totals[["error"]] > 0) stop("Test failures.", call. = FALSE)
+    invisible(results)
+}
+
 #' @title
 #' Test and Validate the rpact Package Installation
 #'
@@ -1134,6 +1238,12 @@ setupPackageTests <- function(token, secret) {
 #'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
 #' @param metaDataFile An optional path to a text file containing metadata: one entry per line in the form \code{KEY=VALUE}.
 #'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
+#' @param workers Number of parallel R test processes. The default \code{NULL} uses
+#'     the available logical CPUs minus two, with a minimum of one and a maximum of
+#'     16, limited to the number of test files. Uses \code{parallelly::availableCores()}
+#'     when installed (including resource limits), otherwise \code{parallel::detectCores()}.
+#'     An explicit positive integer overrides the automatic selection; use \code{1}
+#'     for serial execution. Parallel tests are supported on Windows, Linux, and macOS.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -1190,8 +1300,10 @@ testPackage <- function(
         keepSourceFiles = FALSE,
         reportFileBaseName = "rpact_test_result_report",
         metaData = list(),
-        metaDataFile = NULL) {
+        metaDataFile = NULL,
+        workers = NULL) {
     .assertTestthatIsInstalled()
+    workers <- .getPackageTestWorkers(workers)
     .assertIsSingleCharacter(outDir, "outDir", naAllowed = FALSE)
     .assertIsSingleLogical(completeUnitTestSetEnabled, "completeUnitTestSetEnabled", naAllowed = FALSE)
     .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = TRUE)
@@ -1340,7 +1452,7 @@ testPackage <- function(
     } else if (executionMode %in% c("downloadAndRunTests", "runTestsInTestFileDirectory")) {
         if (completeUnitTestSetEnabled) {
             cat("Run all tests. Please wait...\n")
-            cat("Have a break - it takes about 55 minutes.\n")
+            cat("Test runtime depends on the worker count and the test workload.\n")
             cat("Exceution of all available unit tests startet at ",
                 format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
                 sep = ""
