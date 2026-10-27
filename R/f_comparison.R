@@ -168,7 +168,9 @@ getComparisonData <- function(
     })
     columnNames <- unique(unlist(lapply(frames, names), use.names = FALSE))
     frames <- lapply(frames, function(df) {
-        for (name in setdiff(columnNames, names(df))) df[[name]] <- rep(NA, nrow(df))
+        for (name in setdiff(columnNames, names(df))) {
+            df[[name]] <- rep(NA, nrow(df))
+        }
         df[columnNames]
     })
     for (name in columnNames) {

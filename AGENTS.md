@@ -214,6 +214,67 @@ Apply the same rule to both branches of an `if (...) { ... } else { ... }`
 statement. When adding or modifying conditional logic, ensure every branch
 uses braces; existing unbraced conditionals are not examples to follow.
 
+## Braces in R loops
+
+Always use curly braces for every `for`, `while`, and `repeat` loop, even
+when its body contains only one statement. Put the opening brace on the same
+line as the loop header, the body on separate lines indented with four spaces,
+and the closing brace on its own line. Do not use inline loop bodies.
+
+For example:
+
+```r
+for (parameter in names(limits)) {
+    .assertComparisonLimit(limits[[parameter]], parameter, "summary.TrialComparison")
+}
+```
+
+Apply this rule to nested loops as well. Existing unbraced loops are not
+examples to follow.
+
+## R source formatting and syntax
+
+Follow the established style in files such as `R/class_core_parameter_set.R`,
+`R/class_dictionary.R`, `R/f_core_utilities.R`, and
+`R/f_design_group_sequential.R` in the rpact repository:
+
+- Use four spaces per indentation level, never tabs.
+- Use braced, multiline function bodies, including short functions, S3
+  generics and methods, R6 methods, and anonymous functions. Put `{` on the
+  same line as the end of the function signature and `}` on its own line.
+- Prefer explicit `return(value)` in named functions and R6 methods that
+  return a value, including early returns. Preserve intentional invisible
+  returns with `return(invisible(value))`. Do not add artificial return values
+  to functions whose purpose is a side effect.
+- Use `<-` for assignments and `=` for named arguments and default argument
+  values. Preserve `=` where R syntax requires it, such as R6 member lists.
+- Put spaces around assignment, comparison, and binary arithmetic/logical
+  operators and around `=` in argument lists. Put a space after commas and
+  after control-flow keywords: `if (...)`, `for (...)`, `while (...)`.
+  Write function calls and declarations without a space before `(`:
+  `length(x)` and `function(x)`.
+- Do not put spaces just inside parentheses or brackets, or around `$`, `@`,
+  `::`, or `:::`. Keep unary operators next to their operand, such as `!valid`.
+- Write one statement per line; do not join statements with semicolons.
+  Use blank lines between functions and between logical steps within a
+  function. Keep related assignments together.
+- Wrap long signatures and calls at argument boundaries. Indent continuation
+  lines consistently with the surrounding code, and use one argument per
+  line when that makes a long call easier to read. For multiline calls with
+  a separate closing parenthesis, align it with the start of the call.
+  Do not compress nested logic into a long single-line expression.
+- Prefer double-quoted strings; use single quotes when they avoid escaping
+  embedded double quotes. Write `TRUE` and `FALSE`, not `T` and `F`.
+- Use descriptive `camelCase` names for variables, arguments, functions, and
+  helpers. Preserve established interfaces and conventions such as S3
+  method names, class names, `C_...` constants, and leading dots on internal
+  rpact helpers; do not rename existing interfaces merely for style.
+
+Apply these conventions to new or edited code. Avoid reformatting unrelated
+legacy code, and preserve evaluation, visibility, and numerical behavior.
+When reviewing generated code, check loops and function bodies as well as
+conditionals; syntactically valid one-line forms do not satisfy this style.
+
 ## Roxygen documentation formatting
 
 When creating or updating Roxygen documentation, use the following source-code

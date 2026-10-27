@@ -816,7 +816,9 @@ summary.TrialComparison <- function(object, ..., digits = NA_integer_, maxParame
         maxProfiles = 3L, maxObjects = 6L, maxValues = 4L, output = c("all", "title", "overview", "body")) {
     .warnInCaseOfUnknownArguments(functionName = "summary.TrialComparison", ...)
     limits <- list(maxParameters = maxParameters, maxProfiles = maxProfiles, maxObjects = maxObjects, maxValues = maxValues)
-    for (parameter in names(limits)) .assertComparisonLimit(limits[[parameter]], parameter, "summary.TrialComparison")
+    for (parameter in names(limits)) {
+        .assertComparisonLimit(limits[[parameter]], parameter, "summary.TrialComparison")
+    }
     info <- .getTrialComparisonInfo(object)
     getComparisonParameterDescriptions(info[FALSE, ], digits = digits)
     TrialComparisonSummary$new(object, info, limits, digits, match.arg(output))
