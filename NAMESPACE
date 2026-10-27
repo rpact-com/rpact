@@ -204,3 +204,6 @@ importFrom(knitr,
 importFrom(methods,new)
 importFrom(rlang,.data)
 useDynLib(rpact,.registration = TRUE)
+export(getComparisonParameterInfo)
+export(getComparisonParameterNames)
+export(getComparisonParameterDescriptions)

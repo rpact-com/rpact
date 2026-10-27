@@ -94,6 +94,7 @@ Config/testthat/edition: 3
 Config/testthat/parallel: true
 Config/testthat/start-first: *analysis*
 Collate:
+    'f_comparison_parameters.R'
     'RcppExports.R'
     'f_logger.R'
     'class_dictionary.R'
@@ -162,7 +163,7 @@ Collate:
     'f_design_plan_utilities.R'
     'f_error_handling.R'
     'f_io_utilities.R'
-    'f_plot_comparison.R'
+    'f_comparison_plot.R'
     'f_quality_assurance.R'
     'f_test_execution.R'
     'f_test_reporting.R'
