@@ -1268,11 +1268,29 @@ setupPackageTests <- function(token, secret) {
             value <- tryCatch(job$process$get_result(), error = function(error) {
                 exitCode <- job$process$get_exit_status()
                 if (is.null(exitCode)) exitCode <- "unknown"
-                stop(structure(list(
-                    message = paste0("Test process exited in file '", test_paths[index],
-                        "' with exit code ", exitCode, ": ", conditionMessage(error)),
-                    call = NULL, test_file = test_paths[index]
-                ), class = c("rpact_test_process_error", "error", "condition")))
+                # Preserve the worker error class and file even without a configured factory.
+                factory <- getOption("rpact.error.factory.runtime.issue.condition")
+                if (!is.function(factory)) factory <- getOption("rpact.error.factory.condition")
+                oldOptions <- options(rpact.error.factory.runtime.issue.condition =
+                    function(message, ..., class = NULL) {
+                        condition <- if (is.function(factory)) {
+                            tryCatch(factory(message = message, ..., class = class),
+                                error = function(e) NULL)
+                        } else NULL
+                        if (!inherits(condition, "condition")) condition <- simpleError(message, call = NULL)
+                        class(condition) <- unique(c("rpact_test_process_error", class, class(condition)))
+                        condition$test_file <- test_paths[index]
+                        condition
+                    })
+                on.exit(options(oldOptions), add = TRUE)
+                stopRuntimeIssue("Test process exited in file '", test_paths[index],
+                    "' with exit code ", exitCode, ": ", conditionMessage(error),
+                    functionName = ".runPackageTestFilesInProcesses",
+                    constraint = "each test process must return its results successfully",
+                    diagnosticId = "qa.test_process_failed",
+                    context = list(testFile = test_paths[index], exitCode = exitCode,
+                        cause = conditionMessage(error), workers = workers)
+                )
             })
             for (event in value$events) do.call(reporter[[event$method]], event$args)
             results[[index]] <- unclass(value$results)
@@ -1338,7 +1356,13 @@ setupPackageTests <- function(token, secret) {
         "reporter", "parallel", "stop_on_failure"
     )
     if (!all(required %in% names(formals(testFiles)))) {
-        stop("Unsupported testthat file-runner interface; cannot run package tests safely.")
+        stopRuntimeIssue("Unsupported testthat file-runner interface; cannot run package tests safely.",
+            functionName = ".runPackageUnitTests",
+            constraint = "the testthat runner must support all required arguments",
+            diagnosticId = "qa.test_runner_interface_unsupported",
+            context = list(requiredArguments = required, availableArguments = names(formals(testFiles)),
+                testthatVersion = as.character(utils::packageVersion("testthat")))
+        )
     }
     reportType <- reporterArguments$outputSize
     reporter <- if (reportType == "Rout") {
@@ -1347,7 +1371,13 @@ setupPackageTests <- function(token, secret) {
         do.call(MarkdownReporter$new, reporterArguments)
     }
     if (workers > 1L && !isTRUE(reporter$capabilities$parallel_support)) {
-        stop("The testthat reporter does not support parallel tests; use workers = 1.")
+        stopConflictingArguments("The testthat reporter does not support parallel tests; use workers = 1.",
+            functionName = ".runPackageUnitTests", parameter = "workers", value = workers,
+            relatedParameter = "outputSize", relatedValue = reportType,
+            constraint = "workers must be 1 when the reporter does not support parallel tests",
+            diagnosticId = "qa.reporter_parallel_unsupported",
+            context = list(reporterClass = class(reporter), parallelSupport = reporter$capabilities$parallel_support)
+        )
     }
     cat("R: ", R.version.string, "\nR home: ", R.home(),
         "\nrpact: ", as.character(utils::packageVersion("rpact")),
@@ -1409,8 +1439,23 @@ setupPackageTests <- function(token, secret) {
     ), resultFile)
     cat("\n", resultMessage, "\n", sep = "")
     for (name in names(timings)) cat(sprintf("Runtime %s: %.2f seconds\n", name, timings[[name]]))
-    if (!is.null(executionError)) stop("Test execution aborted; the counts above are partial results.", call. = FALSE)
-    if (totals[["failed"]] > 0 || totals[["error"]] > 0) stop("Test failures.", call. = FALSE)
+    if (!is.null(executionError)) {
+        stopRuntimeIssue("Test execution aborted; the counts above are partial results.",
+            functionName = ".runPackageUnitTests",
+            constraint = "test execution must complete before final counts can be reported",
+            diagnosticId = "qa.test_execution_aborted",
+            context = list(cause = executionError, testFile = failedTestFile,
+                totals = totals, resultFile = resultFile, workers = workers)
+        )
+    }
+    if (totals[["failed"]] > 0 || totals[["error"]] > 0) {
+        stopRuntimeIssue("Test failures.",
+            functionName = ".runPackageUnitTests",
+            constraint = "test results must contain no failures or errors",
+            diagnosticId = "qa.test_expectations_failed",
+            context = list(totals = totals, resultFile = resultFile, workers = workers)
+        )
+    }
     invisible(results)
 }
 
@@ -1575,7 +1620,8 @@ testPackage <- function(
     scope <- match.arg(scope)
 
     if (grepl("/|:|\\\\", reportFileBaseName)) {
-        stopIllegalArgument("'reportFileBaseName' (", dQuote(reportFileBaseName), ") ", "must not contain path separators or drive specifiers",
+        stopIllegalArgument("'reportFileBaseName' (", dQuote(reportFileBaseName), ") ", 
+            "must not contain path separators or drive specifiers",
             functionName = "testPackage",
             parameter = "reportFileBaseName", value = reportFileBaseName
         )
@@ -1731,7 +1777,13 @@ testPackage <- function(
 
     files <- .getPackageTestFiles(testFileTargetDirectory)
     if (!length(files)) {
-        stop("No test files found in directory 'testthat'")
+        stopRuntimeIssue("No test files found in directory 'testthat'",
+            functionName = "testPackage", parameter = "testFileDirectory", value = testFileDirectory,
+            constraint = "the testthat directory must contain test files",
+            diagnosticId = "qa.test_files_missing",
+            context = list(testDirectory = file.path(testFileTargetDirectory, "testthat"),
+                executionMode = executionMode)
+        )
     }
     
     workers <- .getPackageTestWorkers(workers, length(files))
@@ -1747,7 +1799,12 @@ testPackage <- function(
     if (file.exists(testthatMainFile)) {
         testthatMainFileBak <- tempfile("testthat-backup-", tmpdir = testFileTargetDirectory)
         if (!file.rename(testthatMainFile, testthatMainFileBak)) {
-            stop("Cannot back up testthat.R")
+            stopRuntimeIssue("Cannot back up testthat.R",
+                functionName = "testPackage",
+                constraint = "the existing testthat.R must be backed up before running tests",
+                diagnosticId = "qa.test_entry_point_backup_failed",
+                context = list(sourceFile = testthatMainFile, backupFile = testthatMainFileBak)
+            )
         }
         on.exit(
             {

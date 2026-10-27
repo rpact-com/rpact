@@ -71,17 +71,35 @@ plotComparison <- function(
     for (name in c("plotLineEnabled", "plotPointsEnabled", "discreteXAxis", "shinyOptimization", "mirrorModeEnabled")) {
         .assertIsSingleLogical(get(name), name)
     }
-    if (!is.data.frame(data) || !nrow(data) || anyDuplicated(names(data))) stop("'data' must be a non-empty data.frame")
+    if (!is.data.frame(data) || !nrow(data) || anyDuplicated(names(data))) {
+        stopIllegalDataInput("'data' must be a non-empty data.frame with unique column names",
+            functionName = "plotComparison", parameter = "data", value = data,
+            constraint = "a data.frame with at least one row and unique column names",
+            diagnosticId = "comparison.plot_data_invalid"
+        )
+    }
     selected <- list(xParamName = xParamName, yParamName = yParamName,
         categoryParamName = categoryParamName, groupParamName = groupParamName)
     for (name in names(selected)) {
         value <- selected[[name]]
         if (is.null(value) && name %in% c("categoryParamName", "groupParamName")) next
         if (!is.character(value) || length(value) != 1L || is.na(value) || !value %in% names(data)) {
-            stop("Invalid column selection for '", name, "'")
+            stopIllegalArgument("Invalid column selection for '", name, "'",
+                functionName = "plotComparison", parameter = name, value = value,
+                constraint = "one non-missing column name from data",
+                diagnosticId = "comparison.plot_column_invalid",
+                context = list(availableColumns = names(data))
+            )
         }
     }
-    if (!is.numeric(data[[yParamName]])) stop("The y-axis column must be numeric")
+    if (!is.numeric(data[[yParamName]])) {
+        stopIllegalDataInput("The y-axis column must be numeric",
+            functionName = "plotComparison", parameter = yParamName, value = data[[yParamName]],
+            relatedParameter = "yParamName", relatedValue = yParamName,
+            constraint = "the selected y-axis column must be numeric",
+            diagnosticId = "comparison.plot_y_column_not_numeric"
+        )
+    }
     plotSettings <- PlotSettings$new()
     
     if (shinyOptimization) {
@@ -163,7 +181,14 @@ plotComparison <- function(
         if (is.numeric(legendPosition)) {
             p <- plotSettings$setLegendPosition(p, legendPosition)
         } else {
-            if (!legendPosition %in% c("none", "left", "right", "bottom", "top")) stop("Invalid legend position")
+            if (!legendPosition %in% c("none", "left", "right", "bottom", "top")) {
+                stopIllegalArgument("Invalid legend position",
+                    functionName = "plotComparison", parameter = "legendPosition", value = legendPosition,
+                    constraint = "one of none, left, right, bottom, top for a character legend position",
+                    diagnosticId = "comparison.plot_legend_position_invalid",
+                    context = list(allowedValues = c("none", "left", "right", "bottom", "top"))
+                )
+            }
             p <- p + ggplot2::theme(legend.position = legendPosition)
         }
         p <- plotSettings$setLegendBorder(p)

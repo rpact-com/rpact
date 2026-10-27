@@ -26,6 +26,7 @@
 
 ## Improvements, issues, and changes
 
+* Replaced direct errors in comparison extraction, comparison plotting, and package testing with the central error helpers, providing specific error categories and structured diagnostic context while preserving worker failure details.
 * On Windows, `testPackage()` now uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.
 * `testPackage()` now runs R basic package tests in a separate R process before starting parallel workers and isolates configuration writes per test process. Worker crashes preserve partial results and are explicitly reported as incomplete execution, with the expected test count from `META`, the full diagnostic log path, and a hint to retry with `workers = 1`. Partial reports cannot claim successful installation qualification.
 

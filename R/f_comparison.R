@@ -62,12 +62,21 @@ getComparisonData <- function(
     .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
     .assertIsSingleLogical(includeAllParameters, "includeAllParameters")
     if (!is.list(objects) || is.data.frame(objects) || length(objects) == 0) {
-        stop("'objects' must be a non-empty list of rpact designs, plans, or simulation results")
+        stopIllegalArgument("'objects' must be a non-empty list of rpact designs, plans, or simulation results",
+            functionName = "getComparisonData", parameter = "objects", value = objects,
+            constraint = "a non-empty list, excluding data.frames",
+            diagnosticId = "comparison.objects_invalid"
+        )
     }
     frames <- lapply(seq_along(objects), function(i) {
         obj <- objects[[i]]
         if (!inherits(obj, c("TrialDesign", "TrialDesignPlan", "SimulationResults"))) {
-            stop("Unsupported object at position ", i, ": ", paste(class(obj), collapse = "/"))
+            stopIllegalArgument("Unsupported object at position ", i, ": ", paste(class(obj), collapse = "/"),
+                functionName = "getComparisonData", parameter = "objects", value = obj,
+                constraint = "each object must inherit from TrialDesign, TrialDesignPlan, or SimulationResults",
+                diagnosticId = "comparison.object_class_unsupported",
+                context = list(objectPosition = i, objectClass = class(obj))
+            )
         }
         df <- as.data.frame(obj,
             niceColumnNamesEnabled = FALSE,
@@ -83,9 +92,23 @@ getComparisonData <- function(
                 indices <- rep(1L, nrow(df))
             } else if ("stages" %in% names(df) && "stages" %in% names(designData)) {
                 indices <- match(df$stages, designData$stages)
-                if (anyNA(indices)) stop("Cannot match analysis stages of object ", i)
+                if (anyNA(indices)) {
+                    stopIllegalDataInput("Cannot match analysis stages of object ", i,
+                        functionName = "getComparisonData", parameter = "stages", value = df$stages,
+                        relatedParameter = "design$stages", relatedValue = designData$stages,
+                        constraint = "each result stage must match an associated design stage",
+                        diagnosticId = "comparison.stages_unmatched",
+                        context = list(objectPosition = i, unmatchedStages = df$stages[is.na(indices)])
+                    )
+                }
             } else {
-                stop("Cannot match the associated design to the rows of object ", i)
+                stopIllegalDataInput("Cannot match the associated design to the rows of object ", i,
+                    functionName = "getComparisonData", parameter = "objects", value = obj,
+                    constraint = "a multi-row associated design requires stages in both data frames",
+                    diagnosticId = "comparison.design_rows_unmatched",
+                    context = list(objectPosition = i, resultColumns = names(df),
+                        designColumns = names(designData), designRows = nrow(designData))
+                )
             }
             df[missing] <- designData[indices, missing, drop = FALSE]
         }
