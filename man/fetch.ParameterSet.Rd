@@ -46,3 +46,6 @@ getDesignInverseNormal() |> fetch(kMax, output = "list")
 }
 
 }
+\seealso{
+\code{\link[=fetch.TrialComparison]{fetch.TrialComparison()}} for selecting contained objects from a comparison.
+}

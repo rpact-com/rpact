@@ -427,6 +427,11 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
             self$.initParameterTypes()
             self$.initStages()
             self$.setParameterType("power", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("bindingFutility", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("tolerance", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("bindingFutility", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("userAlphaSpending", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("alphaSpent", C_PARAM_NOT_APPLICABLE)
         },
         hasChanged = function(
                 ...,

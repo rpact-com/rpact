@@ -94,7 +94,6 @@ Config/testthat/edition: 3
 Config/testthat/parallel: true
 Config/testthat/start-first: *analysis*
 Collate:
-    'f_comparison_parameters.R'
     'RcppExports.R'
     'f_logger.R'
     'class_dictionary.R'
@@ -146,6 +145,8 @@ Collate:
     'f_analysis_multiarm_survival.R'
     'f_as251.R'
     'f_comparison.R'
+    'f_comparison_parameters.R'
+    'f_comparison_plot.R'
     'f_comparison_r_code.R'
     'f_core_output_formats.R'
     'f_design_fisher_combination_test.R'
@@ -165,10 +166,7 @@ Collate:
     'f_design_plan_utilities.R'
     'f_error_handling.R'
     'f_io_utilities.R'
-    'f_comparison_plot.R'
     'f_quality_assurance.R'
-    'f_test_execution.R'
-    'f_test_reporting.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'
     'f_simulation_calc_subjects_function.R'
@@ -193,6 +191,8 @@ Collate:
     'f_summary_parameters.R'
     'f_summary_title.R'
     'f_summary_utilities.R'
+    'f_test_execution.R'
+    'f_test_reporting.R'
     'f_warning_handling.R'
     'parameter_column_names.R'
     'parameter_formats.R'

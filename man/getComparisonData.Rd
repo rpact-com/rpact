@@ -41,7 +41,12 @@ types are represented as character values. No master design or automatic
 parameter variation is implied. Original objects are not stored in the result.
 }
 \examples{
-objects <- list(fixed = getDesignFixed(),
-    sequential = getDesignGroupSequential(kMax = 2))
+\dontrun{
+objects <- list(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
 head(getComparisonData(objects))
+}
+
 }

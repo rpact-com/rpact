@@ -187,6 +187,96 @@ the validation branch, rather than embedding those choices only in the message.
   inspect metadata through an appropriate configured condition factory when
   testing it.
 
+## Braces in R conditionals
+
+Always use curly braces for every `if`, `else if`, and `else` branch in rpact
+R code, even when a branch contains only one statement or R would allow the
+braces to be omitted. This also applies to early returns and conditional
+expressions used in assignments. Put the branch body on separate lines and
+indent it with four spaces; write `} else {` and `} else if (...) {` on the
+same line.
+
+For example, do not write:
+
+```r
+if (!is.call(call)) return(FALSE)
+```
+
+Write:
+
+```r
+if (!is.call(call)) {
+    return(FALSE)
+}
+```
+
+Apply the same rule to both branches of an `if (...) { ... } else { ... }`
+statement. When adding or modifying conditional logic, ensure every branch
+uses braces; existing unbraced conditionals are not examples to follow.
+
+## Roxygen documentation formatting
+
+When creating or updating Roxygen documentation, use the following source-code
+format consistently, even when Roxygen could infer sections from their order:
+
+- Begin and end every documentation block with an empty Roxygen comment line
+  (`#'`). Keep these separator lines free of trailing whitespace.
+- Separate logical sections with an empty Roxygen comment line, including
+  before `@return`, `@details`, `@examples`, and `@export`. Keep consecutive
+  `@param` entries together as one parameter section.
+- Always write an explicit `@title` tag on its own line, followed by the title
+  on the next Roxygen line. Do not use an untagged first line as an implicit
+  title.
+- Always introduce a description with an explicit `@description` tag on its
+  own line, followed by the description text on subsequent Roxygen lines.
+  Do not rely on an untagged paragraph being interpreted as the description.
+- Likewise, put section tags such as `@details` and `@examples` on their own
+  lines above their content. Keep named tags and short entries such as
+  `@param x ...`, `@rdname ...`, and `@return ...` inline as shown below;
+  `@export` occupies its own line.
+- Use actual Roxygen syntax in R source: do not add Markdown bold markers to
+  tags or literal HTML entities such as `&#x20;` to represent blank lines.
+
+For example:
+
+```r
+#'
+#' @title
+#' Access Objects in a Trial Comparison
+#'
+#' @rdname extract.TrialComparison
+#'
+#' @description
+#' Extracts a contained object by name or position.
+#'
+#' @param x A `TrialComparison`.
+#' @param i A single object name or a positive integer position.
+#' @param name An object name, supplied literally after `$`.
+#' @param ... Further indices are not supported.
+#' @param exact Whether character indices must match exactly, as for list `[[`.
+#'   `$` always matches exactly.
+#'
+#' @return The contained object by reference, or NULL for an unknown name.
+#'
+#' @details
+#' Duplicate names select the first occurrence. Numeric positions refer to the
+#' stored object order. R6 members take precedence for `$`: `x$add` is the method
+#' even when an object is named "add"; use `x[["add"]]` to select that object.
+#' `[[` selects contained objects first and falls back to existing R6 members for
+#' other character names. This also preserves existing internal field access.
+#' These methods provide extraction; replacing collection entries is not supported.
+#' Use [getComparison()] or `$add()` to build or extend the collection.
+#'
+#' @examples
+#' comparison <- getComparison(fixed = getDesignFixed(),
+#'     sequential = getDesignGroupSequential(kMax = 2))
+#' identical(comparison$fixed, comparison[["fixed"]])
+#' identical(comparison[[1]], comparison$fixed)
+#'
+#' @export
+#'
+```
+
 ## Unit tests and test templates
 
 The rpact-specific rules in this section, including the optional

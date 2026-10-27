@@ -8,21 +8,54 @@
 #' @include class_summary.R
 NULL
 
+#'
+#' @title
 #' Compare Existing Trial Planning Objects
 #'
-#' @description Creates a comparison of existing designs, sample size or power
+#' @description
+#' Creates a comparison of existing designs, sample size or power
 #' plans, and simulation results without recalculating them.
-#' @param objects A non-empty, optionally named list accepted by
-#'   [getComparisonData()].
-#' @param ... Further arguments. Currently unused.
+#'
+#' @param objects Optional objects, lists of objects or `TrialComparison` objects.
+#'   NULL is treated as an empty list.
+#' @param ... Designs, plans, simulations, lists thereof, or `TrialComparison`
+#'   objects. Entries from `...` precede entries from `objects`.
+#'
 #' @return An R6 `TrialComparison` inheriting from `ParameterSet`.
+#'
 #' @details
 #' The comparison retains references to its objects. Changes to an original
 #' object are reflected in subsequent comparisons; no comparison data are cached.
 #' `$getObjects()` returns the named list of references. Replacing entries in
 #' that returned list does not change the comparison. `length()` is the number
-#' of objects and `names()` returns their supplied names (or `NULL`). Use
-#' `$getObjects()[[i]]` to retrieve an object; the comparison itself is not a list.
+#' of objects and `names()` returns their supplied names (or `NULL`). Retrieve
+#' contained objects using `comparison[[i]]`, `comparison[["name"]]` or
+#' `comparison$name`. R6 members take precedence for `$`; use `[[` to retrieve
+#' an object whose name coincides with a member such as `add`. Unknown names
+#' return NULL, and duplicate names select the first object. The [fetch.TrialComparison()]
+#' method provides the same object access through `fetch(comparison, name)` or
+#' `fetch(comparison, position)`.
+#' Lists and comparisons are recursively expanded in their original order.
+#' Names on individual objects are retained; container names are discarded.
+#' Duplicate objects and names are retained. `getComparison()` creates an empty
+#' comparison. Its data frame has zero rows and columns, and plotting requires
+#' numeric data to be added first.
+#'
+#' `comparison$add(..., objects = NULL)` appends objects with the same input
+#' rules and returns the comparison invisibly, supporting chaining. All new
+#' entries are validated before the stored list is changed. Adding another
+#' comparison copies its current list of references; subsequent additions to that
+#' source comparison do not affect the target. Existing summary objects remain
+#' snapshots; call `summary()` again after changing the collection.
+#'
+#' `comparison$delete(index)` removes one object by its positive integer position
+#' or exact name and returns the comparison invisibly. Duplicate names select
+#' the first occurrence; use a position to delete another occurrence. Invalid
+#' positions or unknown names raise an error without changing the collection.
+#' Removing the last object leaves an empty comparison, which can be filled again.
+#' Names and order of remaining objects are retained; positions are renumbered.
+#' The S3 generics [add()] and [delete()] delegate to these methods and support
+#' pipelines such as `comparison |> add(other) |> delete(1)`.
 #' Shallow cloning shares the contained objects. `clone(deep = TRUE)` is unsupported.
 #'
 #' `print()` describes the collection and selected observed ranges. `summary()`
@@ -38,6 +71,7 @@ NULL
 #' comparison table. [plot.TrialComparison()] selects axes only when unambiguous.
 #' [getObjectRCode()] reconstructs the comparison and its contained objects;
 #' executing generated simulation code reruns the corresponding simulations.
+#'
 #' @examples
 #' comparison <- getComparison(list(
 #'     fixed = getDesignFixed(), sequential = getDesignGroupSequential(kMax = 2)
@@ -45,19 +79,120 @@ NULL
 #' print(comparison)
 #' summary(comparison)
 #' head(as.data.frame(comparison))
+#' combined <- getComparison(comparison, fixed = getDesignFixed(alpha = 0.05))
+#' combined$add(list(getDesignFixed(alpha = 0.01)), objects = comparison)
+#' empty <- getComparison()
+#' empty$add(getDesignFixed())
+#' combined$delete(1)
+#' combined$delete("sequential")
 #' \dontrun{
 #' plot(comparison, xParamName = "objectNumber", yParamName = "criticalValues", plotLineEnabled = FALSE)
 #' }
+#'
 #' @export
-getComparison <- function(objects, ...) {
-    .warnInCaseOfUnknownArguments(functionName = "getComparison", ...)
-    if (missing(objects)) {
-        stopMissingArgument("'objects' must be supplied", functionName = "getComparison",
-            parameter = "objects", constraint = "a non-empty list of comparison objects",
-            diagnosticId = "comparison.objects_missing")
-    }
-    TrialComparison$new(objects)
+#'
+getComparison <- function(..., objects = NULL) {
+    TrialComparison$new(.collectComparisonObjects(list(...), objects))
 }
+
+.collectComparisonObjects <- function(arguments, objects = NULL) {
+    if (!is.null(objects)) arguments <- c(arguments, list(objects))
+    result <- list()
+    for (i in seq_along(arguments)) {
+        object <- arguments[[i]]
+        if (inherits(object, "TrialComparison")) {
+            entries <- object$getObjects()
+        } else if (is.list(object) && !is.data.frame(object)) {
+            entries <- .collectComparisonObjects(object)
+        } else {
+            # Subsetting keeps an individual object's supplied name, including
+            # duplicate or empty names. Container names do not rename its leaves.
+            entries <- arguments[i]
+        }
+        result <- c(result, entries)
+    }
+    result
+}
+
+.getTrialComparisonData <- function(objects, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE) {
+    .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
+    .assertIsSingleLogical(includeAllParameters, "includeAllParameters")
+    if (!length(objects)) return(data.frame())
+    getComparisonData(objects, niceColumnNamesEnabled = niceColumnNamesEnabled,
+        includeAllParameters = includeAllParameters)
+}
+
+#'
+#' @title
+#' Add Objects to a Collection
+#'
+#' @description
+#' S3 generic for adding objects. The `TrialComparison` method
+#' delegates to `$add()` and modifies the existing comparison by reference.
+#'
+#' @param x An object supporting an `add()` method, such as a `TrialComparison`.
+#' @param ... For `TrialComparison`, designs, plans, simulations, lists or
+#'   comparisons to append. The optional named argument `objects` is appended
+#'   after the other arguments, with the same rules as [getComparison()].
+#'
+#' @return The modified comparison invisibly for `TrialComparison`.
+#'
+#' @seealso [getComparison()], [delete()]
+#'
+#' @examples
+#' comparison <- getComparison(fixed = getDesignFixed())
+#' comparison |> add(sequential = getDesignGroupSequential(kMax = 2))
+#' comparison |> add(objects = list(other = getDesignFixed(alpha = 0.05)))
+#'
+#' @export
+#'
+add <- function(x, ...) UseMethod("add")
+
+#' @rdname add
+#' @export
+add.TrialComparison <- function(x, ...) x$add(...)
+
+#'
+#' @title
+#' Delete an Object from a Collection
+#'
+#' @description
+#' S3 generic for removing objects. The `TrialComparison` method
+#' delegates to `$delete()` and modifies the existing comparison by reference.
+#'
+#' @param x An object supporting a `delete()` method, such as a `TrialComparison`.
+#' @param ... For `TrialComparison`, exactly one `index`, supplied by position
+#'   or name: a positive integer position or an exact object name. Duplicate
+#'   names select the first occurrence. Invalid selections leave the comparison
+#'   unchanged. Removing the last object leaves an empty comparison.
+#'
+#' @return The modified comparison invisibly for `TrialComparison`.
+#'
+#' @seealso [getComparison()], [add()]
+#'
+#' @examples
+#' comparison <- getComparison(fixed = getDesignFixed(),
+#'     sequential = getDesignGroupSequential(kMax = 2))
+#' comparison |> delete("fixed")
+#' comparison |> delete(index = 1)
+#' comparison |> add(getDesignFixed()) |> delete(1)
+#'
+#' @export
+#'
+delete <- function(x, ...) UseMethod("delete")
+
+#'
+#' @title
+#' Delete an Object from a Collection
+#'
+#' @rdname delete
+#'
+#' @description
+#' The `TrialComparison` method deletes one contained object by position or name.
+#'
+#' @export
+#'
+delete.TrialComparison <- function(x, ...) x$delete(...)
 
 #' Trial Comparison
 #' @description R6 container for existing trial planning objects, inheriting from
@@ -69,13 +204,65 @@ NULL
 TrialComparison <- R6::R6Class("TrialComparison",
     inherit = ParameterSet,
     public = list(
-        initialize = function(objects) {
+        initialize = function(objects = list()) {
+            objects <- .collectComparisonObjects(list(objects))
             # Reuse the comparison validation, without storing a table.
-            getComparisonData(objects)
+            .getTrialComparisonData(objects)
             super$initialize()
             private$.objects <- objects
         },
         getObjects = function() private$.objects,
+        add = function(..., objects = NULL) {
+            additions <- .collectComparisonObjects(list(...), objects)
+            if (!length(additions)) return(invisible(self))
+            combined <- c(private$.objects, additions)
+            # Validate the complete candidate before changing the stored list.
+            .getTrialComparisonData(combined)
+            private$.objects <- combined
+            invisible(self)
+        },
+        delete = function(index) {
+            if (missing(index)) {
+                stopMissingArgument("Supply the name or position of the object to delete",
+                    functionName = "TrialComparison$delete", parameter = "index",
+                    constraint = "one object name or position", diagnosticId = "comparison.object_index_missing")
+            }
+            if (length(index) != 1L) {
+                stopArgumentLengthOutOfBounds("Supply exactly one object name or position",
+                    functionName = "TrialComparison$delete", parameter = "index", value = index,
+                    constraint = "exactly one index", expectedLength = 1L, actualLength = length(index),
+                    diagnosticId = "comparison.object_index_length_invalid")
+            }
+            if (is.character(index) && !is.na(index) && nzchar(index)) {
+                position <- match(index, names(private$.objects))
+                if (is.na(position)) {
+                    stopIllegalArgument("No object named '", index, "' exists in the comparison",
+                        functionName = "TrialComparison$delete", parameter = "index", value = index,
+                        constraint = "an exact name of a contained object",
+                        diagnosticId = "comparison.object_name_unknown",
+                        context = list(availableNames = names(private$.objects)))
+                }
+            } else {
+                if (!is.numeric(index) || is.complex(index) || is.na(index) ||
+                        !is.finite(index) || index != trunc(index)) {
+                    stopIllegalArgument("The object index must be a non-empty name or an integer position",
+                        functionName = "TrialComparison$delete", parameter = "index", value = index,
+                        constraint = "one non-missing, non-empty character name or finite integer position",
+                        diagnosticId = "comparison.object_index_invalid")
+                }
+                if (index < 1 || index > length(private$.objects)) {
+                    stopIndexOutOfBounds("Object position is outside the comparison",
+                        functionName = "TrialComparison$delete", parameter = "index", value = index, index = index,
+                        constraint = "a position in [1, number of objects]",
+                        lowerBound = 1L, upperBound = length(private$.objects),
+                        diagnosticId = "comparison.object_index_out_of_bounds")
+                }
+                position <- index
+            }
+            remaining <- private$.objects[-position]
+            private$.objects <- if (length(remaining)) remaining else list()
+            invisible(self)
+        },
         show = function(...) {
             self$.show(..., consoleOutputEnabled = TRUE)
             invisible(self)
@@ -104,6 +291,193 @@ length.TrialComparison <- function(x) length(x$getObjects())
 #' @export
 names.TrialComparison <- function(x) names(x$getObjects())
 
+#' 
+#' @title 
+#' Access Objects in a Trial Comparison
+#' 
+#' @rdname extract.TrialComparison
+#'
+#' @param x A `TrialComparison`.
+#' @param i A single object name or a positive integer position.
+#' @param name An object name, supplied literally after `$`.
+#' @param ... Further indices are not supported.
+#' @param exact Whether character indices must match exactly, as for list `[[`.
+#'   `$` always matches exactly.
+#' 
+#' @return The contained object by reference, or NULL for an unknown name.
+#' 
+#' @details
+#' Duplicate names select the first occurrence. Numeric positions refer to the
+#' stored object order. R6 members take precedence for `$`: `x$add` is the method
+#' even when an object is named "add"; use `x[["add"]]` to select that object.
+#' `[[` selects contained objects first and falls back to existing R6 members for
+#' other character names. This also preserves existing internal field access.
+#' These methods provide extraction; replacing collection entries is not supported.
+#' Use [getComparison()] or `$add()` to build or extend the collection.
+#' 
+#' @examples
+#' comparison <- getComparison(fixed = getDesignFixed(),
+#'     sequential = getDesignGroupSequential(kMax = 2))
+#' identical(comparison$fixed, comparison[["fixed"]])
+#' identical(comparison[[1]], comparison$fixed)
+#' 
+#' @export
+#' 
+`[[.TrialComparison` <- function(x, i, ..., exact = TRUE) {
+    if (missing(i)) {
+        stopMissingArgument("An object name or position must be supplied",
+            functionName = "[[.TrialComparison", parameter = "i",
+            constraint = "one object name or position", diagnosticId = "comparison.object_index_missing")
+    }
+    extra <- list(...)
+    if (length(extra)) {
+        stopIllegalArgument("Only one object index is supported",
+            functionName = "[[.TrialComparison", parameter = "...", value = extra,
+            constraint = "no additional indices", diagnosticId = "comparison.multiple_indices_unsupported")
+    }
+    .assertIsSingleLogical(exact, "exact")
+    if (length(i) != 1L) {
+        stopArgumentLengthOutOfBounds("Supply exactly one object name or position",
+            functionName = "[[.TrialComparison", parameter = "i", value = i,
+            constraint = "exactly one index", expectedLength = 1L, actualLength = length(i),
+            diagnosticId = "comparison.object_index_length_invalid")
+    }
+    objects <- .subset2(x, "getObjects")()
+    if (is.character(i)) {
+        if (!is.na(i) && nzchar(i) && i %in% names(objects)) return(objects[[i, exact = TRUE]])
+        if (!is.na(i) && nzchar(i) && exists(i, envir = x, inherits = FALSE)) return(.subset2(x, i))
+        return(objects[[i, exact = exact]])
+    }
+    if (!is.numeric(i) || is.complex(i) || is.na(i) || !is.finite(i) || i != trunc(i)) {
+        stopIllegalArgument("The object index must be a name or an integer position",
+            functionName = "[[.TrialComparison", parameter = "i", value = i,
+            constraint = "one character name or finite integer position",
+            diagnosticId = "comparison.object_index_invalid")
+    }
+    if (i < 1 || i > length(objects)) {
+        stopIndexOutOfBounds("Object position is outside the comparison",
+            functionName = "[[.TrialComparison", parameter = "i", value = i, index = i,
+            constraint = "a position in [1, number of objects]", lowerBound = 1L, upperBound = length(objects),
+            diagnosticId = "comparison.object_index_out_of_bounds")
+    }
+    objects[[i]]
+}
+
+#' @rdname extract.TrialComparison
+#' @export
+`$.TrialComparison` <- function(x, name) {
+    # Resolve actual bindings without dispatch, keeping R6 methods and fields safe.
+    if (exists(name, envir = x, inherits = FALSE)) return(.subset2(x, name))
+    .subset2(x, "getObjects")()[[name, exact = TRUE]]
+}
+
+#'
+#' @title
+#' Fetch Objects from a Trial Comparison
+#'
+#' @description
+#' Extracts contained objects by name or position without modifying the comparison
+#' or copying its objects. A single selection returns the object itself by default.
+#'
+#' @param x A `TrialComparison`.
+#' @param ... Object names or integer positions, including vectors and multiple
+#'   selections. Names may be quoted or unquoted. Positive positions count from
+#'   the beginning and negative positions from the end. With no selection, the
+#'   last object is returned. Quasi-quotation and programmatic selectors are
+#'   supported; an unquoted name matching a contained object takes precedence
+#'   over a variable of the same name in the calling environment.
+#' @param output One of "value" (default), "named", "labeled", or "list".
+#'   "value" returns a single selected object directly and multiple selections
+#'   as a named list. The other modes always return a named list. Collection
+#'   labels are the supplied object names, with positions for unnamed objects;
+#'   consequently "labeled" and "named" are equivalent for comparisons.
+#'
+#' @return A contained object by reference or a list of objects. An unknown name
+#'   returns NULL (retained as a NULL entry in list output). Duplicate names
+#'   select the first occurrence. Empty selector vectors return an empty list.
+#'
+#' @details
+#' `fetch(x, "fixed")`, `fetch(x, fixed)` and `fetch(x, 1)` provide the named and
+#' positional object access supported by `[[`. Only contained objects are selected;
+#' R6 members are never returned as a fallback. Numeric positions must be finite,
+#' nonzero integers within the collection bounds. Selecting the last object of
+#' an empty comparison raises an index error.
+#'
+#' @seealso
+#' [fetch()] and [getComparison()].
+#'
+#' @examples
+#' comparison <- getComparison(fixed = getDesignFixed(),
+#'     sequential = getDesignGroupSequential(kMax = 2))
+#' identical(comparison |> fetch("fixed"), comparison[["fixed"]])
+#' identical(comparison |> fetch(fixed), comparison$fixed)
+#' identical(comparison |> fetch(1), comparison[[1]])
+#' comparison |> fetch(-1)
+#' comparison |> fetch(1:2, output = "list")
+#'
+#' @export
+#'
+fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled", "list")) {
+    output <- match.arg(output)
+    selectors <- rlang::enquos(...)
+    if (!length(selectors)) selectors <- list(rlang::new_quosure(-1L))
+    objects <- x$getObjects()
+    objectNames <- names(objects)
+    positions <- list()
+    labels <- list()
+    for (i in seq_along(selectors)) {
+        selector <- selectors[[i]]
+        expression <- rlang::quo_get_expr(selector)
+        if (is.symbol(expression) && (as.character(expression) %in% objectNames ||
+                !rlang::env_has(rlang::quo_get_env(selector), as.character(expression), inherit = TRUE))) {
+            value <- as.character(expression)
+        } else {
+            value <- rlang::eval_tidy(selector)
+        }
+        index <- .getComparisonFetchPositions(value, objects, selectorNumber = i)
+        label <- if (is.character(value)) value else {
+            if (is.null(objectNames)) as.character(index) else objectNames[index]
+        }
+        unnamed <- is.na(label) | !nzchar(label)
+        label[unnamed] <- as.character(index[unnamed])
+        positions[[i]] <- index
+        labels[[i]] <- label
+    }
+    positions <- unlist(positions, use.names = FALSE)
+    labels <- unlist(labels, use.names = FALSE)
+    if (!length(positions)) return(list())
+    result <- lapply(positions, function(position) if (is.na(position)) NULL else objects[[position]])
+    names(result) <- labels
+    if (output == "value" && length(result) == 1L) return(result[[1L]])
+    result
+}
+
+.getComparisonFetchPositions <- function(selector, objects, selectorNumber) {
+    if (is.character(selector) && is.null(dim(selector))) {
+        positions <- match(selector, names(objects))
+        positions[is.na(selector) | !nzchar(selector)] <- NA_integer_
+        return(positions)
+    }
+    if (!is.numeric(selector) || is.complex(selector) || !is.null(dim(selector)) ||
+            anyNA(selector) || any(!is.finite(selector)) || any(selector != trunc(selector))) {
+        stopIllegalArgument("Select comparison objects by character names or finite integer positions",
+            functionName = "fetch.TrialComparison", parameter = "...", value = selector,
+            constraint = "character names or finite integer positions",
+            diagnosticId = "comparison.fetch_selector_invalid", context = list(selectorNumber = selectorNumber))
+    }
+    size <- length(objects)
+    invalid <- which(selector == 0 | selector < -size | selector > size)
+    if (length(invalid)) {
+        stopIndexOutOfBounds("Object position is outside the comparison",
+            functionName = "fetch.TrialComparison", parameter = "...", value = selector,
+            index = selector[invalid[1L]], lowerBound = -size, upperBound = size,
+            constraint = "nonzero integer positions in [-number of objects, number of objects]",
+            diagnosticId = "comparison.fetch_index_out_of_bounds",
+            context = list(selectorNumber = selectorNumber))
+    }
+    ifelse(selector < 0, size + selector + 1L, selector)
+}
+
 #' Trial Comparison Data Frame
 #' @param x A `TrialComparison`.
 #' @param row.names Optional row names for the result.
@@ -119,7 +493,7 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame.TrialComparison", ...)
     .assertIsSingleLogical(removeConstantParameters, "removeConstantParameters")
     .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
-    data <- getComparisonData(x$getObjects(), includeAllParameters = includeAllParameters)
+    data <- .getTrialComparisonData(x$getObjects(), includeAllParameters = includeAllParameters)
     allNames <- names(data)
     if (removeConstantParameters) {
         info <- .getTrialComparisonInfo(x, data)
@@ -128,7 +502,7 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
         data <- data[selected]
     }
     if (niceColumnNamesEnabled) {
-        labels <- names(getComparisonData(x$getObjects(), niceColumnNamesEnabled = TRUE,
+        labels <- names(.getTrialComparisonData(x$getObjects(), niceColumnNamesEnabled = TRUE,
             includeAllParameters = includeAllParameters))
         names(data) <- labels[match(names(data), allNames)]
     }
@@ -199,7 +573,7 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
     profile
 }
 
-.getTrialComparisonInfo <- function(object, data = getComparisonData(object$getObjects())) {
+.getTrialComparisonInfo <- function(object, data = .getTrialComparisonData(object$getObjects())) {
     info <- getComparisonParameterInfo(data)
     # Use the common metadata API for the full ordered candidate set; row-wise
     # variation alone cannot identify equal stage profiles of different objects.
@@ -251,7 +625,7 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
     .warnInCaseOfUnknownArguments(functionName = "TrialComparison$show", ...)
     .assertComparisonLimit(maxTypes, "maxTypes", "print.TrialComparison")
     .assertComparisonLimit(maxMetrics, "maxMetrics", "print.TrialComparison")
-    data <- getComparisonData(object$getObjects())
+    data <- .getTrialComparisonData(object$getObjects())
     info <- getComparisonParameterInfo(data)
     getComparisonParameterDescriptions(info[FALSE, ], digits = digits) # Validate display precision.
     object$.resetCat()
@@ -312,12 +686,14 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         .limits = NULL,
         .digits = NULL,
         .objectNames = NULL,
+        .numberOfObjects = NULL,
         initialize = function(object, info, limits, digits, output) {
             super$initialize(object = object, output = output)
             self$parameterInfo <- info
             self$.limits <- limits
             self$.digits <- digits
             self$.objectNames <- names(object)
+            self$.numberOfObjects <- length(object)
         },
         .show = function(..., consoleOutputEnabled = TRUE) {
             .showTrialComparisonSummary(self, consoleOutputEnabled)
@@ -338,7 +714,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         summary$.cat("Trial comparison summary\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
     }
     if (summary$output %in% c("all", "overview")) {
-        emit(length(summary$object), " objects: ", length(different), " differing parameters; ",
+        emit(summary$.numberOfObjects, " objects: ", length(different), " differing parameters; ",
             length(common), " shared parameters/profiles; ", length(empty), " empty parameters.\n")
         emit("Stage/situation profiles are compared exactly; NA means missing/unavailable.\n")
         if (length(common)) {

@@ -1833,6 +1833,9 @@ fetch <- function(x, ..., output) UseMethod("fetch")
 #'  - "value" returns only the value itself
 #'  - "list" returns the value inside a named list
 #'
+#' @seealso
+#' [fetch.TrialComparison()] for selecting contained objects from a comparison.
+#'
 #' @template examples_fetch_parameter_from_result
 #'
 #' @export
