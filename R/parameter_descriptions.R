@@ -360,7 +360,7 @@ NULL
 
 #' Parameter Description: fixedExposureTime for Counts
 #' @param fixedExposureTime If specified, the fixed time of exposure per subject for count data, there is no default.
-#'   Exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
+#'   For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
 #' @name param_fixedExposureTime_counts
 #' @keywords internal
 NULL
@@ -383,7 +383,7 @@ NULL
 #' Parameter Description: followUpTime for Counts
 #' @param followUpTime If specified, the assumed (additional) follow-up time for the study, there is no default.
 #'        The total study duration is \code{accrualTime + followUpTime}.
-#'        Exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
+#'        For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
 #' @name param_followUpTime_counts
 #' @keywords internal
 NULL
