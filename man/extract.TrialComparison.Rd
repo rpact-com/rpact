@@ -25,7 +25,9 @@
 The contained object by reference, or NULL for an unknown name.
 }
 \description{
-Access Objects in a Trial Comparison
+Extracts a contained comparison object by name or position.
+
+\code{$} accesses named comparison objects while preserving public R6 members.
 }
 \details{
 Duplicate names select the first occurrence. Numeric positions refer to the

@@ -32,4 +32,5 @@ labels. Formatting does not alter the metadata or comparison data.
 \examples{
 info <- getComparisonParameterInfo(data.frame(effect = c(0.2, 0.3)))
 getComparisonParameterDescriptions(info)
+
 }

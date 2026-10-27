@@ -17,19 +17,25 @@
 #'
 
 .formatComparisonParameterValues <- function(values, digits = NA_integer_) {
-    if (!length(values)) return(character())
+    if (!length(values)) {
+        return(character())
+    }
     if (is.numeric(values) && !is.object(values) && !is.na(digits)) {
         values <- round(values, digits)
     }
     if (is.numeric(values) && !is.object(values) && is.na(digits)) {
         for (precision in 7:17) {
             labels <- format(values, digits = precision, trim = TRUE)
-            if (length(unique(labels)) == length(unique(values))) return(labels)
+            if (length(unique(labels)) == length(unique(values))) {
+                return(labels)
+            }
         }
     }
     as.character(values)
 }
 
+#'
+#' @title
 #' Get Comparison Parameter Information
 #'
 #' @description
@@ -72,7 +78,9 @@
 #' @examples
 #' data <- data.frame(alpha = c(0.025, 0.025), effect = c(0.2, 0.3))
 #' getComparisonParameterInfo(data)
+#'
 #' @export
+#'
 getComparisonParameterInfo <- function(data, ..., removeConstantParameters = FALSE,
         binaryIntegerAsFactor = TRUE) {
     .warnInCaseOfUnknownArguments(functionName = "getComparisonParameterInfo", ...)
@@ -91,7 +99,9 @@ getComparisonParameterInfo <- function(data, ..., removeConstantParameters = FAL
         binaryValues = character(), stringsAsFactors = FALSE)
     result$values <- list()
     result$singleValue <- list()
-    if (!nrow(data) || !ncol(data)) return(result)
+    if (!nrow(data) || !ncol(data)) {
+        return(result)
+    }
     rows <- lapply(seq_along(data), function(i) {
         x <- data[[i]]
         if (!is.atomic(x) || !is.null(dim(x))) {
@@ -102,7 +112,9 @@ getComparisonParameterInfo <- function(data, ..., removeConstantParameters = FAL
                 context = list(column = names(data)[i], columnPosition = i))
         }
         missingValues <- is.na(x)
-        if (is.character(x) || is.factor(x)) missingValues <- missingValues | trimws(as.character(x)) == ""
+        if (is.character(x) || is.factor(x)) {
+            missingValues <- missingValues | trimws(as.character(x)) == ""
+        }
         values <- unique(x[!missingValues])
         n <- length(values)
         dataType <- class(x)[1L]
@@ -127,23 +139,36 @@ getComparisonParameterInfo <- function(data, ..., removeConstantParameters = FAL
             isBinary = binary, isEmpty = n == 0L, isSingleValue = n == 1L,
             isConstant = n <= 1L, isVarying = n > 1L,
             hasMissingValues = any(missingValues), paramLevelLength = as.integer(n),
-            binaryValues = if (binary) paste(.formatComparisonParameterValues(values), collapse = ", ") else NA_character_,
+            binaryValues = if (binary) {
+                paste(.formatComparisonParameterValues(values), collapse = ", ")
+            } else {
+                NA_character_
+            },
             stringsAsFactors = FALSE)
         row$values <- list(values)
-        row$singleValue <- list(if (n == 1L) values else NULL)
+        row$singleValue <- list(if (n == 1L) {
+            values
+        } else {
+            NULL
+        })
         row
     })
     result <- do.call(rbind, rows)
-    if (removeConstantParameters) result <- result[result$isVarying, , drop = FALSE]
+    if (removeConstantParameters) {
+        result <- result[result$isVarying, , drop = FALSE]
+    }
     rownames(result) <- NULL
     result
 }
 
+#'
+#' @title
 #' Select Comparison Parameters
 #'
 #' @description
 #' Selects varying parameters, axis candidates, or grouping variables using
 #' getComparisonParameterInfo(). Column order is retained.
+#'
 #' @inheritParams getComparisonParameterInfo
 #' @param varyingOnly Whether to exclude constant and empty columns.
 #' @param type One of "all", "continuous", "factor", "binary", or "groupable".
@@ -153,12 +178,16 @@ getComparisonParameterInfo <- function(data, ..., removeConstantParameters = FAL
 #' @param exclude Character vector of names to exclude, e.g., identifiers or
 #'   variables already selected for an axis or a category.
 #' @param maxNumberOfLevels Positive upper limit for numerical grouping variables.
+#'
 #' @return A character vector of column names. No plot or GUI state is changed.
+#'
 #' @examples
 #' data <- data.frame(alpha = 0.025, effect = c(0.2, 0.3), power = c(0.8, 0.9))
 #' getComparisonParameterNames(data)
 #' getComparisonParameterNames(data, exclude = "effect", type = "continuous")
+#'
 #' @export
+#'
 getComparisonParameterNames <- function(data, ..., varyingOnly = TRUE, type = "all",
         exclude = character(), maxNumberOfLevels = 5L, binaryIntegerAsFactor = TRUE) {
     .warnInCaseOfUnknownArguments(functionName = "getComparisonParameterNames", ...)
@@ -191,26 +220,35 @@ getComparisonParameterNames <- function(data, ..., varyingOnly = TRUE, type = "a
     keep <- switch(type, all = rep(TRUE, nrow(info)), continuous = info$isContinuous,
         factor = info$isFactor, binary = info$isBinary,
         groupable = !info$isEmpty & (info$isFactor | info$paramLevelLength <= maxNumberOfLevels))
-    if (varyingOnly) keep <- keep & info$isVarying
+    if (varyingOnly) {
+        keep <- keep & info$isVarying
+    }
     info$paramName[keep & !info$paramName %in% exclude]
 }
 
+#'
+#' @title
 #' Describe Comparison Parameters
 #'
 #' @description
 #' Formats comparison parameter metadata for console output, summaries, and UI
 #' labels. Formatting does not alter the metadata or comparison data.
+#'
 #' @param parameterInfo A table returned by getComparisonParameterInfo(), or a
 #'   row subset of such a table.
 #' @param ... Further arguments. Currently unused.
 #' @param digits Optional number of decimal places for displayed values.
 #' @param showDetails Whether to include the inferred type and plotting role.
+#'
 #' @return A character vector named by parameter names. Empty input returns
 #'   character(). Empty columns are described as empty, not as single-valued.
+#'
 #' @examples
 #' info <- getComparisonParameterInfo(data.frame(effect = c(0.2, 0.3)))
 #' getComparisonParameterDescriptions(info)
+#'
 #' @export
+#'
 getComparisonParameterDescriptions <- function(parameterInfo, ..., digits = NA_integer_, showDetails = TRUE) {
     .warnInCaseOfUnknownArguments(functionName = "getComparisonParameterDescriptions", ...)
     .assertIsSingleLogical(showDetails, "showDetails")
@@ -243,13 +281,27 @@ getComparisonParameterDescriptions <- function(parameterInfo, ..., digits = NA_i
     descriptions <- vapply(seq_len(nrow(parameterInfo)), function(i) {
         info <- parameterInfo[i, , drop = FALSE]
         detail <- character()
-        if (showDetails) detail <- c(info$paramType, if (info$isFactor) "factor" else "continuous")
+        if (showDetails) {
+            detail <- c(info$paramType, if (info$isFactor) {
+                "factor"
+            } else {
+                "continuous"
+            })
+        }
         values <- paste(.formatComparisonParameterValues(info$values[[1L]], digits), collapse = ", ")
-        if (info$isEmpty) detail <- c(detail, "empty")
-        else if (info$isSingleValue) detail <- c(detail, paste0("single value (", values, ")"))
-        else if (info$isBinary) detail <- c(detail, paste0("binary (", values, ")"))
+        if (info$isEmpty) {
+            detail <- c(detail, "empty")
+        } else if (info$isSingleValue) {
+            detail <- c(detail, paste0("single value (", values, ")"))
+        } else if (info$isBinary) {
+            detail <- c(detail, paste0("binary (", values, ")"))
+        }
         if (!showDetails) {
-            return(paste0(info$paramName, if (info$isSingleValue || info$isBinary) paste0(" (", values, ")") else ""))
+            return(paste0(info$paramName, if (info$isSingleValue || info$isBinary) {
+                paste0(" (", values, ")")
+            } else {
+                ""
+            }))
         }
         paste0(info$paramName, ": ", paste(detail, collapse = ", "))
     }, character(1))

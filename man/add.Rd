@@ -22,6 +22,8 @@ The modified comparison invisibly for \code{TrialComparison}.
 \description{
 S3 generic for adding objects. The \code{TrialComparison} method
 delegates to \verb{$add()} and modifies the existing comparison by reference.
+
+The \code{TrialComparison} method appends objects to the comparison.
 }
 \examples{
 comparison <- getComparison(fixed = getDesignFixed())

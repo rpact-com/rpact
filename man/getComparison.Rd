@@ -27,6 +27,10 @@ An R6 \code{TrialComparison} inheriting from \code{ParameterSet}.
 \description{
 Creates a comparison of existing designs, sample size or power
 plans, and simulation results without recalculating them.
+
+\code{length()} returns the number of objects in the comparison.
+
+\code{names()} returns the supplied names of the comparison objects.
 }
 \details{
 The comparison retains references to its objects. Changes to an original

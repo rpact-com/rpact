@@ -56,4 +56,5 @@ not count as observed values.
 \examples{
 data <- data.frame(alpha = c(0.025, 0.025), effect = c(0.2, 0.3))
 getComparisonParameterInfo(data)
+
 }

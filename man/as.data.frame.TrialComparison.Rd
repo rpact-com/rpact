@@ -35,5 +35,5 @@ with different object profiles, using the same rules as \code{summary()}.}
 An unrounded data.frame. All columns are returned by default.
 }
 \description{
-Trial Comparison Data Frame
+Converts a trial comparison to an unrounded data frame.
 }

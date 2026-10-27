@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-#' 
-#' @title 
+#'
+#' @title
 #' Plot Comparison Data
 #'
-#' @description 
+#' @description
 #' Produces a ggplot object from unrounded comparison data.
-#' 
+#'
 #' @param data A non-empty data.frame, for example from getComparisonData().
 #' @param xParamName,yParamName Names of the axis columns. The y column must be numeric.
 #' @param ... Reserved for future extensions.
@@ -33,22 +33,23 @@
 #' @param legendPosition Legend position, either an rpact numeric position or a
 #'   ggplot position name (none, left, right, bottom, top).
 #' @param shinyOptimization Whether to use compact sizing for Shiny displays.
-#' 
+#'
 #' @return A ggplot object, which can be customized with ggplot2 layers.
-#' 
-#' @details Categories and groups jointly identify lines. Without either,
+#'
+#' @details
+#' Categories and groups jointly identify lines. Without either,
 #'   objectNumber (or designNumber) identifies separate objects. Stages are
 #'   separated unless used as an axis. Select categories explicitly to compare
 #'   results across objects along a parameter axis.
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' data <- getComparisonData(list(getDesignFixed(), getDesignGroupSequential()))
 #' plotComparison(data, "stages", "criticalValues", plotLineEnabled = FALSE)
 #' }
-#' 
+#'
 #' @export
-#' 
+#'
 plotComparison <- function(
         data,
         xParamName,
@@ -82,7 +83,9 @@ plotComparison <- function(
         categoryParamName = categoryParamName, groupParamName = groupParamName)
     for (name in names(selected)) {
         value <- selected[[name]]
-        if (is.null(value) && name %in% c("categoryParamName", "groupParamName")) next
+        if (is.null(value) && name %in% c("categoryParamName", "groupParamName")) {
+            next
+        }
         if (!is.character(value) || length(value) != 1L || is.na(value) || !value %in% names(data)) {
             stopIllegalArgument("Invalid column selection for '", name, "'",
                 functionName = "plotComparison", parameter = name, value = value,
@@ -153,7 +156,9 @@ plotComparison <- function(
     }
     
     groups <- c(categoryParamName, groupParamName)
-    if (!length(groups)) groups <- intersect(c("objectNumber", "designNumber"), names(data))[1L]
+    if (!length(groups)) {
+        groups <- intersect(c("objectNumber", "designNumber"), names(data))[1L]
+    }
     groups <- groups[!is.na(groups)]
     stages <- setdiff(intersect(c("stages", "stage"), names(data)), c(xParamName, yParamName))
     groups <- unique(c(groups, stages))

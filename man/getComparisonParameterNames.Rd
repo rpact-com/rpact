@@ -46,4 +46,5 @@ getComparisonParameterInfo(). Column order is retained.
 data <- data.frame(alpha = 0.025, effect = c(0.2, 0.3), power = c(0.8, 0.9))
 getComparisonParameterNames(data)
 getComparisonParameterNames(data, exclude = "effect", type = "continuous")
+
 }

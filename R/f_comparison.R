@@ -119,20 +119,32 @@ getComparisonData <- function(
         endpoint <- if (inherits(obj, "TrialDesign")) {
             "Undefined"
         } else {
-            if (grepl("Means", className)) "Means" 
-            else if (grepl("Rates", className)) "Rates" 
-            else if (grepl("Survival", className)) "Survival" 
-            else if (grepl("Count", className)) "Counts" 
-            else "Undefined"
+            if (grepl("Means", className)) {
+                "Means"
+            } else if (grepl("Rates", className)) {
+                "Rates"
+            } else if (grepl("Survival", className)) {
+                "Survival"
+            } else if (grepl("Count", className)) {
+                "Counts"
+            } else {
+                "Undefined"
+            }
         }
         calculationTarget <- if (inherits(obj, "TrialDesign")) {
             "Design"
         } else {
             if (inherits(obj, "SimulationResults")) {
-                if (grepl("MultiArm", className)) "Multi-arm power simulation" 
-                else "Power simulation"
-            } else if (obj$.isSampleSizeObject()) "Sample size" 
-            else "Power"
+                if (grepl("MultiArm", className)) {
+                    "Multi-arm power simulation"
+                } else {
+                    "Power simulation"
+                }
+            } else if (obj$.isSampleSizeObject()) {
+                "Sample size"
+            } else {
+                "Power"
+            }
         }
         info <- data.frame(
             objectNumber = rep(i, nrow(df)),
@@ -141,7 +153,9 @@ getComparisonData <- function(
         )
         if (!is.null(names(objects))) {
             label <- names(objects)[i]
-            if (is.na(label) || !nzchar(label)) label <- paste("Object", i)
+            if (is.na(label) || !nzchar(label)) {
+                label <- paste("Object", i)
+            }
             info$objectName <- rep(label, nrow(df))
         }
         stageColumn <- intersect(c("stages", "stage"), names(df))
@@ -176,7 +190,11 @@ getComparisonData <- function(
             c("Object number", "Object name", "Object type", "Endpoint", "Calculation target")
         names(result) <- vapply(names(result), function(name) {
             label <- labels[[name]]
-            if (is.null(label)) name else label
+            if (is.null(label)) {
+                name
+            } else {
+                label
+            }
         }, character(1))
         names(result) <- make.unique(names(result))
     }

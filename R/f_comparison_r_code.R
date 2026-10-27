@@ -28,6 +28,8 @@
         precondition = character(), stringWrapParagraphWidth = NULL, postfix = postfix,
         stringWrapPrefix = stringWrapPrefix, pipeOperator = pipeOperator,
         pipeOperatorPostfix = pipeOperatorPostfix, output = output, explicitPrint = explicitPrint)
-    if (output %in% c("vector", "internal")) return(unlist(strsplit(result, "\n", fixed = TRUE), use.names = FALSE))
+    if (output %in% c("vector", "internal")) {
+        return(unlist(strsplit(result, "\n", fixed = TRUE), use.names = FALSE))
+    }
     result
 }

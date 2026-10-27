@@ -41,5 +41,5 @@ an underlying object. Input roles take precedence when roles differ across
 the compared object types.
 }
 \description{
-Summarize Differences Between Trial Planning Objects
+Summarizes differences between the object profiles in a trial comparison.
 }

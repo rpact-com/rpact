@@ -27,5 +27,7 @@ A ggplot object. Ambiguous selections raise an error listing candidate
 descriptions and a concrete example.
 }
 \description{
-Plot a Trial Comparison
+Plots selected variables from a trial comparison.
+
+The summary method plots the objects contained in the comparison.
 }
