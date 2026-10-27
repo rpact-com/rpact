@@ -164,6 +164,8 @@ Collate:
     'f_io_utilities.R'
     'f_plot_comparison.R'
     'f_quality_assurance.R'
+    'f_test_execution.R'
+    'f_test_reporting.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'
     'f_simulation_calc_subjects_function.R'
