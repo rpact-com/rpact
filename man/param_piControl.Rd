@@ -4,7 +4,9 @@
 \alias{param_piControl}
 \title{Parameter Description: Pi Control}
 \arguments{
-\item{piControl}{The assumed probability in the control arm, default is \code{0.5}.}
+\item{piControl}{The assumed event probability in the control arm by \code{eventTime}, default is \code{0.5}.
+If specified and \code{simulationType = "auto"}, the patient-wise simulation is used, which requires
+\code{maxNumberOfSubjects} or an absolute \code{accrualIntensity}.}
 }
 \description{
 Parameter Description: Pi Control
