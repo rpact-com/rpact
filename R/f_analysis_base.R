@@ -157,6 +157,10 @@ NULL
 #' level. For user-defined designs with fixed userAlphaSpending values,
 #' this alpha-dependent design family is not uniquely defined.
 #' Consequently, repeated p-values are not available for such designs.
+#' Repeated p-values are also unavailable for sequential designs with
+#' \code{typeBetaSpending = "bsUser"}, regardless of whether futility is binding.
+#' These calculations return \code{NA} with a warning; other analysis results
+#' remain available.
 #'
 #' @return Returns an \code{\link{AnalysisResults}} object.
 #' The following generics (R generic functions) are available for this result object:
@@ -1060,6 +1064,10 @@ getConditionalPower <- function(
 #' level. For user-defined designs with fixed userAlphaSpending values,
 #' this alpha-dependent design family is not uniquely defined.
 #' Consequently, repeated p-values are not available for such designs.
+#' Repeated p-values are also unavailable for sequential designs with
+#' \code{typeBetaSpending = "bsUser"}, regardless of whether futility is binding.
+#' These calculations return \code{NA} with a warning; other analysis results
+#' remain available.
 #'
 #' @return Returns a \code{\link[base]{numeric}} vector of length \code{kMax} or in case of multi-arm stage results
 #' a \code{\link[base]{matrix}} (each column represents a stage, each row a comparison)
@@ -1093,6 +1101,10 @@ getRepeatedPValues <- function(stageResults, ..., tolerance = 1e-06) {
         return(ifelse(design$sided == 1, stageResults$pValues[1],
             2 * min(stageResults$pValues[1], 1 - stageResults$pValues[1])
         ))
+    }
+
+    if (.repeatedPValuesUnavailableForUserBetaSpending(design, functionName = "getRepeatedPValues")) {
+        return(rep(NA_real_, design$kMax))
     }
 
     if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
@@ -1722,6 +1734,32 @@ getFinalConfidenceInterval <- function(
     }
 
     return(finalConfidenceInterval)
+}
+
+#
+# Check the unsupported user-defined beta-spending case before inversion.
+#
+.repeatedPValuesUnavailableForUserBetaSpending <- function(design, functionName) {
+    if (!.isTrialDesignInverseNormalOrGroupSequential(design) || design$kMax == 1 ||
+            design$typeBetaSpending != C_TYPE_OF_DESIGN_BS_USER) {
+        return(FALSE)
+    }
+    if (.getEnvironmentVariable(
+        "RPACT_ANALYSIS_REPEATED_P_VALUES_WARNINGS_ENABLED",
+        "rpact.analysis.repeated.p.values.warnings.enabled",
+        default = TRUE,
+        type = "logical"
+    )) {
+        warnResultUnavailable(
+            "Repeated p-values not available for 'typeBetaSpending' = 'bsUser'",
+            functionName = functionName,
+            parameter = "typeBetaSpending", value = design$typeBetaSpending,
+            constraint = "repeated p-values require a supported beta-spending rule",
+            diagnosticId = "analysis.repeated_p_values_unsupported",
+            context = list(bindingFutility = design$bindingFutility)
+        )
+    }
+    return(TRUE)
 }
 
 #
