@@ -446,7 +446,10 @@ rcmd <- function(
 #' @description
 #' Returns the R source command of a result object.
 #'
-#' @param obj The result object.
+#' @param obj The result object, including a `TrialComparison` or its summary.
+#'   Comparison reconstruction isolates each object's preconditions. Argument
+#'   overrides are unsupported for comparisons, and their code is not word-wrapped
+#'   so object names and callback bodies remain intact.
 #' @param leadingArguments A character vector with arguments that shall be inserted at the beginning of the function command,
 #'        e.g., \code{design = x}. Be careful with this option because the created R command may no longer be valid if used.
 #' @param includeDefaultParameters If \code{TRUE}, default parameters will be included in all \code{rpact} commands;
@@ -575,7 +578,28 @@ getObjectRCode <- function(
     }
 
     .assertIsParameterSetClass(obj, "ParameterSet")
+    if (inherits(obj, "TrialComparison")) {
+        return(.getTrialComparisonRCode(obj,
+            leadingArguments = leadingArguments, includeDefaultParameters = includeDefaultParameters,
+            prefix = prefix, postfix = postfix, stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues, tolerance = tolerance, pipeOperator = pipeOperator,
+            pipeOperatorPostfix = pipeOperatorPostfix, output = output, explicitPrint = explicitPrint))
+    }
 
+    if (inherits(obj, "TrialComparisonSummary")) {
+        summaryArguments <- c(list(digits = obj$.digits), obj$.limits, list(output = obj$output))
+        arguments <- paste(vapply(names(summaryArguments), function(name) {
+            paste0(name, " = ", paste(deparse(summaryArguments[[name]]), collapse = ""))
+        }, ""), collapse = ", ")
+        code <- getObjectRCode(obj$object, includeDefaultParameters = includeDefaultParameters,
+            leadingArguments = leadingArguments, newArgumentValues = newArgumentValues,
+            stringWrapParagraphWidth = NULL, pipeOperator = pipeOperator, tolerance = tolerance,
+            output = "internal")
+        return(.formatRCode(paste0(prefix, "summary(", paste(code, collapse = "\n"), ", ", arguments, ")"),
+            precondition = character(), stringWrapParagraphWidth = NULL, postfix = postfix,
+            stringWrapPrefix = stringWrapPrefix, pipeOperator = pipeOperator,
+            pipeOperatorPostfix = pipeOperatorPostfix, output = output, explicitPrint = explicitPrint))
+    }
     if (!is.list(newArgumentValues)) {
         stopIllegalArgument("'newArgumentValues' must be a named list ",
             "(is ", .getClassName(newArgumentValues), ")",

@@ -2,6 +2,8 @@
 
 ## New features
 
+* Added `getComparison()` and the R6 `TrialComparison` class (inheriting from `ParameterSet`) for comparing existing designs, planning calculations and simulations. Compact printing, grouped summaries of exact object profiles, full data-frame conversion and plots share the comparison parameter helpers. R-code reconstruction and Markdown output are supported; deep cloning raises an explicit error.
+
 * Added comparison parameter helpers: `getComparisonParameterInfo()` describes types, observed levels, missingness, constants and variation; `getComparisonParameterNames()` selects axis/category candidates; `getComparisonParameterDescriptions()` formats reusable labels without modifying the original data.
 
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.

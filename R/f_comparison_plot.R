@@ -147,6 +147,11 @@ plotComparison <- function(
         p <- ggplot2::ggplot(data = data, mapping = ggplot2::aes(x = !!ggplot2::sym(xParamName), y = !!ggplot2::sym(yParamName)))
     }
     
+    if (grepl("situation|stage|objectNumber|kMax|sided", xParamName, ignore.case = TRUE)) {
+        breaks <- sort(unique(round(na.omit(data[[xParamName]]))))
+        p <- p + ggplot2::scale_x_continuous(breaks = breaks)
+    }
+    
     groups <- c(categoryParamName, groupParamName)
     if (!length(groups)) groups <- intersect(c("objectNumber", "designNumber"), names(data))[1L]
     groups <- groups[!is.na(groups)]

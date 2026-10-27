@@ -997,10 +997,6 @@ getAvailablePlotTypes <- function(
         return(p)
     }
     
-#    if (!is.null(p$scales$get_scales("x"))) {
-#        return(p)
-#    }
-    
     breaks <- sort(unique(round(na.omit(data$xValues), digits = digits)))
     if (addZero && !any(breaks == 0)) {
         breaks <- c(0, breaks)
@@ -1587,11 +1583,11 @@ getAvailablePlotTypes <- function(
     }
     
     if (isFALSE(discreteXAxis) && !is.null(xlab) && 
-            grepl("situation", xlab, ignore.case = TRUE)) {
+            grepl("situation|stage", xlab, ignore.case = TRUE)) {
         discreteXAxis <- TRUE
     }
     if (isFALSE(discreteXAxis) && !is.null(xAxisLabel) && 
-            grepl("situation", xAxisLabel, ignore.case = TRUE)) {
+            grepl("situation|stage", xAxisLabel, ignore.case = TRUE)) {
         discreteXAxis <- TRUE
     }
     
