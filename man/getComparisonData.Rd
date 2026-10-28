@@ -13,8 +13,8 @@ getComparisonData(
 }
 \arguments{
 \item{objects}{A non-empty list of objects inheriting from \code{TrialDesign},
-\code{TrialDesignPlan}, or \code{SimulationResults}. Optional names are retained in
-the column \code{objectName}.}
+\code{TrialDesignCharacteristics}, \code{TrialDesignPlan}, or \code{SimulationResults}.
+Optional names are retained in the column \code{objectName}.}
 
 \item{...}{Further arguments. Currently unused.}
 
@@ -28,14 +28,15 @@ An ordinary \code{data.frame} with identifiers, object type, endpoint,
 calculation target, and input and result parameters.
 }
 \description{
-Combines existing designs, sample size or power plans, and simulation results
-into a data frame without recalculating or modifying the objects.
+Combines existing designs, design characteristics, sample size or power plans,
+and simulation results into a data frame without recalculating or modifying
+the objects.
 }
 \details{
-Each object receives an \code{objectNumber}, repeated for all its rows. Plans and
-simulation results are supplemented with their associated design parameters,
-matched by analysis stage. For fixed designs and results based on them,
-\code{kMax} and \code{stages} identify the single stage as 1, even when omitted by the
+Each object receives an \code{objectNumber}, repeated for all its rows. Design
+characteristics, plans, and simulation results are supplemented with their
+associated design parameters, matched by analysis stage. For fixed designs
+and results based on them, \code{kMax} and \code{stages} identify the single stage as 1, even when omitted by the
 individual data-frame methods. The situation column numbers rows within each
 stage. Columns are matched by technical names; missing
 values are filled with \code{NA}. \code{sampleSizes} is harmonized to \code{numberOfSubjects}
