@@ -11,7 +11,7 @@ plotComparison(
   ...,
   groupParamName = NULL,
   categoryParamName = NULL,
-  mainTitle = "Object Comparison",
+  mainTitle = NULL,
   legendTitle = "Legend",
   plotLineEnabled = TRUE,
   plotPointsEnabled = TRUE,
@@ -40,7 +40,10 @@ are also present.}
 columns define their joint combinations. NULL selects categories automatically;
 NA_character_ or character(0) disables categories.}
 
-\item{mainTitle, legendTitle}{Plot and legend titles.}
+\item{mainTitle}{Plot title. When omitted, generated from the original objects
+using the same title as print and summary. Supply NULL or NA to hide it.}
+
+\item{legendTitle}{Legend title.}
 
 \item{plotLineEnabled, plotPointsEnabled}{Whether to show lines and points.}
 
