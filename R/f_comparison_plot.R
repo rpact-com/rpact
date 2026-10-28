@@ -527,7 +527,9 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
 #' @param categoryParamName Optional character vector of category columns. Multiple
 #'   columns define their joint combinations. NULL selects categories automatically;
 #'   NA_character_ or character(0) disables categories.
-#' @param mainTitle,legendTitle Plot and legend titles.
+#' @param mainTitle Plot title. When omitted, generated from the original objects
+#'   using the same title as print and summary. Supply NULL or NA to hide it.
+#' @param legendTitle Legend title.
 #' @param plotLineEnabled,plotPointsEnabled Whether to show lines and points.
 #' @param pointBorder Point border style, as used by rpact plots.
 #' @param discreteXAxis Whether numeric x ticks should use the observed values only.
@@ -597,7 +599,7 @@ plotComparison <- function(
         ..., 
         groupParamName = NULL,
         categoryParamName = NULL,
-        mainTitle = "Object Comparison",
+        mainTitle = NULL,
         legendTitle = "Legend",
         plotLineEnabled = TRUE,
         plotPointsEnabled = TRUE,
@@ -626,6 +628,9 @@ plotComparison <- function(
         .stopComparisonPlotSelection(selection, functionName)
     }
     input <- .getComparisonPlotInput(data, objects)
+    if (missing(mainTitle)) {
+        mainTitle <- .getTrialComparisonTitle(input$objects)
+    }
     data <- input$data
     xParamName <- selection$xParamName
     yParamName <- selection$yParamName
