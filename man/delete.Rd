@@ -13,8 +13,8 @@ delete(x, ...)
 \item{x}{An object supporting a \code{delete()} method, such as a \code{TrialComparison}.}
 
 \item{...}{For \code{TrialComparison}, exactly one \code{index}, supplied by position
-or name: a positive integer position or an exact object name. Duplicate
-names select the first occurrence. Invalid selections leave the comparison
+or name: a positive integer position or an exact object name.
+Invalid selections leave the comparison
 unchanged. Removing the last object leaves an empty comparison.}
 }
 \value{

@@ -24,8 +24,8 @@ consequently "labeled" and "named" are equivalent for comparisons.}
 }
 \value{
 A contained object by reference or a list of objects. An unknown name
-returns NULL (retained as a NULL entry in list output). Duplicate names
-select the first occurrence. Empty selector vectors return an empty list.
+returns NULL (retained as a NULL entry in list output).
+Empty selector vectors return an empty list.
 }
 \description{
 Extracts contained objects by name or position without modifying the comparison

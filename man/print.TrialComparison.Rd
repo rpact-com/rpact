@@ -29,5 +29,5 @@ to display. These limits do not affect \code{\link[=as.data.frame.TrialCompariso
 The object invisibly, or knitr Markdown output when requested.
 }
 \description{
-Prints a compact overview of a trial comparison.
+Prints a compact overview of a trial comparison using descriptive parameter captions.
 }

@@ -30,7 +30,7 @@ Extracts a contained comparison object by name or position.
 \code{$} accesses named comparison objects while preserving public R6 members.
 }
 \details{
-Duplicate names select the first occurrence. Numeric positions refer to the
+Object names are unique. Numeric positions refer to the
 stored object order. R6 members take precedence for \code{$}: \code{x$add} is the method
 even when an object is named "add"; use \code{x[["add"]]} to select that object.
 \code{[[} selects contained objects first and falls back to existing R6 members for

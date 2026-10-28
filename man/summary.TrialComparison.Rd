@@ -43,3 +43,16 @@ the compared object types.
 \description{
 Summarizes differences between the object profiles in a trial comparison.
 }
+\details{
+Parameter captions are resolved separately for each original object, including
+its design when a parameter comes from that design. \code{parameterInfo$paramName}
+retains the original column names; \code{paramCaption} contains the display label
+and \code{paramCaptions} contains captions in object order (NA for absent parameters).
+These captions are captured with the summary. Distinct object-specific captions
+are shown together and identified alongside the corresponding object labels;
+they do not change exact value-profile grouping. Unnamed entries are labelled
+by their calculation or design type and collection position. The overview and
+these type labels are captured with the summary. The legend explains exact
+profile comparison and mentions NA only when displayed profiles contain
+missing values.
+}

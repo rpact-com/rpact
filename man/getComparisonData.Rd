@@ -34,7 +34,10 @@ into a data frame without recalculating or modifying the objects.
 \details{
 Each object receives an \code{objectNumber}, repeated for all its rows. Plans and
 simulation results are supplemented with their associated design parameters,
-matched by analysis stage. The situation column numbers rows within each stage. Columns are matched by technical names; missing
+matched by analysis stage. For fixed designs and results based on them,
+\code{kMax} and \code{stages} identify the single stage as 1, even when omitted by the
+individual data-frame methods. The situation column numbers rows within each
+stage. Columns are matched by technical names; missing
 values are filled with \code{NA}. \code{sampleSizes} is harmonized to \code{numberOfSubjects}
 when this does not overwrite another column. Conflicting non-numeric column
 types are represented as character values. No master design or automatic

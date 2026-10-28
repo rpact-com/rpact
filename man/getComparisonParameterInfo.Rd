@@ -41,7 +41,10 @@ levels. They are recorded in hasMissingValues. Thus a column containing one
 value and NA is constant among observed values; it is not identical to a
 complete column. Empty columns are constant but are not single-valued.
 Numeric character columns are recognized when every observed entry is a
-signed decimal or scientific numeric literal. dataType records the original
+signed decimal or scientific numeric literal, or a comma-separated sequence
+of these literals as exported for vector-valued parameters. Every token must
+be numeric; incomplete or mixed text sequences remain character. Original
+cell values are retained without parsing them as R code. dataType records the original
 first class; paramType records the inferred plotting type. Finite, exactly
 integral numeric values are classified as integer without integer coercion.
 Factors and date/time classes retain their types. isFactor describes eligibility

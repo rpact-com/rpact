@@ -28,31 +28,33 @@ NULL
 #' @details
 #' The comparison retains references to its objects. Changes to an original
 #' object are reflected in subsequent comparisons; no comparison data are cached.
-#' `$getObjects()` returns the named list of references. Replacing entries in
+#' `$getObjects()` and [getObjects()] return the named list of references. Replacing entries in
 #' that returned list does not change the comparison. `length()` is the number
 #' of objects and `names()` returns their supplied names (or `NULL`). Retrieve
 #' contained objects using `comparison[[i]]`, `comparison[["name"]]` or
 #' `comparison$name`. R6 members take precedence for `$`; use `[[` to retrieve
 #' an object whose name coincides with a member such as `add`. Unknown names
-#' return NULL, and duplicate names select the first object. The [fetch.TrialComparison()]
+#' return NULL. The [fetch.TrialComparison()]
 #' method provides the same object access through `fetch(comparison, name)` or
 #' `fetch(comparison, position)`.
 #' Lists and comparisons are recursively expanded in their original order.
 #' Names on individual objects are retained; container names are discarded.
-#' Duplicate objects and names are retained. `getComparison()` creates an empty
-#' comparison. Its data frame has zero rows and columns, and plotting requires
+#' Supplied non-empty names must be unique across the expanded collection;
+#' duplicate names raise an error. Unnamed entries and repeated references to
+#' the same object are allowed. getComparison() creates an empty comparison.
+#' Its data frame has zero rows and columns, and plotting requires
 #' numeric data to be added first.
 #'
 #' `comparison$add(..., objects = NULL)` appends objects with the same input
 #' rules and returns the comparison invisibly, supporting chaining. All new
-#' entries are validated before the stored list is changed. Adding another
+#' entries are validated before the stored list is changed, including name
+#' collisions with existing objects. Adding another
 #' comparison copies its current list of references; subsequent additions to that
 #' source comparison do not affect the target. Existing summary objects remain
 #' snapshots; call `summary()` again after changing the collection.
 #'
 #' `comparison$delete(index)` removes one object by its positive integer position
-#' or exact name and returns the comparison invisibly. Duplicate names select
-#' the first occurrence; use a position to delete another occurrence. Invalid
+#' or exact name and returns the comparison invisibly. Invalid
 #' positions or unknown names raise an error without changing the collection.
 #' Removing the last object leaves an empty comparison, which can be filled again.
 #' Names and order of remaining objects are retained; positions are renumbered.
@@ -81,8 +83,8 @@ NULL
 #' print(comparison)
 #' summary(comparison)
 #' head(as.data.frame(comparison))
-#' combined <- getComparison(comparison, fixed = getDesignFixed(alpha = 0.05))
-#' combined$add(list(getDesignFixed(alpha = 0.01)), objects = comparison)
+#' combined <- getComparison(comparison, other = getDesignFixed(alpha = 0.05))
+#' combined$add(list(getDesignFixed(alpha = 0.01)))
 #' empty <- getComparison()
 #' empty$add(getDesignFixed())
 #' combined$delete(1)
@@ -94,7 +96,7 @@ NULL
 #' @export
 #'
 getComparison <- function(..., objects = NULL) {
-    TrialComparison$new(.collectComparisonObjects(list(...), objects))
+    return(TrialComparison$new(.collectComparisonObjects(list(...), objects)))
 }
 
 .collectComparisonObjects <- function(arguments, objects = NULL) {
@@ -110,12 +112,35 @@ getComparison <- function(..., objects = NULL) {
             entries <- .collectComparisonObjects(object)
         } else {
             # Subsetting keeps an individual object's supplied name, including
-            # duplicate or empty names. Container names do not rename its leaves.
+            # empty names. Container names do not rename its leaves.
             entries <- arguments[i]
         }
         result <- c(result, entries)
     }
     result
+}
+
+.assertComparisonObjectNames <- function(objects, functionName) {
+    objectNames <- names(objects)
+    suppliedNames <- objectNames[!is.na(objectNames) & nzchar(objectNames)]
+    duplicateNames <- unique(suppliedNames[duplicated(suppliedNames)])
+    if (length(duplicateNames) == 0) {
+        return(invisible())
+    }
+
+    stopConflictingArguments(
+        "Object names must be unique; duplicate names: ",
+        paste(.sQuote(duplicateNames), collapse = ", "), ".",
+        functionName = functionName,
+        parameter = "objects",
+        value = objectNames,
+        constraint = "non-empty, non-missing object names must be unique",
+        diagnosticId = "comparison.object_names_duplicated",
+        context = list(
+            duplicateNames = duplicateNames,
+            objectPositions = which(objectNames %in% duplicateNames)
+        )
+    )
 }
 
 .getTrialComparisonData <- function(objects, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE) {
@@ -126,6 +151,58 @@ getComparison <- function(..., objects = NULL) {
     }
     getComparisonData(objects, niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters)
+}
+
+#'
+#' @title
+#' Get Objects from a Collection
+#'
+#' @description
+#' S3 generic for retrieving the objects contained in a collection.
+#' The `TrialComparison` method delegates to `$getObjects()`.
+#'
+#' @param x An object supporting a `getObjects()` method, such as a `TrialComparison`.
+#' @param ... Further arguments. Currently unused for `TrialComparison`.
+#'
+#' @return For `TrialComparison`, the list of contained objects in their stored
+#'   order, retaining supplied names, or an empty list for an empty comparison.
+#'
+#' @details
+#' The returned list contains references to the original R6 objects. Changing
+#' a contained object affects subsequent comparisons. Replacing or removing
+#' entries in the returned list does not change the comparison's membership;
+#' use [add()] and [delete()] to modify the collection.
+#'
+#' @seealso
+#' [getComparison()], [fetch.TrialComparison()]
+#'
+#' @examples
+#' comparison <- getComparison(fixed = getDesignFixed(),
+#'     sequential = getDesignGroupSequential(kMax = 2))
+#' objects <- comparison |> getObjects()
+#' names(objects)
+#' identical(objects$fixed, comparison$fixed)
+#'
+#' @export
+#'
+getObjects <- function(x, ...) {
+    UseMethod("getObjects")
+}
+
+#'
+#' @title
+#' Get Objects from a Collection
+#'
+#' @description
+#' The `TrialComparison` method returns the list of contained objects.
+#'
+#' @rdname getObjects
+#'
+#' @export
+#'
+getObjects.TrialComparison <- function(x, ...) {
+    .warnInCaseOfUnknownArguments(functionName = "getObjects.TrialComparison", ...)
+    return(x$getObjects())
 }
 
 #'
@@ -178,8 +255,8 @@ add.TrialComparison <- function(x, ...) x$add(...)
 #'
 #' @param x An object supporting a `delete()` method, such as a `TrialComparison`.
 #' @param ... For `TrialComparison`, exactly one `index`, supplied by position
-#'   or name: a positive integer position or an exact object name. Duplicate
-#'   names select the first occurrence. Invalid selections leave the comparison
+#'   or name: a positive integer position or an exact object name.
+#'   Invalid selections leave the comparison
 #'   unchanged. Removing the last object leaves an empty comparison.
 #'
 #' @return The modified comparison invisibly for `TrialComparison`.
@@ -231,6 +308,7 @@ TrialComparison <- R6::R6Class("TrialComparison",
     public = list(
         initialize = function(objects = list()) {
             objects <- .collectComparisonObjects(list(objects))
+            .assertComparisonObjectNames(objects, functionName = "TrialComparison$initialize")
             # Reuse the comparison validation, without storing a table.
             .getTrialComparisonData(objects)
             super$initialize()
@@ -244,6 +322,7 @@ TrialComparison <- R6::R6Class("TrialComparison",
             }
             combined <- c(private$.objects, additions)
             # Validate the complete candidate before changing the stored list.
+            .assertComparisonObjectNames(combined, functionName = "TrialComparison$add")
             .getTrialComparisonData(combined)
             private$.objects <- combined
             invisible(self)
@@ -360,7 +439,7 @@ names.TrialComparison <- function(x) names(x$getObjects())
 #' @return The contained object by reference, or NULL for an unknown name.
 #'
 #' @details
-#' Duplicate names select the first occurrence. Numeric positions refer to the
+#' Object names are unique. Numeric positions refer to the
 #' stored object order. R6 members take precedence for `$`: `x$add` is the method
 #' even when an object is named "add"; use `x[["add"]]` to select that object.
 #' `[[` selects contained objects first and falls back to existing R6 members for
@@ -461,8 +540,8 @@ names.TrialComparison <- function(x) names(x$getObjects())
 #'   consequently "labeled" and "named" are equivalent for comparisons.
 #'
 #' @return A contained object by reference or a list of objects. An unknown name
-#'   returns NULL (retained as a NULL entry in list output). Duplicate names
-#'   select the first occurrence. Empty selector vectors return an empty list.
+#'   returns NULL (retained as a NULL entry in list output).
+#'   Empty selector vectors return an empty list.
 #'
 #' @details
 #' `fetch(x, "fixed")`, `fetch(x, fixed)` and `fetch(x, 1)` provide the named and
@@ -660,6 +739,78 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
     "Results and derived parameters"
 }
 
+.comparisonObjectType <- function(object, startWithUpperCase = TRUE) {
+    label <- object$.toString(startWithUpperCase = FALSE)
+    if (inherits(object, "TrialDesignPlan") && !inherits(object, "SimulationResults")) {
+        label <- paste(.formatCamelCase(object$.objectType), label)
+    }
+    if (startWithUpperCase) {
+        label <- .firstCharacterToUpperCase(label)
+    }
+    return(label)
+}
+
+.comparisonOverview <- function(objects) {
+    if (!length(objects)) {
+        return("Empty trial comparison.")
+    }
+    types <- vapply(objects, .comparisonObjectType, character(1), startWithUpperCase = FALSE)
+    if (length(unique(types)) == 1L &&
+            all(vapply(objects, inherits, logical(1), "TrialDesignPlan")) &&
+            !any(vapply(objects, inherits, logical(1), "SimulationResults"))) {
+        return(paste0("Comparison of ", length(objects), " ", types[1L],
+            if (length(objects) == 1L) {
+                " calculation."
+            } else {
+                " calculations."
+            }))
+    }
+    distinct <- unique(types)
+    description <- ""
+    for (type in head(distinct, 3L)) {
+        description <- .concatenateSummaryText(description, .comparisonText(type, 65L))
+    }
+    if (length(distinct) > 3L) {
+        description <- .concatenateSummaryText(description, "...")
+    }
+    return(paste0("Comparison of ", length(objects), " trial planning ",
+        if (length(objects) == 1L) {
+            "result: "
+        } else {
+            "results: "
+        }, description, "."))
+}
+
+.comparisonCaption <- function(parameter, object = NULL) {
+    if (!is.null(object) && !parameter %in% c(.comparisonScope, .comparisonIdentifiers)) {
+        if (!parameter %in% names(object)) {
+            design <- .getTrialDesign(object)
+            if (is.null(design) || !parameter %in% names(design)) {
+                return(NA_character_)
+            }
+            object <- design
+        }
+    }
+    caption <- .getParameterCaption(parameter, obj = object, tableOutputEnabled = FALSE)
+    if (is.null(caption) || length(caption) != 1L || is.na(caption) || !nzchar(caption)) {
+        caption <- C_TABLE_COLUMN_NAMES[[parameter]]
+    }
+    if (is.null(caption) || length(caption) != 1L || is.na(caption) || !nzchar(caption)) {
+        caption <- switch(parameter,
+            objectType = "Object type", endpoint = "Endpoint", calculationTarget = "Calculation target",
+            situation = "Situation", stage = "Stage", parameter)
+    }
+    return(caption)
+}
+
+.comparisonCaptionLabel <- function(parameter, captions) {
+    captions <- unique(captions[!is.na(captions) & nzchar(captions)])
+    if (!length(captions)) {
+        return(.comparisonCaption(parameter))
+    }
+    return(paste(captions, collapse = " / "))
+}
+
 .comparisonProfile <- function(data, parameter) {
     values <- data[[parameter]]
     if (length(unique(values)) <= 1L) {
@@ -700,6 +851,16 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
     })
     info$nProfiles <- vapply(groups, function(group) length(unique(group)), integer(1))
     info$role <- vapply(info$paramName, function(parameter) .comparisonRole(objects, parameter), "")
+    # Capture object-specific captions separately: captions must not participate
+    # in exact value-profile grouping or change when a summary is printed later.
+    info$paramCaptions <- lapply(info$paramName, function(parameter) {
+        vapply(objects, function(item) {
+            .comparisonCaption(parameter, item)
+        }, character(1))
+    })
+    info$paramCaption <- vapply(seq_len(nrow(info)), function(i) {
+        .comparisonCaptionLabel(info$paramName[i], info$paramCaptions[[i]])
+    }, character(1))
     info$profiles <- profiles
     info$profileGroups <- groups
     rownames(info) <- NULL
@@ -711,7 +872,7 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
 #' Print a Trial Comparison
 #'
 #' @description
-#' Prints a compact overview of a trial comparison.
+#' Prints a compact overview of a trial comparison using descriptive parameter captions.
 #'
 #' @param x A `TrialComparison`.
 #' @param ... Further arguments. Currently unused.
@@ -751,28 +912,56 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
     info <- getComparisonParameterInfo(data)
     getComparisonParameterDescriptions(info[FALSE, ], digits = digits) # Validate display precision.
     object$.resetCat()
-    emit <- function(...) object$.cat(..., consoleOutputEnabled = consoleOutputEnabled)
-    object$.cat("Trial comparison\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
+    emit <- function(...) {
+        object$.cat(..., consoleOutputEnabled = consoleOutputEnabled)
+    }
+    indent <- if (consoleOutputEnabled) {
+        "    "
+    } else {
+        "  "
+    }
+
+    object$.cat("Trial comparison\n\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
     emit(length(object), " objects; ", nrow(data), " comparison rows; ", ncol(data), " columns.\n")
-    types <- table(vapply(object$getObjects(), function(item) class(item)[1L], ""))
-    for (i in seq_len(min(length(types), maxTypes))) {
-        emit("  ", .comparisonText(names(types)[i], 55L), ": ", types[i], "\n")
+
+    types <- table(vapply(object$getObjects(), function(item) {
+        .comparisonObjectType(item)
+    }, ""))
+    typeLabels <- .comparisonText(head(names(types), maxTypes), 55L)
+    typeWidth <- max(c(0L, nchar(typeLabels)))
+    if (length(types)) {
+        emit("\n")
+        object$.cat("Object types:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+    }
+    for (i in seq_along(typeLabels)) {
+        emit(indent, sprintf("%-*s : %s", typeWidth, typeLabels[i], types[i]), "\n")
     }
     if (length(types) > maxTypes) {
-        emit("  ... ", length(types) - maxTypes, " more object types.\n")
+        emit(indent, "... ", length(types) - maxTypes, " more object types.\n")
     }
+
     metrics <- intersect(c("kMax", "alpha", "beta", "maxNumberOfSubjects", "maxNumberOfEvents",
         "nFixed", "overallReject", "expectedNumberOfSubjects", "expectedNumberOfEvents", "studyDuration"), info$paramName[!info$isEmpty])
+    shownMetrics <- head(metrics, maxMetrics)
+    metricCaptions <- vapply(shownMetrics, function(parameter) {
+        captions <- vapply(object$getObjects(), function(item) {
+            .comparisonCaption(parameter, item)
+        }, character(1))
+        .comparisonText(.comparisonCaptionLabel(parameter, captions), 65L)
+    }, character(1))
+    metricWidth <- max(c(0L, nchar(metricCaptions)))
     if (length(metrics)) {
-        emit("Observed metrics (across objects, stages and situations):\n")
+        emit("\n")
+        object$.cat("Observed metrics (across objects, stages and situations):\n",
+            heading = 2, consoleOutputEnabled = consoleOutputEnabled)
     }
-    for (parameter in head(metrics, maxMetrics)) {
+    for (parameter in shownMetrics) {
         row <- info[info$paramName == parameter, , drop = FALSE]
         values <- row$values[[1L]]
         if (is.numeric(values) && length(values) > 1L) {
             values <- range(values)
         }
-        emit("  ", parameter, ": ", .comparisonPreview(values, digits = digits),
+        emit(indent, sprintf("%-*s : %s", metricWidth, metricCaptions[[parameter]], .comparisonPreview(values, digits = digits)),
             if (row$hasMissingValues) {
                 " (missing values present)"
             } else {
@@ -780,11 +969,18 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
             }, "\n")
     }
     if (length(metrics) > maxMetrics) {
-        emit("  ... ", length(metrics) - maxMetrics, " more observed metrics.\n")
+        emit(indent, "... ", length(metrics) - maxMetrics, " more observed metrics.\n")
     }
-    emit("Use summary(x) for differences; as.data.frame(x) for all data;\n",
-        "plot(x, xParamName = ..., yParamName = ...) for plots; x$getObjects() for objects.\n")
-    invisible(object)
+
+    emit("\n")
+    object$.cat("Available operations:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+    operations <- c("summary(x)", "as.data.frame(x)", "plot(x, xParamName = ..., yParamName = ...)", "getObjects(x)")
+    descriptions <- c("Compare differences", "Access all data", "Plot selected parameters", "Access contained objects")
+    operationWidth <- max(nchar(operations))
+    for (i in seq_along(operations)) {
+        emit(indent, sprintf("%-*s : %s", operationWidth, operations[i], descriptions[i]), "\n")
+    }
+    return(invisible(object))
 }
 
 #'
@@ -810,6 +1006,19 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
 #'   an underlying object. Input roles take precedence when roles differ across
 #'   the compared object types.
 #'
+#' @details
+#' Parameter captions are resolved separately for each original object, including
+#' its design when a parameter comes from that design. `parameterInfo$paramName`
+#' retains the original column names; `paramCaption` contains the display label
+#' and `paramCaptions` contains captions in object order (NA for absent parameters).
+#' These captions are captured with the summary. Distinct object-specific captions
+#' are shown together and identified alongside the corresponding object labels;
+#' they do not change exact value-profile grouping. Unnamed entries are labelled
+#' by their calculation or design type and collection position. The overview and
+#' these type labels are captured with the summary. The legend explains exact
+#' profile comparison and mentions NA only when displayed profiles contain
+#' missing values.
+#'
 #' @export
 #'
 summary.TrialComparison <- function(object, ..., digits = NA_integer_, maxParameters = 12L,
@@ -831,6 +1040,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         .limits = NULL,
         .digits = NULL,
         .objectNames = NULL,
+        .objectTypes = NULL,
+        .overview = NULL,
         .numberOfObjects = NULL,
         initialize = function(object, info, limits, digits, output) {
             super$initialize(object = object, output = output)
@@ -838,6 +1049,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             self$.limits <- limits
             self$.digits <- digits
             self$.objectNames <- names(object)
+            self$.objectTypes <- vapply(object$getObjects(), .comparisonObjectType, character(1))
+            self$.overview <- .comparisonOverview(object$getObjects())
             self$.numberOfObjects <- length(object)
         },
         .show = function(..., consoleOutputEnabled = TRUE) {
@@ -849,21 +1062,50 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 
 .showTrialComparisonSummary <- function(summary, consoleOutputEnabled) {
     summary$.resetCat()
-    emit <- function(...) summary$.cat(..., consoleOutputEnabled = consoleOutputEnabled)
+    emit <- function(...) {
+        summary$.cat(..., consoleOutputEnabled = consoleOutputEnabled)
+    }
+    parameterIndent <- if (consoleOutputEnabled) {
+        "    "
+    } else {
+        ""
+    }
+    profileIndent <- if (consoleOutputEnabled) {
+        "        "
+    } else {
+        "  "
+    }
     info <- summary$parameterInfo
     limits <- summary$.limits
     different <- which(info$nProfiles > 1L)
     common <- which(info$nProfiles == 1L & !info$isEmpty)
     empty <- which(info$nProfiles == 1L & info$isEmpty)
     if (summary$output %in% c("all", "title")) {
-        summary$.cat("Trial comparison summary\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
+        summary$.cat("Trial comparison summary\n\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
     }
     if (summary$output %in% c("all", "overview")) {
-        emit(summary$.numberOfObjects, " objects: ", length(different), " differing parameters; ",
-            length(common), " shared parameters/profiles; ", length(empty), " empty parameters.\n")
-        emit("Stage/situation profiles are compared exactly; NA means missing/unavailable.\n")
+        emit(paste(strwrap(summary$.overview, width = 100L), collapse = "\n"), "\n")
+        overview <- .concatenateSummaryText(
+            paste("The comparison identifies", length(different), if (length(different) == 1L) {
+                "differing parameter"
+            } else {
+                "differing parameters"
+            }),
+            paste(length(common), if (length(common) == 1L) {
+                "shared parameter or profile"
+            } else {
+                "shared parameters or profiles"
+            }), sep = " and ")
+        if (length(empty)) {
+            overview <- paste0(overview, ". ", length(empty), if (length(empty) == 1L) {
+                " parameter is empty"
+            } else {
+                " parameters are empty"
+            })
+        }
+        emit(paste(strwrap(paste0(overview, "."), width = 100L), collapse = "\n"), "\n")
         if (length(common)) {
-            emit("Shared (examples): ", paste(head(info$paramName[common], 6L), collapse = ", "),
+            emit("Shared (examples): ", .comparisonText(paste(head(info$paramCaption[common], 6L), collapse = ", "), 130L),
                 if (length(common) > 6L) {
                     ", ..."
                 } else {
@@ -875,74 +1117,130 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         return(invisible(summary))
     }
     if (!length(different)) {
-        emit("No parameter differences between the objects.\n")
+        emit("\nNo parameter differences between the objects.\n")
     }
     roles <- c("Object types and scope", "Inputs and design settings", "Results and derived parameters")
-    ordered <- unlist(lapply(roles, function(role) different[info$role[different] == role]), use.names = FALSE)
+    ordered <- unlist(lapply(roles, function(role) {
+        different[info$role[different] == role]
+    }), use.names = FALSE)
     # Share the display budget across sections so a long input list cannot hide
     # every result difference. Within each section preserve source-column order.
-    sections <- lapply(roles, function(role) different[info$role[different] == role])
+    sections <- lapply(roles, function(role) {
+        different[info$role[different] == role]
+    })
     interleaved <- unlist(lapply(seq_len(max(c(0L, lengths(sections)))), function(position) {
-        unlist(lapply(sections, function(indices) indices[position][!is.na(indices[position])]), use.names = FALSE)
+        unlist(lapply(sections, function(indices) {
+            indices[position][!is.na(indices[position])]
+        }), use.names = FALSE)
     }), use.names = FALSE)
     shown <- head(interleaved, limits$maxParameters)
+    shownNA <- FALSE
+    sectionStarted <- summary$output == "all"
     for (role in roles) {
         indices <- shown[info$role[shown] == role]
         if (!length(indices)) {
             next
         }
-        summary$.cat(paste0(role, "\n"), heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+        if (sectionStarted) {
+            emit("\n")
+        }
+        summary$.cat(paste0(role, ":\n"), heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+        sectionStarted <- TRUE
         for (i in indices) {
             row <- info[i, , drop = FALSE]
             # The common descriptions supply type/role labels, without unbounded values.
             labelInfo <- row
             labelInfo$isBinary <- labelInfo$isSingleValue <- FALSE
             labelInfo$values <- list(character())
+            labelInfo$paramName <- row$paramCaption
             description <- getComparisonParameterDescriptions(labelInfo, digits = summary$.digits)
-            emit(.comparisonText(description, 75L), " [", row$nProfiles, " profiles]\n")
+            if (!consoleOutputEnabled) {
+                description <- sub(": ", " - ", description, fixed = TRUE)
+            }
+            emit("\n")
+            summary$.cat(parameterIndent, .comparisonText(description, 75L), " [", row$nProfiles, " profiles]\n",
+                heading = 3, consoleOutputEnabled = consoleOutputEnabled)
             groups <- row$profileGroups[[1L]]
             for (group in seq_len(min(row$nProfiles, limits$maxProfiles))) {
                 members <- which(groups == group)
                 ids <- head(members, limits$maxObjects)
-                labels <- as.character(ids)
+                labels <- paste(.comparisonText(summary$.objectTypes[ids], 40L), ids)
+                named <- rep(FALSE, length(ids))
                 if (!is.null(summary$.objectNames)) {
-                    names <- summary$.objectNames[ids]
-                    named <- !is.na(names) & nzchar(names)
-                    labels[named] <- paste0(ids[named], " (", .comparisonText(names[named], 18L), ")")
+                    objectNames <- summary$.objectNames[ids]
+                    named <- !is.na(objectNames) & nzchar(objectNames)
+                    labels[named] <- .comparisonText(objectNames[named], 18L)
+                }
+                captions <- row$paramCaptions[[1L]]
+                variedCaptions <- length(unique(stats::na.omit(captions))) > 1L
+                if (variedCaptions) {
+                    hasCaption <- !is.na(captions[ids]) & nzchar(captions[ids])
+                    labels[hasCaption] <- paste0(labels[hasCaption], " (", captions[ids[hasCaption]], ")")
                 }
                 membersText <- paste(labels, collapse = ", ")
+                if (!variedCaptions && !any(named) && length(members) > 1L) {
+                    if (length(unique(summary$.objectTypes[ids])) == 1L) {
+                        membersText <- paste(.comparisonText(summary$.objectTypes[ids[1L]], 40L),
+                            paste(ids, collapse = ", "))
+                    }
+                }
                 if (length(members) > limits$maxObjects) {
-                    membersText <- paste0(
-                        membersText,
-                        ", ... (+", length(members) - limits$maxObjects, " objects)"
-                    )
+                    omitted <- length(members) - limits$maxObjects
+                    omittedLabel <- if (omitted == 1L) {
+                        "object"
+                    } else {
+                        "objects"
+                    }
+                    membersText <- paste0(membersText, ", ... (+", omitted, " ", omittedLabel, ")")
+                }
+                if (variedCaptions) {
+                    membersText <- .comparisonText(membersText, 80L)
                 }
                 profile <- row$profiles[[1L]][[members[1L]]]
                 keys <- setdiff(names(profile), "value")
+                shownNA <- shownNA || anyNA(head(profile$value, limits$maxValues)) ||
+                    any(vapply(keys, function(key) {
+                        anyNA(head(profile[[key]], limits$maxValues))
+                    }, logical(1)))
                 values <- .comparisonPreview(profile$value, limits$maxValues, summary$.digits, row$values[[1L]])
                 if (length(keys)) {
-                    positions <- vapply(keys, function(key) paste0(key, "=",
-                        .comparisonPreview(profile[[key]], limits$maxValues)), "")
+                    positions <- vapply(keys, function(key) {
+                        paste0(.comparisonCaption(key), " = ", .comparisonPreview(profile[[key]], limits$maxValues))
+                    }, "")
                     values <- paste0("[", paste(positions, collapse = "; "), "] ", values)
                 }
-                emit("  ", .comparisonText(values, 85L), " -> objects ", membersText, "\n")
+                emit(profileIndent, membersText, ": ", .comparisonText(values, 85L), "\n")
             }
             if (row$nProfiles > limits$maxProfiles) {
-                emit("  ... ", row$nProfiles - limits$maxProfiles, " more profiles.\n")
+                emit(profileIndent, "... ", row$nProfiles - limits$maxProfiles, " more profiles.\n")
             }
         }
     }
+    emit("\n")
     if (length(ordered) > length(shown)) {
         emit(
             "... ", length(ordered) - length(shown),
             " more differing parameters; increase maxParameters.\n"
         )
     }
-    if (!is.na(summary$.digits)) {
-        emit("Display values are rounded; profile comparisons use exact values.\n")
+    if (length(shown)) {
+        summary$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+        legendIndent <- if (consoleOutputEnabled) {
+            parameterIndent
+        } else {
+            profileIndent
+        }
+        emit(legendIndent, "Profiles compare exact values at each stage and situation.\n")
+        if (shownNA) {
+            emit(legendIndent, "NA: missing/unavailable.\n")
+        }
+        if (!is.na(summary$.digits)) {
+            emit(legendIndent, "Display values are rounded.\n")
+        }
+        emit("\n")
     }
     emit("Full data: as.data.frame(x). Exact profiles: summary(x)$parameterInfo.\n")
-    invisible(summary)
+    return(invisible(summary))
 }
 
 #'

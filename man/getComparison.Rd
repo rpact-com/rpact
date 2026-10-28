@@ -35,31 +35,33 @@ plans, and simulation results without recalculating them.
 \details{
 The comparison retains references to its objects. Changes to an original
 object are reflected in subsequent comparisons; no comparison data are cached.
-\verb{$getObjects()} returns the named list of references. Replacing entries in
+\verb{$getObjects()} and \code{\link[=getObjects]{getObjects()}} return the named list of references. Replacing entries in
 that returned list does not change the comparison. \code{length()} is the number
 of objects and \code{names()} returns their supplied names (or \code{NULL}). Retrieve
 contained objects using \code{comparison[[i]]}, \code{comparison[["name"]]} or
 \code{comparison$name}. R6 members take precedence for \code{$}; use \code{[[} to retrieve
 an object whose name coincides with a member such as \code{add}. Unknown names
-return NULL, and duplicate names select the first object. The \code{\link[=fetch.TrialComparison]{fetch.TrialComparison()}}
+return NULL. The \code{\link[=fetch.TrialComparison]{fetch.TrialComparison()}}
 method provides the same object access through \code{fetch(comparison, name)} or
 \code{fetch(comparison, position)}.
 Lists and comparisons are recursively expanded in their original order.
 Names on individual objects are retained; container names are discarded.
-Duplicate objects and names are retained. \code{getComparison()} creates an empty
-comparison. Its data frame has zero rows and columns, and plotting requires
+Supplied non-empty names must be unique across the expanded collection;
+duplicate names raise an error. Unnamed entries and repeated references to
+the same object are allowed. getComparison() creates an empty comparison.
+Its data frame has zero rows and columns, and plotting requires
 numeric data to be added first.
 
 \code{comparison$add(..., objects = NULL)} appends objects with the same input
 rules and returns the comparison invisibly, supporting chaining. All new
-entries are validated before the stored list is changed. Adding another
+entries are validated before the stored list is changed, including name
+collisions with existing objects. Adding another
 comparison copies its current list of references; subsequent additions to that
 source comparison do not affect the target. Existing summary objects remain
 snapshots; call \code{summary()} again after changing the collection.
 
 \code{comparison$delete(index)} removes one object by its positive integer position
-or exact name and returns the comparison invisibly. Duplicate names select
-the first occurrence; use a position to delete another occurrence. Invalid
+or exact name and returns the comparison invisibly. Invalid
 positions or unknown names raise an error without changing the collection.
 Removing the last object leaves an empty comparison, which can be filled again.
 Names and order of remaining objects are retained; positions are renumbered.
@@ -88,8 +90,8 @@ comparison <- getComparison(list(
 print(comparison)
 summary(comparison)
 head(as.data.frame(comparison))
-combined <- getComparison(comparison, fixed = getDesignFixed(alpha = 0.05))
-combined$add(list(getDesignFixed(alpha = 0.01)), objects = comparison)
+combined <- getComparison(comparison, other = getDesignFixed(alpha = 0.05))
+combined$add(list(getDesignFixed(alpha = 0.01)))
 empty <- getComparison()
 empty$add(getDesignFixed())
 combined$delete(1)

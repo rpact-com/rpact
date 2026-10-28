@@ -33,7 +33,10 @@
 #' @details
 #' Each object receives an `objectNumber`, repeated for all its rows. Plans and
 #' simulation results are supplemented with their associated design parameters,
-#' matched by analysis stage. The situation column numbers rows within each stage. Columns are matched by technical names; missing
+#' matched by analysis stage. For fixed designs and results based on them,
+#' `kMax` and `stages` identify the single stage as 1, even when omitted by the
+#' individual data-frame methods. The situation column numbers rows within each
+#' stage. Columns are matched by technical names; missing
 #' values are filled with `NA`. `sampleSizes` is harmonized to `numberOfSubjects`
 #' when this does not overwrite another column. Conflicting non-numeric column
 #' types are represented as character values. No master design or automatic
@@ -82,6 +85,16 @@ getComparisonData <- function(
             niceColumnNamesEnabled = FALSE,
             includeAllParameters = includeAllParameters
         )
+        design <- if (inherits(obj, "TrialDesign")) {
+            obj
+        } else {
+            obj$.design
+        }
+        if (inherits(design, "TrialDesignFixed")) {
+            # Fixed-design data-frame methods omit these known design coordinates.
+            df$kMax <- rep(design$kMax, nrow(df))
+            df$stages <- rep(1L, nrow(df))
+        }
         if (!inherits(obj, "TrialDesign")) {
             designData <- as.data.frame(obj$.design,
                 niceColumnNamesEnabled = FALSE,
