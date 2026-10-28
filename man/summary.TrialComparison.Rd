@@ -54,5 +54,7 @@ they do not change exact value-profile grouping. Unnamed entries are labelled
 by their calculation or design type and collection position. The overview and
 these type labels are captured with the summary. The legend explains exact
 profile comparison and mentions NA only when displayed profiles contain
-missing values.
+missing values. Titles distinguish designs, sample size calculations, power
+calculations, and power simulations. Mixed comparisons use a design plan
+comparison title; empty comparisons retain the general trial comparison title.
 }

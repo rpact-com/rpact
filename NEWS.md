@@ -27,6 +27,8 @@
 
 ## Improvements, issues, and changes
 
+* Comparison titles now distinguish designs, sample size calculations, power calculations and power simulations. Mixed comparisons use "Design plan comparison"; summary titles add "summary" and are captured with the summary snapshot.
+
 * Comparison data now includes `kMax = 1` and `stages = 1` for fixed designs and calculations based on them, making their known stage coordinates available to plots and summaries.
 
 * Trial comparison summaries now introduce the compared calculation or design types in full sentences and use those types to label unnamed entries. Exact-comparison and missing-value explanations appear in a contextual legend. Numeric type inference also recognizes strictly numeric comma-separated vector cells without altering their stored values.

@@ -739,6 +739,39 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
     "Results and derived parameters"
 }
 
+.getTrialComparisonTitle <- function(objects, summaryEnabled = FALSE) {
+    categories <- vapply(objects, function(object) {
+        if (inherits(object, "SimulationResults")) {
+            return("Power simulation")
+        }
+        if (inherits(object, "TrialDesign")) {
+            return("Design")
+        }
+        if (inherits(object, "TrialDesignPlan")) {
+            if (object$.isSampleSizeObject()) {
+                return("Sample size calculation")
+            }
+            if (object$.isPowerObject()) {
+                return("Power calculation")
+            }
+        }
+        return("Design plan")
+    }, character(1))
+    categories <- unique(categories)
+    category <- if (!length(categories)) {
+        "Trial"
+    } else if (length(categories) == 1L) {
+        categories[[1L]]
+    } else {
+        "Design plan"
+    }
+    title <- paste(category, "comparison")
+    if (summaryEnabled) {
+        title <- paste(title, "summary")
+    }
+    return(title)
+}
+
 .comparisonObjectType <- function(object, startWithUpperCase = TRUE) {
     label <- object$.toString(startWithUpperCase = FALSE)
     if (inherits(object, "TrialDesignPlan") && !inherits(object, "SimulationResults")) {
@@ -921,7 +954,8 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
         "  "
     }
 
-    object$.cat("Trial comparison\n\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
+    object$.cat(.getTrialComparisonTitle(object$getObjects()), "\n\n",
+        heading = 1, consoleOutputEnabled = consoleOutputEnabled)
     emit(length(object), " objects; ", nrow(data), " comparison rows; ", ncol(data), " columns.\n")
 
     types <- table(vapply(object$getObjects(), function(item) {
@@ -1017,7 +1051,9 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
 #' by their calculation or design type and collection position. The overview and
 #' these type labels are captured with the summary. The legend explains exact
 #' profile comparison and mentions NA only when displayed profiles contain
-#' missing values.
+#' missing values. Titles distinguish designs, sample size calculations, power
+#' calculations, and power simulations. Mixed comparisons use a design plan
+#' comparison title; empty comparisons retain the general trial comparison title.
 #'
 #' @export
 #'
@@ -1045,6 +1081,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         .numberOfObjects = NULL,
         initialize = function(object, info, limits, digits, output) {
             super$initialize(object = object, output = output)
+            self$title <- .getTrialComparisonTitle(object$getObjects(), summaryEnabled = TRUE)
             self$parameterInfo <- info
             self$.limits <- limits
             self$.digits <- digits
@@ -1081,7 +1118,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     common <- which(info$nProfiles == 1L & !info$isEmpty)
     empty <- which(info$nProfiles == 1L & info$isEmpty)
     if (summary$output %in% c("all", "title")) {
-        summary$.cat("Trial comparison summary\n\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
+        summary$.cat(summary$title, "\n\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
     }
     if (summary$output %in% c("all", "overview")) {
         emit(paste(strwrap(summary$.overview, width = 100L), collapse = "\n"), "\n")
