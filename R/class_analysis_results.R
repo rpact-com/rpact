@@ -1920,7 +1920,7 @@ plot.AnalysisResults <- function(
         ylab = NA_character_,
         legendTitle = NA_character_,
         palette = "Set1",
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
@@ -1978,7 +1978,7 @@ plot.AnalysisResults <- function(
         ylab = NA_character_,
         legendTitle = NA_character_,
         palette = "Set1",
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {

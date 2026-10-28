@@ -261,7 +261,7 @@
         palette = "Set1",
         theta = NA_real_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         designPlanName = NA_character_,
         plotSettings = NULL,
@@ -1115,7 +1115,7 @@
     if (type == 1 && survivalDesignPlanEnabled) {
         p <- .addDecisionCriticalValuesToPlot(p = p, designMaster = designMaster, type = type, nMax = nMax)
     }
-    return(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }
 
 .getSurvivalFunctionPlotCommand <- function(
@@ -1164,7 +1164,7 @@
         xlab = NA_character_,
         ylab = NA_character_,
         palette = "Set1",
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         designPlanName = NA_character_,
         plotSettings = NULL) {
@@ -1613,7 +1613,7 @@ plot.TrialDesignPlan <- function(
         palette = "Set1",
         theta = NA_real_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
@@ -1681,7 +1681,7 @@ plot.TrialDesignPlan <- function(
         palette = "Set1",
         theta = NA_real_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {

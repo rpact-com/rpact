@@ -448,23 +448,33 @@ NULL
 #' @keywords internal
 NULL
 
-#' Parameter Description: Legend Position On Plots
-#' @param legendPosition The position of the legend.
-#'   By default (\code{NA_integer_}) the algorithm tries to find a suitable position.
-#'   Choose one of the following values to specify the position manually:
+#'
+#' @title
+#' Parameter Description: Legend Position on Plots
+#'
+#' @description
+#' Controls automatic or explicit placement of plot legends.
+#'
+#' @param legendPosition The legend position. The default, `"auto"`, measures the
+#'   legend and chooses among six inside positions by minimizing overlap with
+#'   points, line segments, reference lines, bars, boxes, and error bars.
+#'   Long labels are wrapped and entries arranged vertically in automatic mode.
+#'   Oversized legends and faceted plots use the outside right position.
+#'   This heuristic uses the current graphics device (seven inches square when
+#'   no device is open); resizing may require recreating the plot or setting a
+#'   position explicitly. Manual positions are:
 #'   \itemize{
-#'     \item \code{-1}: no legend will be shown
-#'     \item \code{NA}: the algorithm tries to find a suitable position
-#'     \item \code{0}: legend position outside plot
-#'     \item \code{1}: legend position left top
-#'     \item \code{2}: legend position left center
-#'     \item \code{3}: legend position left bottom
-#'     \item \code{4}: legend position right top
-#'     \item \code{5}: legend position right center
-#'     \item \code{6}: legend position right bottom
+#'     \item `-1` or `"none"`: hide the legend
+#'     \item `"left"`, `"right"`, `"bottom"`, `"top"`: outside the plot
+#'     \item `0`: default outside position with a square aspect ratio
+#'     \item `1`, `2`, `3`: inside left, at the top, centre, or bottom
+#'     \item `4`, `5`, `6`: inside right, at the top, centre, or bottom
+#'     \item `NA`: retain the legacy plot-specific positioning rules
 #'   }
+#'
 #' @name param_legendPosition
 #' @keywords internal
+#'
 NULL
 
 #' Parameter Description: Grid (Output Specification Of Multiple Plots)

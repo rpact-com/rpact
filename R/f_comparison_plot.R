@@ -327,6 +327,7 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
             addIssue(paste0("Invalid column selection for '", parameter, "' (", .arrayToString(value, maxLength = 5), ")"),
                 parameter = parameter, 
                 value = value,
+                constraint = constraint,
                 diagnosticId = "comparison.plot_column_invalid",
                 context = list(availableColumns = names(data), invalidColumns = if (is.character(value)) {
                     setdiff(value, names(data))
@@ -534,8 +535,11 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
 #' @param pointBorder Point border style, as used by rpact plots.
 #' @param discreteXAxis Whether numeric x ticks should use the observed values only.
 #' @param mirrorModeEnabled Whether to use fill categories without a legend.
-#' @param legendPosition Legend position, either an rpact numeric position or a
-#'   ggplot position name (none, left, right, bottom, top).
+#' @param legendPosition "auto" (default) selects an inside position with the least
+#'   overlap with points and lines. Alternatively use rpact positions 1 (top left),
+#'   2 (centre left), 3 (bottom left), 4 (top right), 5 (centre right),
+#'   6 (bottom right), -1 (hidden), 0 (default position with square aspect),
+#'   or a ggplot position name (none, left, right, bottom, top).
 #' @param shinyOptimization Whether to use compact sizing for Shiny displays.
 #' @param objects Optional original objects for role-aware selection with a data
 #'   frame, as in [getComparisonPlotParameters()].
@@ -569,6 +573,14 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
 #' caller's data are not modified. Explicitly placing all parameters on the
 #' right uses one primary axis on the right. Parameters assigned to the same
 #' side always share that scale.
+#'
+#' Legend entries are arranged vertically and long labels are wrapped. Automatic
+#' placement measures the combined legend and scores six inside positions against
+#' points and complete line segments in panel coordinates, including secondary-axis
+#' scaling. It is a heuristic, not a guarantee of no overlap. Oversized legends
+#' are placed outside on the right. The choice uses the current graphics device
+#' (seven inches square if none is open); resizing or exporting to another size
+#' may require an explicit position or recreating the plot on that device.
 #'
 #' Interactive converters must preserve the secondary-axis transformation.
 #' A plain `plotly::ggplotly()` conversion may omit the right axis and display
@@ -606,7 +618,7 @@ plotComparison <- function(
         pointBorder = 4,
         discreteXAxis = FALSE,
         mirrorModeEnabled = FALSE,
-        legendPosition = "bottom",
+        legendPosition = "auto",
         shinyOptimization = FALSE,
         objects = NULL,
         yAxisSide = "auto") {
@@ -629,7 +641,7 @@ plotComparison <- function(
     }
     input <- .getComparisonPlotInput(data, objects)
     if (missing(mainTitle)) {
-        mainTitle <- .getTrialComparisonTitle(input$objects)
+        mainTitle <- .toCapitalizedSingleCharacter(.getTrialComparisonTitle(input$objects))
     }
     data <- input$data
     xParamName <- selection$xParamName
@@ -759,11 +771,12 @@ plotComparison <- function(
     }
     
     # set legend
+    automaticLegend <- identical(legendPosition, "auto")
     if ((!categoryEnabled && !groupEnabled && !multipleY) || mirrorModeEnabled || (!is.na(legendPosition) && legendPosition == -1)) {
         p <- p + ggplot2::theme(legend.position = "none")
     } else {
-        if (is.numeric(legendPosition)) {
-            p <- plotSettings$setLegendPosition(p, legendPosition)
+        if (automaticLegend || is.numeric(legendPosition)) {
+            p <- plotSettings$setLegendPosition(p, legendPosition, finalize = FALSE)
         } else {
             if (!legendPosition %in% c("none", "left", "right", "bottom", "top")) {
                 stopIllegalArgument("Invalid legend position",
@@ -833,5 +846,6 @@ plotComparison <- function(
     } else if (multipleY) {
         p <- p + ggplot2::ylab(paste(captions, collapse = " / "))
     }
-    return(p)
+    p <- .preparePlotLegend(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }

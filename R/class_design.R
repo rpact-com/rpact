@@ -1220,7 +1220,7 @@ plot.TrialDesign <- function(
         theta = seq(-1, 1, 0.01),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
@@ -1290,7 +1290,7 @@ plot.TrialDesign <- function(
         theta = seq(-1, 1, 0.01),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {

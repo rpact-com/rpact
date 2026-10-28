@@ -3007,6 +3007,7 @@ DatasetGeneral <- R6::R6Class("DatasetGeneral",
 #' @param xlab The x-axis label, default is \code{"Stage"}.
 #' @param ylab The y-axis label.
 #' @param legendTitle The legend title, default is \code{"Group"}.
+#' @inheritParams param_legendPosition
 #' @inheritParams param_palette
 #' @inheritParams param_showSource
 #' @inheritParams param_plotSettings
@@ -3052,7 +3053,8 @@ plot.Dataset <- function(
         legendTitle = "Group",
         palette = "Set1",
         showSource = FALSE,
-        plotSettings = NULL) {
+        plotSettings = NULL,
+        legendPosition = "auto") {
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
@@ -3065,6 +3067,7 @@ plot.Dataset <- function(
         xlab = xlab,
         ylab = ylab,
         legendTitle = legendTitle,
+        legendPosition = legendPosition,
         palette = palette,
         plotSettings = plotSettings,
         ...
@@ -3089,7 +3092,8 @@ plot.Dataset <- function(
         legendTitle = "Group",
         palette = "Set1",
         showSource = FALSE,
-        plotSettings = NULL) {
+        plotSettings = NULL,
+        legendPosition = "auto") {
     if (x$.enrichmentEnabled) {
         stopRuntimeIssue("plot of enrichment data is not yet implemented",
             functionName = ".plot.Dataset"
@@ -3253,7 +3257,7 @@ plot.Dataset <- function(
 
     # set legend
     if (x$getNumberOfGroups() > 1) {
-        p <- plotSettings$setLegendPosition(p, legendPosition = C_POSITION_OUTSIDE_PLOT)
+        p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition, finalize = FALSE)
         p <- plotSettings$setLegendBorder(p)
         p <- plotSettings$setLegendTitle(p, legendTitle, mode = "fill")
         p <- plotSettings$setLegendLabelSize(p)
@@ -3269,7 +3273,7 @@ plot.Dataset <- function(
     }
     p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
 
-    return(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }
 
 #'

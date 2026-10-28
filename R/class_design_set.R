@@ -1022,7 +1022,7 @@ plot.TrialDesignSet <- function(
         theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
@@ -1082,7 +1082,7 @@ plot.TrialDesignSet <- function(
         theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
@@ -1152,7 +1152,7 @@ plot.TrialDesignSet <- function(
         theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         designSetName = NA_character_,
         plotSettings = NULL) {
@@ -1276,7 +1276,7 @@ plot.TrialDesignSet <- function(
         type = type, nMax = nMax
     )
 
-    return(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }
 
 .addDecisionCriticalValuesToPlot <- function(p, designMaster, type, nMax = NA_integer_) {

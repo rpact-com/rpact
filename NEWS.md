@@ -2,6 +2,10 @@
 
 ## New features
 
+* All rpact plots with legends now support `legendPosition = "auto"` through the shared `PlotSettings` infrastructure. Automatic placement is the default; explicit positions and legacy `NA` behaviour remain available.
+
+* Comparison plots now wrap legend labels and arrange entries vertically. The default `legendPosition = "auto"` selects a measured inside position with minimal overlap with points and line segments; manual rpact and ggplot2 positions remain available.
+
 * Comparison plots now accept multiple y parameters and per-parameter `yAxisSide` assignments. Automatic assignment separates clearly different scales onto left and right axes; similar scales share the left axis. The preview selector exposes the resolved sides and invertible axis transformation.
 
 * Added `getComparisonPlotParameters()` to preview automatic axes and object categories, with unresolved selections returned as messages and diagnostic details. `plotComparison()` and comparison plot methods use the same selector.

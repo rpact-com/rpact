@@ -2098,7 +2098,7 @@ plot.ParameterSet <- function(
         ylab = NA_character_,
         type = 1L,
         palette = "Set1",
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         plotSettings = NULL) {
     .assertGgplotIsInstalled()

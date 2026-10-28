@@ -522,10 +522,17 @@ PlotSettings <- R6::R6Class("PlotSettings",
                 legend.justification = justification
             ))
         },
-        setLegendPosition = function(p, legendPosition) {
+        setLegendPosition = function(p, legendPosition, finalize = TRUE) {
             .assertIsValidLegendPosition(legendPosition)
 
             legendPosition <- as.character(legendPosition)
+            if (identical(legendPosition, "auto")) {
+                p <- p + ggplot2::theme(legend.position = "right")
+                if (!finalize) {
+                    return(p)
+                }
+                return(.positionPlotLegend(.preparePlotLegend(p), self))
+            }
 
             if (legendPosition %in% c("none", "left", "right", "bottom", "top")) {
                 p <- p + ggplot2::theme(legend.position = legendPosition)
