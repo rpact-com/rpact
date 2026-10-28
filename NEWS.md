@@ -2,14 +2,6 @@
 
 ## New features
 
-* All rpact plots with legends now support `legendPosition = "auto"` through the shared `PlotSettings` infrastructure. Automatic placement is the default; explicit positions and legacy `NA` behaviour remain available.
-
-* Comparison plots now wrap legend labels and arrange entries vertically. The default `legendPosition = "auto"` selects a measured inside position with minimal overlap with points and line segments; manual rpact and ggplot2 positions remain available.
-
-* Comparison plots now accept multiple y parameters and per-parameter `yAxisSide` assignments. Automatic assignment separates clearly different scales onto left and right axes; similar scales share the left axis. The preview selector exposes the resolved sides and invertible axis transformation.
-
-* Added `getComparisonPlotParameters()` to preview automatic axes and object categories, with unresolved selections returned as messages and diagnostic details. `plotComparison()` and comparison plot methods use the same selector.
-
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
 * `getSimulationMultiArmSurvival()` and `getSimulationEnrichmentSurvival()` now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument `simulationType` can be used to choose between the new C++ implementation (`"patientWise"`), the previous test-statistic-based approach (`"testStatisticBased"`), and a basic R reference implementation (`"patientWiseBasic"`) intended for validation and testing. The default `"auto"` setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.
 * `getDataset()` now supports datasets of general, endpoint-independent estimates through the new `DatasetGeneral` class. Stage-wise estimates and standard errors can be provided using `est` and `se`; degrees of freedom (`df`) are optional and default internally to `Inf`, corresponding to a normal approximation.
@@ -35,6 +27,14 @@
 
 ## Improvements, issues, and changes
 
+* All rpact plots with legends now support `legendPosition = "auto"` through the shared `PlotSettings` infrastructure. Automatic placement is the default; explicit positions and legacy `NA` behaviour remain available.
+
+* Comparison plots now wrap legend labels and arrange entries vertically. The default `legendPosition = "auto"` selects a measured inside position with minimal overlap with points and line segments; manual rpact and ggplot2 positions remain available.
+
+* Comparison plots now accept multiple y parameters and per-parameter `yAxisSide` assignments. Automatic assignment separates clearly different scales onto left and right axes; similar scales share the left axis. The preview selector exposes the resolved sides and invertible axis transformation.
+
+* Added `getComparisonPlotParameters()` to preview automatic axes and object categories, with unresolved selections returned as messages and diagnostic details. `plotComparison()` and comparison plot methods use the same selector.
+
 * Comparison plots and their parameter selector now accept multiple category columns through `categoryParamName`. Category combinations jointly determine colours or fills and line groups, including missing values and labels containing separators.
 
 * Comparison titles now distinguish designs, sample size calculations, power calculations and power simulations. Mixed comparisons use "Design plan comparison"; summary titles add "summary" and are captured with the summary snapshot.
@@ -54,9 +54,7 @@
 * Replaced direct errors in comparison extraction, comparison plotting, and package testing with the central error helpers, providing specific error categories and structured diagnostic context while preserving worker failure details.
 * On Windows, `testPackage()` now uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.
 * `testPackage()` now runs R basic package tests in a separate R process before starting parallel workers and isolates configuration writes per test process. Worker crashes preserve partial results and are explicitly reported as incomplete execution, with the expected test count from `META`, the full diagnostic log path, and a hint to retry with `workers = 1`. Partial reports cannot claim successful installation qualification.
-
 * Corrected Weibull hazard ratio conversions for `kappa != 1` in survival planning and simulation, including multi-arm and enrichment simulations. Lambda remains the inverse Weibull scale; the hazard ratio is `(lambda1 / lambda2)^kappa`. Exponential calculations (`kappa = 1`) are unchanged.
-
 * Expanded the documentation of `typeOfSelection` for multi-arm and enrichment simulations, explaining all five selection rules, their interaction with adaptations and thresholds, and how to drop one worst arm at each interim using a custom selection function (issue [#159](https://github.com/rpact-com/rpact/issues/159)).
 * `getObjectRCode()` now removes duplicate precondition blocks while preserving complete user-defined function bodies and pipe chains.
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed

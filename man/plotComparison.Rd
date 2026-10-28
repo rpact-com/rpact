@@ -18,7 +18,7 @@ plotComparison(
   pointBorder = 4,
   discreteXAxis = FALSE,
   mirrorModeEnabled = FALSE,
-  legendPosition = "bottom",
+  legendPosition = "auto",
   shinyOptimization = FALSE,
   objects = NULL,
   yAxisSide = "auto"
@@ -53,8 +53,11 @@ using the same title as print and summary. Supply NULL or NA to hide it.}
 
 \item{mirrorModeEnabled}{Whether to use fill categories without a legend.}
 
-\item{legendPosition}{Legend position, either an rpact numeric position or a
-ggplot position name (none, left, right, bottom, top).}
+\item{legendPosition}{"auto" (default) selects an inside position with the least
+overlap with points and lines. Alternatively use rpact positions 1 (top left),
+2 (centre left), 3 (bottom left), 4 (top right), 5 (centre right),
+6 (bottom right), -1 (hidden), 0 (default position with square aspect),
+or a ggplot position name (none, left, right, bottom, top).}
 
 \item{shinyOptimization}{Whether to use compact sizing for Shiny displays.}
 
@@ -98,6 +101,14 @@ units. Raw values and original columns remain in the long plot data; the
 caller's data are not modified. Explicitly placing all parameters on the
 right uses one primary axis on the right. Parameters assigned to the same
 side always share that scale.
+
+Legend entries are arranged vertically and long labels are wrapped. Automatic
+placement measures the combined legend and scores six inside positions against
+points and complete line segments in panel coordinates, including secondary-axis
+scaling. It is a heuristic, not a guarantee of no overlap. Oversized legends
+are placed outside on the right. The choice uses the current graphics device
+(seven inches square if none is open); resizing or exporting to another size
+may require an explicit position or recreating the plot on that device.
 
 Interactive converters must preserve the secondary-axis transformation.
 A plain \code{plotly::ggplotly()} conversion may omit the right axis and display
