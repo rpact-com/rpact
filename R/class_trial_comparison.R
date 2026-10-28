@@ -1301,58 +1301,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #' @export
 #'
 plot.TrialComparison <- function(x, xParamName = NULL, yParamName = NULL, ...) {
-    data <- as.data.frame(x)
-    available <- getComparisonParameterNames(data, type = "continuous",
-        exclude = c("objectNumber", "situation"))
-    available <- available[vapply(data[available], is.numeric, logical(1))]
-    roles <- vapply(available, function(parameter) .comparisonRole(x$getObjects(), parameter), "")
-    select <- function(selection, parameter, other, preferredRole) {
-        if (!is.null(selection)) {
-            return(selection)
-        }
-        candidates <- setdiff(available, other)
-        preferred <- candidates[roles[candidates] == preferredRole]
-        if (length(preferred)) {
-            candidates <- preferred
-        }
-        if (length(candidates) == 1L) {
-            return(candidates)
-        }
-        info <- getComparisonParameterInfo(data[candidates])
-        descriptions <- getComparisonParameterDescriptions(info)
-        exampleX <- if (!is.null(xParamName)) {
-            xParamName
-        } else {
-            head(available, 1L)
-        }
-        exampleY <- if (!is.null(yParamName)) {
-            yParamName
-        } else {
-            head(setdiff(available, exampleX), 1L)
-        }
-        example <- if (length(exampleX) == 1L && length(exampleY) == 1L) {
-            paste0(
-                "plot(x, xParamName = ", encodeString(exampleX, quote = '"'),
-                ", yParamName = ", encodeString(exampleY, quote = '"'), ")"
-            )
-        } else {
-            "Choose numeric axis columns from as.data.frame(x)."
-        }
-        stopIllegalArgument("Cannot select '", parameter, "' unambiguously. Candidates: ",
-            paste(head(.comparisonText(descriptions, 85L), 8L), collapse = "; "),
-            if (length(candidates) > 8L) {
-                "; ..."
-            } else {
-                ""
-            }, ". ", example,
-            functionName = "plot.TrialComparison", parameter = parameter, value = selection,
-            constraint = "supply an axis name when there is not exactly one candidate",
-            diagnosticId = "comparison.plot_axis_ambiguous",
-            context = list(candidates = candidates, descriptions = descriptions, example = example))
-    }
-    xParamName <- select(xParamName, "xParamName", yParamName, "Inputs and design settings")
-    yParamName <- select(yParamName, "yParamName", xParamName, "Results and derived parameters")
-    plotComparison(data, xParamName, yParamName, ...)
+    return(plotComparison(x, xParamName = xParamName, yParamName = yParamName, ...))
 }
 
 #'

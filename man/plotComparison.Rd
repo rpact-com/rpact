@@ -6,8 +6,8 @@
 \usage{
 plotComparison(
   data,
-  xParamName,
-  yParamName,
+  xParamName = NULL,
+  yParamName = NULL,
   ...,
   groupParamName = NULL,
   categoryParamName = NULL,
@@ -19,17 +19,20 @@ plotComparison(
   discreteXAxis = FALSE,
   mirrorModeEnabled = FALSE,
   legendPosition = "bottom",
-  shinyOptimization = FALSE
+  shinyOptimization = FALSE,
+  objects = NULL
 )
 }
 \arguments{
-\item{data}{A non-empty data.frame, for example from getComparisonData().}
+\item{data}{A non-empty comparison data frame, a \code{TrialComparison}, or its summary.}
 
-\item{xParamName, yParamName}{Names of the axis columns. The y column must be numeric.}
+\item{xParamName, yParamName}{Optional axis columns, selected by
+\code{\link[=getComparisonPlotParameters]{getComparisonPlotParameters()}} when omitted. The y column must be numeric.}
 
 \item{...}{Reserved for future extensions.}
 
-\item{groupParamName, categoryParamName}{Optional column names for grouping and categories.}
+\item{groupParamName, categoryParamName}{Optional grouping and category columns.
+NULL categories are selected automatically; NA_character_ disables categories.}
 
 \item{mainTitle, legendTitle}{Plot and legend titles.}
 
@@ -45,6 +48,9 @@ plotComparison(
 ggplot position name (none, left, right, bottom, top).}
 
 \item{shinyOptimization}{Whether to use compact sizing for Shiny displays.}
+
+\item{objects}{Optional original objects for role-aware selection with a data
+frame, as in \code{\link[=getComparisonPlotParameters]{getComparisonPlotParameters()}}.}
 }
 \value{
 A ggplot object, which can be customized with ggplot2 layers.
@@ -53,6 +59,9 @@ A ggplot object, which can be customized with ggplot2 layers.
 Produces a ggplot object from unrounded comparison data.
 }
 \details{
+Selection is delegated to \code{\link[=getComparisonPlotParameters]{getComparisonPlotParameters()}}. If its \code{message}
+is non-NULL, plotting raises an error using that text. Applications can call
+the selector first to display choices and messages without creating a plot.
 Categories and groups jointly identify lines. Without either,
 objectNumber (or designNumber) identifies separate objects. Stages are
 separated unless used as an axis. Select categories explicitly to compare
