@@ -20,19 +20,25 @@ plotComparison(
   mirrorModeEnabled = FALSE,
   legendPosition = "bottom",
   shinyOptimization = FALSE,
-  objects = NULL
+  objects = NULL,
+  yAxisSide = "auto"
 )
 }
 \arguments{
 \item{data}{A non-empty comparison data frame, a \code{TrialComparison}, or its summary.}
 
 \item{xParamName, yParamName}{Optional axis columns, selected by
-\code{\link[=getComparisonPlotParameters]{getComparisonPlotParameters()}} when omitted. The y column must be numeric.}
+\code{\link[=getComparisonPlotParameters]{getComparisonPlotParameters()}} when omitted. \code{yParamName} may be a vector
+of distinct numeric columns.}
 
 \item{...}{Reserved for future extensions.}
 
-\item{groupParamName, categoryParamName}{Optional grouping and category columns.
-NULL categories are selected automatically; NA_character_ disables categories.}
+\item{groupParamName}{Optional grouping column, mapped to colour when categories
+are also present.}
+
+\item{categoryParamName}{Optional character vector of category columns. Multiple
+columns define their joint combinations. NULL selects categories automatically;
+NA_character_ or character(0) disables categories.}
 
 \item{mainTitle, legendTitle}{Plot and legend titles.}
 
@@ -51,6 +57,11 @@ ggplot position name (none, left, right, bottom, top).}
 
 \item{objects}{Optional original objects for role-aware selection with a data
 frame, as in \code{\link[=getComparisonPlotParameters]{getComparisonPlotParameters()}}.}
+
+\item{yAxisSide}{Axis assignment: "auto" (default), "left", or "right".
+Supply one value for all y parameters, a vector in their order, or a named
+vector assigning individual parameters. Unspecified named entries remain
+automatic. The same argument is accepted by \code{\link[=plotComparison]{plotComparison()}}.}
 }
 \value{
 A ggplot object, which can be customized with ggplot2 layers.
@@ -62,15 +73,47 @@ Produces a ggplot object from unrounded comparison data.
 Selection is delegated to \code{\link[=getComparisonPlotParameters]{getComparisonPlotParameters()}}. If its \code{message}
 is non-NULL, plotting raises an error using that text. Applications can call
 the selector first to display choices and messages without creating a plot.
+Multiple category columns are combined into a discrete colour (or fill when
+an explicit group is present or mirror mode is enabled). Legend labels show
+category values in the supplied column order, separated by ' / '. Every
+observed combination remains distinct, including missing values and values
+containing separators. Category columns must be distinct valid column names.
+More than nine colour groups use a hue palette instead of the limited Set1
+palette, so every combination receives a colour.
 Categories and groups jointly identify lines. Without either,
 objectNumber (or designNumber) identifies separate objects. Stages are
 separated unless used as an axis. Select categories explicitly to compare
 results across objects along a parameter axis.
+
+Multiple y parameters are drawn as separate series, identified by line type
+and point shape. These styles cycle for larger selections and can be replaced
+with ggplot2 scales. Categories and groups remain independent of the parameter
+identity. Captions use the original object context when available. With two
+y axes, right-axis values are transformed onto the left plotting scale and
+the right axis displays the exact inverse transformation, retaining original
+units. Raw values and original columns remain in the long plot data; the
+caller's data are not modified. Explicitly placing all parameters on the
+right uses one primary axis on the right. Parameters assigned to the same
+side always share that scale.
+
+Interactive converters must preserve the secondary-axis transformation.
+A plain \code{plotly::ggplotly()} conversion may omit the right axis and display
+transformed hover values. \code{\link[=getComparisonPlotParameters]{getComparisonPlotParameters()}} exposes the side
+assignments and transformation for application-specific adapters.
 }
 \examples{
 \dontrun{
 data <- getComparisonData(list(getDesignFixed(), getDesignGroupSequential()))
 plotComparison(data, "stages", "criticalValues", plotLineEnabled = FALSE)
+plotComparison(data, "stages", "criticalValues",
+    categoryParamName = c("objectType", "sided"), plotLineEnabled = FALSE)
+performance <- as.data.frame(getPowerAndAverageSampleNumber(
+    getDesignGroupSequential(kMax = 3), nMax = 100))
+plotComparison(performance, "theta",
+    c("averageSampleNumber", "overallEarlyStop", "calculatedPower"),
+    yAxisSide = c(averageSampleNumber = "left",
+        overallEarlyStop = "right", calculatedPower = "right"),
+    plotPointsEnabled = FALSE)
 }
 
 }

@@ -15,7 +15,9 @@
 \item{xParamName, yParamName}{Optional axis column names. Omitted axes are
 selected only when there is exactly one candidate: inputs/design settings
 are preferred for x, results for y, then other varying numeric columns.
-Identifier columns are excluded; stages remain eligible axes.}
+Identifier columns are excluded; stages remain eligible axes. \code{yParamName}
+may also explicitly select multiple numeric parameters. Their axis sides
+can be controlled through \code{yAxisSide} passed to \code{\link[=plotComparison]{plotComparison()}}.}
 
 \item{...}{Arguments passed to \code{\link[=plotComparison]{plotComparison()}}, including categories,
 grouping, titles and line/point settings. Explicit axis selections prevail.}

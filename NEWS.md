@@ -2,6 +2,8 @@
 
 ## New features
 
+* Comparison plots now accept multiple y parameters and per-parameter `yAxisSide` assignments. Automatic assignment separates clearly different scales onto left and right axes; similar scales share the left axis. The preview selector exposes the resolved sides and invertible axis transformation.
+
 * Added `getComparisonPlotParameters()` to preview automatic axes and object categories, with unresolved selections returned as messages and diagnostic details. `plotComparison()` and comparison plot methods use the same selector.
 
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
@@ -28,6 +30,8 @@
 * Added `getComparison()` and the R6 `TrialComparison` class (inheriting from `ParameterSet`) for comparing existing designs, planning calculations and simulations. Compact printing, grouped summaries of exact object profiles, full data-frame conversion and plots share the comparison parameter helpers. R-code reconstruction and Markdown output are supported; deep cloning raises an explicit error. Objects, nested lists and existing comparisons can be combined through `getComparison(..., objects = NULL)` and appended with `$add()`. Empty comparisons can be created and filled later. Contained objects can be extracted by name or position with `[[` and by name with `$`; R6 members retain priority for `$`. `$delete(index)` removes one object by position or exact name, preserving the remaining order and supporting empty comparisons. S3 generics `add()` and `delete()` delegate to the comparison methods and support pipes without masking `base::remove()`. `fetch()` also selects contained objects by name or position, returning a single object directly and supporting unquoted names, negative indices and multiple selections.
 
 ## Improvements, issues, and changes
+
+* Comparison plots and their parameter selector now accept multiple category columns through `categoryParamName`. Category combinations jointly determine colours or fills and line groups, including missing values and labels containing separators.
 
 * Comparison titles now distinguish designs, sample size calculations, power calculations and power simulations. Mixed comparisons use "Design plan comparison"; summary titles add "summary" and are captured with the summary snapshot.
 
