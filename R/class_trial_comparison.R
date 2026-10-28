@@ -15,12 +15,12 @@ NULL
 #' Compare Existing Trial Planning Objects
 #'
 #' @description
-#' Creates a comparison of existing designs, sample size or power
-#' plans, and simulation results without recalculating them.
+#' Creates a comparison of existing designs, design characteristics, sample size
+#' or power plans, and simulation results without recalculating them.
 #'
 #' @param objects Optional objects, lists of objects or `TrialComparison` objects.
 #'   NULL is treated as an empty list.
-#' @param ... Designs, plans, simulations, lists thereof, or `TrialComparison`
+#' @param ... Designs, design characteristics, plans, simulations, lists thereof, or `TrialComparison`
 #'   objects. Entries from `...` precede entries from `objects`.
 #'
 #' @return An R6 `TrialComparison` inheriting from `ParameterSet`.
@@ -83,6 +83,9 @@ NULL
 #' print(comparison)
 #' summary(comparison)
 #' head(as.data.frame(comparison))
+#' withCharacteristics <- getComparison(
+#'     getDesignGroupSequential(kMax = 2),
+#'     getDesignCharacteristics(getDesignGroupSequential(kMax = 3)))
 #' combined <- getComparison(comparison, other = getDesignFixed(alpha = 0.05))
 #' combined$add(list(getDesignFixed(alpha = 0.01)))
 #' empty <- getComparison()
@@ -744,7 +747,7 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
         if (inherits(object, "SimulationResults")) {
             return("Power simulation")
         }
-        if (inherits(object, "TrialDesign")) {
+        if (inherits(object, c("TrialDesign", "TrialDesignCharacteristics"))) {
             return("Design")
         }
         if (inherits(object, "TrialDesignPlan")) {

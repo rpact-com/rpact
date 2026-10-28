@@ -291,11 +291,11 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
         return(.finishComparisonPlotParameters(result, issues))
     }
     if (!is.null(objects) && (!is.list(objects) || is.data.frame(objects) ||
-            !all(vapply(objects, inherits, logical(1), c("TrialDesign", "TrialDesignPlan", "SimulationResults"))))) {
+            !all(vapply(objects, .isComparisonObject, logical(1))))) {
         addIssue("'objects' must be a list of original comparison objects",
             parameter = "objects", 
             objects, 
-            "a list of designs, plans, or simulation results",
+            "a list of designs, design characteristics, plans, or simulation results",
             diagnosticId = "comparison.plot_objects_invalid")
         return(.finishComparisonPlotParameters(result, issues))
     }

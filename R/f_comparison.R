@@ -14,27 +14,32 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
+.isComparisonObject <- function(object) {
+    return(inherits(object, c("TrialDesign", "TrialDesignCharacteristics", "TrialDesignPlan", "SimulationResults")))
+}
+
 #'
 #' @title
 #' Get Comparison Data
 #'
 #' @description
-#' Combines existing designs, sample size or power plans, and simulation results
-#' into a data frame without recalculating or modifying the objects.
+#' Combines existing designs, design characteristics, sample size or power plans,
+#' and simulation results into a data frame without recalculating or modifying
+#' the objects.
 #'
 #' @param objects A non-empty list of objects inheriting from `TrialDesign`,
-#'   `TrialDesignPlan`, or `SimulationResults`. Optional names are retained in
-#'   the column `objectName`.
+#'   `TrialDesignCharacteristics`, `TrialDesignPlan`, or `SimulationResults`.
+#'   Optional names are retained in the column `objectName`.
 #' @param ... Further arguments. Currently unused.
 #' @param niceColumnNamesEnabled If `TRUE`, use descriptive column names.
 #' @param includeAllParameters If `TRUE`, include all parameters supported by
 #'   the existing data-frame methods of the individual objects.
 #'
 #' @details
-#' Each object receives an `objectNumber`, repeated for all its rows. Plans and
-#' simulation results are supplemented with their associated design parameters,
-#' matched by analysis stage. For fixed designs and results based on them,
-#' `kMax` and `stages` identify the single stage as 1, even when omitted by the
+#' Each object receives an `objectNumber`, repeated for all its rows. Design
+#' characteristics, plans, and simulation results are supplemented with their
+#' associated design parameters, matched by analysis stage. For fixed designs
+#' and results based on them, `kMax` and `stages` identify the single stage as 1, even when omitted by the
 #' individual data-frame methods. The situation column numbers rows within each
 #' stage. Columns are matched by technical names; missing
 #' values are filled with `NA`. `sampleSizes` is harmonized to `numberOfSubjects`
@@ -65,7 +70,7 @@ getComparisonData <- function(
     .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
     .assertIsSingleLogical(includeAllParameters, "includeAllParameters")
     if (!is.list(objects) || is.data.frame(objects) || length(objects) == 0) {
-        stopIllegalArgument("'objects' must be a non-empty list of rpact designs, plans, or simulation results",
+        stopIllegalArgument("'objects' must be a non-empty list of rpact designs, design characteristics, plans, or simulation results",
             functionName = "getComparisonData", parameter = "objects", value = objects,
             constraint = "a non-empty list, excluding data.frames",
             diagnosticId = "comparison.objects_invalid"
@@ -73,10 +78,10 @@ getComparisonData <- function(
     }
     frames <- lapply(seq_along(objects), function(i) {
         obj <- objects[[i]]
-        if (!inherits(obj, c("TrialDesign", "TrialDesignPlan", "SimulationResults"))) {
+        if (!.isComparisonObject(obj)) {
             stopIllegalArgument("Unsupported object at position ", i, ": ", paste(class(obj), collapse = "/"),
                 functionName = "getComparisonData", parameter = "objects", value = obj,
-                constraint = "each object must inherit from TrialDesign, TrialDesignPlan, or SimulationResults",
+                constraint = "each object must inherit from TrialDesign, TrialDesignCharacteristics, TrialDesignPlan, or SimulationResults",
                 diagnosticId = "comparison.object_class_unsupported",
                 context = list(objectPosition = i, objectClass = class(obj))
             )
@@ -129,7 +134,8 @@ getComparisonData <- function(
             names(df)[names(df) == "sampleSizes"] <- "numberOfSubjects"
         }
         className <- class(obj)[1L]
-        endpoint <- if (inherits(obj, "TrialDesign")) {
+        isDesign <- inherits(obj, c("TrialDesign", "TrialDesignCharacteristics"))
+        endpoint <- if (isDesign) {
             "Undefined"
         } else {
             if (grepl("Means", className)) {
@@ -144,7 +150,7 @@ getComparisonData <- function(
                 "Undefined"
             }
         }
-        calculationTarget <- if (inherits(obj, "TrialDesign")) {
+        calculationTarget <- if (isDesign) {
             "Design"
         } else {
             if (inherits(obj, "SimulationResults")) {
