@@ -1055,7 +1055,7 @@ getHazardRatioByPi <- function(
         pi1,
         pi2,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
-        kappa = 1,
+        kappa = 1, # note: not necessary
         matrixAllowed = FALSE) {
     .assertIsValidPi(pi1, "pi1", matrixAllowed = matrixAllowed)
     .assertIsValidPi(pi2, "pi2", matrixAllowed = matrixAllowed)
