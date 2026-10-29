@@ -576,7 +576,9 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
 #' Multiple y parameters are drawn as separate series, identified by line type
 #' and point shape. These styles cycle for larger selections and can be replaced
 #' with ggplot2 scales. Categories and groups remain independent of the parameter
-#' identity. Captions use the original object context when available. With two
+#' identity. All axis labels and parameter legends use the rpact parameter captions
+#' with the original object context when available, falling back to technical
+#' names for unknown parameters. This also applies to a single y parameter. With two
 #' y axes, right-axis values are transformed onto the left plotting scale and
 #' the right axis displays the exact inverse transformation, retaining original
 #' units. Raw values and original columns remain in the long plot data; the
@@ -868,6 +870,9 @@ plotComparison <- function(
     }
     p <- plotSettings$setColorPalette(p, palette)
     p <- plotSettings$enlargeAxisTicks(p)
+    p <- p + ggplot2::labs(
+        x = unname(.comparisonYCaptions(xParamName, input$objects)),
+        y = paste(captions, collapse = " / "))
     if (twoAxes) {
         scale <- transformation$scale
         offset <- transformation$offset
@@ -881,8 +886,6 @@ plotComparison <- function(
                 name = paste(captions[sides == "right"], collapse = " / ")))
     } else if (any(sides == "right")) {
         p <- p + ggplot2::scale_y_continuous(name = paste(captions, collapse = " / "), position = "right")
-    } else if (multipleY) {
-        p <- p + ggplot2::ylab(paste(captions, collapse = " / "))
     }
     p <- .preparePlotLegend(p)
     categoryAesthetics <- if (groupEnabled && categoryEnabled) {
@@ -906,6 +909,7 @@ plotComparison <- function(
     return(.layoutComparisonLegends(p, plotSettings, legendPosition,
         categoryAesthetics, parameterAesthetics, categoryLegendPosition, parameterLegendPosition))
 }
+
 .comparisonLegendTitle <- function(data, objects, parameters) {
     if (!length(parameters)) {
         return("Parameter")
@@ -919,12 +923,22 @@ plotComparison <- function(
                 parameter == "designNumber") {
             types <- "Design"
         }
+        
         types[is.na(types)] <- "Object"
         types <- intersect(c("Design", "Calculation", "Simulation", "Object"), unique(types))
         if (!length(types)) {
             return("Object")
         }
-        return(paste(c(types[1L], tolower(types[-1L])), collapse = " / "))
+        
+        if (!"Object" %in% types) {
+            return("Design plan")
+        }
+        
+        if (length(types) > 2L) {
+            return("Object")
+        }
+        
+        return(paste(types, collapse = " / "))
     }, character(1))
     return(paste(unique(title), collapse = " / "))
 }

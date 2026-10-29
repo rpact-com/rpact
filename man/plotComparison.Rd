@@ -107,7 +107,9 @@ results across objects along a parameter axis.
 Multiple y parameters are drawn as separate series, identified by line type
 and point shape. These styles cycle for larger selections and can be replaced
 with ggplot2 scales. Categories and groups remain independent of the parameter
-identity. Captions use the original object context when available. With two
+identity. All axis labels and parameter legends use the rpact parameter captions
+with the original object context when available, falling back to technical
+names for unknown parameters. This also applies to a single y parameter. With two
 y axes, right-axis values are transformed onto the left plotting scale and
 the right axis displays the exact inverse transformation, retaining original
 units. Raw values and original columns remain in the long plot data; the
