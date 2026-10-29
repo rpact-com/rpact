@@ -835,7 +835,7 @@ print.SummaryFactory <- function(
                     legendEntry <- .addLegendEntry("treatmentArm", legendEntry)
                 }
 
-                if (inherits(parameterSet[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+                if (inherits(parameterSet[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeCollection")) {
                     userDefinedEffectMatrix <- FALSE
                     variedParameterValues <- dimnames(parameterSet$piecewiseSurvivalTime$hazardRatios)[[3]]
                     variedParameterCaption <- "situation"

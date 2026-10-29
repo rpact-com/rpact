@@ -1,10 +1,22 @@
 ## |
-## |  *Piecewise survival specifications for patient-wise simulations*
+## |  *Time classes for patient-wise simulations*
+## |
+## |  This file is part of the R package rpact:
+## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |
+## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  Licensed under "GNU Lesser General Public License" version 3
+## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |
+## |  RPACT company website: https://www.rpact.com
+## |  rpact package website: https://www.rpact.org
+## |
+## |  Contact us for information about our services: info@rpact.com
 ## |
 
 .showPiecewiseSimulationParameters <- function(simulationResults, consoleOutputEnabled = TRUE) {
     specification <- simulationResults$piecewiseSurvivalTime
-    if (!inherits(specification, "PiecewisePatientWiseSurvivalTime")) {
+    if (!inherits(specification, "PiecewiseSurvivalTimeCollection")) {
         return(invisible(NULL))
     }
     captions <- "Interval start times"
@@ -36,7 +48,7 @@
             paste(values[[i]], collapse = ", "), "\n", consoleOutputEnabled = consoleOutputEnabled)
     }
     simulationResults$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
-    invisible(NULL)
+    return(invisible(NULL))
 }
 
 .getPiecewiseSurvivalSummaryText <- function(specification) {
@@ -64,7 +76,7 @@
         text <- .concatenateSummaryText(text, paste0("hazard ratios for ", situationNames[situation],
             " (in interval order): ", paste(ratios, collapse = "; ")))
     }
-    text
+    return(text)
 }
 
 .getPiecewiseInitialHazardRatios <- function(piecewiseSurvivalTime) {
@@ -85,12 +97,13 @@
     indices <- match(groups, dimnames(aligned$hazardRatios)[[1]])
     aligned$lambdaControls <- aligned$lambdaControls[indices, , drop = FALSE]
     aligned$hazardRatios <- aligned$hazardRatios[indices, , , drop = FALSE]
-    aligned
+    return(aligned)
 }
 
 .assertPiecewiseGroupNames <- function(actual, expected) {
     if (!is.null(actual) && !is.null(expected) && !identical(actual, expected)) {
-        stopIllegalArgument("group names and their order must agree across all piecewise hazard matrices",
+        stopIllegalArgument(
+            "group names and their order must agree across all piecewise hazard matrices",
             functionName = "getPiecewiseHazardRatioArray", parameter = "groupNames")
     }
 }
@@ -129,14 +142,18 @@
         stopIllegalArgument("'piecewiseSurvivalTime' must contain at least two interval start times",
             functionName = ".validatePiecewiseStartTimes", parameter = "piecewiseSurvivalTime")
     }
+    
     if (piecewiseSurvivalTime[1] != 0) {
         stopIllegalArgument("the first value of 'piecewiseSurvivalTime' must be 0",
             functionName = ".validatePiecewiseStartTimes", parameter = "piecewiseSurvivalTime")
     }
+    
     .assertValuesAreStrictlyIncreasing(piecewiseSurvivalTime, "piecewiseSurvivalTime")
-    piecewiseSurvivalTime
+    return(piecewiseSurvivalTime)
 }
 
+#' 
+#' @title 
 #' Create an Array of Piecewise Hazard Ratios
 #'
 #' @description 
@@ -224,8 +241,8 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
         dimnames = list(group = groupNames, interval = intervalNames, situation = situationNames))
 }
 
-.PiecewisePatientWiseSurvivalTime <- R6::R6Class(
-    "PiecewisePatientWiseSurvivalTime",
+PiecewiseSurvivalTimeCollection <- R6::R6Class(
+    "PiecewiseSurvivalTimeCollection",
     public = list(
         piecewiseSurvivalTime = NULL,
         lambdaControls = NULL,
@@ -241,16 +258,19 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
             storage.mode(self$lambdaControls) <- "double"
             if (ncol(self$lambdaControls) != length(self$piecewiseSurvivalTime)) {
                 stopIllegalArgument("the number of control-hazard columns must equal the number of intervals",
-                    functionName = "PiecewisePatientWiseSurvivalTime", parameter = "lambdaControls")
+                    functionName = "PiecewiseSurvivalTimeCollection", parameter = "lambdaControls")
             }
+            
             if (nrow(self$lambdaControls) != dim(self$hazardRatios)[1]) {
                 stopIllegalArgument("the numbers of control-hazard and hazard-ratio groups must agree",
-                    functionName = "PiecewisePatientWiseSurvivalTime", parameter = "lambdaControls")
+                    functionName = "PiecewiseSurvivalTimeCollection", parameter = "lambdaControls")
             }
+            
             if (any(!is.finite(self$lambdaControls)) || any(self$lambdaControls <= 0)) {
                 stopIllegalArgument("all control hazards must be finite and greater than 0",
-                    functionName = "PiecewisePatientWiseSurvivalTime", parameter = "lambdaControls")
+                    functionName = "PiecewiseSurvivalTimeCollection", parameter = "lambdaControls")
             }
+            
             colnames(self$lambdaControls) <- intervalNames
             if (is.null(rownames(self$lambdaControls))) {
                 rownames(self$lambdaControls) <- dimnames(self$hazardRatios)[[1]]
@@ -303,6 +323,8 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
     )
 )
 
+#' 
+#' @title 
 #' Piecewise Exponential Multi-Arm Survival Time
 #'
 #' @description 
@@ -315,14 +337,14 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
 #'   matrices (one per situation), or an active-arm-by-interval-by-situation
 #'   array. In the array, situation is the slowest-changing dimension.
 #' 
-#' @return A \code{PiecewiseMultiArmSurvivalTime} object.
+#' @return A \code{PiecewiseSurvivalTimeMultiArm} object.
 #' 
 #' @examples
 #' hazardRatios <- getPiecewiseHazardRatioArray(
 #'     favorable = rbind(lowDose = c(0.9, 0.8), highDose = c(0.8, 0.6)),
 #'     conservative = rbind(lowDose = c(1, 0.9), highDose = c(0.9, 0.75))
 #' )
-#' piecewiseTime <- getPiecewiseMultiArmSurvivalTime(
+#' piecewiseTime <- getPiecewiseSurvivalTimeMultiArm(
 #'     piecewiseSurvivalTime = c(0, 6),
 #'     lambdaControl = c(0.08, 0.12),
 #'     hazardRatios = hazardRatios
@@ -331,22 +353,24 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
 #' 
 #' @export
 #' 
-getPiecewiseMultiArmSurvivalTime <- function(piecewiseSurvivalTime, lambdaControl, hazardRatios) {
+getPiecewiseSurvivalTimeMultiArm <- function(piecewiseSurvivalTime, lambdaControl, hazardRatios) {
     if (!is.numeric(lambdaControl) || length(lambdaControl) != length(piecewiseSurvivalTime)) {
         stopIllegalArgument("'lambdaControl' must contain one numeric value per interval",
-            functionName = "getPiecewiseMultiArmSurvivalTime", parameter = "lambdaControl")
+            functionName = "getPiecewiseSurvivalTimeMultiArm", parameter = "lambdaControl")
     }
     hr <- getPiecewiseHazardRatioArray(hazardRatios,
         intervalNames = .getPiecewiseIntervalNames(.validatePiecewiseStartTimes(piecewiseSurvivalTime)))
     controls <- matrix(rep(lambdaControl, each = dim(hr)[1]), nrow = dim(hr)[1])
     rownames(controls) <- dimnames(hr)[[1]]
-    obj <- .PiecewisePatientWiseSurvivalTime$new(
+    obj <- PiecewiseSurvivalTimeCollection$new(
         piecewiseSurvivalTime, controls, hr, "multi-arm"
     )
-    class(obj) <- c("PiecewiseMultiArmSurvivalTime", class(obj))
+    class(obj) <- c("PiecewiseSurvivalTimeMultiArm", class(obj))
     obj
 }
 
+#' 
+#' @title 
 #' Piecewise Exponential Enrichment Survival Time
 #'
 #' @description 
@@ -360,9 +384,9 @@ getPiecewiseMultiArmSurvivalTime <- function(piecewiseSurvivalTime, lambdaContro
 #' @param hazardRatios One subset-by-interval matrix, a named list of such
 #'   matrices (one per situation), or a subset-by-interval-by-situation array.
 #'   In the array, situation is the slowest-changing dimension.
-#' @return A \code{PiecewiseEnrichmentSurvivalTime} object.
+#' @return A \code{PiecewiseSurvivalTimeEnrichment} object.
 #' @examples
-#' piecewiseTime <- getPiecewiseEnrichmentSurvivalTime(
+#' piecewiseTime <- getPiecewiseSurvivalTimeEnrichment(
 #'     piecewiseSurvivalTime = c(0, 6),
 #'     lambdaControls = rbind(markerPositive = c(0.08, 0.12),
 #'         markerNegative = c(0.05, 0.09)),
@@ -377,16 +401,20 @@ getPiecewiseMultiArmSurvivalTime <- function(piecewiseSurvivalTime, lambdaContro
 #' 
 #' @export
 #' 
-getPiecewiseEnrichmentSurvivalTime <- function(piecewiseSurvivalTime, lambdaControls, hazardRatios) {
-    obj <- .PiecewisePatientWiseSurvivalTime$new(
+getPiecewiseSurvivalTimeEnrichment <- function(piecewiseSurvivalTime, lambdaControls, hazardRatios) {
+    obj <- PiecewiseSurvivalTimeCollection$new(
         piecewiseSurvivalTime, lambdaControls, hazardRatios, "enrichment"
     )
-    class(obj) <- c("PiecewiseEnrichmentSurvivalTime", class(obj))
-    obj
+    class(obj) <- c("PiecewiseSurvivalTimeEnrichment", class(obj))
+    return(obj)
 }
 
 #' @export
-as.data.frame.PiecewiseMultiArmSurvivalTime <- function(x, ...) x$asDataFrame()
+as.data.frame.PiecewiseSurvivalTimeMultiArm <- function(x, ...) {
+    return(x$asDataFrame())
+}
 
 #' @export
-as.data.frame.PiecewiseEnrichmentSurvivalTime <- function(x, ...) x$asDataFrame()
+as.data.frame.PiecewiseSurvivalTimeEnrichment <- function(x, ...) {
+    return(x$asDataFrame())
+}

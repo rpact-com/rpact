@@ -530,16 +530,26 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
 #'   NA_character_ or character(0) disables categories.
 #' @param mainTitle Plot title. When omitted, generated from the original objects
 #'   using the same title as print and summary. Supply NULL or NA to hide it.
-#' @param legendTitle Legend title.
+#' @param legendTitle Category/group legend title. When omitted, object identifiers
+#'   use Design, Calculation, Simulation, or a combination derived from the original
+#'   objects or comparison metadata. Other categories use their parameter captions.
+#'   With multiple y parameters and no categories, the title is Parameter.
+#'   Explicit titles, including NULL to hide titles, take precedence.
 #' @param plotLineEnabled,plotPointsEnabled Whether to show lines and points.
 #' @param pointBorder Point border style, as used by rpact plots.
 #' @param discreteXAxis Whether numeric x ticks should use the observed values only.
 #' @param mirrorModeEnabled Whether to use fill categories without a legend.
-#' @param legendPosition "auto" (default) selects an inside position with the least
-#'   overlap with points and lines. Alternatively use rpact positions 1 (top left),
+#' @param legendPosition Shared legend position. "auto" (default) uses the
+#'   adaptive placement described below. Alternatively use rpact positions 1 (top left),
 #'   2 (centre left), 3 (bottom left), 4 (top right), 5 (centre right),
 #'   6 (bottom right), -1 (hidden), 0 (default position with square aspect),
 #'   or a ggplot position name (none, left, right, bottom, top).
+#' @param categoryLegendPosition,parameterLegendPosition Optional separate positions
+#'   for category/group and y-parameter legends, using the same values as
+#'   `legendPosition`. NULL inherits the shared setting. With both guides present,
+#'   shared automatic positioning uses the adaptive layout described below.
+#'   Explicit positions override this layout; two explicit inside positions may
+#'   place the guides independently. A shared hidden legend remains hidden.
 #' @param shinyOptimization Whether to use compact sizing for Shiny displays.
 #' @param objects Optional original objects for role-aware selection with a data
 #'   frame, as in [getComparisonPlotParameters()].
@@ -574,13 +584,21 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
 #' right uses one primary axis on the right. Parameters assigned to the same
 #' side always share that scale.
 #'
-#' Legend entries are arranged vertically and long labels are wrapped. Automatic
-#' placement measures the combined legend and scores six inside positions against
-#' points and complete line segments in panel coordinates, including secondary-axis
-#' scaling. It is a heuristic, not a guarantee of no overlap. Oversized legends
-#' are placed outside on the right. The choice uses the current graphics device
-#' (seven inches square if none is open); resizing or exporting to another size
-#' may require an explicit position or recreating the plot on that device.
+#' For multiple y parameters with category/group legends, `legendPosition = "auto"`
+#' prefers horizontal category entries below the x-axis and a separate vertical
+#' parameter legend automatically placed inside. Category entries wrap into rows
+#' according to measured guide and panel dimensions. If the parameter legend
+#' takes too much inside space or covers more data, the alternative layout places
+#' it vertically below the panel and positions the category legend inside. Layout changes and label
+#' wrapping precede font reductions, which are limited to ten percent. If neither
+#' inside layout fits, both guides are placed below the panel. Very large legends
+#' still require a larger graphics device or an explicit layout.
+#' Explicit shared positions, such as "bottom", continue to apply to both guides
+#' unless a separate position is supplied. With only one guide, the common rpact
+#' positioning rules apply. Automatic inside placement scores points and line
+#' segments in panel coordinates, including secondary-axis scaling. This is a
+#' heuristic using the current device (seven inches square if none is open);
+#' resizing or exporting to another size may require recreating the plot.
 #'
 #' Interactive converters must preserve the secondary-axis transformation.
 #' A plain `plotly::ggplotly()` conversion may omit the right axis and display
@@ -600,6 +618,8 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
 #'     yAxisSide = c(averageSampleNumber = "left",
 #'         overallEarlyStop = "right", calculatedPower = "right"),
 #'     plotPointsEnabled = FALSE)
+#' plotComparison(data, "stages", c("criticalValues", "stageLevels"),
+#'     categoryLegendPosition = "auto", parameterLegendPosition = "bottom")
 #' }
 #'
 #' @export
@@ -612,7 +632,7 @@ plotComparison <- function(
         groupParamName = NULL,
         categoryParamName = NULL,
         mainTitle = NULL,
-        legendTitle = "Legend",
+        legendTitle = NULL,
         plotLineEnabled = TRUE,
         plotPointsEnabled = TRUE,
         pointBorder = 4,
@@ -621,10 +641,16 @@ plotComparison <- function(
         legendPosition = "auto",
         shinyOptimization = FALSE,
         objects = NULL,
-        yAxisSide = "auto") {
+        yAxisSide = "auto",
+        categoryLegendPosition = NULL,
+        parameterLegendPosition = NULL) {
     
     .warnInCaseOfUnknownArguments(functionName = "plotComparison", ...)
     .assertGgplotIsInstalled()
+    .assertComparisonLegendPosition(categoryLegendPosition, "categoryLegendPosition")
+    .assertComparisonLegendPosition(parameterLegendPosition, "parameterLegendPosition")
+    categoryLegendPosition <- unname(categoryLegendPosition)
+    parameterLegendPosition <- unname(parameterLegendPosition)
     for (name in c("plotLineEnabled", "plotPointsEnabled", "discreteXAxis", "shinyOptimization", "mirrorModeEnabled")) {
         .assertIsSingleLogical(get(name), name)
     }
@@ -663,6 +689,15 @@ plotComparison <- function(
     
     categoryEnabled <- length(categoryParamName) > 0L
     groupEnabled <- !is.null(groupParamName) && length(groupParamName) == 1 && !is.na(groupParamName)
+    colourParameters <- if (groupEnabled) {
+        groupParamName
+    } else {
+        categoryParamName
+    }
+    if (missing(legendTitle)) {
+        legendTitle <- .comparisonLegendTitle(data, input$objects, colourParameters)
+    }
+    fillLegendTitle <- .comparisonLegendTitle(data, input$objects, categoryParamName)
     categoryColumn <- categoryParamName
     if (length(categoryParamName) > 1L) {
         categoryColumn <- tail(make.unique(c(names(data), ".comparisonCategory")), 1L)
@@ -791,6 +826,9 @@ plotComparison <- function(
         p <- plotSettings$setLegendBorder(p)
         p <- plotSettings$setLegendTitle(p, legendTitle)
         p <- plotSettings$setLegendLabelSize(p)
+        if (categoryEnabled && groupEnabled) {
+            p <- p + ggplot2::labs(fill = fillLegendTitle)
+        }
     }
     
     p <- plotSettings$plotValues(p,
@@ -847,5 +885,343 @@ plotComparison <- function(
         p <- p + ggplot2::ylab(paste(captions, collapse = " / "))
     }
     p <- .preparePlotLegend(p)
-    return(.finalizePlotLegend(p, legendPosition, plotSettings))
+    categoryAesthetics <- if (groupEnabled && categoryEnabled) {
+        c("colour", "fill")
+    } else if (groupEnabled || categoryEnabled) {
+        "colour"
+    } else {
+        character()
+    }
+    parameterAesthetics <- if (multipleY) {
+        c(if (plotLineEnabled) {
+            "linetype"
+        }, if (plotPointsEnabled) {
+            "shape"
+        }, if (!categoryEnabled && !groupEnabled) {
+            "colour"
+        })
+    } else {
+        character()
+    }
+    return(.layoutComparisonLegends(p, plotSettings, legendPosition,
+        categoryAesthetics, parameterAesthetics, categoryLegendPosition, parameterLegendPosition))
+}
+.comparisonLegendTitle <- function(data, objects, parameters) {
+    if (!length(parameters)) {
+        return("Parameter")
+    }
+    title <- vapply(parameters, function(parameter) {
+        if (!parameter %in% c("objectNumber", "objectName", "designNumber")) {
+            return(.comparisonYCaptions(parameter, objects))
+        }
+        types <- .comparisonLegendObjectTypes(data, objects)
+        if (!length(objects) && !any(c("objectType", "calculationTarget") %in% names(data)) &&
+                parameter == "designNumber") {
+            types <- "Design"
+        }
+        types[is.na(types)] <- "Object"
+        types <- intersect(c("Design", "Calculation", "Simulation", "Object"), unique(types))
+        if (!length(types)) {
+            return("Object")
+        }
+        return(paste(c(types[1L], tolower(types[-1L])), collapse = " / "))
+    }, character(1))
+    return(paste(unique(title), collapse = " / "))
+}
+
+.comparisonLegendObjectTypes <- function(data, objects) {
+    if (length(objects)) {
+        return(vapply(objects, function(object) {
+            if (inherits(object, c("TrialDesign", "TrialDesignCharacteristics"))) {
+                return("Design")
+            }
+            if (inherits(object, "SimulationResults")) {
+                return("Simulation")
+            }
+            if (inherits(object, "TrialDesignPlan")) {
+                return("Calculation")
+            }
+            return("Object")
+        }, character(1)))
+    }
+    types <- rep("Object", nrow(data))
+    if ("objectType" %in% names(data)) {
+        classes <- as.character(data$objectType)
+        types[grepl("^TrialDesign", classes)] <- "Design"
+        types[grepl("^TrialDesignPlan", classes)] <- "Calculation"
+        types[grepl("^SimulationResults", classes)] <- "Simulation"
+    }
+    if ("calculationTarget" %in% names(data)) {
+        targets <- as.character(data$calculationTarget)
+        unknown <- types == "Object"
+        types[unknown & targets %in% "Design"] <- "Design"
+        types[unknown & targets %in% c("Sample size", "Power")] <- "Calculation"
+        types[unknown & grepl("simulation", targets, ignore.case = TRUE)] <- "Simulation"
+    }
+    return(types)
+}
+
+.assertComparisonLegendPosition <- function(value, parameter) {
+    if (is.null(value)) {
+        return(invisible())
+    }
+    valid <- length(value) == 1L && is.null(dim(value)) && !anyNA(value)
+    if (valid && is.numeric(value)) {
+        valid <- !is.complex(value) && is.finite(value) && value == trunc(value) && value >= -1 && value <= 6
+    } else if (valid) {
+        valid <- is.character(value) && value %in% c("auto", "none", "left", "right", "bottom", "top")
+    }
+    if (!valid) {
+        stopIllegalArgument("Invalid legend position for '", parameter, "'",
+            functionName = "plotComparison", parameter = parameter, value = value,
+            constraint = "NULL, auto, none, left, right, bottom, top, or an integer from -1 to 6",
+            diagnosticId = "comparison.legend_position_invalid")
+    }
+}
+
+.comparisonWrapLegendLabels <- function(labels) {
+    if (is.expression(labels) || is.list(labels)) {
+        return(labels)
+    }
+    result <- vapply(as.character(labels), function(label) {
+        lines <- strwrap(label, width = 34L)
+        # Also break long identifiers without whitespace; display wrapping must
+        # not change the factor levels or the original category values.
+        lines <- unlist(lapply(lines, function(line) {
+            starts <- seq.int(1L, max(1L, nchar(line)), by = 34L)
+            return(substring(line, starts, starts + 33L))
+        }), use.names = FALSE)
+        return(paste(lines, collapse = "\n"))
+    }, character(1), USE.NAMES = FALSE)
+    names(result) <- names(labels)
+    return(result)
+}
+
+.comparisonLegendGuide <- function(p, aesthetics, position, plotSettings,
+        horizontal = FALSE, columns = 1L, fontFactor = 1) {
+    if (!length(aesthetics)) {
+        return(p)
+    }
+    if (identical(position, "none") || identical(position, -1) || identical(position, -1L)) {
+        guides <- stats::setNames(rep(list("none"), length(aesthetics)), aesthetics)
+        return(p + do.call(ggplot2::guides, guides))
+    }
+    positionTheme <- ggplot2::theme()
+    if (is.numeric(position) && position > 0) {
+        positions <- list(c(0.05, 0.98), c(0.05, 0.5), c(0.05, 0.02),
+            c(0.95, 0.98), c(0.95, 0.5), c(0.95, 0.02))
+        justifications <- list(c(0, 1), c(0, 0.5), c(0, 0), c(1, 1), c(1, 0.5), c(1, 0))
+        positionTheme <- ggplot2::theme(legend.position.inside = positions[[position]],
+            legend.justification.inside = justifications[[position]])
+        position <- "inside"
+    } else if (identical(position, "auto")) {
+        position <- "inside"
+    } else if (is.numeric(position)) {
+        p <- p + ggplot2::theme(aspect.ratio = 1)
+        position <- "right"
+    }
+    guideTheme <- positionTheme + ggplot2::theme(
+        legend.byrow = TRUE,
+        legend.title.position = if (horizontal) {
+            "left"
+        } else {
+            "top"
+        },
+        legend.text = ggplot2::element_text(size = plotSettings$scaleSize(plotSettings$legendFontSize) * fontFactor),
+        legend.title = if (inherits(p$theme$legend.title, "element_blank")) {
+            ggplot2::element_blank()
+        } else {
+            ggplot2::element_text(size = plotSettings$scaleSize(plotSettings$legendFontSize + 1) * fontFactor)
+        })
+    guides <- stats::setNames(lapply(aesthetics, function(aesthetic) {
+        return(ggplot2::guide_legend(position = position, direction = if (horizontal) {
+            "horizontal"
+        } else {
+            "vertical"
+        }, ncol = if (horizontal) {
+            columns
+        } else {
+            1L
+        }, theme = guideTheme, order = if (aesthetic %in% c("linetype", "shape")) {
+            2L
+        } else {
+            1L
+        }))
+    }), aesthetics)
+    return(p + do.call(ggplot2::guides, guides))
+}
+
+.measureComparisonLegends <- function(p) {
+    built <- ggplot2::ggplot_build(p)
+    table <- suppressMessages(suppressWarnings(ggplot2::ggplot_gtable(built)))
+    boxes <- which(grepl("^guide-box", table$layout$name))
+    boxes <- boxes[!vapply(table$grobs[boxes], inherits, logical(1), "zeroGrob")]
+    sizes <- lapply(boxes, function(index) {
+        box <- table$grobs[[index]]
+        return(c(width = grid::convertWidth(grid::grobWidth(box), "in", valueOnly = TRUE),
+            height = grid::convertHeight(grid::grobHeight(box), "in", valueOnly = TRUE)))
+    })
+    names(sizes) <- sub("guide-box-", "", table$layout$name[boxes], fixed = TRUE)
+    return(list(built = built, sizes = sizes,
+        panelWidth = grDevices::dev.size("in")[1L] - grid::convertWidth(sum(table$widths), "in", valueOnly = TRUE),
+        panelHeight = grDevices::dev.size("in")[2L] - grid::convertHeight(sum(table$heights), "in", valueOnly = TRUE),
+        deviceHeight = grDevices::dev.size("in")[2L]))
+}
+
+.fitComparisonBottomLegend <- function(p, aesthetics, plotSettings, fontFactor) {
+    initial <- .measureComparisonLegends(p)
+    count <- max(1L, vapply(aesthetics, function(aesthetic) {
+        scale <- initial$built$plot$scales$get_scales(aesthetic)
+        if (is.null(scale)) {
+            return(0L)
+        }
+        return(length(scale$get_breaks()))
+    }, integer(1)))
+    lower <- 1L
+    upper <- min(count, 12L)
+    best <- list(plot = p, measurement = initial)
+    while (lower <= upper) {
+        columns <- floor((lower + upper) / 2)
+        candidate <- .comparisonLegendGuide(p, aesthetics, "bottom", plotSettings,
+            horizontal = TRUE, columns = columns, fontFactor = fontFactor)
+        measurement <- .measureComparisonLegends(candidate)
+        if (is.null(measurement$sizes$bottom) ||
+                measurement$sizes$bottom[["width"]] <= measurement$panelWidth * 0.98) {
+            best <- list(plot = candidate, measurement = measurement)
+            lower <- columns + 1L
+        } else {
+            upper <- columns - 1L
+        }
+    }
+    return(best)
+}
+
+.comparisonSplitLegendFits <- function(measurement) {
+    inside <- measurement$sizes$inside
+    bottom <- measurement$sizes$bottom
+    if (is.null(inside) || is.null(bottom)) {
+        return(FALSE)
+    }
+    # Reserve useful space for the panel rather than accepting any guide that
+    # technically fits. Layout choices remain a device-dependent heuristic.
+    return(measurement$panelWidth > 0 && measurement$panelHeight >= measurement$deviceHeight * 0.35 &&
+        inside[["width"]] <= measurement$panelWidth * 0.75 &&
+        inside[["height"]] <= measurement$panelHeight * 0.55 &&
+        bottom[["width"]] <= measurement$panelWidth * 0.98 &&
+        bottom[["height"]] <= measurement$deviceHeight * 0.45)
+}
+
+.layoutComparisonLegends <- function(p, plotSettings, legendPosition, categoryAesthetics,
+        parameterAesthetics, categoryPosition, parameterPosition) {
+    if (identical(p$theme$legend.position, "none")) {
+        return(p)
+    }
+    separate <- length(categoryAesthetics) && length(parameterAesthetics)
+    adaptive <- separate && identical(legendPosition, "auto") &&
+        (is.null(categoryPosition) || identical(categoryPosition, "auto")) &&
+        (is.null(parameterPosition) || identical(parameterPosition, "auto"))
+    if (!adaptive && is.null(categoryPosition) && is.null(parameterPosition)) {
+        return(.finalizePlotLegend(p, legendPosition, plotSettings))
+    }
+    if (grDevices::dev.cur() == 1L) {
+        grDevices::pdf(file = NULL, width = 7, height = 7)
+        on.exit(grDevices::dev.off(), add = TRUE)
+    }
+    for (legendScale in p$scales$scales) {
+        if (legendScale$is_discrete() && any(legendScale$aesthetics %in% c("colour", "fill", "linetype", "shape"))) {
+            legendScale$labels <- .comparisonWrapLegendLabels
+        }
+    }
+    p <- p + ggplot2::theme(legend.position = "inside", legend.justification.bottom = "center")
+    if (adaptive) {
+        for (fontFactor in c(1, 0.95, 0.9)) {
+            first <- .comparisonLegendGuide(p, parameterAesthetics, "inside", plotSettings, fontFactor = fontFactor)
+            first <- .comparisonLegendGuide(first, categoryAesthetics, "bottom", plotSettings,
+                horizontal = TRUE, fontFactor = fontFactor)
+            first <- .fitComparisonBottomLegend(first, categoryAesthetics, plotSettings, fontFactor)
+            firstFits <- .comparisonSplitLegendFits(first$measurement)
+            if (firstFits) {
+                first$plot <- .positionPlotLegend(first$plot, plotSettings)
+                firstScore <- .comparisonInsideLegendScore(first$plot, first$measurement)
+                if (firstScore <= sqrt(.Machine$double.eps)) {
+                    return(first$plot)
+                }
+            }
+            second <- .comparisonLegendGuide(p, categoryAesthetics, "inside", plotSettings, fontFactor = fontFactor)
+            second <- .comparisonLegendGuide(second, parameterAesthetics, "bottom", plotSettings, fontFactor = fontFactor)
+            secondMeasurement <- .measureComparisonLegends(second)
+            if (.comparisonSplitLegendFits(secondMeasurement)) {
+                second <- .positionPlotLegend(second, plotSettings)
+                if (!firstFits || .comparisonInsideLegendScore(second, secondMeasurement) + sqrt(.Machine$double.eps) < firstScore) {
+                    return(second)
+                }
+            }
+            if (firstFits) {
+                return(first$plot)
+            }
+        }
+        # Neither inside layout fits: retain readable text and move both guides
+        # outside. Extremely large legends still require a larger graphics device.
+        fallback <- .comparisonLegendGuide(first$plot, parameterAesthetics, "bottom", plotSettings, fontFactor = 0.9)
+        return(.fitComparisonBottomLegend(fallback, categoryAesthetics, plotSettings, 0.9)$plot)
+    }
+    inheritedPosition <- if (is.na(legendPosition)) {
+        "auto"
+    } else {
+        legendPosition
+    }
+    if (is.null(categoryPosition)) {
+        categoryPosition <- inheritedPosition
+    }
+    if (is.null(parameterPosition)) {
+        parameterPosition <- inheritedPosition
+    }
+    isInside <- function(position) {
+        return(is.numeric(position) && !is.na(position) && position > 0)
+    }
+    automaticInside <- FALSE
+    if (identical(categoryPosition, "auto")) {
+        categoryPosition <- if (isInside(parameterPosition) || identical(parameterPosition, "auto")) {
+            "bottom"
+        } else {
+            automaticInside <- TRUE
+            "inside"
+        }
+    }
+    if (identical(parameterPosition, "auto")) {
+        parameterPosition <- if (isInside(categoryPosition)) {
+            "bottom"
+        } else {
+            automaticInside <- TRUE
+            "inside"
+        }
+    }
+    p <- .comparisonLegendGuide(p, categoryAesthetics, categoryPosition, plotSettings,
+        horizontal = identical(categoryPosition, "bottom"))
+    p <- .comparisonLegendGuide(p, parameterAesthetics, parameterPosition, plotSettings)
+    if (identical(categoryPosition, "bottom")) {
+        p <- .fitComparisonBottomLegend(p, categoryAesthetics, plotSettings, 1)$plot
+    }
+    if (automaticInside) {
+        return(.positionPlotLegend(p, plotSettings))
+    }
+    return(p)
+}
+
+.comparisonInsideLegendScore <- function(p, measurement) {
+    width <- measurement$sizes$inside[["width"]] / measurement$panelWidth
+    height <- measurement$sizes$inside[["height"]] / measurement$panelHeight
+    lower <- p$theme$legend.position.inside - c(width, height) * p$theme$legend.justification
+    rectangle <- c(lower[1L] - 0.01, lower[1L] + width + 0.01,
+        lower[2L] - 0.01, lower[2L] + height + 0.01)
+    built <- measurement$built
+    score <- 0
+    for (layer in seq_along(built$data)) {
+        if (!nrow(built$data[[layer]])) {
+            next
+        }
+        data <- built$layout$coord$transform(built$data[[layer]], built$layout$panel_params[[1L]])
+        score <- score + .plotLegendLayerOverlap(data, p$layers[[layer]]$geom, rectangle)
+    }
+    return(score)
 }

@@ -101,7 +101,7 @@ NULL
 #' arguments are provided.
 #'
 #' For piecewise exponential event times, create \code{piecewiseSurvivalTime}
-#' with \code{getPiecewiseMultiArmSurvivalTime()}. Hazard ratios are represented
+#' with \code{getPiecewiseSurvivalTimeMultiArm()}. Hazard ratios are represented
 #' as an active-arm-by-interval-by-situation array; equivalently, they can be
 #' supplied to the constructor as a named list of active-arm-by-interval
 #' matrices. The situation dimension changes slowest, so printing the object
@@ -486,9 +486,9 @@ getSimulationMultiArmSurvival <- function(
         showStatistics = FALSE,
         cppEnabled = TRUE,
         simulationTypeIsUserDefined = FALSE) {
-    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseMultiArmSurvivalTime")
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeMultiArm")
     if (!is.null(piecewiseSurvivalTime) && !piecewiseEnabled) {
-        stopIllegalArgument("'piecewiseSurvivalTime' must be a PiecewiseMultiArmSurvivalTime object",
+        stopIllegalArgument("'piecewiseSurvivalTime' must be a PiecewiseSurvivalTimeMultiArm object",
             functionName = "getSimulationMultiArmSurvival", parameter = "piecewiseSurvivalTime")
     }
     if (piecewiseEnabled) {

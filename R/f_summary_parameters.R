@@ -265,7 +265,7 @@ NULL
             legendEntry = list()
         ))
     }
-    if (inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+    if (inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeCollection")) {
         return(list(
             groupCaption = paste0(parameterCaption, ", situation = ",
                 dimnames(designPlan$piecewiseSurvivalTime$hazardRatios)[[3]][variedParamNumber]),
@@ -371,7 +371,7 @@ NULL
     numberOfGroups <- 1
     arrayDataDim <- dim(arrayData)
     if (length(arrayDataDim) > 1 && (arrayDataDim[1] > 1 ||
-            inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime"))) {
+            inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeCollection"))) {
         numberOfVariedParams <- arrayDataDim[2]
         if (length(arrayDataDim) > 2) {
             numberOfGroups <- arrayDataDim[3]

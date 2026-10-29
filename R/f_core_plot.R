@@ -1251,7 +1251,7 @@ getAvailablePlotTypes <- function(
     }
 
     piecewiseSpecification <- if (.isParameterSet(parameterSet)) parameterSet[["piecewiseSurvivalTime"]] else NULL
-    if (!inherits(piecewiseSpecification, "PiecewisePatientWiseSurvivalTime")) piecewiseSpecification <- NULL
+    if (!inherits(piecewiseSpecification, "PiecewiseSurvivalTimeCollection")) piecewiseSpecification <- NULL
     if (!is.null(piecewiseSpecification)) {
         # Scenario order is repeated for each plotted arm, stage, or response series.
         data$xValues <- rep(seq_len(piecewiseSpecification$getNumberOfSituations()), length.out = nrow(data))
@@ -2116,6 +2116,12 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     }
     if (length(built$layout$panel_params) != 1L) {
         return(p + ggplot2::theme(legend.position = "right"))
+    }
+    # A comparison can keep one guide below the panel and one inside it.
+    # Only the inside guide belongs to the region being positioned here.
+    inside <- boxes[table$layout$name[boxes] == "guide-box-inside"]
+    if (length(inside)) {
+        boxes <- inside
     }
     legend <- table$grobs[[boxes[1L]]]
     panelWidth <- grDevices::dev.size("in")[1L] - grid::convertWidth(sum(table$widths), "in", valueOnly = TRUE)

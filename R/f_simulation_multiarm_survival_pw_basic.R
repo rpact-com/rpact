@@ -327,7 +327,7 @@ NULL
         treatmentArm = treatments
     )
 
-    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseMultiArmSurvivalTime")
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeMultiArm")
     if (piecewiseEnabled) {
         controlHazards <- piecewiseSurvivalTime$lambdaControls[1, ]
         activeHazards <- piecewiseActiveHazards
@@ -746,7 +746,7 @@ NULL
 
     index <- 1
     allPiecewiseActiveHazards <- if (inherits(
-            piecewiseSurvivalTime, "PiecewiseMultiArmSurvivalTime")) {
+            piecewiseSurvivalTime, "PiecewiseSurvivalTimeMultiArm")) {
         piecewiseSurvivalTime$getActiveHazards()
     } else {
         NULL

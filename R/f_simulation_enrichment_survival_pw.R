@@ -508,7 +508,7 @@ NULL
 #' observed in those subgroups at the preceding analysis count toward the target.
 #'
 #' For piecewise exponential event times, include a
-#' \code{PiecewiseEnrichmentSurvivalTime} object in
+#' \code{PiecewiseSurvivalTimeEnrichment} object in
 #' \code{effectList$piecewiseSurvivalTime}. Its hazard ratios are represented
 #' as a subgroup-by-interval-by-situation array; equivalently, they can be
 #' supplied to the constructor as a named list of subgroup-by-interval matrices.
@@ -584,9 +584,9 @@ getSimulationEnrichmentSurvival <- function(
         selectPopulationsFunction = NULL,
         showStatistics = FALSE) {
     piecewiseSurvivalTime <- if (is.list(effectList)) effectList$piecewiseSurvivalTime else NULL
-    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseEnrichmentSurvivalTime")
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeEnrichment")
     if (!is.null(piecewiseSurvivalTime) && !piecewiseEnabled) {
-        stopIllegalArgument("'effectList$piecewiseSurvivalTime' must be a PiecewiseEnrichmentSurvivalTime object",
+        stopIllegalArgument("'effectList$piecewiseSurvivalTime' must be a PiecewiseSurvivalTimeEnrichment object",
             functionName = "getSimulationEnrichmentSurvival", parameter = "effectList$piecewiseSurvivalTime")
     }
     if (piecewiseEnabled) {

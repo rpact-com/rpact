@@ -150,7 +150,7 @@ updateSubGroupVector <- function(
         treatmentArm = treatments
     )
 
-    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseEnrichmentSurvivalTime")
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeEnrichment")
     if (piecewiseEnabled) {
         lambdaControl <- piecewiseSurvivalTime$lambdaControls
         lambdaActive <- piecewiseActiveHazards
@@ -805,7 +805,7 @@ updateSubGroupVector <- function(
 
     index <- 1
     allPiecewiseActiveHazards <- if (inherits(
-            piecewiseSurvivalTime, "PiecewiseEnrichmentSurvivalTime")) {
+            piecewiseSurvivalTime, "PiecewiseSurvivalTimeEnrichment")) {
         piecewiseSurvivalTime$getActiveHazards()
     } else {
         NULL

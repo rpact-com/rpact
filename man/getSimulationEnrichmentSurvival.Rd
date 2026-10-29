@@ -83,8 +83,8 @@ and number of rows reflecting the different situations to consider (see
 examples). For a piecewise exponential patient-wise survival simulation,
 specify
 \code{subGroups}, \code{prevalences}, and \code{piecewiseSurvivalTime},
-where the latter is a \code{PiecewiseEnrichmentSurvivalTime} object created
-by \code{getPiecewiseEnrichmentSurvivalTime()}. Its subgroup names and the
+where the latter is a \code{PiecewiseSurvivalTimeEnrichment} object created
+by \code{getPiecewiseSurvivalTimeEnrichment()}. Its subgroup names and the
 order of \code{subGroups} must agree. In this case, do not also specify
 \code{piControls}, \code{piTreatments}, or \code{hazardRatios}.}
 
@@ -270,7 +270,7 @@ the planned increase in events among the selected subgroups. Events already
 observed in those subgroups at the preceding analysis count toward the target.
 
 For piecewise exponential event times, include a
-\code{PiecewiseEnrichmentSurvivalTime} object in
+\code{PiecewiseSurvivalTimeEnrichment} object in
 \code{effectList$piecewiseSurvivalTime}. Its hazard ratios are represented
 as a subgroup-by-interval-by-situation array; equivalently, they can be
 supplied to the constructor as a named list of subgroup-by-interval matrices.
@@ -457,7 +457,7 @@ simulationResultsNonInferiority <- getSimulationEnrichmentSurvival(
     simulationType = "patientWise")
 
 # Piecewise exponential event times in two disjoint subgroups
-piecewiseTime <- getPiecewiseEnrichmentSurvivalTime(
+piecewiseTime <- getPiecewiseSurvivalTimeEnrichment(
     piecewiseSurvivalTime = c(0, 6),
     lambdaControls = rbind(S = c(0.08, 0.12), R = c(0.05, 0.09)),
     hazardRatios = list(

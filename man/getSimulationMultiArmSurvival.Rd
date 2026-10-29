@@ -91,8 +91,8 @@ defining the null hypothesis H0: \code{pi = thetaH0}.}
 
 \item{piControl}{The assumed probability in the control arm, default is \code{0.5}.}
 
-\item{piecewiseSurvivalTime}{A \code{PiecewiseMultiArmSurvivalTime} object
-created by \code{getPiecewiseMultiArmSurvivalTime()}. It specifies common
+\item{piecewiseSurvivalTime}{A \code{PiecewiseSurvivalTimeMultiArm} object
+created by \code{getPiecewiseSurvivalTimeMultiArm()}. It specifies common
 interval start times, the control hazard in every interval, and an
 active-arm-by-interval hazard-ratio matrix for every situation. It can
 only be used for patient-wise simulation with \code{kappa = 1}, and cannot
@@ -309,7 +309,7 @@ legacy test-statistic-based approach for backward compatibility if no patient-wi
 arguments are provided.
 
 For piecewise exponential event times, create \code{piecewiseSurvivalTime}
-with \code{getPiecewiseMultiArmSurvivalTime()}. Hazard ratios are represented
+with \code{getPiecewiseSurvivalTimeMultiArm()}. Hazard ratios are represented
 as an active-arm-by-interval-by-situation array; equivalently, they can be
 supplied to the constructor as a named list of active-arm-by-interval
 matrices. The situation dimension changes slowest, so printing the object
@@ -491,7 +491,7 @@ simulationResultsNonInferiority <- getSimulationMultiArmSurvival(
     maxNumberOfIterations = 50, simulationType = "patientWise")
 
 # Piecewise exponential event times for two active arms and two situations
-piecewiseTime <- getPiecewiseMultiArmSurvivalTime(
+piecewiseTime <- getPiecewiseSurvivalTimeMultiArm(
     piecewiseSurvivalTime = c(0, 6),
     lambdaControl = c(0.08, 0.12),
     hazardRatios = list(

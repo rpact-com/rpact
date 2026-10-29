@@ -9,8 +9,8 @@ and number of rows reflecting the different situations to consider (see
 examples). For a piecewise exponential patient-wise survival simulation,
 specify
 \code{subGroups}, \code{prevalences}, and \code{piecewiseSurvivalTime},
-where the latter is a \code{PiecewiseEnrichmentSurvivalTime} object created
-by \code{getPiecewiseEnrichmentSurvivalTime()}. Its subgroup names and the
+where the latter is a \code{PiecewiseSurvivalTimeEnrichment} object created
+by \code{getPiecewiseSurvivalTimeEnrichment()}. Its subgroup names and the
 order of \code{subGroups} must agree. In this case, do not also specify
 \code{piControls}, \code{piTreatments}, or \code{hazardRatios}.}
 }

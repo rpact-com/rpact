@@ -11,8 +11,8 @@ Extend the patient-wise multi-arm and population-enrichment survival simulations
 
 Two constructors provide complete, validated survival specifications:
 
-- `getPiecewiseMultiArmSurvivalTime()` for active arms compared with a common control.
-- `getPiecewiseEnrichmentSurvivalTime()` for active treatment compared with control within disjoint subsets.
+- `getPiecewiseSurvivalTimeMultiArm()` for active arms compared with a common control.
+- `getPiecewiseSurvivalTimeEnrichment()` for active treatment compared with control within disjoint subsets.
 
 Hazard ratios may be supplied as one group-by-interval matrix, a named list of such matrices (one per situation), or an equivalent three-dimensional array. The normalized array dimension order is:
 

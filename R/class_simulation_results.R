@@ -390,7 +390,7 @@ SimulationResults <- R6::R6Class(
                     if (self$.design$kMax > 1) {
                         self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
-                    if (inherits(self[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+                    if (inherits(self[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeCollection")) {
                         self$.cat("  Situations: ",
                             paste(dimnames(self$piecewiseSurvivalTime$hazardRatios)[[3]], collapse = ", "),
                             " (in this order)\n", consoleOutputEnabled = consoleOutputEnabled)

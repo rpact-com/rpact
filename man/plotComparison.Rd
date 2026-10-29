@@ -12,7 +12,7 @@ plotComparison(
   groupParamName = NULL,
   categoryParamName = NULL,
   mainTitle = NULL,
-  legendTitle = "Legend",
+  legendTitle = NULL,
   plotLineEnabled = TRUE,
   plotPointsEnabled = TRUE,
   pointBorder = 4,
@@ -21,7 +21,9 @@ plotComparison(
   legendPosition = "auto",
   shinyOptimization = FALSE,
   objects = NULL,
-  yAxisSide = "auto"
+  yAxisSide = "auto",
+  categoryLegendPosition = NULL,
+  parameterLegendPosition = NULL
 )
 }
 \arguments{
@@ -43,7 +45,11 @@ NA_character_ or character(0) disables categories.}
 \item{mainTitle}{Plot title. When omitted, generated from the original objects
 using the same title as print and summary. Supply NULL or NA to hide it.}
 
-\item{legendTitle}{Legend title.}
+\item{legendTitle}{Category/group legend title. When omitted, object identifiers
+use Design, Calculation, Simulation, or a combination derived from the original
+objects or comparison metadata. Other categories use their parameter captions.
+With multiple y parameters and no categories, the title is Parameter.
+Explicit titles, including NULL to hide titles, take precedence.}
 
 \item{plotLineEnabled, plotPointsEnabled}{Whether to show lines and points.}
 
@@ -53,8 +59,8 @@ using the same title as print and summary. Supply NULL or NA to hide it.}
 
 \item{mirrorModeEnabled}{Whether to use fill categories without a legend.}
 
-\item{legendPosition}{"auto" (default) selects an inside position with the least
-overlap with points and lines. Alternatively use rpact positions 1 (top left),
+\item{legendPosition}{Shared legend position. "auto" (default) uses the
+adaptive placement described below. Alternatively use rpact positions 1 (top left),
 2 (centre left), 3 (bottom left), 4 (top right), 5 (centre right),
 6 (bottom right), -1 (hidden), 0 (default position with square aspect),
 or a ggplot position name (none, left, right, bottom, top).}
@@ -68,6 +74,13 @@ frame, as in \code{\link[=getComparisonPlotParameters]{getComparisonPlotParamete
 Supply one value for all y parameters, a vector in their order, or a named
 vector assigning individual parameters. Unspecified named entries remain
 automatic. The same argument is accepted by \code{\link[=plotComparison]{plotComparison()}}.}
+
+\item{categoryLegendPosition, parameterLegendPosition}{Optional separate positions
+for category/group and y-parameter legends, using the same values as
+\code{legendPosition}. NULL inherits the shared setting. With both guides present,
+shared automatic positioning uses the adaptive layout described below.
+Explicit positions override this layout; two explicit inside positions may
+place the guides independently. A shared hidden legend remains hidden.}
 }
 \value{
 A ggplot object, which can be customized with ggplot2 layers.
@@ -102,13 +115,21 @@ caller's data are not modified. Explicitly placing all parameters on the
 right uses one primary axis on the right. Parameters assigned to the same
 side always share that scale.
 
-Legend entries are arranged vertically and long labels are wrapped. Automatic
-placement measures the combined legend and scores six inside positions against
-points and complete line segments in panel coordinates, including secondary-axis
-scaling. It is a heuristic, not a guarantee of no overlap. Oversized legends
-are placed outside on the right. The choice uses the current graphics device
-(seven inches square if none is open); resizing or exporting to another size
-may require an explicit position or recreating the plot on that device.
+For multiple y parameters with category/group legends, \code{legendPosition = "auto"}
+prefers horizontal category entries below the x-axis and a separate vertical
+parameter legend automatically placed inside. Category entries wrap into rows
+according to measured guide and panel dimensions. If the parameter legend
+takes too much inside space or covers more data, the alternative layout places
+it vertically below the panel and positions the category legend inside. Layout changes and label
+wrapping precede font reductions, which are limited to ten percent. If neither
+inside layout fits, both guides are placed below the panel. Very large legends
+still require a larger graphics device or an explicit layout.
+Explicit shared positions, such as "bottom", continue to apply to both guides
+unless a separate position is supplied. With only one guide, the common rpact
+positioning rules apply. Automatic inside placement scores points and line
+segments in panel coordinates, including secondary-axis scaling. This is a
+heuristic using the current device (seven inches square if none is open);
+resizing or exporting to another size may require recreating the plot.
 
 Interactive converters must preserve the secondary-axis transformation.
 A plain \code{plotly::ggplotly()} conversion may omit the right axis and display
@@ -128,6 +149,8 @@ plotComparison(performance, "theta",
     yAxisSide = c(averageSampleNumber = "left",
         overallEarlyStop = "right", calculatedPower = "right"),
     plotPointsEnabled = FALSE)
+plotComparison(data, "stages", c("criticalValues", "stageLevels"),
+    categoryLegendPosition = "auto", parameterLegendPosition = "bottom")
 }
 
 }

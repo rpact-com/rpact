@@ -788,8 +788,8 @@ NULL
 NULL
 
 #' Parameter Description: Piecewise Multi-Arm Survival Time
-#' @param piecewiseSurvivalTime A \code{PiecewiseMultiArmSurvivalTime} object
-#'   created by \code{getPiecewiseMultiArmSurvivalTime()}. It specifies common
+#' @param piecewiseSurvivalTime A \code{PiecewiseSurvivalTimeMultiArm} object
+#'   created by \code{getPiecewiseSurvivalTimeMultiArm()}. It specifies common
 #'   interval start times, the control hazard in every interval, and an
 #'   active-arm-by-interval hazard-ratio matrix for every situation. It can
 #'   only be used for patient-wise simulation with \code{kappa = 1}, and cannot
@@ -811,8 +811,8 @@ NULL
 #'   examples). For a piecewise exponential patient-wise survival simulation,
 #'   specify
 #'   \code{subGroups}, \code{prevalences}, and \code{piecewiseSurvivalTime},
-#'   where the latter is a \code{PiecewiseEnrichmentSurvivalTime} object created
-#'   by \code{getPiecewiseEnrichmentSurvivalTime()}. Its subgroup names and the
+#'   where the latter is a \code{PiecewiseSurvivalTimeEnrichment} object created
+#'   by \code{getPiecewiseSurvivalTimeEnrichment()}. Its subgroup names and the
 #'   order of \code{subGroups} must agree. In this case, do not also specify
 #'   \code{piControls}, \code{piTreatments}, or \code{hazardRatios}.
 #' @name param_effectList_enrichment_survival
