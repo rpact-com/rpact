@@ -171,6 +171,20 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
             }
             self$.cat("Piecewise exponential ", self$groupType, " survival time\n\n",
                 heading = 1, consoleOutputEnabled = consoleOutputEnabled)
+            
+            for (i in seq_len(self$getNumberOfSituations())) {
+                if (!is.null(self$medianTreatments)) {
+                    self$.cat("\nTreatment medians - ", dimnames(self$hazardRatios)[[3]][i],
+                        " (exponential per interval):\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.showMatrix(matrix(self$medianTreatments[, , i], nrow = self$getNumberOfGroups(),
+                        dimnames = dimnames(self$medianTreatments)[1:2]), digits, consoleOutputEnabled)
+                }
+                self$.cat("\nHazard ratios - ", dimnames(self$hazardRatios)[[3]][i], ":\n",
+                    heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                self$.showMatrix(matrix(self$hazardRatios[, , i], nrow = self$getNumberOfGroups(),
+                    dimnames = dimnames(self$hazardRatios)[1:2]), digits, consoleOutputEnabled)
+            }
+            
             controls <- self$lambdaControls
             if (self$groupType == "multi-arm") {
                 self$.cat("Control hazards (common to all treatment arms):\n",
@@ -191,23 +205,26 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                     heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                 self$.showMatrix(controlMedians, digits, consoleOutputEnabled)
             }
-            for (i in seq_len(self$getNumberOfSituations())) {
-                if (!is.null(self$medianTreatments)) {
-                    self$.cat("\nTreatment medians - ", dimnames(self$hazardRatios)[[3]][i],
-                        " (exponential per interval):\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    self$.showMatrix(matrix(self$medianTreatments[, , i], nrow = self$getNumberOfGroups(),
-                        dimnames = dimnames(self$medianTreatments)[1:2]), digits, consoleOutputEnabled)
-                }
-                self$.cat("\nHazard ratios - ", dimnames(self$hazardRatios)[[3]][i], ":\n",
-                    heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                self$.showMatrix(matrix(self$hazardRatios[, , i], nrow = self$getNumberOfGroups(),
-                    dimnames = dimnames(self$hazardRatios)[1:2]), digits, consoleOutputEnabled)
-            }
+            
             return(invisible(self))
         },
         .showMatrix = function(values, digits, consoleOutputEnabled) {
             if (is.na(digits)) {
                 digits <- getOption("digits")
+            }
+            if (!consoleOutputEnabled) {
+                tableColumns <- ncol(values) + 1L
+                self$.cat(c("Group", colnames(values)), tableColumns = tableColumns,
+                    consoleOutputEnabled = FALSE)
+                self$.cat(rep("-----", tableColumns), tableColumns = tableColumns,
+                    consoleOutputEnabled = FALSE)
+                formattedValues <- format(values, digits = digits, trim = TRUE)
+                for (i in seq_len(nrow(values))) {
+                    self$.cat(c(rownames(values)[i], formattedValues[i, ]),
+                        tableColumns = tableColumns, consoleOutputEnabled = FALSE)
+                }
+                self$.cat("\n", consoleOutputEnabled = FALSE)
+                return(invisible())
             }
             for (line in capture.output(print(values, digits = digits))) {
                 self$.cat(line, "\n", consoleOutputEnabled = consoleOutputEnabled)
