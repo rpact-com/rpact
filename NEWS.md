@@ -27,6 +27,8 @@
 
 ## Improvements, issues, and changes
 
+* Repeated p-values are now unavailable (`NA` with a warning) for sequential designs with user-defined beta spending (`typeBetaSpending = "bsUser"`), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.
+* Replaced direct errors in comparison extraction, comparison plotting, and package testing with the central error helpers, providing specific error categories and structured diagnostic context while preserving worker failure details.
 * On Windows, `testPackage()` now uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.
 * `testPackage()` now runs R basic package tests in a separate R process before starting parallel workers and isolates configuration writes per test process. Worker crashes preserve partial results and are explicitly reported as incomplete execution, with the expected test count from `META`, the full diagnostic log path, and a hint to retry with `workers = 1`. Partial reports cannot claim successful installation qualification.
 * Corrected Weibull hazard ratio conversions for `kappa != 1` in survival planning and simulation, including multi-arm and enrichment simulations. Lambda remains the inverse Weibull scale; the hazard ratio is `(lambda1 / lambda2)^kappa`. Exponential calculations (`kappa = 1`) are unchanged.

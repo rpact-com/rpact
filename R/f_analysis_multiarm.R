@@ -500,6 +500,10 @@ getClosedCombinationTestResults <- function(stageResults) {
     kMax <- design$kMax
     repeatedPValues <- matrix(NA_real_, nrow = gMax, ncol = kMax)
 
+    if (.repeatedPValuesUnavailableForUserBetaSpending(design, functionName = "getRepeatedPValues")) {
+        return(repeatedPValues)
+    }
+
     if (.isTrialDesignInverseNormal(design)) {
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
             warnResultUnavailable("Repeated p-values not available for 'typeOfDesign' = ",
