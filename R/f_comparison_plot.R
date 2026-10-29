@@ -914,20 +914,26 @@ plotComparison <- function(
     if (!length(parameters)) {
         return("Parameter")
     }
+    
     title <- vapply(parameters, function(parameter) {
         if (!parameter %in% c("objectNumber", "objectName", "designNumber")) {
             return(.comparisonYCaptions(parameter, objects))
         }
+        
         types <- .comparisonLegendObjectTypes(data, objects)
-        if (!length(objects) && !any(c("objectType", "calculationTarget") %in% names(data)) &&
+        if (length(objects) == 0 && !any(c("objectType", "calculationTarget") %in% names(data)) &&
                 parameter == "designNumber") {
             types <- "Design"
         }
         
         types[is.na(types)] <- "Object"
         types <- intersect(c("Design", "Calculation", "Simulation", "Object"), unique(types))
-        if (!length(types)) {
+        if (length(types) == 0) {
             return("Object")
+        }
+
+        if (length(types) == 1) {
+            return(types)
         }
         
         if (!"Object" %in% types) {

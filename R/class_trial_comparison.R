@@ -747,19 +747,24 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
         if (inherits(object, "SimulationResults")) {
             return("Power simulation")
         }
+        
         if (inherits(object, c("TrialDesign", "TrialDesignCharacteristics"))) {
             return("Design")
         }
+        
         if (inherits(object, "TrialDesignPlan")) {
             if (object$.isSampleSizeObject()) {
                 return("Sample size calculation")
             }
+            
             if (object$.isPowerObject()) {
                 return("Power calculation")
             }
         }
+        
         return("Design plan")
     }, character(1))
+
     categories <- unique(categories)
     category <- if (!length(categories)) {
         "Trial"
