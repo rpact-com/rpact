@@ -98,6 +98,8 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     groupType = "Group type",
     medianTreatment = "median",
     medianControl = "median(control)",
+    medianControls = "Control medians (exponential per interval)",
+    medianTreatments = "Treatment medians (exponential per interval)",
     nPlanned = "Planned sample size",
     piControl = "Assumed control rate",
     piControls = "Assumed control rates",

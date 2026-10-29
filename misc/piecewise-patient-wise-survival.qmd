@@ -42,9 +42,21 @@ For multi-arm simulations, the control hazards form one vector over intervals. F
 
 The resulting object is supplied through `piecewiseSurvivalTime`. It replaces the ordinary survival-effect inputs (`piControl` and `effectMatrix` for multi-arm simulations; `piControls`, `piTreatments`, and `hazardRatios` inside an enrichment `effectList`). Piecewise inputs imply `typeOfShape = "userDefined"` and patient-wise simulation.
 
-The initial API accepts hazards and hazard ratios. Future alternative input
-parameterizations can normalize into the same validated representation without
-changing the simulation interface.
+Control hazards may alternatively be specified by `medianControl` (one value per
+interval for multi-arm simulations) or `medianControls` (a subgroup-by-interval
+matrix for enrichment simulations). `medianTreatments` accepts the same matrix,
+list, or array shapes as `hazardRatios` and replaces that input. The two choices
+are independent: control medians can be combined with hazard ratios, or treatment
+medians with explicit control hazards. Each pair of alternative inputs is
+mutually exclusive; inputs are not recycled across intervals, groups, or situations.
+
+Each median defines the exponential distribution corresponding to that interval's
+hazard, using `getLambdaByMedian(median, kappa = 1)`. It is not the actual median
+of the complete piecewise distribution. For example, control medians of 12 and 24
+months for intervals starting at 0 and 6 months give an actual overall control
+median of 18 months. Original interval medians remain user-defined parameters,
+while calculated hazards and hazard ratios are derived parameters. R-code
+reconstruction preserves the chosen parameterization and input names.
 
 ## Simulation implementation
 

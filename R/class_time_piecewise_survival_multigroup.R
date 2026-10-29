@@ -15,7 +15,7 @@
 ## |
 
 #' @include class_time.R
-#' @include f_piecewise_survival_utilities.R
+#' @include f_piecewise_survival_time_utilities.R
 NULL
 
 #'
@@ -36,6 +36,7 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
         piecewiseSurvivalTime = NULL,
         lambdaControls = NULL,
         hazardRatios = NULL,
+        medianTreatments = NULL,
         groupType = NULL,
         initialize = function(piecewiseSurvivalTime = NULL, lambdaControls = NULL,
                 hazardRatios = NULL, groupType = NULL) {
@@ -47,6 +48,15 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                 self$.setParameterType(parameter, C_PARAM_USER_DEFINED)
             }
             self$.setParameterType("groupType", C_PARAM_DERIVED)
+            self$.setParameterType("medianTreatments", C_PARAM_NOT_APPLICABLE)
+        },
+        .initMedianParameters = function(medianTreatments) {
+            if (!is.null(medianTreatments)) {
+                dimnames(medianTreatments) <- dimnames(self$hazardRatios)
+                self$medianTreatments <- medianTreatments
+                self$.setParameterType("medianTreatments", C_PARAM_USER_DEFINED)
+                self$.setParameterType("hazardRatios", C_PARAM_DERIVED)
+            }
         },
         .validate = function(functionName = .getClassName(self)) {
             inputs <- .validatePiecewiseSurvivalInputs(self$piecewiseSurvivalTime, self$lambdaControls,
@@ -73,6 +83,42 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                         constraint = "one common control hazard per interval",
                         relatedParameter = "lambdaControls", relatedValue = self$lambdaControls,
                         diagnosticId = "survival.piecewise_common_control")
+                }
+            }
+            controlMedianName <- if (self$groupType == "multi-arm") {
+                "medianControl"
+            } else {
+                "medianControls"
+            }
+            controlMedians <- self[[controlMedianName]]
+            if (!is.null(controlMedians)) {
+                expectedControls <- if (self$groupType == "multi-arm") {
+                    .getPiecewiseMedianHazards(controlMedians, controlMedianName, functionName)
+                } else {
+                    .getPiecewiseMedianHazards(controlMedians, controlMedianName, functionName, dimension = 2)
+                }
+                actualControls <- if (self$groupType == "multi-arm") {
+                    self$lambdaControl
+                } else {
+                    self$lambdaControls
+                }
+                if (!identical(expectedControls, actualControls)) {
+                    stopConflictingArguments("control medians must agree with their derived hazards; recreate the specification",
+                        functionName = functionName, parameter = controlMedianName, value = controlMedians,
+                        constraint = "control hazards derived from the supplied interval medians",
+                        relatedParameter = "lambdaControls", relatedValue = self$lambdaControls,
+                        diagnosticId = "survival.piecewise_median_hazard_consistency")
+                }
+            }
+            if (!is.null(self$medianTreatments)) {
+                expectedRatios <- .getPiecewiseMedianRatios(self$medianTreatments, self$lambdaControls, functionName)
+                if (!identical(dimnames(expectedRatios), dimnames(self$hazardRatios)) ||
+                        !isTRUE(all.equal(expectedRatios, self$hazardRatios, tolerance = 1e-12))) {
+                    stopConflictingArguments("treatment medians must agree with their derived hazard ratios; recreate the specification",
+                        functionName = functionName, parameter = "medianTreatments", value = self$medianTreatments,
+                        constraint = "hazard ratios derived from treatment medians and control hazards",
+                        relatedParameter = "hazardRatios", relatedValue = self$hazardRatios,
+                        diagnosticId = "survival.piecewise_median_hazard_consistency")
                 }
             }
             # Normalized objects are passed to C++ without further dimensional checks.
@@ -135,7 +181,23 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                 self$.cat("Control hazards:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
             }
             self$.showMatrix(controls, digits, consoleOutputEnabled)
+            controlMedians <- self[["medianControls"]]
+            if (self$groupType == "multi-arm" && !is.null(self[["medianControl"]])) {
+                controlMedians <- matrix(self$medianControl, nrow = 1,
+                    dimnames = list("Control", colnames(controls)))
+            }
+            if (!is.null(controlMedians)) {
+                self$.cat("\nControl medians (exponential per interval):\n",
+                    heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                self$.showMatrix(controlMedians, digits, consoleOutputEnabled)
+            }
             for (i in seq_len(self$getNumberOfSituations())) {
+                if (!is.null(self$medianTreatments)) {
+                    self$.cat("\nTreatment medians - ", dimnames(self$hazardRatios)[[3]][i],
+                        " (exponential per interval):\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.showMatrix(matrix(self$medianTreatments[, , i], nrow = self$getNumberOfGroups(),
+                        dimnames = dimnames(self$medianTreatments)[1:2]), digits, consoleOutputEnabled)
+                }
                 self$.cat("\nHazard ratios - ", dimnames(self$hazardRatios)[[3]][i], ":\n",
                     heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                 self$.showMatrix(matrix(self$hazardRatios[, , i], nrow = self$getNumberOfGroups(),
@@ -165,9 +227,13 @@ PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
     inherit = PiecewiseSurvivalTimeMultiGroup,
     public = list(
         lambdaControl = NULL,
-        initialize = function(piecewiseSurvivalTime = NULL, lambdaControl = NULL, hazardRatios = NULL) {
+        medianControl = NULL,
+        initialize = function(piecewiseSurvivalTime = NULL, lambdaControl = NULL, hazardRatios = NULL,
+                medianControl = NULL, medianTreatments = NULL) {
             functionName <- "getPiecewiseSurvivalTimeMultiArm"
             times <- .validatePiecewiseStartTimes(piecewiseSurvivalTime, functionName)
+            lambdaControl <- .getPiecewiseControlInput(times, lambdaControl, medianControl,
+                "lambdaControl", "medianControl", functionName)
             .assertPiecewiseNumeric(lambdaControl, "lambdaControl", functionName)
             if (length(lambdaControl) != length(times)) {
                 stopArgumentLengthOutOfBounds("'lambdaControl' must contain one numeric value per interval",
@@ -176,13 +242,27 @@ PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
                     relatedValue = times, expectedLength = length(times), actualLength = length(lambdaControl),
                     diagnosticId = "survival.piecewise_control_length")
             }
-            ratios <- .normalizePiecewiseHazardRatios(hazardRatios, functionName = functionName)
+            ratios <- .getPiecewiseEffectInput(hazardRatios, medianTreatments, functionName)
+            medians <- NULL
+            if (!is.null(medianTreatments)) {
+                medians <- ratios
+            }
             controls <- matrix(rep(lambdaControl, each = dim(ratios)[1]), nrow = dim(ratios)[1],
                 dimnames = list(dimnames(ratios)[[1]], NULL))
+            if (!is.null(medians)) {
+                ratios <- .getPiecewiseMedianRatios(medians, controls, functionName)
+            }
             super$initialize(times, controls, ratios, "multi-arm")
             self$lambdaControl <- as.numeric(lambdaControl)
             self$.setParameterType("lambdaControl", C_PARAM_USER_DEFINED)
             self$.setParameterType("lambdaControls", C_PARAM_DERIVED)
+            self$.setParameterType("medianControl", C_PARAM_NOT_APPLICABLE)
+            if (!is.null(medianControl)) {
+                self$medianControl <- as.numeric(medianControl)
+                self$.setParameterType("medianControl", C_PARAM_USER_DEFINED)
+                self$.setParameterType("lambdaControl", C_PARAM_DERIVED)
+            }
+            self$.initMedianParameters(medians)
         }
     )
 )
@@ -190,8 +270,31 @@ PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
 PiecewiseSurvivalTimeEnrichment <- R6::R6Class("PiecewiseSurvivalTimeEnrichment",
     inherit = PiecewiseSurvivalTimeMultiGroup,
     public = list(
-        initialize = function(piecewiseSurvivalTime = NULL, lambdaControls = NULL, hazardRatios = NULL) {
-            super$initialize(piecewiseSurvivalTime, lambdaControls, hazardRatios, "enrichment")
+        medianControls = NULL,
+        initialize = function(piecewiseSurvivalTime = NULL, lambdaControls = NULL, hazardRatios = NULL,
+                medianControls = NULL, medianTreatments = NULL) {
+            functionName <- "getPiecewiseSurvivalTimeEnrichment"
+            times <- .validatePiecewiseStartTimes(piecewiseSurvivalTime, functionName)
+            lambdaControls <- .getPiecewiseControlInput(times, lambdaControls, medianControls,
+                "lambdaControls", "medianControls", functionName, dimension = 2)
+            .assertPiecewiseNumeric(lambdaControls, "lambdaControls", functionName, dimension = 2)
+            ratios <- .getPiecewiseEffectInput(hazardRatios, medianTreatments, functionName,
+                groupNames = rownames(lambdaControls))
+            medians <- NULL
+            if (!is.null(medianTreatments)) {
+                medians <- ratios
+                ratios <- .getPiecewiseMedianRatios(medians, lambdaControls, functionName)
+            }
+            super$initialize(times, lambdaControls, ratios, "enrichment")
+            self$.setParameterType("medianControls", C_PARAM_NOT_APPLICABLE)
+            if (!is.null(medianControls)) {
+                self$medianControls <- medianControls
+                storage.mode(self$medianControls) <- "double"
+                dimnames(self$medianControls) <- dimnames(self$lambdaControls)
+                self$.setParameterType("medianControls", C_PARAM_USER_DEFINED)
+                self$.setParameterType("lambdaControls", C_PARAM_DERIVED)
+            }
+            self$.initMedianParameters(medians)
         }
     )
 )

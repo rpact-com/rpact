@@ -14,10 +14,10 @@ NULL
     } else {
         length(dim(value)) == dimension && all(dim(value) > 0)
     }
-    if (!is.numeric(value) || !validDimension) {
+    if (!is.numeric(value) || is.complex(value) || !validDimension) {
         stopIllegalArgument("'", parameter, "' must be numeric with the required dimensions",
             functionName = functionName, parameter = parameter, value = value,
-            constraint = "numeric input with non-zero dimensions and no type coercion",
+            constraint = "real numeric input with non-zero dimensions and no type coercion",
             diagnosticId = "survival.piecewise_numeric_dimensions",
             context = list(expectedDimensions = dimension, actualDimensions = dim(value)))
     }
@@ -25,7 +25,11 @@ NULL
         stopArgumentOutOfRange("all ", parameter, " must be finite and greater than 0",
             functionName = functionName, parameter = parameter, value = value,
             constraint = "finite values in (0, Inf)", lowerBound = 0,
-            diagnosticId = "survival.piecewise_positive_hazards")
+            diagnosticId = if (startsWith(parameter, "median")) {
+                "survival.piecewise_positive_medians"
+            } else {
+                "survival.piecewise_positive_hazards"
+            })
     }
 }
 
@@ -98,10 +102,83 @@ NULL
     }, character(1)))
 }
 
+.assertPiecewiseAlternativeInputs <- function(value, median, parameter, medianParameter, functionName) {
+    if (!is.null(value) && !is.null(median)) {
+        stopConflictingArguments("'", parameter, "' and '", medianParameter, "' cannot both be specified",
+            functionName = functionName, parameter = medianParameter, value = median,
+            constraint = "specify exactly one hazard or median parameterization",
+            relatedParameter = parameter, relatedValue = value,
+            diagnosticId = "survival.piecewise_conflicting_parameterizations")
+    }
+}
+
+.getPiecewiseMedianHazards <- function(medians, parameter, functionName, dimension = NULL) {
+    .assertPiecewiseNumeric(medians, parameter, functionName, dimension = dimension)
+    hazards <- getLambdaByMedian(as.numeric(medians), kappa = 1)
+    if (!is.null(dim(medians))) {
+        dim(hazards) <- dim(medians)
+        dimnames(hazards) <- dimnames(medians)
+    } else {
+        names(hazards) <- names(medians)
+    }
+    return(hazards)
+}
+
+.getPiecewiseControlInput <- function(times, hazards, medians, parameter, medianParameter,
+        functionName, dimension = NULL) {
+    .assertPiecewiseAlternativeInputs(hazards, medians, parameter, medianParameter, functionName)
+    if (is.null(medians)) {
+        return(hazards)
+    }
+    converted <- .getPiecewiseMedianHazards(medians, medianParameter, functionName, dimension)
+    actualLength <- if (is.null(dimension)) {
+        length(medians)
+    } else {
+        ncol(medians)
+    }
+    if (actualLength != length(times)) {
+        stopArgumentLengthOutOfBounds("'", medianParameter, "' must contain one median per interval",
+            functionName = functionName, parameter = medianParameter, value = medians,
+            constraint = "one median per interval; no recycling", relatedParameter = "piecewiseSurvivalTime",
+            relatedValue = times, expectedLength = length(times), actualLength = actualLength,
+            diagnosticId = "survival.piecewise_median_interval_count")
+    }
+    return(converted)
+}
+
+.getPiecewiseEffectInput <- function(hazardRatios, medianTreatments, functionName, groupNames = NULL) {
+    .assertPiecewiseAlternativeInputs(hazardRatios, medianTreatments,
+        "hazardRatios", "medianTreatments", functionName)
+    if (is.null(medianTreatments)) {
+        return(.normalizePiecewiseHazardRatios(hazardRatios,
+            groupNames = groupNames, functionName = functionName))
+    }
+    return(.normalizePiecewiseHazardRatios(medianTreatments,
+        groupNames = groupNames, functionName = functionName, parameter = "medianTreatments"))
+}
+
+.getPiecewiseMedianRatios <- function(medians, controls, functionName) {
+    if (!identical(dim(medians)[1:2], dim(controls))) {
+        stopIllegalArgument("'medianTreatments' must match the control groups and intervals",
+            functionName = functionName, parameter = "medianTreatments", value = medians,
+            constraint = "one treatment median per control group and interval in every situation",
+            relatedParameter = "lambdaControls", relatedValue = controls,
+            diagnosticId = "survival.piecewise_median_dimensions",
+            context = list(expectedDimensions = dim(controls), actualDimensions = dim(medians)))
+    }
+    return(sweep(.getPiecewiseMedianHazards(medians, "medianTreatments", functionName, dimension = 3),
+        c(1, 2), controls, `/`))
+}
+
 .normalizePiecewiseHazardRatios <- function(hazardRatios, groupNames = NULL,
-        intervalNames = NULL, functionName) {
+        intervalNames = NULL, functionName, parameter = "hazardRatios") {
+    matrixType <- if (parameter == "medianTreatments") {
+        "treatment-median"
+    } else {
+        "hazard-ratio"
+    }
     if (is.array(hazardRatios) && length(dim(hazardRatios)) == 3) {
-        .assertPiecewiseNumeric(hazardRatios, "hazardRatios", functionName, dimension = 3)
+        .assertPiecewiseNumeric(hazardRatios, parameter, functionName, dimension = 3)
         result <- hazardRatios
     } else {
         situations <- if (is.list(hazardRatios) && !is.data.frame(hazardRatios)) {
@@ -110,20 +187,20 @@ NULL
             list(hazardRatios)
         }
         if (length(situations) == 0) {
-            stopMissingArgument("at least one hazard-ratio matrix must be specified",
-                functionName = functionName, parameter = "hazardRatios", value = hazardRatios,
+            stopMissingArgument("at least one ", matrixType, " matrix must be specified",
+                functionName = functionName, parameter = parameter, value = hazardRatios,
                 constraint = "at least one group-by-interval matrix",
                 diagnosticId = "survival.piecewise_input_required")
         }
         for (situation in situations) {
-            .assertPiecewiseNumeric(situation, "hazardRatios", functionName, dimension = 2)
+            .assertPiecewiseNumeric(situation, parameter, functionName, dimension = 2)
         }
         referenceDim <- dim(situations[[1]])
         if (any(vapply(situations, function(situation) {
             return(!identical(dim(situation), referenceDim))
         }, logical(1)))) {
-            stopIllegalArgument("all hazard-ratio matrices must have identical non-zero dimensions",
-                functionName = functionName, parameter = "hazardRatios", value = hazardRatios,
+            stopIllegalArgument("all ", matrixType, " matrices must have identical non-zero dimensions",
+                functionName = functionName, parameter = parameter, value = hazardRatios,
                 constraint = "identical non-zero group-by-interval dimensions",
                 diagnosticId = "survival.piecewise_situation_dimensions",
                 context = list(dimensions = lapply(situations, dim)))
@@ -248,20 +325,44 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
     object$.validate(functionName = "getObjectRCode")
     arguments <- list(piecewiseSurvivalTime = object$piecewiseSurvivalTime)
     functionName <- if (object$groupType == "multi-arm") {
-        arguments$lambdaControl <- as.numeric(object$lambdaControls[1, ])
+        if (!is.null(object[["medianControl"]])) {
+            arguments$medianControl <- object$medianControl
+        } else {
+            arguments$lambdaControl <- as.numeric(object$lambdaControls[1, ])
+        }
         "getPiecewiseSurvivalTimeMultiArm"
     } else {
-        arguments$lambdaControls <- object$lambdaControls
+        if (!is.null(object[["medianControls"]])) {
+            arguments$medianControls <- object$medianControls
+        } else {
+            arguments$lambdaControls <- object$lambdaControls
+        }
         "getPiecewiseSurvivalTimeEnrichment"
     }
-    arguments$hazardRatios <- object$hazardRatios
+    if (!is.null(object$medianTreatments)) {
+        arguments$medianTreatments <- object$medianTreatments
+    } else {
+        arguments$hazardRatios <- object$hazardRatios
+    }
+    controlArguments <- if (object$groupType == "multi-arm") {
+        c("lambdaControl", "medianControl")
+    } else {
+        c("lambdaControls", "medianControls")
+    }
+    allowedArguments <- c("piecewiseSurvivalTime", controlArguments, "hazardRatios", "medianTreatments")
     if (!is.list(newArgumentValues) || (length(newArgumentValues) > 0 &&
-            (is.null(names(newArgumentValues)) || any(!names(newArgumentValues) %in% names(arguments))))) {
+            (is.null(names(newArgumentValues)) || any(!names(newArgumentValues) %in% allowedArguments)))) {
         stopIllegalArgument("piecewise survival argument overrides must be a named list of constructor arguments",
             functionName = "getObjectRCode", parameter = "newArgumentValues", value = newArgumentValues,
             constraint = "named constructor argument overrides",
             diagnosticId = "survival.piecewise_r_code_arguments",
-            context = list(allowedArguments = names(arguments)))
+            context = list(allowedArguments = allowedArguments))
+    }
+    for (alternatives in list(controlArguments, c("hazardRatios", "medianTreatments"))) {
+        overridden <- intersect(alternatives, names(newArgumentValues))
+        if (length(overridden) == 1) {
+            arguments[setdiff(alternatives, overridden)] <- NULL
+        }
     }
     for (argumentName in names(newArgumentValues)) {
         arguments[argumentName] <- newArgumentValues[argumentName]

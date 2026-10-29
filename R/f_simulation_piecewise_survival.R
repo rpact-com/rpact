@@ -117,6 +117,12 @@
     indices <- match(groups, actualGroups)
     aligned$lambdaControls <- aligned$lambdaControls[indices, , drop = FALSE]
     aligned$hazardRatios <- aligned$hazardRatios[indices, , , drop = FALSE]
+    if (!is.null(aligned[["medianControls"]])) {
+        aligned$medianControls <- aligned$medianControls[indices, , drop = FALSE]
+    }
+    if (!is.null(aligned$medianTreatments)) {
+        aligned$medianTreatments <- aligned$medianTreatments[indices, , , drop = FALSE]
+    }
     return(aligned)
 }
 

@@ -96,6 +96,8 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     groupType = "Group type",
     medianTreatment = "Median",
     medianControl = "Median (control)",
+    medianControls = "Control medians (exponential per interval)",
+    medianTreatments = "Treatment medians (exponential per interval)",
     overallPi1 = "Cumulative treatment rate",
     overallPi2 = "Cumulative control rate",
     pi1H1 = "pi(1) under H1",
