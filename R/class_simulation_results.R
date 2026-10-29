@@ -92,6 +92,7 @@ SimulationResults <- R6::R6Class(
         .design = NULL,
         .data = NULL,
         .rawData = NULL,
+        .piecewiseSurvivalArguments = NULL,
         .showStatistics = NULL,
         maxNumberOfIterations = NULL,
         seed = NULL,
@@ -390,7 +391,7 @@ SimulationResults <- R6::R6Class(
                     if (self$.design$kMax > 1) {
                         self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
-                    if (inherits(self[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeCollection")) {
+                    if (inherits(self[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
                         self$.cat("  Situations: ",
                             paste(dimnames(self$piecewiseSurvivalTime$hazardRatios)[[3]], collapse = ", "),
                             " (in this order)\n", consoleOutputEnabled = consoleOutputEnabled)

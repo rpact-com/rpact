@@ -679,6 +679,11 @@ updateSubGroupVector <- function(
     piecewiseSurvivalTime <- .alignPiecewiseSurvivalGroups(
         piecewiseSurvivalTime, simulationResults$effectList$subGroups)
     simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
+    if (!is.null(piecewiseSurvivalTime)) {
+        simulationResults$.setParameterType("piecewiseSurvivalTime", C_PARAM_USER_DEFINED)
+        simulationResults$.piecewiseSurvivalArguments <- list(
+            simulationType = "patientWiseBasic", maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage)
+    }
 
     design <- simulationResults$.design
     effectList <- simulationResults$effectList

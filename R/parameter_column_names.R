@@ -94,6 +94,8 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     pi2H1 = "pi(2) under H1",
     lambdaTreatment = "lambda",
     lambdaControl = "lambda(control)",
+    lambdaControls = "Control hazards",
+    groupType = "Group type",
     medianTreatment = "median",
     medianControl = "median(control)",
     nPlanned = "Planned sample size",

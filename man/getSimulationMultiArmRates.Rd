@@ -68,7 +68,8 @@ highest response for \code{"linear"} and \code{"sigmoidEmax"} model,
 default is \code{seq(0, 1, 0.2)}.}
 
 \item{piControl}{If specified, the assumed probability in the control arm
-for simulation and under which the sample size recalculation is performed.}
+for simulation and under which the sample size recalculation is performed, default is
+\code{0.2}.}
 
 \item{gED50}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{gED50} has to be entered
 to specify the ED50 of the sigmoid Emax model.}

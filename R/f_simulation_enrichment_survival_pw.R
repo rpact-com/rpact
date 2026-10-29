@@ -232,6 +232,11 @@ NULL
     piecewiseSurvivalTime <- .alignPiecewiseSurvivalGroups(
         piecewiseSurvivalTime, simulationResults$effectList$subGroups)
     simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
+    if (!is.null(piecewiseSurvivalTime)) {
+        simulationResults$.setParameterType("piecewiseSurvivalTime", C_PARAM_USER_DEFINED)
+        simulationResults$.piecewiseSurvivalArguments <- list(
+            simulationType = "patientWise", maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage)
+    }
     design <- simulationResults$.design
     effectList <- simulationResults$effectList
     successCriterion <- simulationResults$successCriterion
@@ -583,28 +588,44 @@ getSimulationEnrichmentSurvival <- function(
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
         showStatistics = FALSE) {
-    piecewiseSurvivalTime <- if (is.list(effectList)) effectList$piecewiseSurvivalTime else NULL
+    piecewiseSurvivalTime <- if (is.list(effectList)) {
+        effectList$piecewiseSurvivalTime
+    } else {
+        NULL
+    }
     piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeEnrichment")
     if (!is.null(piecewiseSurvivalTime) && !piecewiseEnabled) {
         stopIllegalArgument("'effectList$piecewiseSurvivalTime' must be a PiecewiseSurvivalTimeEnrichment object",
-            functionName = "getSimulationEnrichmentSurvival", parameter = "effectList$piecewiseSurvivalTime")
+            functionName = "getSimulationEnrichmentSurvival", parameter = "effectList$piecewiseSurvivalTime",
+            value = piecewiseSurvivalTime, constraint = "PiecewiseSurvivalTimeEnrichment object",
+            diagnosticId = "survival.piecewise_enrichment_class")
     }
     if (piecewiseEnabled) {
+        piecewiseSurvivalTime$.validate(functionName = "getSimulationEnrichmentSurvival")
         if (!is.na(kappa) && kappa != 1) {
             stopIllegalArgument("'kappa' must be 1 for piecewise exponential survival times",
-                functionName = "getSimulationEnrichmentSurvival", parameter = "kappa")
+                functionName = "getSimulationEnrichmentSurvival", parameter = "kappa", value = kappa,
+                constraint = "kappa = 1 for piecewise exponential survival",
+                diagnosticId = "survival.piecewise_exponential_only")
         }
         conflicting <- intersect(names(effectList), c("piControls", "piTreatments", "hazardRatios"))
         if (length(conflicting) > 0) {
             stopConflictingArguments("piecewise survival cannot be combined with ",
                 .arrayToString(paste0("effectList$", conflicting), encapsulate = TRUE),
                 functionName = "getSimulationEnrichmentSurvival",
-                parameter = "effectList$piecewiseSurvivalTime")
+                parameter = paste0("effectList$", conflicting), value = effectList[conflicting],
+                constraint = "ordinary and piecewise survival inputs are mutually exclusive",
+                relatedParameter = "effectList$piecewiseSurvivalTime", relatedValue = piecewiseSurvivalTime,
+                diagnosticId = "survival.piecewise_conflicting_effect_inputs")
         }
         if (!identical(as.character(effectList$subGroups),
                 dimnames(piecewiseSurvivalTime$hazardRatios)[[1]])) {
             stopIllegalArgument("the subgroup names in 'effectList' and the piecewise specification must agree",
-                functionName = "getSimulationEnrichmentSurvival", parameter = "effectList$subGroups")
+                functionName = "getSimulationEnrichmentSurvival", parameter = "effectList$subGroups",
+                value = effectList$subGroups, constraint = "identical subgroup names in identical order",
+                relatedParameter = "piecewiseSurvivalTime$groupNames",
+                relatedValue = dimnames(piecewiseSurvivalTime$hazardRatios)[[1]],
+                diagnosticId = "survival.piecewise_group_identity")
         }
         effectList$piecewiseSurvivalTime <- NULL
         effectList$hazardRatios <- .getPiecewiseInitialHazardRatios(piecewiseSurvivalTime)

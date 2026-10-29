@@ -806,6 +806,7 @@ NULL
             piControl <- .setPi2(simulationResults, piControl, parameterName = "piControl", endpoint = endpoint)
         } else {
             simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
+            simulationResults$.setParameterType("piecewiseSurvivalTime", C_PARAM_USER_DEFINED)
             simulationResults$piControl <- NA_real_
             simulationResults$.setParameterType("piControl", C_PARAM_NOT_APPLICABLE)
         }

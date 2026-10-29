@@ -5,9 +5,9 @@
 \title{Piecewise Exponential Enrichment Survival Time}
 \usage{
 getPiecewiseSurvivalTimeEnrichment(
-  piecewiseSurvivalTime,
-  lambdaControls,
-  hazardRatios
+  piecewiseSurvivalTime = NULL,
+  lambdaControls = NULL,
+  hazardRatios = NULL
 )
 }
 \arguments{
@@ -27,6 +27,18 @@ A \code{PiecewiseSurvivalTimeEnrichment} object.
 \description{
 Creates a validated piecewise exponential survival specification for a
 patient-wise population-enrichment simulation.
+}
+\details{
+At least two finite, strictly increasing interval starts are required. The last
+interval is open-ended. Hazards must be finite and strictly positive. Group and
+situation names must be unique and non-empty. Unnamed groups are positional;
+named groups must agree in order. Interval columns are positional and receive
+labels derived from the interval starts. Only piecewise exponential event times
+are supported; simulation requires \code{kappa = 1}.
+The returned time definition inherits from \code{ParameterSet} and supports \code{names()},
+\code{print()}, \code{summary()}, \code{as.data.frame()}, \code{as.matrix()}, and \code{getObjectRCode()}.
+Hazard ratios specify the data-generating distribution, rather than separate
+interval-specific analysis estimands.
 }
 \examples{
 piecewiseTime <- getPiecewiseSurvivalTimeEnrichment(

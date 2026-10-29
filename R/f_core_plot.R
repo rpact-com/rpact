@@ -1250,8 +1250,14 @@ getAvailablePlotTypes <- function(
         }
     }
 
-    piecewiseSpecification <- if (.isParameterSet(parameterSet)) parameterSet[["piecewiseSurvivalTime"]] else NULL
-    if (!inherits(piecewiseSpecification, "PiecewiseSurvivalTimeCollection")) piecewiseSpecification <- NULL
+    piecewiseSpecification <- if (.isParameterSet(parameterSet)) {
+        parameterSet[["piecewiseSurvivalTime"]]
+    } else {
+        NULL
+    }
+    if (!inherits(piecewiseSpecification, "PiecewiseSurvivalTimeMultiGroup")) {
+        piecewiseSpecification <- NULL
+    }
     if (!is.null(piecewiseSpecification)) {
         # Scenario order is repeated for each plotted arm, stage, or response series.
         data$xValues <- rep(seq_len(piecewiseSpecification$getNumberOfSituations()), length.out = nrow(data))

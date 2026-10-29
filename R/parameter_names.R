@@ -92,6 +92,8 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     pi2 = "Assumed control rate",
     lambdaTreatment = "Lambda",
     lambdaControl = "Lambda (control)",
+    lambdaControls = "Control hazards",
+    groupType = "Group type",
     medianTreatment = "Median",
     medianControl = "Median (control)",
     overallPi1 = "Cumulative treatment rate",

@@ -14,6 +14,13 @@ Two constructors provide complete, validated survival specifications:
 - `getPiecewiseSurvivalTimeMultiArm()` for active arms compared with a common control.
 - `getPiecewiseSurvivalTimeEnrichment()` for active treatment compared with control within disjoint subsets.
 
+Both constructors create real R6 subclasses of `PiecewiseSurvivalTimeMultiGroup`,
+which inherits from `TimeDefinition` and therefore `ParameterSet`. The established
+two-arm `PiecewiseSurvivalTime` remains a separate `TimeDefinition` subclass.
+The two constructors distinguish treatment-arm rows with a common control from
+disjoint-subgroup rows with subgroup-specific controls. Their normalization,
+validation, hazard calculation, and presentation are shared.
+
 Hazard ratios may be supplied as one group-by-interval matrix, a named list of such matrices (one per situation), or an equivalent three-dimensional array. The normalized array dimension order is:
 
 ```text
@@ -22,9 +29,22 @@ group x interval x situation
 
 The situation dimension is slowest-changing. Printing therefore shows one readily readable group-by-interval matrix for every situation. `getPiecewiseHazardRatioArray()` is provided as a small helper for constructing and validating this array.
 
+Interval starts must be numeric, finite, strictly increasing, begin at zero, and
+contain at least two entries. The last interval is open-ended; `Inf` is not an
+additional start. Numeric matrices and arrays are accepted without coercing
+character or logical inputs. Hazards and hazard ratios must be finite and
+strictly positive, and all dimensions must be non-empty. Supplied group,
+interval, and situation names must be unique, non-empty, and non-missing.
+Named groups must match in order; unnamed groups are interpreted positionally.
+Interval columns are positional and receive labels derived from interval starts.
+
 For multi-arm simulations, the control hazards form one vector over intervals. For enrichment simulations, control hazards form a subset-by-interval matrix. Active hazards are calculated as the corresponding control hazard multiplied by the interval-specific hazard ratio.
 
 The resulting object is supplied through `piecewiseSurvivalTime`. It replaces the ordinary survival-effect inputs (`piControl` and `effectMatrix` for multi-arm simulations; `piControls`, `piTreatments`, and `hazardRatios` inside an enrichment `effectList`). Piecewise inputs imply `typeOfShape = "userDefined"` and patient-wise simulation.
+
+The initial API accepts hazards and hazard ratios. Future alternative input
+parameterizations can normalize into the same validated representation without
+changing the simulation interface.
 
 ## Simulation implementation
 
@@ -34,11 +54,26 @@ Piecewise requests use the C++ patient-wise simulation engine by default. The va
 
 The existing non-piecewise code path remains separate so its random-number sequence and seeded regression results do not change.
 
+Specifications are revalidated at the simulation boundary, including edits to
+public R6 fields. In multi-arm specifications the expanded `lambdaControls`
+matrix is derived from the user-defined `lambdaControl` vector; their agreement
+is checked before use. Subgroup reordering operates on a clone. C++ continues to
+receive plain lists of interval starts and hazard matrices, independent of the
+R6 hierarchy. Initial hazard ratios used by existing internal interfaces are
+compatibility inputs, not hazard ratios averaged over the complete follow-up.
+
 ## Results and presentation
 
 The piecewise specification is retained in the simulation result. Its print method displays interval labels and control hazards followed by one hazard-ratio matrix for every situation. A long-form `as.data.frame()` representation contains the situation, group, interval boundaries, control hazard, hazard ratio, and resulting active hazard.
 
 Stage-wise effect estimates remain scalar log-rank-based estimates. The interval-specific hazard ratios describe the data-generating distribution, not separate interval-specific analysis estimands.
+
+Objects support the standard rpact field names, parameter types, technical
+summary, console and Markdown printing, Knitr output, and matrix conversion.
+`getObjectRCode()` reconstructs specifications with their dimensions, names, and
+numeric precision. Simulation reconstruction includes the complete specification
+and retains the engine and raw-data retention limit. The class itself does not
+introduce a new standalone plotting interface.
 
 ## Verification
 

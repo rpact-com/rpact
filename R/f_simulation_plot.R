@@ -62,7 +62,7 @@ NULL
         simulationResults,
         showSource = FALSE,
         simulationResultsName = NA_character_) {
-    if (inherits(simulationResults[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeCollection")) {
+    if (inherits(simulationResults[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
         if (!isFALSE(showSource)) {
             return(paste0("seq_len(", simulationResults$piecewiseSurvivalTime$getNumberOfSituations(), ")"))
         }
@@ -109,8 +109,12 @@ NULL
 }
 
 .getSimulationPlotXAxisLabel <- function(simulationResults, xlab = NULL, ..., situationEnabled = TRUE) {
-    if (inherits(simulationResults[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeCollection")) {
-        return(if (!is.null(xlab) && !is.na(xlab)) xlab else "Situation")
+    if (inherits(simulationResults[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+        if (!is.null(xlab) && !is.na(xlab)) {
+            return(xlab)
+        } else {
+            return("Situation")
+        }
     }
 
     if (grepl("SimulationResultsEnrichment", .getClassName(simulationResults))) {
@@ -235,8 +239,14 @@ NULL
     countDataEnabled <- grepl("CountData", .getClassName(simulationResults))
     patienWiseSimulationEnabled <- equals(simulationResults[["simulationType"]], "patientWise")
     piecewiseSpecification <- simulationResults[["piecewiseSurvivalTime"]]
-    if (!inherits(piecewiseSpecification, "PiecewiseSurvivalTimeCollection")) piecewiseSpecification <- NULL
-    scenarioLabels <- if (!is.null(piecewiseSpecification)) dimnames(piecewiseSpecification$hazardRatios)[[3]] else NULL
+    if (!inherits(piecewiseSpecification, "PiecewiseSurvivalTimeMultiGroup")) {
+        piecewiseSpecification <- NULL
+    }
+    scenarioLabels <- if (!is.null(piecewiseSpecification)) {
+        dimnames(piecewiseSpecification$hazardRatios)[[3]]
+    } else {
+        NULL
+    }
     userDefinedEffectMatrix <- multiArmEnabled &&
         (simulationResults$isUserDefinedParameter("effectMatrix") || !is.null(piecewiseSpecification))
 

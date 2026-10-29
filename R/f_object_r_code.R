@@ -37,6 +37,10 @@ NULL
 }
 
 .getArgumentValueRCode <- function(x, name) {
+    if (inherits(x, "PiecewiseSurvivalTimeMultiGroup")) {
+        return(paste(getObjectRCode(x, pipeOperator = "none", output = "internal",
+            stringWrapParagraphWidth = NULL), collapse = "\n"))
+    }
     if (is.null(x)) {
         return("NULL")
     }
@@ -210,6 +214,14 @@ NULL
 
     if (inherits(obj, "SimulationResultsEnrichmentSurvival")) {
         return("getSimulationEnrichmentSurvival")
+    }
+
+    if (inherits(obj, "PiecewiseSurvivalTimeMultiArm")) {
+        return("getPiecewiseSurvivalTimeMultiArm")
+    }
+
+    if (inherits(obj, "PiecewiseSurvivalTimeEnrichment")) {
+        return("getPiecewiseSurvivalTimeEnrichment")
     }
 
     if (inherits(obj, "PiecewiseSurvivalTime")) {
@@ -578,6 +590,13 @@ getObjectRCode <- function(
     }
 
     .assertIsParameterSetClass(obj, "ParameterSet")
+    if (inherits(obj, "PiecewiseSurvivalTimeMultiGroup")) {
+        return(.getPiecewiseSurvivalRCode(obj, leadingArguments, newArgumentValues,
+            prefix, postfix, stringWrapPrefix, pipeOperator, pipeOperatorPostfix, output, explicitPrint))
+    }
+    if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+        stringWrapParagraphWidth <- NULL
+    }
     if (inherits(obj, "TrialComparison")) {
         return(.getTrialComparisonRCode(obj,
             leadingArguments = leadingArguments, includeDefaultParameters = includeDefaultParameters,
@@ -612,9 +631,13 @@ getObjectRCode <- function(
             !is.null(obj[[".design"]]) &&
             (is.null(leadingArguments) || !any(grepl("design", leadingArguments)))
         ) {
+        designArgumentValues <- newArgumentValues
+        if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+            designArgumentValues <- newArgumentValues[intersect(names(newArgumentValues), names(obj$.design))]
+        }
         preconditionDesign <- .getPreconditionDesignRCode(
             obj[[".design"]], pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
-            stringWrapParagraphWidth, stringWrapPrefix, newArgumentValues,
+            stringWrapParagraphWidth, stringWrapPrefix, designArgumentValues,
             leadingArguments
         )
         precondition <- c(precondition, preconditionDesign$precondition)
@@ -706,9 +729,19 @@ getObjectRCode <- function(
     }
 
     if (grepl("SimulationResultsEnrichment(Means|Rates|Survival)", .getClassName(obj))) {
+        effectList <- obj$effectList
+        if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+            effectList[c("piControls", "piTreatments", "hazardRatios")] <- NULL
+            if ("piecewiseSurvivalTime" %in% names(newArgumentValues)) {
+                effectList$piecewiseSurvivalTime <- newArgumentValues$piecewiseSurvivalTime
+                newArgumentValues["piecewiseSurvivalTime"] <- NULL
+            } else {
+                effectList$piecewiseSurvivalTime <- obj$piecewiseSurvivalTime
+            }
+        }
         precond <- paste0(
             "effectList <- ",
-            .getArgumentValueRCode(obj$effectList, "effectList")
+            .getArgumentValueRCode(effectList, "effectList")
         )
         if (pipeOperator == "none") {
             precondition <- c(precondition, precond)
@@ -747,6 +780,23 @@ getObjectRCode <- function(
             objNames <- obj$.getUserDefinedParameters()
         }
         objNames <- objNames[objNames != "stages"]
+    }
+
+    if (inherits(obj, "SimulationResultsEnrichmentSurvival") &&
+            inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+        objNames <- setdiff(objNames, c("piecewiseSurvivalTime", "effectList"))
+        if (!"effectList" %in% names(newArgumentValues)) {
+            leadingArguments <- c(leadingArguments, "effectList = effectList")
+        }
+    }
+    if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+        for (argumentName in names(obj$.piecewiseSurvivalArguments)) {
+            if (!argumentName %in% names(newArgumentValues)) {
+                leadingArguments <- c(leadingArguments, paste0(argumentName, " = ",
+                    .getArgumentValueRCode(obj$.piecewiseSurvivalArguments[[argumentName]], argumentName)))
+            }
+        }
+        objNames <- setdiff(objNames, names(obj$.piecewiseSurvivalArguments))
     }
 
     isSurvivalObject <-

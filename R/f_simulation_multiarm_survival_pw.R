@@ -489,26 +489,39 @@ getSimulationMultiArmSurvival <- function(
     piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeMultiArm")
     if (!is.null(piecewiseSurvivalTime) && !piecewiseEnabled) {
         stopIllegalArgument("'piecewiseSurvivalTime' must be a PiecewiseSurvivalTimeMultiArm object",
-            functionName = "getSimulationMultiArmSurvival", parameter = "piecewiseSurvivalTime")
+            functionName = "getSimulationMultiArmSurvival", parameter = "piecewiseSurvivalTime",
+            value = piecewiseSurvivalTime, constraint = "PiecewiseSurvivalTimeMultiArm object",
+            diagnosticId = "survival.piecewise_multiarm_class")
     }
     if (piecewiseEnabled) {
+        piecewiseSurvivalTime$.validate(functionName = "getSimulationMultiArmSurvival")
         if (!is.na(kappa) && kappa != 1) {
             stopIllegalArgument("'kappa' must be 1 for piecewise exponential survival times",
-                functionName = "getSimulationMultiArmSurvival", parameter = "kappa")
+                functionName = "getSimulationMultiArmSurvival", parameter = "kappa", value = kappa,
+                constraint = "kappa = 1 for piecewise exponential survival",
+                diagnosticId = "survival.piecewise_exponential_only")
         }
         if (!all(is.na(piControl))) {
             stopConflictingArguments("'piControl' and 'piecewiseSurvivalTime' cannot both be specified",
                 functionName = "getSimulationMultiArmSurvival", parameter = "piControl",
-                relatedParameter = "piecewiseSurvivalTime")
+                value = piControl, constraint = "ordinary and piecewise survival inputs are mutually exclusive",
+                relatedParameter = "piecewiseSurvivalTime", relatedValue = piecewiseSurvivalTime,
+                diagnosticId = "survival.piecewise_conflicting_effect_inputs")
         }
         if (!is.null(effectMatrix)) {
             stopConflictingArguments("'effectMatrix' and 'piecewiseSurvivalTime' cannot both be specified",
                 functionName = "getSimulationMultiArmSurvival", parameter = "effectMatrix",
-                relatedParameter = "piecewiseSurvivalTime")
+                value = effectMatrix, constraint = "ordinary and piecewise survival inputs are mutually exclusive",
+                relatedParameter = "piecewiseSurvivalTime", relatedValue = piecewiseSurvivalTime,
+                diagnosticId = "survival.piecewise_conflicting_effect_inputs")
         }
         if (!is.na(activeArms) && activeArms != piecewiseSurvivalTime$getNumberOfGroups()) {
             stopIllegalArgument("'activeArms' does not match the piecewise survival specification",
-                functionName = "getSimulationMultiArmSurvival", parameter = "activeArms")
+                functionName = "getSimulationMultiArmSurvival", parameter = "activeArms", value = activeArms,
+                constraint = "one active arm per piecewise group", relatedParameter = "piecewiseSurvivalTime",
+                relatedValue = piecewiseSurvivalTime,
+                diagnosticId = "survival.piecewise_active_arm_count",
+                context = list(expectedActiveArms = piecewiseSurvivalTime$getNumberOfGroups()))
         }
         activeArms <- piecewiseSurvivalTime$getNumberOfGroups()
         typeOfShape <- "userDefined"
@@ -660,6 +673,15 @@ getSimulationMultiArmSurvival <- function(
         accrualIntensityType = accrualIntensityType,
         maxNumberOfSubjects = maxNumberOfSubjects
     )
+    if (piecewiseEnabled) {
+        simulationResults$.piecewiseSurvivalArguments <- list(
+            simulationType = if (isTRUE(cppEnabled)) {
+                "patientWise"
+            } else {
+                "patientWiseBasic"
+            },
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage)
+    }
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (accrualIntensity < 1L) {
             stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
