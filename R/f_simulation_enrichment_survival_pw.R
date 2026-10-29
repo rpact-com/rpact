@@ -465,7 +465,7 @@ NULL
 #' @inheritParams param_effectList_enrichment_survival
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_enrichment
 #' @inheritParams param_thetaH0
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned

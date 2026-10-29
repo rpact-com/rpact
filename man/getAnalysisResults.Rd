@@ -73,8 +73,12 @@ For survival data, only a stratified analysis is possible (see Brannath et al., 
 }}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
-only applicable for one-sided testing; default is \code{TRUE}
-which means that larger values of the test statistics yield smaller p-values.}
+only applicable for one-sided testing; \code{TRUE}
+means that larger values of the test statistics yield smaller p-values.
+The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+(power calculations, simulations, and analyses).
+In sample size calculations, the direction is derived from the specified alternative;
+a specified \code{directionUpper} must agree with it.}
 
 \item{thetaH0}{The null hypothesis value,
 default is \code{0} for general estimates, the normal case, and the binary case,

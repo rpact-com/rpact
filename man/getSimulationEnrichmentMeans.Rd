@@ -34,7 +34,12 @@ getSimulationEnrichmentMeans(
 \arguments{
 \item{design}{The trial design. If no trial design is specified, a fixed sample size design is used.
 In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
-and \code{sided} can be directly entered as argument where necessary.}
+and \code{sided} can be directly entered as argument where necessary.
+Must be created with \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+\code{\link[=getDesignFisher]{getDesignFisher()}}, or
+\code{\link[=getDesignFixed]{getDesignFixed()}};
+designs created with \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} or
+\code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}} are not supported.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
@@ -118,7 +123,9 @@ to the maximum number of subjects per selected active arm.}
 for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
 It is defined as the power for the subsequent stage given the current data. By default,
 the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
-\code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
+\code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates;
+\code{piTreatmentsH1} and \code{piControlH1} in multi-arm designs, \code{piTreatmentH1} and
+\code{piControlH1} in enrichment designs), or \code{thetaH1} (for simulating
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
 \item{thetaH1}{If specified, the value of the alternative under which

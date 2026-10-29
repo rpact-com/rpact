@@ -67,8 +67,12 @@ For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be spe
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
-only applicable for one-sided testing; default is \code{TRUE}
-which means that larger values of the test statistics yield smaller p-values.}
+only applicable for one-sided testing; \code{TRUE}
+means that larger values of the test statistics yield smaller p-values.
+The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+(power calculations, simulations, and analyses).
+In sample size calculations, the direction is derived from the specified alternative;
+a specified \code{directionUpper} must agree with it.}
 
 \item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
 default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
@@ -78,11 +82,14 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
 \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
-Must be a positive numeric of length 1.}
+Must be a positive numeric value or vector: without \code{piecewiseSurvivalTime}, a vector defines
+alternative hazard rates to be considered; with \code{piecewiseSurvivalTime}, it contains one hazard rate
+per time interval. \code{getEventProbabilities()} uses only the first value of a non-piecewise vector.}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
 \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
-Must be a positive numeric of length 1.}
+Must be a positive numeric of length 1, or a vector with one hazard rate per time interval
+if \code{piecewiseSurvivalTime} is specified.}
 
 \item{median1}{The assumed median survival time in the treatment group, there is no default.}
 
@@ -90,7 +97,8 @@ Must be a positive numeric of length 1.}
 
 \item{hazardRatio}{The vector of hazard ratios under consideration.
 If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
-not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
+not to be specified as it is calculated, there is no default. Must be a positive numeric value or vector;
+\code{getEventProbabilities()} accepts a single value only.}
 
 \item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
 of the shape of the Weibull distribution.
@@ -157,7 +165,9 @@ of events per stage (i.e., not cumulated), the first element is not taken into a
 for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
 It is defined as the power for the subsequent stage given the current data. By default,
 the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
-\code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
+\code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates;
+\code{piTreatmentsH1} and \code{piControlH1} in multi-arm designs, \code{piTreatmentH1} and
+\code{piControlH1} in enrichment designs), or \code{thetaH1} (for simulating
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
 \item{thetaH1}{If specified, the value of the alternative under which

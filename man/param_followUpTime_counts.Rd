@@ -5,7 +5,8 @@
 \title{Parameter Description: followUpTime for Counts}
 \arguments{
 \item{followUpTime}{If specified, the assumed (additional) follow-up time for the study, there is no default.
-The total study duration is \code{accrualTime + followUpTime}.}
+The total study duration is \code{accrualTime + followUpTime}.
+For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.}
 }
 \description{
 Parameter Description: followUpTime for Counts

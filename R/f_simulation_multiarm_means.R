@@ -285,7 +285,7 @@ NULL
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfShapeMeans
 #' @inheritParams param_typeOfSelection
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_multiarm
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_plannedSubjects
 #' @inheritParams param_minNumberOfSubjectsPerStage

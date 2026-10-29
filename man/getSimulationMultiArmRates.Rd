@@ -42,12 +42,18 @@ getSimulationMultiArmRates(
 \arguments{
 \item{design}{The trial design. If no trial design is specified, a fixed sample size design is used.
 In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
-and \code{sided} can be directly entered as argument where necessary.}
+and \code{sided} can be directly entered as argument where necessary.
+Must be created with \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+\code{\link[=getDesignFisher]{getDesignFisher()}},
+\code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}, or
+\code{\link[=getDesignFixed]{getDesignFixed()}};
+designs created with \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} are not supported.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{activeArms}{The number of active treatment arms to be compared with control, default is \code{3}.}
+\item{activeArms}{The number of active treatment arms to be compared with control, default is \code{3}.
+Must not exceed \code{8}.}
 
 \item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and one or more rows,
 where each row represents a different situation to consider.}
@@ -86,8 +92,12 @@ Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonfer
 \code{"Sidak"}, and \code{"Hierarchical"}, default is \code{"Dunnett"}.}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
-only applicable for one-sided testing; default is \code{TRUE}
-which means that larger values of the test statistics yield smaller p-values.}
+only applicable for one-sided testing; \code{TRUE}
+means that larger values of the test statistics yield smaller p-values.
+The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+(power calculations, simulations, and analyses).
+In sample size calculations, the direction is derived from the specified alternative;
+a specified \code{directionUpper} must agree with it.}
 
 \item{adaptations}{A logical vector of length \code{kMax - 1} indicating whether or not an adaptation takes
 place at interim k, default is \code{rep(TRUE, kMax - 1)}.}
@@ -155,7 +165,9 @@ to the maximum number of subjects per selected active arm.}
 for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
 It is defined as the power for the subsequent stage given the current data. By default,
 the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
-\code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
+\code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates;
+\code{piTreatmentsH1} and \code{piControlH1} in multi-arm designs, \code{piTreatmentH1} and
+\code{piControlH1} in enrichment designs), or \code{thetaH1} (for simulating
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
 \item{thetaH0}{The null hypothesis value,

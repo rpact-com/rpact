@@ -448,7 +448,7 @@ NULL
 #' @inheritParams param_stDevSimulation
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_enrichment
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_plannedSubjects
 #' @inheritParams param_minNumberOfSubjectsPerStage

@@ -28,15 +28,19 @@ that a warning will be displayed if unknown arguments are passed.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
 \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
-Must be a positive numeric of length 1.}
+Must be a positive numeric value or vector: without \code{piecewiseSurvivalTime}, a vector defines
+alternative hazard rates to be considered; with \code{piecewiseSurvivalTime}, it contains one hazard rate
+per time interval. \code{getEventProbabilities()} uses only the first value of a non-piecewise vector.}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
 \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
-Must be a positive numeric of length 1.}
+Must be a positive numeric of length 1, or a vector with one hazard rate per time interval
+if \code{piecewiseSurvivalTime} is specified.}
 
 \item{hazardRatio}{The vector of hazard ratios under consideration.
 If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
-not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
+not to be specified as it is calculated, there is no default. Must be a positive numeric value or vector;
+\code{getEventProbabilities()} accepts a single value only.}
 
 \item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
 default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or

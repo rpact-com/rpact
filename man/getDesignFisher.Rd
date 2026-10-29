@@ -58,8 +58,12 @@ Must be a positive integer of length 1.}
 the critical values is affected by the futility bounds (default is \code{TRUE}).}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
-only applicable for one-sided testing; default is \code{TRUE}
-which means that larger values of the test statistics yield smaller p-values.}
+only applicable for one-sided testing; \code{TRUE}
+means that larger values of the test statistics yield smaller p-values.
+The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+(power calculations, simulations, and analyses).
+In sample size calculations, the direction is derived from the specified alternative;
+a specified \code{directionUpper} must agree with it.}
 
 \item{tolerance}{The numerical tolerance, default is \code{1e-14}.}
 
