@@ -661,6 +661,9 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #' @param optional Unused; included for compatibility with `as.data.frame()`.
 #' @param ... Further arguments. Currently unused.
 #' @inheritParams .getComparisonData
+#' @inheritParams param_niceColumnNamesEnabled
+#' @param includeAllParameters If TRUE, include all parameters in the comparison,
+#'   even if they are constant across all objects. If FALSE, only parameters
 #' @param removeConstantParameters If TRUE, retain identifiers and only parameters
 #'   with different object profiles, using the same rules as `summary()`.
 #'
