@@ -1,5 +1,5 @@
 ## |
-## |  *Time classes*
+## |  *Time classes piecewise exponential survival multi-group simulations*
 ## |
 ## |  This file is part of the R package rpact:
 ## |  Confirmatory Adaptive Clinical Trial Design and Analysis
@@ -27,7 +27,14 @@ NULL
 #' Groups, intervals, and situations occupy the first, second, and third hazard-ratio
 #' dimensions. Use the specialized constructors to specify their statistical roles.
 #'
+#' @template field_piecewiseSurvivalTime
+#' @template field_lambdaControls
+#' @template field_hazardRatios
+#' @template field_medianTreatments
+#' @template field_groupType
+#'
 #' @name PiecewiseSurvivalTimeMultiGroup
+#'
 #' @keywords internal
 #'
 PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup",
@@ -240,6 +247,40 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
     )
 )
 
+#'
+#' @name PiecewiseSurvivalTimeMultiArm
+#'
+#' @title
+#' Piecewise Exponential Survival Time for Multiple Treatment Arms
+#'
+#' @description
+#' Class for piecewise exponential survival times in patient-wise multi-arm
+#' simulations, with a common control hazard for all active treatment arms.
+#'
+#' @template field_piecewiseSurvivalTime
+#' @template field_lambdaControl_piecewise
+#' @template field_lambdaControls
+#' @template field_hazardRatios
+#' @template field_medianControl_piecewise
+#' @template field_medianTreatments
+#' @template field_groupType
+#'
+#' @details
+#' Create objects with [getPiecewiseSurvivalTimeMultiArm()]. The class inherits
+#' from \code{PiecewiseSurvivalTimeMultiGroup} and \code{TimeDefinition}.
+#' Rows of \code{lambdaControls} repeat the common control hazards for each
+#' active arm. The dimensions of \code{hazardRatios} and \code{medianTreatments}
+#' are active arm, interval, and situation, in that order.
+#' Interval starts begin at zero and the last interval is open-ended.
+#' Supplied interval medians parameterize exponential hazards through
+#' \code{log(2) / median}; they are not the medians of the complete piecewise
+#' survival distributions. Derived hazards and hazard ratios are retained
+#' alongside the supplied medians.
+#'
+#' @seealso [getPiecewiseSurvivalTimeMultiArm()], [PiecewiseSurvivalTimeEnrichment]
+#'
+#' @keywords internal
+#'
 PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
     inherit = PiecewiseSurvivalTimeMultiGroup,
     public = list(
@@ -284,6 +325,40 @@ PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
     )
 )
 
+#'
+#' @name PiecewiseSurvivalTimeEnrichment
+#'
+#' @title
+#' Piecewise Exponential Survival Time for Population Enrichment
+#'
+#' @description
+#' Class for piecewise exponential survival times in patient-wise population-
+#' enrichment simulations, with control hazards and treatment effects specified
+#' for disjoint population subsets.
+#'
+#' @template field_piecewiseSurvivalTime
+#' @template field_lambdaControls
+#' @template field_hazardRatios
+#' @template field_medianControls
+#' @template field_medianTreatments
+#' @template field_groupType
+#'
+#' @details
+#' Create objects with [getPiecewiseSurvivalTimeEnrichment()]. The class inherits
+#' from \code{PiecewiseSurvivalTimeMultiGroup} and \code{TimeDefinition}.
+#' Rows of \code{lambdaControls} and \code{medianControls} correspond to disjoint
+#' population subsets. The dimensions of \code{hazardRatios} and
+#' \code{medianTreatments} are subset, interval, and situation, in that order.
+#' Interval starts begin at zero and the last interval is open-ended.
+#' Supplied interval medians parameterize exponential hazards through
+#' \code{log(2) / median}; they are not the medians of the complete piecewise
+#' survival distributions. Derived hazards and hazard ratios are retained
+#' alongside the supplied medians.
+#'
+#' @seealso [getPiecewiseSurvivalTimeEnrichment()], [PiecewiseSurvivalTimeMultiArm]
+#'
+#' @keywords internal
+#'
 PiecewiseSurvivalTimeEnrichment <- R6::R6Class("PiecewiseSurvivalTimeEnrichment",
     inherit = PiecewiseSurvivalTimeMultiGroup,
     public = list(

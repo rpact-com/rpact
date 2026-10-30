@@ -152,7 +152,8 @@ getComparison <- function(..., objects = NULL) {
     if (!length(objects)) {
         return(data.frame())
     }
-    getComparisonData(objects, niceColumnNamesEnabled = niceColumnNamesEnabled,
+    
+    .getComparisonData(objects, niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters)
 }
 
@@ -408,7 +409,9 @@ TrialComparison <- R6::R6Class("TrialComparison",
 #'
 #' @export
 #'
-length.TrialComparison <- function(x) length(x$getObjects())
+length.TrialComparison <- function(x) {
+    return(length(x$getObjects()))
+}
 
 #'
 #' @title
@@ -421,7 +424,9 @@ length.TrialComparison <- function(x) length(x$getObjects())
 #'
 #' @export
 #'
-names.TrialComparison <- function(x) names(x$getObjects())
+names.TrialComparison <- function(x) {
+    return(names(x$getObjects()))
+}
 
 #'
 #' @title
@@ -655,7 +660,10 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #' @param row.names Optional row names for the result.
 #' @param optional Unused; included for compatibility with `as.data.frame()`.
 #' @param ... Further arguments. Currently unused.
-#' @inheritParams getComparisonData
+#' @inheritParams .getComparisonData
+#' @inheritParams param_niceColumnNamesEnabled
+#' @param includeAllParameters If TRUE, include all parameters in the comparison,
+#'   even if they are constant across all objects. If FALSE, only parameters
 #' @param removeConstantParameters If TRUE, retain identifiers and only parameters
 #'   with different object profiles, using the same rules as `summary()`.
 #'
@@ -1301,8 +1309,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #'   are preferred for x, results for y, then other varying numeric columns.
 #'   Identifier columns are excluded; stages remain eligible axes. `yParamName`
 #'   may also explicitly select multiple numeric parameters. Their axis sides
-#'   can be controlled through `yAxisSide` passed to [plotComparison()].
-#' @param ... Arguments passed to [plotComparison()], including categories,
+#'   can be controlled through `yAxisSide` passed to [plot.TrialComparison()].
+#' @param ... Arguments passed to [plot.TrialComparison()], including categories,
 #'   grouping, titles and line/point settings. Explicit axis selections prevail.
 #'
 #' @return A ggplot object. Ambiguous selections raise an error listing candidate
@@ -1311,7 +1319,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #' @export
 #'
 plot.TrialComparison <- function(x, xParamName = NULL, yParamName = NULL, ...) {
-    return(plotComparison(x, xParamName = xParamName, yParamName = yParamName, ...))
+    return(.plotComparison(x, xParamName = xParamName, yParamName = yParamName, ...))
 }
 
 #'
