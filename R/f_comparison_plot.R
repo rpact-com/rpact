@@ -216,7 +216,7 @@
 #' @param yAxisSide Axis assignment: "auto" (default), "left", or "right".
 #'   Supply one value for all y parameters, a vector in their order, or a named
 #'   vector assigning individual parameters. Unspecified named entries remain
-#'   automatic. The same argument is accepted by [.plotComparison()].
+#'   automatic. The same argument is accepted by [plot.TrialComparison()].
 #'
 #' @return A list containing `xParamName`, `yParamName`, `categoryParamName`,
 #'   `groupParamName`, `yAxisSide`, `yAxisTransformation`, `yAxisRanges`, `message`,
@@ -226,7 +226,7 @@
 #'   for scaling, not ggplot's expanded panel limits. Unresolved selections
 #'   are NULL. `message` is NULL on success, otherwise contains all selection
 #'   problems. `candidates` lists eligible columns for each selection; `issues`
-#'   contains diagnostic metadata used by [.plotComparison()].
+#'   contains diagnostic metadata used by [plot.TrialComparison()].
 #'
 #' @details
 #' Explicit selections prevail. When original objects are available, inputs and
@@ -294,9 +294,15 @@ getComparisonPlotParameters <- function(
             relatedParameter = NULL,
             relatedValue = NULL) {
         issues[[length(issues) + 1L]] <<- list(
-            message = message, parameter = parameter,
-            value = value, constraint = constraint, diagnosticId = diagnosticId,
-            context = context, type = type, relatedParameter = relatedParameter, relatedValue = relatedValue
+            message = message, 
+            parameter = parameter,
+            value = value, 
+            constraint = constraint, 
+            diagnosticId = diagnosticId,
+            context = context, 
+            type = type, 
+            relatedParameter = relatedParameter, 
+            relatedValue = relatedValue
         )
     }
     if (!is.data.frame(data) || !nrow(data) || anyNA(names(data)) ||

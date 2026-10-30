@@ -1306,8 +1306,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #'   are preferred for x, results for y, then other varying numeric columns.
 #'   Identifier columns are excluded; stages remain eligible axes. `yParamName`
 #'   may also explicitly select multiple numeric parameters. Their axis sides
-#'   can be controlled through `yAxisSide` passed to [.plotComparison()].
-#' @param ... Arguments passed to [.plotComparison()], including categories,
+#'   can be controlled through `yAxisSide` passed to [plot.TrialComparison()].
+#' @param ... Arguments passed to [plot.TrialComparison()], including categories,
 #'   grouping, titles and line/point settings. Explicit axis selections prevail.
 #'
 #' @return A ggplot object. Ambiguous selections raise an error listing candidate
