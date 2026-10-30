@@ -12,7 +12,7 @@ getComparisonParameterInfo(
 )
 }
 \arguments{
-\item{data}{A data.frame, typically returned by getComparisonData(). Columns
+\item{data}{A data.frame, typically returned by .getComparisonData(). Columns
 must be one-dimensional atomic vectors, including factors and dates.}
 
 \item{...}{Further arguments. Currently unused.}

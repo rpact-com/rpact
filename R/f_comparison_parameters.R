@@ -14,8 +14,6 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-#'
-
 .formatComparisonParameterValues <- function(values, digits = NA_integer_) {
     if (!length(values)) {
         return(character())
@@ -42,7 +40,7 @@
 #' Describes the observed values and plotting roles of comparison-data columns.
 #' This analysis does not change, round, or recalculate the supplied data.
 #'
-#' @param data A data.frame, typically returned by getComparisonData(). Columns
+#' @param data A data.frame, typically returned by .getComparisonData(). Columns
 #'   must be one-dimensional atomic vectors, including factors and dates.
 #' @param ... Further arguments. Currently unused.
 #' @param removeConstantParameters Whether to omit columns with at most one

@@ -38,8 +38,10 @@
 
 .comparisonYAxisSettings <- function(data, parameters, yAxisSide = "auto") {
     issue <- function(message, parameter, value, diagnosticId, constraint, type = "argument", context = list()) {
-        return(list(message = message, parameter = parameter, value = value,
-            diagnosticId = diagnosticId, constraint = constraint, type = type, context = context))
+        return(list(
+            message = message, parameter = parameter, value = value,
+            diagnosticId = diagnosticId, constraint = constraint, type = type, context = context
+        ))
     }
     result <- list(side = NULL, transformation = NULL, ranges = NULL, issue = NULL)
     if (is.null(yAxisSide)) {
@@ -58,7 +60,8 @@
         result$issue <- issue("'yAxisSide' must assign auto, left, or right to the selected y parameters",
             "yAxisSide", yAxisSide, "comparison.plot_y_axis_side_invalid",
             "one side for all parameters, one per parameter in order, or a named subset of selected y parameters",
-            context = list(yParamName = parameters, allowedValues = c("auto", "left", "right")))
+            context = list(yParamName = parameters, allowedValues = c("auto", "left", "right"))
+        )
         return(result)
     }
     requested <- stats::setNames(rep("auto", length(parameters)), parameters)
@@ -121,8 +124,10 @@
         if (!is.finite(transformation$scale) || transformation$scale <= 0 || !is.finite(transformation$offset)) {
             result$issue <- issue("Cannot construct a finite invertible transformation between the y axes",
                 "data", data[parameters], "comparison.plot_y_scaling_invalid",
-                "finite axis ranges allowing a positive finite scale and finite offset", type = "data",
-                context = list(yParamName = parameters, yAxisSide = suggested, ranges = ranges))
+                "finite axis ranges allowing a positive finite scale and finite offset",
+                type = "data",
+                context = list(yParamName = parameters, yAxisSide = suggested, ranges = ranges)
+            )
             return(result)
         }
     }
@@ -152,8 +157,10 @@
     if (length(parameters) == 1L) {
         return(list(data = data, yColumn = parameters, parameterColumn = NULL, labels = NULL))
     }
-    columns <- tail(make.unique(c(names(data), ".comparisonYParameter", ".comparisonYValue",
-        ".comparisonYPlot", ".comparisonYAxis")), 4L)
+    columns <- tail(make.unique(c(
+        names(data), ".comparisonYParameter", ".comparisonYValue",
+        ".comparisonYPlot", ".comparisonYAxis"
+    )), 4L)
     names(columns) <- c("parameter", "value", "plot", "side")
     twoAxes <- length(unique(sides)) > 1L
     labels <- if (twoAxes) {
@@ -165,7 +172,8 @@
     frames <- lapply(seq_along(parameters), function(i) {
         frame <- data
         frame[[columns[["parameter"]]]] <- factor(rep(parameters[i], nrow(data)),
-            levels = parameters, labels = labels)
+            levels = parameters, labels = labels
+        )
         frame[[columns[["value"]]]] <- data[[parameters[i]]]
         frame[[columns[["plot"]]]] <- if (twoAxes && sides[i] == "right") {
             data[[parameters[i]]] * transformation$scale + transformation$offset
@@ -177,8 +185,10 @@
     })
     combined <- do.call(rbind, frames)
     rownames(combined) <- NULL
-    return(list(data = combined, yColumn = columns[["plot"]],
-        parameterColumn = columns[["parameter"]], labels = labels))
+    return(list(
+        data = combined, yColumn = columns[["plot"]],
+        parameterColumn = columns[["parameter"]], labels = labels
+    ))
 }
 
 #'
@@ -206,7 +216,7 @@
 #' @param yAxisSide Axis assignment: "auto" (default), "left", or "right".
 #'   Supply one value for all y parameters, a vector in their order, or a named
 #'   vector assigning individual parameters. Unspecified named entries remain
-#'   automatic. The same argument is accepted by [plotComparison()].
+#'   automatic. The same argument is accepted by [.plotComparison()].
 #'
 #' @return A list containing `xParamName`, `yParamName`, `categoryParamName`,
 #'   `groupParamName`, `yAxisSide`, `yAxisTransformation`, `yAxisRanges`, `message`,
@@ -216,7 +226,7 @@
 #'   for scaling, not ggplot's expanded panel limits. Unresolved selections
 #'   are NULL. `message` is NULL on success, otherwise contains all selection
 #'   problems. `candidates` lists eligible columns for each selection; `issues`
-#'   contains diagnostic metadata used by [plotComparison()].
+#'   contains diagnostic metadata used by [.plotComparison()].
 #'
 #' @details
 #' Explicit selections prevail. When original objects are available, inputs and
@@ -250,32 +260,54 @@
 #'
 #' @export
 #'
-getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NULL, ...,
-        categoryParamName = NULL, groupParamName = NULL, objects = NULL, yAxisSide = "auto") {
+getComparisonPlotParameters <- function(
+        data,
+        xParamName = NULL,
+        yParamName = NULL,
+        ...,
+        categoryParamName = NULL,
+        groupParamName = NULL,
+        objects = NULL,
+        yAxisSide = "auto") {
     .warnInCaseOfUnknownArguments(functionName = "getComparisonPlotParameters", ...)
     input <- .getComparisonPlotInput(data, objects)
     data <- input$data
     objects <- input$objects
-    result <- list(xParamName = xParamName, yParamName = yParamName,
+    result <- list(
+        xParamName = xParamName, yParamName = yParamName,
         categoryParamName = categoryParamName, groupParamName = groupParamName,
         yAxisSide = NULL, yAxisTransformation = NULL, yAxisRanges = NULL,
-        message = NULL, candidates = list(xParamName = character(), yParamName = character(),
-            categoryParamName = character(), groupParamName = character()), issues = list())
+        message = NULL, candidates = list(
+            xParamName = character(), yParamName = character(),
+            categoryParamName = character(), groupParamName = character()
+        ), issues = list()
+    )
     issues <- list()
-    addIssue <- function(message, parameter, value = NULL, constraint, diagnosticId,
-            context = list(), type = "argument", relatedParameter = NULL, relatedValue = NULL) {
-        issues[[length(issues) + 1L]] <<- list(message = message, parameter = parameter,
+    addIssue <- function(
+            message,
+            parameter,
+            value = NULL,
+            constraint,
+            diagnosticId,
+            context = list(),
+            type = "argument",
+            relatedParameter = NULL,
+            relatedValue = NULL) {
+        issues[[length(issues) + 1L]] <<- list(
+            message = message, parameter = parameter,
             value = value, constraint = constraint, diagnosticId = diagnosticId,
-            context = context, type = type, relatedParameter = relatedParameter, relatedValue = relatedValue)
+            context = context, type = type, relatedParameter = relatedParameter, relatedValue = relatedValue
+        )
     }
     if (!is.data.frame(data) || !nrow(data) || anyNA(names(data)) ||
             any(!nzchar(names(data))) || anyDuplicated(names(data))) {
         addIssue("Cannot select plot parameters: 'data' must be a non-empty data.frame with unique column names",
-            parameter = "data", 
+            parameter = "data",
             value = data,
             constraint = "a data.frame with at least one row and unique non-empty column names",
-            diagnosticId = "comparison.plot_data_invalid", 
-            type = "data")
+            diagnosticId = "comparison.plot_data_invalid",
+            type = "data"
+        )
         return(.finishComparisonPlotParameters(result, issues))
     }
     supported <- vapply(data, function(column) {
@@ -283,20 +315,22 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
     }, logical(1))
     if (!all(supported)) {
         addIssue("Comparison columns must be one-dimensional atomic vectors",
-            parameter = "data", 
-            value = data[!supported], 
+            parameter = "data",
+            value = data[!supported],
             "one-dimensional atomic columns",
-            diagnosticId = "comparison.parameter_column_unsupported", 
-            context = list(columns = names(data)[!supported]), type = "data")
+            diagnosticId = "comparison.parameter_column_unsupported",
+            context = list(columns = names(data)[!supported]), type = "data"
+        )
         return(.finishComparisonPlotParameters(result, issues))
     }
     if (!is.null(objects) && (!is.list(objects) || is.data.frame(objects) ||
             !all(vapply(objects, .isComparisonObject, logical(1))))) {
         addIssue("'objects' must be a list of original comparison objects",
-            parameter = "objects", 
-            objects, 
+            parameter = "objects",
+            objects,
             "a list of designs, design characteristics, plans, or simulation results",
-            diagnosticId = "comparison.plot_objects_invalid")
+            diagnosticId = "comparison.plot_objects_invalid"
+        )
         return(.finishComparisonPlotParameters(result, issues))
     }
     invalid <- stats::setNames(rep(FALSE, 4L), c("xParamName", "yParamName", "categoryParamName", "groupParamName"))
@@ -310,7 +344,7 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
         if (is.null(value)) {
             next
         }
-        
+
         multipleAllowed <- parameter %in% c("categoryParamName", "yParamName")
         valid <- is.character(value) && is.null(dim(value)) && length(value) > 0L && !anyNA(value) &&
             all(nzchar(value)) && all(value %in% names(data)) &&
@@ -325,7 +359,7 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
                 "one non-missing column name from data"
             }
             addIssue(paste0("Invalid column selection for '", parameter, "' (", .arrayToString(value, maxLength = 5), ")"),
-                parameter = parameter, 
+                parameter = parameter,
                 value = value,
                 constraint = constraint,
                 diagnosticId = "comparison.plot_column_invalid",
@@ -333,7 +367,8 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
                     setdiff(value, names(data))
                 } else {
                     character()
-                }))
+                })
+            )
             result[parameter] <- list(NULL)
             invalid[parameter] <- TRUE
         }
@@ -341,22 +376,25 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
     if (!is.null(result$yParamName)) {
         nonNumeric <- result$yParamName[!vapply(data[result$yParamName], is.numeric, logical(1))]
         for (parameter in nonNumeric) {
-            addIssue("The y-axis column must be numeric", 
-                parameter = parameter, 
+            addIssue("The y-axis column must be numeric",
+                parameter = parameter,
                 value = data[[parameter]],
-                constraint = "every selected y-axis column must be numeric", 
+                constraint = "every selected y-axis column must be numeric",
                 diagnosticId = "comparison.plot_y_column_not_numeric",
-                type = "data", 
-                relatedParameter = "yParamName", 
-                relatedValue = parameter)
+                type = "data",
+                relatedParameter = "yParamName",
+                relatedValue = parameter
+            )
         }
         if (length(nonNumeric)) {
             result["yParamName"] <- list(NULL)
             invalid["yParamName"] <- TRUE
         }
     }
-    available <- getComparisonParameterNames(data, type = "continuous",
-        exclude = c("objectNumber", "designNumber", "situation"))
+    available <- getComparisonParameterNames(data,
+        type = "continuous",
+        exclude = c("objectNumber", "designNumber", "situation")
+    )
     available <- available[vapply(data[available], is.numeric, logical(1))]
     roles <- stats::setNames(rep("", length(available)), available)
     if (length(objects)) {
@@ -390,18 +428,22 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
         }
         info <- getComparisonParameterInfo(data[candidates])
         descriptions <- getComparisonParameterDescriptions(info)
-        addIssue(paste0("Cannot select '", parameter, "' unambiguously. Candidates: ",
-            paste(head(.comparisonText(descriptions, 85L), 8L), collapse = "; "),
-            if (length(candidates) > 8L) {
-                "; ..."
-            } else {
-                ""
-            }, "."), 
-            parameter = parameter, 
+        addIssue(
+            paste0(
+                "Cannot select '", parameter, "' unambiguously. Candidates: ",
+                paste(head(.comparisonText(descriptions, 85L), 8L), collapse = "; "),
+                if (length(candidates) > 8L) {
+                    "; ..."
+                } else {
+                    ""
+                }, "."
+            ),
+            parameter = parameter,
             constraint = "supply an axis name when there is not exactly one candidate",
-            type = "missingArgument", 
+            type = "missingArgument",
             diagnosticId = "comparison.plot_axis_ambiguous",
-            context = list(candidates = candidates, descriptions = descriptions))
+            context = list(candidates = candidates, descriptions = descriptions)
+        )
     }
     exampleX <- if (!is.null(result$xParamName)) {
         result$xParamName
@@ -419,12 +461,14 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
         } else {
             paste0("c(", paste(encodeString(exampleY, quote = '"'), collapse = ", "), ")")
         }
-        paste0(if (input$isComparison) {
-            "plot(x"
-        } else {
-            "plotComparison(data"
-        }, ", xParamName = ", encodeString(exampleX, quote = '"'),
-            ", yParamName = ", yCode, ")")
+        paste0(
+            if (input$isComparison) {
+                "plot(x"
+            } else {
+                ".plotComparison(data"
+            }, ", xParamName = ", encodeString(exampleX, quote = '"'),
+            ", yParamName = ", yCode, ")"
+        )
     } else {
         "Choose numeric axis columns from the comparison data."
     }
@@ -434,8 +478,10 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
             issues[[i]]$message <- paste(issues[[i]]$message, example)
         }
     }
-    identities <- setdiff(intersect(c("objectName", "objectNumber", "designNumber"), names(data)),
-        c(result$xParamName, result$yParamName, result$groupParamName))
+    identities <- setdiff(
+        intersect(c("objectName", "objectNumber", "designNumber"), names(data)),
+        c(result$xParamName, result$yParamName, result$groupParamName)
+    )
     categories <- identities[vapply(data[identities], function(column) {
         !anyNA(column) && all(nzchar(trimws(as.character(column)))) && length(unique(column)) > 1L
     }, logical(1))]
@@ -461,13 +507,14 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
         result["yAxisRanges"] <- list(axes$ranges)
         if (!is.null(axes$issue)) {
             issue <- axes$issue
-            addIssue(issue$message, 
-                parameter = issue$parameter, 
-                value = issue$value, 
+            addIssue(issue$message,
+                parameter = issue$parameter,
+                value = issue$value,
                 constraint = issue$constraint,
-                diagnosticId = issue$diagnosticId, 
-                context = issue$context, 
-                type = issue$type)
+                diagnosticId = issue$diagnosticId,
+                context = issue$context,
+                type = issue$type
+            )
         }
     }
     return(.finishComparisonPlotParameters(result, issues))
@@ -484,9 +531,11 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
     } else {
         stopIllegalArgument
     }
-    errorHelper(selection$message, functionName = functionName, parameter = issue$parameter,
+    errorHelper(selection$message,
+        functionName = functionName, parameter = issue$parameter,
         value = issue$value, constraint = issue$constraint, diagnosticId = issue$diagnosticId,
-        relatedParameter = issue$relatedParameter, relatedValue = issue$relatedValue, context = context)
+        relatedParameter = issue$relatedParameter, relatedValue = issue$relatedValue, context = context
+    )
 }
 
 .comparisonInteraction <- function(data, columns, labelsEnabled = FALSE) {
@@ -609,28 +658,35 @@ getComparisonPlotParameters <- function(data, xParamName = NULL, yParamName = NU
 #'
 #' @examples
 #' \dontrun{
-#' data <- getComparisonData(list(getDesignFixed(), getDesignGroupSequential()))
-#' plotComparison(data, "stages", "criticalValues", plotLineEnabled = FALSE)
-#' plotComparison(data, "stages", "criticalValues",
-#'     categoryParamName = c("objectType", "sided"), plotLineEnabled = FALSE)
+#' data <- .getComparisonData(list(getDesignFixed(), getDesignGroupSequential()))
+#' .plotComparison(data, "stages", "criticalValues", plotLineEnabled = FALSE)
+#' .plotComparison(data, "stages", "criticalValues",
+#'     categoryParamName = c("objectType", "sided"), plotLineEnabled = FALSE
+#' )
 #' performance <- as.data.frame(getPowerAndAverageSampleNumber(
-#'     getDesignGroupSequential(kMax = 3), nMax = 100))
-#' plotComparison(performance, "theta",
+#'     getDesignGroupSequential(kMax = 3),
+#'     nMax = 100
+#' ))
+#' .plotComparison(performance, "theta",
 #'     c("averageSampleNumber", "overallEarlyStop", "calculatedPower"),
-#'     yAxisSide = c(averageSampleNumber = "left",
-#'         overallEarlyStop = "right", calculatedPower = "right"),
-#'     plotPointsEnabled = FALSE)
-#' plotComparison(data, "stages", c("criticalValues", "stageLevels"),
-#'     categoryLegendPosition = "auto", parameterLegendPosition = "bottom")
+#'     yAxisSide = c(
+#'         averageSampleNumber = "left",
+#'         overallEarlyStop = "right", calculatedPower = "right"
+#'     ),
+#'     plotPointsEnabled = FALSE
+#' )
+#' .plotComparison(data, "stages", c("criticalValues", "stageLevels"),
+#'     categoryLegendPosition = "auto", parameterLegendPosition = "bottom"
+#' )
 #' }
 #'
-#' @export
+#' @noRd
 #'
-plotComparison <- function(
+.plotComparison <- function(
         data,
         xParamName = NULL,
         yParamName = NULL,
-        ..., 
+        ...,
         groupParamName = NULL,
         categoryParamName = NULL,
         mainTitle = NULL,
@@ -646,8 +702,7 @@ plotComparison <- function(
         yAxisSide = "auto",
         categoryLegendPosition = NULL,
         parameterLegendPosition = NULL) {
-    
-    .warnInCaseOfUnknownArguments(functionName = "plotComparison", ...)
+    .warnInCaseOfUnknownArguments(functionName = ".plotComparison", ...)
     .assertGgplotIsInstalled()
     .assertComparisonLegendPosition(categoryLegendPosition, "categoryLegendPosition")
     .assertComparisonLegendPosition(parameterLegendPosition, "parameterLegendPosition")
@@ -658,12 +713,13 @@ plotComparison <- function(
     }
     selection <- getComparisonPlotParameters(data, xParamName, yParamName,
         categoryParamName = categoryParamName, groupParamName = groupParamName, objects = objects,
-        yAxisSide = yAxisSide)
+        yAxisSide = yAxisSide
+    )
     if (!is.null(selection$message)) {
         functionName <- if (inherits(data, c("TrialComparison", "TrialComparisonSummary"))) {
             "plot.TrialComparison"
         } else {
-            "plotComparison"
+            ".plotComparison"
         }
         .stopComparisonPlotSelection(selection, functionName)
     }
@@ -682,13 +738,13 @@ plotComparison <- function(
     multipleY <- length(yParamName) > 1L
     twoAxes <- length(unique(sides)) > 1L
     plotSettings <- PlotSettings$new()
-    
+
     if (shinyOptimization) {
         plotSettings$.pointBorderEnabled <- FALSE
         plotSettings$pointSize <- 2.2
         plotSettings$scalingFactor <- 0.85
     }
-    
+
     categoryEnabled <- length(categoryParamName) > 0L
     groupEnabled <- !is.null(groupParamName) && length(groupParamName) == 1 && !is.na(groupParamName)
     colourParameters <- if (groupEnabled) {
@@ -705,7 +761,7 @@ plotComparison <- function(
         categoryColumn <- tail(make.unique(c(names(data), ".comparisonCategory")), 1L)
         data[[categoryColumn]] <- .comparisonInteraction(data, categoryParamName, labelsEnabled = TRUE)
     }
-    
+
     prepared <- .comparisonPlotYData(data, yParamName, captions, sides, transformation)
     data <- prepared$data
     yColumn <- prepared$yColumn
@@ -713,9 +769,9 @@ plotComparison <- function(
 
     if (categoryEnabled && groupEnabled) {
         p <- ggplot2::ggplot(
-            data = data, 
+            data = data,
             mapping = ggplot2::aes(
-                x = !!ggplot2::sym(xParamName), 
+                x = !!ggplot2::sym(xParamName),
                 y = !!ggplot2::sym(yColumn),
                 colour = factor(!!ggplot2::sym(groupParamName)),
                 fill = factor(!!ggplot2::sym(categoryColumn))
@@ -724,21 +780,22 @@ plotComparison <- function(
     } else if (groupEnabled && !categoryEnabled) {
         p <- ggplot2::ggplot(data, ggplot2::aes(
             x = !!ggplot2::sym(xParamName), y = !!ggplot2::sym(yColumn),
-            colour = factor(!!ggplot2::sym(groupParamName))))
+            colour = factor(!!ggplot2::sym(groupParamName))
+        ))
     } else if (categoryEnabled && mirrorModeEnabled) {
         p <- ggplot2::ggplot(
-            data = data, 
+            data = data,
             mapping = ggplot2::aes(
-                x = !!ggplot2::sym(xParamName), 
+                x = !!ggplot2::sym(xParamName),
                 y = !!ggplot2::sym(yColumn),
                 fill = factor(!!ggplot2::sym(categoryColumn))
             )
         )
     } else if (categoryEnabled) {
         p <- ggplot2::ggplot(
-            data = data, 
+            data = data,
             mapping = ggplot2::aes(
-                x = !!ggplot2::sym(xParamName), 
+                x = !!ggplot2::sym(xParamName),
                 y = !!ggplot2::sym(yColumn),
                 colour = factor(!!ggplot2::sym(categoryColumn))
             )
@@ -746,7 +803,7 @@ plotComparison <- function(
     } else {
         p <- ggplot2::ggplot(data = data, mapping = ggplot2::aes(x = !!ggplot2::sym(xParamName), y = !!ggplot2::sym(yColumn)))
     }
-    
+
     if (multipleY) {
         if (plotLineEnabled) {
             p <- p + ggplot2::aes(linetype = !!ggplot2::sym(parameterColumn))
@@ -763,13 +820,18 @@ plotComparison <- function(
             legendTitle
         }
         if (plotLineEnabled) {
-            p <- p + ggplot2::scale_linetype_manual(name = parameterLegendTitle,
+            p <- p + ggplot2::scale_linetype_manual(
+                name = parameterLegendTitle,
                 values = stats::setNames(rep(c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"),
-                    length.out = length(prepared$labels)), prepared$labels))
+                    length.out = length(prepared$labels)
+                ), prepared$labels)
+            )
         }
         if (plotPointsEnabled) {
-            p <- p + ggplot2::scale_shape_manual(name = parameterLegendTitle,
-                values = stats::setNames(rep(c(21, 22, 24, 23, 25), length.out = length(prepared$labels)), prepared$labels))
+            p <- p + ggplot2::scale_shape_manual(
+                name = parameterLegendTitle,
+                values = stats::setNames(rep(c(21, 22, 24, 23, 25), length.out = length(prepared$labels)), prepared$labels)
+            )
         }
     }
 
@@ -777,7 +839,7 @@ plotComparison <- function(
         breaks <- sort(unique(round(na.omit(data[[xParamName]]))))
         p <- p + ggplot2::scale_x_continuous(breaks = breaks)
     }
-    
+
     groups <- c(categoryParamName, groupParamName)
     if (!length(groups)) {
         groups <- intersect(c("objectNumber", "designNumber"), names(data))[1L]
@@ -795,18 +857,18 @@ plotComparison <- function(
     }
     p <- plotSettings$setTheme(p)
     p <- plotSettings$hideGridLines(p)
-    
+
     if (discreteXAxis && is.numeric(data[[xParamName]])) {
         p <- p + ggplot2::scale_x_continuous(breaks = sort(unique(data[[xParamName]])))
     }
-    
+
     # set main title
     if (!is.null(mainTitle) && length(mainTitle) == 1 && !is.na(mainTitle)) {
         p <- plotSettings$setMainTitle(p, mainTitle)
     } else {
         p <- p + ggplot2::theme(plot.title = ggplot2::element_blank())
     }
-    
+
     # set legend
     automaticLegend <- identical(legendPosition, "auto")
     if ((!categoryEnabled && !groupEnabled && !multipleY) || mirrorModeEnabled || (!is.na(legendPosition) && legendPosition == -1)) {
@@ -817,7 +879,7 @@ plotComparison <- function(
         } else {
             if (!legendPosition %in% c("none", "left", "right", "bottom", "top")) {
                 stopIllegalArgument("Invalid legend position",
-                    functionName = "plotComparison", parameter = "legendPosition", value = legendPosition,
+                    functionName = ".plotComparison", parameter = "legendPosition", value = legendPosition,
                     constraint = "one of none, left, right, bottom, top for a character legend position",
                     diagnosticId = "comparison.plot_legend_position_invalid",
                     context = list(allowedValues = c("none", "left", "right", "bottom", "top"))
@@ -832,7 +894,7 @@ plotComparison <- function(
             p <- p + ggplot2::labs(fill = fillLegendTitle)
         }
     }
-    
+
     p <- plotSettings$plotValues(p,
         plotLineEnabled = isTRUE(plotLineEnabled),
         plotPointsEnabled = isTRUE(plotPointsEnabled) && !multipleY,
@@ -840,18 +902,22 @@ plotComparison <- function(
     )
     if (multipleY && plotPointsEnabled) {
         if (pointBorder > 0 && plotSettings$.pointBorderEnabled) {
-            p <- p + ggplot2::geom_point(colour = "white", fill = "white",
+            p <- p + ggplot2::geom_point(
+                colour = "white", fill = "white",
                 size = plotSettings$scaleSize(plotSettings$pointSize, TRUE),
-                stroke = pointBorder / 2.25, show.legend = FALSE)
+                stroke = pointBorder / 2.25, show.legend = FALSE
+            )
         }
         if ((categoryEnabled && groupEnabled) || (categoryEnabled && mirrorModeEnabled)) {
             p <- p + ggplot2::geom_point(size = plotSettings$scaleSize(plotSettings$pointSize, TRUE), alpha = 1)
         } else {
-            p <- p + ggplot2::geom_point(size = plotSettings$scaleSize(plotSettings$pointSize, TRUE),
-                fill = "white", alpha = 1)
+            p <- p + ggplot2::geom_point(
+                size = plotSettings$scaleSize(plotSettings$pointSize, TRUE),
+                fill = "white", alpha = 1
+            )
         }
     }
-    
+
     p <- plotSettings$setAxesAppearance(p)
     colourValues <- if (groupEnabled) {
         data[[groupParamName]]
@@ -872,7 +938,8 @@ plotComparison <- function(
     p <- plotSettings$enlargeAxisTicks(p)
     p <- p + ggplot2::labs(
         x = unname(.comparisonYCaptions(xParamName, input$objects)),
-        y = paste(captions, collapse = " / "))
+        y = paste(captions, collapse = " / ")
+    )
     if (twoAxes) {
         scale <- transformation$scale
         offset <- transformation$offset
@@ -883,7 +950,9 @@ plotComparison <- function(
                 range(c(limits, axisRange))
             },
             sec.axis = ggplot2::sec_axis(~ (. - offset) / scale,
-                name = paste(captions[sides == "right"], collapse = " / ")))
+                name = paste(captions[sides == "right"], collapse = " / ")
+            )
+        )
     } else if (any(sides == "right")) {
         p <- p + ggplot2::scale_y_continuous(name = paste(captions, collapse = " / "), position = "right")
     }
@@ -906,26 +975,28 @@ plotComparison <- function(
     } else {
         character()
     }
-    return(.layoutComparisonLegends(p, plotSettings, legendPosition,
-        categoryAesthetics, parameterAesthetics, categoryLegendPosition, parameterLegendPosition))
+    return(.layoutComparisonLegends(
+        p, plotSettings, legendPosition,
+        categoryAesthetics, parameterAesthetics, categoryLegendPosition, parameterLegendPosition
+    ))
 }
 
 .comparisonLegendTitle <- function(data, objects, parameters) {
     if (!length(parameters)) {
         return("Parameter")
     }
-    
+
     title <- vapply(parameters, function(parameter) {
         if (!parameter %in% c("objectNumber", "objectName", "designNumber")) {
             return(.comparisonYCaptions(parameter, objects))
         }
-        
+
         types <- .comparisonLegendObjectTypes(data, objects)
         if (length(objects) == 0 && !any(c("objectType", "calculationTarget") %in% names(data)) &&
                 parameter == "designNumber") {
             types <- "Design"
         }
-        
+
         types[is.na(types)] <- "Object"
         types <- intersect(c("Design", "Calculation", "Simulation", "Object"), unique(types))
         if (length(types) == 0) {
@@ -935,15 +1006,15 @@ plotComparison <- function(
         if (length(types) == 1) {
             return(types)
         }
-        
+
         if (!"Object" %in% types) {
             return("Design plan")
         }
-        
+
         if (length(types) > 2L) {
             return("Object")
         }
-        
+
         return(paste(types, collapse = " / "))
     }, character(1))
     return(paste(unique(title), collapse = " / "))
@@ -993,9 +1064,10 @@ plotComparison <- function(
     }
     if (!valid) {
         stopIllegalArgument("Invalid legend position for '", parameter, "'",
-            functionName = "plotComparison", parameter = parameter, value = value,
+            functionName = ".plotComparison", parameter = parameter, value = value,
             constraint = "NULL, auto, none, left, right, bottom, top, or an integer from -1 to 6",
-            diagnosticId = "comparison.legend_position_invalid")
+            diagnosticId = "comparison.legend_position_invalid"
+        )
     }
 }
 
@@ -1017,8 +1089,14 @@ plotComparison <- function(
     return(result)
 }
 
-.comparisonLegendGuide <- function(p, aesthetics, position, plotSettings,
-        horizontal = FALSE, columns = 1L, fontFactor = 1) {
+.comparisonLegendGuide <- function(
+        p,
+        aesthetics,
+        position,
+        plotSettings,
+        horizontal = FALSE,
+        columns = 1L,
+        fontFactor = 1) {
     if (!length(aesthetics)) {
         return(p)
     }
@@ -1028,11 +1106,15 @@ plotComparison <- function(
     }
     positionTheme <- ggplot2::theme()
     if (is.numeric(position) && position > 0) {
-        positions <- list(c(0.05, 0.98), c(0.05, 0.5), c(0.05, 0.02),
-            c(0.95, 0.98), c(0.95, 0.5), c(0.95, 0.02))
+        positions <- list(
+            c(0.05, 0.98), c(0.05, 0.5), c(0.05, 0.02),
+            c(0.95, 0.98), c(0.95, 0.5), c(0.95, 0.02)
+        )
         justifications <- list(c(0, 1), c(0, 0.5), c(0, 0), c(1, 1), c(1, 0.5), c(1, 0))
-        positionTheme <- ggplot2::theme(legend.position.inside = positions[[position]],
-            legend.justification.inside = justifications[[position]])
+        positionTheme <- ggplot2::theme(
+            legend.position.inside = positions[[position]],
+            legend.justification.inside = justifications[[position]]
+        )
         position <- "inside"
     } else if (identical(position, "auto")) {
         position <- "inside"
@@ -1052,7 +1134,8 @@ plotComparison <- function(
             ggplot2::element_blank()
         } else {
             ggplot2::element_text(size = plotSettings$scaleSize(plotSettings$legendFontSize + 1) * fontFactor)
-        })
+        }
+    )
     guides <- stats::setNames(lapply(aesthetics, function(aesthetic) {
         return(ggplot2::guide_legend(position = position, direction = if (horizontal) {
             "horizontal"
@@ -1078,14 +1161,18 @@ plotComparison <- function(
     boxes <- boxes[!vapply(table$grobs[boxes], inherits, logical(1), "zeroGrob")]
     sizes <- lapply(boxes, function(index) {
         box <- table$grobs[[index]]
-        return(c(width = grid::convertWidth(grid::grobWidth(box), "in", valueOnly = TRUE),
-            height = grid::convertHeight(grid::grobHeight(box), "in", valueOnly = TRUE)))
+        return(c(
+            width = grid::convertWidth(grid::grobWidth(box), "in", valueOnly = TRUE),
+            height = grid::convertHeight(grid::grobHeight(box), "in", valueOnly = TRUE)
+        ))
     })
     names(sizes) <- sub("guide-box-", "", table$layout$name[boxes], fixed = TRUE)
-    return(list(built = built, sizes = sizes,
+    return(list(
+        built = built, sizes = sizes,
         panelWidth = grDevices::dev.size("in")[1L] - grid::convertWidth(sum(table$widths), "in", valueOnly = TRUE),
         panelHeight = grDevices::dev.size("in")[2L] - grid::convertHeight(sum(table$heights), "in", valueOnly = TRUE),
-        deviceHeight = grDevices::dev.size("in")[2L]))
+        deviceHeight = grDevices::dev.size("in")[2L]
+    ))
 }
 
 .fitComparisonBottomLegend <- function(p, aesthetics, plotSettings, fontFactor) {
@@ -1103,7 +1190,8 @@ plotComparison <- function(
     while (lower <= upper) {
         columns <- floor((lower + upper) / 2)
         candidate <- .comparisonLegendGuide(p, aesthetics, "bottom", plotSettings,
-            horizontal = TRUE, columns = columns, fontFactor = fontFactor)
+            horizontal = TRUE, columns = columns, fontFactor = fontFactor
+        )
         measurement <- .measureComparisonLegends(candidate)
         if (is.null(measurement$sizes$bottom) ||
                 measurement$sizes$bottom[["width"]] <= measurement$panelWidth * 0.98) {
@@ -1131,8 +1219,14 @@ plotComparison <- function(
         bottom[["height"]] <= measurement$deviceHeight * 0.45)
 }
 
-.layoutComparisonLegends <- function(p, plotSettings, legendPosition, categoryAesthetics,
-        parameterAesthetics, categoryPosition, parameterPosition) {
+.layoutComparisonLegends <- function(
+        p,
+        plotSettings,
+        legendPosition,
+        categoryAesthetics,
+        parameterAesthetics,
+        categoryPosition,
+        parameterPosition) {
     if (identical(p$theme$legend.position, "none")) {
         return(p)
     }
@@ -1157,7 +1251,8 @@ plotComparison <- function(
         for (fontFactor in c(1, 0.95, 0.9)) {
             first <- .comparisonLegendGuide(p, parameterAesthetics, "inside", plotSettings, fontFactor = fontFactor)
             first <- .comparisonLegendGuide(first, categoryAesthetics, "bottom", plotSettings,
-                horizontal = TRUE, fontFactor = fontFactor)
+                horizontal = TRUE, fontFactor = fontFactor
+            )
             first <- .fitComparisonBottomLegend(first, categoryAesthetics, plotSettings, fontFactor)
             firstFits <- .comparisonSplitLegendFits(first$measurement)
             if (firstFits) {
@@ -1217,7 +1312,8 @@ plotComparison <- function(
         }
     }
     p <- .comparisonLegendGuide(p, categoryAesthetics, categoryPosition, plotSettings,
-        horizontal = identical(categoryPosition, "bottom"))
+        horizontal = identical(categoryPosition, "bottom")
+    )
     p <- .comparisonLegendGuide(p, parameterAesthetics, parameterPosition, plotSettings)
     if (identical(categoryPosition, "bottom")) {
         p <- .fitComparisonBottomLegend(p, categoryAesthetics, plotSettings, 1)$plot
@@ -1232,8 +1328,10 @@ plotComparison <- function(
     width <- measurement$sizes$inside[["width"]] / measurement$panelWidth
     height <- measurement$sizes$inside[["height"]] / measurement$panelHeight
     lower <- p$theme$legend.position.inside - c(width, height) * p$theme$legend.justification
-    rectangle <- c(lower[1L] - 0.01, lower[1L] + width + 0.01,
-        lower[2L] - 0.01, lower[2L] + height + 0.01)
+    rectangle <- c(
+        lower[1L] - 0.01, lower[1L] + width + 0.01,
+        lower[2L] - 0.01, lower[2L] + height + 0.01
+    )
     built <- measurement$built
     score <- 0
     for (layer in seq_along(built$data)) {
