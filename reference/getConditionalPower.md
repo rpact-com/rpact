@@ -59,7 +59,7 @@ getConditionalPower(stageResults, ..., nPlanned, allocationRatioPlanned = 1)
   considered. For survival outcomes, it should contain the planned
   number of additional events. For multi-arm designs, it is the
   per-comparison (combined) sample size. For enrichment designs, it is
-  the (combined) sample size for the considered sub-population.
+  the (combined) sample size for the considered subpopulation.
 
 - allocationRatioPlanned:
 

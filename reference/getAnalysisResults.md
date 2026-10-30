@@ -125,8 +125,12 @@ getAnalysisResults(
 - directionUpper:
 
   Logical. Specifies the direction of the alternative, only applicable
-  for one-sided testing; default is `TRUE` which means that larger
-  values of the test statistics yield smaller p-values.
+  for one-sided testing; `TRUE` means that larger values of the test
+  statistics yield smaller p-values. The default is `TRUE` for means,
+  rates, and count data, and `FALSE` for survival data (power
+  calculations, simulations, and analyses). In sample size calculations,
+  the direction is derived from the specified alternative; a specified
+  `directionUpper` must agree with it.
 
 - thetaH0:
 
@@ -164,7 +168,7 @@ getAnalysisResults(
   considered. For survival outcomes, it should contain the planned
   number of additional events. For multi-arm designs, it is the
   per-comparison (combined) sample size. For enrichment designs, it is
-  the (combined) sample size for the considered sub-population.
+  the (combined) sample size for the considered subpopulation.
 
 - allocationRatioPlanned:
 
@@ -279,6 +283,10 @@ design can be re-created for arbitrary values of the global significance
 level. For user-defined designs with fixed userAlphaSpending values,
 this alpha-dependent design family is not uniquely defined.
 Consequently, repeated p-values are not available for such designs.
+Repeated p-values are also unavailable for sequential designs with
+`typeBetaSpending = "bsUser"`, regardless of whether futility is
+binding. These calculations return `NA` with a warning; other analysis
+results remain available.
 
 ## How to get help for generic functions
 
@@ -385,7 +393,7 @@ if (require(ggplot2)) plot(y, thetaRange = c(0, 0.4))
 
 # Example 4 Enrichment Design
 # Perform an two-stage enrichment design analysis with O'Brien & Fleming boundaries
-# where one sub-population (S1) and a full population (F) are considered as primary
+# where one subpopulation (S1) and a full population (F) are considered as primary
 # analysis sets. At interim, S1 is selected for further analysis and the sample
 # size is increased accordingly. With the Spiessens & Debois intersection test,
 # the results of a closed adaptive test procedure together with the CRP, repeated

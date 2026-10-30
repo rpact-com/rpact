@@ -12,13 +12,23 @@ getLambdaByMedian(median, kappa = 1, matrixAllowed = FALSE)
 
 getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getHazardRatioByLambda(lambda1, lambda2, matrixAllowed = FALSE)
+getHazardRatioByLambda(lambda1, lambda2, matrixAllowed = FALSE, kappa = 1)
 
 getHazardRatioByMedian(median1, median2, kappa = 1, matrixAllowed = FALSE)
 
-getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio, matrixAllowed = FALSE)
+getLambda1ByLambda2AndHazardRatio(
+  lambda2,
+  hazardRatio,
+  matrixAllowed = FALSE,
+  kappa = 1
+)
 
-getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio, matrixAllowed = FALSE)
+getLambda2ByLambda1AndHazardRatio(
+  lambda1,
+  hazardRatio,
+  matrixAllowed = FALSE,
+  kappa = 1
+)
 
 getPi1ByPi2AndHazardRatio(
   pi2,
@@ -89,3 +99,9 @@ median, lambda, or hazard ratio values, e.g, for usage in
 [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
 or
 [`getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.md).
+
+For the Weibull distribution, the hazard ratio is
+`(lambda1 / lambda2)^kappa = (median2 / median1)^kappa`, where `lambda`
+is the inverse Weibull scale and `kappa` is the common shape parameter.
+Conversions from a hazard ratio therefore use `hazardRatio^(1 / kappa)`
+to recover the lambda ratio.

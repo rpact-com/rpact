@@ -2,13 +2,29 @@
 
 ## All functions
 
+- [`TrialComparison`](https://docs.rpact.org/reference/TrialComparison.md)
+  : Trial Comparison
+- [`add()`](https://docs.rpact.org/reference/add.md) : Add Objects to a
+  Collection
+- [`as.data.frame(`*`<PiecewiseSurvivalTimeMultiGroup>`*`)`](https://docs.rpact.org/reference/as.data.frame.PiecewiseSurvivalTimeMultiGroup.md)
+  : Coerce a Multi-Group Piecewise Survival Specification to a Data
+  Frame
+- [`as.data.frame(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/as.data.frame.TrialComparison.md)
+  : Trial Comparison Data Frame
 - [`as251Normal()`](https://docs.rpact.org/reference/as251Normal.md) :
   Algorithm AS 251: Normal Distribution
 - [`as251StudentT()`](https://docs.rpact.org/reference/as251StudentT.md)
   : Algorithm AS 251: Student T Distribution
+- [`delete()`](https://docs.rpact.org/reference/delete.md) : Delete an
+  Object from a Collection
+- [`` `[[`( ``*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/extract.TrialComparison.md)
+  [`` `$`( ``*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/extract.TrialComparison.md)
+  : Access Objects in a Trial Comparison
 - [`obtain()`](https://docs.rpact.org/reference/fetch.ParameterSet.md)
   [`fetch()`](https://docs.rpact.org/reference/fetch.ParameterSet.md) :
   Extract a single parameter
+- [`fetch(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/fetch.TrialComparison.md)
+  : Fetch Objects from a Trial Comparison
 - [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)
   : Get Accrual Time
 - [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)
@@ -20,6 +36,20 @@
   : Get Closed Combination Test Results
 - [`getClosedConditionalDunnettTestResults()`](https://docs.rpact.org/reference/getClosedConditionalDunnettTestResults.md)
   : Get Closed Conditional Dunnett Test Results
+- [`getComparison()`](https://docs.rpact.org/reference/getComparison.md)
+  [`length(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/getComparison.md)
+  [`names(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/getComparison.md)
+  : Compare Existing Trial Planning Objects
+- [`getComparisonData()`](https://docs.rpact.org/reference/getComparisonData.md)
+  : Get Comparison Data
+- [`getComparisonParameterDescriptions()`](https://docs.rpact.org/reference/getComparisonParameterDescriptions.md)
+  : Describe Comparison Parameters
+- [`getComparisonParameterInfo()`](https://docs.rpact.org/reference/getComparisonParameterInfo.md)
+  : Get Comparison Parameter Information
+- [`getComparisonParameterNames()`](https://docs.rpact.org/reference/getComparisonParameterNames.md)
+  : Select Comparison Parameters
+- [`getComparisonPlotParameters()`](https://docs.rpact.org/reference/getComparisonPlotParameters.md)
+  : Select Parameters for a Comparison Plot
 - [`getConditionalPower()`](https://docs.rpact.org/reference/getConditionalPower.md)
   : Get Conditional Power
 - [`getConditionalRejectionProbabilities()`](https://docs.rpact.org/reference/getConditionalRejectionProbabilities.md)
@@ -61,20 +91,22 @@
 - [`rcmd()`](https://docs.rpact.org/reference/getObjectRCode.md)
   [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md)
   : Get Object R Code
+- [`getObjects()`](https://docs.rpact.org/reference/getObjects.md) : Get
+  Objects from a Collection
 - [`getObservedInformationRates()`](https://docs.rpact.org/reference/getObservedInformationRates.md)
   : Get Observed Information Rates
 - [`getOutputFormat()`](https://docs.rpact.org/reference/getOutputFormat.md)
   : Get Output Format
 - [`getPerformanceScore()`](https://docs.rpact.org/reference/getPerformanceScore.md)
   : Get Performance Score
-- [`getPiecewiseEnrichmentSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseEnrichmentSurvivalTime.md)
-  : Piecewise Exponential Enrichment Survival Time
 - [`getPiecewiseHazardRatioArray()`](https://docs.rpact.org/reference/getPiecewiseHazardRatioArray.md)
   : Create an Array of Piecewise Hazard Ratios
-- [`getPiecewiseMultiArmSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseMultiArmSurvivalTime.md)
-  : Piecewise Exponential Multi-Arm Survival Time
 - [`getPiecewiseSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTime.md)
   : Get Piecewise Survival Time
+- [`getPiecewiseSurvivalTimeEnrichment()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeEnrichment.md)
+  : Piecewise Exponential Enrichment Survival Time
+- [`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeMultiArm.md)
+  : Piecewise Exponential Multi-Arm Survival Time
 - [`getPowerAndAverageSampleNumber()`](https://docs.rpact.org/reference/getPowerAndAverageSampleNumber.md)
   : Get Power And Average Sample Number
 - [`getPowerCounts()`](https://docs.rpact.org/reference/getPowerCounts.md)
@@ -145,6 +177,9 @@
   : Stage Results Plotting
 - [`plot(`*`<SummaryFactory>`*`)`](https://docs.rpact.org/reference/plot.SummaryFactory.md)
   : Summary Factory Plotting
+- [`plot(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/plot.TrialComparison.md)
+  [`plot(`*`<TrialComparisonSummary>`*`)`](https://docs.rpact.org/reference/plot.TrialComparison.md)
+  : Plot a Trial Comparison
 - [`plot(`*`<TrialDesign>`*`)`](https://docs.rpact.org/reference/plot.TrialDesign.md)
   [`plot(`*`<TrialDesignCharacteristics>`*`)`](https://docs.rpact.org/reference/plot.TrialDesign.md)
   : Trial Design Plotting
@@ -154,8 +189,12 @@
   : Trial Design Set Plotting
 - [`plot(`*`<TrialDesignSummaries>`*`)`](https://docs.rpact.org/reference/plot.TrialDesignSummaries.md)
   : Plot Trial Design Summaries
+- [`plotComparison()`](https://docs.rpact.org/reference/plotComparison.md)
+  : Plot Comparison Data
 - [`print(`*`<SummaryFactory>`*`)`](https://docs.rpact.org/reference/print.SummaryFactory.md)
   : Summary Factory Printing
+- [`print(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/print.TrialComparison.md)
+  : Print a Trial Comparison
 - [`print(`*`<TrialDesignCharacteristics>`*`)`](https://docs.rpact.org/reference/print.TrialDesignCharacteristics.md)
   : Trial Design Characteristics Printing
 - [`print(`*`<TrialDesignSummaries>`*`)`](https://docs.rpact.org/reference/print.TrialDesignSummaries.md)
@@ -169,6 +208,8 @@
   Confirmatory Adaptive Clinical Trial Design and Analysis
 - [`setOutputFormat()`](https://docs.rpact.org/reference/setOutputFormat.md)
   : Set Output Format
+- [`summary(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/summary.TrialComparison.md)
+  : Summarize Differences Between Trial Planning Objects
 - [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) :
   Test and Validate the rpact Package Installation
 - [`getPiecewiseExponentialDistribution()`](https://docs.rpact.org/reference/utilitiesForPiecewiseExponentialDistribution.md)

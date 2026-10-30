@@ -7,4 +7,4 @@ Parameter Description: overdispersion for Counts
 - overdispersion:
 
   A numeric value that represents the assumed overdispersion of the
-  negative binomial distribution, default is `0`.
+  negative binomial distribution, default is `0`. Must be `>= 0`.

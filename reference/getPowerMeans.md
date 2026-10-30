@@ -47,7 +47,7 @@ getPowerMeans(
 
 - meanRatio:
 
-  If `TRUE`, the sample size for one-sided testing of H0:
+  If `TRUE`, the power for one-sided testing of H0:
   `mu1 / mu2 = thetaH0` is calculated, default is `FALSE`.
 
 - thetaH0:
@@ -94,8 +94,12 @@ getPowerMeans(
 - directionUpper:
 
   Logical. Specifies the direction of the alternative, only applicable
-  for one-sided testing; default is `TRUE` which means that larger
-  values of the test statistics yield smaller p-values.
+  for one-sided testing; `TRUE` means that larger values of the test
+  statistics yield smaller p-values. The default is `TRUE` for means,
+  rates, and count data, and `FALSE` for survival data (power
+  calculations, simulations, and analyses). In sample size calculations,
+  the direction is derived from the specified alternative; a specified
+  `directionUpper` must agree with it.
 
 - maxNumberOfSubjects:
 

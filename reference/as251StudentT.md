@@ -49,9 +49,9 @@ as251StudentT(
 
 - errorControl:
 
-  error control. If set to 1, strict error control based on fourth
-  derivative is used. If set to zero, error control based on halving
-  intervals is used
+  error control. If set to `"strict"` (default), strict error control
+  based on fourth derivative is used. If set to `"halvingIntervals"`,
+  error control based on halving intervals is used
 
 - intervalSimpsonsRule:
 

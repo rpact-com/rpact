@@ -43,8 +43,12 @@ getPowerCounts(
 - directionUpper:
 
   Logical. Specifies the direction of the alternative, only applicable
-  for one-sided testing; default is `TRUE` which means that larger
-  values of the test statistics yield smaller p-values.
+  for one-sided testing; `TRUE` means that larger values of the test
+  statistics yield smaller p-values. The default is `TRUE` for means,
+  rates, and count data, and `FALSE` for survival data (power
+  calculations, simulations, and analyses). In sample size calculations,
+  the direction is derived from the specified alternative; a specified
+  `directionUpper` must agree with it.
 
 - maxNumberOfSubjects:
 
@@ -104,17 +108,21 @@ getPowerCounts(
 - overdispersion:
 
   A numeric value that represents the assumed overdispersion of the
-  negative binomial distribution, default is `0`.
+  negative binomial distribution, default is `0`. Must be `>= 0`.
 
 - fixedExposureTime:
 
   If specified, the fixed time of exposure per subject for count data,
-  there is no default.
+  there is no default. For power calculations and simulations, exactly
+  one of `fixedExposureTime` and `followUpTime` must be specified.
 
 - accrualTime:
 
   If specified, the assumed accrual time interval(s) for the study,
-  there is no default.
+  there is no default. A single value defines the end of accrual; if a
+  vector is specified, its first value must be `0`. If `followUpTime` is
+  specified, `accrualTime` can have at most two elements. Required for
+  [`getSimulationCounts()`](https://docs.rpact.org/reference/getSimulationCounts.md).
 
 - accrualIntensity:
 
@@ -125,7 +133,9 @@ getPowerCounts(
 
   If specified, the assumed (additional) follow-up time for the study,
   there is no default. The total study duration is
-  `accrualTime + followUpTime`.
+  `accrualTime + followUpTime`. For power calculations and simulations,
+  exactly one of `fixedExposureTime` and `followUpTime` must be
+  specified.
 
 - allocationRatioPlanned:
 

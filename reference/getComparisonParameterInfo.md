@@ -1,0 +1,87 @@
+# Get Comparison Parameter Information
+
+Describes the observed values and plotting roles of comparison-data
+columns. This analysis does not change, round, or recalculate the
+supplied data.
+
+## Usage
+
+``` r
+getComparisonParameterInfo(
+  data,
+  ...,
+  removeConstantParameters = FALSE,
+  binaryIntegerAsFactor = TRUE
+)
+```
+
+## Arguments
+
+- data:
+
+  A data.frame, typically returned by getComparisonData(). Columns must
+  be one-dimensional atomic vectors, including factors and dates.
+
+- ...:
+
+  Further arguments. Currently unused.
+
+- removeConstantParameters:
+
+  Whether to omit columns with at most one distinct observed value.
+  Defaults to FALSE so all parameters are available.
+
+- binaryIntegerAsFactor:
+
+  Whether integer-valued binary variables are also eligible for use as
+  factors. This does not change the source column.
+
+## Value
+
+A data.frame with one row per column: paramName, dataType, paramType,
+isContinuous, isFactor, isBinary, isEmpty, isSingleValue, isConstant,
+isVarying, hasMissingValues, paramLevelLength, and binaryValues (display
+text). The list columns values and singleValue preserve the original
+value types and precision; singleValue contains NULL except for
+single-valued columns. Empty inputs produce a zero-row table with the
+same schema.
+
+## Details
+
+Missing values and blank character/factor entries are excluded from
+observed levels. They are recorded in hasMissingValues. Thus a column
+containing one value and NA is constant among observed values; it is not
+identical to a complete column. Empty columns are constant but are not
+single-valued. Numeric character columns are recognized when every
+observed entry is a signed decimal or scientific numeric literal, or a
+comma-separated sequence of these literals as exported for vector-valued
+parameters. Every token must be numeric; incomplete or mixed text
+sequences remain character. Original cell values are retained without
+parsing them as R code. dataType records the original first class;
+paramType records the inferred plotting type. Finite, exactly integral
+numeric values are classified as integer without integer coercion.
+Factors and date/time classes retain their types. isFactor describes
+eligibility for categorical use, rather than whether the original column
+is an R factor. isContinuous and isFactor may both be TRUE for
+integer-valued binary data.
+
+Variation is evaluated across rows, including stages and situations.
+This is not a test of differences between complete stage profiles of
+separate objects. No numerical tolerance is applied to distinctness.
+Unused factor levels do not count as observed values.
+
+## Examples
+
+``` r
+data <- data.frame(alpha = c(0.025, 0.025), effect = c(0.2, 0.3))
+getComparisonParameterInfo(data)
+#>   paramName dataType paramType isContinuous isFactor isBinary isEmpty
+#> 1     alpha  numeric   numeric         TRUE    FALSE    FALSE   FALSE
+#> 2    effect  numeric   numeric         TRUE    FALSE     TRUE   FALSE
+#>   isSingleValue isConstant isVarying hasMissingValues paramLevelLength
+#> 1          TRUE       TRUE     FALSE            FALSE                1
+#> 2         FALSE      FALSE      TRUE            FALSE                2
+#>   binaryValues   values singleValue
+#> 1         <NA>    0.025       0.025
+#> 2     0.2, 0.3 0.2, 0.3        NULL
+```

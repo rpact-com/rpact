@@ -24,6 +24,26 @@
   event, censoring, dropout, and maximum-subject constraints while
   preserving the previous test-statistic-based workflow for existing use
   cases.
+- The new functions
+  [`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeMultiArm.md)
+  and
+  [`getPiecewiseSurvivalTimeEnrichment()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeEnrichment.md)
+  define piecewise exponential survival distributions for patient-wise
+  multi-arm and enrichment simulations. They support interval-specific
+  hazard ratios and multiple named simulation situations, with a common
+  control-hazard profile across treatment arms for multi-arm designs and
+  subgroup-specific control hazards for enrichment designs. Control and
+  treatment hazards can alternatively be specified through exponential
+  medians for each interval using `medianControl` (multi-arm),
+  `medianControls` (enrichment), and `medianTreatments`; these interval
+  parameters are not the medians of the complete piecewise survival
+  distributions. The new helper
+  [`getPiecewiseHazardRatioArray()`](https://docs.rpact.org/reference/getPiecewiseHazardRatioArray.md)
+  combines group-by-interval hazard-ratio matrices into an array of
+  simulation situations. The resulting survival specifications support
+  console and Markdown output, data-frame and matrix conversion, and
+  R-code reconstruction with
+  [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md).
 - [`getDataset()`](https://docs.rpact.org/reference/getDataset.md) now
   supports datasets of general, endpoint-independent estimates through
   the new `DatasetGeneral` class. Stage-wise estimates and standard
@@ -75,9 +95,80 @@
   provided solely to validate that this derived direction is consistent
   with a `directionUpper` value that may already have been set in the
   design.
+- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
+  supports parallel test execution on Windows, Linux, and macOS while
+  retaining its HTML and PDF reports. The new `workers` argument
+  defaults to automatic selection (available CPUs minus two, between one
+  and 16); use `workers = 1` for serial execution. Local test scheduling
+  priorities are respected, and the result includes the worker count and
+  separate timings for unit tests, R basic package tests, and HTML/PDF
+  rendering.
+- Added
+  [`getComparison()`](https://docs.rpact.org/reference/getComparison.md)
+  and the R6 `TrialComparison` class for comparing designs, design
+  characteristics, sample size and power calculations, and simulations.
+  Named or unnamed objects, nested lists, and existing comparisons can
+  be combined, extended with
+  [`add()`](https://docs.rpact.org/reference/add.md), and edited with
+  [`delete()`](https://docs.rpact.org/reference/delete.md);
+  [`getObjects()`](https://docs.rpact.org/reference/getObjects.md),
+  [`fetch()`](https://docs.rpact.org/reference/fetch.ParameterSet.md),
+  `$`, and `[[` provide access to the contained objects. Duplicate names
+  are rejected. Compact print and summary output presents shared and
+  differing parameter profiles using descriptive object labels,
+  context-specific captions, and titles, with display limits for large
+  comparisons. Full data-frame conversion, Markdown output, and R-code
+  reconstruction are supported, including stage coordinates for fixed
+  designs and robust numeric type inference. The
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) of a
+  `TrialComparison` result supports multiple category columns and y
+  parameters, with automatic or explicit left/right axis assignment
+  through `yAxisSide`.
+  [`getComparisonPlotParameters()`](https://docs.rpact.org/reference/getComparisonPlotParameters.md)
+  previews selections, axis transformations, and diagnostic messages.
+  Comparison axes use context-specific parameter captions for both
+  single and multiple y parameters. Comparison legends use object-aware
+  titles and adaptive category/parameter layouts, with measured
+  wrapping, independent positions, and font reductions limited to ten
+  percent. Automatic legend placement (`legendPosition = "auto"`) is the
+  default across all rpact plots with legends, while manual positions
+  and legacy `NA` behaviour remain available. Comparison operations and
+  package testing provide structured errors through the central error
+  helpers, preserving worker failure details.
 
 ### Improvements, issues, and changes
 
+- Repeated p-values are now unavailable (`NA` with a warning) for
+  sequential designs with user-defined beta spending
+  (`typeBetaSpending = "bsUser"`), for both binding and nonbinding
+  futility. This avoids unreliable inversion results and C++ bounds
+  warnings. The restriction also applies to multi-arm and enrichment
+  analyses; other analysis results remain available.
+- Replaced direct errors in comparison extraction, comparison plotting,
+  and package testing with the central error helpers, providing specific
+  error categories and structured diagnostic context while preserving
+  worker failure details.
+- On Windows,
+  [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
+  uses parallel R processes with file-backed standard streams and result
+  files to avoid the pipe-related access violation in R bug 19104.
+- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
+  runs R basic package tests in a separate R process before starting
+  parallel workers and isolates configuration writes per test process.
+  Worker crashes preserve partial results and are explicitly reported as
+  incomplete execution, with the expected test count from `META`, the
+  full diagnostic log path, and a hint to retry with `workers = 1`.
+  Partial reports cannot claim successful installation qualification.
+- Corrected Weibull hazard ratio conversions for `kappa != 1` in
+  survival planning and simulation, including multi-arm and enrichment
+  simulations. Lambda remains the inverse Weibull scale; the hazard
+  ratio is `(lambda1 / lambda2)^kappa`. Exponential calculations
+  (`kappa = 1`) are unchanged.
+- Expanded the documentation of `typeOfSelection` for multi-arm and
+  enrichment simulations, explaining all five selection rules, their
+  interaction with adaptations and thresholds, and how to drop one worst
+  arm at each interim using a custom selection function (issue
+  [\#159](https://github.com/rpact-com/rpact/issues/159)).
 - [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md)
   now removes duplicate precondition blocks while preserving complete
   user-defined function bodies and pipe chains.

@@ -7,4 +7,4 @@ Parameter Description: Active Arms
 - activeArms:
 
   The number of active treatment arms to be compared with control,
-  default is `3`.
+  default is `3`. Must not exceed `8`.

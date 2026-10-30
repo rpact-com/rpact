@@ -7,4 +7,5 @@ Parameter Description: Planned Calendar Time
 - plannedCalendarTime:
 
   For simulating count data, the time points where an analysis is
-  planned to be performed. Should be a vector of length `kMax`
+  planned to be performed. Required for group sequential designs as a
+  vector of length `kMax`; ignored for a fixed design.

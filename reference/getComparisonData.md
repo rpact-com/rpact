@@ -1,0 +1,69 @@
+# Get Comparison Data
+
+Combines existing designs, design characteristics, sample size or power
+plans, and simulation results into a data frame without recalculating or
+modifying the objects.
+
+## Usage
+
+``` r
+getComparisonData(
+  objects,
+  ...,
+  niceColumnNamesEnabled = FALSE,
+  includeAllParameters = FALSE
+)
+```
+
+## Arguments
+
+- objects:
+
+  A non-empty list of objects inheriting from `TrialDesign`,
+  `TrialDesignCharacteristics`, `TrialDesignPlan`, or
+  `SimulationResults`. Optional names are retained in the column
+  `objectName`.
+
+- ...:
+
+  Further arguments. Currently unused.
+
+- niceColumnNamesEnabled:
+
+  If `TRUE`, use descriptive column names.
+
+- includeAllParameters:
+
+  If `TRUE`, include all parameters supported by the existing data-frame
+  methods of the individual objects.
+
+## Value
+
+An ordinary `data.frame` with identifiers, object type, endpoint,
+calculation target, and input and result parameters.
+
+## Details
+
+Each object receives an `objectNumber`, repeated for all its rows.
+Design characteristics, plans, and simulation results are supplemented
+with their associated design parameters, matched by analysis stage. For
+fixed designs and results based on them, `kMax` and `stages` identify
+the single stage as 1, even when omitted by the individual data-frame
+methods. The situation column numbers rows within each stage. Columns
+are matched by technical names; missing values are filled with `NA`.
+`sampleSizes` is harmonized to `numberOfSubjects` when this does not
+overwrite another column. Conflicting non-numeric column types are
+represented as character values. No master design or automatic parameter
+variation is implied. Original objects are not stored in the result.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+objects <- list(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
+head(getComparisonData(objects))
+} # }
+```

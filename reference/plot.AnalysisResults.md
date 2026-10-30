@@ -18,7 +18,7 @@ plot(
   ylab = NA_character_,
   legendTitle = NA_character_,
   palette = "Set1",
-  legendPosition = NA_integer_,
+  legendPosition = "auto",
   showSource = FALSE,
   grid = 1,
   plotSettings = NULL
@@ -77,7 +77,7 @@ plot(
   considered. For survival outcomes, it should contain the planned
   number of additional events. For multi-arm designs, it is the
   per-comparison (combined) sample size. For enrichment designs, it is
-  the (combined) sample size for the considered sub-population.
+  the (combined) sample size for the considered subpopulation.
 
 - allocationRatioPlanned:
 
@@ -113,27 +113,26 @@ plot(
 
 - legendPosition:
 
-  The position of the legend. By default (`NA_integer_`) the algorithm
-  tries to find a suitable position. Choose one of the following values
-  to specify the position manually:
+  The legend position. The default, `"auto"`, measures the legend and
+  chooses among six inside positions by minimizing overlap with points,
+  line segments, reference lines, bars, boxes, and error bars. Long
+  labels are wrapped and entries arranged vertically in automatic mode.
+  Oversized legends and faceted plots use the outside right position.
+  This heuristic uses the current graphics device (seven inches square
+  when no device is open); resizing may require recreating the plot or
+  setting a position explicitly. Manual positions are:
 
-  - `-1`: no legend will be shown
+  - `-1` or `"none"`: hide the legend
 
-  - `NA`: the algorithm tries to find a suitable position
+  - `"left"`, `"right"`, `"bottom"`, `"top"`: outside the plot
 
-  - `0`: legend position outside plot
+  - `0`: default outside position with a square aspect ratio
 
-  - `1`: legend position left top
+  - `1`, `2`, `3`: inside left, at the top, centre, or bottom
 
-  - `2`: legend position left center
+  - `4`, `5`, `6`: inside right, at the top, centre, or bottom
 
-  - `3`: legend position left bottom
-
-  - `4`: legend position right top
-
-  - `5`: legend position right center
-
-  - `6`: legend position right bottom
+  - `NA`: retain the legacy plot-specific positioning rules
 
 - showSource:
 

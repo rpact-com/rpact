@@ -11,8 +11,8 @@ Parameter Description: Effect List for Enrichment Survival
   examples). For a piecewise exponential patient-wise survival
   simulation, specify `subGroups`, `prevalences`, and
   `piecewiseSurvivalTime`, where the latter is a
-  `PiecewiseEnrichmentSurvivalTime` object created by
-  [`getPiecewiseEnrichmentSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseEnrichmentSurvivalTime.md).
+  `PiecewiseSurvivalTimeEnrichment` object created by
+  [`getPiecewiseSurvivalTimeEnrichment()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeEnrichment.md).
   Its subgroup names and the order of `subGroups` must agree. In this
   case, do not also specify `piControls`, `piTreatments`, or
   `hazardRatios`.

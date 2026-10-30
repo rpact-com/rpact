@@ -38,8 +38,12 @@ getDesignFixed(
 - directionUpper:
 
   Logical. Specifies the direction of the alternative, only applicable
-  for one-sided testing; default is `TRUE` which means that larger
-  values of the test statistics yield smaller p-values.
+  for one-sided testing; `TRUE` means that larger values of the test
+  statistics yield smaller p-values. The default is `TRUE` for means,
+  rates, and count data, and `FALSE` for survival data (power
+  calculations, simulations, and analyses). In sample size calculations,
+  the direction is derived from the specified alternative; a specified
+  `directionUpper` must agree with it.
 
 - twoSidedPower:
 
@@ -113,12 +117,6 @@ design
 #>   Critical values                 : 1.960 
 #>   Stage levels (one-sided)        : 0.0250 
 #> 
-#> ISSUES (parameters with undefined type):
-#>   Cumulative alpha spending       : NA 
-#>   Binding futility                : NA 
-#>   Tolerance                       : 1e-06 
-#>   User defined alpha spending     : NA 
-#> 
 
 # Custom significance and power
 design2 <- getDesignFixed(alpha = 0.05, beta = 0.1)
@@ -135,11 +133,5 @@ design2
 #> Output:
 #>   Critical values                 : 1.645 
 #>   Stage levels (one-sided)        : 0.0500 
-#> 
-#> ISSUES (parameters with undefined type):
-#>   Cumulative alpha spending       : NA 
-#>   Binding futility                : NA 
-#>   Tolerance                       : 1e-06 
-#>   User defined alpha spending     : NA 
 #> 
 ```

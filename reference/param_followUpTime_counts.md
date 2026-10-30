@@ -8,4 +8,6 @@ Parameter Description: followUpTime for Counts
 
   If specified, the assumed (additional) follow-up time for the study,
   there is no default. The total study duration is
-  `accrualTime + followUpTime`.
+  `accrualTime + followUpTime`. For power calculations and simulations,
+  exactly one of `fixedExposureTime` and `followUpTime` must be
+  specified.

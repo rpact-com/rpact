@@ -44,6 +44,30 @@ following elements:
 
   Main output report filename
 
+- logFile:
+
+  Absolute path to the test log, including `testthat.Rout.fail` on
+  failure
+
+- executionCompleted:
+
+  Whether all scheduled test files completed, independently of assertion
+  failures
+
+- executionError:
+
+  Execution or worker-process error message, or `NULL`
+
+- workers:
+
+  Number of R test processes used
+
+- timings:
+
+  Named numeric vector of elapsed seconds for `tests`, `basicPackages`,
+  `html`, and `pdf`; `NULL` if execution failed before results were
+  collected
+
 - reportFileNames:
 
   Vector of report files generated

@@ -117,8 +117,12 @@ getSimulationRates(
 - directionUpper:
 
   Logical. Specifies the direction of the alternative, only applicable
-  for one-sided testing; default is `TRUE` which means that larger
-  values of the test statistics yield smaller p-values.
+  for one-sided testing; `TRUE` means that larger values of the test
+  statistics yield smaller p-values. The default is `TRUE` for means,
+  rates, and count data, and `FALSE` for survival data (power
+  calculations, simulations, and analyses). In sample size calculations,
+  the direction is derived from the specified alternative; a specified
+  `directionUpper` must agree with it.
 
 - allocationRatioPlanned:
 
@@ -162,9 +166,10 @@ getSimulationRates(
   the current data. By default, the conditional power will be calculated
   under the observed effect size. Optionally, you can also specify
   `thetaH1` and `stDevH1` (for simulating means), `pi1H1` and `pi2H1`
-  (for simulating rates), or `thetaH1` (for simulating hazard ratios) as
-  parameters under which it is calculated and the sample size
-  recalculation is performed.
+  (for simulating rates; `piTreatmentsH1` and `piControlH1` in multi-arm
+  designs, `piTreatmentH1` and `piControlH1` in enrichment designs), or
+  `thetaH1` (for simulating hazard ratios) as parameters under which it
+  is calculated and the sample size recalculation is performed.
 
 - pi1H1:
 

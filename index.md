@@ -68,7 +68,7 @@ simulation, and analysis:
 - Multi-arm and population enrichment analysis for means, rates, and
   survival endpoints
 - Analysis of general estimates and standard errors supplied through
-  `getDataset(est = ..., se = ...)` (development version)
+  `getDataset(est = ..., se = ...)`
 - Support for fixed-sample designs, classical group sequential designs,
   and adaptive multi-arm multi-stage (MAMS) designs based on the inverse
   normal or Fisher combination test
@@ -96,73 +96,150 @@ the development version of `rpact` from
 pak::pak("rpact-com/rpact")
 ```
 
-## Quick start
-
-Plan a two-arm trial with a continuous endpoint and three analyses. This
-example uses a one-sided significance level of 0.025, 90% power, an
-expected mean difference of 0.5, and a common standard deviation of 1.
-
-``` r
-
-library(rpact)
-getDesignGroupSequential(
-    kMax = 3,
-    informationRates = c(0.5, 0.75, 1),
-    alpha = 0.025,
-    beta = 0.1,
-    sided = 1,
-    typeOfDesign = "OF"
-) |>
-    getSampleSizeMeans(
-        groups = 2,
-        alternative = 0.5,
-        stDev = 1,
-        allocationRatioPlanned = 1
-    ) |>
-    summary()
-```
-
-*Sample size calculation for a continuous endpoint*
-
-Sequential analysis with a maximum of three looks (group sequential
-design), one-sided overall significance level 2.5%, power 90%. The
-results were calculated for a two-sample t-test, H0: mu(1) - mu(2) = 0,
-H1: effect = 0.5, standard deviation = 1.
-
-| Stage                                             | 1      | 2      | 3      |
-|---------------------------------------------------|--------|--------|--------|
-| Planned information rate                          | 50%    | 75%    | 100%   |
-| Cumulative alpha spent                            | 0.0021 | 0.0105 | 0.0250 |
-| Stage levels (one-sided)                          | 0.0021 | 0.0097 | 0.0215 |
-| Efficacy boundary (z-value scale)                 | 2.863  | 2.337  | 2.024  |
-| Efficacy boundary (t)                             | 0.631  | 0.415  | 0.309  |
-| Cumulative power                                  | 0.2928 | 0.6960 | 0.9000 |
-| Number of subjects                                | 86.9   | 130.4  | 173.8  |
-| Expected number of subjects under H1              | 130.9  |        |        |
-| Stopping probability                              | 0.6960 |        |        |
-| Efficacy stopping probability by stage (under H0) | 0.0021 | 0.0084 |        |
-| Efficacy stopping probability by stage            | 0.2928 | 0.4033 |        |
-
-Legend:
-
-- *(t)*: treatment effect scale
-
-The result includes the required sample sizes at each analysis. To
-evaluate power for a specified maximum sample size, use
-[`getPowerMeans()`](https://docs.rpact.org/reference/getPowerMeans.md).
-
 ## Documentation
 
 Package information and tutorials are available at
 [www.rpact.org](https://www.rpact.org). For function arguments, return
 values, and examples, see the [function
-reference](https://docs.rpact.org).
+reference](https://docs.rpact.org/reference/).
 
 ## Vignettes
 
 Step-by-step examples and tutorials are available in the `rpact`
 vignettes at
 [www.rpact.org/vignettes](https://www.rpact.org/vignettes/).
+
+## Quick start
+
+### A simple sample size calculation
+
+This deliberately simple example illustrates a basic sample size
+calculation with `rpact`.
+
+Suppose a study compares two treatments for high blood pressure. We
+expect the new treatment to lower systolic blood pressure by **15 mmHg**
+on average, compared with **10 mmHg** under standard treatment—a
+difference of **5 mmHg**. We assume a standard deviation of **12 mmHg**
+in each group. These numbers are illustrative assumptions, not
+recommendations for a clinical study.
+
+How many participants are needed in two equally sized groups to detect
+this difference with **80% power**?
+
+``` r
+
+library(rpact)
+
+getSampleSizeMeans(
+    groups = 2, # Two treatment groups
+    alternative = 5, # Expected difference: 15 - 10 mmHg
+    stDev = 12, # Assumed standard deviation in each group
+    alpha = 0.05, # 5% significance level
+    beta = 0.20, # 80% power
+    sided = 2 # Two-sided test
+) |>
+    summary()
+```
+
+*Sample size calculation for a continuous endpoint*
+
+Fixed sample analysis, two-sided significance level 5%, power 80%. The
+results were calculated for a two-sample t-test, H0: mu(1) - mu(2) = 0,
+H1: effect = 5, standard deviation = 12.
+
+| Stage                             | Fixed  |
+|-----------------------------------|--------|
+| Stage level (two-sided)           | 0.0500 |
+| Efficacy boundary (z-value scale) | 1.960  |
+| Lower efficacy boundary (t)       | -3.503 |
+| Upper efficacy boundary (t)       | 3.503  |
+| Number of subjects                | 182.8  |
+
+Legend:
+
+- *(t)*: treatment effect scale
+
+This example uses a conventional **two-sided test at the 5% significance
+level**, without interim analyses. The calculated total sample size is
+approximately 183 participants. Rounding up to equally sized groups
+gives **92 participants per group**, before allowing for missing data or
+dropouts. Power of 80% means an 80% chance of detecting the assumed
+difference if it truly exists under the planning assumptions.
+
+### A more advanced example: adding an interim analysis
+
+We now make the study objective more explicit: we want to demonstrate
+that the new treatment lowers blood pressure **more than the standard
+treatment**. We therefore use a **one-sided test at the 2.5%
+significance level**, a common choice for confirmatory superiority
+trials. The direction of benefit is specified before the study begins.
+Blood pressure reductions are recorded as positive values, so
+`alternative = 5` represents the expected additional reduction with the
+new treatment.
+
+We keep the same illustrative assumptions and 80% power, but add **one
+interim analysis**, when approximately half of the total statistical
+information is available. If the evidence is sufficiently strong, the
+study can stop early for efficacy. Otherwise, it continues to the final
+analysis.
+
+Simply testing twice at the usual significance level would increase the
+chance of a false-positive conclusion. A **group sequential design**
+accounts for both analyses. Here, we use O’Brien–Fleming boundaries,
+which require particularly strong evidence to stop early.
+
+``` r
+
+getDesignGroupSequential(
+    kMax = 2, # One interim and one final analysis
+    informationRates = c(0.5, 1), # 50% information at interim, 100% at final
+    typeOfDesign = "OF", # O'Brien–Fleming boundaries
+    alpha = 0.025, # One-sided 2.5% significance level
+    beta = 0.20, # 80% power
+    sided = 1 # One-sided test
+) |>
+    getSampleSizeMeans(
+        groups = 2, # Two treatment groups
+        alternative = 5, # Additional blood pressure reduction (mmHg)
+        stDev = 12 # Assumed standard deviation (mmHg)
+    ) |>
+    summary()
+```
+
+*Sample size calculation for a continuous endpoint*
+
+Sequential analysis with a maximum of two looks (group sequential
+design), one-sided overall significance level 2.5%, power 80%. The
+results were calculated for a two-sample t-test, H0: mu(1) - mu(2) = 0,
+H1: effect = 5, standard deviation = 12.
+
+| Stage                                             | 1      | 2      |
+|---------------------------------------------------|--------|--------|
+| Planned information rate                          | 50%    | 100%   |
+| Cumulative alpha spent                            | 0.0026 | 0.0250 |
+| Stage levels (one-sided)                          | 0.0026 | 0.0240 |
+| Efficacy boundary (z-value scale)                 | 2.797  | 1.977  |
+| Efficacy boundary (t)                             | 7.169  | 3.520  |
+| Cumulative power                                  | 0.2096 | 0.8000 |
+| Number of subjects                                | 92.1   | 184.2  |
+| Expected number of subjects under H1              | 164.9  |        |
+| Stopping probability                              | 0.2096 |        |
+| Efficacy stopping probability by stage (under H0) | 0.0026 |        |
+| Efficacy stopping probability by stage            | 0.2096 |        |
+
+Legend:
+
+- *(t)*: treatment effect scale
+
+The output shows the planned cumulative sample sizes and the efficacy
+boundaries at each analysis. Allowing an early stop usually requires a
+slightly larger **maximum sample size** than a corresponding study
+without interim analyses, but may reduce the number of participants
+actually needed.
+
+This is an illustration of the workflow; a clinical study requires
+additional planning, including the timing and conduct of the interim
+analysis.
 
 ## Issues and Feature Requests
 
@@ -193,7 +270,7 @@ provides guided, browser-based access to selected `rpact` functionality,
 including study design, sample size calculation, simulation, and
 reporting, without requiring users to write R code.
 
-[demo.rpact.cloud](https://demo.rpact.cloud)
+[rpact.cloud](https://demo.rpact.cloud)
 
 ## RPACT Connect
 

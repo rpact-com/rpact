@@ -42,7 +42,10 @@ getObjectRCode(
 
 - obj:
 
-  The result object.
+  The result object, including a `TrialComparison` or its summary.
+  Comparison reconstruction isolates each object's preconditions.
+  Argument overrides are unsupported for comparisons, and their code is
+  not word-wrapped so object names and callback bodies remain intact.
 
 - ...:
 

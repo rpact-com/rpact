@@ -97,15 +97,18 @@ getDesignGroupSequential(
 
 - deltaWT:
 
-  Delta for Wang & Tsiatis Delta class.
+  Delta for Wang & Tsiatis Delta class. Required for
+  `typeOfDesign = "WT"`.
 
 - deltaPT1:
 
   Delta1 for Pampallona & Tsiatis class rejecting H0 boundaries.
+  Required (together with `deltaPT0`) for `typeOfDesign = "PT"`.
 
 - deltaPT0:
 
   Delta0 for Pampallona & Tsiatis class rejecting H1 boundaries.
+  Required (together with `deltaPT1`) for `typeOfDesign = "PT"`.
 
 - optimizationCriterion:
 
@@ -115,7 +118,9 @@ getDesignGroupSequential(
 
 - gammaA:
 
-  Parameter for alpha spending function.
+  Parameter for alpha spending function. Required for
+  `typeOfDesign = "asKD"` (validated range `[0.4, 8]`) and
+  `typeOfDesign = "asHSD"`.
 
 - typeBetaSpending:
 
@@ -148,7 +153,9 @@ getDesignGroupSequential(
 
 - gammaB:
 
-  Parameter for beta spending function.
+  Parameter for beta spending function. Required for
+  `typeBetaSpending = "bsKD"` (validated range `[0.4, 8]`) and
+  `typeBetaSpending = "bsHSD"`.
 
 - bindingFutility:
 
@@ -166,8 +173,12 @@ getDesignGroupSequential(
 - directionUpper:
 
   Logical. Specifies the direction of the alternative, only applicable
-  for one-sided testing; default is `TRUE` which means that larger
-  values of the test statistics yield smaller p-values.
+  for one-sided testing; `TRUE` means that larger values of the test
+  statistics yield smaller p-values. The default is `TRUE` for means,
+  rates, and count data, and `FALSE` for survival data (power
+  calculations, simulations, and analyses). In sample size calculations,
+  the direction is derived from the specified alternative; a specified
+  `directionUpper` must agree with it.
 
 - betaAdjustment:
 

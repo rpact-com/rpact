@@ -22,7 +22,8 @@ testPackage(
   keepSourceFiles = FALSE,
   reportFileBaseName = "rpact_test_result_report",
   metaData = list(),
-  metaDataFile = NULL
+  metaDataFile = NULL,
+  workers = NULL
 )
 ```
 
@@ -115,6 +116,18 @@ testPackage(
   and
   [`readKeyValueFile`](https://docs.rpact.org/reference/readKeyValueFile.md).
 
+- workers:
+
+  Number of parallel R test processes. The default `NULL` uses the
+  available logical CPUs minus two, with a minimum of one and a maximum
+  of 16, limited to the number of test files. Uses
+  [`parallelly::availableCores()`](https://parallelly.futureverse.org/reference/availableCores.html)
+  when installed (including resource limits), otherwise
+  [`parallel::detectCores()`](https://rdrr.io/r/parallel/detectCores.html).
+  An explicit positive integer overrides the automatic selection; use
+  `1` for serial execution. Parallel tests are supported on Windows,
+  Linux, and macOS.
+
 ## Value
 
 Invisibly returns an
@@ -129,6 +142,21 @@ functions as expected. A directory named `rpact-tests` is created within
 the specified output directory, where all test files are downloaded from
 a secure resource and executed. Results are saved in the file
 `testthat.Rout`, located in the `rpact-tests` directory.
+
+Unit test files are distributed across separate R processes. On Windows,
+standard output and error use files to avoid the pipe-related access
+violation in R bug 19104. Linux and macOS use the testthat parallel
+runner. Scheduling priorities are read from the `DESCRIPTION` above a
+local test directory, when present, and otherwise from the installed
+rpact package. Report sections follow file completion order. Personal
+rpact configuration files are isolated for the run. R basic package
+tests run in a separate R process before parallel workers start, using a
+temporary output directory. If execution aborts, partial results are
+marked as incomplete and the diagnostic log path is printed; use
+`workers = 1` to investigate persistent parallel-worker failures. The
+returned object includes `workers` and `timings`, with elapsed seconds
+for unit tests (including worker startup), R basic package tests, HTML
+rendering, and PDF rendering.
 
 Installation qualification is a critical step in the validation process.
 Without successful IQ, the package cannot be considered fully validated.

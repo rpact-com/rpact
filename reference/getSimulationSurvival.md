@@ -89,8 +89,12 @@ getSimulationSurvival(
 - directionUpper:
 
   Logical. Specifies the direction of the alternative, only applicable
-  for one-sided testing; default is `TRUE` which means that larger
-  values of the test statistics yield smaller p-values.
+  for one-sided testing; `TRUE` means that larger values of the test
+  statistics yield smaller p-values. The default is `TRUE` for means,
+  rates, and count data, and `FALSE` for survival data (power
+  calculations, simulations, and analyses). In sample size calculations,
+  the direction is derived from the specified alternative; a specified
+  `directionUpper` must agree with it.
 
 - pi1:
 
@@ -109,14 +113,20 @@ getSimulationSurvival(
   The assumed hazard rate in the treatment group, there is no default.
   `lambda1` can also be used to define piecewise exponentially
   distributed survival times (see details). Must be a positive numeric
-  of length 1.
+  value or vector: without `piecewiseSurvivalTime`, a vector defines
+  alternative hazard rates to be considered; with
+  `piecewiseSurvivalTime`, it contains one hazard rate per time
+  interval.
+  [`getEventProbabilities()`](https://docs.rpact.org/reference/getEventProbabilities.md)
+  uses only the first value of a non-piecewise vector.
 
 - lambda2:
 
   The assumed hazard rate in the reference group, there is no default.
   `lambda2` can also be used to define piecewise exponentially
   distributed survival times (see details). Must be a positive numeric
-  of length 1.
+  of length 1, or a vector with one hazard rate per time interval if
+  `piecewiseSurvivalTime` is specified.
 
 - median1:
 
@@ -133,7 +143,9 @@ getSimulationSurvival(
   The vector of hazard ratios under consideration. If the event or
   hazard rates in both treatment groups are defined, the hazard ratio
   needs not to be specified as it is calculated, there is no default.
-  Must be a positive numeric of length 1.
+  Must be a positive numeric value or vector;
+  [`getEventProbabilities()`](https://docs.rpact.org/reference/getEventProbabilities.md)
+  accepts a single value only.
 
 - kappa:
 
@@ -248,9 +260,10 @@ getSimulationSurvival(
   the current data. By default, the conditional power will be calculated
   under the observed effect size. Optionally, you can also specify
   `thetaH1` and `stDevH1` (for simulating means), `pi1H1` and `pi2H1`
-  (for simulating rates), or `thetaH1` (for simulating hazard ratios) as
-  parameters under which it is calculated and the sample size
-  recalculation is performed.
+  (for simulating rates; `piTreatmentsH1` and `piControlH1` in multi-arm
+  designs, `piTreatmentH1` and `piControlH1` in enrichment designs), or
+  `thetaH1` (for simulating hazard ratios) as parameters under which it
+  is calculated and the sample size recalculation is performed.
 
 - thetaH1:
 

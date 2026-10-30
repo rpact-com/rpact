@@ -6,8 +6,8 @@ Parameter Description: Piecewise Multi-Arm Survival Time
 
 - piecewiseSurvivalTime:
 
-  A `PiecewiseMultiArmSurvivalTime` object created by
-  [`getPiecewiseMultiArmSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseMultiArmSurvivalTime.md).
+  A `PiecewiseSurvivalTimeMultiArm` object created by
+  [`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeMultiArm.md).
   It specifies common interval start times, the control hazard in every
   interval, and an active-arm-by-interval hazard-ratio matrix for every
   situation. It can only be used for patient-wise simulation with

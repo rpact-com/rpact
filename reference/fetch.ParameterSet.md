@@ -47,6 +47,11 @@ fetch(x, ..., output = c("named", "labeled", "value", "list"))
 
   - "list" returns the value inside a named list
 
+## See also
+
+[`fetch.TrialComparison()`](https://docs.rpact.org/reference/fetch.TrialComparison.md)
+for selecting contained objects from a comparison.
+
 ## Examples
 
 ``` r
