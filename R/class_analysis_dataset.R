@@ -3160,7 +3160,7 @@ plot.Dataset <- function(
                 na.rm = TRUE
             )
         } else if (x$isDatasetRates()) {
-            p <- ggplot2::ggplot(show.legend = FALSE)
+            p <- ggplot2::ggplot()
 
             # plot sample size
             p <- p + ggplot2::geom_bar(
@@ -3211,7 +3211,7 @@ plot.Dataset <- function(
                 na.rm = TRUE
             )
         } else if (x$isDatasetRates()) {
-            p <- ggplot2::ggplot(show.legend = FALSE)
+            p <- ggplot2::ggplot()
 
             # plot sample size
             p <- p + ggplot2::geom_bar(
