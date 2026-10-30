@@ -31,8 +31,12 @@ and \code{sided} can be directly entered as argument where necessary.}
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
-only applicable for one-sided testing; default is \code{TRUE}
-which means that larger values of the test statistics yield smaller p-values.}
+only applicable for one-sided testing; \code{TRUE}
+means that larger values of the test statistics yield smaller p-values.
+The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+(power calculations, simulations, and analyses).
+In sample size calculations, the direction is derived from the specified alternative;
+a specified \code{directionUpper} must agree with it.}
 
 \item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified for power calculations or calculation
 of necessary follow-up (count data). For two treatment arms, it is the maximum number of subjects for both treatment arms.}
@@ -67,16 +71,21 @@ For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be spe
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
 \item{overdispersion}{A numeric value that represents the assumed overdispersion of the negative binomial distribution,
-default is \code{0}.}
+default is \code{0}. Must be \code{>= 0}.}
 
-\item{fixedExposureTime}{If specified, the fixed time of exposure per subject for count data, there is no default.}
+\item{fixedExposureTime}{If specified, the fixed time of exposure per subject for count data, there is no default.
+For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.}
 
-\item{accrualTime}{If specified, the assumed accrual time interval(s) for the study, there is no default.}
+\item{accrualTime}{If specified, the assumed accrual time interval(s) for the study, there is no default.
+A single value defines the end of accrual; if a vector is specified, its first value must be \code{0}.
+If \code{followUpTime} is specified, \code{accrualTime} can have at most two elements.
+Required for \code{getSimulationCounts()}.}
 
 \item{accrualIntensity}{If specified, the assumed accrual intensities for the study, there is no default.}
 
 \item{followUpTime}{If specified, the assumed (additional) follow-up time for the study, there is no default.
-The total study duration is \code{accrualTime + followUpTime}.}
+The total study duration is \code{accrualTime + followUpTime}.
+For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.

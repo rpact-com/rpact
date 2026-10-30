@@ -285,7 +285,7 @@ plot.EventProbabilities <- function(
         legendTitle = NA_character_,
         palette = "Set1",
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         plotSettings = NULL) {
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
@@ -331,7 +331,7 @@ plot.EventProbabilities <- function(
         legendTitle = NA_character_,
         palette = "Set1",
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
@@ -525,7 +525,7 @@ plot.NumberOfSubjects <- function(
         legendTitle = NA_character_,
         palette = "Set1",
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         plotSettings = NULL) {
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
@@ -571,7 +571,7 @@ plot.NumberOfSubjects <- function(
         legendTitle = NA_character_,
         palette = "Set1",
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)

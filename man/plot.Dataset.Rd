@@ -14,7 +14,8 @@
   legendTitle = "Group",
   palette = "Set1",
   showSource = FALSE,
-  plotSettings = NULL
+  plotSettings = NULL,
+  legendPosition = "auto"
 )
 }
 \arguments{
@@ -51,6 +52,23 @@ returned as character vector (function stops if an error occurs)
 Note: no plot object will be returned if \code{showSource} is a character.}
 
 \item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSettings()}}.}
+
+\item{legendPosition}{The legend position. The default, \code{"auto"}, measures the
+legend and chooses among six inside positions by minimizing overlap with
+points, line segments, reference lines, bars, boxes, and error bars.
+Long labels are wrapped and entries arranged vertically in automatic mode.
+Oversized legends and faceted plots use the outside right position.
+This heuristic uses the current graphics device (seven inches square when
+no device is open); resizing may require recreating the plot or setting a
+position explicitly. Manual positions are:
+\itemize{
+\item \code{-1} or \code{"none"}: hide the legend
+\item \code{"left"}, \code{"right"}, \code{"bottom"}, \code{"top"}: outside the plot
+\item \code{0}: default outside position with a square aspect ratio
+\item \code{1}, \code{2}, \code{3}: inside left, at the top, centre, or bottom
+\item \code{4}, \code{5}, \code{6}: inside right, at the top, centre, or bottom
+\item \code{NA}: retain the legacy plot-specific positioning rules
+}}
 }
 \value{
 Returns a \code{ggplot2} object.

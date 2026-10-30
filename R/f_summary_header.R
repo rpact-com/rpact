@@ -374,7 +374,7 @@ NULL
         }
     } else if (settings$survivalEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
-        if (inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+        if (inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
             treatmentRateText <- .getPiecewiseSurvivalSummaryText(designPlan$piecewiseSurvivalTime)
         } else {
             parameterNames <- designPlan$.getVisibleFieldNamesOrdered()
@@ -975,7 +975,7 @@ NULL
 
     if (settings$survivalEnabled || settings$countDataEnabled) {
         if (settings$survivalEnabled &&
-                !inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime") &&
+                !inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup") &&
                 !is.null(designPlan[["eventTime"]]) &&
                 !all(is.na(designPlan[["eventTime"]]))) {
             header <- .concatenateSummaryText(header, paste0(

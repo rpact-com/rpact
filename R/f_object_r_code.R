@@ -37,6 +37,10 @@ NULL
 }
 
 .getArgumentValueRCode <- function(x, name) {
+    if (inherits(x, "PiecewiseSurvivalTimeMultiGroup")) {
+        return(paste(getObjectRCode(x, pipeOperator = "none", output = "internal",
+            stringWrapParagraphWidth = NULL), collapse = "\n"))
+    }
     if (is.null(x)) {
         return("NULL")
     }
@@ -210,6 +214,14 @@ NULL
 
     if (inherits(obj, "SimulationResultsEnrichmentSurvival")) {
         return("getSimulationEnrichmentSurvival")
+    }
+
+    if (inherits(obj, "PiecewiseSurvivalTimeMultiArm")) {
+        return("getPiecewiseSurvivalTimeMultiArm")
+    }
+
+    if (inherits(obj, "PiecewiseSurvivalTimeEnrichment")) {
+        return("getPiecewiseSurvivalTimeEnrichment")
     }
 
     if (inherits(obj, "PiecewiseSurvivalTime")) {
@@ -446,7 +458,10 @@ rcmd <- function(
 #' @description
 #' Returns the R source command of a result object.
 #'
-#' @param obj The result object.
+#' @param obj The result object, including a `TrialComparison` or its summary.
+#'   Comparison reconstruction isolates each object's preconditions. Argument
+#'   overrides are unsupported for comparisons, and their code is not word-wrapped
+#'   so object names and callback bodies remain intact.
 #' @param leadingArguments A character vector with arguments that shall be inserted at the beginning of the function command,
 #'        e.g., \code{design = x}. Be careful with this option because the created R command may no longer be valid if used.
 #' @param includeDefaultParameters If \code{TRUE}, default parameters will be included in all \code{rpact} commands;
@@ -575,7 +590,35 @@ getObjectRCode <- function(
     }
 
     .assertIsParameterSetClass(obj, "ParameterSet")
+    if (inherits(obj, "PiecewiseSurvivalTimeMultiGroup")) {
+        return(.getPiecewiseSurvivalRCode(obj, leadingArguments, newArgumentValues,
+            prefix, postfix, stringWrapPrefix, pipeOperator, pipeOperatorPostfix, output, explicitPrint))
+    }
+    if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+        stringWrapParagraphWidth <- NULL
+    }
+    if (inherits(obj, "TrialComparison")) {
+        return(.getTrialComparisonRCode(obj,
+            leadingArguments = leadingArguments, includeDefaultParameters = includeDefaultParameters,
+            prefix = prefix, postfix = postfix, stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues, tolerance = tolerance, pipeOperator = pipeOperator,
+            pipeOperatorPostfix = pipeOperatorPostfix, output = output, explicitPrint = explicitPrint))
+    }
 
+    if (inherits(obj, "TrialComparisonSummary")) {
+        summaryArguments <- c(list(digits = obj$.digits), obj$.limits, list(output = obj$output))
+        arguments <- paste(vapply(names(summaryArguments), function(name) {
+            paste0(name, " = ", paste(deparse(summaryArguments[[name]]), collapse = ""))
+        }, ""), collapse = ", ")
+        code <- getObjectRCode(obj$object, includeDefaultParameters = includeDefaultParameters,
+            leadingArguments = leadingArguments, newArgumentValues = newArgumentValues,
+            stringWrapParagraphWidth = NULL, pipeOperator = pipeOperator, tolerance = tolerance,
+            output = "internal")
+        return(.formatRCode(paste0(prefix, "summary(", paste(code, collapse = "\n"), ", ", arguments, ")"),
+            precondition = character(), stringWrapParagraphWidth = NULL, postfix = postfix,
+            stringWrapPrefix = stringWrapPrefix, pipeOperator = pipeOperator,
+            pipeOperatorPostfix = pipeOperatorPostfix, output = output, explicitPrint = explicitPrint))
+    }
     if (!is.list(newArgumentValues)) {
         stopIllegalArgument("'newArgumentValues' must be a named list ",
             "(is ", .getClassName(newArgumentValues), ")",
@@ -588,9 +631,13 @@ getObjectRCode <- function(
             !is.null(obj[[".design"]]) &&
             (is.null(leadingArguments) || !any(grepl("design", leadingArguments)))
         ) {
+        designArgumentValues <- newArgumentValues
+        if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+            designArgumentValues <- newArgumentValues[intersect(names(newArgumentValues), names(obj$.design))]
+        }
         preconditionDesign <- .getPreconditionDesignRCode(
             obj[[".design"]], pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
-            stringWrapParagraphWidth, stringWrapPrefix, newArgumentValues,
+            stringWrapParagraphWidth, stringWrapPrefix, designArgumentValues,
             leadingArguments
         )
         precondition <- c(precondition, preconditionDesign$precondition)
@@ -682,9 +729,19 @@ getObjectRCode <- function(
     }
 
     if (grepl("SimulationResultsEnrichment(Means|Rates|Survival)", .getClassName(obj))) {
+        effectList <- obj$effectList
+        if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+            effectList[c("piControls", "piTreatments", "hazardRatios")] <- NULL
+            if ("piecewiseSurvivalTime" %in% names(newArgumentValues)) {
+                effectList$piecewiseSurvivalTime <- newArgumentValues$piecewiseSurvivalTime
+                newArgumentValues["piecewiseSurvivalTime"] <- NULL
+            } else {
+                effectList$piecewiseSurvivalTime <- obj$piecewiseSurvivalTime
+            }
+        }
         precond <- paste0(
             "effectList <- ",
-            .getArgumentValueRCode(obj$effectList, "effectList")
+            .getArgumentValueRCode(effectList, "effectList")
         )
         if (pipeOperator == "none") {
             precondition <- c(precondition, precond)
@@ -723,6 +780,23 @@ getObjectRCode <- function(
             objNames <- obj$.getUserDefinedParameters()
         }
         objNames <- objNames[objNames != "stages"]
+    }
+
+    if (inherits(obj, "SimulationResultsEnrichmentSurvival") &&
+            inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+        objNames <- setdiff(objNames, c("piecewiseSurvivalTime", "effectList"))
+        if (!"effectList" %in% names(newArgumentValues)) {
+            leadingArguments <- c(leadingArguments, "effectList = effectList")
+        }
+    }
+    if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
+        for (argumentName in names(obj$.piecewiseSurvivalArguments)) {
+            if (!argumentName %in% names(newArgumentValues)) {
+                leadingArguments <- c(leadingArguments, paste0(argumentName, " = ",
+                    .getArgumentValueRCode(obj$.piecewiseSurvivalArguments[[argumentName]], argumentName)))
+            }
+        }
+        objNames <- setdiff(objNames, names(obj$.piecewiseSurvivalArguments))
     }
 
     isSurvivalObject <-

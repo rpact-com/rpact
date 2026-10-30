@@ -49,7 +49,7 @@
 #'     simulationType = "patientWise")
 #'
 #' # Piecewise exponential event times in two disjoint subgroups
-#' piecewiseTime <- getPiecewiseEnrichmentSurvivalTime(
+#' piecewiseTime <- getPiecewiseSurvivalTimeEnrichment(
 #'     piecewiseSurvivalTime = c(0, 6),
 #'     lambdaControls = rbind(S = c(0.08, 0.12), R = c(0.05, 0.09)),
 #'     hazardRatios = list(

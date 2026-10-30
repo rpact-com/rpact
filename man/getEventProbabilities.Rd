@@ -56,11 +56,14 @@ definition of the exponential survival time cumulative distribution function \cr
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
 \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
-Must be a positive numeric of length 1.}
+Must be a positive numeric of length 1, or a vector with one hazard rate per time interval
+if \code{piecewiseSurvivalTime} is specified.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
 \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
-Must be a positive numeric of length 1.}
+Must be a positive numeric value or vector: without \code{piecewiseSurvivalTime}, a vector defines
+alternative hazard rates to be considered; with \code{piecewiseSurvivalTime}, it contains one hazard rate
+per time interval. \code{getEventProbabilities()} uses only the first value of a non-piecewise vector.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered,
@@ -68,7 +71,8 @@ the optimal allocation ratio yielding the smallest overall sample size is determ
 
 \item{hazardRatio}{The vector of hazard ratios under consideration.
 If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
-not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
+not to be specified as it is calculated, there is no default. Must be a positive numeric value or vector;
+\code{getEventProbabilities()} accepts a single value only.}
 
 \item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.
 For multi-arm simulations, this can be a vector of length equal to the number of active arms,

@@ -18,6 +18,7 @@
 
 #include <Rcpp.h>
 #include <cmath>
+#include <vector>
 
 // [[Rcpp::plugins(cpp11)]]
 
@@ -400,6 +401,37 @@ List getSurvDropoutTimes(int numberOfSubjects,
 	);
 }
 
+// Temporary size-one multinomial workaround for R PR#18693. Both simulation
+// paths use this helper; replace its body with R's native sampler once all
+// supported R versions have platform-independent multinomial RNG consumption.
+// Returns the selected category using R's one-based indexing.
+// [[Rcpp::export(name = ".sampleMultinomOneCpp")]]
+int sampleMultinomOne(NumericVector probabilities) {
+    // Explicit double accumulation avoids platform-dependent long-double state.
+    std::vector<double> cumulativeWeights(probabilities.size());
+    double totalWeight = 0.0;
+    int lastPositive = -1;
+    for (int i = 0; i < probabilities.size(); i++) {
+        double weight = probabilities[i];
+        if (!std::isfinite(weight) || weight < 0.0) {
+            stop("Subgroup sampling weights must be finite and nonnegative");
+        }
+        totalWeight += weight;
+        cumulativeWeights[i] = totalWeight;
+        if (weight > 0.0) lastPositive = i;
+    }
+    if (!std::isfinite(totalWeight) || totalWeight <= 0.0) {
+        stop("Subgroup sampling weights must have a finite positive sum");
+    }
+
+    double draw = R::runif(0.0, 1.0) * totalWeight;
+    for (int i = 0; i < probabilities.size(); i++) {
+        if (draw < cumulativeWeights[i]) return i + 1;
+    }
+    // Rounding can place a draw exactly at the total weight.
+    return lastPositive + 1;
+}
+
 // [[Rcpp::export(name = ".updateSubGroupVectorCpp")]]
 CharacterVector updateSubGroupVector(int k, // 0-based
 						  int maxNumberOfSubjects,
@@ -414,9 +446,7 @@ CharacterVector updateSubGroupVector(int k, // 0-based
 	CharacterVector result = subGroupVector[seq(0, numberOfSubjects[k - 1] - 1)];
 	
 	while (result.size() < maxNumberOfSubjects) {
-		IntegerVector multinomResult(prevSelected.size());
-		rmultinom(1, prevSelected.begin(), prevSelected.size(), multinomResult.begin());
-		int selectedIndex = which(multinomResult == 1)[0];
+        int selectedIndex = sampleMultinomOne(prevSelected) - 1;
 		std::string subGroup = Rcpp::as<std::string>(subGroups[selectedIndex]);
 		
 		for (int i = 0; i < allocationFraction[0] + allocationFraction[1]; i++) {
@@ -575,7 +605,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
     NumericVector lambdaActive;
     if (!piecewise.enabled) {
         lambdaControl = getLambdasByPis(piControls, eventTime, kappa);
-        lambdaActive = hazardRatios * lambdaControl;
+        lambdaActive = pow(hazardRatios, 1.0 / kappa) * lambdaControl;
     }
 
 	// Generate random survival and dropout times
@@ -679,8 +709,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				// Create new survival and dropout times for selected populations
 				
 				// Calculate adjusted prevalences for selected subgroups
-				NumericVector prevInSelected = prevalences[selectedsubGroupsIndices(_, k)];
-				NumericVector prevSelected = prevalences / sum(prevInSelected);
+				NumericVector prevSelected = clone(prevalences);
 				prevSelected[!selectedsubGroupsIndices(_, k)] = 0.0;
 						
 				int numberNewSubjects = maxNumberOfSubjects - numberOfSubjects[k - 1] + 1;
@@ -852,7 +881,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			adjustedPValues[k] = std::min(minPValue * selectedCount, 1.0 - 1e-07);
 
 			// Conditional critical value to reject the null hypotheses at the next stage of the trial
-			NumericVector criticalValues = design.get("criticalValues");			
+			NumericVector criticalValues = Rcpp::clone(Rcpp::as<NumericVector>(design.get("criticalValues")));
+            criticalValues = Rcpp::abs(criticalValues);
 
 			if (isDesignFisher) {
 				double numerator = criticalValues[k + 1];

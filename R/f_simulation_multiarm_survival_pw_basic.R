@@ -327,13 +327,13 @@ NULL
         treatmentArm = treatments
     )
 
-    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseMultiArmSurvivalTime")
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeMultiArm")
     if (piecewiseEnabled) {
         controlHazards <- piecewiseSurvivalTime$lambdaControls[1, ]
         activeHazards <- piecewiseActiveHazards
     } else {
         lambdaControl <- getLambdaByPi(piControl, eventTime, kappa)
-        lambdaVector <- c(omegaVector * lambdaControl, lambdaControl)
+        lambdaVector <- c(omegaVector^(1 / kappa) * lambdaControl, lambdaControl)
     }
 
     for (i in 1:maxNumberOfSubjects) {
@@ -746,7 +746,7 @@ NULL
 
     index <- 1
     allPiecewiseActiveHazards <- if (inherits(
-            piecewiseSurvivalTime, "PiecewiseMultiArmSurvivalTime")) {
+            piecewiseSurvivalTime, "PiecewiseSurvivalTimeMultiArm")) {
         piecewiseSurvivalTime$getActiveHazards()
     } else {
         NULL

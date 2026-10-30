@@ -4,8 +4,8 @@
 \alias{param_piecewiseSurvivalTime_multiarm}
 \title{Parameter Description: Piecewise Multi-Arm Survival Time}
 \arguments{
-\item{piecewiseSurvivalTime}{A \code{PiecewiseMultiArmSurvivalTime} object
-created by \code{getPiecewiseMultiArmSurvivalTime()}. It specifies common
+\item{piecewiseSurvivalTime}{A \code{PiecewiseSurvivalTimeMultiArm} object
+created by \code{getPiecewiseSurvivalTimeMultiArm()}. It specifies common
 interval start times, the control hazard in every interval, and an
 active-arm-by-interval hazard-ratio matrix for every situation. It can
 only be used for patient-wise simulation with \code{kappa = 1}, and cannot

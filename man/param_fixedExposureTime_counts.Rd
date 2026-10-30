@@ -4,7 +4,8 @@
 \alias{param_fixedExposureTime_counts}
 \title{Parameter Description: fixedExposureTime for Counts}
 \arguments{
-\item{fixedExposureTime}{If specified, the fixed time of exposure per subject for count data, there is no default.}
+\item{fixedExposureTime}{If specified, the fixed time of exposure per subject for count data, there is no default.
+For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.}
 }
 \description{
 Parameter Description: fixedExposureTime for Counts

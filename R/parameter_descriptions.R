@@ -102,6 +102,32 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Design with Default for Multi-Arm Designs
+#' @param design The trial design. If no trial design is specified, a fixed sample size design is used.
+#'   In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
+#'   and \code{sided} can be directly entered as argument where necessary.
+#'   Must be created with \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+#'   \code{\link[=getDesignFisher]{getDesignFisher()}},
+#'   \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}, or
+#'   \code{\link[=getDesignFixed]{getDesignFixed()}};
+#'   designs created with \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} are not supported.
+#' @name param_design_multiarm
+#' @keywords internal
+NULL
+
+#' Parameter Description: Design with Default for Enrichment Designs
+#' @param design The trial design. If no trial design is specified, a fixed sample size design is used.
+#'   In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
+#'   and \code{sided} can be directly entered as argument where necessary.
+#'   Must be created with \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+#'   \code{\link[=getDesignFisher]{getDesignFisher()}}, or
+#'   \code{\link[=getDesignFixed]{getDesignFixed()}};
+#'   designs created with \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} or
+#'   \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}} are not supported.
+#' @name param_design_enrichment
+#' @keywords internal
+NULL
+
 #' Parameter Description: N_max
 #' @param nMax The maximum sample size. Must be a positive integer of length 1.
 #' @name param_nMax
@@ -154,7 +180,9 @@ NULL
 #' Parameter Description: Lambda (1)
 #' @param lambda1 The assumed hazard rate in the treatment group, there is no default.
 #'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
-#'   Must be a positive numeric of length 1.
+#'   Must be a positive numeric value or vector: without \code{piecewiseSurvivalTime}, a vector defines
+#'   alternative hazard rates to be considered; with \code{piecewiseSurvivalTime}, it contains one hazard rate
+#'   per time interval. \code{getEventProbabilities()} uses only the first value of a non-piecewise vector.
 #' @name param_lambda1
 #' @keywords internal
 NULL
@@ -162,7 +190,8 @@ NULL
 #' Parameter Description: Lambda (2)
 #' @param lambda2 The assumed hazard rate in the reference group, there is no default.
 #'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
-#'   Must be a positive numeric of length 1.
+#'   Must be a positive numeric of length 1, or a vector with one hazard rate per time interval
+#'   if \code{piecewiseSurvivalTime} is specified.
 #' @name param_lambda2
 #' @keywords internal
 NULL
@@ -213,7 +242,8 @@ NULL
 #' Parameter Description: Hazard Ratio
 #' @param hazardRatio The vector of hazard ratios under consideration.
 #'   If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
-#'   not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.
+#'   not to be specified as it is calculated, there is no default. Must be a positive numeric value or vector;
+#'   \code{getEventProbabilities()} accepts a single value only.
 #' @name param_hazardRatio
 #' @keywords internal
 NULL
@@ -323,19 +353,23 @@ NULL
 
 #' Parameter Description: overdispersion for Counts
 #' @param overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution,
-#' default is \code{0}.
+#' default is \code{0}. Must be \code{>= 0}.
 #' @name param_overdispersion_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: fixedExposureTime for Counts
 #' @param fixedExposureTime If specified, the fixed time of exposure per subject for count data, there is no default.
+#'   For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
 #' @name param_fixedExposureTime_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: accrualTime for Counts
 #' @param accrualTime If specified, the assumed accrual time interval(s) for the study, there is no default.
+#'   A single value defines the end of accrual; if a vector is specified, its first value must be \code{0}.
+#'   If \code{followUpTime} is specified, \code{accrualTime} can have at most two elements.
+#'   Required for \code{getSimulationCounts()}.
 #' @name param_accrualTime_counts
 #' @keywords internal
 NULL
@@ -349,6 +383,7 @@ NULL
 #' Parameter Description: followUpTime for Counts
 #' @param followUpTime If specified, the assumed (additional) follow-up time for the study, there is no default.
 #'        The total study duration is \code{accrualTime + followUpTime}.
+#'        For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
 #' @name param_followUpTime_counts
 #' @keywords internal
 NULL
@@ -375,7 +410,7 @@ NULL
 #'   the combined sample size from both treatment groups if two groups are considered. For survival outcomes,
 #'   it should contain the planned number of additional events.
 #'   For multi-arm designs, it is the per-comparison (combined) sample size.
-#'   For enrichment designs, it is the (combined) sample size for the considered sub-population.
+#'   For enrichment designs, it is the (combined) sample size for the considered subpopulation.
 #' @name param_nPlanned
 #' @keywords internal
 NULL
@@ -401,8 +436,12 @@ NULL
 
 #' Parameter Description: Direction Upper
 #' @param directionUpper Logical. Specifies the direction of the alternative,
-#'   only applicable for one-sided testing; default is \code{TRUE}
-#'   which means that larger values of the test statistics yield smaller p-values.
+#'   only applicable for one-sided testing; \code{TRUE}
+#'   means that larger values of the test statistics yield smaller p-values.
+#'   The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+#'   (power calculations, simulations, and analyses).
+#'   In sample size calculations, the direction is derived from the specified alternative;
+#'   a specified \code{directionUpper} must agree with it.
 #' @name param_directionUpper
 #' @keywords internal
 NULL
@@ -448,23 +487,33 @@ NULL
 #' @keywords internal
 NULL
 
-#' Parameter Description: Legend Position On Plots
-#' @param legendPosition The position of the legend.
-#'   By default (\code{NA_integer_}) the algorithm tries to find a suitable position.
-#'   Choose one of the following values to specify the position manually:
+#'
+#' @title
+#' Parameter Description: Legend Position on Plots
+#'
+#' @description
+#' Controls automatic or explicit placement of plot legends.
+#'
+#' @param legendPosition The legend position. The default, `"auto"`, measures the
+#'   legend and chooses among six inside positions by minimizing overlap with
+#'   points, line segments, reference lines, bars, boxes, and error bars.
+#'   Long labels are wrapped and entries arranged vertically in automatic mode.
+#'   Oversized legends and faceted plots use the outside right position.
+#'   This heuristic uses the current graphics device (seven inches square when
+#'   no device is open); resizing may require recreating the plot or setting a
+#'   position explicitly. Manual positions are:
 #'   \itemize{
-#'     \item \code{-1}: no legend will be shown
-#'     \item \code{NA}: the algorithm tries to find a suitable position
-#'     \item \code{0}: legend position outside plot
-#'     \item \code{1}: legend position left top
-#'     \item \code{2}: legend position left center
-#'     \item \code{3}: legend position left bottom
-#'     \item \code{4}: legend position right top
-#'     \item \code{5}: legend position right center
-#'     \item \code{6}: legend position right bottom
+#'     \item `-1` or `"none"`: hide the legend
+#'     \item `"left"`, `"right"`, `"bottom"`, `"top"`: outside the plot
+#'     \item `0`: default outside position with a square aspect ratio
+#'     \item `1`, `2`, `3`: inside left, at the top, centre, or bottom
+#'     \item `4`, `5`, `6`: inside right, at the top, centre, or bottom
+#'     \item `NA`: retain the legacy plot-specific positioning rules
 #'   }
+#'
 #' @name param_legendPosition
 #' @keywords internal
+#'
 NULL
 
 #' Parameter Description: Grid (Output Specification Of Multiple Plots)
@@ -555,7 +604,9 @@ NULL
 #'   for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
 #'   It is defined as the power for the subsequent stage given the current data. By default,
 #'   the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
-#'   \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
+#'   \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates;
+#'   \code{piTreatmentsH1} and \code{piControlH1} in multi-arm designs, \code{piTreatmentH1} and
+#'   \code{piControlH1} in enrichment designs), or \code{thetaH1} (for simulating
 #'   hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.
 #' @name param_conditionalPowerSimulation
 #' @keywords internal
@@ -731,13 +782,17 @@ NULL
 NULL
 
 #' Parameter Description: Type of Selection
-#' @param typeOfSelection The way the treatment arms or populations are selected at interim.
-#'   Five options are available: \code{"best"}, \code{"rbest"}, \code{"epsilon"}, \code{"all"}, and \code{"userDefined"},
-#'   default is \code{"best"}.\cr
-#'   For \code{"rbest"} (select the \code{rValue} best treatment arms/populations), the parameter \code{rValue} has to be specified,
-#'   for \code{"epsilon"} (select treatment arm/population not worse than epsilon compared to the best), the parameter
-#'   \code{epsilonValue} has to be specified.
-#'   If \code{"userDefined"} is selected, \code{"selectArmsFunction"} or \code{"selectPopulationsFunction"} has to be specified.
+#' @param typeOfSelection Rule for selecting treatment arms (multi-arm designs) or
+#'   populations (enrichment designs) for continuation after an interim analysis.
+#'   The default \code{"best"} selects only the single best arm or population;
+#'   \code{"rBest"} (also accepted as \code{"rbest"}) selects the best \code{rValue};
+#'   \code{"epsilon"} selects those within \code{epsilonValue} of the best;
+#'   \code{"all"} retains all remaining arms or populations; and
+#'   \code{"userDefined"} applies \code{selectArmsFunction} or
+#'   \code{selectPopulationsFunction}. Selection is applied at interims with
+#'   \code{adaptations = TRUE}. See the section \emph{Treatment arm and population
+#'   selection} for details and an example of gradual elimination.
+#' @template details_type_of_selection
 #' @name param_typeOfSelection
 #' @keywords internal
 NULL
@@ -774,8 +829,8 @@ NULL
 NULL
 
 #' Parameter Description: Piecewise Multi-Arm Survival Time
-#' @param piecewiseSurvivalTime A \code{PiecewiseMultiArmSurvivalTime} object
-#'   created by \code{getPiecewiseMultiArmSurvivalTime()}. It specifies common
+#' @param piecewiseSurvivalTime A \code{PiecewiseSurvivalTimeMultiArm} object
+#'   created by \code{getPiecewiseSurvivalTimeMultiArm()}. It specifies common
 #'   interval start times, the control hazard in every interval, and an
 #'   active-arm-by-interval hazard-ratio matrix for every situation. It can
 #'   only be used for patient-wise simulation with \code{kappa = 1}, and cannot
@@ -797,8 +852,8 @@ NULL
 #'   examples). For a piecewise exponential patient-wise survival simulation,
 #'   specify
 #'   \code{subGroups}, \code{prevalences}, and \code{piecewiseSurvivalTime},
-#'   where the latter is a \code{PiecewiseEnrichmentSurvivalTime} object created
-#'   by \code{getPiecewiseEnrichmentSurvivalTime()}. Its subgroup names and the
+#'   where the latter is a \code{PiecewiseSurvivalTimeEnrichment} object created
+#'   by \code{getPiecewiseSurvivalTimeEnrichment()}. Its subgroup names and the
 #'   order of \code{subGroups} must agree. In this case, do not also specify
 #'   \code{piControls}, \code{piTreatments}, or \code{hazardRatios}.
 #' @name param_effectList_enrichment_survival
@@ -807,6 +862,7 @@ NULL
 
 #' Parameter Description: Active Arms
 #' @param activeArms The number of active treatment arms to be compared with control, default is \code{3}.
+#'   Must not exceed \code{8}.
 #' @name param_activeArms
 #' @keywords internal
 NULL
@@ -990,7 +1046,7 @@ NULL
 
 #' Parameter Description: Planned Calendar Time
 #' @param plannedCalendarTime For simulating count data, the time points where an analysis is planned to be performed.
-#'     Should be a vector of length \code{kMax}
+#'     Required for group sequential designs as a vector of length \code{kMax}; ignored for a fixed design.
 #' @name param_plannedCalendarTime
 #' @keywords internal
 NULL
@@ -1055,7 +1111,9 @@ NULL
 NULL
 
 #' Parameter Description: Pi Control
-#' @param piControl The assumed probability in the control arm, default is \code{0.5}.
+#' @param piControl The assumed event probability in the control arm by \code{eventTime}, default is \code{0.5}.
+#'   If specified and \code{simulationType = "auto"}, the patient-wise simulation is used, which requires
+#'   \code{maxNumberOfSubjects} or an absolute \code{accrualIntensity}.
 #' @name param_piControl
 #' @keywords internal
 NULL

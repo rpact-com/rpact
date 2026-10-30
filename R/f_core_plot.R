@@ -992,6 +992,20 @@ getAvailablePlotTypes <- function(
     return(TRUE)
 }
 
+.setXAxisScale <- function(p, data, ..., addZero = FALSE, digits = 0) {
+    if (is.null(data$xValues) || !is.numeric(data$xValues) || length(na.omit(data$xValues)) == 0) {
+        return(p)
+    }
+    
+    breaks <- sort(unique(round(na.omit(data$xValues), digits = digits)))
+    if (addZero && !any(breaks == 0)) {
+        breaks <- c(0, breaks)
+    }
+
+    p <- p + ggplot2::scale_x_continuous(breaks = breaks)
+    return(p)
+}
+
 .plotParameterSet <- function(
         ...,
         parameterSet,
@@ -1005,7 +1019,7 @@ getAvailablePlotTypes <- function(
         theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         variedParameters = logical(0),
         qnormAlphaLineEnabled = TRUE,
         yAxisScalingEnabled = TRUE,
@@ -1236,8 +1250,14 @@ getAvailablePlotTypes <- function(
         }
     }
 
-    piecewiseSpecification <- if (.isParameterSet(parameterSet)) parameterSet[["piecewiseSurvivalTime"]] else NULL
-    if (!inherits(piecewiseSpecification, "PiecewisePatientWiseSurvivalTime")) piecewiseSpecification <- NULL
+    piecewiseSpecification <- if (.isParameterSet(parameterSet)) {
+        parameterSet[["piecewiseSurvivalTime"]]
+    } else {
+        NULL
+    }
+    if (!inherits(piecewiseSpecification, "PiecewiseSurvivalTimeMultiGroup")) {
+        piecewiseSpecification <- NULL
+    }
     if (!is.null(piecewiseSpecification)) {
         # Scenario order is repeated for each plotted arm, stage, or response series.
         data$xValues <- rep(seq_len(piecewiseSpecification$getNumberOfSituations()), length.out = nrow(data))
@@ -1369,9 +1389,7 @@ getAvailablePlotTypes <- function(
             breaks = seq_len(piecewiseSpecification$getNumberOfSituations()),
             labels = dimnames(piecewiseSpecification$hazardRatios)[[3]])
     } else if (xParameterName == "informationRates") {
-        p <- p + ggplot2::scale_x_continuous(breaks = c(0, round(data$xValues, 3)))
-    } else if (xParameterName == "situation") { # simulation enrichment
-        p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
+        p <- .setXAxisScale(p, data, addZero = TRUE, digits = 3)
     }
 
     # add mirrored lines
@@ -1431,7 +1449,7 @@ getAvailablePlotTypes <- function(
         )
     }
 
-    return(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }
 
 .naAndNaNOmit <- function(x) {
@@ -1495,7 +1513,7 @@ getAvailablePlotTypes <- function(
         palette = "Set1",
         plotPointsEnabled = NA,
         legendTitle = NA_character_,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         scalingFactor1 = 1,
         scalingFactor2 = 1,
         addPowerAndAverageSampleNumber = FALSE,
@@ -1569,14 +1587,23 @@ getAvailablePlotTypes <- function(
     } else {
         p <- ggplot2::ggplot(data, ggplot2::aes(x = .data[["xValues"]], y = .data[["yValues"]]))
     }
-
+    
+    if (isFALSE(discreteXAxis) && !is.null(xlab) && 
+            grepl("situation|stage", xlab, ignore.case = TRUE)) {
+        discreteXAxis <- TRUE
+    }
+    if (isFALSE(discreteXAxis) && !is.null(xAxisLabel) && 
+            grepl("situation|stage", xAxisLabel, ignore.case = TRUE)) {
+        discreteXAxis <- TRUE
+    }
+    
     p <- plotSettings$setTheme(p)
     p <- plotSettings$hideGridLines(p)
 
     if (!is.null(xAxisTickLabels)) {
         p <- p + ggplot2::scale_x_continuous(breaks = seq_along(xAxisTickLabels), labels = xAxisTickLabels)
     } else if (discreteXAxis) {
-        p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
+        p <- .setXAxisScale(p, data)
     }
 
     # set main title
@@ -1586,7 +1613,7 @@ getAvailablePlotTypes <- function(
     if (!categoryEnabled || mirrorModeEnabled || (!is.na(legendPosition) && legendPosition == -1)) {
         p <- p + ggplot2::theme(legend.position = "none")
     } else {
-        p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition)
+        p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition, finalize = FALSE)
         p <- plotSettings$setLegendBorder(p)
         p <- plotSettings$setLegendTitle(p, legendTitle)
         p <- plotSettings$setLegendLabelSize(p)
@@ -1664,7 +1691,7 @@ getAvailablePlotTypes <- function(
     p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
 
     # start plot generation
-    return(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }
 
 .getPointBorder <- function(data, plotSettings) {
@@ -2018,4 +2045,195 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         relatedParameter = "class", 
         relatedValue = .getClassName(x)
     )
+}
+
+.plotLegendLabels <- function(labels) {
+    if (is.expression(labels) || is.list(labels)) {
+        return(labels)
+    }
+    result <- vapply(as.character(labels), function(label) {
+        paste(strwrap(label, width = 34), collapse = "\n")
+    }, character(1), USE.NAMES = FALSE)
+    names(result) <- names(labels)
+    return(result)
+}
+
+.plotLegendOverlap <- function(data, rectangle, linesEnabled) {
+    inside <- function(x, y) {
+        return(is.finite(x) & is.finite(y) & x >= rectangle[1L] &
+            x <= rectangle[2L] & y >= rectangle[3L] & y <= rectangle[4L])
+    }
+    if (!linesEnabled) {
+        return(sum(inside(data$x, data$y)))
+    }
+    score <- 0
+    for (group in split(data, interaction(data$PANEL, data$group, drop = TRUE))) {
+        group <- group[order(group$x), , drop = FALSE]
+        if (nrow(group) < 2L) {
+            next
+        }
+        x <- head(group$x, -1L)
+        y <- head(group$y, -1L)
+        dx <- diff(group$x)
+        dy <- diff(group$y)
+        valid <- is.finite(x) & is.finite(y) & is.finite(dx) & is.finite(dy)
+        x <- x[valid]
+        y <- y[valid]
+        dx <- dx[valid]
+        dy <- dy[valid]
+        lower <- rep(0, length(x))
+        upper <- rep(1, length(x))
+        # Clip each segment to the legend rectangle. Count intersections along
+        # the entire line, including segments whose endpoints lie outside it.
+        for (axis in 1:2) {
+            origin <- list(x, y)[[axis]]
+            delta <- list(dx, dy)[[axis]]
+            bounds <- rectangle[(2L * axis - 1L):(2L * axis)]
+            parallel <- delta == 0
+            upper[parallel & (origin < bounds[1L] | origin > bounds[2L])] <- -1
+            moving <- !parallel
+            first <- (bounds[1L] - origin[moving]) / delta[moving]
+            last <- (bounds[2L] - origin[moving]) / delta[moving]
+            lower[moving] <- pmax(lower[moving], pmin(first, last))
+            upper[moving] <- pmin(upper[moving], pmax(first, last))
+        }
+        score <- score + sum(pmax(0, upper - lower) * sqrt(dx^2 + dy^2)) * 20
+    }
+    return(score)
+}
+
+.positionPlotLegend <- function(p, plotSettings) {
+    # Measure the compact legend on the current device. A private null device
+    # supplies the standard seven-inch size when no graphics device is open.
+    if (grDevices::dev.cur() == 1L) {
+        grDevices::pdf(file = NULL, width = 7, height = 7)
+        on.exit(grDevices::dev.off(), add = TRUE)
+    }
+    args <- plotSettings$getLegendPositionArguments(c(0.02, 0.98), c(0, 1))
+    probe <- p + do.call(ggplot2::theme, args)
+    built <- ggplot2::ggplot_build(probe)
+    # Avoid repeating draw-time diagnostics during the layout probe; drawing
+    # the returned plot still signals the original geometry warnings/messages.
+    table <- suppressMessages(suppressWarnings(ggplot2::ggplot_gtable(built)))
+    boxes <- which(grepl("^guide-box", table$layout$name))
+    boxes <- boxes[!vapply(table$grobs[boxes], inherits, logical(1), "zeroGrob")]
+    if (!length(boxes)) {
+        return(p)
+    }
+    if (length(built$layout$panel_params) != 1L) {
+        return(p + ggplot2::theme(legend.position = "right"))
+    }
+    # A comparison can keep one guide below the panel and one inside it.
+    # Only the inside guide belongs to the region being positioned here.
+    inside <- boxes[table$layout$name[boxes] == "guide-box-inside"]
+    if (length(inside)) {
+        boxes <- inside
+    }
+    legend <- table$grobs[[boxes[1L]]]
+    panelWidth <- grDevices::dev.size("in")[1L] - grid::convertWidth(sum(table$widths), "in", valueOnly = TRUE)
+    panelHeight <- grDevices::dev.size("in")[2L] - grid::convertHeight(sum(table$heights), "in", valueOnly = TRUE)
+    width <- grid::convertWidth(grid::grobWidth(legend), "in", valueOnly = TRUE) / panelWidth
+    height <- grid::convertHeight(grid::grobHeight(legend), "in", valueOnly = TRUE) / panelHeight
+    if (!is.finite(width) || !is.finite(height) || width > 0.9 || height > 0.9 ||
+            panelWidth <= 0 || panelHeight <= 0) {
+        return(p + ggplot2::theme(legend.position = "right"))
+    }
+    positions <- list(c(0.98, 0.98), c(0.02, 0.98), c(0.98, 0.02),
+        c(0.02, 0.02), c(0.98, 0.5), c(0.02, 0.5))
+    justifications <- list(c(1, 1), c(0, 1), c(1, 0), c(0, 0), c(1, 0.5), c(0, 0.5))
+    scores <- vapply(seq_along(positions), function(i) {
+        lower <- positions[[i]] - c(width, height) * justifications[[i]]
+        rectangle <- c(lower[1L] - 0.01, lower[1L] + width + 0.01,
+            lower[2L] - 0.01, lower[2L] + height + 0.01)
+        score <- 0
+        for (layer in seq_along(built$data)) {
+            data <- built$data[[layer]]
+            if (!nrow(data)) {
+                next
+            }
+            data <- built$layout$coord$transform(data, built$layout$panel_params[[1L]])
+            score <- score + .plotLegendLayerOverlap(data, p$layers[[layer]]$geom, rectangle)
+        }
+        return(score)
+    }, numeric(1))
+    best <- which.min(scores)
+    args <- plotSettings$getLegendPositionArguments(positions[[best]], justifications[[best]])
+    return(p + do.call(ggplot2::theme, args))
+}
+
+.preparePlotLegend <- function(p) {
+    for (legendScale in p$scales$scales) {
+        if (legendScale$is_discrete() && any(legendScale$aesthetics %in% c("colour", "fill", "linetype", "shape"))) {
+            labels <- legendScale$labels
+            if (is.function(labels)) {
+                # Preserve caller-provided labelling functions and avoid
+                # wrapping an already prepared scale again.
+                next
+            } else if (inherits(labels, "waiver")) {
+                legendScale$labels <- .plotLegendLabels
+            } else if (!is.null(labels)) {
+                legendScale$labels <- .plotLegendLabels(labels)
+            }
+        }
+    }
+    guides <- list()
+    for (aesthetic in c("colour", "fill", "linetype", "shape")) {
+        guide <- p$guides$guides[[aesthetic]]
+        if (identical(guide, "none") || inherits(guide, "GuideNone")) {
+            next
+        }
+        if (inherits(guide, "GuideLegend")) {
+            guide <- local({
+                originalGuide <- guide
+                ggplot2::ggproto(NULL, originalGuide)
+            })
+            guide$params$ncol <- 1L
+            guide$params$nrow <- NULL
+            guide$params$direction <- "vertical"
+        } else {
+            guide <- ggplot2::guide_legend(ncol = 1, title.position = "top")
+        }
+        guides[[aesthetic]] <- guide
+    }
+    return(p + do.call(ggplot2::guides, guides) + ggplot2::theme(
+        legend.direction = "vertical", legend.box = "vertical", legend.title.position = "top"))
+}
+
+.plotLegendLayerOverlap <- function(data, geom, rectangle) {
+    if (inherits(geom, "GeomHline")) {
+        data <- data.frame(x = rep(c(0, 1), nrow(data)), y = rep(data$yintercept, each = 2),
+            PANEL = 1L, group = rep(seq_len(nrow(data)), each = 2))
+        return(.plotLegendOverlap(data, rectangle, TRUE))
+    }
+    if (inherits(geom, "GeomVline")) {
+        data <- data.frame(x = rep(data$xintercept, each = 2), y = rep(c(0, 1), nrow(data)),
+            PANEL = 1L, group = rep(seq_len(nrow(data)), each = 2))
+        return(.plotLegendOverlap(data, rectangle, TRUE))
+    }
+    if (all(c("xmin", "xmax", "ymin", "ymax") %in% names(data))) {
+        width <- pmax(0, pmin(rectangle[2L], data$xmax) - pmax(rectangle[1L], data$xmin))
+        height <- pmax(0, pmin(rectangle[4L], data$ymax) - pmax(rectangle[3L], data$ymin))
+        return(sum(width * height, na.rm = TRUE) * 100)
+    }
+    if (all(c("x", "ymin", "ymax") %in% names(data))) {
+        data <- data.frame(x = rep(data$x, each = 2),
+            y = as.vector(rbind(data$ymin, data$ymax)), PANEL = 1L,
+            group = rep(seq_len(nrow(data)), each = 2))
+        return(.plotLegendOverlap(data, rectangle, TRUE))
+    }
+    if (!all(c("x", "y") %in% names(data)) || inherits(geom, "GeomBlank")) {
+        return(0)
+    }
+    return(.plotLegendOverlap(data, rectangle,
+        inherits(geom, "GeomLine") || inherits(geom, "GeomPath")))
+}
+
+.finalizePlotLegend <- function(p, legendPosition, plotSettings) {
+    if (!identical(legendPosition, "auto") || identical(p$theme$legend.position, "none")) {
+        return(p)
+    }
+    if (is.null(plotSettings)) {
+        plotSettings <- PlotSettings$new()
+    }
+    return(plotSettings$setLegendPosition(p, "auto"))
 }

@@ -1552,14 +1552,17 @@ NULL
         .assertIsSingleInteger(legendPosition, "legendPosition", validateType = FALSE)
         .assertIsInClosedInterval(legendPosition, "legendPosition", lower = -1, upper = 6)
     } else {
-        validLegendPositions <- c("none", "left", "right", "bottom", "top")
+        validLegendPositions <- c("auto", "none", "left", "right", "bottom", "top")
         if (!(legendPosition %in% validLegendPositions)) {
             stopIllegalArgument("'legendPosition' (", legendPosition, ") ",
                 "must be one of the following values: ",
                 .arrayToString(validLegendPositions),
                 functionName = ".assertIsValidLegendPosition",
                 parameter = "legendPosition",
-                value = legendPosition
+                value = legendPosition,
+                constraint = "a supported automatic, named outside, or numeric legend position",
+                diagnosticId = "plot.legend_position_unsupported",
+                context = list(allowedValues = validLegendPositions)
             )
         }
     }

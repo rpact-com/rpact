@@ -448,7 +448,7 @@ NULL
 #' @inheritParams param_stDevSimulation
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_enrichment
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_plannedSubjects
 #' @inheritParams param_minNumberOfSubjectsPerStage
@@ -492,6 +492,7 @@ NULL
 #' \code{stDevH1}.
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
+#' @template details_type_of_selection
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'

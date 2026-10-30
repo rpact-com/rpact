@@ -362,7 +362,8 @@ NULL
 #'        highest response for \code{"linear"} and \code{"sigmoidEmax"} model,
 #'        default is \code{seq(0, 1, 0.2)}.
 #' @param piControl If specified, the assumed probability in the control arm
-#'        for simulation and under which the sample size recalculation is performed.
+#'        for simulation and under which the sample size recalculation is performed, default is 
+#'        \code{0.2}.
 #' @param piTreatmentsH1 If specified, the assumed probability in the active treatment arm(s)
 #'        under which the sample size recalculation is performed.
 #' @param piControlH1 If specified, the assumed probability in the reference group
@@ -377,7 +378,7 @@ NULL
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfShapeRates
 #' @inheritParams param_typeOfSelection
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_multiarm
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_plannedSubjects
@@ -426,6 +427,7 @@ NULL
 #' \code{piControlH1}.
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
+#' @template details_type_of_selection
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'

@@ -979,6 +979,12 @@ rpwexp <- function(n, ..., s = NA_real_, lambda = NA_real_, kappa = 1) {
 #' @details
 #' Can be used, e.g., to convert pi, median, or lambda values into pi, median, lambda, or hazard ratio values, e.g, for usage in
 #' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}} or \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
+#' 
+#' For the Weibull distribution, the hazard ratio is
+#' `(lambda1 / lambda2)^kappa = (median2 / median1)^kappa`, where
+#' `lambda` is the inverse Weibull scale and `kappa` is the common shape parameter. 
+#' Conversions from a hazard ratio therefore use `hazardRatio^(1 / kappa)` to 
+#' recover the lambda ratio.
 #'
 #' @return Returns a \code{\link[base]{numeric}} value or vector will be returned.
 #'
@@ -1049,7 +1055,7 @@ getHazardRatioByPi <- function(
         pi1,
         pi2,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
-        kappa = 1,
+        kappa = 1, # note: not necessary
         matrixAllowed = FALSE) {
     .assertIsValidPi(pi1, "pi1", matrixAllowed = matrixAllowed)
     .assertIsValidPi(pi2, "pi2", matrixAllowed = matrixAllowed)
@@ -1057,8 +1063,8 @@ getHazardRatioByPi <- function(
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
-    return(getLambdaByPi(pi1, eventTime, kappa, matrixAllowed = matrixAllowed) / 
-            getLambdaByPi(pi2, eventTime, kappa, matrixAllowed = matrixAllowed))
+    return((getLambdaByPi(pi1, eventTime, kappa, matrixAllowed = matrixAllowed) /
+            getLambdaByPi(pi2, eventTime, kappa, matrixAllowed = matrixAllowed))^kappa)
 }
 
 #' @rdname utilitiesForSurvivalTrials
@@ -1066,11 +1072,13 @@ getHazardRatioByPi <- function(
 getHazardRatioByLambda <- function(
         lambda1,
         lambda2,
-        matrixAllowed = FALSE) {
+        matrixAllowed = FALSE,
+        kappa = 1) {
     lambda1 <- .assertIsValidLambda(lambda1, 1, matrixAllowed = matrixAllowed)
     lambda2 <- .assertIsValidLambda(lambda2, 2, matrixAllowed = matrixAllowed)
     .assertHasCompatibleLength(lambda1, lambda2, "lambda1", "lambda2")
-    return(lambda1 / lambda2)
+    .assertIsValidKappa(kappa)
+    return((lambda1 / lambda2)^kappa)
 }
 
 #' @rdname utilitiesForSurvivalTrials
@@ -1083,8 +1091,8 @@ getHazardRatioByMedian <- function(
     median1 <- .assertIsNumericVector(median1, "median1", matrixAllowed = matrixAllowed)
     median2 <- .assertIsNumericVector(median2, "median2", matrixAllowed = matrixAllowed)
     .assertHasCompatibleLength(median1, median2, "median1", "median2")
-    return(getLambdaByMedian(median1, kappa = kappa, matrixAllowed = matrixAllowed) / 
-            getLambdaByMedian(median2, kappa = kappa, matrixAllowed = matrixAllowed))
+    return((getLambdaByMedian(median1, kappa = kappa, matrixAllowed = matrixAllowed) /
+            getLambdaByMedian(median2, kappa = kappa, matrixAllowed = matrixAllowed))^kappa)
 }
 
 #' @rdname utilitiesForSurvivalTrials
@@ -1093,11 +1101,13 @@ getHazardRatioByMedian <- function(
 getLambda1ByLambda2AndHazardRatio <- function(
         lambda2,
         hazardRatio,
-        matrixAllowed = FALSE) {
+        matrixAllowed = FALSE,
+        kappa = 1) {
     lambda2 <- .assertIsValidLambda(lambda2, 2, matrixAllowed = matrixAllowed)
     .assertIsValidHazardRatioVector(hazardRatio, matrixAllowed = matrixAllowed)
     .assertHasCompatibleLength(lambda2, hazardRatio, "lambda2", "hazardRatio")
-    return(lambda2 * hazardRatio)
+    .assertIsValidKappa(kappa)
+    return(lambda2 * hazardRatio^(1 / kappa))
 }
 
 #' @rdname utilitiesForSurvivalTrials
@@ -1106,11 +1116,13 @@ getLambda1ByLambda2AndHazardRatio <- function(
 getLambda2ByLambda1AndHazardRatio <- function(
         lambda1,
         hazardRatio,
-        matrixAllowed = FALSE) {
+        matrixAllowed = FALSE,
+        kappa = 1) {
     lambda1 <- .assertIsValidLambda(lambda1, 1, matrixAllowed = matrixAllowed)
     .assertIsValidHazardRatioVector(hazardRatio, matrixAllowed = matrixAllowed)
     .assertHasCompatibleLength(lambda1, hazardRatio, "lambda1", "hazardRatio")
-    return(lambda1 / hazardRatio)
+    .assertIsValidKappa(kappa)
+    return(lambda1 / hazardRatio^(1 / kappa))
 }
 
 #' @rdname utilitiesForSurvivalTrials
@@ -1126,7 +1138,7 @@ getPi1ByPi2AndHazardRatio <- function(
     .assertIsValidHazardRatioVector(hazardRatio, matrixAllowed = matrixAllowed)
     .assertIsValidKappa(kappa)
     lambda2 <- getLambdaByPi(pi2, eventTime, kappa = kappa, matrixAllowed = matrixAllowed)
-    lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio, matrixAllowed = matrixAllowed)
+    lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio, matrixAllowed = matrixAllowed, kappa = kappa)
     pi1 <- getPiByLambda(lambda1, eventTime, kappa = kappa, matrixAllowed = matrixAllowed)
     return(pi1)
 }
@@ -1144,7 +1156,7 @@ getPi2ByPi1AndHazardRatio <- function(
     .assertIsValidHazardRatioVector(hazardRatio, matrixAllowed = matrixAllowed)
     .assertIsValidKappa(kappa)
     lambda1 <- getLambdaByPi(pi1, eventTime, kappa = kappa, matrixAllowed = matrixAllowed)
-    lambda2 <- getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio, matrixAllowed = matrixAllowed)
+    lambda2 <- getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio, matrixAllowed = matrixAllowed, kappa = kappa)
     pi2 <- getPiByLambda(lambda2, eventTime, kappa = kappa, matrixAllowed = matrixAllowed)
     return(pi2)
 }

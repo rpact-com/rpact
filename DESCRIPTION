@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.5.0.9323
-Date: 2026-10-22
+Version: 4.5.0.9326
+Date: 2026-10-30
 Authors@R: c(
 	person(
 		given = "Gernot",
@@ -69,6 +69,9 @@ Language: en-US
 Depends:
 	R (>= 4.1.0)
 Imports:
+    grid,
+    grDevices,
+    parallel,
 	methods,
 	stats,
 	utils,
@@ -80,6 +83,8 @@ Imports:
 	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
 Suggests:
+    callr,
+    parallelly,
 	ggplot2 (>= 3.5.0),
 	testthat (>= 3.0.0),
 	rmarkdown (>= 1.10),
@@ -123,7 +128,10 @@ Collate:
     'class_summary.R'
     'class_time_accrual.R'
     'class_time_piecewise_survival.R'
-    'class_time_piecewise_survival_multiarm.R'
+    'f_error_handling.R'
+    'f_piecewise_survival_time_utilities.R'
+    'class_time_piecewise_survival_multigroup.R'
+    'class_trial_comparison.R'
     'data.R'
     'f_analysis_base_general.R'
     'f_analysis_base_means.R'
@@ -139,6 +147,10 @@ Collate:
     'f_analysis_multiarm_rates.R'
     'f_analysis_multiarm_survival.R'
     'f_as251.R'
+    'f_comparison.R'
+    'f_comparison_parameters.R'
+    'f_comparison_plot.R'
+    'f_comparison_r_code.R'
     'f_core_output_formats.R'
     'f_design_fisher_combination_test.R'
     'f_design_fixed.R'
@@ -155,8 +167,8 @@ Collate:
     'f_design_plan_rates.R'
     'f_design_plan_survival.R'
     'f_design_plan_utilities.R'
-    'f_error_handling.R'
     'f_io_utilities.R'
+    'f_piecewise_survival_time_multiarm.R'
     'f_quality_assurance.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'
@@ -176,12 +188,15 @@ Collate:
     'f_simulation_multiarm_survival_pw.R'
     'f_simulation_multiarm_survival_pw_basic.R'
     'f_simulation_performance_score.R'
+    'f_simulation_piecewise_survival.R'
     'f_simulation_plot.R'
     'f_summary.R'
     'f_summary_header.R'
     'f_summary_parameters.R'
     'f_summary_title.R'
     'f_summary_utilities.R'
+    'f_test_execution.R'
+    'f_test_reporting.R'
     'f_warning_handling.R'
     'parameter_column_names.R'
     'parameter_formats.R'

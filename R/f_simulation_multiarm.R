@@ -806,6 +806,7 @@ NULL
             piControl <- .setPi2(simulationResults, piControl, parameterName = "piControl", endpoint = endpoint)
         } else {
             simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
+            simulationResults$.setParameterType("piecewiseSurvivalTime", C_PARAM_USER_DEFINED)
             simulationResults$piControl <- NA_real_
             simulationResults$.setParameterType("piControl", C_PARAM_NOT_APPLICABLE)
         }
@@ -1308,7 +1309,7 @@ NULL
         simulationResults$lambdaTreatment <- matrix(NA_real_, nrow = numberOfRows, ncol = numberOfCols)
         for (i in 1:numberOfRows) {
             simulationResults$lambdaTreatment[i, ] <- getLambda1ByLambda2AndHazardRatio(
-                simulationResults$lambdaControl, hazardRatio[i, ])
+                simulationResults$lambdaControl, hazardRatio[i, ], kappa = kappa)
         }
         simulationResults$.setParameterType("lambdaTreatment", C_PARAM_DERIVED)
         simulationResults$.setParameterType("lambdaControl", C_PARAM_DERIVED)

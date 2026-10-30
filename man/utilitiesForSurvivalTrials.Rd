@@ -23,13 +23,23 @@ getLambdaByMedian(median, kappa = 1, matrixAllowed = FALSE)
 
 getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getHazardRatioByLambda(lambda1, lambda2, matrixAllowed = FALSE)
+getHazardRatioByLambda(lambda1, lambda2, matrixAllowed = FALSE, kappa = 1)
 
 getHazardRatioByMedian(median1, median2, kappa = 1, matrixAllowed = FALSE)
 
-getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio, matrixAllowed = FALSE)
+getLambda1ByLambda2AndHazardRatio(
+  lambda2,
+  hazardRatio,
+  matrixAllowed = FALSE,
+  kappa = 1
+)
 
-getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio, matrixAllowed = FALSE)
+getLambda2ByLambda1AndHazardRatio(
+  lambda1,
+  hazardRatio,
+  matrixAllowed = FALSE,
+  kappa = 1
+)
 
 getPi1ByPi2AndHazardRatio(
   pi2,
@@ -83,5 +93,11 @@ Functions to convert pi, lambda, median, and hazard ratio values into each other
 \details{
 Can be used, e.g., to convert pi, median, or lambda values into pi, median, lambda, or hazard ratio values, e.g, for usage in
 \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}} or \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
+
+For the Weibull distribution, the hazard ratio is
+\code{(lambda1 / lambda2)^kappa = (median2 / median1)^kappa}, where
+\code{lambda} is the inverse Weibull scale and \code{kappa} is the common shape parameter.
+Conversions from a hazard ratio therefore use \code{hazardRatio^(1 / kappa)} to
+recover the lambda ratio.
 }
 \keyword{internal}

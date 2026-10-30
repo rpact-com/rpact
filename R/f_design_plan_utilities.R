@@ -352,3 +352,25 @@ NULL
         }
     }
 }
+
+.catLegendEnrichment <- function(parameterSet, consoleOutputEnabled) {
+    if (is.null(parameterSet) || is.null(parameterSet$effectList) || 
+            is.null(parameterSet$effectList$subGroups)) {
+        return(invisible())
+    }
+    
+    subGroups <- parameterSet$effectList$subGroups
+    if (any(grepl("^S\\d", subGroups))) {
+        parameterSet$.cat(paste0("  S<i>: subpopulation i\n"), consoleOutputEnabled = consoleOutputEnabled)
+    }
+    else if (any(grepl("^S", subGroups))) {
+        parameterSet$.cat(paste0("  S: subpopulation\n"), consoleOutputEnabled = consoleOutputEnabled)
+    }
+    parameterSet$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
+    if (length(subGroups) > 1) {
+        parameterSet$.cat(
+            paste0("  R: remaining population\n"),
+            consoleOutputEnabled = consoleOutputEnabled
+        )
+    }
+}

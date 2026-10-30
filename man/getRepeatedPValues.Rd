@@ -42,6 +42,10 @@ design can be re-created for arbitrary values of the global significance
 level. For user-defined designs with fixed userAlphaSpending values,
 this alpha-dependent design family is not uniquely defined.
 Consequently, repeated p-values are not available for such designs.
+Repeated p-values are also unavailable for sequential designs with
+\code{typeBetaSpending = "bsUser"}, regardless of whether futility is binding.
+These calculations return \code{NA} with a warning; other analysis results
+remain available.
 }
 
 \examples{

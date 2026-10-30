@@ -92,6 +92,7 @@ SimulationResults <- R6::R6Class(
         .design = NULL,
         .data = NULL,
         .rawData = NULL,
+        .piecewiseSurvivalArguments = NULL,
         .showStatistics = NULL,
         maxNumberOfIterations = NULL,
         seed = NULL,
@@ -390,23 +391,14 @@ SimulationResults <- R6::R6Class(
                     if (self$.design$kMax > 1) {
                         self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
-                    if (inherits(self[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+                    if (inherits(self[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
                         self$.cat("  Situations: ",
                             paste(dimnames(self$piecewiseSurvivalTime$hazardRatios)[[3]], collapse = ", "),
                             " (in this order)\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
 
                     if (enrichmentEnabled) {
-                        if (length(self$effectList$subGroups) > 1) {
-                            self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
-                        }
-                        self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
-                        if (length(self$effectList$subGroups) > 1) {
-                            self$.cat(
-                                paste0("  R: remaining population\n"),
-                                consoleOutputEnabled = consoleOutputEnabled
-                            )
-                        }
+                        .catLegendEnrichment(self, consoleOutputEnabled)
                     }
 
                     self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)

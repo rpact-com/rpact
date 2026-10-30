@@ -707,8 +707,8 @@ writeDatasets <- function(
 #' comparison to control (see Examples).
 #'
 #' For enrichment designs, the comparison of two samples is provided for an unstratified
-#' (sub-population wise) or stratified data input.\cr
-#' For non-stratified (sub-population wise) data input the data sets are defined for the sub-populations
+#' (subpopulation wise) or stratified data input.\cr
+#' For non-stratified (subpopulation wise) data input the data sets are defined for the sub-populations
 #' S1, S2, ..., F, where F refers to the full populations. Use of \code{getDataset(S1 = , S2, ..., F = )}
 #' defines the data set to be used in \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 #' For stratified data input the data sets are defined for the strata S1, S12, S2, ..., R, where R
@@ -3007,6 +3007,7 @@ DatasetGeneral <- R6::R6Class("DatasetGeneral",
 #' @param xlab The x-axis label, default is \code{"Stage"}.
 #' @param ylab The y-axis label.
 #' @param legendTitle The legend title, default is \code{"Group"}.
+#' @inheritParams param_legendPosition
 #' @inheritParams param_palette
 #' @inheritParams param_showSource
 #' @inheritParams param_plotSettings
@@ -3052,7 +3053,8 @@ plot.Dataset <- function(
         legendTitle = "Group",
         palette = "Set1",
         showSource = FALSE,
-        plotSettings = NULL) {
+        plotSettings = NULL,
+        legendPosition = "auto") {
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
@@ -3065,6 +3067,7 @@ plot.Dataset <- function(
         xlab = xlab,
         ylab = ylab,
         legendTitle = legendTitle,
+        legendPosition = legendPosition,
         palette = palette,
         plotSettings = plotSettings,
         ...
@@ -3089,7 +3092,8 @@ plot.Dataset <- function(
         legendTitle = "Group",
         palette = "Set1",
         showSource = FALSE,
-        plotSettings = NULL) {
+        plotSettings = NULL,
+        legendPosition = "auto") {
     if (x$.enrichmentEnabled) {
         stopRuntimeIssue("plot of enrichment data is not yet implemented",
             functionName = ".plot.Dataset"
@@ -3156,7 +3160,7 @@ plot.Dataset <- function(
                 na.rm = TRUE
             )
         } else if (x$isDatasetRates()) {
-            p <- ggplot2::ggplot(show.legend = FALSE)
+            p <- ggplot2::ggplot()
 
             # plot sample size
             p <- p + ggplot2::geom_bar(
@@ -3207,7 +3211,7 @@ plot.Dataset <- function(
                 na.rm = TRUE
             )
         } else if (x$isDatasetRates()) {
-            p <- ggplot2::ggplot(show.legend = FALSE)
+            p <- ggplot2::ggplot()
 
             # plot sample size
             p <- p + ggplot2::geom_bar(
@@ -3253,7 +3257,7 @@ plot.Dataset <- function(
 
     # set legend
     if (x$getNumberOfGroups() > 1) {
-        p <- plotSettings$setLegendPosition(p, legendPosition = C_POSITION_OUTSIDE_PLOT)
+        p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition, finalize = FALSE)
         p <- plotSettings$setLegendBorder(p)
         p <- plotSettings$setLegendTitle(p, legendTitle, mode = "fill")
         p <- plotSettings$setLegendLabelSize(p)
@@ -3269,7 +3273,7 @@ plot.Dataset <- function(
     }
     p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
 
-    return(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }
 
 #'

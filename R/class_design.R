@@ -427,6 +427,11 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
             self$.initParameterTypes()
             self$.initStages()
             self$.setParameterType("power", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("bindingFutility", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("tolerance", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("bindingFutility", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("userAlphaSpending", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("alphaSpent", C_PARAM_NOT_APPLICABLE)
         },
         hasChanged = function(
                 ...,
@@ -1215,7 +1220,7 @@ plot.TrialDesign <- function(
         theta = seq(-1, 1, 0.01),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
@@ -1285,7 +1290,7 @@ plot.TrialDesign <- function(
         theta = seq(-1, 1, 0.01),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {

@@ -148,7 +148,7 @@ StageResults <- R6::R6Class("StageResults",
 
                 if (grepl("Enrichment", .getClassName(self))) {
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  S: subpopulation\n"), consoleOutputEnabled = consoleOutputEnabled)
                     self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                 } else if (grepl("MultiArm", .getClassName(self))) {
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
@@ -1657,7 +1657,7 @@ plot.StageResults <- function(
         ylab = NA_character_,
         legendTitle = NA_character_,
         palette = "Set1",
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         plotSettings = NULL) {
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
@@ -1704,7 +1704,7 @@ plot.StageResults <- function(
         ylab = NA_character_,
         legendTitle = NA_character_,
         palette = "Set1",
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
@@ -1909,7 +1909,7 @@ plot.StageResults <- function(
         ylab = NA_character_,
         legendTitle = NA_character_,
         palette = "Set1",
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         numberOfPairedLines = NA_integer_,
         plotSettings = NULL) {
     ciModeEnabled <- !is.null(data[["lower"]]) && !is.null(data[["upper"]])
@@ -1942,7 +1942,7 @@ plot.StageResults <- function(
     if (is.na(legendPosition)) {
         legendPosition <- C_POSITION_LEFT_TOP
     }
-    p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition)
+    p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition, finalize = FALSE)
     p <- plotSettings$setLegendBorder(p)
     p <- plotSettings$setLegendTitle(p, legendTitle)
     p <- plotSettings$setLegendLabelSize(p)
@@ -2018,5 +2018,5 @@ plot.StageResults <- function(
     p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
 
     # start plot generation
-    return(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }

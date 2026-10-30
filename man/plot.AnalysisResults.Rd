@@ -16,7 +16,7 @@
   ylab = NA_character_,
   legendTitle = NA_character_,
   palette = "Set1",
-  legendPosition = NA_integer_,
+  legendPosition = "auto",
   showSource = FALSE,
   grid = 1,
   plotSettings = NULL
@@ -51,7 +51,7 @@ The argument must be a vector with length equal to the number of remaining stage
 the combined sample size from both treatment groups if two groups are considered. For survival outcomes,
 it should contain the planned number of additional events.
 For multi-arm designs, it is the per-comparison (combined) sample size.
-For enrichment designs, it is the (combined) sample size for the considered sub-population.}
+For enrichment designs, it is the (combined) sample size for the considered subpopulation.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
@@ -70,19 +70,21 @@ Note that internally \code{allocationRatioPlanned} is treated as a vector of len
 
 \item{palette}{The palette, default is \code{"Set1"}.}
 
-\item{legendPosition}{The position of the legend.
-By default (\code{NA_integer_}) the algorithm tries to find a suitable position.
-Choose one of the following values to specify the position manually:
+\item{legendPosition}{The legend position. The default, \code{"auto"}, measures the
+legend and chooses among six inside positions by minimizing overlap with
+points, line segments, reference lines, bars, boxes, and error bars.
+Long labels are wrapped and entries arranged vertically in automatic mode.
+Oversized legends and faceted plots use the outside right position.
+This heuristic uses the current graphics device (seven inches square when
+no device is open); resizing may require recreating the plot or setting a
+position explicitly. Manual positions are:
 \itemize{
-\item \code{-1}: no legend will be shown
-\item \code{NA}: the algorithm tries to find a suitable position
-\item \code{0}: legend position outside plot
-\item \code{1}: legend position left top
-\item \code{2}: legend position left center
-\item \code{3}: legend position left bottom
-\item \code{4}: legend position right top
-\item \code{5}: legend position right center
-\item \code{6}: legend position right bottom
+\item \code{-1} or \code{"none"}: hide the legend
+\item \code{"left"}, \code{"right"}, \code{"bottom"}, \code{"top"}: outside the plot
+\item \code{0}: default outside position with a square aspect ratio
+\item \code{1}, \code{2}, \code{3}: inside left, at the top, centre, or bottom
+\item \code{4}, \code{5}, \code{6}: inside right, at the top, centre, or bottom
+\item \code{NA}: retain the legacy plot-specific positioning rules
 }}
 
 \item{showSource}{Logical. If \code{TRUE}, the parameter names of the object will

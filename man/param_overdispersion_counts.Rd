@@ -5,7 +5,7 @@
 \title{Parameter Description: overdispersion for Counts}
 \arguments{
 \item{overdispersion}{A numeric value that represents the assumed overdispersion of the negative binomial distribution,
-default is \code{0}.}
+default is \code{0}. Must be \code{>= 0}.}
 }
 \description{
 Parameter Description: overdispersion for Counts

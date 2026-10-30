@@ -265,7 +265,7 @@ NULL
             legendEntry = list()
         ))
     }
-    if (inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime")) {
+    if (inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
         return(list(
             groupCaption = paste0(parameterCaption, ", situation = ",
                 dimnames(designPlan$piecewiseSurvivalTime$hazardRatios)[[3]][variedParamNumber]),
@@ -332,7 +332,7 @@ NULL
         categoryCaption <- .getCategoryCaptionEnrichment(designPlan, parameterName, groupNumber)
         categoryCaption <- sub("^F$", "Full population F", categoryCaption)
         categoryCaption <- sub("^R$", "Remaining population R", categoryCaption)
-        categoryCaption <- sub("^S", "Subset S", categoryCaption)
+        categoryCaption <- sub("^S", "Subpopulation S", categoryCaption)
 
         return(paste0(listItemPrefix, categoryCaption))
     }
@@ -371,7 +371,7 @@ NULL
     numberOfGroups <- 1
     arrayDataDim <- dim(arrayData)
     if (length(arrayDataDim) > 1 && (arrayDataDim[1] > 1 ||
-            inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewisePatientWiseSurvivalTime"))) {
+            inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup"))) {
         numberOfVariedParams <- arrayDataDim[2]
         if (length(arrayDataDim) > 2) {
             numberOfGroups <- arrayDataDim[3]

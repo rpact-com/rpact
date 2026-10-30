@@ -45,7 +45,7 @@
 #'     maxNumberOfIterations = 50, simulationType = "patientWise")
 #'
 #' # Piecewise exponential event times for two active arms and two situations
-#' piecewiseTime <- getPiecewiseMultiArmSurvivalTime(
+#' piecewiseTime <- getPiecewiseSurvivalTimeMultiArm(
 #'     piecewiseSurvivalTime = c(0, 6),
 #'     lambdaControl = c(0.08, 0.12),
 #'     hazardRatios = list(

@@ -28,6 +28,12 @@ NULL
     list(treatments = treatments, subGroupVector = subGroupVector)
 }
 
+.sampleMultinomOne <- function(probabilities) {
+    # Keep the workaround isolated so R's native sampler can replace it once
+    # platform-independent rmultinom() is available in all supported R releases.
+    .sampleMultinomOneCpp(probabilities)
+}
+
 updateSubGroupVector <- function(
         k,
         maxNumberOfSubjects,
@@ -39,7 +45,7 @@ updateSubGroupVector <- function(
     subGroupVector <- subGroupVector[1:numberOfSubjects[k - 1]]
 
     while (length(subGroupVector) < maxNumberOfSubjects) {
-        subGroup <- subGroups[which(rmultinom(1, 1, prevSelected) == 1)]
+        subGroup <- subGroups[.sampleMultinomOne(prevSelected)]
         subGroupVector <- c(
             subGroupVector,
             rep(subGroup, allocationFraction[1] + allocationFraction[2])
@@ -144,13 +150,13 @@ updateSubGroupVector <- function(
         treatmentArm = treatments
     )
 
-    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseEnrichmentSurvivalTime")
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeEnrichment")
     if (piecewiseEnabled) {
         lambdaControl <- piecewiseSurvivalTime$lambdaControls
         lambdaActive <- piecewiseActiveHazards
     } else {
         lambdaControl <- getLambdaByPi(piControls, eventTime, kappa)
-        lambdaActive <- hazardRatios * lambdaControl
+        lambdaActive <- hazardRatios^(1 / kappa) * lambdaControl
     }
 
     for (i in 1:maxNumberOfSubjects) {
@@ -243,7 +249,7 @@ updateSubGroupVector <- function(
             if (analysisTime[k - 1] < max(survivalDataSet$accrualTime)) {
                 #  create new survival and dropout times for selected populations
                 if (!all(selectedPopulations[, k] & selectedPopulations[, k - 1])) {
-                    prevSelected <- prevalences / sum(prevalences[selectedsubGroupsIndices[, k]])
+                    prevSelected <- prevalences
                     prevSelected[!selectedsubGroupsIndices[, k]] <- 0
 
                     subGroupVector <- updateSubGroupVector(
@@ -673,6 +679,11 @@ updateSubGroupVector <- function(
     piecewiseSurvivalTime <- .alignPiecewiseSurvivalGroups(
         piecewiseSurvivalTime, simulationResults$effectList$subGroups)
     simulationResults$piecewiseSurvivalTime <- piecewiseSurvivalTime
+    if (!is.null(piecewiseSurvivalTime)) {
+        simulationResults$.setParameterType("piecewiseSurvivalTime", C_PARAM_USER_DEFINED)
+        simulationResults$.piecewiseSurvivalArguments <- list(
+            simulationType = "patientWiseBasic", maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage)
+    }
 
     design <- simulationResults$.design
     effectList <- simulationResults$effectList
@@ -799,7 +810,7 @@ updateSubGroupVector <- function(
 
     index <- 1
     allPiecewiseActiveHazards <- if (inherits(
-            piecewiseSurvivalTime, "PiecewiseEnrichmentSurvivalTime")) {
+            piecewiseSurvivalTime, "PiecewiseSurvivalTimeEnrichment")) {
         piecewiseSurvivalTime$getActiveHazards()
     } else {
         NULL
@@ -997,19 +1008,22 @@ updateSubGroupVector <- function(
             }
         }
 
+        # Leave zero accumulators at zero when no iteration reaches a stage,
+        # matching the C++ engine and avoiding NaNs in expected overall values.
+        stageDenominators <- pmax(iterations[, i], 1)
         for (g in 1:gMax) {
             simulatedPopulationEventsPerStage[, i, g] <- round(
-                simulatedPopulationEventsPerStage[, i, g] / iterations[, i],
+                simulatedPopulationEventsPerStage[, i, g] / stageDenominators,
                 1
             )
         }
-        simulatedNumberOfEvents[, i] <- simulatedNumberOfEvents[, i] / iterations[, i]
+        simulatedNumberOfEvents[, i] <- simulatedNumberOfEvents[, i] / stageDenominators
         simulatedSingleEventsPerStage[, i] <-
-            simulatedSingleEventsPerStage[, i] / iterations[, i]
+            simulatedSingleEventsPerStage[, i] / stageDenominators
         simulatedSubsetEventsPerStage[, i, ] <-
-            simulatedSubsetEventsPerStage[, i, ] / iterations[, i]
-        simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / iterations[, i]
-        simulatedAnalysisTime[, i] <- simulatedAnalysisTime[, i] / iterations[, i]
+            simulatedSubsetEventsPerStage[, i, ] / stageDenominators
+        simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / stageDenominators
+        simulatedAnalysisTime[, i] <- simulatedAnalysisTime[, i] / stageDenominators
 
         if (kMax > 1) {
             simulatedRejections[2:kMax, i, ] <- simulatedRejections[2:kMax, i, ] -

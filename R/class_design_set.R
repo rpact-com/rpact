@@ -1022,7 +1022,7 @@ plot.TrialDesignSet <- function(
         theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
@@ -1082,7 +1082,7 @@ plot.TrialDesignSet <- function(
         theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
@@ -1152,7 +1152,7 @@ plot.TrialDesignSet <- function(
         theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         designSetName = NA_character_,
         plotSettings = NULL) {
@@ -1276,7 +1276,7 @@ plot.TrialDesignSet <- function(
         type = type, nMax = nMax
     )
 
-    return(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }
 
 .addDecisionCriticalValuesToPlot <- function(p, designMaster, type, nMax = NA_integer_) {
@@ -1323,15 +1323,18 @@ plot.TrialDesignSet <- function(
         stroke = 1.25,
         show.legend = TRUE
     )
+    colourScale <- ggplot2::ggplot_build(p)$plot$scales$get_scales("colour")
+    legendShapes <- rep(NA_integer_, length(colourScale$get_breaks()))
+    legendShapes[colourScale$get_breaks() == "Decision critical value"] <- 4L
     p <- p + ggplot2::guides(
         colour = ggplot2::guide_legend(
             override.aes = list(
-                shape = c(NA, NA, 4)
+                shape = legendShapes
             )
         )
     )
 
-    for (i in 1:nrow(data)) {
+    for (i in seq_len(nrow(data))) {
         label <- paste0("(", round(data[i, 1], 3), ", ", round(data[i, 2], 3), ")")
         p <- p + ggplot2::annotate("text",
             x = data[i, 1],
@@ -1342,8 +1345,5 @@ plot.TrialDesignSet <- function(
         )
     }
 
-    try(suppressWarnings(suppressMessages(p <- p + ggplot2::scale_color_manual(
-        values = c("#4daf4a", "#377eb8", "#e41a1c")
-    ))))
     return(p)
 }
