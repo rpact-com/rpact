@@ -24,6 +24,8 @@ Class for the definition of accrual time and accrual intensity.
 
 \item{\code{accrualTime}}{The assumed accrual time intervals for the study. Is a numeric vector.}
 
+\item{\code{accrualTimeOriginal}}{The original accrual time intervals before extending the last interval to recruit the remaining subjects. Is NA if no extension is required. Is a numeric vector.}
+
 \item{\code{accrualIntensity}}{The absolute accrual intensities. Is a numeric vector of length \code{kMax}.}
 
 \item{\code{accrualIntensityRelative}}{The relative accrual intensities.}

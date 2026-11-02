@@ -152,7 +152,8 @@ getComparison <- function(..., objects = NULL) {
     if (!length(objects)) {
         return(data.frame())
     }
-    getComparisonData(objects, niceColumnNamesEnabled = niceColumnNamesEnabled,
+    
+    .getComparisonData(objects, niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters)
 }
 
@@ -408,7 +409,9 @@ TrialComparison <- R6::R6Class("TrialComparison",
 #'
 #' @export
 #'
-length.TrialComparison <- function(x) length(x$getObjects())
+length.TrialComparison <- function(x) {
+    return(length(x$getObjects()))
+}
 
 #'
 #' @title
@@ -421,7 +424,9 @@ length.TrialComparison <- function(x) length(x$getObjects())
 #'
 #' @export
 #'
-names.TrialComparison <- function(x) names(x$getObjects())
+names.TrialComparison <- function(x) {
+    return(names(x$getObjects()))
+}
 
 #'
 #' @title
@@ -655,7 +660,9 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #' @param row.names Optional row names for the result.
 #' @param optional Unused; included for compatibility with `as.data.frame()`.
 #' @param ... Further arguments. Currently unused.
-#' @inheritParams getComparisonData
+#' @inheritParams param_niceColumnNamesEnabled
+#' @param includeAllParameters If TRUE, include all parameters in the comparison,
+#'   even if they are constant across all objects. If FALSE, only parameters
 #' @param removeConstantParameters If TRUE, retain identifiers and only parameters
 #'   with different object profiles, using the same rules as `summary()`.
 #'
@@ -822,7 +829,7 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
         }, description, "."))
 }
 
-.comparisonCaption <- function(parameter, object = NULL) {
+.comparisonCaption <- function(parameter, object = NULL, tableOutputEnabled = FALSE) {
     if (!is.null(object) && !parameter %in% c(.comparisonScope, .comparisonIdentifiers)) {
         if (!parameter %in% names(object)) {
             design <- .getTrialDesign(object)
@@ -832,7 +839,7 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
             object <- design
         }
     }
-    caption <- .getParameterCaption(parameter, obj = object, tableOutputEnabled = FALSE)
+    caption <- .getParameterCaption(parameter, obj = object, tableOutputEnabled = tableOutputEnabled)
     if (is.null(caption) || length(caption) != 1L || is.na(caption) || !nzchar(caption)) {
         caption <- C_TABLE_COLUMN_NAMES[[parameter]]
     }
@@ -844,10 +851,10 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
     return(caption)
 }
 
-.comparisonCaptionLabel <- function(parameter, captions) {
+.comparisonCaptionLabel <- function(parameter, captions, tableOutputEnabled = FALSE) {
     captions <- unique(captions[!is.na(captions) & nzchar(captions)])
     if (!length(captions)) {
-        return(.comparisonCaption(parameter))
+        return(.comparisonCaption(parameter, tableOutputEnabled = tableOutputEnabled))
     }
     return(paste(captions, collapse = " / "))
 }
@@ -877,7 +884,7 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
 }
 
 .getTrialComparisonInfo <- function(object, data = .getTrialComparisonData(object$getObjects())) {
-    info <- getComparisonParameterInfo(data)
+    info <- .getComparisonParameterInfo(data)
     # Use the common metadata API for the full ordered candidate set; row-wise
     # variation alone cannot identify equal stage profiles of different objects.
     candidates <- getComparisonParameterNames(data, varyingOnly = FALSE, exclude = .comparisonIdentifiers)
@@ -950,7 +957,7 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
     .assertComparisonLimit(maxTypes, "maxTypes", "print.TrialComparison")
     .assertComparisonLimit(maxMetrics, "maxMetrics", "print.TrialComparison")
     data <- .getTrialComparisonData(object$getObjects())
-    info <- getComparisonParameterInfo(data)
+    info <- .getComparisonParameterInfo(data)
     getComparisonParameterDescriptions(info[FALSE, ], digits = digits) # Validate display precision.
     object$.resetCat()
     emit <- function(...) {
@@ -1062,6 +1069,11 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
 #' missing values. Titles distinguish designs, sample size calculations, power
 #' calculations, and power simulations. Mixed comparisons use a design plan
 #' comparison title; empty comparisons retain the general trial comparison title.
+#' Markdown output presents each differing parameter as a table with one row per
+#' displayed profile and columns labelled by stage and situation. Scalar profiles
+#' use a Value column. Blank cells indicate coordinates absent from a profile;
+#' explicit missing values are shown as NA. The display limits also apply to
+#' these tables, with omitted values and profiles indicated explicitly.
 #'
 #' @export
 #'
@@ -1104,6 +1116,59 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         }
     )
 )
+
+.comparisonProfileMatrix <- function(profiles, labels, maxValues, digits, reference,
+        wrapColumnLabels = FALSE) {
+    coordinates <- lapply(profiles, function(profile) {
+        keys <- setdiff(names(profile), "value")
+        if (length(keys) == 0) {
+            return(rep(list("Value"), min(nrow(profile), maxValues)))
+        }
+        return(lapply(seq_len(min(nrow(profile), maxValues)), function(i) {
+            return(vapply(keys, function(key) {
+                return(paste(.comparisonCaption(key, tableOutputEnabled = TRUE),
+                    .comparisonPreview(profile[[key]][i])))
+            }, character(1)))
+        }))
+    })
+    positions <- lapply(coordinates, function(profile) {
+        return(vapply(profile, function(parts) {
+            return(paste(parts, collapse = "; "))
+        }, character(1)))
+    })
+    columns <- unique(unlist(positions, use.names = FALSE))
+    omitted <- vapply(profiles, function(profile) {
+        return(max(0L, nrow(profile) - maxValues))
+    }, numeric(1))
+    if (any(omitted > 0L)) {
+        columns <- c(columns, "...")
+    }
+    values <- matrix("", nrow = length(profiles), ncol = length(columns),
+        dimnames = list(labels, columns))
+    for (i in seq_along(profiles)) {
+        profile <- profiles[[i]]
+        values[i, match(positions[[i]], columns)] <- vapply(head(profile$value, maxValues), function(value) {
+            return(.comparisonPreview(value, digits = digits, reference = reference))
+        }, character(1))
+        if (omitted[i] > 0L) {
+            values[i, ncol(values)] <- paste0("... (+", omitted[i], " values)")
+        }
+    }
+    if (wrapColumnLabels) {
+        displayLabels <- unlist(lapply(coordinates, function(profile) {
+            return(vapply(profile, function(parts) {
+                return(paste(gsub(" ", "\u00a0", parts, fixed = TRUE), collapse = " "))
+            }, character(1)))
+        }), use.names = FALSE)
+        # Match by the original coordinates before replacing display labels.
+        # Spaces within each dimension are protected; dimensions can wrap freely.
+        indices <- match(columns, unlist(positions, use.names = FALSE))
+        matched <- !is.na(indices)
+        columns[matched] <- displayLabels[indices[matched]]
+        colnames(values) <- columns
+    }
+    return(values)
+}
 
 .showTrialComparisonSummary <- function(summary, consoleOutputEnabled) {
     summary$.resetCat()
@@ -1206,6 +1271,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             summary$.cat(parameterIndent, .comparisonText(description, 75L), " [", row$nProfiles, " profiles]\n",
                 heading = 3, consoleOutputEnabled = consoleOutputEnabled)
             groups <- row$profileGroups[[1L]]
+            profileLabels <- character()
+            displayedProfiles <- list()
             for (group in seq_len(min(row$nProfiles, limits$maxProfiles))) {
                 members <- which(groups == group)
                 ids <- head(members, limits$maxObjects)
@@ -1247,6 +1314,11 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                     any(vapply(keys, function(key) {
                         anyNA(head(profile[[key]], limits$maxValues))
                     }, logical(1)))
+                if (!consoleOutputEnabled) {
+                    profileLabels <- c(profileLabels, membersText)
+                    displayedProfiles[[length(displayedProfiles) + 1L]] <- profile
+                    next
+                }
                 values <- .comparisonPreview(profile$value, limits$maxValues, summary$.digits, row$values[[1L]])
                 if (length(keys)) {
                     positions <- vapply(keys, function(key) {
@@ -1255,6 +1327,12 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                     values <- paste0("[", paste(positions, collapse = "; "), "] ", values)
                 }
                 emit(profileIndent, membersText, ": ", .comparisonText(values, 85L), "\n")
+            }
+            if (!consoleOutputEnabled) {
+                values <- .comparisonProfileMatrix(displayedProfiles, profileLabels,
+                    limits$maxValues, summary$.digits, row$values[[1L]], wrapColumnLabels = TRUE)
+                .showMatrix(summary, values, summary$.digits, consoleOutputEnabled = FALSE,
+                    rowLabel = "Parameter", escapeMarkdown = TRUE)
             }
             if (row$nProfiles > limits$maxProfiles) {
                 emit(profileIndent, "... ", row$nProfiles - limits$maxProfiles, " more profiles.\n")
@@ -1301,8 +1379,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #'   are preferred for x, results for y, then other varying numeric columns.
 #'   Identifier columns are excluded; stages remain eligible axes. `yParamName`
 #'   may also explicitly select multiple numeric parameters. Their axis sides
-#'   can be controlled through `yAxisSide` passed to [plotComparison()].
-#' @param ... Arguments passed to [plotComparison()], including categories,
+#'   can be controlled through `yAxisSide` passed to [plot.TrialComparison()].
+#' @param ... Arguments passed to [plot.TrialComparison()], including categories,
 #'   grouping, titles and line/point settings. Explicit axis selections prevail.
 #'
 #' @return A ggplot object. Ambiguous selections raise an error listing candidate
@@ -1311,7 +1389,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #' @export
 #'
 plot.TrialComparison <- function(x, xParamName = NULL, yParamName = NULL, ...) {
-    return(plotComparison(x, xParamName = xParamName, yParamName = yParamName, ...))
+    return(.plotComparison(x, xParamName = xParamName, yParamName = yParamName, ...))
 }
 
 #'

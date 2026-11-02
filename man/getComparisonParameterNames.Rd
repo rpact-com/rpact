@@ -15,8 +15,9 @@ getComparisonParameterNames(
 )
 }
 \arguments{
-\item{data}{A data.frame, typically returned by getComparisonData(). Columns
-must be one-dimensional atomic vectors, including factors and dates.}
+\item{data}{A data.frame, typically obtained with as.data.frame() from a trial
+comparison. Columns must be one-dimensional atomic vectors, including factors
+and dates.}
 
 \item{...}{Further arguments. Currently unused.}
 
@@ -39,8 +40,8 @@ eligible for use as factors. This does not change the source column.}
 A character vector of column names. No plot or GUI state is changed.
 }
 \description{
-Selects varying parameters, axis candidates, or grouping variables using
-getComparisonParameterInfo(). Column order is retained.
+Selects varying parameters, axis candidates, or grouping variables from
+comparison-data columns. Column order is retained.
 }
 \examples{
 data <- data.frame(alpha = 0.025, effect = c(0.2, 0.3), power = c(0.8, 0.9))

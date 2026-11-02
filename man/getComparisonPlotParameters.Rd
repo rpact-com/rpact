@@ -39,7 +39,7 @@ is a data frame. A \code{TrialComparison} supplies its own objects automatically
 \item{yAxisSide}{Axis assignment: "auto" (default), "left", or "right".
 Supply one value for all y parameters, a vector in their order, or a named
 vector assigning individual parameters. Unspecified named entries remain
-automatic. The same argument is accepted by \code{\link[=plotComparison]{plotComparison()}}.}
+automatic. The same argument is accepted by \code{\link[=plot.TrialComparison]{plot.TrialComparison()}}.}
 }
 \value{
 A list containing \code{xParamName}, \code{yParamName}, \code{categoryParamName},
@@ -50,7 +50,7 @@ the right-axis plotting transformation is \code{value * scale + offset} from
 for scaling, not ggplot's expanded panel limits. Unresolved selections
 are NULL. \code{message} is NULL on success, otherwise contains all selection
 problems. \code{candidates} lists eligible columns for each selection; \code{issues}
-contains diagnostic metadata used by \code{\link[=plotComparison]{plotComparison()}}.
+contains diagnostic metadata used by \code{\link[=plot.TrialComparison]{plot.TrialComparison()}}.
 }
 \description{
 Proposes axes and an object category without creating a plot. Selection

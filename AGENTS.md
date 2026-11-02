@@ -338,6 +338,102 @@ For example:
 #'
 ```
 
+## Documenting new R6 classes and additional fields
+
+Whenever a new R6 class is introduced or an existing class gains fields,
+complete the following documentation workflow as part of the same task.
+Constructor documentation alone is not sufficient documentation of a class
+and its fields.
+
+1. Inspect comparable classes, for example
+   `R/class_time_accrual.R`, `R/class_time_piecewise_survival.R`, and
+   `R/class_time_piecewise_survival_multigroup.R`. Give each new class its own
+   Roxygen block immediately before its `R6::R6Class()` declaration, with
+   `@name`, explicit `@title` and `@description`, field templates, and useful
+   `@details` and `@seealso` entries. Follow the Roxygen formatting rules above.
+   Use `@keywords internal` for internal class generators, following existing
+   classes; do not export a class generator merely to document it. Explain how
+   users obtain instances through the supported constructor functions.
+2. Inventory the public data fields of the affected class and its relevant
+   base classes. Document all public data fields, including inherited fields
+   needed to understand a specialized class. Update the base-class
+   documentation when a shared field is added. Internal implementation members
+   such as dot-prefixed fields are not automatically part of this inventory.
+   Check actual field values and their use in the implementation before
+   describing their types, dimensions, defaults, or statistical meaning.
+3. Maintain field descriptions centrally in
+   `man-raw/class_field_descriptions.xlsx`, not directly in generated
+   `man-roxygen/field_*.R` files or as duplicated inline `@field` prose.
+   Inspect the workbook's existing conventions and preserve unrelated sheets,
+   values, formatting, and workbook features. In the `field_templates` sheet,
+   reuse a suitable existing row or add a complete row containing
+   `field_name_readable`, `field_id`, `field_name_unique`, `field_description`,
+   `field_type`, and the applicable `is_unique` value following existing rows.
+   `field_id` must be the actual R field name; `field_name_unique` determines
+   the template filename. Select an existing type from
+   `field_type_descriptions`; use `C_DATATYPE_NONE` when the description itself
+   explains a type that the existing type descriptions cannot express.
+   Describe units, dimensions and their order, group or scenario roles,
+   optional `NULL`/`NA` values, and supplied versus derived values where relevant.
+   Do not leave new descriptions as TODOs: the generator normally excludes them.
+4. Reuse a template only if its meaning and type fit the field in the affected
+   class. When the same field name has different semantics or dimensions in
+   different classes, add a separate workbook row with the same `field_id`
+   and a distinct `field_name_unique`, following existing suffix conventions.
+   For example, `lambdaControl_piecewise` documents the interval-specific
+   vector without changing the existing scalar `lambdaControl` description.
+5. Read `man-raw/create_class_field_descriptions.R` and run its template
+   generation and diagnostic commands from the rpact repository root, with
+   `rpact.dev` available. The current commands are:
+
+   ```r
+   rpact.dev::createFieldDescriptionRoxygenTemplates(
+       overwrite = TRUE,
+       analyzeIssues = FALSE
+   )
+   rpact.dev::searchForRefClassFieldIssues()
+   ```
+
+   Review the generated diff, because `overwrite = TRUE` regenerates templates
+   beyond the affected class. Preserve unrelated work and investigate any
+   pre-existing discrepancy between the workbook and generated templates;
+   do not silently introduce unrelated documentation changes. Make corrections
+   in the workbook and regenerate the affected templates rather than editing
+   generated descriptions by hand.
+6. Reference the generated templates in each affected class's Roxygen block,
+   using actual Roxygen syntax, for example:
+
+   ```r
+   #' @template field_piecewiseSurvivalTime
+   #' @template field_lambdaControl_piecewise
+   #' @template field_hazardRatios
+   ```
+
+   Use `field_<field_name_unique>` as the template name. Do not add Markdown
+   bold markers around `@template`. Explain class-specific relationships and
+   interpretation in `@details` while keeping field descriptions central.
+7. Regenerate the affected `man/*.Rd` files with the package's Roxygen
+   configuration and review their content and links. Keep unrelated help files
+   intact; a targeted generation must not delete other documentation topics.
+   Verify that every field in the inventory appears with the correct
+   description and that the generated templates match the workbook, including
+   their appended type descriptions. Parse/check the affected Rd files with
+   `tools::parse_Rd()` and `tools::checkRd()`.
+   Inspect diagnostic output rather than trusting an issue count: if the field
+   checker fails to read a class, a reported zero issues does not establish
+   coverage. Perform the field inventory and Rd comparison directly in that
+   case and report the diagnostic limitation. If a full documentation run is
+   blocked by an unrelated failure, generate and validate the affected topics
+   separately where possible and report the remaining limitation.
+
+The `man-raw` directory is currently gitignored. Its workbook is still the
+authoritative local source and must be updated alongside the generated
+templates and Rd files. Do not force-add it or change ignore rules unless
+requested. Mention this local source change when reporting completion. If the
+workbook or generator is unavailable, locate the maintained copy or ask for
+its location; do not invent a replacement source or silently maintain only
+the generated output.
+
 ## Unit tests and test templates
 
 The rpact-specific rules in this section, including the optional

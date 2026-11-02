@@ -12,8 +12,8 @@ getComparisonParameterDescriptions(
 )
 }
 \arguments{
-\item{parameterInfo}{A table returned by getComparisonParameterInfo(), or a
-row subset of such a table.}
+\item{parameterInfo}{A comparison parameter metadata table, as available in
+\code{summary(comparison)$parameterInfo}, or a row subset of such a table.}
 
 \item{...}{Further arguments. Currently unused.}
 
@@ -30,7 +30,8 @@ Formats comparison parameter metadata for console output, summaries, and UI
 labels. Formatting does not alter the metadata or comparison data.
 }
 \examples{
-info <- getComparisonParameterInfo(data.frame(effect = c(0.2, 0.3)))
+comparison <- getComparison(getDesignFixed(), getDesignGroupSequential(kMax = 2))
+info <- summary(comparison)$parameterInfo
 getComparisonParameterDescriptions(info)
 
 }

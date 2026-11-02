@@ -1,5 +1,5 @@
 ## |
-## |  *Time classes for patient-wise simulations*
+## |  *Time functions for piecewise exponential survival multi-group simulations*
 ## |
 ## |  This file is part of the R package rpact:
 ## |  Confirmatory Adaptive Clinical Trial Design and Analysis
