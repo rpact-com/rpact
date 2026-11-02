@@ -147,7 +147,7 @@
 .comparisonYCaptions <- function(parameters, objects) {
     return(vapply(parameters, function(parameter) {
         captions <- vapply(objects, function(object) {
-            .comparisonCaption(parameter, object)
+            .comparisonCaption(parameter, object, tableOutputEnabled = FALSE)
         }, character(1))
         .comparisonCaptionLabel(parameter, captions)
     }, character(1)))

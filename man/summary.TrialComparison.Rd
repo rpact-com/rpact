@@ -57,4 +57,9 @@ profile comparison and mentions NA only when displayed profiles contain
 missing values. Titles distinguish designs, sample size calculations, power
 calculations, and power simulations. Mixed comparisons use a design plan
 comparison title; empty comparisons retain the general trial comparison title.
+Markdown output presents each differing parameter as a table with one row per
+displayed profile and columns labelled by stage and situation. Scalar profiles
+use a Value column. Blank cells indicate coordinates absent from a profile;
+explicit missing values are shown as NA. The display limits also apply to
+these tables, with omitted values and profiles indicated explicitly.
 }

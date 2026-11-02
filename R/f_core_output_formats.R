@@ -1356,3 +1356,42 @@ getOutputFormat <- function(
     base::options(C_OUTPUT_FORMAT_DEFAULT_VALUES)
     message(length(C_OUTPUT_FORMAT_DEFAULT_VALUES), " output formats were successfully reset")
 }
+
+.showMatrix <- function(object, values, digits, consoleOutputEnabled, rowLabel = "Group",
+        escapeMarkdown = FALSE) {
+    if (is.na(digits)) {
+        digits <- getOption("digits")
+    }
+    if (!consoleOutputEnabled) {
+        escapeCell <- function(value) {
+            if (!escapeMarkdown) {
+                return(value)
+            }
+            value <- gsub("&", "&amp;", value, fixed = TRUE)
+            value <- gsub("<", "&lt;", value, fixed = TRUE)
+            value <- gsub("\\", "&#92;", value, fixed = TRUE)
+            value <- gsub("|", "&#124;", value, fixed = TRUE)
+            value <- gsub("*", "&#42;", value, fixed = TRUE)
+            value <- gsub("_", "&#95;", value, fixed = TRUE)
+            value <- gsub("`", "&#96;", value, fixed = TRUE)
+            value <- gsub("[", "&#91;", value, fixed = TRUE)
+            value <- gsub("]", "&#93;", value, fixed = TRUE)
+            return(gsub("[\r\n]+", " ", value))
+        }
+        tableColumns <- ncol(values) + 1L
+        object$.cat(escapeCell(c(rowLabel, colnames(values))), tableColumns = tableColumns,
+            consoleOutputEnabled = FALSE)
+        object$.cat(rep("-----", tableColumns), tableColumns = tableColumns,
+            consoleOutputEnabled = FALSE)
+        formattedValues <- format(values, digits = digits, trim = TRUE)
+        for (i in seq_len(nrow(values))) {
+            object$.cat(escapeCell(c(rownames(values)[i], formattedValues[i, ])),
+                tableColumns = tableColumns, consoleOutputEnabled = FALSE)
+        }
+        object$.cat("\n", consoleOutputEnabled = FALSE)
+        return(invisible())
+    }
+    for (line in capture.output(print(values, digits = digits))) {
+        object$.cat(line, "\n", consoleOutputEnabled = consoleOutputEnabled)
+    }
+}
