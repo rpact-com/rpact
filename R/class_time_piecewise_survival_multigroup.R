@@ -203,7 +203,10 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
 
             return(invisible(self))
         },
-        .getNChar = function() {
+        .getNChar = function(includeAllParameters = FALSE) {
+            if (includeAllParameters) {
+                return(super$.getNChar(includeAllParameters = TRUE))
+            }
             # Only parameter lines determine the colon column, never table headings
             # or captions of inactive fields. Long captions remain complete.
             parameters <- self$.getVisibleFieldNames()

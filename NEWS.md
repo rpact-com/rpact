@@ -27,8 +27,7 @@
 
 ## Improvements, issues, and changes
 
-* Multi-arm and enrichment piecewise survival specifications now display time intervals vertically and group details into user-defined, default, and generated parameters. Hazards, hazard ratios, and interval medians use the configured rpact parameter formats in console and Markdown output. Parameter alignment uses only captions of applicable parameter lines, without extra padding and with a maximum padding width of 40 characters; headings and table captions do not widen these lines. The established two-group output and simulation data structures are unchanged.
-* Markdown summaries of trial comparisons now display parameter profiles in tables with labelled stage and situation columns, making scenarios easier to compare while retaining display limits and omission notices.
+* Parameter listings now align their colon column using applicable parameter captions without a fixed four-character padding allowance. Technical summaries account separately for parameter type prefixes. Caption padding remains capped at 40 characters, and longer captions are retained in full.
 * Repeated p-values are now unavailable (`NA` with a warning) for sequential designs with user-defined beta spending (`typeBetaSpending = "bsUser"`), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.
 * Replaced direct errors in comparison extraction, comparison plotting, and package testing with the central error helpers, providing specific error categories and structured diagnostic context while preserving worker failure details.
 * On Windows, `testPackage()` now uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.
