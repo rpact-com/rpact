@@ -1117,21 +1117,28 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     )
 )
 
-.comparisonProfileMatrix <- function(profiles, labels, maxValues, digits, reference) {
-    positions <- lapply(profiles, function(profile) {
+.comparisonProfileMatrix <- function(profiles, labels, maxValues, digits, reference,
+        wrapColumnLabels = FALSE) {
+    coordinates <- lapply(profiles, function(profile) {
         keys <- setdiff(names(profile), "value")
-        if (!length(keys)) {
-            return(rep("Value", min(nrow(profile), maxValues)))
+        if (length(keys) == 0) {
+            return(rep(list("Value"), min(nrow(profile), maxValues)))
         }
-        return(vapply(seq_len(min(nrow(profile), maxValues)), function(i) {
-            paste(vapply(keys, function(key) {
-                paste(.comparisonCaption(key, tableOutputEnabled = TRUE), .comparisonPreview(profile[[key]][i]))
-            }, character(1)), collapse = "; ")
+        return(lapply(seq_len(min(nrow(profile), maxValues)), function(i) {
+            return(vapply(keys, function(key) {
+                return(paste(.comparisonCaption(key, tableOutputEnabled = TRUE),
+                    .comparisonPreview(profile[[key]][i])))
+            }, character(1)))
+        }))
+    })
+    positions <- lapply(coordinates, function(profile) {
+        return(vapply(profile, function(parts) {
+            return(paste(parts, collapse = "; "))
         }, character(1)))
     })
     columns <- unique(unlist(positions, use.names = FALSE))
     omitted <- vapply(profiles, function(profile) {
-        max(0L, nrow(profile) - maxValues)
+        return(max(0L, nrow(profile) - maxValues))
     }, numeric(1))
     if (any(omitted > 0L)) {
         columns <- c(columns, "...")
@@ -1141,11 +1148,24 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     for (i in seq_along(profiles)) {
         profile <- profiles[[i]]
         values[i, match(positions[[i]], columns)] <- vapply(head(profile$value, maxValues), function(value) {
-            .comparisonPreview(value, digits = digits, reference = reference)
+            return(.comparisonPreview(value, digits = digits, reference = reference))
         }, character(1))
         if (omitted[i] > 0L) {
             values[i, ncol(values)] <- paste0("... (+", omitted[i], " values)")
         }
+    }
+    if (wrapColumnLabels) {
+        displayLabels <- unlist(lapply(coordinates, function(profile) {
+            return(vapply(profile, function(parts) {
+                return(paste(gsub(" ", "\u00a0", parts, fixed = TRUE), collapse = " "))
+            }, character(1)))
+        }), use.names = FALSE)
+        # Match by the original coordinates before replacing display labels.
+        # Spaces within each dimension are protected; dimensions can wrap freely.
+        indices <- match(columns, unlist(positions, use.names = FALSE))
+        matched <- !is.na(indices)
+        columns[matched] <- displayLabels[indices[matched]]
+        colnames(values) <- columns
     }
     return(values)
 }
@@ -1310,7 +1330,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             }
             if (!consoleOutputEnabled) {
                 values <- .comparisonProfileMatrix(displayedProfiles, profileLabels,
-                    limits$maxValues, summary$.digits, row$values[[1L]])
+                    limits$maxValues, summary$.digits, row$values[[1L]], wrapColumnLabels = TRUE)
                 .showMatrix(summary, values, summary$.digits, consoleOutputEnabled = FALSE,
                     rowLabel = "Parameter", escapeMarkdown = TRUE)
             }

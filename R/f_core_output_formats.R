@@ -1368,6 +1368,7 @@ getOutputFormat <- function(
                 return(value)
             }
             value <- gsub("&", "&amp;", value, fixed = TRUE)
+            value <- gsub("\u00a0", "&#160;", value, fixed = TRUE)
             value <- gsub("<", "&lt;", value, fixed = TRUE)
             value <- gsub("\\", "&#92;", value, fixed = TRUE)
             value <- gsub("|", "&#124;", value, fixed = TRUE)
