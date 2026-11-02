@@ -40,8 +40,9 @@
 #' Describes the observed values and plotting roles of comparison-data columns.
 #' This analysis does not change, round, or recalculate the supplied data.
 #'
-#' @param data A data.frame, typically returned by .getComparisonData(). Columns
-#'   must be one-dimensional atomic vectors, including factors and dates.
+#' @param data A data.frame, typically obtained with as.data.frame() from a trial
+#'   comparison. Columns must be one-dimensional atomic vectors, including factors
+#'   and dates.
 #' @param ... Further arguments. Currently unused.
 #' @param removeConstantParameters Whether to omit columns with at most one
 #'   distinct observed value. Defaults to FALSE so all parameters are available.
@@ -78,18 +79,18 @@
 #'
 #' @examples
 #' data <- data.frame(alpha = c(0.025, 0.025), effect = c(0.2, 0.3))
-#' getComparisonParameterInfo(data)
+#' .getComparisonParameterInfo(data)
 #'
-#' @export
+#' @noRd
 #'
-getComparisonParameterInfo <- function(data, ..., removeConstantParameters = FALSE,
+.getComparisonParameterInfo <- function(data, ..., removeConstantParameters = FALSE,
         binaryIntegerAsFactor = TRUE) {
-    .warnInCaseOfUnknownArguments(functionName = "getComparisonParameterInfo", ...)
+    .warnInCaseOfUnknownArguments(functionName = ".getComparisonParameterInfo", ...)
     .assertIsSingleLogical(removeConstantParameters, "removeConstantParameters")
     .assertIsSingleLogical(binaryIntegerAsFactor, "binaryIntegerAsFactor")
     if (!is.data.frame(data) || anyNA(names(data)) || any(!nzchar(names(data))) || anyDuplicated(names(data))) {
         stopIllegalArgument("'data' must be a data.frame with unique non-empty column names",
-            functionName = "getComparisonParameterInfo", parameter = "data", value = data,
+            functionName = ".getComparisonParameterInfo", parameter = "data", value = data,
             constraint = "a data.frame with unique non-empty column names",
             diagnosticId = "comparison.parameter_data_invalid")
     }
@@ -107,7 +108,7 @@ getComparisonParameterInfo <- function(data, ..., removeConstantParameters = FAL
         x <- data[[i]]
         if (!is.atomic(x) || !is.null(dim(x))) {
             stopIllegalDataInput("Comparison columns must be one-dimensional atomic vectors",
-                functionName = "getComparisonParameterInfo", parameter = "data", value = x,
+                functionName = ".getComparisonParameterInfo", parameter = "data", value = x,
                 constraint = "one-dimensional atomic columns",
                 diagnosticId = "comparison.parameter_column_unsupported",
                 context = list(column = names(data)[i], columnPosition = i))
@@ -173,10 +174,15 @@ getComparisonParameterInfo <- function(data, ..., removeConstantParameters = FAL
 #' Select Comparison Parameters
 #'
 #' @description
-#' Selects varying parameters, axis candidates, or grouping variables using
-#' getComparisonParameterInfo(). Column order is retained.
+#' Selects varying parameters, axis candidates, or grouping variables from
+#' comparison-data columns. Column order is retained.
 #'
-#' @inheritParams getComparisonParameterInfo
+#' @param data A data.frame, typically obtained with as.data.frame() from a trial
+#'   comparison. Columns must be one-dimensional atomic vectors, including factors
+#'   and dates.
+#' @param ... Further arguments. Currently unused.
+#' @param binaryIntegerAsFactor Whether integer-valued binary variables are also
+#'   eligible for use as factors. This does not change the source column.
 #' @param varyingOnly Whether to exclude constant and empty columns.
 #' @param type One of "all", "continuous", "factor", "binary", or "groupable".
 #'   Groupable columns are categorical or have at most maxNumberOfLevels observed
@@ -223,7 +229,7 @@ getComparisonParameterNames <- function(data, ..., varyingOnly = TRUE, type = "a
             constraint = "a number in [1, Inf]", lowerBound = 1, upperBound = Inf,
             diagnosticId = "comparison.parameter_level_limit_out_of_range")
     }
-    info <- getComparisonParameterInfo(data, binaryIntegerAsFactor = binaryIntegerAsFactor)
+    info <- .getComparisonParameterInfo(data, binaryIntegerAsFactor = binaryIntegerAsFactor)
     keep <- switch(type, all = rep(TRUE, nrow(info)), continuous = info$isContinuous,
         factor = info$isFactor, binary = info$isBinary,
         groupable = !info$isEmpty & (info$isFactor | info$paramLevelLength <= maxNumberOfLevels))
@@ -241,8 +247,8 @@ getComparisonParameterNames <- function(data, ..., varyingOnly = TRUE, type = "a
 #' Formats comparison parameter metadata for console output, summaries, and UI
 #' labels. Formatting does not alter the metadata or comparison data.
 #'
-#' @param parameterInfo A table returned by getComparisonParameterInfo(), or a
-#'   row subset of such a table.
+#' @param parameterInfo A comparison parameter metadata table, as available in
+#'   `summary(comparison)$parameterInfo`, or a row subset of such a table.
 #' @param ... Further arguments. Currently unused.
 #' @param digits Optional number of decimal places for displayed values.
 #' @param showDetails Whether to include the inferred type and plotting role.
@@ -251,7 +257,8 @@ getComparisonParameterNames <- function(data, ..., varyingOnly = TRUE, type = "a
 #'   character(). Empty columns are described as empty, not as single-valued.
 #'
 #' @examples
-#' info <- getComparisonParameterInfo(data.frame(effect = c(0.2, 0.3)))
+#' comparison <- getComparison(getDesignFixed(), getDesignGroupSequential(kMax = 2))
+#' info <- summary(comparison)$parameterInfo
 #' getComparisonParameterDescriptions(info)
 #'
 #' @export
@@ -282,7 +289,7 @@ getComparisonParameterDescriptions <- function(parameterInfo, ..., digits = NA_i
     if (!validInfo) {
         stopIllegalArgument("'parameterInfo' must be a comparison parameter information table",
             functionName = "getComparisonParameterDescriptions", parameter = "parameterInfo", value = parameterInfo,
-            constraint = "a table from getComparisonParameterInfo",
+            constraint = "a table from .getComparisonParameterInfo",
             diagnosticId = "comparison.parameter_info_invalid")
     }
     descriptions <- vapply(seq_len(nrow(parameterInfo)), function(i) {

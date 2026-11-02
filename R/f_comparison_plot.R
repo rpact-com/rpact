@@ -432,7 +432,7 @@ getComparisonPlotParameters <- function(
             result[parameter] <- list(candidates[[1L]])
             next
         }
-        info <- getComparisonParameterInfo(data[candidates])
+        info <- .getComparisonParameterInfo(data[candidates])
         descriptions <- getComparisonParameterDescriptions(info)
         addIssue(
             paste0(

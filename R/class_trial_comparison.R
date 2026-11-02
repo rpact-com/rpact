@@ -660,7 +660,6 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #' @param row.names Optional row names for the result.
 #' @param optional Unused; included for compatibility with `as.data.frame()`.
 #' @param ... Further arguments. Currently unused.
-#' @inheritParams .getComparisonData
 #' @inheritParams param_niceColumnNamesEnabled
 #' @param includeAllParameters If TRUE, include all parameters in the comparison,
 #'   even if they are constant across all objects. If FALSE, only parameters
@@ -885,7 +884,7 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
 }
 
 .getTrialComparisonInfo <- function(object, data = .getTrialComparisonData(object$getObjects())) {
-    info <- getComparisonParameterInfo(data)
+    info <- .getComparisonParameterInfo(data)
     # Use the common metadata API for the full ordered candidate set; row-wise
     # variation alone cannot identify equal stage profiles of different objects.
     candidates <- getComparisonParameterNames(data, varyingOnly = FALSE, exclude = .comparisonIdentifiers)
@@ -958,7 +957,7 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
     .assertComparisonLimit(maxTypes, "maxTypes", "print.TrialComparison")
     .assertComparisonLimit(maxMetrics, "maxMetrics", "print.TrialComparison")
     data <- .getTrialComparisonData(object$getObjects())
-    info <- getComparisonParameterInfo(data)
+    info <- .getComparisonParameterInfo(data)
     getComparisonParameterDescriptions(info[FALSE, ], digits = digits) # Validate display precision.
     object$.resetCat()
     emit <- function(...) {
