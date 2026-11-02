@@ -432,6 +432,15 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     if (inherits(obj, "PlotSettings")) {
         return(C_PARAMETER_NAMES_PLOT_SETTINGS[[parameterName]])
     }
+
+    if (inherits(obj, "PiecewiseSurvivalTimeMultiArm")) {
+        if (parameterName == "lambdaControl") {
+            return("Control hazards (common)")
+        }
+        if (parameterName == "medianControl") {
+            return("Control medians (exponential per interval)")
+        }
+    }
     
     if (identical(parameterName, "lambdaControl") && equals(obj$activeArms, 1L)) {
         return("Lambda (2)")
