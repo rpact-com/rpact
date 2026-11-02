@@ -203,6 +203,20 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
 
             return(invisible(self))
         },
+        .getNChar = function() {
+            # Only parameter lines determine the colon column, never table headings
+            # or captions of inactive fields. Long captions remain complete.
+            parameters <- self$.getVisibleFieldNames()
+            parameters <- setdiff(parameters, c("lambdaControls", "medianControls",
+                "hazardRatios", "medianTreatments"))
+            captions <- character()
+            for (parameter in parameters) {
+                if (self$isApplicableParameter(parameter)) {
+                    captions <- c(captions, .getParameterCaption(parameter, self))
+                }
+            }
+            return(min(40, max(c(1, nchar(captions)))))
+        },
         .showPiecewiseParameterGroup = function(parameters, title, digits, consoleOutputEnabled) {
             # The common control matrix repeats lambdaControl in the multi-arm class.
             # Retain its metadata and technical output, but avoid duplicate normal output.
