@@ -122,21 +122,35 @@ is performed.</p>
 <span class="r-in"><span><span class="va">piecewiseTime</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential multi-arm survival time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Control hazards (common to all treatment arms):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Interval Control</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 - &lt;6 0.080  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;=6    0.120  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise survival times : 0.00, 6.00 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Control hazards (common) : 0.080, 0.120 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Hazard ratios - favorable:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           interval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> group      0 - &lt;6 &gt;=6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lowDose     0.9 0.8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   highDose    0.8 0.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Interval lowDose highDose</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 - &lt;6 0.900   0.800   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;=6    0.800   0.600   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Hazard ratios - conservative:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           interval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> group      0 - &lt;6  &gt;=6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lowDose     1.0 0.90</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   highDose    0.9 0.75</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Control hazards (common to all treatment arms):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         0 - &lt;6  &gt;=6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Control   0.08 0.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Interval lowDose highDose</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 - &lt;6 1.000   0.900   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;=6    0.900   0.750   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters: not available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group type               : multi-arm </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">getPiecewiseSurvivalTimeMultiArm</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    piecewiseSurvivalTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>,</span></span>
@@ -145,25 +159,36 @@ is performed.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential multi-arm survival time</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Control hazards (common to all treatment arms):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Interval Control</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 - &lt;6 0.0578 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;=6    0.0289 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise survival times                 : 0.00, 6.00 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Control medians (exponential per interval) : 12.000, 24.000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Treatment medians - Situation 1 (exponential per interval):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           interval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> group      0 - &lt;6 &gt;=6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lowDose      15  30</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   highDose     18  36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Interval lowDose highDose</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 - &lt;6 15.000  18.000  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;=6    30.000  36.000  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters: not available</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Control hazards (common)                 : 0.0578, 0.0289 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Hazard ratios - Situation 1:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           interval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> group         0 - &lt;6       &gt;=6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lowDose  0.8000000 0.8000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   highDose 0.6666667 0.6666667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Control hazards (common to all treatment arms):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             0 - &lt;6        &gt;=6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Control 0.05776227 0.02888113</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Interval lowDose highDose</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0 - &lt;6 0.800   0.667   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   &gt;=6    0.800   0.667   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Group type                               : multi-arm </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Control medians (exponential per interval):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         0 - &lt;6 &gt;=6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Control     12  24</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -87,21 +87,35 @@ piecewiseTime <- getPiecewiseSurvivalTimeMultiArm(
 piecewiseTime
 #> Piecewise exponential multi-arm survival time
 #> 
+#> Control hazards (common to all treatment arms):
+#>         Group
+#> Interval Control
+#>   0 - <6 0.080  
+#>   >=6    0.120  
+#> 
+#> Details:
+#> 
+#> User defined parameters:
+#>   Piecewise survival times : 0.00, 6.00 
+#>   Control hazards (common) : 0.080, 0.120 
 #> 
 #> Hazard ratios - favorable:
-#>           interval
-#> group      0 - <6 >=6
-#>   lowDose     0.9 0.8
-#>   highDose    0.8 0.6
+#>         Group
+#> Interval lowDose highDose
+#>   0 - <6 0.900   0.800   
+#>   >=6    0.800   0.600   
 #> 
 #> Hazard ratios - conservative:
-#>           interval
-#> group      0 - <6  >=6
-#>   lowDose     1.0 0.90
-#>   highDose    0.9 0.75
-#> Control hazards (common to all treatment arms):
-#>         0 - <6  >=6
-#> Control   0.08 0.12
+#>         Group
+#> Interval lowDose highDose
+#>   0 - <6 1.000   0.900   
+#>   >=6    0.900   0.750   
+#> 
+#> Default parameters: not available
+#> 
+#> Generated parameters:
+#>   Group type               : multi-arm 
+#> 
 
 getPiecewiseSurvivalTimeMultiArm(
     piecewiseSurvivalTime = c(0, 6),
@@ -110,23 +124,34 @@ getPiecewiseSurvivalTimeMultiArm(
 )
 #> Piecewise exponential multi-arm survival time
 #> 
+#> Control hazards (common to all treatment arms):
+#>         Group
+#> Interval Control
+#>   0 - <6 0.0578 
+#>   >=6    0.0289 
+#> 
+#> Details:
+#> 
+#> User defined parameters:
+#>   Piecewise survival times                 : 0.00, 6.00 
+#>   Control medians (exponential per interval) : 12.000, 24.000 
 #> 
 #> Treatment medians - Situation 1 (exponential per interval):
-#>           interval
-#> group      0 - <6 >=6
-#>   lowDose      15  30
-#>   highDose     18  36
+#>         Group
+#> Interval lowDose highDose
+#>   0 - <6 15.000  18.000  
+#>   >=6    30.000  36.000  
+#> 
+#> Default parameters: not available
+#> 
+#> Generated parameters:
+#>   Control hazards (common)                 : 0.0578, 0.0289 
 #> 
 #> Hazard ratios - Situation 1:
-#>           interval
-#> group         0 - <6       >=6
-#>   lowDose  0.8000000 0.8000000
-#>   highDose 0.6666667 0.6666667
-#> Control hazards (common to all treatment arms):
-#>             0 - <6        >=6
-#> Control 0.05776227 0.02888113
+#>         Group
+#> Interval lowDose highDose
+#>   0 - <6 0.800   0.667   
+#>   >=6    0.800   0.667   
+#>   Group type                               : multi-arm 
 #> 
-#> Control medians (exponential per interval):
-#>         0 - <6 >=6
-#> Control     12  24
 ```

@@ -55,7 +55,9 @@
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-5-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-5-0"></a></h3>
-<ul><li>Repeated p-values are now unavailable (<code>NA</code> with a warning) for sequential designs with user-defined beta spending (<code>typeBetaSpending = "bsUser"</code>), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.</li>
+<ul><li>Markdown comparison tables now keep each coordinate label, such as “Stage 1” or “Situation 1”, together using Unicode non-breaking spaces. Ordinary spaces between dimensions permit flexible line wrapping without semicolons or HTML line-break tags.</li>
+<li>Parameter listings now align their colon column using applicable parameter captions without a fixed four-character padding allowance. Technical summaries account separately for parameter type prefixes. Caption padding remains capped at 40 characters, and longer captions are retained in full.</li>
+<li>Repeated p-values are now unavailable (<code>NA</code> with a warning) for sequential designs with user-defined beta spending (<code>typeBetaSpending = "bsUser"</code>), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.</li>
 <li>Replaced direct errors in comparison extraction, comparison plotting, and package testing with the central error helpers, providing specific error categories and structured diagnostic context while preserving worker failure details.</li>
 <li>On Windows, <code><a href="../reference/testPackage.html">testPackage()</a></code> now uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.</li>
 <li>

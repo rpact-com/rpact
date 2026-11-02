@@ -39,6 +39,12 @@ intensity.
 
   The assumed accrual time intervals for the study. Is a numeric vector.
 
+- `accrualTimeOriginal`:
+
+  The original accrual time intervals before extending the last interval
+  to recruit the remaining subjects. Is NA if no extension is required.
+  Is a numeric vector.
+
 - `accrualIntensity`:
 
   The absolute accrual intensities. Is a numeric vector of length

@@ -138,8 +138,8 @@ getSimulationEnrichmentSurvival(
   used for the piecewise definition of the survival time distribution,
   i.e., only `piecewiselambda` (as a single value) and `kappa` can be
   specified. This function is equivalent to
-  `pweibull(t, shape = kappa, scale = 1 / lambda)` of the `stats`
-  package, i.e., the scale parameter is `1 / 'hazard rate'`.  
+  `pweibull(q = time, shape = kappa, scale = 1 / lambda)` of the `stats`
+  package.  
   For example,
   `getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)`
   and `pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)` provide the

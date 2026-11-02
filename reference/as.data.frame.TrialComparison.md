@@ -38,12 +38,14 @@ as.data.frame(
 
 - niceColumnNamesEnabled:
 
-  If `TRUE`, use descriptive column names.
+  Logical. If `TRUE`, nice looking column names will be used; syntactic
+  names (variable names) otherwise (see
+  [`make.names`](https://rdrr.io/r/base/make.names.html)).
 
 - includeAllParameters:
 
-  If `TRUE`, include all parameters supported by the existing data-frame
-  methods of the individual objects.
+  If TRUE, include all parameters in the comparison, even if they are
+  constant across all objects. If FALSE, only parameters
 
 - removeConstantParameters:
 

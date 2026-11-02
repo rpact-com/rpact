@@ -27,15 +27,13 @@ plot(x, xParamName = NULL, yParamName = NULL, ..., showSummary = FALSE)
   results for y, then other varying numeric columns. Identifier columns
   are excluded; stages remain eligible axes. `yParamName` may also
   explicitly select multiple numeric parameters. Their axis sides can be
-  controlled through `yAxisSide` passed to
-  [`plotComparison()`](https://docs.rpact.org/reference/plotComparison.md).
+  controlled through `yAxisSide` passed to `plot.TrialComparison()`.
 
 - ...:
 
-  Arguments passed to
-  [`plotComparison()`](https://docs.rpact.org/reference/plotComparison.md),
-  including categories, grouping, titles and line/point settings.
-  Explicit axis selections prevail.
+  Arguments passed to `plot.TrialComparison()`, including categories,
+  grouping, titles and line/point settings. Explicit axis selections
+  prevail.
 
 - showSummary:
 

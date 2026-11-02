@@ -47,6 +47,31 @@ dimensions. Use the specialized constructors to specify their statistical roles.
     </div>
 
 
+    <div class="section level2">
+    <h2 id="fields">Fields<a class="anchor" aria-label="anchor" href="#fields"></a></h2>
+
+
+<dl><dt><code>piecewiseSurvivalTime</code></dt>
+<dd><p>The time intervals for the piecewise definition of the exponential survival time cumulative distribution function. Is a numeric vector.</p></dd>
+
+
+<dt><code>lambdaControls</code></dt>
+<dd><p>Positive, finite control hazards, with groups in rows and piecewise survival intervals in columns. Groups are active treatment arms sharing the same control hazards in multi-arm specifications, or disjoint population subsets in enrichment specifications. Is a numeric matrix.</p></dd>
+
+
+<dt><code>hazardRatios</code></dt>
+<dd><p>Positive, finite treatment-to-control hazard ratios in a group-by-interval-by-situation numeric array. Groups are active treatment arms or disjoint population subsets. Situations occupy the third, slowest-changing dimension.</p></dd>
+
+
+<dt><code>medianTreatments</code></dt>
+<dd><p>The supplied positive, finite exponential treatment medians in a group-by-interval-by-situation numeric array, or NULL when hazard ratios were supplied directly. Dimensions and names match <code>hazardRatios</code>. These parameterize interval treatment hazards, rather than the medians of the complete piecewise survival distributions.</p></dd>
+
+
+<dt><code>groupType</code></dt>
+<dd><p>The statistical role of the groups: <code>"multi-arm"</code> for active treatment arms sharing a common control, or <code>"enrichment"</code> for disjoint population subsets. Is a single character value.</p></dd>
+
+
+</dl></div>
 
   </main></div>
 

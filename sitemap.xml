@@ -42,6 +42,8 @@
 <url><loc>https://docs.rpact.org/reference/ParameterSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/PerformanceScore.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/PiecewiseSurvivalTime.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/PiecewiseSurvivalTimeEnrichment.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/PiecewiseSurvivalTimeMultiArm.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/PiecewiseSurvivalTimeMultiGroup.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/PlotSettings.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/PowerAndAverageSampleNumberResult.html</loc></url>
@@ -121,9 +123,7 @@
 <url><loc>https://docs.rpact.org/reference/getClosedCombinationTestResults.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getClosedConditionalDunnettTestResults.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getComparison.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/getComparisonData.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getComparisonParameterDescriptions.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/getComparisonParameterInfo.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getComparisonParameterNames.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getComparisonPlotParameters.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getConditionalPower.html</loc></url>
@@ -366,7 +366,6 @@
 <url><loc>https://docs.rpact.org/reference/plot.TrialDesignPlan.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/plot.TrialDesignSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/plot.TrialDesignSummaries.html</loc></url>
-<url><loc>https://docs.rpact.org/reference/plotComparison.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/print.Dataset.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/print.FieldSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/print.FutilityBounds.html</loc></url>

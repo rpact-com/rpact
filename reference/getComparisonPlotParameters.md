@@ -61,7 +61,7 @@ getComparisonPlotParameters(
   value for all y parameters, a vector in their order, or a named vector
   assigning individual parameters. Unspecified named entries remain
   automatic. The same argument is accepted by
-  [`plotComparison()`](https://docs.rpact.org/reference/plotComparison.md).
+  [`plot.TrialComparison()`](https://docs.rpact.org/reference/plot.TrialComparison.md).
 
 ## Value
 
@@ -75,7 +75,7 @@ panel limits. Unresolved selections are NULL. `message` is NULL on
 success, otherwise contains all selection problems. `candidates` lists
 eligible columns for each selection; `issues` contains diagnostic
 metadata used by
-[`plotComparison()`](https://docs.rpact.org/reference/plotComparison.md).
+[`plot.TrialComparison()`](https://docs.rpact.org/reference/plot.TrialComparison.md).
 
 ## Details
 

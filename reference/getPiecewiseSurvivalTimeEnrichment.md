@@ -115,25 +115,44 @@ getPiecewiseSurvivalTimeEnrichment(
 )
 #> Piecewise exponential enrichment survival time
 #> 
-#> 
-#> Treatment medians - Situation 1 (exponential per interval):
-#>                 interval
-#> group            0 - <6 >=6
-#>   markerPositive     18  36
-#>   markerNegative     20  32
-#> 
-#> Hazard ratios - Situation 1:
-#>                 interval
-#> group               0 - <6       >=6
-#>   markerPositive 0.6666667 0.6666667
-#>   markerNegative 0.9000000 0.9375000
 #> Control hazards:
-#>                    0 - <6        >=6
-#> markerPositive 0.05776227 0.02888113
-#> markerNegative 0.03850818 0.02310491
+#>         Group
+#> Interval markerPositive markerNegative
+#>   0 - <6 0.0578         0.0385        
+#>   >=6    0.0289         0.0231        
+#> 
+#> Details:
+#> 
+#> User defined parameters:
+#>   Piecewise survival times : 0.00, 6.00 
 #> 
 #> Control medians (exponential per interval):
-#>                0 - <6 >=6
-#> markerPositive     12  24
-#> markerNegative     18  30
+#>         Group
+#> Interval markerPositive markerNegative
+#>   0 - <6 12.000         18.000        
+#>   >=6    24.000         30.000        
+#> 
+#> Treatment medians - Situation 1 (exponential per interval):
+#>         Group
+#> Interval markerPositive markerNegative
+#>   0 - <6 18.000         20.000        
+#>   >=6    36.000         32.000        
+#> 
+#> Default parameters: not available
+#> 
+#> Generated parameters:
+#> 
+#> Control hazards:
+#>         Group
+#> Interval markerPositive markerNegative
+#>   0 - <6 0.0578         0.0385        
+#>   >=6    0.0289         0.0231        
+#> 
+#> Hazard ratios - Situation 1:
+#>         Group
+#> Interval markerPositive markerNegative
+#>   0 - <6 0.667          0.900         
+#>   >=6    0.667          0.938         
+#>   Group type               : enrichment 
+#> 
 ```

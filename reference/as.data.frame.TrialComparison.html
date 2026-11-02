@@ -75,12 +75,14 @@
 
 
 <dt id="arg-nicecolumnnamesenabled">niceColumnNamesEnabled<a class="anchor" aria-label="anchor" href="#arg-nicecolumnnamesenabled"></a></dt>
-<dd><p>If <code>TRUE</code>, use descriptive column names.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, nice looking column
+names will be used; syntactic names (variable names) otherwise
+(see <code><a href="https://rdrr.io/r/base/make.names.html" class="external-link">make.names</a></code>).</p></dd>
 
 
 <dt id="arg-includeallparameters">includeAllParameters<a class="anchor" aria-label="anchor" href="#arg-includeallparameters"></a></dt>
-<dd><p>If <code>TRUE</code>, include all parameters supported by
-the existing data-frame methods of the individual objects.</p></dd>
+<dd><p>If TRUE, include all parameters in the comparison,
+even if they are constant across all objects. If FALSE, only parameters</p></dd>
 
 
 <dt id="arg-removeconstantparameters">removeConstantParameters<a class="anchor" aria-label="anchor" href="#arg-removeconstantparameters"></a></dt>

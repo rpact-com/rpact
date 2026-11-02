@@ -71,25 +71,25 @@ comparison |> fetch(-1)
 #> Design parameters and output of group sequential design:
 #> 
 #> User defined parameters:
-#>   Maximum number of stages                     : 2 
-#>   Stages                                       : 1, 2 
+#>   Maximum number of stages      : 2 
+#>   Stages                        : 1, 2 
 #> 
 #> Default parameters:
-#>   Type of design                               : O'Brien & Fleming 
-#>   Significance level                           : 0.0250 
-#>   Type II error rate                           : 0.2000 
-#>   Binding futility                             : FALSE 
-#>   Test                                         : one-sided 
-#>   Tolerance                                    : 1e-08 
+#>   Type of design                : O'Brien & Fleming 
+#>   Significance level            : 0.0250 
+#>   Type II error rate            : 0.2000 
+#>   Binding futility              : FALSE 
+#>   Test                          : one-sided 
+#>   Tolerance                     : 1e-08 
 #> 
 #> Derived parameters:
-#>   Information rates                            : 0.500, 1.000 
-#>   Futility bounds (non-binding)                : -Inf 
+#>   Information rates             : 0.500, 1.000 
+#>   Futility bounds (non-binding) : -Inf 
 #> 
 #> Output:
-#>   Cumulative alpha spending                    : 0.002583, 0.025000 
-#>   Critical values                              : 2.797, 1.977 
-#>   Stage levels (one-sided)                     : 0.002583, 0.023996 
+#>   Cumulative alpha spending     : 0.002583, 0.025000 
+#>   Critical values               : 2.797, 1.977 
+#>   Stage levels (one-sided)      : 0.002583, 0.023996 
 #> 
 comparison |> fetch(1:2, output = "list")
 #> $fixed
@@ -98,38 +98,38 @@ comparison |> fetch(1:2, output = "list")
 #> User defined parameters: not available
 #> 
 #> Default parameters:
-#>   Significance level              : 0.0250 
-#>   Type II error rate              : 0.2000 
-#>   Test                            : one-sided 
+#>   Significance level       : 0.0250 
+#>   Type II error rate       : 0.2000 
+#>   Test                     : one-sided 
 #> 
 #> Output:
-#>   Critical values                 : 1.960 
-#>   Stage levels (one-sided)        : 0.0250 
+#>   Critical values          : 1.960 
+#>   Stage levels (one-sided) : 0.0250 
 #> 
 #> 
 #> $sequential
 #> Design parameters and output of group sequential design:
 #> 
 #> User defined parameters:
-#>   Maximum number of stages                     : 2 
-#>   Stages                                       : 1, 2 
+#>   Maximum number of stages      : 2 
+#>   Stages                        : 1, 2 
 #> 
 #> Default parameters:
-#>   Type of design                               : O'Brien & Fleming 
-#>   Significance level                           : 0.0250 
-#>   Type II error rate                           : 0.2000 
-#>   Binding futility                             : FALSE 
-#>   Test                                         : one-sided 
-#>   Tolerance                                    : 1e-08 
+#>   Type of design                : O'Brien & Fleming 
+#>   Significance level            : 0.0250 
+#>   Type II error rate            : 0.2000 
+#>   Binding futility              : FALSE 
+#>   Test                          : one-sided 
+#>   Tolerance                     : 1e-08 
 #> 
 #> Derived parameters:
-#>   Information rates                            : 0.500, 1.000 
-#>   Futility bounds (non-binding)                : -Inf 
+#>   Information rates             : 0.500, 1.000 
+#>   Futility bounds (non-binding) : -Inf 
 #> 
 #> Output:
-#>   Cumulative alpha spending                    : 0.002583, 0.025000 
-#>   Critical values                              : 2.797, 1.977 
-#>   Stage levels (one-sided)                     : 0.002583, 0.023996 
+#>   Cumulative alpha spending     : 0.002583, 0.025000 
+#>   Critical values               : 2.797, 1.977 
+#>   Stage levels (one-sided)      : 0.002583, 0.023996 
 #> 
 #> 
 ```

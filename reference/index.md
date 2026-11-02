@@ -40,12 +40,8 @@
   [`length(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/getComparison.md)
   [`names(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/getComparison.md)
   : Compare Existing Trial Planning Objects
-- [`getComparisonData()`](https://docs.rpact.org/reference/getComparisonData.md)
-  : Get Comparison Data
 - [`getComparisonParameterDescriptions()`](https://docs.rpact.org/reference/getComparisonParameterDescriptions.md)
   : Describe Comparison Parameters
-- [`getComparisonParameterInfo()`](https://docs.rpact.org/reference/getComparisonParameterInfo.md)
-  : Get Comparison Parameter Information
 - [`getComparisonParameterNames()`](https://docs.rpact.org/reference/getComparisonParameterNames.md)
   : Select Comparison Parameters
 - [`getComparisonPlotParameters()`](https://docs.rpact.org/reference/getComparisonPlotParameters.md)
@@ -189,8 +185,6 @@
   : Trial Design Set Plotting
 - [`plot(`*`<TrialDesignSummaries>`*`)`](https://docs.rpact.org/reference/plot.TrialDesignSummaries.md)
   : Plot Trial Design Summaries
-- [`plotComparison()`](https://docs.rpact.org/reference/plotComparison.md)
-  : Plot Comparison Data
 - [`print(`*`<SummaryFactory>`*`)`](https://docs.rpact.org/reference/print.SummaryFactory.md)
   : Summary Factory Printing
 - [`print(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/print.TrialComparison.md)

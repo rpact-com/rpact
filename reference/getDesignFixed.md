@@ -109,13 +109,13 @@ design
 #> User defined parameters: not available
 #> 
 #> Default parameters:
-#>   Significance level              : 0.0250 
-#>   Type II error rate              : 0.2000 
-#>   Test                            : one-sided 
+#>   Significance level       : 0.0250 
+#>   Type II error rate       : 0.2000 
+#>   Test                     : one-sided 
 #> 
 #> Output:
-#>   Critical values                 : 1.960 
-#>   Stage levels (one-sided)        : 0.0250 
+#>   Critical values          : 1.960 
+#>   Stage levels (one-sided) : 0.0250 
 #> 
 
 # Custom significance and power
@@ -124,14 +124,14 @@ design2
 #> Design parameters and output of fixed sample size design:
 #> 
 #> User defined parameters:
-#>   Significance level              : 0.0500 
-#>   Type II error rate              : 0.1000 
+#>   Significance level       : 0.0500 
+#>   Type II error rate       : 0.1000 
 #> 
 #> Default parameters:
-#>   Test                            : one-sided 
+#>   Test                     : one-sided 
 #> 
 #> Output:
-#>   Critical values                 : 1.645 
-#>   Stage levels (one-sided)        : 0.0500 
+#>   Critical values          : 1.645 
+#>   Stage levels (one-sided) : 0.0500 
 #> 
 ```

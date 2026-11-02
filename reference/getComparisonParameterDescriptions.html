@@ -58,8 +58,8 @@ labels. Formatting does not alter the metadata or comparison data.</p>
 
 
 <dl><dt id="arg-parameterinfo">parameterInfo<a class="anchor" aria-label="anchor" href="#arg-parameterinfo"></a></dt>
-<dd><p>A table returned by getComparisonParameterInfo(), or a
-row subset of such a table.</p></dd>
+<dd><p>A comparison parameter metadata table, as available in
+<code>summary(comparison)$parameterInfo</code>, or a row subset of such a table.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -82,10 +82,39 @@ character(). Empty columns are described as empty, not as single-valued.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">info</span> <span class="op">&lt;-</span> <span class="fu"><a href="getComparisonParameterInfo.html">getComparisonParameterInfo</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>effect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="getComparison.html">getComparison</a></span><span class="op">(</span><span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">info</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">)</span><span class="op">$</span><span class="va">parameterInfo</span></span></span>
 <span class="r-in"><span><span class="fu">getComparisonParameterDescriptions</span><span class="op">(</span><span class="va">info</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                           effect </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "effect: numeric, continuous, binary (0.2, 0.3)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                             objectType </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "objectType: character, factor, binary (TrialDesignFixed, TrialDesignGroupSequential)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                               endpoint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                "endpoint: character, factor, single value (Undefined)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                      calculationTarget </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          "calculationTarget: character, factor, single value (Design)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                  alpha </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                     "alpha: numeric, continuous, single value (0.025)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                   beta </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                        "beta: numeric, continuous, single value (0.2)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                  sided </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                         "sided: integer, continuous, single value (1)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                         criticalValues </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                  "criticalValues: numeric, continuous" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                            stageLevels </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                     "stageLevels: numeric, continuous" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                   kMax </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                 "kMax: integer, factor, binary (1, 2)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                           typeOfDesign </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                   "typeOfDesign: character, factor, single value (OF)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                       informationRates </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                             "informationRates: numeric, continuous, binary (0.5, 1.0)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                         futilityBounds </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                             "futilityBounds: numeric, continuous, single value (-Inf)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                        bindingFutility </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                               "bindingFutility: logical, factor, single value (FALSE)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                              tolerance </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                 "tolerance: numeric, continuous, single value (1e-08)" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                             alphaSpent </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   "alphaSpent: numeric, continuous, binary (0.002582893, 0.024999990)" </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

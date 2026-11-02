@@ -1,7 +1,7 @@
 # Select Comparison Parameters
 
-Selects varying parameters, axis candidates, or grouping variables using
-getComparisonParameterInfo(). Column order is retained.
+Selects varying parameters, axis candidates, or grouping variables from
+comparison-data columns. Column order is retained.
 
 ## Usage
 
@@ -21,8 +21,9 @@ getComparisonParameterNames(
 
 - data:
 
-  A data.frame, typically returned by getComparisonData(). Columns must
-  be one-dimensional atomic vectors, including factors and dates.
+  A data.frame, typically obtained with as.data.frame() from a trial
+  comparison. Columns must be one-dimensional atomic vectors, including
+  factors and dates.
 
 - ...:
 
