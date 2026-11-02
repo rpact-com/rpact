@@ -3,12 +3,49 @@
 ## New features
 
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
+* `getSimulationMultiArmSurvival()` and `getSimulationEnrichmentSurvival()` now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument `simulationType` can be used to choose between the new C++ implementation (`"patientWise"`), the previous test-statistic-based approach (`"testStatisticBased"`), and a basic R reference implementation (`"patientWiseBasic"`) intended for validation and testing. The default `"auto"` setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.
+* The new functions `getPiecewiseSurvivalTimeMultiArm()` and `getPiecewiseSurvivalTimeEnrichment()` define piecewise exponential survival distributions for patient-wise multi-arm and enrichment simulations. They support interval-specific hazard ratios and multiple named simulation situations, with a common control-hazard profile across treatment arms for multi-arm designs and subgroup-specific control hazards for enrichment designs. Control and treatment hazards can alternatively be specified through exponential medians for each interval using `medianControl` (multi-arm), `medianControls` (enrichment), and `medianTreatments`; these interval parameters are not the medians of the complete piecewise survival distributions. The new helper `getPiecewiseHazardRatioArray()` combines group-by-interval hazard-ratio matrices into an array of simulation situations. The resulting survival specifications support console and Markdown output, data-frame and matrix conversion, and R-code reconstruction with `getObjectRCode()`.
+* `getDataset()` now supports datasets of general, endpoint-independent estimates through the new `DatasetGeneral` class. Stage-wise estimates and standard errors can be provided using `est` and `se`; degrees of freedom (`df`) are optional and default internally to `Inf`, corresponding to a normal approximation.
 * rpact options can now be configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles; see the new vignette [Hidden rpact Features: Options and Environment Variables](https://www.rpact.org/vignettes/utilities/rpact_hidden_features/).
 * Optimized the display of `criticalValues` and `futilityBounds` for designs with `directionUpper = FALSE`. If the direction of the alternative is already specified when creating a design, e.g., with `getDesignGroupSequential(directionUpper = FALSE)`, the boundaries are now shown in the correct direction, typically as negative values. This also applies to futility bounds generated for beta-spending designs.
+* The new function `getFisherInformation()` can be used to calculate cumulative
+  or stage-wise Fisher information at selected planned analyses for a design
+  plan or simulation results object for means, rates, survival, or count data
+  endpoints. Its typed output can be passed directly to `getFutilityBounds()`,
+  which validates that cumulative or stage-wise information is used as required
+  by the requested conversion. Complete multi-stage and multi-situation output
+  can be piped into `getFutilityBounds()`; the calculation is then carried out
+  separately for every interim stage and planning situation. The print methods
+  identify the target scale, information type, requested analysis stages and,
+  where applicable, the planning situations represented by the values.
+  Trial design plans and simulation results can also be piped directly into
+  `getFutilityBounds()`; the required Fisher information and its cumulative or
+  stage-wise type are then determined internally from the requested target scale.
+* For survival endpoints, the default value of `directionUpper` has changed from `TRUE` to `FALSE`. Accordingly, the default event rates have been adjusted to provide meaningful examples for an alternative in the lower direction: `pi2` (and `piControl`) now defaults to `0.5`, while the sample size default for `pi1` is now `c(0.1, 0.2, 0.3)`; the power and simulation default for `pi1` remains `seq(0.2, 0.5, 0.1)`. One-sided power calculations and simulations issue a warning if `directionUpper` is not specified explicitly, making users aware of the changed default. No warning is issued for sample size calculations because the `directionUpper` argument has only been added to these functions in this version. For sample size calculations, the direction is always derived from the specified alternative; the argument is provided solely to validate that this derived direction is consistent with a `directionUpper` value that may already have been set in the design.
+* `testPackage()` now supports parallel test execution on Windows, Linux, and macOS while retaining its HTML and PDF reports. The new `workers` argument defaults to automatic selection (available CPUs minus two, between one and 16); use `workers = 1` for serial execution. Local test scheduling priorities are respected, and the result includes the worker count and separate timings for unit tests, R basic package tests, and HTML/PDF rendering.
+* Added `getComparison()` and the R6 `TrialComparison` class for comparing designs, design characteristics, sample size and power calculations, and simulations. Named or unnamed objects, nested lists, and existing comparisons can be combined, extended with `add()`, and edited with `delete()`; `getObjects()`, `fetch()`, `$`, and `[[` provide access to the contained objects. Duplicate names are rejected. Compact print and summary output presents shared and differing parameter profiles using descriptive object labels, context-specific captions, and titles, with display limits for large comparisons. Full data-frame conversion, Markdown output, and R-code reconstruction are supported, including stage coordinates for fixed designs and robust numeric type inference. The `plot()` of a `TrialComparison` result supports multiple category columns and y parameters, with automatic or explicit left/right axis assignment through `yAxisSide`. `getComparisonPlotParameters()` previews selections, axis transformations, and diagnostic messages. Comparison axes use context-specific parameter captions for both single and multiple y parameters. Comparison legends use object-aware titles and adaptive category/parameter layouts, with measured wrapping, independent positions, and font reductions limited to ten percent. Automatic legend placement (`legendPosition = "auto"`) is the default across all rpact plots with legends, while manual positions and legacy `NA` behaviour remain available. Comparison operations and package testing provide structured errors through the central error helpers, preserving worker failure details.
 
 ## Improvements, issues, and changes
 
+* Repeated p-values are now unavailable (`NA` with a warning) for sequential designs with user-defined beta spending (`typeBetaSpending = "bsUser"`), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.
+* Replaced direct errors in comparison extraction, comparison plotting, and package testing with the central error helpers, providing specific error categories and structured diagnostic context while preserving worker failure details.
+* On Windows, `testPackage()` now uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.
+* `testPackage()` now runs R basic package tests in a separate R process before starting parallel workers and isolates configuration writes per test process. Worker crashes preserve partial results and are explicitly reported as incomplete execution, with the expected test count from `META`, the full diagnostic log path, and a hint to retry with `workers = 1`. Partial reports cannot claim successful installation qualification.
+* Corrected Weibull hazard ratio conversions for `kappa != 1` in survival planning and simulation, including multi-arm and enrichment simulations. Lambda remains the inverse Weibull scale; the hazard ratio is `(lambda1 / lambda2)^kappa`. Exponential calculations (`kappa = 1`) are unchanged.
+* Expanded the documentation of `typeOfSelection` for multi-arm and enrichment simulations, explaining all five selection rules, their interaction with adaptations and thresholds, and how to drop one worst arm at each interim using a custom selection function (issue [#159](https://github.com/rpact-com/rpact/issues/159)).
+* `getObjectRCode()` now removes duplicate precondition blocks while preserving complete user-defined function bodies and pipe chains.
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
+* Several improvements and refactorings, focusing on enhanced error handling, improved naming conventions, and more consistent function signatures
+* Updates to the documentation
+* In `getSimulationSurvival()`, the early stopping probability ("Early stop") is now displayed stage-wise instead of overall
+* In `getSimulationSurvival()`, `numberOfSubjects1` and `numberOfSubjects2` are no longer shown in the print output (though still available in the result object), and `singleEventsPerStage` is now displayed.
+* Improved naming of variables and class fields: in `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()`, the field `numberOfActiveArms` has been replaced by `numberOfSelectedArms`.
+* Refactored error handling in plotting functions to use more specific internal error functions (`stopIllegalArgument`, `stopMissingArgument`) for clearer and more consistent error messages.
+* Standardized and clarified function signatures for R6 class initializers and S3 methods, improving readability and maintainability. This includes consistent formatting and argument ordering across multiple classes 
+* `getSampleSizeCounts()`: field 'expectedStudyDurationH1' in result object was replaced by 'studyDuration', i.e., 'expectedStudyDurationH1' is deprecated 
+* In all simulation raw data, the `armNumber` column was renamed to `activeArm`
+* For consistency with other result objects, the `direction` field in `getStageResults()` result objects was renamed to `directionUpper`.
+* Error and warning context now identifies diagnostic situations with stable IDs and factual metadata. Authored explanations and corrective instructions are maintained separately by consuming applications; ordinary condition messages remain unchanged.
 
 # rpact 4.4.0
 
@@ -69,7 +106,6 @@
 * Issue [#99](https://github.com/rpact-com/rpact/issues/99) fixed
 * Testing improved, e.g., new helper function `getTestLabel()` introduced
 * Several minor improvements
-
 
 # rpact 4.2.1
 
@@ -553,3 +589,11 @@ note that this is a novel implementation, hence experimental
 # rpact 1.0.0
 
 * First release of rpact
+
+## Optimal conditional error updates
+
+* Applied the constraint-related fixes from optconerrf 1.0.3: bounds now enter
+  the selection between competing conditional error solutions at high conditional
+  power, and infeasible integrated bounds are detected before calibration.
+* Clarified that conditional power functions do not guarantee optimality and
+  that conditional power also limits the conditional error in the continuation region.

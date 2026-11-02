@@ -13,15 +13,15 @@ with suitable arguments to create the multi-arm analysis results of a Fisher com
 \section{Fields}{
 
 \describe{
-\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a logical vector of length 1.}
+\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a single logical value.}
 
-\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
 
-\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
 
 \item{\code{pi1}}{The assumed probability or probabilities in the active treatment group in two-group designs, or the alternative probability for a one-group design.}
 
-\item{\code{pi2}}{The assumed probability in the reference group for two-group designs. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{pi2}}{The assumed probability in the reference group for two-group designs. Is a single numeric value between 0 and 1.}
 
 \item{\code{nPlanned}}{The sample size planned for each of the subsequent stages. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
@@ -31,7 +31,7 @@ with suitable arguments to create the multi-arm analysis results of a Fisher com
 
 \item{\code{piTreatments}}{The assumed rates in the treatment groups for multi-arm and enrichment designs, i.e., designs with multiple subsets.}
 
-\item{\code{intersectionTest}}{The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a character vector of length 1.}
+\item{\code{intersectionTest}}{The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a single character value.}
 
 \item{\code{varianceOption}}{Defines the way to calculate the variance in multiple (i.e., >2) treatment arms or population enrichment designs when testing means. Available options for multiple arms: \code{"overallPooled", "pairwisePooled", "notPooled"}. Available options for enrichment designs: \code{"pooled", "pooledFromFull", "notPooled"}.}
 
@@ -47,11 +47,11 @@ with suitable arguments to create the multi-arm analysis results of a Fisher com
 
 \item{\code{conditionalPowerSimulated}}{The simulated conditional power, under the assumption of observed or assumed effect sizes.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a single numeric value representing a  whole number.}
 
-\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
+\item{\code{seed}}{The seed used for random number generation. Is a single numeric value.}
 
-\item{\code{stratifiedAnalysis}}{For enrichment designs, typically a stratified analysis should be chosen. When testing means and rates, a non-stratified analysis can be performed on overall data. For survival data, only a stratified analysis is possible. Is a logical vector of length 1.}
+\item{\code{stratifiedAnalysis}}{For enrichment designs, typically a stratified analysis should be chosen. When testing means and rates, a non-stratified analysis can be performed on overall data. For survival data, only a stratified analysis is possible. Is a single logical value.}
 }}
 
 \keyword{internal}

@@ -23,8 +23,12 @@ or optimum designs, default is \code{0.20}. Must be a positive numeric of length
 Must be a positive integer of length 1.}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
-only applicable for one-sided testing; default is \code{TRUE}
-which means that larger values of the test statistics yield smaller p-values.}
+only applicable for one-sided testing; \code{TRUE}
+means that larger values of the test statistics yield smaller p-values.
+The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+(power calculations, simulations, and analyses).
+In sample size calculations, the direction is derived from the specified alternative;
+a specified \code{directionUpper} must agree with it.}
 
 \item{twoSidedPower}{For two-sided testing, if \code{twoSidedPower = TRUE} is specified
 the sample size calculation is performed by considering both tails of the distribution.

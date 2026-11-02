@@ -33,7 +33,7 @@ getSimulationSurvival(
   maxNumberOfEventsPerStage = NA_real_,
   conditionalPower = NA_real_,
   thetaH1 = NA_real_,
-  maxNumberOfIterations = 1000L,
+  maxNumberOfIterations = NA_integer_,
   maxNumberOfRawDatasetsPerStage = 0,
   longTimeSimulationAllowed = FALSE,
   seed = NA_real_,
@@ -50,11 +50,12 @@ and \code{sided} can be directly entered as argument where necessary.}
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{thetaH0}{The null hypothesis value,
-default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+default is \code{0} for general estimates, the normal case, and the binary case,
 it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
+\item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
 \item \emph{means}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the mean ratio) can be specified.
 \item \emph{rates}: a value \code{!= 0}
@@ -66,22 +67,29 @@ For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be spe
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
-only applicable for one-sided testing; default is \code{TRUE}
-which means that larger values of the test statistics yield smaller p-values.}
+only applicable for one-sided testing; \code{TRUE}
+means that larger values of the test statistics yield smaller p-values.
+The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+(power calculations, simulations, and analyses).
+In sample size calculations, the direction is derived from the specified alternative;
+a specified \code{directionUpper} must agree with it.}
 
 \item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
 default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
-\code{seq(0.4, 0.6, 0.1)} (sample size calculations).}
+\code{c(0.1, 0.2, 0.3)} (sample size calculations).}
 
-\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
+\item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.5}.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
 \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
-Must be a positive numeric of length 1.}
+Must be a positive numeric value or vector: without \code{piecewiseSurvivalTime}, a vector defines
+alternative hazard rates to be considered; with \code{piecewiseSurvivalTime}, it contains one hazard rate
+per time interval. \code{getEventProbabilities()} uses only the first value of a non-piecewise vector.}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
 \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
-Must be a positive numeric of length 1.}
+Must be a positive numeric of length 1, or a vector with one hazard rate per time interval
+if \code{piecewiseSurvivalTime} is specified.}
 
 \item{median1}{The assumed median survival time in the treatment group, there is no default.}
 
@@ -89,7 +97,8 @@ Must be a positive numeric of length 1.}
 
 \item{hazardRatio}{The vector of hazard ratios under consideration.
 If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
-not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
+not to be specified as it is calculated, there is no default. Must be a positive numeric value or vector;
+\code{getEventProbabilities()} accepts a single value only.}
 
 \item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
 of the shape of the Weibull distribution.
@@ -125,7 +134,9 @@ intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTim
 Must be one of \code{"auto"}, \code{"absolute"}, or \code{"relative"}; default is \code{"auto"},
 i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code{"absolute"}.}
 
-\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
+\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.
+For multi-arm simulations, this can be a vector of length equal to the number of active arms,
+specifying different drop-out rates for each active arm.}
 
 \item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
 
@@ -154,7 +165,9 @@ of events per stage (i.e., not cumulated), the first element is not taken into a
 for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
 It is defined as the power for the subsequent stage given the current data. By default,
 the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
-\code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
+\code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates;
+\code{piTreatmentsH1} and \code{piControlH1} in multi-arm designs, \code{piTreatmentH1} and
+\code{piControlH1} in enrichment designs), or \code{thetaH1} (for simulating
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
 \item{thetaH1}{If specified, the value of the alternative under which
@@ -349,6 +362,24 @@ The value is an \emph{upper bound per stage}, not a fixed count. The actual numb
 }
 
 As a result, the number specified is the \strong{maximum possible} datasets saved \emph{per stage}, not the exact number.
+}
+
+\section{Conditional power under piecewise hazards}{
+
+Conditional power is calculated using a scalar hazard ratio estimated from
+the interim data or specified through \code{thetaH1}. The calculation uses
+a proportional-hazards working model, including when survival times are
+generated from piecewise hazards with interval-specific hazard ratios.
+The interval-specific hazards are not used to project future test-statistic
+drift in this calculation.
+
+Accordingly, \code{conditionalPowerAchieved} reports conditional power under
+the scalar effect assumption for the selected number of events. It is not
+an empirical rejection probability and, when hazard ratios vary over time,
+need not equal the conditional rejection probability under the specified
+piecewise survival model. The default event-number recalculation uses the
+same working model; a custom \code{calcEventsFunction} can define a different
+recalculation rule.
 }
 
 \section{How to get help for generic functions}{

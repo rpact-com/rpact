@@ -17,9 +17,9 @@ with suitable arguments to create it.
 \describe{
 \item{\code{nFixed}}{The sample size in a fixed (one-stage) design. Is a positive numeric vector.}
 
-\item{\code{shift}}{The shift value for group sequential test characteristics. Is a numeric vector of length 1.}
+\item{\code{shift}}{The shift value for group sequential test characteristics. Is a single numeric value.}
 
-\item{\code{inflationFactor}}{The relative increase of maximum sample size in a group sequential design as compared to the fixed sample size case. Is a positive numeric vector of length 1.}
+\item{\code{inflationFactor}}{The relative increase of maximum sample size in a group sequential design as compared to the fixed sample size case. Is a single positive numeric value.}
 
 \item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
@@ -31,11 +31,11 @@ with suitable arguments to create it.
 
 \item{\code{futilityProbabilities}}{The overall probabilities of stopping the trial for futility. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}
 
-\item{\code{averageSampleNumber1}}{The expected sample size under H1. Is a positive numeric vector of length 1.}
+\item{\code{averageSampleNumber1}}{The expected sample size under H1. Is a single positive numeric value.}
 
-\item{\code{averageSampleNumber01}}{The expected sample size for a value between H0 and H1. Is a positive numeric vector of length 1.}
+\item{\code{averageSampleNumber01}}{The expected sample size for a value between H0 and H1. Is a single positive numeric value.}
 
-\item{\code{averageSampleNumber0}}{The expected sample size under H0. Is a positive numeric vector of length 1.}
+\item{\code{averageSampleNumber0}}{The expected sample size under H0. Is a single positive numeric value.}
 }}
 
 \seealso{

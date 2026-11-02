@@ -13,9 +13,9 @@ with suitable arguments to create a conditional Dunnett test design.
 \section{Fields}{
 
 \describe{
-\item{\code{kMax}}{The maximum number of stages \code{K}. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{kMax}}{The maximum number of stages \code{K}. Is a single numeric value representing a  whole number.}
 
-\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a single numeric value between 0 and 1.}
 
 \item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
@@ -29,15 +29,15 @@ with suitable arguments to create a conditional Dunnett test design.
 
 \item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a logical vector of length 1.}
+\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a single logical value.}
 
-\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
+\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a single numeric value.}
 
-\item{\code{informationAtInterim}}{The information to be expected at interim, default is informationAtInterim = 0.5. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{informationAtInterim}}{The information to be expected at interim, default is informationAtInterim = 0.5. Is a single numeric value between 0 and 1.}
 
-\item{\code{secondStageConditioning}}{The way the second stage p-values are calculated within the closed system of hypotheses. If \code{FALSE}, the unconditional adjusted p-values are used, otherwise conditional adjusted p-values are calculated. Is a logical vector of length 1.}
+\item{\code{secondStageConditioning}}{The way the second stage p-values are calculated within the closed system of hypotheses. If \code{FALSE}, the unconditional adjusted p-values are used, otherwise conditional adjusted p-values are calculated. Is a single logical value.}
 
-\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a numeric vector of length 1 containing a whole number.}
+\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a single numeric value representing a  whole number.}
 }}
 
 \seealso{

@@ -19,7 +19,8 @@ Returns \code{NULL} if the specified \code{parameterName} does not exist.
 Returns the parameter type for a given object and parameter name.
 }
 \details{
-This function identifies and returns the type that will be used in print outputs of an rpact result object.
+This function identifies and returns the type that will
+be used in print outputs of an rpact result object.
 }
 \examples{
 \dontrun{

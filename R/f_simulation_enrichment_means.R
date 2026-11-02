@@ -29,8 +29,7 @@ NULL
         overallEffects,
         stDevH1,
         minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage
-        ) {
+        maxNumberOfSubjectsPerStage) {
     stage <- stage - 1 # to be consistent with non-enrichment situation
     gMax <- nrow(overallEffects)
 
@@ -78,7 +77,8 @@ NULL
     return(newSubjects)
 }
 
-.getSimulatedStageMeansEnrichment <- function(...,
+.getSimulatedStageMeansEnrichment <- function(
+        ...,
         design,
         subsets,
         prevalences,
@@ -384,13 +384,13 @@ NULL
                         is.na(newSubjects) ||
                         newSubjects < 0
                     ) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcSubjectsFunction' returned an illegal or undefined result (",
-                        newSubjects,
-                        "); ",
+                    stopIllegalArgument(
+                        "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
                         "the output must be a single numeric value >= 0",
-                        call. = FALSE
+                        functionName = ".getSimulatedStageMeansEnrichment",
+                        parameter = "calcSubjectsFunction",
+                        value = calcSubjectsFunction,
+                        diagnosticId = "simulation.subject_callback_result_invalid"
                     )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
@@ -448,7 +448,7 @@ NULL
 #' @inheritParams param_stDevSimulation
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_enrichment
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_plannedSubjects
 #' @inheritParams param_minNumberOfSubjectsPerStage
@@ -492,6 +492,7 @@ NULL
 #' \code{stDevH1}.
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
+#' @template details_type_of_selection
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'
@@ -499,7 +500,8 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentMeans <- function(design = NULL,
+getSimulationEnrichmentMeans <- function(
+        design = NULL,
         ...,
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
@@ -518,7 +520,7 @@ getSimulationEnrichmentMeans <- function(design = NULL,
         conditionalPower = NA_real_,
         thetaH1 = NA_real_,
         stDevH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectPopulationsFunction = NULL,
@@ -570,7 +572,8 @@ getSimulationEnrichmentMeans <- function(design = NULL,
         calcSubjectsFunction = calcSubjectsFunction, # means + rates only
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
-        endpoint = "means"
+        endpoint = "means",
+        simulationType = "testStatisticBased"
     )
 
     design <- simulationResults$.design
@@ -589,6 +592,7 @@ getSimulationEnrichmentMeans <- function(design = NULL,
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
 
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
@@ -786,6 +790,9 @@ getSimulationEnrichmentMeans <- function(design = NULL,
     simulationResults$selectedPopulations <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedPopulationsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     if (kMax > 1) {
@@ -803,7 +810,10 @@ getSimulationEnrichmentMeans <- function(design = NULL,
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stopRuntimeIssue(
+            "internal error, simulation not possible due to numerical overflow",
+            functionName = "getSimulationEnrichmentMeans"
+        )
     }
 
     data <- data.frame(

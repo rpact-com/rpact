@@ -1,3 +1,3 @@
 #' Field description: n max
-#' @field nMax The maximum sample size. Is a numeric vector of length 1 containing a whole number.
+#' @field nMax The maximum sample size. Is a single numeric value representing a  whole number.
 #' @keywords internal

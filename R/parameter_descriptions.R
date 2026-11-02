@@ -1,5 +1,5 @@
 ## |
-## |  *Parameters*
+## |  *Parameter Descriptions*
 ## |
 ## |  This file is part of the R package rpact:
 ## |  Confirmatory Adaptive Clinical Trial Design and Analysis
@@ -102,6 +102,32 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Design with Default for Multi-Arm Designs
+#' @param design The trial design. If no trial design is specified, a fixed sample size design is used.
+#'   In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
+#'   and \code{sided} can be directly entered as argument where necessary.
+#'   Must be created with \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+#'   \code{\link[=getDesignFisher]{getDesignFisher()}},
+#'   \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}, or
+#'   \code{\link[=getDesignFixed]{getDesignFixed()}};
+#'   designs created with \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} are not supported.
+#' @name param_design_multiarm
+#' @keywords internal
+NULL
+
+#' Parameter Description: Design with Default for Enrichment Designs
+#' @param design The trial design. If no trial design is specified, a fixed sample size design is used.
+#'   In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
+#'   and \code{sided} can be directly entered as argument where necessary.
+#'   Must be created with \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+#'   \code{\link[=getDesignFisher]{getDesignFisher()}}, or
+#'   \code{\link[=getDesignFixed]{getDesignFixed()}};
+#'   designs created with \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} or
+#'   \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}} are not supported.
+#' @name param_design_enrichment
+#' @keywords internal
+NULL
+
 #' Parameter Description: N_max
 #' @param nMax The maximum sample size. Must be a positive integer of length 1.
 #' @name param_nMax
@@ -133,6 +159,13 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Effect Under Alternative
+#' @param estimatedTheta If specified, the value of the alternative under which
+#'   the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.
+#' @name param_estimatedTheta
+#' @keywords internal
+NULL
+
 #' Parameter Description: Standard Deviation
 #' @param stDev The standard deviation under which the sample size or power
 #'   calculation is performed, default is \code{1}.
@@ -146,16 +179,19 @@ NULL
 
 #' Parameter Description: Lambda (1)
 #' @param lambda1 The assumed hazard rate in the treatment group, there is no default.
-#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). 
-#'   Must be a positive numeric of length 1.
+#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
+#'   Must be a positive numeric value or vector: without \code{piecewiseSurvivalTime}, a vector defines
+#'   alternative hazard rates to be considered; with \code{piecewiseSurvivalTime}, it contains one hazard rate
+#'   per time interval. \code{getEventProbabilities()} uses only the first value of a non-piecewise vector.
 #' @name param_lambda1
 #' @keywords internal
 NULL
 
 #' Parameter Description: Lambda (2)
 #' @param lambda2 The assumed hazard rate in the reference group, there is no default.
-#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). 
-#'   Must be a positive numeric of length 1.
+#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
+#'   Must be a positive numeric of length 1, or a vector with one hazard rate per time interval
+#'   if \code{piecewiseSurvivalTime} is specified.
 #' @name param_lambda2
 #' @keywords internal
 NULL
@@ -173,7 +209,7 @@ NULL
 #' Parameter Description: Pi (1) for Survival Data
 #' @param pi1 A numeric value or vector that represents the assumed event rate in the treatment group,
 #'   default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
-#'   \code{seq(0.4, 0.6, 0.1)} (sample size calculations).
+#'   \code{c(0.1, 0.2, 0.3)} (sample size calculations).
 #' @name param_pi1_survival
 #' @keywords internal
 NULL
@@ -186,7 +222,7 @@ NULL
 NULL
 
 #' Parameter Description: Pi (2) for Survival Data
-#' @param pi2 A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.
+#' @param pi2 A numeric value that represents the assumed event rate in the control group, default is \code{0.5}.
 #' @name param_pi2_survival
 #' @keywords internal
 NULL
@@ -206,7 +242,8 @@ NULL
 #' Parameter Description: Hazard Ratio
 #' @param hazardRatio The vector of hazard ratios under consideration.
 #'   If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
-#'   not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.
+#'   not to be specified as it is calculated, there is no default. Must be a positive numeric value or vector;
+#'   \code{getEventProbabilities()} accepts a single value only.
 #' @name param_hazardRatio
 #' @keywords internal
 NULL
@@ -251,6 +288,8 @@ NULL
 
 #' Parameter Description: Dropout Rate (1)
 #' @param dropoutRate1 The assumed drop-out rate in the treatment group, default is \code{0}.
+#'   For multi-arm simulations, this can be a vector of length equal to the number of active arms, 
+#'   specifying different drop-out rates for each active arm.
 #' @name param_dropoutRate1
 #' @keywords internal
 NULL
@@ -314,19 +353,23 @@ NULL
 
 #' Parameter Description: overdispersion for Counts
 #' @param overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution,
-#' default is \code{0}.
+#' default is \code{0}. Must be \code{>= 0}.
 #' @name param_overdispersion_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: fixedExposureTime for Counts
 #' @param fixedExposureTime If specified, the fixed time of exposure per subject for count data, there is no default.
+#'   For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
 #' @name param_fixedExposureTime_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: accrualTime for Counts
 #' @param accrualTime If specified, the assumed accrual time interval(s) for the study, there is no default.
+#'   A single value defines the end of accrual; if a vector is specified, its first value must be \code{0}.
+#'   If \code{followUpTime} is specified, \code{accrualTime} can have at most two elements.
+#'   Required for \code{getSimulationCounts()}.
 #' @name param_accrualTime_counts
 #' @keywords internal
 NULL
@@ -340,6 +383,7 @@ NULL
 #' Parameter Description: followUpTime for Counts
 #' @param followUpTime If specified, the assumed (additional) follow-up time for the study, there is no default.
 #'        The total study duration is \code{accrualTime + followUpTime}.
+#'        For power calculations and simulations, exactly one of \code{fixedExposureTime} and \code{followUpTime} must be specified.
 #' @name param_followUpTime_counts
 #' @keywords internal
 NULL
@@ -366,7 +410,7 @@ NULL
 #'   the combined sample size from both treatment groups if two groups are considered. For survival outcomes,
 #'   it should contain the planned number of additional events.
 #'   For multi-arm designs, it is the per-comparison (combined) sample size.
-#'   For enrichment designs, it is the (combined) sample size for the considered sub-population.
+#'   For enrichment designs, it is the (combined) sample size for the considered subpopulation.
 #' @name param_nPlanned
 #' @keywords internal
 NULL
@@ -392,15 +436,20 @@ NULL
 
 #' Parameter Description: Direction Upper
 #' @param directionUpper Logical. Specifies the direction of the alternative,
-#'   only applicable for one-sided testing; default is \code{TRUE}
-#'   which means that larger values of the test statistics yield smaller p-values.
+#'   only applicable for one-sided testing; \code{TRUE}
+#'   means that larger values of the test statistics yield smaller p-values.
+#'   The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+#'   (power calculations, simulations, and analyses).
+#'   In sample size calculations, the direction is derived from the specified alternative;
+#'   a specified \code{directionUpper} must agree with it.
 #' @name param_directionUpper
 #' @keywords internal
 NULL
 
 #' Parameter Description: Data Input
 #' @param dataInput The summary data used for calculating the test results.
-#'   This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival}
+#'   This is an element of \code{DatasetGeneral}, \code{DatasetMeans},
+#'   \code{DatasetRates}, or \code{DatasetSurvival}
 #'   and should be created with the function \code{\link[=getDataset]{getDataset()}}.
 #'   For more information see \code{\link[=getDataset]{getDataset()}}.
 #' @name param_dataInput
@@ -419,11 +468,12 @@ NULL
 
 #' Parameter Description: Theta H0
 #' @param thetaH0 The null hypothesis value,
-#'   default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+#'   default is \code{0} for general estimates, the normal case, and the binary case,
 #'   it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 #'   For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 #'   That is, in case of (one-sided) testing of
 #'   \itemize{
+#'     \item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
 #'     \item \emph{means}: a value \code{!= 0}
 #'       (or a value \code{!= 1} for testing the mean ratio) can be specified.
 #'     \item \emph{rates}: a value \code{!= 0}
@@ -437,23 +487,33 @@ NULL
 #' @keywords internal
 NULL
 
-#' Parameter Description: Legend Position On Plots
-#' @param legendPosition The position of the legend.
-#'   By default (\code{NA_integer_}) the algorithm tries to find a suitable position.
-#'   Choose one of the following values to specify the position manually:
+#'
+#' @title
+#' Parameter Description: Legend Position on Plots
+#'
+#' @description
+#' Controls automatic or explicit placement of plot legends.
+#'
+#' @param legendPosition The legend position. The default, `"auto"`, measures the
+#'   legend and chooses among six inside positions by minimizing overlap with
+#'   points, line segments, reference lines, bars, boxes, and error bars.
+#'   Long labels are wrapped and entries arranged vertically in automatic mode.
+#'   Oversized legends and faceted plots use the outside right position.
+#'   This heuristic uses the current graphics device (seven inches square when
+#'   no device is open); resizing may require recreating the plot or setting a
+#'   position explicitly. Manual positions are:
 #'   \itemize{
-#'     \item \code{-1}: no legend will be shown
-#'     \item \code{NA}: the algorithm tries to find a suitable position
-#'     \item \code{0}: legend position outside plot
-#'     \item \code{1}: legend position left top
-#'     \item \code{2}: legend position left center
-#'     \item \code{3}: legend position left bottom
-#'     \item \code{4}: legend position right top
-#'     \item \code{5}: legend position right center
-#'     \item \code{6}: legend position right bottom
+#'     \item `-1` or `"none"`: hide the legend
+#'     \item `"left"`, `"right"`, `"bottom"`, `"top"`: outside the plot
+#'     \item `0`: default outside position with a square aspect ratio
+#'     \item `1`, `2`, `3`: inside left, at the top, centre, or bottom
+#'     \item `4`, `5`, `6`: inside right, at the top, centre, or bottom
+#'     \item `NA`: retain the legacy plot-specific positioning rules
 #'   }
+#'
 #' @name param_legendPosition
 #' @keywords internal
+#'
 NULL
 
 #' Parameter Description: Grid (Output Specification Of Multiple Plots)
@@ -544,7 +604,9 @@ NULL
 #'   for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
 #'   It is defined as the power for the subsequent stage given the current data. By default,
 #'   the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
-#'   \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
+#'   \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates;
+#'   \code{piTreatmentsH1} and \code{piControlH1} in multi-arm designs, \code{piTreatmentH1} and
+#'   \code{piControlH1} in enrichment designs), or \code{thetaH1} (for simulating
 #'   hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.
 #' @name param_conditionalPowerSimulation
 #' @keywords internal
@@ -720,13 +782,17 @@ NULL
 NULL
 
 #' Parameter Description: Type of Selection
-#' @param typeOfSelection The way the treatment arms or populations are selected at interim.
-#'   Five options are available: \code{"best"}, \code{"rbest"}, \code{"epsilon"}, \code{"all"}, and \code{"userDefined"},
-#'   default is \code{"best"}.\cr
-#'   For \code{"rbest"} (select the \code{rValue} best treatment arms/populations), the parameter \code{rValue} has to be specified,
-#'   for \code{"epsilon"} (select treatment arm/population not worse than epsilon compared to the best), the parameter
-#'   \code{epsilonValue} has to be specified.
-#'   If \code{"userDefined"} is selected, \code{"selectArmsFunction"} or \code{"selectPopulationsFunction"} has to be specified.
+#' @param typeOfSelection Rule for selecting treatment arms (multi-arm designs) or
+#'   populations (enrichment designs) for continuation after an interim analysis.
+#'   The default \code{"best"} selects only the single best arm or population;
+#'   \code{"rBest"} (also accepted as \code{"rbest"}) selects the best \code{rValue};
+#'   \code{"epsilon"} selects those within \code{epsilonValue} of the best;
+#'   \code{"all"} retains all remaining arms or populations; and
+#'   \code{"userDefined"} applies \code{selectArmsFunction} or
+#'   \code{selectPopulationsFunction}. Selection is applied at interims with
+#'   \code{adaptations = TRUE}. See the section \emph{Treatment arm and population
+#'   selection} for details and an example of gradual elimination.
+#' @template details_type_of_selection
 #' @name param_typeOfSelection
 #' @keywords internal
 NULL
@@ -756,9 +822,20 @@ NULL
 NULL
 
 #' Parameter Description: Effect Matrix
-#' @param effectMatrix Matrix of effect sizes with \code{activeArms} columns and number of rows
-#'   reflecting the different situations to consider.
+#' @param effectMatrix Matrix of effect sizes with \code{activeArms} columns and one or more rows,
+#'   where each row represents a different situation to consider.
 #' @name param_effectMatrix
+#' @keywords internal
+NULL
+
+#' Parameter Description: Piecewise Multi-Arm Survival Time
+#' @param piecewiseSurvivalTime A \code{PiecewiseSurvivalTimeMultiArm} object
+#'   created by \code{getPiecewiseSurvivalTimeMultiArm()}. It specifies common
+#'   interval start times, the control hazard in every interval, and an
+#'   active-arm-by-interval hazard-ratio matrix for every situation. It can
+#'   only be used for patient-wise simulation with \code{kappa = 1}, and cannot
+#'   be combined with \code{piControl} or \code{effectMatrix}.
+#' @name param_piecewiseSurvivalTime_multiarm
 #' @keywords internal
 NULL
 
@@ -769,8 +846,23 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Effect List for Enrichment Survival
+#' @param effectList List of subsets, prevalences, and effect sizes with columns
+#'   and number of rows reflecting the different situations to consider (see
+#'   examples). For a piecewise exponential patient-wise survival simulation,
+#'   specify
+#'   \code{subGroups}, \code{prevalences}, and \code{piecewiseSurvivalTime},
+#'   where the latter is a \code{PiecewiseSurvivalTimeEnrichment} object created
+#'   by \code{getPiecewiseSurvivalTimeEnrichment()}. Its subgroup names and the
+#'   order of \code{subGroups} must agree. In this case, do not also specify
+#'   \code{piControls}, \code{piTreatments}, or \code{hazardRatios}.
+#' @name param_effectList_enrichment_survival
+#' @keywords internal
+NULL
+
 #' Parameter Description: Active Arms
 #' @param activeArms The number of active treatment arms to be compared with control, default is \code{3}.
+#'   Must not exceed \code{8}.
 #' @name param_activeArms
 #' @keywords internal
 NULL
@@ -954,8 +1046,46 @@ NULL
 
 #' Parameter Description: Planned Calendar Time
 #' @param plannedCalendarTime For simulating count data, the time points where an analysis is planned to be performed.
-#'     Should be a vector of length \code{kMax}
+#'     Required for group sequential designs as a vector of length \code{kMax}; ignored for a fixed design.
 #' @name param_plannedCalendarTime
+#' @keywords internal
+NULL
+
+#' Parameter Description: Simulation Type
+#' @param simulationType Character value specifying the simulation approach:
+#' \code{"auto"}, \code{"patientWise"}, \code{"testStatisticBased"}, or
+#' \code{"patientWiseBasic"}.
+#' If \code{"auto"} is specified, the simulation type is selected automatically based on
+#' the explicitly specified arguments. If patient-wise-specific arguments such as
+#' \code{eventTime}, \code{accrualTime}, \code{accrualIntensity}, \code{dropoutRate1},
+#' \code{dropoutRate2}, \code{dropoutTime}, \code{maxNumberOfSubjects}, or \code{kappa}
+#' are provided, patient-wise simulation is used; otherwise the test-statistic-based
+#' simulation is used for backward compatibility.
+#' @name param_simulationType_enrichment_survival
+#' @keywords internal
+NULL
+
+#' Parameter Description: Simulation Type
+#' @param simulationType Character value specifying the simulation approach:
+#' \code{"auto"}, \code{"patientWise"}, \code{"testStatisticBased"}, or
+#' \code{"patientWiseBasic"}.
+#' If \code{"auto"} is specified, the simulation type is selected automatically based on
+#' the explicitly specified arguments. If patient-wise-specific arguments such as
+#' \code{piControl}, \code{eventTime}, \code{accrualTime}, \code{accrualIntensity},
+#' \code{accrualIntensityType}, \code{dropoutRate1}, \code{dropoutRate2},
+#' \code{dropoutTime}, \code{maxNumberOfSubjects}, or \code{kappa} are provided,
+#' a patient-wise simulation approach is used; otherwise the test-statistic-based
+#' simulation is used for backward compatibility.
+#' @name param_simulationType_multiarm_survival
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum Number of Raw Datasets Per Stage
+#' @param maxNumberOfRawDatasetsPerStage The maximum number of patient-level datasets
+#'     to retain for each scenario and stopping stage. The default is \code{0}, which
+#'     retains no patient-level data. Use \code{\link[=getRawData]{getRawData()}} to
+#'     retrieve retained datasets.
+#' @name param_maxNumberOfRawDatasetsPerStage
 #' @keywords internal
 NULL
 
@@ -963,7 +1093,281 @@ NULL
 #' @param twoSidedPower For two-sided testing, if \code{twoSidedPower = TRUE} is specified
 #'     the sample size calculation is performed by considering both tails of the distribution.
 #'     Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
-#'     should be directed to one part.#' 
+#'     should be directed to one part.#'
 #' @name param_twoSidedPower
+#' @keywords internal
+NULL
+
+#' Parameter Description: Correlation Computation
+#' @param correlationComputation If \code{correlationComputation = "alternative"},
+#'        for simulating log-rank statistics in the many-to-one design, a correlation
+#'        matrix according to Deng et al. (Biometrics, 2019) accounting for the
+#'        respective alternative is used;
+#'        if \code{correlationComputation = "null"}, a constant correlation matrix valid
+#'        under the null, i.e., not accounting for the alternative is used,
+#'        default is \code{"alternative"}.
+#' @name param_correlationComputation
+#' @keywords internal
+NULL
+
+#' Parameter Description: Pi Control
+#' @param piControl The assumed event probability in the control arm by \code{eventTime}, default is \code{0.5}.
+#'   If specified and \code{simulationType = "auto"}, the patient-wise simulation is used, which requires
+#'   \code{maxNumberOfSubjects} or an absolute \code{accrualIntensity}.
+#' @name param_piControl
+#' @keywords internal
+NULL
+
+#' Parameter Description: Omega Max Vector
+#' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
+#'        \code{"sigmoidEmax"} model, default is \code{seq(1, 0.4, -0.2)}.
+#' @name param_omegaMaxVector
+#' @keywords internal
+NULL
+
+##
+## Optimal Conditional Error Function
+##
+
+#' Parameter Description: Overall Type I Error Rate (optimal conditional error design)
+#' @param alpha
+#' The overall type I error rate \eqn{\alpha} of the design. Must be a numeric value between 0 and 1.
+#' @name param_alphaOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: (Conditional) Type I Error Rate (optimal conditional error design)
+#' @param alpha
+#' The (conditional) type I error rate of the design. Must be a numeric vector with values between 0 and 1.
+#' @name param_alphaGenericOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Futility boundary (optimal conditional error design)
+#' @param futilityBounds
+#' Binding stage 1 futility boundary \eqn{\alpha_0} (p-value scale). Must be a numeric value between 0 and 1. Should be greater than \code{efficacyBounds}. Specify \code{futilityBounds=1} to disable early stopping for futility.
+#' @name param_futilityBoundsOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Efficacy boundary (optimal conditional error design)
+#' @param efficacyBounds
+#' Stage 1 efficacy boundary \eqn{\alpha_1} (p-value scale). Must be a numeric value between 0 and 1. Should be smaller than \code{futilityBounds}.
+#' @name param_efficacyBoundsOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Alternative (optimal conditional error design)
+#' @param theta
+#' Finite numeric vector of assumed treatment effects on the mean difference scale.
+#' @name param_thetaOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Monotonisation argument (optimal conditional error design)
+#' @param argument
+#' The argument in which the function should be monotonised, given as a character.
+#' @name param_argumentOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Conditional Power (optimal conditional error design)
+#' @param conditionalPower
+#' The target conditional power \eqn{CP} of the design. Must be a numeric scalar strictly between 0 and 1. Takes precedence over \code{conditionalPowerFunction}.
+#' @name param_conditionalPowerOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Conditional Power Function (optimal conditional error design)
+#' @param conditionalPowerFunction
+#' A function accepting a single first-stage p-value and returning a numeric scalar strictly between 0 and 1. The function is evaluated separately for each p-value. This function should not be increasing in the first-stage p-value, otherwise monotonicity issues may occur. With a conditional power function, the resulting conditional error function is not necessarily optimal for expected second-stage information.
+#' @name param_conditionalPowerFunctionOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Integration Constant (optimal conditional error design)
+#' @param constant
+#' Current value of the level constant for the optimal conditional error function, internally used as integral argument.
+#' @name param_constantOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Planning effect (optimal conditional error design)
+#' @param thetaH1
+#' Fixed effect assumption at which the conditional power should be achieved, expressed on the mean difference scale. Is only used if \code{useInterimEstimate=FALSE}. Must be a numeric value greater than 0.
+#' @name param_thetaH1OCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum planning effect (optimal conditional error design)
+#' @param maxThetaH1
+#' The maximum for an interim estimate of the treatment effect, specified on the mean difference scale. If the interim estimate (on the mean difference scale) yields a value larger than \code{maxThetaH1}, \code{maxThetaH1} is used for it. Is only used if \code{useInterimEstimate=TRUE}. Must be a numeric value. Default value is \code{Inf}, i.e., no upper restriction.
+#' @name param_maxThetaH1OCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Minimum planning effect (optimal conditional error design)
+#' @param minThetaH1
+#' The minimum for an interim estimate of the treatment effect, specified on the mean difference scale. If the interim estimate (on the mean difference scale) yields a value smaller than \code{minThetaH1}, \code{minThetaH1} is used for it. Is only used if \code{useInterimEstimate=TRUE}. Must be a numeric value.
+#' @name param_minThetaH1OCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Design Object (optimal conditional error design)
+#' @param design
+#' An object of class \code{TrialDesignOptimalConditionalError} created by \code{getDesignOptimalConditionalError()}. Contains all necessary arguments to calculate the optimal conditional error function for the specified case.
+#' @name param_designOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Enforce Monotonicity (optimal conditional error design)
+#' @param enforceMonotonicity
+#' Logical. Determines whether or not the optimal conditional error function should automatically be modified to be non-increasing. Default is \code{TRUE}.
+#' @name param_enforceMonotonicityOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: epsilon (optimal conditional error design)
+#' @param epsilon
+#' Maximum allowed difference between the initial and monotone integral. Must be a numeric value. Default 10^-5.
+#' @name param_epsilonOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: First-stage information (optimal conditional error design)
+#' @param firstStageInformation
+#' Information of the first stage of the trial. Must be a positive numeric value.
+#' @name param_firstStageInformationOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Integration first-stage p-value (optimal conditional error design)
+#' @param pValue
+#' First-stage p-value, internally used as integral argument.
+#' @name param_pValueIntegralOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: First-stage p-value (optimal conditional error design)
+#' @param pValue
+#' First-stage p-value or p-values. Must be a numeric vector between 0 and 1.
+#' @name param_pValueOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Function to be made monotone (optimal conditional error design)
+#' @param fun
+#' The function to be made monotone.
+#' @name param_funOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum for level constant search interval (optimal conditional error design)
+#' @param maxLevelConstant
+#' The maximum of the interval on which the value for the level constant should be searched. Default value is 10.
+#' @name param_maxLevelConstantOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Minimum for level constant search interval (optimal conditional error design)
+#' @param minLevelConstant
+#' The minimum of the interval on which the value for the level constant should be searched. Default value is 0.
+#' @name param_minLevelConstantOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Likelihood ratio distribution for expected information (optimal conditional error design)
+#' @param likelihoodRatioDistribution
+#' The distribution to be used for the effect size of the likelihood ratio in the calculation of the expected second-stage information. Options are \code{"fixed", "normal", "exp", "unif"} for fixed effect size, normally distributed, exponentially distributed, and uniformly distributed prior of the effect size, respectively.
+#' Each case requires different additional specifications: \cr
+#' \itemize{
+#' \item \code{likelihoodRatioDistribution="fixed"} uses one (or more) fixed effect sizes for the likelihood ratio and requires the parameter \code{thetaLR} which provides the mean difference under which to calculate the likelihood ratio. If \code{thetaLR} contains multiple values, they may be weighted using an additional argument \code{weightsLR}. Omitting \code{weightsLR} automatically leads to equal weighting.
+#' \item \code{likelihoodRatioDistribution="normal"} uses a normal prior for the effect size and requires parameters \code{thetaLR} and \code{stDevLR} for the mean and standard deviation of the normal distribution (both on mean difference scale).
+#' \item \code{likelihoodRatioDistribution="exp"} uses an exponential prior for the effect size and requires the parameter \code{kappaLR} which specifies the rate on the non-centrality scale divided by \code{sqrt(firstStageInformation)}. The mean effect on the mean difference scale is \code{1 / (kappaLR * firstStageInformation)}.
+#' \item \code{likelihoodRatioDistribution="unif"} uses a uniform prior for the effect size and requires the specification of \code{maxThetaLR}, which is the maximum of the support for the uniform likelihood ratio distribution (on the mean difference scale).
+#' }
+#' The default is \code{likelihoodRatioDistribution=NULL}.
+#' In this case, the likelihood ratio distribution under which the expected second-stage information is calculated is taken directly from the design object.
+#' @name param_likelihoodRatioDistributionExpectedOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Likelihood ratio distribution for minimisation (optimal conditional error design)
+#' @param likelihoodRatioDistribution
+#' The distribution to be used for the effect size of the likelihood ratio in the optimal conditional error function. Options are \code{"fixed", "normal", "exp", "unif", "maxlr"} for fixed effect size, normally distributed, exponentially distributed, uniformly distributed prior of the effect size and maximum likelihood ratio, respectively.
+#' Each case requires different additional specifications: \cr
+#' \itemize{
+#' \item \code{likelihoodRatioDistribution="fixed"} uses one (or more) fixed effect sizes for the likelihood ratio and requires the parameter \code{thetaLR} which provides the mean difference under which to calculate the likelihood ratio. If \code{thetaLR} contains multiple values, they may be weighted using an additional argument \code{weightsLR}. Omitting \code{weightsLR} automatically leads to equal weighting.
+#' \item \code{likelihoodRatioDistribution="normal"} uses a normal prior for the effect size and requires parameters \code{thetaLR} and \code{stDevLR} for the mean and standard deviation of the normal distribution (both on mean difference scale).
+#' \item \code{likelihoodRatioDistribution="exp"} uses an exponential prior for the effect size and requires the parameter \code{kappaLR} which specifies the rate on the non-centrality scale divided by \code{sqrt(firstStageInformation)}. The mean effect on the mean difference scale is \code{1 / (kappaLR * firstStageInformation)}.
+#' \item \code{likelihoodRatioDistribution="unif"} uses a uniform prior for the effect size and requires the specification of \code{maxThetaLR}, which is the maximum of the support for the uniform likelihood ratio distribution (on the mean difference scale).
+#' \item \code{likelihoodRatioDistribution="maxlr"} estimates the non-centrality parameter to be used for the likelihood ratio from the data. No additional parameters must be specified.
+#' }
+#' @name param_likelihoodRatioDistributionOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Lower limit of monotonisation interval (optimal conditional error design)
+#' @param lower
+#' The lower limit of the interval on which the function should be monotonised. Must be a numeric value.
+#' @name param_lowerOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum conditional error (optimal conditional error design)
+#' @param maxConditionalError
+#' Upper boundary for the optimal conditional error function. Default value is 1, however, the optimal conditional error function is inherently bounded by the conditional power.
+#' @name param_maxConditionalErrorOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Maximum second-stage information (optimal conditional error design)
+#' @param maxInformationPerStage
+#' The maximum additional information allowed in stage two. A single numeric value; does not apply to firstStageInformation. Default value is \code{Inf}, i.e., no restriction.
+#' @name param_maxInformationPerStageOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Minimum conditional error (optimal conditional error design)
+#' @param minConditionalError
+#' Lower boundary for the optimal conditional error function. Default 0 (no restriction).
+#' @name param_minConditionalErrorOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Minimum second-stage information (optimal conditional error design)
+#' @param minInformationPerStage
+#' The minimum additional information allowed in stage two. A single numeric value; does not apply to firstStageInformation. Default value is \code{0}, i.e., no restriction.
+#' @name param_minInformationPerStageOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Number of steps for checking monotonicity (optimal conditional error design)
+#' @param gridSize
+#' The number of steps to be taken when checking the function for monotonicity. Must be a numeric value. Default 10^4.
+#' @name param_gridSizeOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Max. iterations to determine Q (optimal conditional error design)
+#' @param maxIterations
+#' Maximum number of iterations allowed to determine each value of q. Must be a numeric value. Default 10^4.
+#' @name param_maxIterationsOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Upper limit of monotonisation interval (optimal conditional error design)
+#' @param upper
+#' The upper limit of the interval on which the function should be monotonised.
+#' @name param_upperOCEF
+#' @keywords internal
+NULL
+
+#' Parameter Description: Use Interim Estimate (optimal conditional error design)
+#' @param useInterimEstimate
+#' Logical. Defines whether or not an interim estimate should be used for conditional power.
+#' If \code{TRUE}, a lower cut-off for the interim estimate must be specified by \code{minThetaH1} or \code{minNonCentralityParameterH1}. An upper cut-off may also
+#' be specified by \code{maxThetaH1} or \code{maxNonCentralityParameterH1}. If \code{FALSE}, the fixed effect size must be specified by \code{thetaH1} or \code{nonCentralityParameterH1}.
+#' @name param_useInterimEstimateOCEF
 #' @keywords internal
 NULL

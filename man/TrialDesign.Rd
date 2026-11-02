@@ -18,9 +18,9 @@ Basic class for trial designs.
 \section{Fields}{
 
 \describe{
-\item{\code{kMax}}{The maximum number of stages \code{K}. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{kMax}}{The maximum number of stages \code{K}. Is a single numeric value representing a  whole number.}
 
-\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a single numeric value between 0 and 1.}
 
 \item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
@@ -34,9 +34,9 @@ Basic class for trial designs.
 
 \item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a logical vector of length 1.}
+\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a single logical value.}
 
-\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
+\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a single numeric value.}
 }}
 
 \keyword{internal}

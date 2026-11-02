@@ -37,6 +37,7 @@
 #' \code{StageResults} is the basic class for
 #' \itemize{
 #'   \item \code{\link{StageResultsMeans}},
+#'   \item \code{\link{StageResultsGeneral}},
 #'   \item \code{\link{StageResultsRates}},
 #'   \item \code{\link{StageResultsSurvival}},
 #'   \item \code{\link{StageResultsMultiArmMeans}},
@@ -70,22 +71,24 @@ StageResults <- R6::R6Class("StageResults",
         weightsFisher = NULL,
         weightsInverseNormal = NULL,
         thetaH0 = NULL,
-        direction = NULL,
-        initialize = function(...,
+        directionUpper = NULL,
+        initialize = function(
+                ...,
                 stage = NULL,
                 stages = NULL,
                 pValues = NULL,
                 weightsFisher = NULL,
                 weightsInverseNormal = NULL,
                 thetaH0 = NULL,
-                direction = NULL) {
+                directionUpper = NULL
+                ) {
             self$stage <- stage
             self$stages <- stages
             self$pValues <- pValues
             self$weightsFisher <- weightsFisher
             self$weightsInverseNormal <- weightsInverseNormal
             self$thetaH0 <- thetaH0
-            self$direction <- direction
+            self$directionUpper <- directionUpper
             super$initialize(...)
         },
         init = function(design, dataInput) {
@@ -107,11 +110,13 @@ StageResults <- R6::R6Class("StageResults",
             self$.setParameterType("pValues", ifelse(
                 self$.isMultiArm(), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED
             ))
+            thetaH0Default <- ifelse(
+                self$isDatasetMeans(), C_THETA_H0_MEANS_DEFAULT,
+                ifelse(self$isDatasetRates(), C_THETA_H0_RATES_DEFAULT, C_THETA_H0_SURVIVAL_DEFAULT)
+            )
             self$.setParameterType("thetaH0", ifelse(
-                isTRUE(all.equal(self$thetaH0, C_THETA_H0_MEANS_DEFAULT)), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-            ))
-            self$.setParameterType("direction", ifelse(
-                identical(self$direction, C_DIRECTION_UPPER), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                equals(self$thetaH0, thetaH0Default), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         getPlotSettings = function() {
@@ -143,7 +148,7 @@ StageResults <- R6::R6Class("StageResults",
 
                 if (grepl("Enrichment", .getClassName(self))) {
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  S: subpopulation\n"), consoleOutputEnabled = consoleOutputEnabled)
                     self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                 } else if (grepl("MultiArm", .getClassName(self))) {
                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
@@ -159,9 +164,6 @@ StageResults <- R6::R6Class("StageResults",
                     self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
             }
-        },
-        isDirectionUpper = function() {
-            return(self$direction == C_DIRECTION_UPPER)
         },
         .isMultiArm = function() {
             return(grepl("multi", tolower(.getClassName(self))))
@@ -192,7 +194,9 @@ StageResults <- R6::R6Class("StageResults",
                 s <- paste(s, "enrichment")
             }
 
-            if (grepl("Means", .getClassName(self))) {
+            if (grepl("General", .getClassName(self))) {
+                s <- paste(s, "general estimates")
+            } else if (grepl("Means", .getClassName(self))) {
                 s <- paste(s, "means")
             }
 
@@ -225,6 +229,9 @@ StageResults <- R6::R6Class("StageResults",
         isDatasetMeans = function() {
             return(self$.dataInput$isDatasetMeans())
         },
+        isDatasetGeneral = function() {
+            return(self$.dataInput$isDatasetGeneral())
+        },
         isDatasetRates = function() {
             return(self$.dataInput$isDatasetRates())
         },
@@ -253,6 +260,82 @@ StageResults <- R6::R6Class("StageResults",
 )
 
 #'
+#' @name StageResultsGeneral
+#'
+#' @title Stage Results of General Estimates
+#'
+#' @description
+#' Class for stage results calculated from endpoint-independent estimates,
+#' standard errors, and degrees of freedom.
+#'
+#' @keywords internal
+#'
+StageResultsGeneral <- R6::R6Class("StageResultsGeneral",
+    inherit = StageResults,
+    public = list(
+        combInverseNormal = NULL,
+        combFisher = NULL,
+        overallTestStatistics = NULL,
+        overallPValues = NULL,
+        effectSizes = NULL,
+        testStatistics = NULL,
+        overallEstimates = NULL,
+        overallStandardErrors = NULL,
+        overallDegreesOfFreedom = NULL,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
+                combInverseNormal = NULL,
+                combFisher = NULL,
+                overallTestStatistics = NULL,
+                overallPValues = NULL,
+                effectSizes = NULL,
+                testStatistics = NULL,
+                overallEstimates = NULL,
+                overallStandardErrors = NULL,
+                overallDegreesOfFreedom = NULL) {
+            super$initialize(.design = design, .dataInput = dataInput, ...)
+
+            self$combInverseNormal <- combInverseNormal
+            self$combFisher <- combFisher
+            self$overallTestStatistics <- overallTestStatistics
+            self$overallPValues <- overallPValues
+            self$effectSizes <- effectSizes
+            self$testStatistics <- testStatistics
+            self$overallEstimates <- overallEstimates
+            self$overallStandardErrors <- overallStandardErrors
+            self$overallDegreesOfFreedom <- overallDegreesOfFreedom
+
+            self$init(design = design, dataInput = dataInput)
+
+            for (parameterName in self$.getParametersToShow()) {
+                self$.setParameterType(parameterName, C_PARAM_GENERATED)
+            }
+        },
+        .getParametersToShow = function() {
+            parametersToShow <- c(
+                "stages",
+                "overallTestStatistics",
+                "overallPValues",
+                "overallEstimates",
+                "overallStandardErrors",
+                "overallDegreesOfFreedom",
+                "testStatistics",
+                "pValues",
+                "effectSizes"
+            )
+            if (.isTrialDesignInverseNormal(self$.design)) {
+                parametersToShow <- c(parametersToShow, "combInverseNormal", "weightsInverseNormal")
+            } else if (.isTrialDesignFisher(self$.design)) {
+                parametersToShow <- c(parametersToShow, "combFisher", "weightsFisher")
+            }
+            return(c(parametersToShow, "thetaH0", "directionUpper"))
+        }
+    )
+)
+
+#'
 #' @name StageResultsMeans
 #'
 #' @title
@@ -268,6 +351,7 @@ StageResults <- R6::R6Class("StageResults",
 #' @template field_overallPValues
 #' @template field_effectSizes
 #' @template field_testActions
+#' @template field_directionUpper
 #' @template field_direction
 #' @template field_normalApproximation
 #' @template field_equalVariances
@@ -310,8 +394,10 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
         overallSampleSizes2 = NULL,
         equalVariances = NULL,
         normalApproximation = NULL,
-        initialize = function(design,
-                dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -362,7 +448,7 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -420,7 +506,7 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation"
             )
             if (self$.dataInput$getNumberOfGroups() == 2) {
@@ -496,8 +582,10 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
         varianceOption = NULL,
         normalApproximation = NULL,
         directionUpper = NULL,
-        initialize = function(design,
-                dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -541,7 +629,7 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -563,7 +651,7 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
             parametersToShow <- c(
                 "stages",
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation",
                 "directionUpper",
                 "varianceOption",
@@ -610,6 +698,7 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
 #' @template field_pValues
 #' @template field_overallPValues
 #' @template field_effectSizes
+#' @template field_directionUpper
 #' @template field_direction
 #' @template field_testActions
 #' @template field_thetaH0
@@ -651,7 +740,10 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
         overallSampleSizes1 = NULL,
         overallSampleSizes2 = NULL,
         normalApproximation = NULL,
-        initialize = function(design, dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -698,7 +790,7 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -757,7 +849,7 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation"
             )
             return(parametersToShow)
@@ -824,8 +916,10 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
         intersectionTest = NULL,
         normalApproximation = NULL,
         directionUpper = NULL,
-        initialize = function(design,
-                dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 overallPiTreatments = NULL,
                 overallPiControl = NULL,
                 combInverseNormal = NULL,
@@ -868,7 +962,7 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -886,7 +980,7 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
             parametersToShow <- c(
                 "stages",
                 "thetaH0",
-                "direction",
+                "directionUpper",
                 "normalApproximation",
                 "directionUpper",
                 "overallPiControl",
@@ -970,7 +1064,10 @@ StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
         events = NULL,
         allocationRatios = NULL,
         testStatistics = NULL,
-        initialize = function(design, dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallPValues = NULL,
@@ -1006,7 +1103,7 @@ StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
@@ -1041,7 +1138,7 @@ StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
             parametersToShow <- c(
                 parametersToShow,
                 "thetaH0",
-                "direction"
+                "directionUpper"
             )
             return(parametersToShow)
         }
@@ -1103,7 +1200,10 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
         singleStepAdjustedPValues = NULL,
         intersectionTest = NULL,
         directionUpper = NULL,
-        initialize = function(design, dataInput, ...,
+        initialize = function(
+                design,
+                dataInput,
+                ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -1140,13 +1240,13 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
             }
 
             for (param in self$.getParametersToShow()) {
-                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                if (self$isUndefinedParameter(param)) {
                     self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
 
             self$.setParameterType("directionUpper", ifelse(
-                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT),
+                identical(self$directionUpper, C_DIRECTION_UPPER_SURVIVAL_DEFAULT),
                 C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
@@ -1154,7 +1254,6 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
             parametersToShow <- c(
                 "stages",
                 "thetaH0",
-                "direction",
                 "directionUpper",
                 "intersectionTest",
                 "overallTestStatistics",
@@ -1362,9 +1461,14 @@ names.StageResults <- function(x) {
 #'
 #' @keywords internal
 #'
-as.data.frame.StageResults <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE,
-        includeAllParameters = FALSE, type = 1, ...) {
+as.data.frame.StageResults <- function(
+        x,
+        row.names = NULL,
+        optional = FALSE,
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE,
+        type = 1,
+        ...) {
     if (type == 1) {
         parametersToShow <- x$.getParametersToShow()
 
@@ -1407,8 +1511,9 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         dataInput <- x[[".dataInput"]]
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "failed to get 'dataInput' from ", .getClassName(x)
+        stopRuntimeIssue("failed to get 'dataInput' from ", .getClassName(x),
+            functionName = ".getTreatmentArmsToShow",
+            parameter = "dataInput"
         )
     }
 
@@ -1427,11 +1532,10 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
             all(is.na(treatmentArmsToShow)) || !is.numeric(treatmentArmsToShow)) {
         treatmentArmsToShow <- validComparisons
     } else if (!all(treatmentArmsToShow %in% validComparisons)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'treatmentArms' (",
-            .arrayToString(treatmentArmsToShow), ") must be a vector ",
+        stopIllegalArgument("'treatmentArms' (", .arrayToString(treatmentArmsToShow), ") must be a vector ",
             "containing one or more values of ", .arrayToString(validComparisons),
-            call. = FALSE
+            functionName = ".getTreatmentArmsToShow",
+            parameter = "treatmentArms"
         )
     }
     treatmentArmsToShow <- sort(unique(treatmentArmsToShow))
@@ -1444,8 +1548,9 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         dataInput <- x[[".dataInput"]]
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "failed to get 'dataInput' from ", .getClassName(x)
+        stopRuntimeIssue("failed to get 'dataInput' from ", .getClassName(x),
+            functionName = ".getPopulationsToShow",
+            parameter = "dataInput"
         )
     }
 
@@ -1465,11 +1570,11 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
             all(is.na(populationsToShow)) || !is.numeric(populationsToShow)) {
         populationsToShow <- validComparisons
     } else if (!all(populationsToShow %in% validComparisons)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (",
-            .arrayToString(populationsToShow), ") must be a vector ",
-            "containing one or more values of ", .arrayToString(validComparisons),
-            call. = FALSE
+        stopIllegalArgument("'populations' (", .arrayToString(populationsToShow), ") must be a vector ",
+            "containing one or more values of ",
+            .arrayToString(validComparisons),
+            functionName = ".getPopulationsToShow",
+            parameter = "populations"
         )
     }
     populationsToShow <- sort(unique(populationsToShow))
@@ -1539,18 +1644,20 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #'
 #' @export
 #'
-plot.StageResults <- function(x,
+plot.StageResults <- function(
+        x,
         y,
         ...,
         type = 1L,
         nPlanned,
-        allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
+        allocationRatioPlanned = 1,
+        # C_ALLOCATION_RATIO_DEFAULT
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,
         legendTitle = NA_character_,
         palette = "Set1",
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         plotSettings = NULL) {
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
@@ -1584,18 +1691,20 @@ plot.StageResults <- function(x,
     return(do.call(.plot.StageResults, args))
 }
 
-.plot.StageResults <- function(x,
+.plot.StageResults <- function(
+        x,
         y,
         ...,
         type = 1L,
         nPlanned,
-        allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
+        allocationRatioPlanned = 1,
+        # C_ALLOCATION_RATIO_DEFAULT
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,
         legendTitle = NA_character_,
         palette = "Set1",
-        legendPosition = NA_integer_,
+        legendPosition = "auto",
         showSource = FALSE,
         plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
@@ -1609,9 +1718,9 @@ plot.StageResults <- function(x,
     .stopInCaseOfIllegalStageDefinition2(...)
 
     if (x$.design$kMax == 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "cannot plot stage results of a fixed design",
-            call. = FALSE
+        stopIllegalArgument("cannot plot stage results of a fixed design",
+            functionName = ".plot.StageResults",
+            diagnosticId = "plot.fixed_design_has_no_interims"
         )
     }
 
@@ -1790,10 +1899,19 @@ plot.StageResults <- function(x,
     ))
 }
 
-.createAnalysisResultsPlotObject <- function(x, ..., data, plotData,
-        main = NA_character_, xlab = NA_character_, ylab = NA_character_,
-        legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
-        numberOfPairedLines = NA_integer_, plotSettings = NULL) {
+.createAnalysisResultsPlotObject <- function(
+        x,
+        ...,
+        data,
+        plotData,
+        main = NA_character_,
+        xlab = NA_character_,
+        ylab = NA_character_,
+        legendTitle = NA_character_,
+        palette = "Set1",
+        legendPosition = "auto",
+        numberOfPairedLines = NA_integer_,
+        plotSettings = NULL) {
     ciModeEnabled <- !is.null(data[["lower"]]) && !is.null(data[["upper"]])
 
     if (!ciModeEnabled) {
@@ -1824,7 +1942,7 @@ plot.StageResults <- function(x,
     if (is.na(legendPosition)) {
         legendPosition <- C_POSITION_LEFT_TOP
     }
-    p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition)
+    p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition, finalize = FALSE)
     p <- plotSettings$setLegendBorder(p)
     p <- plotSettings$setLegendTitle(p, legendTitle)
     p <- plotSettings$setLegendLabelSize(p)
@@ -1900,5 +2018,5 @@ plot.StageResults <- function(x,
     p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
 
     # start plot generation
-    return(p)
+    return(.finalizePlotLegend(p, legendPosition, plotSettings))
 }

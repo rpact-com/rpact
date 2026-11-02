@@ -16,34 +16,59 @@ knitr::opts_chunk$set(
 )
 ```
 
-**Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis**
+**Confirmatory Adaptive Clinical Trial Design and Analysis**
+
+`rpact` supports the design, simulation, and analysis of confirmatory clinical
+trials, from standard fixed-sample planning to group sequential and adaptive
+methods. Sample size and power planning and simulation are available for
+continuous, binary, survival (time-to-event), and count data endpoints.
 
 ## Functional Range
 
-*	Fixed sample design and designs with interim analysis stages
-*	Sample size and power calculation for
-    +	means (continuous endpoint)
-    +	rates (binary endpoint)
-    +	survival trials with flexible recruitment and survival time options
-    +	count data 
-*	Simulation tool for means, rates, survival data, and count data
-    +	Assessment of adaptive sample size/event number recalculations based on
-        conditional power
-    +   Assessment of treatment selection strategies in multi-arm trials
-*	Adaptive analysis of means, rates, and survival data
-*	Adaptive designs and analysis for multi-arm trials
-*	Adaptive analysis and simulation tools for enrichment design testing means,
-    rates, and hazard ratios
-*	Automatic boundary recalculations during the trial for analysis with alpha
-    spending approach, including under- and over-running
-  
+### Sample size and power planning
+
+* Standard fixed-sample designs without interim analyses
+* Classical group sequential designs with planned interim analyses
+* Sample size and power calculations for
+    + means (continuous endpoints)
+    + rates (binary endpoints)
+    + survival (time-to-event) endpoints with flexible recruitment and
+      survival-time options
+    + count data endpoints
+
+### Simulation and adaptive trial design
+
+* Power and operating-characteristic simulations for means, rates, survival
+  data, and count data
+* Assessment of adaptive sample size or event-number reassessment based on
+  conditional power
+* Multi-stage adaptive hypothesis testing based on the combination testing
+  principle
+* Assessment of treatment selection strategies in multi-arm trials, including
+  multi-arm multi-stage (MAMS) settings for means, rates, and survival endpoints
+* Simulation and analysis methods for population enrichment designs with means,
+  rates, and hazard ratios
+
+### Analysis and trial conduct
+
+* Confirmatory analysis for means and rates in one-arm and two-arm trials,
+  and for survival endpoints in treatment comparisons
+* Multi-arm and population enrichment analysis for means, rates, and survival
+  endpoints
+* Analysis of general estimates and standard errors supplied through
+  `getDataset(est = ..., se = ...)`
+* Support for fixed-sample designs, classical group sequential designs, and
+  adaptive multi-arm multi-stage (MAMS) designs based on the inverse normal or
+  Fisher combination test
+* Automatic boundary recalculation during a trial using alpha-spending
+  approaches, including under- and over-running
 
 ## Learn to use rpact
 
 We recommend three ways to learn how to use `rpact`:
 
 > 1. Use RPACT Cloud:
->    [rpact.cloud](https://rpact-cloud.share.connect.posit.cloud)
+>    [demo.rpact.cloud](https://demo.rpact.cloud)
 > 2. Use the Vignettes:
 >    [rpact.org/vignettes](https://www.rpact.org/vignettes/)
 > 3. Book a training:
@@ -51,44 +76,95 @@ We recommend three ways to learn how to use `rpact`:
 
 ### RPACT Cloud 
 
-A graphical user interface (GUI) for the rpact R package, designed to simplify
-its use through an intuitive interface:
-[rpact.cloud](https://rpact-cloud.share.connect.posit.cloud)
+**RPACT Cloud** provides guided, browser-based access to selected `rpact`
+functionality, including study design, sample size calculation, simulation,
+and reporting, without requiring users to write R code:
+[demo.rpact.cloud](https://demo.rpact.cloud).
 
-### Vignettes
+### Vignettes and function reference
 
-Developed for practical use: our collection of practical examples
-and use-cases, the so-called rpact vignettes, are hosted at 
-[rpact.org/vignettes](https://www.rpact.org/vignettes/) 
-
+Practical examples and tutorials are available at
+[rpact.org/vignettes](https://www.rpact.org/vignettes/).
+For function arguments, return values, and examples, see the
+[function reference](https://docs.rpact.org).
 
 ## User Concept
 
 ### Workflow
 
--   Everything is starting with a design, e.g.:
-    `design <- getDesignGroupSequential()`
--   Find the optimal design parameters with help of
-    [rpact](https://cran.r-project.org/package=rpact) comparison tools:
-    `getDesignSet`
--   Calculate the required sample size, e.g.: `getSampleSizeMeans()`,
-    `getPowerMeans()`
--   Simulate specific characteristics of an adaptive design, e.g.:
-    `getSimulationMeans()`
--   Collect your data, import it into R and create a dataset:
-    `data <- getDataset()`
--   Analyze your data: `getAnalysisResults(design, data)`
+1. Create a fixed-sample, group sequential, or adaptive design.
+2. Compare alternative designs with `getDesignSet()`.
+3. Calculate the required sample size with, for example, `getSampleSizeMeans()`,
+   or evaluate power for a specified sample size with `getPowerMeans()`.
+4. Assess operating characteristics and adaptation strategies using simulation,
+   for example, `getSimulationMeans()`.
+5. Prepare aggregated trial data with `getDataset()` and analyze them with
+   `getAnalysisResults()`.
+
+### Planning example
+
+Plan a two-arm trial with a continuous endpoint, a one-sided significance level
+of 0.025, 90% power, and three analyses at 50%, 75%, and 100% of the planned
+information. Assume a mean difference of 0.5 and a common standard deviation of 1.
+
+```{r planning, message=FALSE}
+library(rpact)
+design <- getDesignGroupSequential(
+    kMax = 3, informationRates = c(0.5, 0.75, 1),
+    alpha = 0.025, beta = 0.1, sided = 1, typeOfDesign = "OF"
+)
+sampleSize <- getSampleSizeMeans(
+    design = design, groups = 2, alternative = 0.5,
+    stDev = 1, allocationRatioPlanned = 1
+)
+summary(sampleSize)
+```
+
+For a design without interim analyses, use `getDesignFixed()` instead.
+
+### Analysis example
+
+The following illustrative data represent two independent groups at each of
+three stages. Sample sizes, means, and standard deviations are **stage-wise**:
+each entry describes only the new observations collected in that stage.
+The sample sizes are chosen for illustration, independently of the planning
+result above.
+
+```{r analysis}
+trialData <- getDataset(
+    sampleSizes1 = c(40, 20, 20), sampleSizes2 = c(40, 20, 20),
+    means1 = c(0.2, 0.3, 0.5), means2 = c(0, 0, 0),
+    stDevs1 = c(1, 1, 1), stDevs2 = c(1, 1, 1)
+)
+analysisResults <- getAnalysisResults(
+    design = design, dataInput = trialData, directionUpper = TRUE
+)
+summary(analysisResults)
+```
+
+If the available summaries are cumulative, use the corresponding `cumulative`
+prefixes, such as `cumulativeSampleSizes1`, `cumulativeMeans1`, and
+`cumulativeStDevs1`. For survival data, cumulative event counts and log-rank
+statistics are commonly used; see `getDataset()` for the required inputs.
+Analysis results and the availability of confidence intervals depend on the
+chosen design and endpoint; see `getAnalysisResults()` for details.
 
 ### Focus on Usability
+
+The terms *survival* and *time-to-event* refer to the same endpoint type here.
+The corresponding function names use the suffix `Survival`.
 
 The most important [rpact](https://cran.r-project.org/package=rpact) functions
 have intuitive names:
 
--   `getDesign`[`GroupSequential`/`InverseNormal`/`Fisher`]`()`
+-   `getDesign`[`Fixed`/`GroupSequential`/`InverseNormal`/`Fisher`]`()`
 -   [`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.html)
 -   `getSampleSize`[`Means`/`Rates`/`Survival`/`Counts`]`()`
 -   `getPower`[`Means`/`Rates`/`Survival`/`Counts`]`()`
--   `getSimulation`[`MultiArm`/`Enrichment`][`Means`/`Rates`/`Survival`/`Counts`]`()`
+-   `getSimulation`[`Means`/`Rates`/`Survival`/`Counts`]`()`
+-   `getSimulationMultiArm`[`Means`/`Rates`/`Survival`]`()`
+-   `getSimulationEnrichment`[`Means`/`Rates`/`Survival`]`()`
+-   `getDesignConditionalDunnett()` for adaptive two-stage multi-arm designs
 -   [`getDataset()`](https://docs.rpact.org/reference/getDataset.html)
 -   [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.html)
 -   [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.html)
@@ -97,12 +173,11 @@ have intuitive names:
 / [VS Code](https://code.visualstudio.com) / [Eclipse](https://www.eclipse.org):
 auto code completion makes it easy to use these functions.
 
-
 ### R generics
 
-In general, everything runs with the R standard functions which are always
-present in R: so-called R generics, e.g., `print`, `summary`, `plot`,
-`as.data.frame`, `names`, `length`
+Result objects support familiar R functions such as `print()`, `summary()`,
+`plot()`, `as.data.frame()`, `names()`, and `length()`. The available methods
+depend on the object class; see the corresponding function reference.
 
 ### Utilities
 
@@ -123,41 +198,43 @@ Several utility functions are available, e.g.
 
 ## Validation
 
-Please [contact](https://www.rpact.com/contact/) us to learn how to use `rpact`
-on FDA/GxP-compliant validated corporate computer systems and how to get a copy
-of the formal validation documentation that is customized and licensed for
-exclusive use by your company, e.g., to fulfill regulatory requirements.
+For organizations using `rpact` in FDA/GxP-regulated environments, RPACT offers
+support and formal validation documentation for use on validated corporate
+computer systems. The documentation can be customized and licensed for exclusive
+use by your company to support applicable regulatory requirements.
 
-## RPACT Connect 
+The validation documentation also contains the personal access data required to
+run the full test suite for installation qualification with `testPackage()`.
 
-Connecting you to insights, downloads, and premium support:
-[connect.rpact.com](https://rpact-connect.share.connect.posit.cloud)
+> [Contact RPACT](https://www.rpact.com/contact/) to learn more.
+
+## RPACT Connect
+
+**RPACT Connect** provides access to insights, downloads, and premium support
+for users and organizations working with RPACT software:
+[connect.rpact.app](https://connect.rpact.app).
 
 ## About
 
-* **rpact** is a comprehensive validated^[The rpact validation documentation is
-  available exclusively for our customers and supporting companies. For more
-  information visit
-  [rpact.com/services/service-level-agreement](https://www.rpact.com/services/service-level-agreement/)]
-  R package for clinical research which
-    + enables the design and analysis of confirmatory adaptive group sequential
-      designs
-    + is a powerful sample size calculator
-    + is a free of charge open-source software licensed under
-      [LGPL-3](https://cran.r-project.org/web/licenses/LGPL-3)
-    + particularly, implements the methods described in the recent monograph by
-      [Wassmer and Brannath (2025)](https://doi.org/10.1007%2F978-3-031-89669-9)
+**rpact** is free of charge and open source, licensed under
+[LGPL-3](https://cran.r-project.org/web/licenses/LGPL-3). It implements a broad
+range of methods described in the monograph by
+[Wassmer and Brannath (2025)](https://doi.org/10.1007/978-3-031-89669-9).
+Formal validation documentation is available to customers and supporting
+members through the
+[RPACT service level agreement](https://www.rpact.com/services/service-level-agreement/).
 
-> For more information please visit [rpact.org](https://www.rpact.org)
+**RPACT GmbH** develops **Statistical Tools for Drug Development**.
+We develop and support R packages, Shiny applications, and cloud-based tools
+for clinical research, with services covering software development, validation,
+technical support, consulting, and training.
 
-* **RPACT** is a company which offers
-    + enterprise software development services 
-    + technical support for the `rpact` package
-    + consultancy and user training for clinical research using R
-    + validated software solutions and R package development for clinical
-      research
+Our products include [rpact](https://cran.r-project.org/package=rpact) and
+[RPACT Cloud](https://demo.rpact.cloud). We also maintain and support
+[crmPack](https://www.rpact.com/products/r-package-crmpack/), the open-source
+package for dose escalation trial design, simulation, and analysis.
 
-> For more information please visit [rpact.com](https://www.rpact.com)
+For more information, visit [www.rpact.com](https://www.rpact.com).
 
 ## Contact
 

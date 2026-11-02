@@ -18,24 +18,33 @@
 NULL
 
 .stopWithWrongDesignMessage <- function(
-        design, 
-        ..., 
+        design,
+        ...,
         inclusiveConditionalDunnett = TRUE) {
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'design' must be an instance of ", .arrayToString(
-        .getTrialDesignClassNames(inclusiveConditionalDunnett = inclusiveConditionalDunnett),
-        vectorLookAndFeelEnabled = FALSE
-    ), " (is '", .getClassName(design), "')", call. = FALSE)
+    stopIllegalArgument("'design' must be an instance of ",
+        .arrayToString(.getTrialDesignClassNames(inclusiveConditionalDunnett = inclusiveConditionalDunnett),
+            vectorLookAndFeelEnabled = FALSE
+        ), " (is ", .getClassName(design, quote = TRUE), ")",
+        functionName = ".stopWithWrongDesignMessage",
+        parameter = "design",
+        value = design,
+        diagnosticId = "validation.design_class_incompatible"
+    )
 }
 
 .stopWithWrongDesignMessageEnrichment <- function(
-        design, 
-        ..., 
+        design,
+        ...,
         inclusiveConditionalDunnett = TRUE) {
     trialDesignClassNames <- c(C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL, C_CLASS_NAME_TRIAL_DESIGN_FISHER)
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'design' must be an instance of ", .arrayToString(
-        trialDesignClassNames,
-        vectorLookAndFeelEnabled = FALSE
-    ), " (is '", .getClassName(design), "')", call. = FALSE)
+    stopIllegalArgument("'design' must be an instance of ",
+        .arrayToString(trialDesignClassNames, vectorLookAndFeelEnabled = FALSE),
+        " (is ", .getClassName(design, quote = TRUE), ")",
+        functionName = ".stopWithWrongDesignMessageEnrichment",
+        parameter = "design",
+        value = design,
+        diagnosticId = "validation.design_class_incompatible"
+    )
 }
 
 .isParameterSet <- function(x) {
@@ -44,20 +53,21 @@ NULL
 
 .assertIsParameterSetClass <- function(x, objectName = "x") {
     if (!.isParameterSet(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", objectName, "' (", .getClassName(x), ") must be a S4 class ",
+        stopIllegalArgument(.pQuote(objectName), " (", .getClassName(x), ") must be a S4 class ",
             "which inherits from class 'ParameterSet' ",
-            call. = FALSE
+            functionName = ".assertIsParameterSetClass",
+            parameter = "ParameterSet"
         )
     }
 }
 
 .assertIsTrialDesignSet <- function(x, objectName = "x") {
     if (!.isTrialDesignSet(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'designSet' must be an instance of 'TrialDesignSet' ",
-            "(is '", .getClassName(x), "')",
-            call. = FALSE
+        stopIllegalArgument("'designSet' must be an instance of 'TrialDesignSet' ",
+            "(is ", .getClassName(x, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignSet",
+            parameter = "designSet",
+            relatedParameter = "TrialDesignSet"
         )
     }
 }
@@ -104,11 +114,12 @@ NULL
 
 .isTrialDesign <- function(design) {
     return(
-        .isTrialDesignFixed(design) || 
-        .isTrialDesignInverseNormal(design) || 
-        .isTrialDesignGroupSequential(design) ||
-        .isTrialDesignFisher(design) || 
-        .isTrialDesignConditionalDunnett(design))
+        .isTrialDesignFixed(design) ||
+            .isTrialDesignInverseNormal(design) ||
+            .isTrialDesignGroupSequential(design) ||
+            .isTrialDesignFisher(design) ||
+            .isTrialDesignConditionalDunnett(design)
+    )
 }
 
 .isTrialDesignPlanMeans <- function(designPlan) {
@@ -136,113 +147,120 @@ NULL
 
 .assertIsTrialDesignPlan <- function(designPlan) {
     if (!.isTrialDesignPlan(designPlan)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'designPlan' must be an instance of 'TrialDesignPlan' (is '", .getClassName(designPlan), "')",
-            call. = FALSE
+        stopIllegalArgument("'designPlan' must be an instance of 'TrialDesignPlan' (is ", .getClassName(designPlan, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignPlan",
+            parameter = "designPlan",
+            value = designPlan
         )
     }
 }
 
 .assertIsTrialDesign <- function(design) {
     if (!.isTrialDesign(design)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'design' must be an instance of ", .arrayToString(
-            .getTrialDesignClassNames(),
-            vectorLookAndFeelEnabled = FALSE
-        ), " (is '", .getClassName(design), "')", call. = FALSE)
+        stopIllegalArgument("'design' must be an instance of ",
+            .arrayToString(.getTrialDesignClassNames(), vectorLookAndFeelEnabled = FALSE),
+            " (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesign",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
+        )
     }
 }
 
 .assertIsTrialDesignInverseNormal <- function(design) {
     if (!.isTrialDesignInverseNormal(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal' (is '", .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignInverseNormal' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignInverseNormal",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignInverseNormalOrFixed <- function(design) {
     if (!.isTrialDesignInverseNormal(design) && !.isTrialDesignFixed(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal', ",
-            "'TrialDesignFixed' (is '",
-            .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignInverseNormal', ", "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignInverseNormalOrFixed",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignFisher <- function(design) {
     if (!.isTrialDesignFisher(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignFisher' (is '", .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignFisher' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignFisher",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignGroupSequential <- function(design) {
     if (!.isTrialDesignGroupSequential(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignGroupSequential' (is '", .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignGroupSequential' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignGroupSequential",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignGroupSequentialOrFixed <- function(design) {
     if (!.isTrialDesignGroupSequential(design) && !.isTrialDesignFixed(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class 'TrialDesignFixed' or ",
-            "'TrialDesignGroupSequential' (is '", .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class 'TrialDesignFixed' or ",
+            "'TrialDesignGroupSequential' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignGroupSequentialOrFixed",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignConditionalDunnett <- function(design) {
     if (!.isTrialDesignConditionalDunnett(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignConditionalDunnett' (is '", .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignConditionalDunnett' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignConditionalDunnett",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignInverseNormalOrGroupSequential <- function(design) {
     if (!.isTrialDesignInverseNormalOrGroupSequential(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal' or 'TrialDesignGroupSequential' (is '",
-            .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignInverseNormal' or 'TrialDesignGroupSequential' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignInverseNormalOrGroupSequential",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed <- function(design) {
     if (!.isTrialDesignInverseNormalOrGroupSequential(design) && !.isTrialDesignFixed(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal', ",
-            "'TrialDesignGroupSequential', or ",
-            "'TrialDesignFixed' (is '",
-            .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignInverseNormal', ", "'TrialDesignGroupSequential', or ",
+            "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -257,59 +275,55 @@ NULL
 
 .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher <- function(design) {
     if (!.isTrialDesignInverseNormalOrGroupSequentialOrFisher(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal', ",
-            "'TrialDesignGroupSequential', or ",
-            "'TrialDesignFisher' (is '",
-            .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignInverseNormal', ", "'TrialDesignGroupSequential', or ",
+            "'TrialDesignFisher' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisherOrFixed <- function(design) {
-    if (!.isTrialDesignInverseNormalOrGroupSequentialOrFisher(design) && 
+    if (!.isTrialDesignInverseNormalOrGroupSequentialOrFisher(design) &&
             !.isTrialDesignFixed(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal', ",
-            "'TrialDesignGroupSequential', ",
-            "'TrialDesignFisher', or ",
-            "'TrialDesignFixed' (is '",
-            .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignInverseNormal', ", "'TrialDesignGroupSequential', ",
+            "'TrialDesignFisher', or ", "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignInverseNormalOrGroupSequentialOrFisherOrFixed",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignInverseNormalOrFisherOrFixed <- function(design) {
-    if (!.isTrialDesignInverseNormalOrFisher(design) && 
+    if (!.isTrialDesignInverseNormalOrFisher(design) &&
             !.isTrialDesignFixed(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal', ",
-            "'TrialDesignFisher', or ",
-            "'TrialDesignFixed' (is '",
-            .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class ",
+            "'TrialDesignInverseNormal', ", "'TrialDesignFisher', or ",
+            "'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignInverseNormalOrFisherOrFixed",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
 
 .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed <- function(design) {
-    if (!.isTrialDesignInverseNormalOrFisher(design) && 
-            !.isTrialDesignConditionalDunnett(design) && 
+    if (!.isTrialDesignInverseNormalOrFisher(design) &&
+            !.isTrialDesignConditionalDunnett(design) &&
             !.isTrialDesignFixed(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class 'TrialDesignInverseNormal', ",
-            "'TrialDesignFisher', 'TrialDesignConditionalDunnett', or 'TrialDesignFixed' (is '",
-            .getClassName(design), "')",
-            call. = FALSE
+        stopIllegalArgument("'design' must be an instance of class 'TrialDesignInverseNormal', ",
+            "'TrialDesignFisher', 'TrialDesignConditionalDunnett', or 'TrialDesignFixed' (is ", .getClassName(design, quote = TRUE), ")",
+            functionName = ".assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed",
+            parameter = "design",
+            value = design,
+            diagnosticId = "validation.design_class_incompatible"
         )
     }
 }
@@ -320,11 +334,11 @@ NULL
 
 .assertIsSimulationResults <- function(simulationResults) {
     if (!.isSimulationResults(simulationResults)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'simulationResults' must be an instance of SimulationResults ",
-            "(is '", .getClassName(simulationResults), "')",
-            call. = FALSE
+        stopIllegalArgument("'simulationResults' must be an instance of SimulationResults ",
+            "(is ", .getClassName(simulationResults, quote = TRUE), ")",
+            functionName = ".assertIsSimulationResults",
+            parameter = "simulationResults",
+            value = simulationResults
         )
     }
 }
@@ -351,12 +365,111 @@ NULL
 
 .assertIsStageResults <- function(stageResults) {
     if (!.isStageResults(stageResults)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'stageResults' ",
-            "must be a 'StageResults' object",
-            " (is '", .getClassName(stageResults), "')",
-            call. = FALSE
+        stopIllegalArgument("'stageResults' ", "must be a 'StageResults' object",
+            " (is ", .getClassName(stageResults, quote = TRUE), ")",
+            functionName = ".assertIsStageResults",
+            parameter = "stageResults",
+            value = stageResults
         )
+    }
+}
+
+.rangeLimitPrint <- function(boundary) {
+    if (is.null(boundary) || length(boundary) == 0) {
+        return("NULL")
+    }
+
+    if (is.na(boundary)) {
+        return("NA")
+    }
+
+    if (is.infinite(boundary)) {
+        return(ifelse(boundary > 0, "Inf", "-Inf"))
+    }
+
+    if (abs(boundary) < 1e-14) {
+        boundary <- round(boundary, digits = 6)
+    }
+
+    return(as.character(boundary))
+}
+
+.assertIsInInterval <- function(
+        x,
+        xName,
+        ...,
+        lower,
+        upper,
+        lowerIncluded = NA,
+        upperIncluded = NA,
+        naAllowed = FALSE,
+        matrixAllowed = FALSE) {
+    .warnInCaseOfUnknownArguments(functionName = ".assertIsInInterval", ...)
+    if (naAllowed && all(is.na(x))) {
+        return(invisible())
+    }
+
+    functionName <- paste(deparse(sys.call()), collapse = "")
+    .assertIsNumericVector(x, xName, naAllowed = naAllowed, matrixAllowed = matrixAllowed)
+    .assertIsSingleLogical(lowerIncluded, "lowerIncluded")
+    .assertIsSingleLogical(upperIncluded, "upperIncluded")
+
+    if (lowerIncluded) {
+        lowerCheck <- x < lower
+    } else {
+        lowerCheck <- x <= lower
+    }
+
+    if (is.null(upper) || is.na(upper)) {
+        if (any(lowerCheck, na.rm = TRUE)) {
+            prefix <- ifelse(length(x) > 1, "each value of ", "")
+            stopArgumentOutOfRange(prefix, .pQuote(xName), " (", .arrayToString(x), ") must be ",
+                ifelse(lowerIncluded, ">=", ">"), " ", .rangeLimitPrint(lower),
+                parameter = xName,
+                value = x,
+                constraint = paste0(.pQuote(xName), ifelse(lowerIncluded, " >= ", " > "), lower),
+                functionName = functionName,
+                lowerBound = lower,
+                upperBound = NULL,
+                diagnosticId = "validation.values_outside_interval"
+            )
+        }
+    } else {
+        if (upperIncluded) {
+            upperCheck <- x > upper
+        } else {
+            upperCheck <- x >= upper
+        }
+
+        if (lower == upper) {
+            if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
+                stopArgumentOutOfRange(.pQuote(xName), " (", .arrayToString(x), ") ",
+                    "must be equal to ", .rangeLimitPrint(lower),
+                    parameter = xName,
+                    value = x,
+                    constraint = paste0(.pQuote(xName), " == ", lower),
+                    functionName = functionName,
+                    lowerBound = lower,
+                    upperBound = upper,
+                    diagnosticId = "validation.values_outside_interval"
+                )
+            }
+        } else if (any(lowerCheck, na.rm = TRUE) || any(upperCheck, na.rm = TRUE)) {
+            stopArgumentOutOfRange(.pQuote(xName), " (", .arrayToString(x), ") must be in ",
+                ifelse(lowerIncluded, "[", "("), .rangeLimitPrint(lower), "; ",
+                .rangeLimitPrint(upper), ifelse(upperIncluded, "]", ")"),
+                parameter = xName,
+                value = x,
+                constraint = paste0(
+                    .pQuote(xName), ifelse(lowerIncluded, " >= ", " > "), lower, " and ",
+                    .pQuote(xName), ifelse(upperIncluded, " <= ", " < "), upper
+                ),
+                functionName = functionName,
+                lowerBound = lower,
+                upperBound = upper,
+                diagnosticId = "validation.values_outside_interval"
+            )
+        }
     }
 }
 
@@ -373,7 +486,6 @@ NULL
 #' @param lower Numeric. The inclusive lower bound of the interval.
 #' @param upper Numeric. The inclusive upper bound of the interval. If \code{NULL} or \code{NA}, only the lower bound is enforced.
 #' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
-#' @param call. Logical. If \code{TRUE} the error message will include the call. Default is \code{FALSE}.
 #'
 #' @return Invisibly returns \code{x} if all elements are within the specified interval.
 #'
@@ -385,45 +497,33 @@ NULL
 #'
 #' @noRd
 #'
-.assertIsInClosedInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
-    .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
-    if (naAllowed && all(is.na(x))) {
-        return(invisible())
-    }
-
-    if (!naAllowed && length(x) > 1 && anyNA(x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", xName, "' (", .arrayToString(x), ") must be a valid numeric vector or a single NA",
-            call. = call.
-        )
-    }
-
-    if (is.null(upper) || is.na(upper)) {
-        if (any(x < lower, na.rm = TRUE)) {
-            prefix <- ifelse(length(x) > 1, "each value of ", "")
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, prefix,
-                "'", xName, "' (", .arrayToString(x), ") must be >= ", lower,
-                call. = call.
-            )
-        }
-    } else if (any(x < lower, na.rm = TRUE) || any(x > upper, na.rm = TRUE)) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'", xName, "' (", .arrayToString(x), ") is out of bounds [", lower, "; ", upper, "]",
-            call. = call.
-        )
-    }
+.assertIsInClosedInterval <- function(
+        x,
+        xName,
+        ...,
+        lower,
+        upper,
+        naAllowed = FALSE,
+        matrixAllowed = FALSE) {
+    .assertIsInInterval(
+        x = x,
+        xName = xName,
+        lower = lower,
+        upper = upper,
+        lowerIncluded = TRUE,
+        upperIncluded = TRUE,
+        naAllowed = naAllowed,
+        matrixAllowed = matrixAllowed,
+        ...
+    )
 }
 
-#'
 #' Assert Values Are in an Open Interval
 #'
 #' @description
-#' Checks if every element of \code{x} is within the open 
+#' Checks if every element of \code{x} is within the open
 #' interval defined by \code{lower} and \code{upper}.
-#' If any element is outside the interval (i.e., less than 
+#' If any element is outside the interval (i.e., less than
 #' or equal to \code{lower} or greater than or equal to \code{upper}),
 #' an error is thrown.
 #'
@@ -432,7 +532,7 @@ NULL
 #' @param lower Numeric. The exclusive lower bound of the interval.
 #' @param upper Numeric. The exclusive upper bound of the interval.
 #' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
-#' @param call. Logical. If \code{TRUE}, the error message will 
+#' @param call. Logical. If \code{TRUE}, the error message will
 #'        include the original function call. Default is \code{FALSE}.
 #'
 #' @return Invisibly returns \code{x} if all elements are within the specified open interval.
@@ -444,36 +544,25 @@ NULL
 #'
 #' @noRd
 #'
-.assertIsInOpenInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
-    if (naAllowed && all(is.na(x))) {
-        return(invisible())
-    }
-
-    if (!naAllowed && length(x) > 1 && anyNA(x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", xName, "' (", .arrayToString(x), ") ",
-            "must be a valid numeric vector or a single NA",
-            call. = call.
-        )
-    }
-
-    if (is.null(upper) || is.na(upper)) {
-        if (any(x <= lower, na.rm = TRUE)) {
-            prefix <- ifelse(length(x) > 1, "each value of ", "")
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, prefix,
-                "'", xName, "' (", .arrayToString(x), ") must be > ", lower,
-                call. = call.
-            )
-        }
-    } else if (any(x <= lower, na.rm = TRUE) || any(x >= upper, na.rm = TRUE)) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'", xName, "' (", .arrayToString(x), ") is out of bounds (", lower, "; ", upper, ")",
-            call. = call.
-        )
-    }
+.assertIsInOpenInterval <- function(
+        x,
+        xName,
+        ...,
+        lower,
+        upper,
+        naAllowed = FALSE,
+        matrixAllowed = FALSE) {
+    .assertIsInInterval(
+        x = x,
+        xName = xName,
+        lower = lower,
+        upper = upper,
+        lowerIncluded = FALSE,
+        upperIncluded = FALSE,
+        naAllowed = naAllowed,
+        matrixAllowed = matrixAllowed,
+        ...
+    )
 }
 
 .assertIsValidDataInput <- function(dataInput, design = NULL, stage = NULL) {
@@ -483,12 +572,10 @@ NULL
     }
 
     if (dataInput$.enrichmentEnabled && dataInput$getNumberOfGroups() != 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-            "only population enrichment data with 2 groups can be analyzed but ",
-            dataInput$getNumberOfGroups(), " group",
-            ifelse(dataInput$getNumberOfGroups() == 1, " is", "s are"), " defined",
-            call. = FALSE
+        stopIllegalDataInput("only population enrichment data with 2 groups can be analyzed but ",
+            dataInput$getNumberOfGroups(),
+            " group", ifelse(dataInput$getNumberOfGroups() == 1, " is", "s are"), " defined",
+            functionName = ".assertIsValidDataInput"
         )
     }
 
@@ -497,48 +584,54 @@ NULL
     for (fieldName in dataInput$.getVisibleFieldNames()) {
         l2 <- length(dataInput[[fieldName]])
         if (fieldName != "stages" && l1 != l2) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                "all parameters must have the same length ('stages' has length ", l1,
-                ", '", fieldName, "' has length ", l2, ")",
-                call. = FALSE
+            stopIllegalDataInput("all parameters must have the same length ",
+                "('stages' has length ", l1, ", ", .pQuote(fieldName), " has length ", l2, ")",
+                functionName = ".assertIsValidDataInput",
+                parameter = "stages"
             )
         }
     }
 
     if (!is.null(stage)) {
         if (dataInput$getNumberOfGroups() == 1) {
-            if (.isDatasetMeans(dataInput)) {
+            if (.isDatasetGeneral(dataInput)) {
+                if (any(na.omit(dataInput$getStandardErrorsUpTo(stage)) <= 0)) {
+                    stopIllegalDataInput("all standard errors must be > 0",
+                        functionName = ".assertIsValidDataInput"
+                    )
+                }
+                if (any(na.omit(dataInput$getDegreesOfFreedomUpTo(stage)) <= 0)) {
+                    stopIllegalDataInput("all degrees of freedom must be > 0",
+                        functionName = ".assertIsValidDataInput"
+                    )
+                }
+            } else if (.isDatasetMeans(dataInput)) {
                 if (any(na.omit(dataInput$getStDevsUpTo(stage)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all standard deviations must be > 0",
-                        call. = FALSE
+                    stopIllegalDataInput("all standard deviations must be > 0",
+                        functionName = ".assertIsValidDataInput"
                     )
                 }
                 if (any(na.omit(dataInput$getSampleSizesUpTo(stage)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all sample sizes must be > 0",
-                        call. = FALSE
+                    stopIllegalDataInput("all sample sizes must be > 0",
+                        functionName = ".assertIsValidDataInput"
                     )
                 }
             } else if (.isDatasetRates(dataInput)) {
                 if (any(na.omit(dataInput$getEventsUpTo(stage)) < 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all events must be >= 0",
-                        call. = FALSE
+                    stopIllegalDataInput("all events must be >= 0",
+                        functionName = ".assertIsValidDataInput"
                     )
                 }
                 if (any(na.omit(dataInput$getSampleSizesUpTo(stage)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all sample sizes must be > 0",
-                        call. = FALSE
+                    stopIllegalDataInput("all sample sizes must be > 0",
+                        functionName = ".assertIsValidDataInput"
                     )
                 }
                 if (any(na.omit(dataInput$getEventsUpTo(stage)) >
                         na.omit(dataInput$getSampleSizesUpTo(stage)))) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all events must be <= corresponding sample size",
-                        call. = FALSE
+                    stopIllegalDataInput("all events must be <= corresponding sample size",
+                        functionName = ".assertIsValidDataInput",
+                        diagnosticId = "dataset.binary_events_exceed_subjects"
                     )
                 }
             }
@@ -546,38 +639,34 @@ NULL
             if (.isDatasetMeans(dataInput)) {
                 if (any(na.omit(dataInput$getStDevsUpTo(stage, 1)) <= 0) ||
                         any(na.omit(dataInput$getStDevsUpTo(stage, 2)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all standard deviations must be > 0",
-                        call. = FALSE
+                    stopIllegalDataInput("all standard deviations must be > 0",
+                        functionName = ".assertIsValidDataInput"
                     )
                 }
                 if (any(na.omit(dataInput$getSampleSizesUpTo(stage, 1)) <= 0) ||
                         any(na.omit(dataInput$getSampleSizesUpTo(stage, 2)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all sample sizes must be > 0",
-                        call. = FALSE
+                    stopIllegalDataInput("all sample sizes must be > 0",
+                        functionName = ".assertIsValidDataInput"
                     )
                 }
             } else if (.isDatasetRates(dataInput)) {
                 if (any(na.omit(dataInput$getEventsUpTo(stage, 1)) < 0) ||
                         any(na.omit(dataInput$getEventsUpTo(stage, 2)) < 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all events must be >= 0",
-                        call. = FALSE
+                    stopIllegalDataInput("all events must be >= 0",
+                        functionName = ".assertIsValidDataInput"
                     )
                 }
                 if (any(na.omit(dataInput$getSampleSizesUpTo(stage, 1)) <= 0) ||
                         any(na.omit(dataInput$getSampleSizesUpTo(stage, 2)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all sample sizes must be > 0",
-                        call. = FALSE
+                    stopIllegalDataInput("all sample sizes must be > 0",
+                        functionName = ".assertIsValidDataInput"
                     )
                 }
                 if (any(na.omit(dataInput$getEventsUpTo(stage, 1)) > na.omit(dataInput$getSampleSizesUpTo(stage, 1))) ||
                         any(na.omit(dataInput$getEventsUpTo(stage, 2)) > na.omit(dataInput$getSampleSizesUpTo(stage, 2)))) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                        "all events must be <= corresponding sample size",
-                        call. = FALSE
+                    stopIllegalDataInput("all events must be <= corresponding sample size",
+                        functionName = ".assertIsValidDataInput",
+                        diagnosticId = "dataset.binary_events_exceed_subjects"
                     )
                 }
             }
@@ -585,16 +674,14 @@ NULL
 
         if (.isDatasetSurvival(dataInput)) {
             if (any(na.omit(dataInput$getOverallEventsUpTo(stage)) < 0)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                    "all cumulative events must be >= 0",
-                    call. = FALSE
+                stopIllegalDataInput("all cumulative events must be >= 0",
+                    functionName = ".assertIsValidDataInput"
                 )
             }
 
             if (any(na.omit(dataInput$getOverallAllocationRatiosUpTo(stage)) <= 0)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                    "all cumulative allocation ratios must be > 0",
-                    call. = FALSE
+                stopIllegalDataInput("all cumulative allocation ratios must be > 0",
+                    functionName = ".assertIsValidDataInput"
                 )
             }
         }
@@ -606,13 +693,15 @@ NULL
         if (numberOfStages > kMax) {
             s <- numberOfStages - kMax
             plural <- ifelse(s == 1, "", "s")
-            warning(sprintf(
+            warnDataIssue(sprintf(
                 paste0(
                     "The data of the last %s in the dataset will be ",
                     "ignored because the design has specified kMax = %s"
                 ),
                 ifelse(s == 1, "stage", paste0(s, " stages")), kMax
-            ), call. = FALSE)
+            ),
+                diagnosticId = "dataset.stages_exceed_design"
+            )
         } else if (numberOfStages < kMax) {
             dataInput$.fillWithNAs(kMax)
         }
@@ -623,53 +712,75 @@ NULL
 
 .assertIsDataset <- function(dataInput) {
     if (!.isDataset(dataInput)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'dataInput' must be an instance of class ",
-            "'DatasetMeans', 'DatasetRates' or 'DatasetSurvival' ",
-            "(is '", .getClassName(dataInput), "')",
-            call. = FALSE
+        stopIllegalArgument("'dataInput' must be an instance of class ",
+            "'DatasetGeneral', 'DatasetMeans', 'DatasetRates', or 'DatasetSurvival' ",
+            "(is ", .getClassName(dataInput, quote = TRUE), ")",
+            functionName = ".assertIsDataset",
+            parameter = "dataInput",
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
 
 .assertIsDatasetMeans <- function(dataInput) {
     if (!.isDatasetMeans(dataInput = dataInput)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'dataInput' must be an instance of class ",
-            "'DatasetMeans' (is '", .getClassName(dataInput), "')",
-            call. = FALSE
+        stopIllegalArgument("'dataInput' must be an instance of class ",
+            "'DatasetMeans' (is ", .getClassName(dataInput, quote = TRUE), ")",
+            functionName = ".assertIsDatasetMeans",
+            parameter = "dataInput",
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
+        )
+    }
+}
+
+.assertIsDatasetGeneral <- function(dataInput) {
+    if (!.isDatasetGeneral(dataInput = dataInput)) {
+        stopIllegalArgument("'dataInput' must be an instance of class ",
+            "'DatasetGeneral' (is ", .getClassName(dataInput, quote = TRUE), ")",
+            functionName = ".assertIsDatasetGeneral",
+            parameter = "dataInput",
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
 
 .assertIsDatasetRates <- function(dataInput) {
     if (!.isDatasetRates(dataInput = dataInput)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' must be an instance of class ",
-            "'DatasetRates' (is '", .getClassName(dataInput), "')",
-            call. = FALSE
+        stopIllegalArgument("'dataInput' must be an instance of class ",
+            "'DatasetRates' (is ", .getClassName(dataInput, quote = TRUE), ")",
+            functionName = ".assertIsDatasetRates",
+            parameter = "dataInput",
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
 
 .assertIsDatasetSurvival <- function(dataInput) {
     if (!.isDatasetSurvival(dataInput = dataInput)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'dataInput' must be an instance of class ",
+        stopIllegalArgument("'dataInput' must be an instance of class ",
             "'DatasetSurvival' or 'DatasetEnrichmentSurvival' ",
-            "(is '", .getClassName(dataInput), "')",
-            call. = FALSE
+            "(is ", .getClassName(dataInput, quote = TRUE), ")",
+            functionName = ".assertIsDatasetSurvival",
+            parameter = "dataInput",
+            value = dataInput,
+            diagnosticId = "validation.dataset_class_incompatible"
         )
     }
 }
 
 .isDataset <- function(dataInput) {
-    return(.isDatasetMeans(dataInput) ||
+    return(.isDatasetGeneral(dataInput) ||
+        .isDatasetMeans(dataInput) ||
         .isDatasetRates(dataInput) ||
         .isDatasetSurvival(dataInput))
+}
+
+.isDatasetGeneral <- function(dataInput) {
+    return(inherits(dataInput, "DatasetGeneral"))
 }
 
 .isDatasetMeans <- function(dataInput) {
@@ -681,324 +792,421 @@ NULL
 }
 
 .isDatasetSurvival <- function(dataInput) {
-    return(inherits(dataInput, "DatasetSurvival") || 
+    return(inherits(dataInput, "DatasetSurvival") ||
         inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
-.assertIsNumericVector <- function(x,
+.assertIsNumericVector <- function(
+        x,
         argumentName,
         ...,
         naAllowed = FALSE,
         noDefaultAvailable = FALSE,
         len = NA_integer_,
-        call. = FALSE) {
-    if (missing("x") || is.null(x) || length(x) == 0) {
-        .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
-            "' must be a valid numeric value or vector",
-            call. = call.
+        matrixAllowed = FALSE) {
+    functionName <- paste(deparse(sys.call()), collapse = "")
+    argumentValue <- NULL
+    if (!missing(x)) {
+        argumentValue <- x
+    }
+
+    if (missing(x) || is.null(x) || length(x) == 0) {
+        .assertIsNoDefault(argumentValue, argumentName, noDefaultAvailable, checkNA = FALSE)
+        stopMissingArgument(sQuote(argumentName), " must be a valid numeric value or vector",
+            parameter = argumentName,
+            constraint = "must be a valid numeric value or vector",
+            functionName = functionName,
+            value = if (!missing(x)) x else NULL
         )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
-    if ((!naAllowed && anyNA(x)) || !is.numeric(x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must be a valid numeric value or vector",
-            call. = call.
-        )
+    if (!isTRUE(matrixAllowed)) {
+        illegalMatrix <- !all(is.na(x)) && is.matrix(x) && all(dim(x) > 1)
+        if (illegalMatrix || (!naAllowed && anyNA(x)) || !is.numeric(x)) {
+            stopIllegalArgument(sQuote(argumentName), " (", .arrayToString(x), ") must be a valid numeric value or vector",
+                ifelse(!is.vector(x), paste0(" (is ", .getClassName(x), ")"), ""),
+                parameter = argumentName, value = x,
+                constraint = "must be a valid numeric value or vector",
+                functionName = functionName,
+                relatedParameter = paste0("class of ", argumentName),
+                relatedValue = .getClassName(x)
+            )
+        }
     }
 
     if (!anyNA(len) && !length(x) %in% len) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must have length ", .arrayToString(len, mode = "or"),
-            call. = call.
+        stopIllegalArgument(sQuote(argumentName), " (", .arrayToString(x), ") must have length ",
+            .arrayToString(len, mode = "or"),
+            parameter = argumentName,
+            value = x,
+            constraint = paste0("length must be ", .arrayToString(len,
+                mode = "or"
+            )),
+            functionName = functionName,
+            relatedParameter = "expected length of argument",
+            relatedValue = .arrayToString(len, mode = "or")
         )
     }
+
+    return(invisible(as.numeric(x)))
 }
 
-.assertIsIntegerVector <- function(x, argumentName, ..., naAllowed = FALSE,
-        validateType = TRUE, noDefaultAvailable = FALSE, call. = FALSE) {
+.assertIsIntegerVector <- function(
+        x,
+        argumentName,
+        ...,
+        naAllowed = FALSE,
+        validateType = TRUE,
+        noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
-            "' must be a valid integer value or vector",
-            call. = call.
+        stopMissingArgument(.pQuote(argumentName), " must be a valid integer value or vector",
+            functionName = ".assertIsIntegerVector",
+            parameter = argumentName,
+            value = if (!missing(x)) x else NULL
         )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if (naAllowed && all(is.na(x))) {
-        return(invisible())
+        return(invisible(if (all(is.finite(x))) as.integer(x) else x))
     }
 
     if (!is.numeric(x) || (!naAllowed && anyNA(x)) || (validateType && !is.integer(x)) ||
             (!validateType && any(as.integer(na.omit(x)) != na.omit(x)))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must be a valid integer value or vector",
-            call. = call.
+        stopIllegalArgument(.pQuote(argumentName), " (", .arrayToString(x),
+            ") must be a valid integer value or vector",
+            functionName = ".assertIsIntegerVector",
+            parameter = argumentName,
+            value = x
         )
     }
+
+    return(invisible(if (all(is.finite(x))) as.integer(x) else x))
 }
 
-.assertIsLogicalVector <- function(x, argumentName, ..., naAllowed = FALSE,
-        noDefaultAvailable = FALSE, call. = FALSE) {
+.assertIsLogicalVector <- function(
+        x,
+        argumentName,
+        ...,
+        naAllowed = FALSE,
+        noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' ",
-            "must be a valid logical value or vector",
-            call. = call.
+        stopMissingArgument(.pQuote(argumentName), " ", "must be a valid logical value or vector",
+            functionName = ".assertIsLogicalVector",
+            parameter = argumentName,
+            value = if (!missing(x)) x else NULL
         )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if ((!naAllowed && anyNA(x)) || !is.logical(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (", x, ") ",
+        stopIllegalArgument(.pQuote(argumentName), " (", x, ") ",
             "must be a valid logical value or vector",
-            call. = call.
+            functionName = ".assertIsLogicalVector",
+            parameter = argumentName,
+            value = x
         )
     }
+
+    return(invisible(as.logical(x)))
 }
 
-.assertIsNoDefault <- function(x, argumentName, noDefaultAvailable, ..., checkNA = FALSE, call. = FALSE) {
+.assertIsNoDefault <- function(x, argumentName, noDefaultAvailable, ..., checkNA = FALSE) {
     if (noDefaultAvailable && (!checkNA || all(is.na(x)))) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' ",
+        stopMissingArgument(.pQuote(argumentName), " ",
             "must be specified, there is no default value",
-            call. = call.
+            functionName = ".assertIsNoDefault",
+            parameter = argumentName,
+            value = if (!missing(x)) x else NULL
         )
     }
 }
 
-.assertIsSingleLogical <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = FALSE) {
+.assertIsSingleLogical <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a single logical value",
-            call. = call.
+        stopMissingArgument(.pQuote(argumentName), " ",
+            "must be a single logical value",
+            functionName = ".assertIsSingleLogical",
+            parameter = argumentName,
+            value = if (!missing(x)) x else NULL
         )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if (length(x) > 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
+        stopIllegalArgument(.pQuote(argumentName), " ",
             .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single logical value",
-            call. = call.
+            functionName = ".assertIsSingleLogical",
+            parameter = argumentName,
+            value = x
         )
     }
 
     if ((!naAllowed && is.na(x)) || !is.logical(x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            ifelse(.isResultObjectBaseClass(x), .getClassName(x), x), ") must be a single logical value",
-            call. = call.
+        stopIllegalArgument(.pQuote(argumentName), " (",
+            ifelse(.isResultObjectBaseClass(x), .getClassName(x), x),
+            ") must be a single logical value",
+            functionName = ".assertIsSingleLogical",
+            parameter = argumentName,
+            value = x
         )
     }
+
+    return(invisible(as.logical(x)))
 }
 
-.assertIsSingleNumber <- function(x, argumentName, ..., naAllowed = FALSE, 
-        noDefaultAvailable = FALSE, call. = FALSE) {
+.assertIsSingleNumber <- function(
+        x,
+        argumentName,
+        ...,
+        naAllowed = FALSE,
+        noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid numeric value",
-            call. = call.
+        stopMissingArgument(.pQuote(argumentName), " must be a valid numeric value",
+            functionName = ".assertIsSingleNumber",
+            parameter = argumentName,
+            value = if (!missing(x)) x else NULL
         )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if (length(x) > 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
-            .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single numeric value",
-            call. = call.
+        stopIllegalArgument(.pQuote(argumentName), " ",
+            .arrayToString(x, vectorLookAndFeelEnabled = TRUE),
+            " must be a single numeric value",
+            functionName = ".assertIsSingleNumber",
+            parameter = argumentName,
+            value = x
         )
     }
 
     if ((!naAllowed && is.na(x)) || !is.numeric(x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
+        stopIllegalArgument(.pQuote(argumentName), " (",
             ifelse(.isResultObjectBaseClass(x), .getClassName(x), x), ") must be a valid numeric value",
-            call. = call.
+            functionName = ".assertIsSingleNumber",
+            parameter = argumentName,
+            value = x
         )
     }
+
+    return(invisible(as.numeric(x)))
 }
 
-.assertIsSingleInteger <- function(x, argumentName, ..., naAllowed = FALSE,
-        validateType = TRUE, noDefaultAvailable = FALSE, call. = FALSE) {
-    .assertIsSinglePositiveInteger(
+.assertIsSingleInteger <- function(
+        x,
+        argumentName,
+        ...,
+        naAllowed = FALSE,
+        validateType = TRUE,
+        noDefaultAvailable = FALSE) {
+    return(invisible(.assertIsSinglePositiveInteger(
         x = x,
         argumentName = argumentName,
         naAllowed = naAllowed,
         validateType = validateType,
         mustBePositive = FALSE,
-        noDefaultAvailable = noDefaultAvailable,
-        call. = call.
-    )
+        noDefaultAvailable = noDefaultAvailable
+    )))
 }
 
-.assertIsSinglePositiveInteger <- function(x,
+.assertIsSinglePositiveInteger <- function(
+        x,
         argumentName,
         ...,
         naAllowed = FALSE,
         validateType = TRUE,
         mustBePositive = TRUE,
-        noDefaultAvailable = FALSE,
-        call. = FALSE) {
+        noDefaultAvailable = FALSE) {
     prefix <- ifelse(mustBePositive, "single positive ", "single ")
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'", argumentName, "' must be a ", prefix, "integer value",
-            call. = call.
+        stopMissingArgument(.pQuote(argumentName), " must be a ", prefix, "integer value",
+            functionName = ".assertIsSinglePositiveInteger",
+            parameter = argumentName,
+            relatedParameter = "prefix",
+            relatedValue = prefix,
+            value = if (!missing(x)) x else NULL
         )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if (length(x) > 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
-            .arrayToString(x, vectorLookAndFeelEnabled = TRUE),
-            " must be a ", prefix, "integer value",
-            call. = call.
+        stopIllegalArgument(.pQuote(argumentName), " ",
+            .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a ",
+            prefix, "integer value",
+            functionName = ".assertIsSinglePositiveInteger",
+            parameter = argumentName,
+            value = x
         )
     }
 
     if (!is.numeric(x) || (!naAllowed && is.na(x)) || (validateType && !is.integer(x)) ||
             (!validateType && !is.na(x) && !is.infinite(x) && as.integer(x) != x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(.isResultObjectBaseClass(x), 
-            .getClassName(x), x), ") must be a ", prefix, "integer value",
-            call. = call.
+        stopIllegalArgument(.pQuote(argumentName), " (",
+            ifelse(.isResultObjectBaseClass(x), .getClassName(x), x),
+            ") must be a ", prefix, "integer value",
+            functionName = ".assertIsSinglePositiveInteger",
+            parameter = argumentName,
+            value = x
         )
     }
 
     if (mustBePositive && !is.na(x) && !is.infinite(x) && x <= 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(.isResultObjectBaseClass(x), 
-            .getClassName(x), x), ") must be a ", prefix, "integer value",
-            call. = call.
+        stopIllegalArgument(.pQuote(argumentName), " (",
+            ifelse(.isResultObjectBaseClass(x), .getClassName(x), x), ") must be a ", prefix,
+            "integer value",
+            functionName = ".assertIsSinglePositiveInteger",
+            parameter = argumentName,
+            value = x
         )
     }
+
+    return(invisible(if (all(is.finite(x))) as.integer(x) else x))
 }
 
-.assertIsSingleCharacter <- function(x,
+.assertIsSingleCharacter <- function(
+        x,
         argumentName,
         ...,
         naAllowed = FALSE,
-        noDefaultAvailable = FALSE,
-        call. = FALSE) {
+        noDefaultAvailable = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid character value",
-            call. = call.
+        stopMissingArgument(.pQuote(argumentName), " must be a valid character value",
+            functionName = ".assertIsSingleCharacter",
+            parameter = argumentName,
+            value = if (!missing(x)) x else NULL
         )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if (length(x) > 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
+        stopIllegalArgument(.pQuote(argumentName), " ",
             .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single character value",
-            call. = call.
+            functionName = ".assertIsSingleCharacter",
+            parameter = argumentName,
+            value = x
         )
     }
 
     if (!is.character(x)) {
-        stop(
-            sprintf(paste0(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'%s' must be a valid character value (is an instance of class '%s')"
-            ), argumentName, .getClassName(x)),
-            call. = call.
+        stopIllegalArgument(
+            sprintf(
+                "'%s' must be a valid character value (is an instance of class '%s')", argumentName,
+                .getClassName(x)
+            ),
+            parameter = argumentName,
+            value = x,
+            constraint = "must be a valid character value",
+            functionName = ".assertIsSingleCharacter"
         )
     }
 
     if (!naAllowed && is.na(x)) {
-        stop(
-            sprintf(paste0(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'%s' (NA) must be a valid character value"
-            ), argumentName),
-            call. = call.
+        stopIllegalArgument(sprintf("'%s' (NA) must be a valid character value", argumentName),
+            parameter = argumentName,
+            value = x,
+            constraint = "must be a valid character value",
+            functionName = ".assertIsSingleCharacter"
         )
     }
+
+    return(invisible(as.character(x)))
 }
 
-.assertIsCharacter <- function(x, argumentName, ..., naAllowed = FALSE, call. = FALSE) {
+.assertIsCharacter <- function(x, argumentName, ..., naAllowed = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'", argumentName, "' must be a valid character value or vector",
-            call. = call.
+        stopMissingArgument(.pQuote(argumentName), " must be a valid character value or vector",
+            functionName = ".assertIsCharacter",
+            parameter = argumentName,
+            value = if (!missing(x)) x else NULL
         )
     }
 
     if (!all(is.character(x))) {
-        stop(
-            sprintf(paste0(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'%s' must be a valid character value or vector ",
-                "(is an instance of class '%s')"
-            ), argumentName, .getClassName(x)),
-            call. = call.
+        stopIllegalArgument(
+            sprintf(
+                "'%s' must be a valid character value or vector (is an instance of class '%s')",
+                argumentName, .getClassName(x)
+            ),
+            parameter = argumentName,
+            value = x,
+            constraint = "must be a valid character value or vector",
+            functionName = ".assertIsCharacter"
         )
     }
 
     if (!naAllowed && anyNA(x)) {
-        stop(
+        stopIllegalArgument(
             sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'%s' (%s) must be a valid character value (NA is not allowed)"
-                ),
-                argumentName, .arrayToString(x)
+                "'%s' (%s) must be a valid character value (NA is not allowed)", argumentName,
+                .arrayToString(x)
             ),
-            call. = call.
+            parameter = argumentName,
+            value = x,
+            constraint = "must be a valid character value; NA is not allowed",
+            functionName = ".assertIsCharacter"
         )
     }
+
+    return(invisible(as.character(x)))
 }
 
-.assertDesignParameterExists <- function(design, parameterName, defaultValue) {
+.assertDesignParameterExists <- function(
+        design,
+        parameterName,
+        defaultValue,
+        ...,
+        relatedParameter = NULL,
+        relatedValue = NULL) {
     if (missing(design)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'design' must be defined",
-            call. = FALSE
+        stopMissingArgument("'design' must be defined",
+            functionName = ".assertDesignParameterExists",
+            parameter = "design"
         )
     }
 
     if (missing(parameterName)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'parameterName' must be defined",
-            call. = FALSE
+        stopMissingArgument("'parameterName' must be defined",
+            functionName = ".assertDesignParameterExists",
+            parameter = "parameterName"
         )
     }
 
     if (missing(defaultValue)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'defaultValue' must be defined",
-            call. = FALSE
+        stopMissingArgument("'defaultValue' must be defined",
+            functionName = ".assertDesignParameterExists",
+            parameter = "defaultValue"
         )
     }
 
     value <- design[[parameterName]]
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT, "parameter '", parameterName,
-            "' must be specified in design",
-            call. = FALSE
+        constraint <- NULL
+        if (identical(relatedParameter, "typeOfDesign") && !is.null(relatedValue)) {
+            constraint <- paste0(
+                "must be specified for ", .pQuote(relatedParameter), " = ", .pQuote(relatedValue)
+            )
+        }
+
+        stopMissingArgument("parameter ", .pQuote(parameterName), " must be specified in design",
+            functionName = ".assertDesignParameterExists",
+            parameter = parameterName,
+            relatedParameter = relatedParameter,
+            relatedValue = relatedValue,
+            constraint = constraint
         )
     }
 
@@ -1016,16 +1224,16 @@ NULL
 
 .designParameterExists <- function(design, parameterName) {
     if (missing(design)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'design' must be defined",
-            call. = FALSE
+        stopMissingArgument("'design' must be defined",
+            functionName = ".designParameterExists",
+            parameter = "design"
         )
     }
 
     if (missing(parameterName)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'parameterName' must be defined",
-            call. = FALSE
+        stopMissingArgument("'parameterName' must be defined",
+            functionName = ".designParameterExists",
+            parameter = "parameterName"
         )
     }
 
@@ -1043,16 +1251,14 @@ NULL
 
 .assertIsOptimizationCriterion <- function(x) {
     if (!.isOptimizationCriterion(x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "optimization criterion must be one of the following: ",
-            .printOptimizationCriterion(),
-            call. = FALSE
+        stopIllegalArgument("optimization criterion must be one of the following: ", .printOptimizationCriterion(),
+            functionName = ".assertIsOptimizationCriterion"
         )
     }
 }
 
-.showParameterOutOfValidatedBoundsMessage <- function(parameterValue,
+.showParameterOutOfValidatedBoundsMessage <- function(
+        parameterValue,
         parameterName,
         ...,
         lowerBound = NA_real_,
@@ -1069,9 +1275,11 @@ NULL
     .assertIsSingleNumber(lowerBound, "lowerBound", naAllowed = TRUE)
     .assertIsSingleNumber(upperBound, "upperBound", naAllowed = TRUE)
     if (is.na(lowerBound) && is.na(upperBound)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'lowerBound' or 'upperBound' must be defined",
-            call. = FALSE
+        stopMissingArgument("'lowerBound' or 'upperBound' must be defined",
+            functionName = ".showParameterOutOfValidatedBoundsMessage",
+            parameter = "lowerBound",
+            relatedParameter = "upperBound",
+            value = lowerBound
         )
     }
 
@@ -1118,10 +1326,12 @@ NULL
             type = "character"
         )
         if (identical(type, "warning")) {
-            warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
+            warnNotValidated("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
                 spendingFunctionName, "is out of validated bounds ",
                 bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix,
-                call. = FALSE
+                parameter = parameterName,
+                value = parameterValue,
+                diagnosticId = "validation.parameter_outside_validated_range"
             )
         } else if (identical(type, "message")) {
             message(
@@ -1138,33 +1348,40 @@ NULL
     .assertIsInOpenInterval(kappa, "kappa", lower = 0, upper = NULL)
 }
 
-.assertIsValidLambda <- function(lambda, lambdaNumber = 0) {
+.assertIsValidLambda <- function(lambda, lambdaNumber = 0, matrixAllowed = FALSE) {
     argumentName <- "lambda"
     if (lambdaNumber >= 1) {
         argumentName <- paste0("lambda", lambdaNumber)
     }
-    .assertIsNumericVector(lambda, argumentName, naAllowed = TRUE)
+    lambda <- .assertIsNumericVector(lambda, argumentName,
+        naAllowed = TRUE, matrixAllowed = matrixAllowed
+    )
     if (all(is.na(lambda))) {
-        return(invisible())
+        return(invisible(lambda))
     }
 
     if (anyNA(lambda)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(lambda), ") must be a valid numeric vector",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(argumentName), " (", .arrayToString(lambda),
+            ") must be a valid numeric vector",
+            functionName = ".assertIsValidLambda",
+            parameter = argumentName,
+            relatedParameter = "lambda",
+            relatedValue = lambda
         )
     }
 
     .assertIsInClosedInterval(lambda, argumentName, lower = 0, upper = NULL)
     if (all(lambda == 0)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(lambda), ") not allowed: ",
-            "at least one lambda value must be > 0",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(argumentName), " (", .arrayToString(lambda),
+            ") not allowed: ", "at least one lambda value must be > 0",
+            functionName = ".assertIsValidLambda",
+            parameter = argumentName,
+            relatedParameter = "lambda",
+            relatedValue = lambda
         )
     }
+
+    return(invisible(lambda))
 }
 
 .assertIsValidFollowUpTime <- function(followUpTime) {
@@ -1174,59 +1391,75 @@ NULL
 
     .assertIsSingleNumber(followUpTime, "followUpTime", naAllowed = TRUE)
     if (followUpTime < 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'followUpTime' (", followUpTime, ") must be >= 0",
-            call. = FALSE
+        stopIllegalArgument("'followUpTime' (", followUpTime, ") must be >= 0",
+            functionName = ".assertIsValidFollowUpTime",
+            parameter = "followUpTime", value = followUpTime
         )
     }
 }
 
 .assertIsValidAccrualTime <- function(accrualTime, ..., naAllowed = TRUE) {
-    .assertIsNumericVector(accrualTime, "accrualTime", naAllowed = naAllowed)
+    accrualTime <- .assertIsNumericVector(accrualTime, "accrualTime", naAllowed = naAllowed)
 
     if (length(accrualTime) == 0 || all(is.na(accrualTime))) {
-        return(invisible())
+        return(invisible(accrualTime))
     }
 
     if (length(accrualTime) > 1 && accrualTime[1] != 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "the first value of 'accrualTime' ",
+        stopIllegalArgument("the first value of 'accrualTime' ",
             "(", .arrayToString(accrualTime), ") must be 0",
-            call. = FALSE
+            functionName = ".assertIsValidAccrualTime",
+            parameter = "accrualTime",
+            value = accrualTime
         )
     }
 
     if (identical(accrualTime, 0) || identical(accrualTime, 0L)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "single 'accrualTime' is not allowed to be 0",
-            call. = FALSE
+        stopIllegalArgument("single 'accrualTime' is not allowed to be 0",
+            functionName = ".assertIsValidAccrualTime",
+            parameter = "accrualTime",
+            value = accrualTime
         )
     }
 
-    .assertIsInClosedInterval(accrualTime, "accrualTime", lower = 0, upper = NULL, naAllowed = naAllowed)
+    .assertIsInClosedInterval(accrualTime, "accrualTime",
+        lower = 0, upper = NULL, naAllowed = naAllowed
+    )
     .assertValuesAreStrictlyIncreasing(accrualTime, "accrualTime")
+
+    return(invisible(accrualTime))
 }
 
-.assertIsValidStandardDeviation <- function(stDev, groups = 1L, ..., name = "stDev", naAllowed = TRUE) {
+.assertIsValidStandardDeviation <- function(
+        stDev,
+        groups = 1L,
+        ...,
+        name = "stDev",
+        naAllowed = TRUE) {
     if (groups == 1L) {
-        .assertIsSingleNumber(stDev, name, naAllowed = naAllowed)
+        stDev <- .assertIsSingleNumber(stDev, name, naAllowed = naAllowed)
     } else {
-        .assertIsNumericVector(stDev, name, len = unique(c(1L, groups)), naAllowed = naAllowed)
+        stDev <- .assertIsNumericVector(stDev, name,
+            len = unique(c(1L, groups)), naAllowed = naAllowed
+        )
     }
 
     if (naAllowed && all(is.na(stDev))) {
-        return(invisible())
+        return(invisible(stDev))
     }
 
     if (any(stDev <= 0)) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "standard deviation '", name, "' (", .arrayToString(stDev), ") must be > 0",
-            call. = FALSE
+        stopArgumentOutOfRange("standard deviation ", .pQuote(name), " ",
+            "(", .arrayToString(stDev), ") must be > 0",
+            functionName = ".assertIsValidStandardDeviation",
+            parameter = "name",
+            value = name,
+            relatedParameter = "stDev",
+            relatedValue = stDev
         )
     }
+
+    return(invisible(stDev))
 }
 
 .assertIsValidAlpha <- function(alpha, ..., naAllowed = FALSE) {
@@ -1257,13 +1490,8 @@ NULL
 
 .assertIsValidStage <- function(stage, kMax) {
     .assertIsSingleNumber(stage, "stage")
-    if (stage < 1 || stage > kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'stage' (", stage, ") is out of bounds [1; ", kMax, "]",
-            call. = FALSE
-        )
-    }
+    .assertIsSingleNumber(kMax, "kMax")
+    .assertIsInClosedInterval(stage, "stage", lower = 1, upper = kMax)
 }
 
 .assertIsValidIterationsAndSeed <- function(iterations, seed, ..., zeroIterationsAllowed = TRUE) {
@@ -1271,38 +1499,35 @@ NULL
 
     if (zeroIterationsAllowed) {
         if (iterations < 0) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'iterations' (", iterations, ") must be >= 0",
-                call. = FALSE
+            stopIllegalArgument("'iterations' (", iterations, ") must be >= 0",
+                functionName = ".assertIsValidIterationsAndSeed",
+                parameter = "iterations", value = iterations
             )
         }
     } else {
         if (iterations < 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'iterations' (", iterations, ") must be > 0",
-                call. = FALSE
+            stopIllegalArgument("'iterations' (", iterations, ") must be > 0",
+                functionName = ".assertIsValidIterationsAndSeed",
+                parameter = "iterations", value = iterations
             )
         }
     }
 
     if (is.null(seed) || length(seed) == 0 || (!is.na(seed) && !is.numeric(seed))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'seed' (", seed, ") must be a valid integer value",
-            call. = FALSE
+        stopIllegalArgument("'seed' (", seed, ") must be a valid integer value",
+            functionName = ".assertIsValidIterationsAndSeed",
+            parameter = "seed", value = seed
         )
     }
 }
 
 .assertIsValidLegendPosition <- function(legendPosition) {
     if (is.null(legendPosition) || length(legendPosition) != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'legendPosition' (", .arrayToString(legendPosition), ") ",
+        stopIllegalArgument("'legendPosition' (", .arrayToString(legendPosition), ") ",
             "must be a single integer or character value",
-            call. = FALSE
+            functionName = ".assertIsValidLegendPosition",
+            parameter = "legendPosition",
+            value = legendPosition
         )
     }
 
@@ -1315,11 +1540,11 @@ NULL
     }
 
     if (!is.numeric(legendPosition) && !is.character(legendPosition)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'legendPosition' (", legendPosition, ") ",
+        stopIllegalArgument("'legendPosition' (", legendPosition, ") ",
             "must be a single integer or character value",
-            call. = FALSE
+            functionName = ".assertIsValidLegendPosition",
+            parameter = "legendPosition",
+            value = legendPosition
         )
     }
 
@@ -1327,54 +1552,72 @@ NULL
         .assertIsSingleInteger(legendPosition, "legendPosition", validateType = FALSE)
         .assertIsInClosedInterval(legendPosition, "legendPosition", lower = -1, upper = 6)
     } else {
-        validLegendPositions <- c("none", "left", "right", "bottom", "top")
+        validLegendPositions <- c("auto", "none", "left", "right", "bottom", "top")
         if (!(legendPosition %in% validLegendPositions)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'legendPosition' (", legendPosition, ") ",
+            stopIllegalArgument("'legendPosition' (", legendPosition, ") ",
                 "must be one of the following values: ",
                 .arrayToString(validLegendPositions),
-                call. = FALSE
+                functionName = ".assertIsValidLegendPosition",
+                parameter = "legendPosition",
+                value = legendPosition,
+                constraint = "a supported automatic, named outside, or numeric legend position",
+                diagnosticId = "plot.legend_position_unsupported",
+                context = list(allowedValues = validLegendPositions)
             )
         }
     }
 }
 
-.assertIsValidKMax <- function(kMax, kMaxLowerBound = 1,
-        kMaxUpperBound = C_KMAX_UPPER_BOUND, ..., showWarnings = FALSE) {
+.assertIsValidKMax <- function(
+        kMax,
+        kMaxLowerBound = 1,
+        kMaxUpperBound = C_KMAX_UPPER_BOUND,
+        ...,
+        showWarnings = FALSE) {
     .assertIsSingleInteger(kMax, "kMax", validateType = FALSE)
     .assertIsInClosedInterval(kMax, "kMax", lower = kMaxLowerBound, upper = kMaxUpperBound)
     if (showWarnings && kMax > 10) {
-        warning("The usage of 'kMax' (", kMax, ") > 10 is not validated", call. = FALSE)
+        warnNotValidated("The usage of 'kMax' (", kMax, ") > 10 is not validated",
+            diagnosticId = "validation.stage_count_outside_validated_range"
+        )
     }
 }
 
-.assertAreValidInformationRates <- function(informationRates, kMax = length(informationRates),
-        kMaxLowerBound = 1L, kMaxUpperBound = C_KMAX_UPPER_BOUND) {
+.assertAreValidInformationRates <- function(
+        informationRates,
+        kMax = length(informationRates),
+        kMaxLowerBound = 1L,
+        kMaxUpperBound = C_KMAX_UPPER_BOUND) {
     if (length(informationRates) < kMaxLowerBound) {
-        stop(
+        upperBound <- ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND,
+            kMax, C_KMAX_UPPER_BOUND
+        )
+        stopArgumentLengthOutOfBounds(
             sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
-                    "length of 'informationRates' (%s) is out of bounds [%s; %s]"
-                ),
-                length(informationRates), kMaxLowerBound,
-                ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND, kMax, C_KMAX_UPPER_BOUND)
+                "length of 'informationRates' (%s) must be in [%s; %s]",
+                length(informationRates), kMaxLowerBound, upperBound
             ),
-            call. = FALSE
+            parameter = "informationRates",
+            value = informationRates,
+            lowerBound = kMaxLowerBound,
+            upperBound = upperBound,
+            actualLength = length(informationRates),
+            functionName = ".assertAreValidInformationRates"
         )
     }
 
     if (length(informationRates) != kMax) {
-        stop(
+        stopConflictingArguments(
             sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                    "length of 'informationRates' (%s) must be equal to 'kMax' (%s)"
-                ),
-                length(informationRates), kMax
+                "length of 'informationRates' (%s) must be equal to 'kMax' (%s)", length(informationRates),
+                kMax
             ),
-            call. = FALSE
+            parameter = "informationRates",
+            value = informationRates,
+            relatedParameter = "kMax",
+            relatedValue = kMax,
+            functionName = ".assertAreValidInformationRates",
+            diagnosticId = "design.information_rates_length"
         )
     }
 
@@ -1382,69 +1625,48 @@ NULL
         return(invisible())
     }
 
-    .assertValuesAreInsideBounds("informationRates", informationRates,
-        0, 1,
-        lowerBoundInclusive = FALSE
+    .assertIsInInterval(informationRates, "informationRates",
+        lower = 0, upper = 1,
+        lowerIncluded = FALSE, upperIncluded = TRUE
     )
 
     if (min(informationRates) <= 0 || max(informationRates) > 1 ||
             any(informationRates[2:kMax] <= informationRates[1:(kMax - 1)])) {
-        stop(
+        stopIllegalArgument(
             sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'informationRates' (%s) ",
-                    "must be strictly increasing: 0 < x_1 < .. < x_%s <= 1"
-                ),
+                "'informationRates' (%s) must be strictly increasing: 0 < x_1 < .. < x_%s <= 1",
                 .arrayToString(informationRates, vectorLookAndFeelEnabled = FALSE), kMax
             ),
-            call. = FALSE
+            parameter = "informationRates",
+            value = informationRates, constraint = sprintf(
+                "must be strictly increasing: 0 < x_1 < .. < x_%s <= 1",
+                kMax
+            ),
+            functionName = ".assertAreValidInformationRates",
+            diagnosticId = "design.information_rates_not_cumulative"
         )
     }
 
-    if (kMax > 1 && kMax <= 10 && (any(informationRates[2:kMax] - informationRates[1:(kMax - 1)] < 0.05 - 1E-10))) {
-        warning("Chosen 'informationRates' (",
+    if (kMax > 1 && kMax <= 10 && (any(informationRates[2:kMax] - informationRates[1:(kMax - 1)] < 0.05 - 1e-10))) {
+        warnNotValidated("Chosen 'informationRates' (",
             .arrayToString(informationRates, vectorLookAndFeelEnabled = FALSE),
             ") outside validated range",
-            call. = FALSE
+            diagnosticId = "validation.parameter_outside_validated_range"
         )
-    }
-}
-
-.assertValuesAreInsideBounds <- function(parameterName, values, lowerBound, upperBound, ...,
-        lowerBoundInclusive = TRUE, upperBoundInclusive = TRUE) {
-    lower <- min(values)
-    upper <- max(values)
-    lowerInvalid <- ifelse(lowerBoundInclusive, lower < lowerBound, lower <= lowerBound)
-    upperInvalid <- ifelse(upperBoundInclusive, upper > upperBound, upper >= upperBound)
-    if (!is.na(lowerInvalid)) {
-        if (lowerInvalid || upperInvalid) {
-            stop(
-                sprintf(
-                    paste0(
-                        C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                        "'%s' (%s) is out of bounds %s%s; %s%s"
-                    ),
-                    parameterName, .arrayToString(values, vectorLookAndFeelEnabled = FALSE),
-                    ifelse(lowerBoundInclusive, "[", "("), lowerBound,
-                    upperBound, ifelse(upperBoundInclusive, "]", ")")
-                ),
-                call. = FALSE
-            )
-        }
     }
 }
 
 .assertContainsNoNas <- function(values, parameterName) {
     if (anyNA(values)) {
-        stop(
+        stopIllegalArgument(
             sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
-                    "must contain valid numeric values (NA is not allowed)"
-                ),
-                parameterName, .arrayToString(values, vectorLookAndFeelEnabled = FALSE)
+                "'%s' (%s) must contain valid numeric values (NA is not allowed)", parameterName,
+                .arrayToString(values, vectorLookAndFeelEnabled = FALSE)
             ),
-            call. = FALSE
+            parameter = parameterName,
+            value = values,
+            constraint = "must contain valid numeric values; NA is not allowed",
+            functionName = ".assertContainsNoNas"
         )
     }
 }
@@ -1456,21 +1678,22 @@ NULL
 
     for (i in length(values):2) {
         if (!is.na(values[i]) && is.na(values[i - 1])) {
-            stop(
+            stopIllegalArgument(
                 sprintf(
-                    paste0(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
-                        "must contain valid numeric values (NAs are only allowed at the end of the vector)"
-                    ),
+                    "'%s' (%s) must contain valid numeric values (NAs are only allowed at the end of the vector)",
                     parameterName, .arrayToString(values, vectorLookAndFeelEnabled = FALSE)
                 ),
-                call. = FALSE
+                parameter = parameterName,
+                value = values,
+                constraint = "must contain valid numeric values; NAs are only allowed at the end of the vector",
+                functionName = ".assertContainsOnlyNasAtTheEnd"
             )
         }
     }
 }
 
-.assertValuesAreStrictlyIncreasing <- function(values,
+.assertValuesAreStrictlyIncreasing <- function(
+        values,
         parameterName,
         ...,
         endingNasAllowed = FALSE,
@@ -1498,15 +1721,15 @@ NULL
     }
 
     if (any(values[2:len] <= values[1:(len - 1)])) {
-        stop(
+        stopIllegalArgument(
             sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
-                    "must be strictly increasing: x_1 < .. < x_%s"
-                ),
-                parameterName, .arrayToString(valuesTemp, vectorLookAndFeelEnabled = FALSE), len
+                "'%s' (%s) must be strictly increasing: x_1 < .. < x_%s", parameterName,
+                .arrayToString(valuesTemp, vectorLookAndFeelEnabled = FALSE), len
             ),
-            call. = FALSE
+            parameter = parameterName,
+            value = valuesTemp,
+            constraint = sprintf("must be strictly increasing: x_1 < .. < x_%s", len),
+            functionName = ".assertValuesAreStrictlyIncreasing"
         )
     }
 }
@@ -1531,120 +1754,157 @@ NULL
     }
 
     if (any(values[2:len] < values[1:(len - 1)])) {
-        stop(
+        stopIllegalArgument(
             sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
-                    "must be increasing: x_1 <= .. <= x_%s"
-                ),
-                parameterName, .arrayToString(valuesTemp, vectorLookAndFeelEnabled = FALSE), len
+                "'%s' (%s) must be increasing: x_1 <= .. <= x_%s",
+                parameterName, .arrayToString(valuesTemp,
+                    vectorLookAndFeelEnabled = FALSE
+                ), len
             ),
-            call. = FALSE
+            parameter = parameterName,
+            value = valuesTemp,
+            constraint = sprintf(
+                "must be increasing: x_1 <= .. <= x_%s",
+                len
+            ),
+            functionName = ".assertValuesAreMonotoneIncreasing"
         )
     }
 }
 
 .assertAreValidFutilityBounds <- function(
-        futilityBounds, 
+        futilityBounds,
         kMax = length(futilityBounds) + 1,
         directionUpper = TRUE,
-        kMaxLowerBound = 1, 
-        kMaxUpperBound = C_KMAX_UPPER_BOUND) {
+        kMaxLowerBound = 1,
+        kMaxUpperBound = C_KMAX_UPPER_BOUND,
+        naAllowed = FALSE) {
     if (length(futilityBounds) < kMaxLowerBound - 1) {
-        stop(
-            sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
-                    "length of 'futilityBounds' (%s) is out of bounds [%s; %s]"
-                ),
-                length(futilityBounds), kMaxLowerBound - 1,
-                ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND, kMax - 1, C_KMAX_UPPER_BOUND - 1)
-            ),
-            call. = FALSE
+        upperBound <- ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND,
+            kMax - 1, C_KMAX_UPPER_BOUND - 1
+        )
+
+        if (kMaxLowerBound - 1 == upperBound) {
+            msg <- sprintf(
+                "length of 'futilityBounds' (%s) must be %s", length(futilityBounds),
+                kMaxLowerBound - 1
+            )
+        } else {
+            msg <- sprintf(
+                "length of 'futilityBounds' (%s) must be in [%s; %s]", length(futilityBounds),
+                kMaxLowerBound - 1, upperBound
+            )
+        }
+
+        stopArgumentLengthOutOfBounds(
+            msg,
+            parameter = "futilityBounds",
+            value = futilityBounds,
+            lowerBound = kMaxLowerBound - 1,
+            upperBound = upperBound,
+            actualLength = length(futilityBounds),
+            functionName = ".assertAreValidFutilityBounds"
         )
     }
 
     .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
 
     if (length(futilityBounds) != kMax - 1) {
-        stop(
-            C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "length of 'futilityBounds' (", length(futilityBounds),
-            ") must be equal to 'kMax' (", kMax, ") - 1",
-            call. = FALSE
+        stopConflictingArguments("length of 'futilityBounds' (", length(futilityBounds), ") must be equal to 'kMax' (",
+            kMax, ") - 1",
+            parameter = "futilityBounds", value = futilityBounds,
+            relatedParameter = "kMax",
+            relatedValue = kMax,
+            functionName = ".assertAreValidFutilityBounds",
+            diagnosticId = "validation.interim_vector_length"
         )
     }
-    
+
     lowerBound <- ifelse(isFALSE(directionUpper), -6, -Inf)
     upperBound <- ifelse(isFALSE(directionUpper), Inf, 6)
-    .assertValuesAreInsideBounds("futilityBounds", futilityBounds, 
-        lowerBound = lowerBound, upperBound = upperBound)
+    .assertIsInClosedInterval(futilityBounds, "futilityBounds",
+        lower = lowerBound, upper = upperBound, naAllowed = naAllowed
+    )
 }
 
 .assertIsValidCipher <- function(key, value) {
     if (!(key %in% names(C_CIPHERS)) || (getCipheredValue(value) != C_CIPHERS[[key]])) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'token' and/or 'secret' unkown",
-            call. = FALSE
+        stopIllegalArgument("'token' and/or 'secret' unkown",
+            functionName = ".assertIsValidCipher",
+            parameter = "token",
+            relatedParameter = "secret"
         )
     }
 }
 
-.assertIsValidAlpha0Vec <- function(alpha0Vec, kMax = length(alpha0Vec) - 1,
-        kMaxLowerBound = 1, kMaxUpperBound = C_KMAX_UPPER_BOUND) {
+.assertIsValidAlpha0Vec <- function(
+        alpha0Vec,
+        kMax = length(alpha0Vec) - 1,
+        kMaxLowerBound = 1,
+        kMaxUpperBound = C_KMAX_UPPER_BOUND) {
     .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
 
     if (length(alpha0Vec) < kMaxLowerBound - 1) {
-        stop(
+        stopArgumentLengthOutOfBounds(
             sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
-                    "length of 'alpha0Vec' (%s) is out of bounds [%s; %s]"
-                ),
-                length(alpha0Vec), kMaxLowerBound - 1, kMax - 1
+                "length of 'alpha0Vec' (%s) must be in [%s; %s]", length(alpha0Vec),
+                kMaxLowerBound - 1, kMax - 1
             ),
-            call. = FALSE
+            parameter = "alpha0Vec",
+            value = alpha0Vec,
+            lowerBound = kMaxLowerBound - 1,
+            upperBound = kMax - 1,
+            actualLength = length(alpha0Vec),
+            functionName = ".assertIsValidAlpha0Vec"
         )
     }
 
     if (length(alpha0Vec) != kMax - 1) {
-        stop(
-            C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "length of 'alpha0Vec' (", length(alpha0Vec),
+        stopConflictingArguments("length of 'alpha0Vec' (", length(alpha0Vec),
             ") must be equal to 'kMax' (", kMax, ") - 1",
-            call. = FALSE
+            parameter = "alpha0Vec",
+            value = alpha0Vec,
+            relatedParameter = "kMax",
+            relatedValue = kMax,
+            functionName = ".assertIsValidAlpha0Vec",
+            diagnosticId = "validation.interim_vector_length"
         )
     }
 
-    .assertValuesAreInsideBounds("alpha0Vec", alpha0Vec, 0, 1, lowerBoundInclusive = FALSE)
+    .assertIsInInterval(alpha0Vec, "alpha0Vec",
+        lower = 0, upper = 1,
+        lowerIncluded = FALSE, upperIncluded = TRUE
+    )
 }
 
 .assertIsValidSidedParameter <- function(sided) {
     if (is.null(match.call(expand.dots = FALSE)[["sided"]])) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'sided' must be defined",
-            call. = FALSE
+        stopMissingArgument("'sided' must be defined",
+            functionName = ".assertIsValidSidedParameter",
+            parameter = "sided"
         )
     }
     if (sided != 1 && sided != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'sided' (", sided, ") must be 1 or 2",
-            call. = FALSE
+        stopIllegalArgument("'sided' (", sided, ") must be 1 or 2",
+            functionName = ".assertIsValidSidedParameter",
+            parameter = "sided",
+            value = sided
         )
     }
 }
 
 .assertIsValidGroupsParameter <- function(groups) {
     if (is.null(match.call(expand.dots = FALSE)[["groups"]])) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'groups' must be defined",
-            call. = FALSE
+        stopMissingArgument("'groups' must be defined",
+            functionName = ".assertIsValidGroupsParameter",
+            parameter = "groups"
         )
     }
     if (groups != 1 && groups != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'groups' (", groups, ") must be 1 or 2",
-            call. = FALSE
+        stopIllegalArgument("'groups' (", groups, ") must be 1 or 2",
+            functionName = ".assertIsValidGroupsParameter",
+            parameter = "groups",
+            value = groups
         )
     }
 }
@@ -1669,9 +1929,9 @@ NULL
     tryCatch(expr = {
         args <- list(...)
     }, error = function(e) {
-        stop(
-            simpleError(paste0(C_EXCEPTION_TYPE_MISSING_ARGUMENT, e$message), call = e$call),
-            call. = FALSE
+        stopMissingArgument(e$message,
+            call = e$call,
+            functionName = ".associatedArgumentsAreDefined"
         )
     })
 
@@ -1682,8 +1942,8 @@ NULL
     args <- args[args != "warningOnlyEnabled" & !is.null(args)]
     argNames <- names(args)
     if (sum(argNames == "") > 0) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "each argument must have a name defined, e.g. a = a"
+        stopRuntimeIssue("each argument must have a name defined, e.g. a = a",
+            functionName = ".associatedArgumentsAreDefined"
         )
     }
 
@@ -1706,10 +1966,17 @@ NULL
             ifelse(length(definedArguments) > 1, " are", " is"), " defined"
         )
         if (warningOnlyEnabled) {
-            warning(C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS, message, call. = FALSE)
+            warnInvalidInput(C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS, message,
+                parameter = undefinedArguments,
+                diagnosticId = "validation.companion_arguments_undefined"
+            )
             return(FALSE)
         } else {
-            stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, message, call. = FALSE)
+            stopMissingArgument(message,
+                parameter = undefinedArguments,
+                relatedParameter = definedArguments,
+                functionName = ".associatedArgumentsAreDefined"
+            )
         }
     }
 
@@ -1721,9 +1988,10 @@ NULL
         if (!required) {
             return(invisible())
         }
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'nPlanned' must be specified",
-            call. = FALSE
+        stopMissingArgument("'nPlanned' must be specified",
+            functionName = ".assertIsValidNPlanned",
+            parameter = "nPlanned",
+            value = nPlanned
         )
     }
 
@@ -1731,37 +1999,37 @@ NULL
     .assertIsSingleInteger(stage, "stage", validateType = FALSE)
 
     if (is.null(nPlanned) || length(nPlanned) != kMax - stage) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        stopIllegalArgument(
             sprintf(
-                paste0(
-                    "'nPlanned' (%s) is invalid: ",
-                    "length must be equal to %s (kMax - stage = %s - %s)"
-                ),
+                paste0("'nPlanned' (%s) is invalid: ", "length must be equal to %s (kMax - stage = %s - %s)"),
                 .arrayToString(nPlanned), kMax - stage, kMax, stage
             ),
-            call. = FALSE
+            functionName = ".assertIsValidNPlanned",
+            parameter = "nPlanned",
+            value = nPlanned,
+            diagnosticId = "analysis.remaining_stages_length"
         )
     }
 
     if (sum(is.na(nPlanned)) > 0 || sum(nPlanned <= 0) > 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        stopIllegalArgument(
             sprintf(
-                paste0(
-                    "'nPlanned' (%s) is invalid: ",
-                    "all values must be > 0"
-                ),
+                paste0("'nPlanned' (%s) is invalid: ", "all values must be > 0"),
                 .arrayToString(nPlanned)
             ),
-            call. = FALSE
+            functionName = ".assertIsValidNPlanned",
+            parameter = "nPlanned",
+            value = nPlanned
         )
     }
 }
 
 .isValidNPlanned <- function(nPlanned, kMax, stage) {
     if (missing(nPlanned)) {
-        warning("'nPlanned' is missing", call. = FALSE)
+        warnInvalidInput("'nPlanned' is missing",
+            parameter = "nPlanned",
+            diagnosticId = "analysis.n_planned_missing"
+        )
         return(FALSE)
     }
 
@@ -1770,32 +2038,44 @@ NULL
     }
 
     if (length(nPlanned) != kMax - stage) {
-        warning(sprintf(
+        warnArgumentIgnored(sprintf(
             paste0(
                 "'nPlanned' (%s) will be ignored: ",
                 "length must be equal to %s (kMax - stage = %s - %s)"
             ),
             .arrayToString(nPlanned), kMax - stage, kMax, stage
-        ), call. = FALSE)
+        ),
+            parameter = "nPlanned",
+            value = nPlanned,
+            diagnosticId = "analysis.n_planned_length"
+        )
         return(FALSE)
     }
 
     if (sum(nPlanned <= 0, na.rm = TRUE) > 0) {
-        warning(sprintf(
+        warnArgumentIgnored(sprintf(
             paste0(
                 "'nPlanned' (%s) will be ignored: ",
                 "all values must be > 0"
             ),
             .arrayToString(nPlanned)
-        ), call. = FALSE)
+        ),
+            parameter = "nPlanned",
+            value = nPlanned,
+            diagnosticId = "analysis.n_planned_nonpositive"
+        )
         return(FALSE)
     }
 
     return(TRUE)
 }
 
-.warnInCaseOfUnknownArguments <- function(..., functionName, ignore = character(),
-        numberOfAllowedUnnamedParameters = 0, exceptionEnabled = FALSE) {
+.warnInCaseOfUnknownArguments <- function(
+        ...,
+        functionName,
+        ignore = character(),
+        numberOfAllowedUnnamedParameters = 0,
+        exceptionEnabled = FALSE) {
     args <- list(...)
     if (length(args) == 0) {
         return(invisible())
@@ -1833,19 +2113,42 @@ NULL
             }
             argValue <- paste0(" (", .getClassName(arg), ")")
             tryCatch(expr = {
-                argValue <- .arrayToString(arg, vectorLookAndFeelEnabled = length(arg) > 1, encapsulate = is.character(arg))
-                argValue <- paste0(" = ", argValue)
+                argValue <- .arrayToString(arg,
+                    vectorLookAndFeelEnabled = length(arg) > 1,
+                    encapsulate = is.character(arg)
+                )
             }, error = function(e) {})
-            if (exceptionEnabled) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "argument unknown in ", functionName, "(...): '", argName, "'",
-                    argValue, " is not allowed",
-                    call. = FALSE
+
+            errorFactory <- getOption("rpact.error.factory.condition")
+            errorContextEnabled <- (!is.null(errorFactory) && is.function(errorFactory))
+            if (isTRUE(errorContextEnabled)) {
+                stopArgumentUnknown("argument ", .pQuote(argName), " ",
+                    "is unknown and not allowed in function ", functionName, "(). ",
+                    "Remove ", .pQuote(paste0(argName, " = ", argValue)),
+                    " from ", functionName, "()",
+                    functionName = functionName,
+                    parameter = argName,
+                    value = argValue,
+                    relatedParameter = "functionName",
+                    relatedValue = functionName,
+                    diagnosticId = "validation.unknown_argument"
+                )
+            } else if (exceptionEnabled) {
+                stopArgumentUnknown(.pQuote(argName), " = ", argValue,
+                    " is not allowed in ", functionName, "()",
+                    functionName = ".warnInCaseOfUnknownArguments",
+                    parameter = argName,
+                    value = argValue,
+                    relatedParameter = "functionName",
+                    relatedValue = functionName,
+                    diagnosticId = "validation.unknown_argument"
                 )
             } else {
-                warning("Argument unknown in ", functionName, "(...): '", argName, "'",
-                    argValue, " will be ignored",
-                    call. = FALSE
+                warnArgumentIgnored("Argument unknown in ", functionName, "(...): ",
+                    .pQuote(argName), " = ", argValue, " will be ignored",
+                    parameter = argName,
+                    value = arg,
+                    diagnosticId = "validation.unused_argument"
                 )
             }
         }
@@ -1854,15 +2157,17 @@ NULL
 
 .warnInCaseOfUnusedArgument <- function(arg, argName, defaultValue, functionName) {
     if (!identical(arg, defaultValue)) {
-        warning("Unused argument in ", functionName, "(...): '",
-            argName, "' = ", .arrayToString(
+        warnArgumentIgnored(
+            "Unused argument in ", functionName, "(...): ", .pQuote(argName), " = ", .arrayToString(
                 arg,
                 vectorLookAndFeelEnabled = (length(arg) > 1),
                 maxLength = 10,
                 encapsulate = !is.null(arg) && any(is.character(arg))
             ),
             " will be ignored",
-            call. = FALSE
+            parameter = argName,
+            value = arg,
+            diagnosticId = "validation.unused_argument"
         )
     }
 }
@@ -1871,14 +2176,19 @@ NULL
     args <- list(...)
     argNames <- names(args)
     if ("twoSidedPower" %in% argNames) {
-        warning("'twoSidedPower' can only be defined in 'design'", call. = FALSE)
+        warnArgumentIgnored("'twoSidedPower' can only be defined in 'design'",
+            parameter = "twoSidedPower",
+            diagnosticId = "design.two_sided_power_set_in_design"
+        )
     }
 }
 
 .warnInCaseOfTwoSidedPowerIsDisabled <- function(design) {
     if (design$sided == 2 && !is.na(design$twoSidedPower) && !design$twoSidedPower &&
-            design$.getParameterType("twoSidedPower") == C_PARAM_USER_DEFINED) {
-        warning("design$twoSidedPower = FALSE will be ignored because design$sided = 2", call. = FALSE)
+            design$isUserDefinedParameter("twoSidedPower")) {
+        warnArgumentIgnored("design$twoSidedPower = FALSE will be ignored because design$sided = 2",
+            diagnosticId = "design.two_sided_power_ignored"
+        )
     }
 }
 
@@ -1926,9 +2236,13 @@ NULL
 
 .assertPackageIsInstalled <- function(packageName) {
     if (!.isPackageNamespaceLoaded(packageName, quietly = TRUE)) {
-        stop("Package \"", packageName, "\" is needed for this function to work. ",
+        stopRuntimeIssue("Package \"", packageName, "\" is needed for this function to work. ",
             "Please install using, e.g., install.packages(\"", packageName, "\")",
-            call. = FALSE
+            parameter = "packageName",
+            value = packageName,
+            constraint = "installed package namespace",
+            functionName = ".assertPackageIsInstalled",
+            diagnosticId = "runtime.optional_package_missing"
         )
     }
 }
@@ -1945,14 +2259,25 @@ NULL
     .assertPackageIsInstalled("testthat")
 }
 
-.assertIsValidThetaH0 <- function(thetaH0,
+.assertIsValidThetaH0 <- function(
+        thetaH0,
         ...,
-        endpoint = c("means", "rates", "survival", "counts"),
+        endpoint = c("general", "means", "rates", "survival", "counts"),
         groups,
         ratioEnabled = FALSE,
         naAllowed = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsValidThetaH0", ...)
-    .assertIsSingleNumber(thetaH0, "thetaH0", naAllowed = naAllowed)
+    .assertIsSingleNumber(thetaH0, "thetaH0", naAllowed = TRUE)
+    if (endpoint == "rates" && groups == 1 && is.na(thetaH0)) {
+        stopMissingArgument("'thetaH0' must be specified for testing a rate in one sample",
+            parameter = "thetaH0", constraint = "must be specified for testing a rate in one sample",
+            functionName = ".assertIsValidThetaH0",
+            value = thetaH0
+        )
+    }
+    if (isFALSE(naAllowed)) {
+        .assertIsSingleNumber(thetaH0, "thetaH0", naAllowed = naAllowed)
+    }
     if (naAllowed && is.na(thetaH0)) {
         return(invisible())
     }
@@ -1984,47 +2309,52 @@ NULL
     )
 }
 
-.assertIsValidThetaRange <- function(..., thetaRange, thetaAutoSeqEnabled = TRUE, survivalDataEnabled = FALSE) {
-    if (is.null(thetaRange) || (thetaAutoSeqEnabled && length(thetaRange) <= 1) ||
-            anyNA(thetaRange)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'thetaRange' (", .arrayToString(thetaRange), ") must be a vector ",
+.assertIsValidThetaRange <- function(
+        ...,
+        theta,
+        thetaAutoSeqEnabled = TRUE,
+        survivalDataEnabled = FALSE) {
+    if (is.null(theta) || (thetaAutoSeqEnabled && length(theta) <= 1) ||
+            anyNA(theta)) {
+        stopIllegalArgument("'theta' (", .arrayToString(theta), ") must be a vector ",
             "with two entries defining minimum and maximum ",
             "or a sequence of numeric values with length > 2",
-            call. = FALSE
+            functionName = ".assertIsValidThetaRange",
+            parameter = "theta",
+            value = theta
         )
-    } else if (length(thetaRange) == 2 && thetaAutoSeqEnabled) {
-        minValue <- thetaRange[1]
-        maxValue <- thetaRange[2]
+    } else if (length(theta) == 2 && thetaAutoSeqEnabled) {
+        minValue <- theta[1]
+        maxValue <- theta[2]
         if (survivalDataEnabled) {
-            .assertIsValidHazardRatio(minValue, "thetaRange[1]")
-            .assertIsValidHazardRatio(maxValue, "thetaRange[2]")
+            minValue <- .assertIsValidHazardRatio(minValue, "theta[1]")
+            maxValue <- .assertIsValidHazardRatio(maxValue, "theta[2]")
         }
         if (minValue >= maxValue) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'thetaRange' with length 2 must contain minimum < maximum (",
-                minValue, " >= ", maxValue, ")",
-                call. = FALSE
+            stopIllegalArgument("'theta' with length 2 must contain ",
+                "minimum < maximum (", minValue, " >= ", maxValue, ")",
+                functionName = ".assertIsValidThetaRange",
+                parameter = "theta",
+                value = theta
             )
         }
         by <- (maxValue - minValue) / C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT
-        thetaRange <- seq(minValue, maxValue, by)
+        theta <- seq(minValue, maxValue, by)
     }
 
-    invisible(thetaRange)
+    invisible(theta)
 }
 
 .assertIsValidPiTreatmentRange <- function(..., piTreatmentRange, piAutoSeqEnabled = TRUE) {
     if (is.null(piTreatmentRange) || (piAutoSeqEnabled && length(piTreatmentRange) <= 1) ||
             anyNA(piTreatmentRange)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'piTreatmentRange' (", .arrayToString(piTreatmentRange), ") must be a vector ",
+        stopIllegalArgument("'piTreatmentRange' (",
+            .arrayToString(piTreatmentRange), ") must be a vector ",
             "with two entries defining minimum and maximum ",
             "or a sequence of numeric values with length > 2",
-            call. = FALSE
+            functionName = ".assertIsValidPiTreatmentRange",
+            parameter = "piTreatmentRange",
+            value = piTreatmentRange
         )
     } else if (length(piTreatmentRange) == 2) {
         if (piAutoSeqEnabled) {
@@ -2039,11 +2369,12 @@ NULL
             .assertIsValidPi(minValue, "piTreatmentRange[1]")
             .assertIsValidPi(maxValue, "piTreatmentRange[2]")
             if (minValue >= maxValue) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'piTreatmentRange' with length 2 must contain minimum < maximum (",
+                stopIllegalArgument("'piTreatmentRange' with length 2 ",
+                    "must contain minimum < maximum (",
                     minValue, " >= ", maxValue, ")",
-                    call. = FALSE
+                    functionName = ".assertIsValidPiTreatmentRange",
+                    parameter = "piTreatmentRange",
+                    value = piTreatmentRange
                 )
             }
             by <- (maxValue - minValue) / C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT
@@ -2054,12 +2385,11 @@ NULL
     invisible(piTreatmentRange)
 }
 
-.assertIsValidPi <- function(piValue, piName) {
+.assertIsValidPi <- function(piValue, piName, matrixAllowed = FALSE) {
     if (is.null(piValue) || length(piValue) == 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", piName, "' must be a valid numeric value",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(piName), " must be a valid numeric value",
+            functionName = ".assertIsValidPi",
+            parameter = "piName", value = piName
         )
     }
 
@@ -2067,22 +2397,10 @@ NULL
         return(invisible())
     }
 
-    if (!is.numeric(piValue) || anyNA(piValue)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", piName, "' (", .arrayToString(piValue), ") must be a valid numeric value",
-            call. = FALSE
-        )
-    }
-
-    if (any(piValue <= -1e-16) || any(piValue >= 1 + 1e-16)) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'", piName, "' (", .arrayToString(piValue), ") ",
-            "is out of bounds (0; 1) or event time too long",
-            call. = FALSE
-        )
-    }
+    .assertIsNumericVector(piValue, piName, matrixAllowed = matrixAllowed)
+    .assertIsInOpenInterval(piValue, piName,
+        lower = -1e-16, upper = 1 + 1e-16, matrixAllowed = matrixAllowed
+    )
 }
 
 .assertIsValidPi1 <- function(pi1, stageResults = NULL, stage = NULL) {
@@ -2108,10 +2426,10 @@ NULL
 .assertIsValidAllocationRatioPlanned <- function(allocationRatioPlanned, numberOfGroups) {
     if (numberOfGroups == 1) {
         if (allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT) {
-            warning(
+            warnArgumentIgnored(
                 "Planned allocation ratio ", allocationRatioPlanned, " will be ignored ",
                 "because the specified data has only one group",
-                call. = FALSE
+                diagnosticId = "analysis.two_group_argument_ignored"
             )
         }
         return(invisible())
@@ -2124,11 +2442,15 @@ NULL
     )
 }
 
-.assertIsValidAllocationRatioPlannedSampleSize <- function(allocationRatioPlanned, maxNumberOfSubjects = NA_integer_) {
-    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+.assertIsValidAllocationRatioPlannedSampleSize <- function(
+        allocationRatioPlanned,
+        maxNumberOfSubjects = NA_integer_) {
+    allocationRatioPlanned <- .assertIsNumericVector(
+        allocationRatioPlanned, "allocationRatioPlanned",
+        naAllowed = TRUE
+    )
     .assertIsInClosedInterval(allocationRatioPlanned, "allocationRatioPlanned",
-        lower = 0,
-        upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
     )
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
 
@@ -2138,21 +2460,27 @@ NULL
 
     if (length(maxNumberOfSubjects) == 1 && !is.na(maxNumberOfSubjects) &&
             maxNumberOfSubjects > 0 && all(allocationRatioPlanned == 0)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "determination of optimal allocation ratio not possible ",
-            "if explicit or implicit 'maxNumberOfSubjects' (", maxNumberOfSubjects,
-            ") > 0, i.e., follow-up time should be calculated ",
+        stopIllegalArgument("determination of optimal allocation ratio not possible ",
+            "if explicit or implicit 'maxNumberOfSubjects' (",
+            maxNumberOfSubjects, ") > 0, i.e., follow-up time should be calculated ",
             "(please specify an 'allocationRatioPlanned' > 0)",
-            call. = FALSE
+            functionName = ".assertIsValidAllocationRatioPlannedSampleSize",
+            parameter = "maxNumberOfSubjects",
+            value = maxNumberOfSubjects,
+            relatedParameter = "allocationRatioPlanned",
+            diagnosticId = "planning.allocation_optimization_with_fixed_total"
         )
     }
 
     return(invisible(allocationRatioPlanned))
 }
 
-.assertIsValidThetaH1 <- function(thetaH1, stageResults = NULL,
-        stage = NULL, ..., results = NULL) {
+.assertIsValidThetaH1 <- function(
+        thetaH1,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     if (is.na(thetaH1) && !is.null(stageResults) && !is.null(stage)) {
         thetaH1 <- stageResults$effectSizes[stage]
         if (!is.null(results)) {
@@ -2163,8 +2491,12 @@ NULL
     invisible(thetaH1)
 }
 
-.assertIsValidAssumedStDev <- function(assumedStDev,
-        stageResults = NULL, stage = NULL, ..., results = NULL) {
+.assertIsValidAssumedStDev <- function(
+        assumedStDev,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     if (is.na(assumedStDev) && !is.null(stageResults) && !is.null(stage)) {
         assumedStDev <- stageResults$overallStDevs[stage]
         if (!is.null(results)) {
@@ -2173,17 +2505,20 @@ NULL
     }
     .assertIsSingleNumber(assumedStDev, "assumedStDev")
     if (assumedStDev <= 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'assumedStDev' (", assumedStDev, ") must be > 0",
-            call. = FALSE
+        stopIllegalArgument("'assumedStDev' (", assumedStDev, ") must be > 0",
+            functionName = ".assertIsValidAssumedStDev",
+            parameter = "assumedStDev", value = assumedStDev
         )
     }
     invisible(assumedStDev)
 }
 
-.assertIsValidThetaH1ForMultiArm <- function(thetaH1,
-        stageResults = NULL, stage = NULL, ..., results = NULL) {
+.assertIsValidThetaH1ForMultiArm <- function(
+        thetaH1,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     if (!is.null(stageResults) && all(is.na(thetaH1)) && !is.null(stage)) {
         thetaH1 <- stageResults$effectSizes[, stage]
         if (!is.null(results)) {
@@ -2195,16 +2530,24 @@ NULL
     invisible(thetaH1)
 }
 
-.assertIsValidThetaH1ForEnrichment <- function(thetaH1,
-        stageResults = NULL, stage = NULL, ..., results = NULL) {
+.assertIsValidThetaH1ForEnrichment <- function(
+        thetaH1,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     invisible(.assertIsValidThetaH1ForMultiArm(
         thetaH1 = thetaH1,
         stageResults = stageResults, stage = stage, results = results
     ))
 }
 
-.assertIsValidAssumedStDevForMultiHypotheses <- function(assumedStDev,
-        stageResults = NULL, stage = NULL, ..., results = NULL) {
+.assertIsValidAssumedStDevForMultiHypotheses <- function(
+        assumedStDev,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     if (!is.null(stageResults) && all(is.na(assumedStDev)) && !is.null(stage)) {
         if (is.matrix(stageResults$overallStDevs)) { # inherits(stageResults, "StageResultsMultiArmMeans")
             assumedStDev <- stageResults$overallStDevs[, stage]
@@ -2218,10 +2561,10 @@ NULL
     }
     .assertIsNumericVector(assumedStDev, "assumedStDev", naAllowed = TRUE)
     if (any(assumedStDev <= 0, na.rm = TRUE)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'assumedStDev' (", .arrayToString(assumedStDev), ") must be > 0",
-            call. = FALSE
+        stopIllegalArgument("'assumedStDev' (", .arrayToString(assumedStDev), ") must be > 0",
+            functionName = ".assertIsValidAssumedStDevForMultiHypotheses",
+            parameter = "assumedStDev",
+            value = assumedStDev
         )
     }
 
@@ -2230,19 +2573,26 @@ NULL
 
 .assertIsValidAssumedStDevs <- function(assumedStDevs, gMax) {
     if (length(assumedStDevs) != 1 && length(assumedStDevs) != gMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'assumedStDevs' (%s) ",
-                "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(assumedStDevs), gMax),
-            call. = FALSE
+        stopIllegalArgument(
+            sprintf(
+                paste0("length of 'assumedStDevs' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                .arrayToString(assumedStDevs), gMax
+            ),
+            functionName = ".assertIsValidAssumedStDevs",
+            parameter = "assumedStDevs",
+            value = assumedStDevs,
+            relatedParameter = "gMax",
+            relatedValue = gMax
         )
     }
 }
 
-.assertIsValidPiTreatmentsForMultiArm <- function(piTreatments,
-        stageResults = NULL, stage = NULL, ..., results = NULL) {
+.assertIsValidPiTreatmentsForMultiArm <- function(
+        piTreatments,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     if (!is.null(stageResults) && all(is.na(piTreatments)) && !is.null(stage)) {
         piTreatments <- stageResults$overallPiTreatments[, stage]
         if (!is.null(results)) {
@@ -2254,8 +2604,12 @@ NULL
     invisible(piTreatments)
 }
 
-.assertIsValidPiControlForMultiArm <- function(piControl,
-        stageResults = NULL, stage = NULL, ..., results = NULL) {
+.assertIsValidPiControlForMultiArm <- function(
+        piControl,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     if (!is.null(stageResults) && is.na(piControl) && !is.null(stage)) {
         piControl <- stageResults$overallPiControl[, stage]
         if (!is.null(results)) {
@@ -2267,8 +2621,12 @@ NULL
     invisible(piControl)
 }
 
-.assertIsValidPiTreatmentsForEnrichment <- function(piTreatments,
-        stageResults = NULL, stage = NULL, ..., results = NULL) {
+.assertIsValidPiTreatmentsForEnrichment <- function(
+        piTreatments,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     if (!is.null(stageResults) && all(is.na(piTreatments)) && !is.null(stage)) {
         piTreatments <- stageResults$overallPisTreatment[, stage]
         if (!is.null(results)) {
@@ -2280,113 +2638,178 @@ NULL
     invisible(piTreatments)
 }
 
-.assertIsValidPiControlForEnrichment <- function(piControls,
-        stageResults = NULL, stage = NULL, ..., results = NULL) {
+.assertIsValidPiControlForEnrichment <- function(
+        piControls,
+        stageResults = NULL,
+        stage = NULL,
+        ...,
+        results = NULL) {
     if (!is.null(stageResults) && all(is.na(piControls)) && !is.null(stage)) {
         piControls <- stageResults$overallPisControl[, stage]
         if (!is.null(results)) {
             results$.setParameterType("piControls", C_PARAM_GENERATED)
         }
     }
-    .assertIsNumericVector(piControls, "piControls", naAllowed = TRUE)
+    piControls <- .assertIsNumericVector(piControls, "piControls", naAllowed = TRUE)
     .assertIsInClosedInterval(piControls, "piControls", lower = 0, upper = 1, naAllowed = TRUE)
-    invisible(piControls)
+    invisible(invisible(piControls))
 }
 
 .assertIsValidHazardRatio <- function(hazardRatio, thetaH0) {
-    .assertIsNumericVector(hazardRatio, "hazardRatio")
+    hazardRatio <- .assertIsNumericVector(hazardRatio, "hazardRatio")
     if (any(hazardRatio == thetaH0)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "alternative not correctly specified: ",
-            "each hazard ratio (",
-            .arrayToString(hazardRatio[1:min(length(hazardRatio), 10)]),
-            ") must be unequal to 'thetaH0' (", thetaH0, ")",
-            call. = FALSE
+        stopIllegalArgument("alternative not correctly specified: ",
+            "each hazard ratio (", .arrayToString(hazardRatio[1:min(
+                length(hazardRatio),
+                10
+            )]), ") must be unequal to 'thetaH0' (", thetaH0, ")",
+            functionName = ".assertIsValidHazardRatio",
+            parameter = "thetaH0",
+            value = thetaH0,
+            diagnosticId = "planning.alternative_equals_null"
+        )
+    }
+    return(invisible(hazardRatio))
+}
+
+.assertIsValidHazardRatioVector <- function(hazardRatio, matrixAllowed = FALSE) {
+    hazardRatio <- .assertIsNumericVector(hazardRatio, "hazardRatio", matrixAllowed = matrixAllowed)
+    if (any(hazardRatio <= 0)) {
+        if (length(hazardRatio) == 1) {
+            stopIllegalArgument("'hazardRatio' (", hazardRatio, ") must be > 0",
+                functionName = ".assertIsValidHazardRatioVector",
+                parameter = "hazardRatio", value = hazardRatio
+            )
+        } else {
+            stopIllegalArgument("each 'hazardRatio' (",
+                .arrayToString(hazardRatio[1:min(length(hazardRatio), 10)]),
+                ") must be > 0",
+                functionName = ".assertIsValidHazardRatioVector",
+                parameter = "hazardRatio",
+                value = hazardRatio
+            )
+        }
+    }
+    return(invisible(hazardRatio))
+}
+
+.warnInCaseOfIgnoredDirectionUpper <- function(
+        directionUpper,
+        sided,
+        ...,
+        userFunctionCallEnabled = TRUE) {
+    if (sided == 2 && !is.na(directionUpper)) {
+        if (userFunctionCallEnabled) {
+            warnArgumentIgnored("'directionUpper' (", directionUpper, ") will be ignored because it ",
+                "is not applicable for 'sided' = 2",
+                parameter = "directionUpper",
+                value = directionUpper,
+                diagnosticId = "design.direction_not_applicable"
+            )
+        }
+        return(invisible(NA))
+    }
+
+    return(invisible(directionUpper))
+}
+
+.warnInCaseOfChangedDirectionUpperSurvivalDefault <- function(
+        directionUpper,
+        default,
+        design,
+        ...,
+        userFunctionCallEnabled = TRUE) {
+    if (userFunctionCallEnabled &&
+            design$sided == 1 &&
+            identical(default, C_DIRECTION_UPPER_SURVIVAL_DEFAULT) &&
+            isTRUE(is.na(directionUpper)) &&
+            isTRUE(is.na(design$directionUpper))) {
+        warnArgumentAdjusted(
+            "The default value of 'directionUpper' for survival endpoints has changed ",
+            "from TRUE to FALSE. Please specify 'directionUpper' explicitly to avoid this warning.",
+            diagnosticId = "design.survival_direction_default"
         )
     }
 }
 
-.assertIsValidHazardRatioVector <- function(hazardRatio) {
-    .assertIsNumericVector(hazardRatio, "hazardRatio")
-    if (any(hazardRatio <= 0)) {
-        if (length(hazardRatio) == 1) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'hazardRatio' (", hazardRatio, ") must be > 0",
-                call. = FALSE
-            )
-        } else {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "each 'hazardRatio' (",
-                .arrayToString(hazardRatio[1:min(length(hazardRatio), 10)]),
-                ") must be > 0",
-                call. = FALSE
-            )
-        }
-    }
-}
-
-.assertIsValidDirectionUpper <- function(directionUpper,
+.assertIsValidDirectionUpper <- function(
+        directionUpper,
         design,
         ...,
         objectType = c("sampleSize", "power", "analysis"),
-        userFunctionCallEnabled = FALSE) {
+        userFunctionCallEnabled = FALSE,
+        default = C_DIRECTION_UPPER_DEFAULT) {
     objectType <- match.arg(objectType)
 
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
-
-    if (!is.na(directionUpper) && !is.na(design$directionUpper) &&
-            !identical(directionUpper, design$directionUpper)) {
-        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "in the design directionUpper = ", design$directionUpper, " is defined. ",
-            "In the ", ifelse(objectType == "sampleSize", "sample size", objectType),
-            " function the same direction must be specified, but it is ", directionUpper,
-            call. = FALSE
+    
+    if (!identical(objectType, "sampleSize")) {
+        .warnInCaseOfChangedDirectionUpperSurvivalDefault(
+            directionUpper,
+            default,
+            design,
+            userFunctionCallEnabled = userFunctionCallEnabled
         )
     }
 
-    if (objectType %in% c("power", "analysis")) {
-        sided <- design$sided
-        if (sided == 1 && is.na(directionUpper)) {
+    if (isTRUE(userFunctionCallEnabled) && 
+            !is.na(directionUpper) && !is.na(design$directionUpper) &&
+            !identical(directionUpper, design$directionUpper)) {
+        stopConflictingArguments("in the design directionUpper = ",
+            design$directionUpper, " is defined. ", "In the ",
+            ifelse(objectType == "sampleSize", "sample size", objectType),
+            " function the same direction must be specified, but it is ",
+            directionUpper,
+            functionName = ".assertIsValidDirectionUpper",
+            parameter = "directionUpper",
+            value = design$directionUpper,
+            diagnosticId = "design.direction_mismatch"
+        )
+    }
+
+    if (objectType %in% c("sampleSize", "power", "analysis")) {
+        if (design$sided == 1 && is.na(directionUpper)) {
             if (!is.na(design$directionUpper)) {
                 directionUpper <- design$directionUpper
             } else {
-                directionUpper <- C_DIRECTION_UPPER_DEFAULT
+                directionUpper <- default
             }
         }
-        if (userFunctionCallEnabled && sided == 2 && !is.na(directionUpper)) {
-            warning("'directionUpper' will be ignored because it ",
-                "is not applicable for 'sided' = 2",
-                call. = FALSE
-            )
-        }
+        directionUpper <- .warnInCaseOfIgnoredDirectionUpper(
+            directionUpper, design$sided,
+            userFunctionCallEnabled = userFunctionCallEnabled
+        )
     } else if (is.na(directionUpper)) {
         if (!is.na(design$directionUpper)) {
             directionUpper <- design$directionUpper
         } else {
-            directionUpper <- C_DIRECTION_UPPER_DEFAULT
+            directionUpper <- default
         }
     }
-
+    
     return(directionUpper)
 }
 
-.assertIsFunction <- function(fun) {
+.assertIsFunction <- function(fun, funArgName = "fun") {
     if (is.null(fun)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'fun' must be a valid function",
-            call. = FALSE
+        stopIllegalArgument(.sQuote(funArgName), " must be a valid function",
+            functionName = ".assertIsFunction",
+            parameter = funArgName,
+            value = fun
         )
     }
     if (!is.function(fun)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'fun' must be a function (is ", .getClassName(fun), ")",
-            call. = FALSE
+        stopIllegalArgument(.sQuote(funArgName), " must be a function (is ", .getClassName(fun), ")",
+            functionName = ".assertIsFunction",
+            parameter = funArgName,
+            value = fun
         )
     }
 }
 
-.assertIsValidFunction <- function(fun, ...,
+.assertIsValidFunction <- function(
+        fun,
+        ...,
         funArgName = "fun",
         expectedArguments = NULL,
         expectedFunction = NULL,
@@ -2397,18 +2820,20 @@ NULL
     fCall <- match.call(expand.dots = FALSE)
 
     if (is.null(expectedArguments) && is.null(expectedFunction)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'expectedArguments' or 'expectedFunction' must be not NULL",
-            call. = FALSE
+        stopIllegalArgument("'expectedArguments' or 'expectedFunction' must be not NULL",
+            functionName = ".assertIsValidFunction",
+            parameter = "expectedArguments",
+            relatedParameter = "expectedFunction",
+            value = expectedArguments
         )
     }
 
     if (!is.function(fun)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", funArgName, "' must be a function",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(funArgName), " must be a function",
+            parameter = funArgName,
+            value = fun,
+            constraint = "must be a function",
+            functionName = ".assertIsValidFunction"
         )
     }
 
@@ -2422,10 +2847,11 @@ NULL
         argNamesExpected <- expectedArguments
     } else if (!is.null(expectedFunction)) {
         if (!is.function(expectedFunction)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'expectedFunction' must be a function",
-                call. = FALSE
+            stopIllegalArgument("'expectedFunction' must be a function",
+                parameter = "expectedFunction",
+                value = expectedFunction,
+                constraint = "must be a function",
+                functionName = ".assertIsValidFunction"
             )
         }
         argNamesExpected <- methods::formalArgs(expectedFunction)
@@ -2433,11 +2859,14 @@ NULL
 
     if (validateThreeDots) {
         if (!("..." %in% argNames)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'", funArgName, "' must contain the three-dots argument '...', e.g., ",
-                funArgName, " = ", functionName, "(", .arrayToString(argNames), ", ...)",
-                call. = FALSE
+            stopIllegalArgument(.pQuote(funArgName), " ",
+                "must contain the three-dots argument '...', e.g., ", funArgName,
+                " = ", functionName, "(", .arrayToString(argNames), ", ...)",
+                parameter = funArgName,
+                value = fun,
+                constraint = "must contain the three-dots argument '...'",
+                functionName = ".assertIsValidFunction",
+                diagnosticId = "simulation.callback_requires_dots"
             )
         }
     }
@@ -2452,17 +2881,27 @@ NULL
     for (argName in argNames) {
         if (argName != "..." && !(argName %in% argNamesExpected)) {
             msg <- paste0(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "the argument '", argName, "' in '", funArgName,
-                "' (", functionName, ") is not allowed."
+                "the argument ", .pQuote(argName), " in ", .pQuote(funArgName), " (", functionName, ") is not allowed."
             )
             if (length(argNamesExpected) == 1) {
-                stop(msg, " Expected: '", argNamesExpected, "'", call. = FALSE)
+                stopIllegalArgument(msg, " Expected: ", .pQuote(argNamesExpected),
+                    parameter = argName,
+                    value = fun,
+                    relatedParameter = funArgName,
+                    relatedValue = functionName,
+                    functionName = ".assertIsValidFunction"
+                )
             }
-            stop(
-                msg, "\n\n", "Use one or more of the following arguments:\n ",
-                .arrayToString(argNamesExpected, encapsulate = TRUE),
-                call. = FALSE
+            stopIllegalArgument(msg, "\n\n",
+                "Use one or more of the following arguments:\n ",
+                .arrayToString(argNamesExpected,
+                    encapsulate = TRUE
+                ),
+                parameter = argName,
+                value = fun,
+                relatedParameter = funArgName,
+                relatedValue = functionName,
+                functionName = ".assertIsValidFunction"
             )
         }
     }
@@ -2470,11 +2909,14 @@ NULL
     if (identical) {
         for (argNameExpected in argNamesExpected) {
             if (argNameExpected != "..." && !(argNameExpected %in% argNames)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'", funArgName, "' (", functionName, ") must contain ",
-                    "an argument with name '", argNameExpected, "'",
-                    call. = FALSE
+                stopIllegalArgument(.pQuote(funArgName), " (", functionName, ") must contain ",
+                    "an argument with name ", .pQuote(argNameExpected),
+                    parameter = funArgName, value = fun, constraint = paste0(
+                        "must contain an argument with name ", .pQuote(argNameExpected)
+                    ),
+                    functionName = ".assertIsValidFunction",
+                    relatedParameter = "functionName",
+                    relatedValue = functionName
                 )
             }
         }
@@ -2492,20 +2934,24 @@ NULL
     }
 
     if (counter == 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", funArgName, "' (", functionName, ") must contain at ",
+        stopIllegalArgument(.pQuote(funArgName), " (", functionName, ") must contain at ",
             "least one of the following arguments: ",
             .arrayToString(argNamesExpected),
-            call. = FALSE
+            parameter = funArgName, value = fun, constraint = paste0(
+                "must contain at least one of the following arguments: ",
+                .arrayToString(argNamesExpected)
+            ),
+            functionName = ".assertIsValidFunction",
+            relatedParameter = "functionName",
+            relatedValue = functionName
         )
     }
 
     if (showUnusedArgumentsMessage && length(unusedArgs) > 0) {
-        message("Note that the following arguments can optionally be used in '",
-            funArgName, "' (", functionName, "): \n",
-            .arrayToString(unusedArgs),
-            call. = FALSE
+        message(
+            "Note that the following arguments can optionally be used in ",
+            .pQuote(funArgName), " (", functionName, "): \n",
+            .arrayToString(unusedArgs)
         )
     }
 }
@@ -2513,34 +2959,45 @@ NULL
 .assertIsValidThreshold <- function(threshold, activeArms) {
     .assertIsNumericVector(threshold, "threshold", naAllowed = TRUE)
     if ((length(threshold) != 1) && (length(threshold) != activeArms)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'threshold' (", .arrayToString(threshold),
-            ") must be a single value or a vector of length ", activeArms,
-            call. = FALSE
+        stopIllegalArgument("'threshold' (", .arrayToString(threshold), ") ",
+            "must be a single value or a vector of length ",
+            activeArms,
+            functionName = ".assertIsValidThreshold",
+            parameter = "threshold",
+            value = threshold
         )
     }
 }
 
-.assertIsValidPlannedSubjectsOrEvents <- function(design,
+.assertIsValidPlannedSubjectsOrEvents <- function(
+        design,
         plannedValues,
         parameterName = c("plannedSubjects", "plannedEvents")) {
     parameterName <- match.arg(parameterName)
     .assertIsIntegerVector(plannedValues, parameterName, validateType = FALSE)
     if (length(plannedValues) != design$kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", parameterName, "' (", .arrayToString(plannedValues), ") ",
-            "must have length ", design$kMax,
-            call. = FALSE
+        stopIllegalArgument(.pQuote(parameterName), " (",
+            .arrayToString(plannedValues), ") ", "must have length ",
+            design$kMax,
+            functionName = ".assertIsValidPlannedSubjectsOrEvents",
+            parameter = parameterName,
+            relatedParameter = "plannedValues",
+            relatedValue = plannedValues
         )
     }
     .assertIsInClosedInterval(plannedValues, parameterName, lower = 1, upper = NULL)
     .assertValuesAreStrictlyIncreasing(plannedValues, parameterName)
 }
 
-.assertIsValidNumberOfSubjectsPerStage <- function(parameterValues, parameterName, plannedSubjects,
-        conditionalPower, calcSubjectsFunction, kMax,
-        endpoint = c("means", "rates", "survival"), calcSubjectsFunctionEnabled = TRUE) {
+.assertIsValidNumberOfSubjectsPerStage <- function(
+        parameterValues,
+        parameterName,
+        plannedSubjects,
+        conditionalPower,
+        calcSubjectsFunction,
+        kMax,
+        endpoint = c("means", "rates", "survival"),
+        calcSubjectsFunctionEnabled = TRUE) {
     endpoint <- match.arg(endpoint)
 
     if (kMax == 1) {
@@ -2553,20 +3010,26 @@ NULL
 
     .assertIsNumericVector(parameterValues, parameterName, naAllowed = TRUE)
 
-    calcSubjectsFunctionName <- ifelse(endpoint == "survival", "calcEventsFunction", "calcSubjectsFunction")
+    calcSubjectsFunctionName <- ifelse(endpoint == "survival",
+        "calcEventsFunction", "calcSubjectsFunction"
+    )
 
     if (is.na(conditionalPower) && is.null(calcSubjectsFunction)) {
         if (length(parameterValues) != 1 || !is.na(parameterValues)) {
             if (calcSubjectsFunctionEnabled) {
-                warning("'", parameterName, "' (", .arrayToString(parameterValues), ") ",
-                    "will be ignored because neither 'conditionalPower' nor '",
-                    calcSubjectsFunctionName, "' is defined",
-                    call. = FALSE
+                warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
+                    "will be ignored because neither 'conditionalPower' nor ",
+                    .pQuote(calcSubjectsFunctionName), " is defined",
+                    parameter = parameterName,
+                    value = parameterValues,
+                    diagnosticId = "simulation.bounds_require_reassessment"
                 )
             } else {
-                warning("'", parameterName, "' (", .arrayToString(parameterValues), ") ",
+                warnArgumentIgnored(.pQuote(parameterName), " (", .arrayToString(parameterValues), ") ",
                     "will be ignored because 'conditionalPower' is not defined",
-                    call. = FALSE
+                    parameter = parameterName,
+                    value = parameterValues,
+                    diagnosticId = "simulation.alternative_requires_conditional_power"
                 )
             }
         }
@@ -2576,42 +3039,50 @@ NULL
     if (!is.na(conditionalPower) && length(parameterValues) == 0 ||
             (length(parameterValues) == 1 && is.na(parameterValues))) {
         if (calcSubjectsFunctionEnabled) {
-            stop(
-                C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                "'", parameterName, "' must be defined ",
-                "because 'conditionalPower' or '", calcSubjectsFunctionName, "' is defined",
-                call. = FALSE
+            stopMissingArgument(.pQuote(parameterName), " must be defined ",
+                "because 'conditionalPower' or ", .pQuote(calcSubjectsFunctionName), " is defined",
+                functionName = ".assertIsValidNumberOfSubjectsPerStage",
+                parameter = parameterName,
+                relatedParameter = "conditionalPower",
+                relatedValue = conditionalPower,
+                diagnosticId = "simulation.per_stage_bounds_missing"
             )
         } else {
-            stop(
-                C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                "'", parameterName, "' must be defined ",
+            stopMissingArgument(.pQuote(parameterName), " must be defined ",
                 "because 'conditionalPower' is defined",
-                call. = FALSE
+                functionName = ".assertIsValidNumberOfSubjectsPerStage",
+                parameter = parameterName,
+                relatedParameter = "conditionalPower",
+                relatedValue = conditionalPower,
+                diagnosticId = "simulation.per_stage_bounds_missing"
             )
         }
     }
 
     if (length(parameterValues) != kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", parameterName, "' (",
+        stopIllegalArgument(.pQuote(parameterName), " (",
             .arrayToString(parameterValues), ") must have length ", kMax,
-            call. = FALSE
+            functionName = ".assertIsValidNumberOfSubjectsPerStage",
+            parameter = parameterName,
+            value = parameterValues
         )
     }
 
     if (any(is.na(parameterValues[2:length(parameterValues)]))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", parameterName, "' (",
-            .arrayToString(parameterValues), ") must contain valid numeric values",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(parameterName), " (", .arrayToString(parameterValues),
+            ") must contain valid numeric values",
+            functionName = ".assertIsValidNumberOfSubjectsPerStage",
+            parameter = parameterName,
+            value = parameterValues
         )
     }
 
     if (!is.na(parameterValues[1]) && parameterValues[1] != plannedSubjects[1]) {
-        warning("First value of '", parameterName, "' ",
+        warnArgumentAdjusted("First value of ", .pQuote(parameterName), " ",
             "(", parameterValues[1], ") will be ignored",
-            call. = FALSE
+            parameter = parameterName,
+            value = parameterValues,
+            diagnosticId = "simulation.first_stage_bound_adjusted"
         )
     }
 
@@ -2623,8 +3094,14 @@ NULL
 }
 
 .assertIsValidMaxNumberOfSubjects <- function(maxNumberOfSubjects, naAllowed = FALSE) {
-    .assertIsSingleNumber(maxNumberOfSubjects, "maxNumberOfSubjects", naAllowed = naAllowed)
-    .assertIsInClosedInterval(maxNumberOfSubjects, "maxNumberOfSubjects", lower = 1, upper = NULL, naAllowed = naAllowed)
+    .assertIsSingleNumber(maxNumberOfSubjects,
+        "maxNumberOfSubjects",
+        naAllowed = naAllowed
+    )
+    .assertIsInClosedInterval(maxNumberOfSubjects,
+        "maxNumberOfSubjects",
+        lower = 1, upper = NULL, naAllowed = naAllowed
+    )
 }
 
 .assertAreSuitableInformationRates <- function(design, dataInput, stage) {
@@ -2634,7 +3111,15 @@ NULL
 
     param <- NA_character_
     paramValues <- NA_real_
-    if (dataInput$isDatasetSurvival()) {
+    if (dataInput$isDatasetGeneral()) {
+        observedInformations <- cumsum(dataInput$getInformationsUpTo(stage))
+        if (any(abs(design$informationRates[2:stage] -
+                observedInformations[2:stage] / observedInformations[1] * design$informationRates[1]) >
+                C_ACCEPT_DEVIATION_INFORMATIONRATES)) {
+            param <- "information values"
+            paramValues <- observedInformations
+        }
+    } else if (dataInput$isDatasetSurvival()) {
         if (any(abs(design$informationRates[2:stage] - dataInput$getOverallEventsUpTo(stage)[2:stage] /
                 dataInput$getOverallEventsUpTo(1) * design$informationRates[1]) >
                 C_ACCEPT_DEVIATION_INFORMATIONRATES)) {
@@ -2665,26 +3150,31 @@ NULL
         }
     }
     if (!is.na(param)) {
-        warning("Observed ", param, " (", .arrayToString(paramValues),
+        warnDataIssue("Observed ", param, " (", .arrayToString(paramValues),
             ") not according to specified information rates (",
             .arrayToString(design$informationRates[1:stage]), ") in ",
             "group sequential design. ",
             "Test procedure might not control Type I error rate",
-            call. = FALSE
+            diagnosticId = "analysis.information_rates_changed"
         )
     }
 }
 
-.assertIsOneSidedDesign <- function(design,
+.assertIsOneSidedDesign <- function(
+        design,
         designType = c("multi-arm", "enrichment"),
         engineType = c("simulation", "analysis")) {
     if (design$sided == 2) {
         designType <- match.arg(designType)
         engineType <- match.arg(engineType)
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            designType, " ", engineType, " is only applicable for one-sided testing",
-            call. = FALSE
+        stopIllegalArgument(designType, " ", engineType,
+            " is only applicable for one-sided testing",
+            functionName = ".assertIsOneSidedDesign",
+            parameter = "designType",
+            value = designType,
+            relatedParameter = "engineType",
+            relatedValue = engineType,
+            diagnosticId = "validation.one_sided_procedure_required"
         )
     }
 }
@@ -2732,108 +3222,119 @@ NULL
 }
 
 .isMultiArmSimulationResults <- function(simulationResults) {
-    return(inherits(simulationResults, "SimulationResults") && grepl("MultiArm", .getClassName(simulationResults)))
+    return(inherits(simulationResults, "SimulationResults") &&
+        grepl("MultiArm", .getClassName(simulationResults)))
 }
 
 .isEnrichmentSimulationResults <- function(simulationResults) {
-    return(inherits(simulationResults, "SimulationResults") && grepl("Enrichment", .getClassName(simulationResults)))
+    return(inherits(simulationResults, "SimulationResults") &&
+        grepl("Enrichment", .getClassName(simulationResults)))
 }
 
 .assertIsStageResultsMultiArm <- function(stageResults) {
     if (!inherits(stageResults, "StageResults")) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'stageResults' must be a multi-arm stage results object ",
+        stopIllegalArgument("'stageResults' must be a multi-arm stage results object ",
             "(is ", .getClassName(stageResults), ")",
-            call. = FALSE
+            functionName = ".assertIsStageResultsMultiArm",
+            parameter = "stageResults",
+            value = stageResults
         )
     }
 
     if (!.isMultiArmStageResults(stageResults)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'stageResults' must be a multi-arm object ",
+        stopIllegalArgument("'stageResults' must be a multi-arm object ",
             "(is ", .getClassName(stageResults), ")",
-            call. = FALSE
+            functionName = ".assertIsStageResultsMultiArm",
+            parameter = "stageResults",
+            value = stageResults
         )
     }
 }
 
 .assertIsStageResultsNonMultiHypotheses <- function(stageResults) {
     if (inherits(stageResults, "StageResults") && .isMultiArmStageResults(stageResults)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'stageResults' must be a non-multi-arm object ",
+        stopIllegalArgument("'stageResults' must be a non-multi-arm object ",
             "(is ", .getClassName(stageResults), ")",
-            call. = FALSE
+            functionName = ".assertIsStageResultsNonMultiHypotheses",
+            parameter = "stageResults",
+            value = stageResults
         )
     }
 
     if (inherits(stageResults, "StageResults") && .isEnrichmentStageResults(stageResults)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'stageResults' must be a non-enrichment object ",
+        stopIllegalArgument("'stageResults' must be a non-enrichment object ",
             "(is ", .getClassName(stageResults), ")",
-            call. = FALSE
+            functionName = ".assertIsStageResultsNonMultiHypotheses",
+            parameter = "stageResults",
+            value = stageResults
         )
     }
 
     allowedClasses <- c(
+        "StageResultsGeneral",
         "StageResultsMeans",
         "StageResultsRates",
         "StageResultsSurvival"
     )
     if (!(.getClassName(stageResults) %in% allowedClasses)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'stageResults' must be an instance of ",
-            .arrayToString(allowedClasses, vectorLookAndFeelEnabled = FALSE),
-            " (is '", .getClassName(stageResults), "')",
-            call. = FALSE
+        stopIllegalArgument("'stageResults' must be an instance of ",
+            .arrayToString(allowedClasses, vectorLookAndFeelEnabled = FALSE, encapsulate = TRUE),
+            " (is ", .getClassName(stageResults, quote = TRUE), ")",
+            functionName = ".assertIsStageResultsNonMultiHypotheses",
+            parameter = "stageResults",
+            value = stageResults
         )
     }
 }
 
 .assertIsDatasetNonMultiHypotheses <- function(dataInput) {
     if (.isMultiArmDataset(dataInput)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'dataInput' must be a non-multi-arm dataset ",
+        stopIllegalArgument("'dataInput' must be a non-multi-arm dataset ",
             "(has ", dataInput$getNumberOfGroups(), " treatment arms)",
-            call. = FALSE
+            functionName = ".assertIsDatasetNonMultiHypotheses",
+            parameter = "dataInput",
+            value = dataInput
         )
     }
     if (.isEnrichmentDataset(dataInput)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'dataInput' must be a non-enrichment dataset ",
+        stopIllegalArgument("'dataInput' must be a non-enrichment dataset ",
             "(has ", dataInput$getNumberOfSubsets(), " subsets)",
-            call. = FALSE
+            functionName = ".assertIsDatasetNonMultiHypotheses",
+            parameter = "dataInput",
+            value = dataInput
         )
     }
 }
 
 .assertIsAnalysisResults <- function(analysisResults) {
     if (!inherits(analysisResults, "AnalysisResults")) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'analysisResults' ",
+        stopIllegalArgument("'analysisResults' ",
             "must be a valid 'AnalysisResults' object ",
-            " (is '", .getClassName(analysisResults), "')",
-            call. = FALSE
+            " (is ", .getClassName(analysisResults, quote = TRUE), ")",
+            functionName = ".assertIsAnalysisResults",
+            parameter = "analysisResults",
+            value = analysisResults,
+            relatedParameter = "AnalysisResults"
         )
     }
 }
 
 .isValidIntersectionTestMultiArm <- function(intersectionTest) {
-    return(!is.null(intersectionTest) && length(intersectionTest) == 1 && !is.na(intersectionTest) &&
-        is.character(intersectionTest) && intersectionTest %in% C_INTERSECTION_TESTS_MULTIARMED)
+    return(!is.null(intersectionTest) &&
+        length(intersectionTest) == 1 && !is.na(intersectionTest) &&
+        is.character(intersectionTest) &&
+        intersectionTest %in% C_INTERSECTION_TESTS_MULTIARMED)
 }
 
-.getCorrectedIntersectionTestMultiArmIfNecessary <- function(design, intersectionTest, userFunctionCallEnabled = TRUE) {
+.getCorrectedIntersectionTestMultiArmIfNecessary <- function(
+        design,
+        intersectionTest,
+        userFunctionCallEnabled = TRUE) {
     .assertIsCharacter(intersectionTest, "intersectionTest")
     intersectionTest <- intersectionTest[1]
     if (.isTrialDesignConditionalDunnett(design) && intersectionTest != "Dunnett") {
         if (userFunctionCallEnabled) {
-            message <- paste0("Intersection test '", intersectionTest, "' ")
+            message <- paste0("Intersection test ", .pQuote(intersectionTest), " ")
             if (!.isValidIntersectionTestMultiArm(intersectionTest)) {
                 message <- paste0(message, "is invalid, ")
             }
@@ -2843,7 +3344,9 @@ NULL
                 message, "and 'Dunnett' will be used instead ",
                 "because conditional Dunnett test was specified as design"
             )
-            warning(message, call. = FALSE)
+            warnArgumentAdjusted(message,
+                diagnosticId = "analysis.intersection_test_adjusted_to_dunnett"
+            )
         }
         intersectionTest <- "Dunnett"
     }
@@ -2854,43 +3357,60 @@ NULL
     .assertIsCharacter(intersectionTest, "intersectionTest")
     intersectionTest <- intersectionTest[1]
     if (!.isValidIntersectionTestMultiArm(intersectionTest)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'intersectionTest' ",
+        stopIllegalArgument("'intersectionTest' ",
             "(", intersectionTest, ") must be one of ",
-            .arrayToString(C_INTERSECTION_TESTS_MULTIARMED, encapsulate = TRUE),
-            call. = FALSE
+            .arrayToString(C_INTERSECTION_TESTS_MULTIARMED,
+                encapsulate = TRUE
+            ),
+            functionName = ".assertIsValidIntersectionTestMultiArm",
+            parameter = "intersectionTest",
+            value = intersectionTest
         )
     }
-    if (.isTrialDesignConditionalDunnett(design) && intersectionTest != "Dunnett") {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "intersection test ",
-            "('", intersectionTest, "') must be 'Dunnett' ",
+    if (.isTrialDesignConditionalDunnett(design) &&
+            intersectionTest != "Dunnett") {
+        stopIllegalArgument("intersection test ",
+            "(", .pQuote(intersectionTest), ") must be 'Dunnett' ",
             "because conditional Dunnett test was specified as design",
-            call. = FALSE
+            functionName = ".assertIsValidIntersectionTestMultiArm",
+            parameter = "intersectionTest",
+            value = intersectionTest,
+            relatedParameter = "design",
+            relatedValue = design,
+            diagnosticId = "analysis.conditional_dunnett_intersection_test"
         )
     }
 }
 
 .isValidIntersectionTestEnrichment <- function(intersectionTest) {
-    return(!is.null(intersectionTest) && length(intersectionTest) == 1 && !is.na(intersectionTest) &&
-        is.character(intersectionTest) && intersectionTest %in% C_INTERSECTION_TESTS_ENRICHMENT)
+    return(!is.null(intersectionTest) &&
+        length(intersectionTest) == 1 && !is.na(intersectionTest) &&
+        is.character(intersectionTest) &&
+        intersectionTest %in% C_INTERSECTION_TESTS_ENRICHMENT)
 }
 
 .assertIsValidIntersectionTestEnrichment <- function(design, intersectionTest) {
     .assertIsCharacter(intersectionTest, "intersectionTest")
     intersectionTest <- intersectionTest[1]
     if (!.isValidIntersectionTestEnrichment(intersectionTest)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'intersectionTest' ",
+        stopIllegalArgument("'intersectionTest' ",
             "(", intersectionTest, ") must be one of ",
-            .arrayToString(C_INTERSECTION_TESTS_ENRICHMENT, encapsulate = TRUE),
-            call. = FALSE
+            .arrayToString(C_INTERSECTION_TESTS_ENRICHMENT,
+                encapsulate = TRUE
+            ),
+            functionName = ".assertIsValidIntersectionTestEnrichment",
+            parameter = "intersectionTest",
+            value = intersectionTest
         )
     }
     return(intersectionTest)
 }
 
-.ignoreParameterIfNotUsed <- function(paramName, paramValue, requirementLogical, requirementFailedReason,
+.ignoreParameterIfNotUsed <- function(
+        paramName,
+        paramValue,
+        requirementLogical,
+        requirementFailedReason,
         prefix = NA_character_) {
     if (all(is.na(paramValue)) || requirementLogical) {
         return(paramValue)
@@ -2902,9 +3422,12 @@ NULL
         prefix <- paste0(trimws(prefix), " ")
     }
 
-    warning(prefix, "'", paramName, "' (", .arrayToString(paramValue), ") will be ignored because ",
+    warnArgumentIgnored(prefix, .pQuote(paramName), " (",
+        .arrayToString(paramValue), ") will be ignored because ",
         requirementFailedReason,
-        call. = FALSE
+        parameter = paramName,
+        value = paramValue,
+        diagnosticId = "validation.argument_not_applicable"
     )
     return(NA_real_)
 }
@@ -2922,15 +3445,17 @@ NULL
 #
 .stopInCaseOfIllegalStageDefinition <- function(stageResults, ...) {
     stage <- list(...)[["stage"]]
-    if (is.null(stage) && is.numeric(stageResults) && stageResults %in% 1L:C_KMAX_UPPER_BOUND) {
+    if (is.null(stage) && is.numeric(stageResults) &&
+            stageResults %in% 1L:C_KMAX_UPPER_BOUND) {
         stage <- stageResults
     }
     if (!is.null(stage)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'stage' (", stage, ") can only be defined in ",
+        stopIllegalArgument("'stage' (", stage, ") can only be defined in ",
             "getStageResults() or getAnalysisResults()",
-            call. = FALSE
+            functionName = ".stopInCaseOfIllegalStageDefinition",
+            parameter = "stage",
+            value = stage,
+            diagnosticId = "analysis.stage_argument_misplaced"
         )
     }
 }
@@ -2938,11 +3463,11 @@ NULL
 .stopInCaseOfIllegalStageDefinition2 <- function(...) {
     forbiddenStage <- .getOptionalArgument("stage", ...)
     if (!is.null(forbiddenStage)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'stage' (", forbiddenStage, ") can only be defined in ",
+        stopIllegalArgument("'stage' (", forbiddenStage, ") can only be defined in ",
             "getStageResults() or getAnalysisResults()",
-            call. = FALSE
+            functionName = ".stopInCaseOfIllegalStageDefinition2",
+            parameter = "stage",
+            diagnosticId = "analysis.stage_argument_misplaced"
         )
     }
 }
@@ -2953,24 +3478,29 @@ NULL
 }
 
 .isValidVarianceOptionMultiArmed <- function(varianceOption) {
-    return(!is.null(varianceOption) && length(varianceOption) == 1 && !is.na(varianceOption) &&
+    return(!is.null(varianceOption) &&
+        length(varianceOption) == 1 && !is.na(varianceOption) &&
         is.character(varianceOption) && varianceOption %in% C_VARIANCE_OPTIONS_MULTIARMED)
 }
 
 .assertIsValidVarianceOptionMultiArmed <- function(design, varianceOption) {
     if (!.isValidVarianceOptionMultiArmed(varianceOption)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'varianceOption' should be one of ",
+        stopIllegalArgument("'varianceOption' should be one of ",
             .arrayToString(C_VARIANCE_OPTIONS_MULTIARMED, encapsulate = TRUE),
-            call. = FALSE
+            functionName = ".assertIsValidVarianceOptionMultiArmed",
+            parameter = "varianceOption",
+            value = varianceOption
         )
     }
     if (.isTrialDesignConditionalDunnett(design) && varianceOption != C_VARIANCE_OPTION_DUNNETT) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "variance option ('", varianceOption, "') must be '", C_VARIANCE_OPTION_DUNNETT, "' ",
-            "because conditional Dunnett test was specified as design",
-            call. = FALSE
+        stopIllegalArgument("variance option (", .pQuote(varianceOption), ") must be ",
+            .pQuote(C_VARIANCE_OPTION_DUNNETT), " because conditional Dunnett test was specified as design",
+            functionName = ".assertIsValidVarianceOptionMultiArmed",
+            parameter = "varianceOption",
+            value = varianceOption,
+            relatedParameter = "design",
+            relatedValue = design,
+            diagnosticId = "analysis.conditional_dunnett_variance"
         )
     }
 }
@@ -2978,10 +3508,11 @@ NULL
 .assertIsValidVarianceOptionEnrichment <- function(varianceOption) {
     .assertIsSingleCharacter(varianceOption, "varianceOption")
     if (!varianceOption %in% C_VARIANCE_OPTIONS_ENRICHMENT) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'varianceOption' should be one of ",
+        stopIllegalArgument("'varianceOption' should be one of ",
             .arrayToString(C_VARIANCE_OPTIONS_ENRICHMENT, encapsulate = TRUE),
-            call. = FALSE
+            functionName = ".assertIsValidVarianceOptionEnrichment",
+            parameter = "varianceOption",
+            value = varianceOption
         )
     }
 }
@@ -2991,8 +3522,11 @@ NULL
 
     if (dataInput$getNumberOfGroups() == 1) {
         if (!is.na(stdErrorEstimate)) {
-            warning("'stdErrorEstimate' (", stdErrorEstimate, ") will be ignored because data input has only one group",
-                call. = FALSE
+            warnArgumentIgnored("'stdErrorEstimate' (", stdErrorEstimate,
+                ") will be ignored because data input has only one group",
+                parameter = "stdErrorEstimate",
+                value = stdErrorEstimate,
+                diagnosticId = "analysis.two_group_argument_ignored"
             )
         }
 
@@ -3004,11 +3538,13 @@ NULL
     }
 
     if (!stdErrorEstimate %in% C_RATES_STD_ERROR_ESTIMATE) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'stdErrorEstimate' (", stdErrorEstimate, ") must be ",
-            .arrayToString(C_RATES_STD_ERROR_ESTIMATE, mode = "or", encapsulate = TRUE),
-            call. = FALSE
+        stopIllegalArgument("'stdErrorEstimate' (", stdErrorEstimate,
+            ") must be ", .arrayToString(C_RATES_STD_ERROR_ESTIMATE,
+                mode = "or", encapsulate = TRUE
+            ),
+            functionName = ".assertIsValidStdErrorEstimateRates",
+            parameter = "stdErrorEstimate",
+            value = stdErrorEstimate
         )
     }
 
@@ -3018,12 +3554,14 @@ NULL
 .assertIsValidSummaryIntervalFormat <- function(intervalFormat) {
     .assertIsSingleCharacter(intervalFormat, "intervalFormat") # "[%s; %s]"
     if (!grepl("^[^%]*%s[^%]*%s[^%]*$", intervalFormat)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'intervalFormat' (", intervalFormat, ") has an invalid format; ",
+        stopIllegalArgument("'intervalFormat' (", intervalFormat,
+            ") has an invalid format; ",
             "the control character %s must appear exactly twice; ",
             "to change it use 'options(\"rpact.summary.intervalFormat\" = \"[%s; %s]\")'",
-            call. = FALSE
+            functionName = ".assertIsValidSummaryIntervalFormat",
+            parameter = "intervalFormat",
+            value = intervalFormat,
+            relatedParameter = "options(\"rpact.summary.intervalFormat\" = \"[%s; %s]\")"
         )
     }
 }
@@ -3058,38 +3596,60 @@ NULL
         typeOfSelection <- "rBest"
     }
     if (!(typeOfSelection %in% C_TYPES_OF_SELECTION)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'typeOfSelection' ",
-            "(", typeOfSelection, ") must be one of ",
-            .arrayToString(C_TYPES_OF_SELECTION, encapsulate = TRUE),
-            call. = FALSE
+        stopIllegalArgument("'typeOfSelection' ", "(", typeOfSelection,
+            ") must be one of ", .arrayToString(C_TYPES_OF_SELECTION,
+                encapsulate = TRUE
+            ),
+            functionName = ".assertIsValidTypeOfSelection",
+            parameter = "typeOfSelection",
+            value = typeOfSelection
         )
     }
 
     if (typeOfSelection == "rBest") {
-        .assertIsSingleNumber(rValue, "rValue", naAllowed = FALSE, noDefaultAvailable = TRUE)
+        .assertIsSingleNumber(rValue, "rValue",
+            naAllowed = FALSE, noDefaultAvailable = TRUE
+        )
         if (activeArms == 1) {
-            warning("'typeOfSelection' (\"", typeOfSelection, "\") will be ignored ",
+            warnArgumentIgnored("'typeOfSelection' (\"", typeOfSelection, "\") will be ignored ",
                 "because 'activeArms' or 'populations' = 1",
-                call. = FALSE
+                parameter = "typeOfSelection",
+                value = typeOfSelection,
+                diagnosticId = "selection.requires_multiple_groups"
             )
         } else if (rValue > activeArms) {
-            warning("'rValue' (", rValue, ") is larger than activeArms or populations ",
+            warnArgumentIgnored("'rValue' (", rValue, ") is larger than activeArms or populations ",
                 "(", activeArms, ") and will be ignored",
-                call. = FALSE
+                parameter = "rValue",
+                value = rValue,
+                diagnosticId = "selection.r_exceeds_group_count"
             )
         }
     } else if (!is.na(rValue)) {
-        warning("'rValue' (", rValue, ") will be ignored because 'typeOfSelection' != \"rBest\"", call. = FALSE)
+        warnArgumentIgnored("'rValue' (", rValue, ") will be ignored because 'typeOfSelection' != \"rBest\"",
+            parameter = "rValue",
+            value = rValue,
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            diagnosticId = "selection.r_requires_r_best"
+        )
     }
 
     if (typeOfSelection == "epsilon") {
-        .assertIsSingleNumber(epsilonValue, "epsilonValue", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        .assertIsInClosedInterval(epsilonValue, "epsilonValue", lower = 0, upper = NULL, naAllowed = TRUE)
+        .assertIsSingleNumber(epsilonValue, "epsilonValue",
+            naAllowed = FALSE, noDefaultAvailable = TRUE
+        )
+        .assertIsInClosedInterval(epsilonValue, "epsilonValue",
+            lower = 0, upper = NULL, naAllowed = TRUE
+        )
     } else if (!is.na(epsilonValue)) {
-        warning("'epsilonValue' (", epsilonValue, ") will be ignored ",
+        warnArgumentIgnored("'epsilonValue' (", epsilonValue, ") will be ignored ",
             "because 'typeOfSelection' != \"epsilon\"",
-            call. = FALSE
+            parameter = "epsilonValue",
+            value = epsilonValue,
+            relatedParameter = "typeOfSelection",
+            relatedValue = typeOfSelection,
+            diagnosticId = "selection.epsilon_requires_epsilon_rule"
         )
     }
 
@@ -3100,11 +3660,13 @@ NULL
     .assertIsCharacter(successCriterion, "successCriterion")
     successCriterion <- successCriterion[1]
     if (!(successCriterion %in% C_SUCCESS_CRITERIONS)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'successCriterion' ",
-            "(", successCriterion, ") must be one of ",
-            .arrayToString(C_SUCCESS_CRITERIONS, encapsulate = TRUE),
-            call. = FALSE
+        stopIllegalArgument("'successCriterion' ",
+            "(", successCriterion, ") must be one of ", .arrayToString(C_SUCCESS_CRITERIONS,
+                encapsulate = TRUE
+            ),
+            functionName = ".assertIsValidSuccessCriterion",
+            parameter = "successCriterion",
+            value = successCriterion
         )
     }
     return(successCriterion)
@@ -3114,35 +3676,49 @@ NULL
     .assertIsCharacter(effectMeasure, "effectMeasure")
     effectMeasure <- effectMeasure[1]
     if (!(effectMeasure %in% C_EFFECT_MEASURES)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'effectMeasure' ",
-            "(", effectMeasure, ") must be one of ",
-            .arrayToString(C_EFFECT_MEASURES, encapsulate = TRUE),
-            call. = FALSE
+        stopIllegalArgument("'effectMeasure' ",
+            "(", effectMeasure, ") must be one of ", .arrayToString(C_EFFECT_MEASURES,
+                encapsulate = TRUE
+            ),
+            functionName = ".assertIsValidEffectMeasure",
+            parameter = "effectMeasure",
+            value = effectMeasure
         )
     }
     return(effectMeasure)
 }
 
-.assertIsValidMatrix <- function(x, argumentName, ...,
-        expectedNumberOfColumns = NA_integer_, naAllowed = FALSE, returnSingleValueAsMatrix = FALSE) {
+.assertIsValidMatrix <- function(
+        x,
+        argumentName,
+        ...,
+        expectedNumberOfColumns = NA_integer_,
+        naAllowed = FALSE,
+        returnSingleValueAsMatrix = FALSE,
+        relatedParameter = NULL,
+        relatedValue = NULL) {
     if (missing(x) || is.null(x) || length(x) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'", argumentName, "' must be a valid matrix",
-            call. = FALSE
+        stopMissingArgument(.pQuote(argumentName), " must be specified",
+            functionName = ".assertIsValidMatrix",
+            parameter = argumentName,
+            value = if (!missing(x)) x else NULL,
+            relatedParameter = relatedParameter,
+            relatedValue = relatedValue
         )
     }
 
-    if (returnSingleValueAsMatrix && !is.matrix(x) && (is.numeric(x) || is.character(x) || is.logical(x))) {
+    if (returnSingleValueAsMatrix && !is.matrix(x) &&
+            (is.numeric(x) || is.character(x) || is.logical(x))) {
         if (length(x) == 1) {
             x <- matrix(x)
         } else if (length(x) > 1 && !is.na(expectedNumberOfColumns)) {
             if (length(x) %% expectedNumberOfColumns != 0) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "the length of ",
-                    "'", argumentName, "' (", .arrayToString(x),
-                    ") must be a divisor or a multiple ", expectedNumberOfColumns,
-                    call. = FALSE
+                stopIllegalArgument("the length of ",
+                    .pQuote(argumentName), " (", .arrayToString(x), ") must be a divisor or a multiple ",
+                    expectedNumberOfColumns,
+                    functionName = ".assertIsValidMatrix",
+                    parameter = argumentName,
+                    value = x
                 )
             }
 
@@ -3151,32 +3727,39 @@ NULL
     }
 
     if (!is.matrix(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", .getClassName(x), ") must be a valid matrix",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(argumentName), " (", .getClassName(x), ") ",
+            "must be a valid matrix",
+            functionName = ".assertIsValidMatrix",
+            parameter = argumentName,
+            value = x
         )
     }
 
     if (!naAllowed && anyNA(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", .arrayToString(x), ") must not contain NA's",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(argumentName), " (", .arrayToString(x), ") ",
+            "must not contain NA's",
+            functionName = ".assertIsValidMatrix",
+            parameter = argumentName,
+            value = x
         )
     }
 
     if (!is.numeric(x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must be a valid numeric matrix",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(argumentName), " (", .arrayToString(x), ") ",
+            "must be a valid numeric matrix",
+            functionName = ".assertIsValidMatrix",
+            parameter = argumentName,
+            value = x
         )
     }
 
     if (!is.na(expectedNumberOfColumns) && ncol(x) != expectedNumberOfColumns) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must be a numeric matrix with ", expectedNumberOfColumns, " columns",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(argumentName), " (", .arrayToString(x), ") ",
+            "must be a numeric matrix with ",
+            expectedNumberOfColumns, " columns",
+            functionName = ".assertIsValidMatrix",
+            parameter = argumentName,
+            value = x
         )
     }
 
@@ -3186,23 +3769,27 @@ NULL
 .assertIsValidDecisionMatrix <- function(decisionMatrix, kMax) {
     .assertIsValidMatrix(decisionMatrix, "decisionMatrix", naAllowed = FALSE)
     if (!(nrow(decisionMatrix) %in% c(2, 4))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'decisionMatrix' must have two or four rows",
-            call. = FALSE
+        stopIllegalArgument("'decisionMatrix' must have two or four rows",
+            functionName = ".assertIsValidDecisionMatrix",
+            parameter = "decisionMatrix",
+            value = decisionMatrix
         )
     }
     if (ncol(decisionMatrix) != kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'decisionMatrix' must have 'kMax' ",
+        stopIllegalArgument("'decisionMatrix' must have 'kMax' ",
             "(= length(informationRates) = ", kMax, ") columns",
-            call. = FALSE
+            functionName = ".assertIsValidDecisionMatrix",
+            parameter = "decisionMatrix",
+            relatedParameter = "kMax",
+            relatedValue = kMax,
+            value = decisionMatrix
         )
     }
     if (any(decisionMatrix[2:nrow(decisionMatrix), ] < decisionMatrix[1:(nrow(decisionMatrix) - 1), ])) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'decisionMatrix' needs to be increasing in each column",
-            call. = FALSE
+        stopIllegalArgument("'decisionMatrix' needs to be increasing in each column",
+            functionName = ".assertIsValidDecisionMatrix",
+            parameter = "decisionMatrix",
+            value = decisionMatrix
         )
     }
 }
@@ -3211,11 +3798,13 @@ NULL
     .assertIsCharacter(typeOfShape, "typeOfShape")
     typeOfShape <- typeOfShape[1]
     if (!(typeOfShape %in% C_TYPES_OF_SHAPE)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'typeOfShape' ",
-            "(", typeOfShape, ") must be one of ",
-            .arrayToString(C_TYPES_OF_SHAPE, encapsulate = TRUE),
-            call. = FALSE
+        stopIllegalArgument("'typeOfShape' ", "(", typeOfShape, ") ",
+            "must be one of ", .arrayToString(C_TYPES_OF_SHAPE,
+                encapsulate = TRUE
+            ),
+            functionName = ".assertIsValidTypeOfShape",
+            parameter = "typeOfShape",
+            value = typeOfShape
         )
     }
     return(typeOfShape)
@@ -3227,17 +3816,72 @@ NULL
     }
 
     if (length(x) != len) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sQuote(argumentName), " (", .arrayToString(x), ") ",
-            "must have length ", sQuote(lenArgName), " (", len, ")",
-            call. = FALSE
+        stopIllegalArgument(sQuote(argumentName), " (", .arrayToString(x), ") ",
+            "must have length ", sQuote(lenArgName), " (", len,
+            ")",
+            functionName = ".assertHasLength",
+            parameter = argumentName,
+            relatedParameter = lenArgName,
+            value = x
         )
     }
 }
 
-.assertIsValidEffectMatrix <- function(...,
+# Validate the normalized enrichment effect list after list/data.frame conversion.
+.assertIsValidEffectList <- function(effectList, ..., endpoint, simulationType = "auto",
+        requirePiControls = simulationType %in% c("patientWise", "patientWiseBasic")) {
+    requiredNames <- c("subGroups", "prevalences")
+    if (endpoint == "means") {
+        requiredNames <- c(requiredNames, "effects", "stDevs")
+    } else if (endpoint == "rates") {
+        requiredNames <- c(requiredNames, "piTreatments", "piControls")
+    } else if (endpoint == "survival") {
+        if (is.null(effectList$hazardRatios)) {
+            requiredNames <- c(requiredNames, "piTreatments", "piControls")
+        }
+        if (requirePiControls) {
+            requiredNames <- c(requiredNames, "piControls")
+        }
+    }
+    for (name in unique(requiredNames)) {
+        if (is.null(effectList[[name]]) || length(effectList[[name]]) == 0) {
+            patientWiseControls <- name == "piControls" && endpoint == "survival" && requirePiControls
+            stopMissingArgument(
+                sQuote(paste0("effectList$", name)),
+                if (patientWiseControls) {
+                    " must be specified for patient-wise survival simulations"
+                } else {
+                    " must be specified"
+                },
+                functionName = ".assertIsValidEffectList",
+                parameter = paste0("effectList$", name), value = effectList[[name]]
+            )
+        }
+    }
+    for (name in intersect(names(effectList), c(
+        "prevalences", "effects", "stDevs", "piControls", "piTreatments", "hazardRatios"
+    ))) {
+        .assertIsNumericVector(effectList[[name]], paste0("effectList$", name), matrixAllowed = TRUE)
+        .assertArgumentFitsWithSubGroups(effectList[[name]], name, effectList$subGroups)
+    }
+    .assertIsInClosedInterval(effectList$prevalences, "effectList$prevalences", lower = 0, upper = 1)
+    for (name in intersect(names(effectList), c("effects", "piTreatments", "hazardRatios"))) {
+        .assertIsValidMatrix(effectList[[name]], paste0("effectList$", name))
+    }
+    for (name in intersect(names(effectList), c("piControls", "piTreatments"))) {
+        .assertIsInOpenInterval(effectList[[name]], paste0("effectList$", name),
+            lower = 0, upper = 1, matrixAllowed = TRUE)
+    }
+    for (name in intersect(names(effectList), c("hazardRatios", "stDevs"))) {
+        .assertIsInOpenInterval(effectList[[name]], paste0("effectList$", name),
+            lower = 0, upper = NULL, matrixAllowed = TRUE)
+    }
+}
+
+.assertIsValidEffectMatrix <- function(
+        ...,
         simulationResults,
+        activeArms,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
         effectMatrix,
         valueMaxVector,
@@ -3253,40 +3897,52 @@ NULL
     .assertIsNumericVector(doseLevels, "doseLevels", naAllowed = TRUE)
     .assertHasLength(doseLevels, "doseLevels", gMax, "gMax", naAllowed = TRUE)
     .assertValuesAreStrictlyIncreasing(doseLevels, "doseLevels", naAllowed = TRUE)
-    .assertIsInOpenInterval(doseLevels, "doseLevels", lower = 0, upper = NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(doseLevels, "doseLevels",
+        lower = 0, upper = NULL,
+        naAllowed = TRUE, matrixAllowed = TRUE
+    )
 
     if (typeOfShape == "userDefined") {
         effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
-            expectedNumberOfColumns = gMax, naAllowed = FALSE, returnSingleValueAsMatrix = TRUE
+            expectedNumberOfColumns = gMax, naAllowed = FALSE, returnSingleValueAsMatrix = TRUE,
+            relatedParameter = "typeOfShape",
+            relatedValue = typeOfShape
         )
         .assertIsNumericVector(valueMaxVector, valueMaxVectorName, naAllowed = TRUE)
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         if (valueMaxVectorName == "piMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix",
-                lower = 0, upper = 1, naAllowed = FALSE
+                lower = 0, upper = 1, naAllowed = FALSE, matrixAllowed = TRUE
             )
-            valueMaxVectorDefault <- C_PI_1_DEFAULT
+            valueMaxVectorDefault <- .getPi1Default(type = "power", endpoint = "survival")
         } else if (valueMaxVectorName == "omegaMaxVector") {
-            .assertIsInOpenInterval(effectMatrix, "effectMatrix", lower = 0, upper = NULL, naAllowed = FALSE)
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix",
+                lower = 0, upper = NULL, naAllowed = FALSE, matrixAllowed = TRUE
+            )
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {
-            warning(sQuote(valueMaxVectorName), " (", .arrayToString(valueMaxVector),
+            warnArgumentIgnored(sQuote(valueMaxVectorName), " (", .arrayToString(valueMaxVector),
                 ") will be ignored because it will be set to first column of 'effectMatrix'",
-                call. = FALSE
+                parameter = valueMaxVectorName,
+                value = valueMaxVector,
+                diagnosticId = "shape.maximum_effect_ignored"
             )
         }
         if (!is.null(doseLevels) && !anyNA(doseLevels)) {
-            warning("'doseLevels' (", .arrayToString(doseLevels), ") ",
+            warnArgumentIgnored("'doseLevels' (", .arrayToString(doseLevels), ") ",
                 "will be ignored because 'typeOfShape' ",
-                "is defined as '", typeOfShape, "'",
-                call. = FALSE
+                "is defined as ", .pQuote(typeOfShape),
+                parameter = "doseLevels",
+                value = doseLevels,
+                diagnosticId = "shape.dose_levels_ignored"
             )
         }
     } else if (!is.null(effectMatrix)) {
-        warning("'effectMatrix' will be ignored because 'typeOfShape' ",
-            "is defined as '", typeOfShape, "'",
-            call. = FALSE
+        warnArgumentIgnored("'effectMatrix' will be ignored because 'typeOfShape' ",
+            "is defined as ", .pQuote(typeOfShape),
+            parameter = "effectMatrix",
+            diagnosticId = "shape.effect_matrix_requires_user_defined"
         )
     }
 
@@ -3325,8 +3981,10 @@ NULL
     return(effectMatrix)
 }
 
-.assertIsValidEffectMatrixMeans <- function(...,
+.assertIsValidEffectMatrixMeans <- function(
+        ...,
         simulationResults,
+        activeArms,
         typeOfShape,
         effectMatrix,
         muMaxVector,
@@ -3336,6 +3994,7 @@ NULL
         doseLevels) {
     return(.assertIsValidEffectMatrix(
         simulationResults = simulationResults,
+        activeArms = activeArms,
         typeOfShape = typeOfShape,
         effectMatrix = effectMatrix,
         valueMaxVector = muMaxVector,
@@ -3347,8 +4006,10 @@ NULL
     ))
 }
 
-.assertIsValidEffectMatrixRates <- function(...,
+.assertIsValidEffectMatrixRates <- function(
+        ...,
         simulationResults,
+        activeArms,
         typeOfShape,
         effectMatrix,
         piMaxVector,
@@ -3359,6 +4020,7 @@ NULL
         doseLevels) {
     return(.assertIsValidEffectMatrix(
         simulationResults = simulationResults,
+        activeArms = activeArms,
         typeOfShape = typeOfShape,
         effectMatrix = effectMatrix,
         valueMaxVector = piMaxVector,
@@ -3371,8 +4033,10 @@ NULL
     ))
 }
 
-.assertIsValidEffectMatrixSurvival <- function(...,
+.assertIsValidEffectMatrixSurvival <- function(
+        ...,
         simulationResults,
+        activeArms,
         typeOfShape,
         effectMatrix,
         omegaMaxVector,
@@ -3382,6 +4046,7 @@ NULL
         doseLevels) {
     return(.assertIsValidEffectMatrix(
         simulationResults = simulationResults,
+        activeArms = activeArms,
         typeOfShape = typeOfShape,
         effectMatrix = effectMatrix,
         valueMaxVector = omegaMaxVector,
@@ -3396,11 +4061,13 @@ NULL
 .assertIsValidPlannedSubjects <- function(plannedSubjects, kMax) {
     .assertIsIntegerVector(plannedSubjects, "plannedSubjects", validateType = FALSE)
     if (length(plannedSubjects) != kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'plannedSubjects' (", .arrayToString(plannedSubjects),
-            ") must have length 'kMax' (", kMax, ")",
-            call. = FALSE
+        stopIllegalArgument("'plannedSubjects' (", .arrayToString(plannedSubjects), ") ",
+            "must have length 'kMax' (", kMax, ")",
+            functionName = ".assertIsValidPlannedSubjects",
+            parameter = "plannedSubjects",
+            value = plannedSubjects,
+            relatedParameter = "kMax",
+            relatedValue = kMax
         )
     }
     .assertIsInClosedInterval(plannedSubjects, "plannedSubjects", lower = 1, upper = NULL)
@@ -3417,9 +4084,11 @@ NULL
 
 .isDelayedInformationEnabled <- function(..., design = NULL, delayedInformation = NULL) {
     if (is.null(design) && is.null(delayedInformation)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "either 'design' or 'delayedInformation' must be specified",
-            call. = FALSE
+        stopMissingArgument("either 'design' or 'delayedInformation' must be specified",
+            functionName = ".isDelayedInformationEnabled",
+            parameter = "design",
+            relatedParameter = "delayedInformation",
+            diagnosticId = "design.delayed_information_missing"
         )
     }
 
@@ -3427,7 +4096,7 @@ NULL
         if (.isTrialDesignFixed(design)) {
             return(FALSE)
         }
-        
+
         if (!.isTrialDesignInverseNormalOrGroupSequential(design)) {
             return(FALSE)
         }
@@ -3441,7 +4110,8 @@ NULL
     return(all(!is.na(delayedInformation)) && any(delayedInformation >= 1e-03))
 }
 
-.assertIsValidCountsParameterCombination <- function(existingParamNames,
+.assertIsValidCountsParameterCombination <- function(
+        existingParamNames,
         forbiddenParamNames,
         params,
         ...,
@@ -3466,13 +4136,17 @@ NULL
         })]
         requiredParamNamesFound <- requiredParamNames[requiredParamNames %in% existingParamNamesWithValue]
         if (length(requiredParamNamesFound) < length(requiredParamNames)) {
-            stop(
-                C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE),
-                " ", ifelse(length(requiredParamNames) == 1, "is", "are"),
-                " specified, ", .arrayToString(requiredParamNames, mode = "and", encapsulate = TRUE),
-                " must also be specified",
-                call. = FALSE
+            stopMissingArgument("if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE), " ",
+                ifelse(length(requiredParamNames) == 1, "is", "are"),
+                " specified, ", .arrayToString(requiredParamNames,
+                    mode = "and", encapsulate = TRUE
+                ), " must also be specified",
+                functionName = ".assertIsValidCountsParameterCombination",
+                parameter = "existingParamNames",
+                value = existingParamNames,
+                relatedParameter = "requiredParamNames",
+                relatedValue = requiredParamNames,
+                diagnosticId = "counts.companion_parameters_missing"
             )
         }
     }
@@ -3487,16 +4161,18 @@ NULL
 
     if (length(theta) > 1) {
         existingParamNames <- existingParamNames[existingParamNames != "theta"]
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'theta' cannot be specified as vector if ", sQuote(existingParamNames[1]), " is specified",
-            call. = FALSE
+        stopIllegalArgument("'theta' cannot be specified as vector if ",
+            sQuote(existingParamNames[1]), " is specified",
+            functionName = ".assertIsValidCountsParameterCombination",
+            parameter = "theta",
+            relatedParameter = existingParamNames[1]
         )
     } else if (length(theta) > 0 && "lambda1" %in% paramNames && length(params$lambda1) > 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'lambda1' cannot be specified as vector if ", sQuote("theta"), " is specified",
-            call. = FALSE
+        stopIllegalArgument("'lambda1' cannot be specified as vector if ",
+            sQuote("theta"), " is specified",
+            functionName = ".assertIsValidCountsParameterCombination",
+            parameter = "lambda1",
+            relatedParameter = "theta"
         )
     }
 
@@ -3504,16 +4180,20 @@ NULL
         return(invisible())
     }
 
-    stop(
-        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-        "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE),
+    stopConflictingArguments("if ",
+        .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE),
         " are specified, ", .arrayToString(foundParamNames, mode = "and", encapsulate = TRUE),
         " must not be specified",
-        call. = FALSE
+        functionName = ".assertIsValidCountsParameterCombination",
+        parameter = "existingParamNames", value = existingParamNames,
+        relatedParameter = "foundParamNames",
+        relatedValue = foundParamNames,
+        diagnosticId = "validation.conflicting_parameterizations"
     )
 }
 
-.assertIsValidEffectCountData <- function(sampleSizeEnabled,
+.assertIsValidEffectCountData <- function(
+        sampleSizeEnabled,
         sided,
         lambda1,
         lambda2,
@@ -3523,9 +4203,10 @@ NULL
         overdispersion) {
     .assertIsSingleInteger(sided, "sided", validateType = FALSE)
     if (sided != 1 && sided != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'sided' (", sided, ") must be defined as 1 or 2",
-            call. = FALSE
+        stopIllegalArgument("'sided' (", sided, ") must be defined as 1 or 2",
+            parameter = "sided", value = sided,
+            constraint = "must be defined as 1 or 2",
+            functionName = ".assertIsValidEffectCountData"
         )
     }
     .assertIsSingleNumber(lambda, "lambda", naAllowed = TRUE)
@@ -3559,10 +4240,15 @@ NULL
 
     numberOfParameters <- sum(is.na(lambda2), anyNA(lambda1), is.na(lambda), anyNA(theta))
     if (numberOfParameters != 2) {
-        stop(
-            ifelse(numberOfParameters > 2, C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, C_EXCEPTION_TYPE_MISSING_ARGUMENT),
-            "exactly two of the parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified",
-            call. = FALSE
+        message <- "exactly two of the parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified"
+        do.call(
+            what = if (numberOfParameters > 2) stopConflictingArguments else stopMissingArgument,
+            args = list(message,
+                functionName = ".assertIsValidEffectCountData",
+                parameter = c("lambda", "lambda1", "lambda2", "theta"),
+                relatedParameter = "numberOfParameters",
+                relatedValue = numberOfParameters
+            )
         )
     }
 
@@ -3574,22 +4260,30 @@ NULL
 
     if (sampleSizeEnabled && !all(is.na(lambda1)) && !all(is.na(lambda2)) && !is.na(thetaH0) &&
             any(abs(lambda1 / lambda2 - thetaH0) < 1e-12, na.rm = TRUE)) {
-        stop(
-            C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "'lambda1 / lambda2' (", .arrayToString(round(lambda1 / lambda2, 4)), ") must be != 'thetaH0' (", thetaH0, ")",
-            call. = FALSE
+        stopConflictingArguments("'lambda1 / lambda2' (",
+            .arrayToString(round(lambda1 / lambda2, 4)), ") must be != 'thetaH0' (",
+            thetaH0, ")",
+            functionName = ".assertIsValidEffectCountData",
+            parameter = "lambda1 / lambda2",
+            value = lambda1 / lambda2,
+            relatedParameter = "thetaH0",
+            relatedValue = thetaH0,
+            diagnosticId = "planning.alternative_equals_null"
         )
     }
 }
 
-.assertParametersAreSpecifiedCorrectlyTogether <- function(...,
+.assertParametersAreSpecifiedCorrectlyTogether <- function(
+        ...,
         case = c("notTogether", "eitherOr"),
         .paramNames = NULL) {
     params <- list(...)
     if (length(params) != 2) {
         if (is.null(names(params)) ||
                 length(params[!(names(params) %in% c("case", ".paramNames"))]) < 2) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "two or more parameters must be specified")
+            stopRuntimeIssue("two or more parameters must be specified",
+                functionName = ".assertParametersAreSpecifiedCorrectlyTogether"
+            )
         }
     }
     case <- match.arg(case)
@@ -3599,28 +4293,39 @@ NULL
         paramNames <- names(params)
     }
     if (is.null(paramNames) || any(nchar(paramNames) == 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "all arguments must be named")
+        stopRuntimeIssue("all arguments must be named",
+            functionName = ".assertParametersAreSpecifiedCorrectlyTogether"
+        )
     }
     if (case == "notTogether" && !all(is.na(params[[1]])) && !all(is.na(params[[2]]))) {
         paramVector <- c()
         for (i in seq_along(params)) {
-            paramVector <- c(paramVector, paste0(sQuote(paramNames[i]), " (", .arrayToString(params[[i]]), ")"))
+            paramVector <- c(paramVector, paste0(
+                sQuote(paramNames[i]),
+                " (", .arrayToString(params[[i]]), ")"
+            ))
         }
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            .arrayToString(paramVector, mode = "and"), " cannot be specified together",
-            call. = FALSE
+        stopIllegalArgument(.arrayToString(paramVector, mode = "and"),
+            " cannot be specified together",
+            functionName = ".assertParametersAreSpecifiedCorrectlyTogether",
+            parameter = "paramVector",
+            value = paramVector,
+            diagnosticId = "validation.conflicting_parameterizations"
         )
     } else if (case == "eitherOr" && all(is.na(params[[1]])) && all(is.na(params[[2]]))) {
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "either ", .arrayToString(paramNames, mode = "or", encapsulate = TRUE), " must be specified",
-            call. = FALSE
+        stopMissingArgument("either ",
+            .arrayToString(paramNames, mode = "or", encapsulate = TRUE),
+            " must be specified",
+            functionName = ".assertParametersAreSpecifiedCorrectlyTogether",
+            parameter = "paramNames",
+            value = paramNames,
+            diagnosticId = "validation.alternative_parameters_missing"
         )
     }
 }
 
-.assertAreValidParametersCountData <- function(...,
+.assertAreValidParametersCountData <- function(
+        ...,
         sampleSizeEnabled,
         simulationEnabled,
         fixedExposureTime,
@@ -3640,12 +4345,17 @@ NULL
     .assertIsInClosedInterval(accrualIntensity, "accrualIntensity", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
 
-    if (!all(is.na(accrualTime)) && length(accrualTime) > 2 && all(is.na(accrualIntensity))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualIntensity' need to be specified if piecewise accrual is enabled, i.e., ",
-            "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements",
-            call. = FALSE
+    if (!all(is.na(accrualTime)) && length(accrualTime) > 2 &&
+            all(is.na(accrualIntensity))) {
+        stopIllegalArgument("'accrualIntensity' need to be specified if ",
+            "piecewise accrual is enabled, i.e., ", "'accrualTime' (",
+            .arrayToString(accrualTime), ") has more than two elements",
+            functionName = ".assertAreValidParametersCountData",
+            parameter = "accrualIntensity",
+            relatedParameter = "accrualTime",
+            relatedValue = accrualTime,
+            value = accrualIntensity,
+            diagnosticId = "accrual.piecewise_intensities_missing"
         )
     }
 
@@ -3688,26 +4398,37 @@ NULL
         )
     }
     if (anyNA(accrualTime) && !is.na(followUpTime)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' needs to be specified if 'followUpTime' (", followUpTime, ") is specified",
-            call. = FALSE
+        stopIllegalArgument("'accrualTime' needs to be specified if ",
+            "'followUpTime' (", followUpTime, ") is specified",
+            functionName = ".assertAreValidParametersCountData",
+            parameter = "accrualTime",
+            relatedParameter = "followUpTime",
+            relatedValue = followUpTime,
+            value = accrualTime
         )
     }
     if (!is.na(followUpTime) && length(accrualTime) > 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements; ",
-            "'followUpTime' (", followUpTime, ") can only be specified if 'accrualTime' has one or two elements",
-            call. = FALSE
+        stopIllegalArgument("'accrualTime' (", .arrayToString(accrualTime), ") ",
+            "has more than two elements; ",
+            "'followUpTime' (", followUpTime, ") can only be specified if ",
+            "'accrualTime' has one or two elements",
+            functionName = ".assertAreValidParametersCountData",
+            parameter = "accrualTime",
+            value = accrualTime,
+            relatedParameter = "followUpTime",
+            relatedValue = followUpTime
         )
     }
     if (!is.na(maxNumberOfSubjects) && length(accrualTime) > 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements; ",
-            "'maxNumberOfSubjects' (", maxNumberOfSubjects, ") can only be specified if 'accrualTime' has one or two elements",
-            call. = FALSE
+        stopIllegalArgument("'accrualTime' (", .arrayToString(accrualTime), ") ",
+            "has more than two elements; ",
+            "'maxNumberOfSubjects' (", maxNumberOfSubjects, ") can only be ",
+            "specified if 'accrualTime' has one or two elements",
+            functionName = ".assertAreValidParametersCountData",
+            parameter = "accrualTime",
+            value = accrualTime,
+            relatedParameter = "maxNumberOfSubjects",
+            relatedValue = maxNumberOfSubjects
         )
     }
     if (sampleSizeEnabled) {
@@ -3728,33 +4449,40 @@ NULL
             "fixedExposureTime" = fixedExposureTime
         )
         if (!is.na(maxNumberOfSubjects) && anyNA(accrualTime)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'accrualTime' needs to be specified if 'maxNumberOfSubjects' ",
-                "(", maxNumberOfSubjects, ") is specified",
-                call. = FALSE
+            stopIllegalArgument("'accrualTime' needs to be specified if ",
+                "'maxNumberOfSubjects' ", "(", maxNumberOfSubjects, ") is specified",
+                functionName = ".assertAreValidParametersCountData",
+                parameter = "accrualTime",
+                relatedParameter = "maxNumberOfSubjects",
+                relatedValue = maxNumberOfSubjects,
+                value = accrualTime
             )
         }
     } else if (!simulationEnabled) {
         if (is.na(maxNumberOfSubjects) && (anyNA(accrualIntensity) || anyNA(accrualTime))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified",
-                call. = FALSE
+            stopIllegalArgument("'accrualTime' and 'accrualIntensity' ",
+                "need to be specified if 'maxNumberOfSubjects' is not specified",
+                functionName = ".assertAreValidParametersCountData",
+                parameter = "accrualTime",
+                relatedParameter = "accrualIntensity",
+                value = accrualTime
             )
         }
         if (anyNA(accrualIntensity) && !anyNA(accrualTime) && !is.na(fixedExposureTime)) {
-            warning(
-                "Specification of 'accrualTime' has no influence of calculation and will be ignored",
-                call. = FALSE
+            warnArgumentIgnored(
+                "Specification of 'accrualTime' has no ",
+                "influence of calculation and will be ignored",
+                diagnosticId = "counts.accrual_ignored_for_fixed_exposure"
             )
         }
     } else {
         if (is.na(maxNumberOfSubjects) && (anyNA(accrualIntensity) || anyNA(accrualTime))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified",
-                call. = FALSE
+            stopIllegalArgument("'accrualTime' and 'accrualIntensity' ",
+                "need to be specified if 'maxNumberOfSubjects' is not specified",
+                functionName = ".assertAreValidParametersCountData",
+                parameter = "accrualTime",
+                relatedParameter = "accrualIntensity",
+                value = accrualTime
             )
         }
     }
@@ -3768,28 +4496,32 @@ NULL
     if (!anyNA(accrualIntensity) && (accrualTime[1] != 0) &&
             length(accrualIntensity) == 1 &&
             length(accrualTime) != length(accrualIntensity)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' (", .arrayToString(accrualTime), ") and ",
+        stopIllegalArgument("'accrualTime' (", .arrayToString(accrualTime), ") and ",
             "'accrualIntensity' (", .arrayToString(accrualIntensity), ") does not match",
-            call. = FALSE
+            functionName = ".assertAreValidParametersCountData",
+            parameter = "accrualTime",
+            value = accrualTime,
+            relatedParameter = "accrualIntensity",
+            relatedValue = accrualIntensity
         )
     }
     if (!anyNA(accrualIntensity) && (length(accrualIntensity) > 1) &&
             length(accrualTime) != length(accrualIntensity) + 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' (", .arrayToString(accrualTime), ") and ",
+        stopIllegalArgument("'accrualTime' (", .arrayToString(accrualTime), ") and ",
             "'accrualIntensity' (", .arrayToString(accrualIntensity), ") does not match",
-            call. = FALSE
+            functionName = ".assertAreValidParametersCountData",
+            parameter = "accrualTime", value = accrualTime,
+            relatedParameter = "accrualIntensity",
+            relatedValue = accrualIntensity
         )
     }
     if (accrualIntensityValidationEnabled && anyNA(accrualIntensity) &&
             length(accrualTime) > 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualIntensity' (", .arrayToString(accrualIntensity), ") is not correctly specified",
-            call. = FALSE
+        stopIllegalArgument("'accrualIntensity' (", .arrayToString(accrualIntensity), ") ",
+            "is not correctly specified",
+            functionName = ".assertAreValidParametersCountData",
+            parameter = "accrualIntensity",
+            value = accrualIntensity
         )
     }
 }
@@ -3797,59 +4529,124 @@ NULL
 .assertAreValidCalendarTimes <- function(plannedCalendarTime, kMax) {
     .assertIsNumericVector(plannedCalendarTime, "plannedCalendarTime", naAllowed = FALSE)
     .assertValuesAreStrictlyIncreasing(plannedCalendarTime, "plannedCalendarTime")
-    .assertIsInOpenInterval(plannedCalendarTime, "plannedCalendarTime", lower = 0, upper = NULL, naAllowed = FALSE)
+    .assertIsInOpenInterval(plannedCalendarTime, "plannedCalendarTime",
+        lower = 0, upper = NULL, naAllowed = FALSE
+    )
     if (length(plannedCalendarTime) != kMax) {
-        stop(
+        stopConflictingArguments(
             sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                    "length of 'plannedCalendarTime' (%s) must be equal to 'kMax' (%s)"
-                ),
+                "length of 'plannedCalendarTime' (%s) must be equal to 'kMax' (%s)",
                 length(plannedCalendarTime), kMax
             ),
-            call. = FALSE
+            parameter = "plannedCalendarTime",
+            value = plannedCalendarTime,
+            relatedParameter = "kMax",
+            relatedValue = kMax,
+            functionName = ".assertAreValidCalendarTimes",
+            diagnosticId = "simulation.calendar_time_length"
         )
     }
 }
 
 .assertIsValidPlotType <- function(type, naAllowed = FALSE) {
     if (is.null(type) || length(type) == 0 || (!naAllowed && all(is.na(type)))) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'type' must be defined", call. = FALSE)
+        stopMissingArgument("'type' must be defined",
+            functionName = ".assertIsValidPlotType",
+            parameter = "type",
+            value = type
+        )
     }
 
     if (!is.numeric(type) && !is.character(type)) {
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'type' must be an integer or character value or vector (is ", .getClassName(type), ")",
-            call. = FALSE
+        stopMissingArgument("'type' must be an integer or character value or vector (is ",
+            .getClassName(type), ")",
+            functionName = ".assertIsValidPlotType",
+            parameter = "type",
+            value = .getClassName(type)
         )
     }
 
     if (is.numeric(type)) {
-        .assertIsIntegerVector(type, "type", naAllowed = naAllowed, validateType = FALSE)
+        .assertIsIntegerVector(type, "type",
+            naAllowed = naAllowed, validateType = FALSE
+        )
     }
 }
 
-.showFutilityBoundsUnnecessaryArgumentWarning <- function(argumentName, argValue, sourceScale, targetScale) {
+.assertIsAvailablePlotType <- function(
+        x,
+        type,
+        availablePlotTypes = NULL,
+        ...,
+        functionName = ".assertIsAvailablePlotType",
+        allOptionAllowed = TRUE) {
+    if (is.null(availablePlotTypes)) {
+        availablePlotTypes <- getAvailablePlotTypes(x,
+            output = "numeric", numberInCaptionEnabled = FALSE
+        )
+    }
+
+    if (length(availablePlotTypes) == 0 || all(is.na(availablePlotTypes))) {
+        stopIllegalArgument(
+            "no plot type available for this object",
+            functionName = functionName
+        )
+    }
+    
+    if (all(is.na(type))) {
+        type <- availablePlotTypes[1]
+    }
+    
+    if (isTRUE(allOptionAllowed)) {    
+        availablePlotTypes <- c(availablePlotTypes, "all")
+    }
+    
+    if (!(type %in% availablePlotTypes)) {
+        stopIllegalArgument(
+            "'type' (", type, ") is not available; ",
+            ifelse(length(availablePlotTypes) == 1, "available is only", "available values are"), " ",
+            .arrayToString(availablePlotTypes, mode = "or", compactEnabled = TRUE),
+            functionName = functionName,
+            parameter = "type",
+            value = type,
+            relatedParameter = "availablePlotTypes",
+            relatedValue = getAvailablePlotTypes(x, output = "numcap")
+        )
+    }
+
+    return(invisible(type))
+}
+
+.showFutilityBoundsUnnecessaryArgumentWarning <- function(
+        argumentName,
+        argValue,
+        sourceScale,
+        targetScale) {
     valueStr <- ""
     if (!is.null(argValue) && is.numeric(argValue) && length(argValue) > 0) {
         valueStr <- paste0(" (", .arrayToString(argValue), ")")
     }
 
-    warning(
+    warnArgumentIgnored(
         sQuote(argumentName), valueStr, " will be ignored ",
-        "because it is not required for the conversion from '",
-        sourceScale, "' to '", targetScale, "'",
-        call. = FALSE
+        "because it is not required for the conversion from ",
+        .pQuote(sourceScale), " to ", .pQuote(targetScale),
+        parameter = argumentName,
+        diagnosticId = "futility.conversion_input_ignored"
     )
 }
 
-.showFutilityBoundsMissingArgumentError <- function(argumentName, scaleName, scaleValue) {
-    stop(
-        C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-        sQuote(argumentName), " needs to be specified for ",
+.showFutilityBoundsMissingArgumentError <- function(
+        argumentName,
+        scaleName,
+        scaleValue) {
+    stopMissingArgument(sQuote(argumentName), " needs to be specified for ",
         sQuote(scaleName), " = ", dQuote(scaleValue),
-        call. = FALSE
+        functionName = ".showFutilityBoundsMissingArgumentError",
+        parameter = argumentName,
+        relatedParameter = scaleName,
+        relatedValue = scaleValue,
+        diagnosticId = "futility.conversion_input_missing"
     )
 }
 
@@ -3955,10 +4752,12 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
 #'     information2 = 0.8
 #' )
 #' }
+
 #'
 #' @noRd
 #'
-.assertAreValidFutilityBoundsScaleArguments <- function(...,
+.assertAreValidFutilityBoundsScaleArguments <- function(
+        ...,
         design,
         sourceScale,
         targetScale,
@@ -3986,22 +4785,29 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     information2 <- infos$information2
     information <- infos$information
 
-    .checkForUnnecessaryFutilityBoundsScaleArgs("design", 
-        design, sourceScale, targetScale, scalesWithReverse)
+    .checkForUnnecessaryFutilityBoundsScaleArgs(
+        "design",
+        design, sourceScale, targetScale, scalesWithReverse
+    )
 
     if (infos$vectorInput) {
-        .checkForUnnecessaryFutilityBoundsScaleArgs("information", 
-            information, sourceScale, targetScale, scalesWithEffect)
+        .checkForUnnecessaryFutilityBoundsScaleArgs(
+            "information",
+            information, sourceScale, targetScale, scalesWithEffect
+        )
     } else {
         .checkForUnnecessaryFutilityBoundsScaleArgs(
-            infos$paramNames[1], information1, sourceScale, 
-            targetScale, scalesWithEffectSecondStageOnly)
+            infos$paramNames[1], information1, sourceScale,
+            targetScale, scalesWithEffectSecondStageOnly
+        )
         .checkForUnnecessaryFutilityBoundsScaleArgs(
-            infos$paramNames[2], information2, sourceScale, 
-            targetScale, baseScales)
+            infos$paramNames[2], information2, sourceScale,
+            targetScale, baseScales
+        )
     }
     .checkForUnnecessaryFutilityBoundsScaleArgs(
-        "theta", theta, sourceScale, targetScale, "conditionalPower")
+        "theta", theta, sourceScale, targetScale, "conditionalPower"
+    )
 
     args <- list(
         design       = design,
@@ -4011,13 +4817,16 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         theta        = theta
     )
 
-    .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args, 
-        informationVectorInput = infos$vectorInput)
-    .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args, 
-        informationVectorInput = infos$vectorInput)
+    .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args,
+        informationVectorInput = infos$vectorInput
+    )
+    .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args,
+        informationVectorInput = infos$vectorInput
+    )
 }
 
-.showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(futilityBounds,
+.showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(
+        futilityBounds,
         ...,
         lowerBound = 1e-12,
         upperBound = 1 - 1e-12) {
@@ -4027,17 +4836,46 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
 
     if (!is.null(lowerBound) && length(lowerBound) > 0 && !anyNA(lowerBound) &&
             any(futilityBounds < lowerBound, na.rm = TRUE)) {
-        warning(
+        warnNumericalIssue(
             "At least one calculated futility bound outside acceptable range",
-            call. = FALSE
+            parameter = "futilityBounds",
+            value = futilityBounds,
+            relatedParameter = c("lowerBound", "upperBound"),
+            relatedValue = list(lowerBound = lowerBound, upperBound = upperBound),
+            diagnosticId = "futility.bounds_outside_range"
         )
     }
 
     if (!is.null(upperBound) && length(upperBound) > 0 && !anyNA(upperBound) &&
             any(futilityBounds > upperBound, na.rm = TRUE)) {
-        warning(
+        warnNumericalIssue(
             "At least one calculated futility bound outside acceptable range",
-            call. = FALSE
+            parameter = "futilityBounds",
+            value = futilityBounds,
+            relatedParameter = c("lowerBound", "upperBound"),
+            relatedValue = list(lowerBound = lowerBound, upperBound = upperBound),
+            diagnosticId = "futility.bounds_outside_range"
         )
+    }
+}
+
+.assertIsTrialDesignPlanOrSimulationResults <- function(designPlan) {
+    if (!is(designPlan, "TrialDesignPlan") && !is(designPlan, "SimulationResults")) {
+        stopIllegalArgument(
+            .sQuote("designPlan"), " must be a trial design plan or ",
+            "simulation results object, but is of class ", .getClassName(designPlan),
+            functionName = ".assertIsTrialDesignPlanOrSimulationResults",
+            parameter = "designPlan",
+            value = .getClassName(designPlan)
+        )
+    }
+}
+
+.assertIsUniqueVector <- function(x, name) {
+    if (length(x) != length(unique(x))) {
+        dupEntries <- x[duplicated(x)]
+        dupCounts <- as.data.frame(table(dupEntries), stringsAsFactors = FALSE)
+        dupText <- paste(paste0(dupCounts$dupEntries, " (", dupCounts$Freq, ")"), collapse = ", ")
+        stopRuntimeIssue(.sQuote(name), " contains duplicate entries: ", dupText, ".")
     }
 }

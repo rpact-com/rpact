@@ -7,29 +7,30 @@
 Trial design plan for survival data.
 }
 \details{
-This object cannot be created directly; use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
+This object cannot be created directly;
+use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 with suitable arguments to create a design plan for a dataset of survival data.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
 
 \item{\code{typeOfComputation}}{The type of computation used, either \code{"Schoenfeld", "Freedman"}, or \code{"HsiehFreedman"}.}
 
-\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
 
 \item{\code{pi1}}{The assumed event rate in the treatment group. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{pi2}}{The assumed event rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{pi2}}{The assumed event rate in the control group. Is a single numeric value between 0 and 1.}
 
 \item{\code{median1}}{The assumed median survival time in the treatment group. Is a numeric vector.}
 
-\item{\code{median2}}{The assumed median survival time in the reference group. Is a numeric vector of length 1.}
+\item{\code{median2}}{The assumed median survival time in the reference group. Is a single numeric value.}
 
 \item{\code{lambda1}}{The assumed hazard rate in the treatment group. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a numeric vector of length 1.}
+\item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a single numeric value.}
 
 \item{\code{hazardRatio}}{The hazard ratios under consideration. Is a numeric vector of length \code{kMax}.}
 
@@ -41,33 +42,33 @@ with suitable arguments to create a design plan for a dataset of survival data.
 
 \item{\code{maxNumberOfEvents}}{The maximum number of events for power calculations. Is a positive numeric vector of length \code{kMax}.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.}
 
-\item{\code{optimumAllocationRatio}}{The allocation ratio that is optimum with respect to the overall sample size at given power. Is a logical vector of length 1.}
+\item{\code{optimumAllocationRatio}}{The allocation ratio that is optimum with respect to the overall sample size at given power. Is a single logical value.}
 
-\item{\code{accountForObservationTimes}}{If \code{FALSE}, only the event rates are used for the calculation of the maximum number of subjects. Is a logical vector of length 1.}
+\item{\code{accountForObservationTimes}}{If \code{FALSE}, only the event rates are used for the calculation of the maximum number of subjects. Is a single logical value.}
 
-\item{\code{eventTime}}{The assumed time under which the event rates are calculated. Is a numeric vector of length 1.}
+\item{\code{eventTime}}{The assumed time under which the event rates are calculated. Is a single numeric value.}
 
 \item{\code{accrualTime}}{The assumed accrual time intervals for the study. Is a numeric vector.}
 
-\item{\code{totalAccrualTime}}{The total accrual time, i.e., the maximum of \code{accrualTime}. Is a positive numeric vector of length 1.}
+\item{\code{totalAccrualTime}}{The total accrual time, i.e., the maximum of \code{accrualTime}. Is a single positive numeric value.}
 
 \item{\code{accrualIntensity}}{The absolute accrual intensities. Is a numeric vector of length \code{kMax}.}
 
 \item{\code{accrualIntensityRelative}}{The relative accrual intensities.}
 
-\item{\code{kappa}}{The shape of the Weibull distribution if \code{kappa!=1}. Is a numeric vector of length 1.}
+\item{\code{kappa}}{The shape of the Weibull distribution if \code{kappa!=1}. Is a single numeric value.}
 
 \item{\code{piecewiseSurvivalTime}}{The time intervals for the piecewise definition of the exponential survival time cumulative distribution function. Is a numeric vector.}
 
-\item{\code{followUpTime}}{The assumed follow-up time for the study. Is a numeric vector of length 1.}
+\item{\code{followUpTime}}{The assumed follow-up time for the study. Is a single numeric value.}
 
-\item{\code{dropoutRate1}}{The assumed drop-out rate in the treatment group. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{dropoutRate1}}{The assumed drop-out rate in the treatment group. Is a single numeric value between 0 and 1.}
 
-\item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a single numeric value between 0 and 1.}
 
-\item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a numeric vector of length 1.}
+\item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.}
 
 \item{\code{chi}}{The calculated event probability at end of trial. Is a numeric vector.}
 
@@ -94,8 +95,6 @@ with suitable arguments to create a design plan for a dataset of survival data.
 \item{\code{informationRates}}{The information rates (that must be fixed prior to the trial), default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{analysisTime}}{The estimated time of analysis. Is a numeric matrix.}
-
-\item{\code{studyDurationH1}}{The study duration under the alternative hypothesis. Is a positive numeric vector.}
 
 \item{\code{studyDuration}}{The study duration for specified effect size. Is a positive numeric vector.}
 

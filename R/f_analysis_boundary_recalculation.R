@@ -14,7 +14,8 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-.getRecalculatedInformationRates <- function(dataInput,
+.getRecalculatedInformationRates <- function(
+        dataInput,
         maxInformation,
         stage = NA_integer_) {
     .assertIsSingleInteger(stage, "stage", naAllowed = TRUE, validateType = FALSE)
@@ -25,7 +26,10 @@
 
     informationRates <- rep(NA_real_, stage)
     absoluteInformations <- rep(NA_real_, stage)
-    if (.isDatasetMeans(dataInput) || .isDatasetRates(dataInput)) {
+    if (.isDatasetGeneral(dataInput)) {
+        absoluteInformations <- cumsum(dataInput$getInformationsUpTo(stage))
+        informationRates <- absoluteInformations / maxInformation
+    } else if (.isDatasetMeans(dataInput) || .isDatasetRates(dataInput)) {
         for (k in 1:stage) {
             sampleSizes <- dataInput$getOverallSampleSizes(stage = k)
             absoluteInformations[k] <- sum(sampleSizes, na.rm = TRUE)
@@ -38,9 +42,9 @@
             informationRates[k] <- absoluteInformations[k] / maxInformation
         }
     } else {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'dataInput' class ",
-            .getClassName(dataInput), " is not supported"
+        stopRuntimeIssue("'dataInput' class ", .getClassName(dataInput), " is not supported",
+            functionName = ".getRecalculatedInformationRates",
+            parameter = "dataInput", value = dataInput
         )
     }
 
@@ -64,7 +68,8 @@
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' For means and rates the maximum information is the maximum number of subjects
+#' For general estimates, information is calculated as the cumulative inverse
+#' squared standard error. For means and rates the maximum information is the maximum number of subjects
 #' or the relative proportion if \code{informationEpsilon} < 1;
 #' for survival data it is the maximum number of events
 #' or the relative proportion if \code{informationEpsilon} < 1.
@@ -104,7 +109,8 @@
 #'
 #' @export
 #'
-getObservedInformationRates <- function(dataInput,
+getObservedInformationRates <- function(
+        dataInput,
         ...,
         maxInformation = NULL,
         informationEpsilon = NULL,
@@ -213,11 +219,11 @@ getObservedInformationRates <- function(dataInput,
     }
 
     if (any(informationRates > 1)) {
-        warning("The observed information at stage ",
+        warnDataIssue("The observed information at stage ",
             .arrayToString(which(informationRates > 1)), " is over-running, ",
             "i.e., the information rate (", .arrayToString(informationRates[informationRates > 1]), ") ",
             "is larger than the planned maximum information rate (1)",
-            call. = FALSE
+            diagnosticId = "analysis.observed_information_exceeds_planned"
         )
     }
 
@@ -250,13 +256,13 @@ getObservedInformationRates <- function(dataInput,
 .getRecalculatedDesign <- function(design, newArgumentValues, ignore = character()) {
     parametersToIgnore <- character()
     if (!("kMax" %in% names(newArgumentValues))) {
-        if (identical(design$.getParameterType("kMax"), C_PARAM_USER_DEFINED)) {
+        if (design$isUserDefinedParameter("kMax")) {
             parametersToIgnore <- c(parametersToIgnore, "kMax")
         }
         newArgumentValues$kMax <- NA_integer_
     }
     for (paramName in c("futilityBounds", ignore)) {
-        if (identical(design$.getParameterType(paramName), C_PARAM_USER_DEFINED)) {
+        if (design$isUserDefinedParameter(paramName)) {
             parametersToIgnore <- c(parametersToIgnore, paramName)
             if (!(paramName %in% names(newArgumentValues))) {
                 newArgumentValues[[paramName]] <- NA_real_
@@ -264,12 +270,13 @@ getObservedInformationRates <- function(dataInput,
         }
     }
     if (length(parametersToIgnore) > 0) {
-        warning("The user-defined parameter",
+        warnArgumentIgnored("The user-defined parameter",
             ifelse(length(parametersToIgnore) == 1, "", "s"), " ",
             .arrayToString(sQuote(parametersToIgnore), mode = "and"),
             " will be ignored because they are not applicable ",
             "for automatic recalculation of the boundaries",
-            call. = FALSE
+            parameter = parametersToIgnore,
+            diagnosticId = "analysis.recalculation_argument_ignored"
         )
     }
 
@@ -279,7 +286,8 @@ getObservedInformationRates <- function(dataInput,
     ))))
 }
 
-.getDesignWithRecalculatedBoundaries <- function(...,
+.getDesignWithRecalculatedBoundaries <- function(
+        ...,
         design,
         dataInput,
         directionUpper,
@@ -308,11 +316,12 @@ getObservedInformationRates <- function(dataInput,
             arguments <- c(arguments, paste0("'informationEpsilon' (", .arrayToString(informationEpsilon), ")"))
         }
         if (length(arguments) > 0) {
-            warning(.arrayToString(arguments, mode = "and"),
+            warnArgumentIgnored(.arrayToString(arguments, mode = "and"),
                 " will be ignored because ", ifelse(length(arguments) == 1, "it is", "they are"),
                 " only applicable for alpha spending", "\n",
                 "group sequential designs with no futility bounds and a single hypothesis",
-                call. = FALSE
+                parameter = arguments,
+                diagnosticId = "analysis.recalculation_design_unsupported"
             )
         }
         return(result)
@@ -320,20 +329,21 @@ getObservedInformationRates <- function(dataInput,
 
     if (is.null(maxInformation) || length(maxInformation) == 0 || is.na(maxInformation)) {
         if (!is.null(informationEpsilon) && !all(is.na(informationEpsilon))) {
-            warning("'informationEpsilon' (", .arrayToString(informationEpsilon),
+            warnArgumentIgnored("'informationEpsilon' (", .arrayToString(informationEpsilon),
                 ") will be ignored because 'maxInformation' is undefined",
-                call. = FALSE
+                parameter = "informationEpsilon",
+                value = informationEpsilon,
+                diagnosticId = "analysis.information_epsilon_requires_maximum"
             )
         }
         return(result)
     }
 
     if (design$typeOfDesign == "asUser") {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "recalculation of the information rates not possible ",
+        stopIllegalArgument("recalculation of the information rates not possible ",
             "for user-defined alpha spending designs",
-            call. = FALSE
+            functionName = ".getDesignWithRecalculatedBoundaries",
+            diagnosticId = "analysis.user_spending_recalculation_unsupported"
         )
     }
 
@@ -369,10 +379,9 @@ getObservedInformationRates <- function(dataInput,
 
     stageFromData <- dataInput$getNumberOfStages()
     if (stageFromData == 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "recalculation of the information rates not possible at stage 1",
-            call. = FALSE
+        stopIllegalArgument("recalculation of the information rates not possible at stage 1",
+            functionName = ".getDesignWithRecalculatedBoundaries",
+            diagnosticId = "analysis.first_stage_recalculation_unsupported"
         )
     }
 
@@ -442,9 +451,9 @@ getObservedInformationRates <- function(dataInput,
         )
     )
     base::options("rpact.analysis.repeated.p.values.warnings.enabled" = "FALSE")
-    warning("Repeated p-values not available for automatic ",
+    warnResultUnavailable("Repeated p-values not available for automatic ",
         "recalculation of boundaries at final stage",
-        call. = FALSE
+        diagnosticId = "analysis.final_recalculation_repeated_p_unavailable"
     )
 
     return(list(

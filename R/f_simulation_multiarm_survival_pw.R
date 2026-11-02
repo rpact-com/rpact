@@ -1,0 +1,915 @@
+## |
+## |  *Simulation of multi-arm design with time to event data*
+## |
+## |  This file is part of the R package rpact:
+## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |
+## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  Licensed under "GNU Lesser General Public License" version 3
+## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |
+## |  RPACT company website: https://www.rpact.com
+## |  rpact package website: https://www.rpact.org
+## |
+## |  Contact us for information about our services: info@rpact.com
+## |
+## |  File version: $Revision: 8449 $
+## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Di, 10 Dez 2024) $
+## |  Last changed by: $Author: wassmer $
+## |
+
+#' @include f_simulation_multiarm.R
+NULL
+
+#'
+#' @title
+#' Get Simulation Multi-Arm Survival
+#'
+#' @description
+#' Returns the simulated power, stopping and selection probabilities, conditional power, and
+#' expected sample size for testing hazard ratios in a multi-arm treatment groups testing situation.
+#'
+#' Depending on \code{simulationType}, either a patient-wise survival simulation is performed,
+#' a patient-wise basic approximation is used, or normally distributed log-rank test statistics
+#' are simulated. The default \code{simulationType = "auto"} chooses the simulation approach
+#' automatically based on the explicitly specified arguments.
+#' The null hypothesis is defined by the hazard ratio \code{thetaH0}; values other
+#' than 1 can be used, for example, to simulate non-inferiority designs.
+#'
+#' @inheritParams param_intersectionTest_MultiArm
+#' @inheritParams param_typeOfSelection
+#' @inheritParams param_effectMeasure
+#' @inheritParams param_adaptations
+#' @inheritParams param_threshold
+#' @inheritParams param_effectMatrix
+#' @inheritParams param_activeArms
+#' @inheritParams param_piControl
+#' @inheritParams param_piecewiseSurvivalTime_multiarm
+#' @inheritParams param_successCriterion
+#' @inheritParams param_correlationComputation
+#' @inheritParams param_typeOfShapeSurvival
+#' @inheritParams param_design_multiarm
+#' @inheritParams param_thetaH0
+#' @inheritParams param_directionUpper
+#' @inheritParams param_allocationRatioPlanned
+#' @inheritParams param_eventTime
+#' @inheritParams param_accrualTime
+#' @inheritParams param_accrualIntensity
+#' @inheritParams param_accrualIntensityType
+#' @inheritParams param_dropoutRate1
+#' @inheritParams param_dropoutRate2
+#' @inheritParams param_dropoutTime
+#' @inheritParams param_maxNumberOfSubjects_survival
+#' @inheritParams param_minNumberOfEventsPerStage
+#' @inheritParams param_maxNumberOfEventsPerStage
+#' @inheritParams param_conditionalPowerSimulation
+#' @inheritParams param_estimatedTheta
+#' @inheritParams param_thetaH1
+#' @inheritParams param_plannedEvents
+#' @inheritParams param_maxNumberOfIterations
+#' @inheritParams param_calcEventsFunction
+#' @inheritParams param_selectArmsFunction
+#' @inheritParams param_rValue
+#' @inheritParams param_epsilonValue
+#' @inheritParams param_gED50
+#' @inheritParams param_slope
+#' @inheritParams param_kappa
+#' @inheritParams param_doseLevels
+#' @inheritParams param_seed
+#' @inheritParams param_three_dots
+#' @inheritParams param_showStatistics
+#' @inheritParams param_maxNumberOfRawDatasetsPerStage
+#' @inheritParams param_simulationType_multiarm_survival
+#' @inheritParams param_piControl
+#' @inheritParams param_omegaMaxVector
+#'
+#' @details
+#' At given design the function simulates the analysis times, power, stopping
+#' probabilities, expected sample size and events, and selection probabilities,
+#' at given number of subjects, events, parameter configuration, and treatment
+#' arm selection rule in the multi-arm survival design situation. An allocation
+#' ratio can be specified referring to the ratio of number of subjects in the
+#' active treatment groups as compared to the control group.
+#'
+#' If \code{simulationType = "patientWise"}, patient-wise survival data are simulated based on
+#' the specified accrual, event-time, and dropout assumptions. If
+#' \code{simulationType = "patientWiseBasic"}, a simplified patient-wise survival approach is
+#' used. If \code{simulationType = "testStatisticBased"}, normally distributed log-rank test
+#' statistics are simulated instead. The default \code{simulationType = "auto"} selects the
+#' simulation approach automatically based on the explicitly specified arguments and uses the
+#' legacy test-statistic-based approach for backward compatibility if no patient-wise-specific
+#' arguments are provided.
+#'
+#' For piecewise exponential event times, create \code{piecewiseSurvivalTime}
+#' with \code{getPiecewiseSurvivalTimeMultiArm()}. Hazard ratios are represented
+#' as an active-arm-by-interval-by-situation array; equivalently, they can be
+#' supplied to the constructor as a named list of active-arm-by-interval
+#' matrices. The situation dimension changes slowest, so printing the object
+#' displays one active-arm-by-interval matrix for each situation.
+#'
+#' The definition of \code{thetaH1} makes only sense if \code{kMax} > 1
+#' and if \code{conditionalPower}, \code{minNumberOfEventsPerStage}, and
+#' \code{maxNumberOfEventsPerStage} (or \code{calcEventsFunction}) are defined.
+#'
+#' \code{calcEventsFunction}\cr
+#' This function returns the number of events at given conditional power
+#' and conditional critical value for specified testing situation.
+#' The function might depend on the variables
+#' \code{stage},
+#' \code{selectedArms},
+#' \code{plannedEvents},
+#' \code{directionUpper},
+#' \code{thetaH0},
+#' \code{allocationRatioPlanned},
+#' \code{minNumberOfEventsPerStage},
+#' \code{maxNumberOfEventsPerStage},
+#' \code{conditionalPower},
+#' \code{conditionalCriticalValue}, and
+#' \code{overallEffects}.
+#' The function has to contain the three-dots argument '...' (see examples).
+#'
+#' @template details_type_of_selection
+#' @template details_survival_conditional_power
+#'
+#' @template return_object_simulation_results
+#' @template how_to_get_help_for_generics
+#'
+#' @template examples_get_simulation_multiarm_survival
+#'
+#' @export
+#'
+getSimulationMultiArmSurvival <- function(
+        design = NULL,
+        ...,
+        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
+        activeArms = NA_integer_,
+        piControl = NA_real_,
+        piecewiseSurvivalTime = NULL,
+        effectMatrix = NULL,
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+        omegaMaxVector = NA_real_,
+        kappa = 1,
+        gED50 = NA_real_,
+        slope = 1,
+        doseLevels = NA_real_,
+        eventTime = 12,
+        accrualTime = c(0, 12),
+        accrualIntensity = 0.1,
+        accrualIntensityType = c("auto", "absolute", "relative"),
+        dropoutRate1 = 0,
+        dropoutRate2 = 0,
+        dropoutTime = 12,
+        maxNumberOfSubjects = NA_real_,
+        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
+        directionUpper = NA,
+        adaptations = NA,
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        successCriterion = c("all", "atLeastOne"),
+        correlationComputation = c("alternative", "null"),
+        epsilonValue = NA_real_,
+        rValue = NA_real_,
+        threshold = -Inf,
+        plannedEvents = NA_real_,
+        allocationRatioPlanned = NA_real_,
+        minNumberOfEventsPerStage = NA_real_,
+        maxNumberOfEventsPerStage = NA_real_,
+        conditionalPower = NA_real_,
+        thetaH1 = NA_real_,
+        maxNumberOfIterations = NA_integer_,
+        maxNumberOfRawDatasetsPerStage = 0,
+        seed = NA_real_,
+        calcEventsFunction = NULL,
+        selectArmsFunction = NULL,
+        showStatistics = FALSE) {
+    simulationType <- match.arg(simulationType)
+    maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
+        maxNumberOfRawDatasetsPerStage)
+
+    callArgs <- names(as.list(match.call(expand.dots = FALSE)))
+    hasArg <- function(x) x %in% callArgs
+
+    usesBasicOnlyArgs <- hasArg("correlationComputation")
+    usesPatientWiseOnlyArgs <- any(vapply(
+        c(
+            "piControl", "eventTime", "accrualTime", "accrualIntensity",
+            "accrualIntensityType", "dropoutRate1", "dropoutRate2",
+            "dropoutTime", "maxNumberOfSubjects", "kappa",
+            "piecewiseSurvivalTime"
+        ),
+        hasArg,
+        FALSE
+    )) || maxNumberOfRawDatasetsPerStage > 0
+
+    simulationTypeIsUserDefined <- !identical(simulationType, "auto")
+
+    if (simulationType == "auto") {
+        if (usesBasicOnlyArgs && usesPatientWiseOnlyArgs) {
+            stopConflictingArguments(
+                "arguments from both 'testStatisticBased' and 'patientWise' ",
+                "simulation types were specified",
+                functionName = "getSimulationMultiArmSurvival",
+                parameter = "testStatisticBased",
+                relatedParameter = "patientWise",
+                diagnosticId = "simulation.engine_inputs_conflict"
+            )
+        }
+        if (usesBasicOnlyArgs) {
+            simulationType <- "testStatisticBased"
+        } else if (usesPatientWiseOnlyArgs) {
+            simulationType <- "patientWise"
+        } else {
+            simulationType <- "testStatisticBased"
+        }
+    }
+
+    if (simulationType == "testStatisticBased") {
+        if (maxNumberOfRawDatasetsPerStage > 0) {
+            stopIllegalArgument(
+                "raw data are only available for patient-wise simulations",
+                functionName = "getSimulationMultiArmSurvival",
+                parameter = "maxNumberOfRawDatasetsPerStage",
+                value = maxNumberOfRawDatasetsPerStage,
+                relatedParameter = "simulationType",
+                relatedValue = simulationType,
+                diagnosticId = "simulation.raw_data_requires_patient_wise"
+            )
+        }
+        if (usesPatientWiseOnlyArgs) {
+            stopIllegalArgument(
+                "patient-wise simulation arguments cannot be specified ",
+                "if 'simulationType' = \"testStatisticBased\"",
+                functionName = "getSimulationMultiArmSurvival",
+                parameter = "simulationType", 
+                value = simulationType,
+                diagnosticId = "simulation.patient_inputs_with_statistic_engine"
+            )
+        }
+
+        message(
+            "Note: 'simulationType' = \"testStatisticBased\" simulates normally ",
+            "distributed log-rank test statistics instead of patient-wise survival data. ",
+            "To simulate patient-wise survival data, specify ",
+            "'simulationType' = \"patientWise\" and the corresponding arguments."
+        )
+
+        return(.getSimulationMultiArmSurvivalBasic(
+            design = design,
+            ...,
+            thetaH0 = thetaH0,
+            activeArms = activeArms,
+            effectMatrix = effectMatrix,
+            typeOfShape = typeOfShape,
+            omegaMaxVector = omegaMaxVector,
+            gED50 = gED50,
+            slope = slope,
+            doseLevels = doseLevels,
+            intersectionTest = intersectionTest,
+            directionUpper = directionUpper,
+            adaptations = adaptations,
+            typeOfSelection = typeOfSelection,
+            effectMeasure = effectMeasure,
+            successCriterion = successCriterion,
+            correlationComputation = correlationComputation,
+            epsilonValue = epsilonValue,
+            rValue = rValue,
+            threshold = threshold,
+            plannedEvents = plannedEvents,
+            allocationRatioPlanned = allocationRatioPlanned,
+            minNumberOfEventsPerStage = minNumberOfEventsPerStage,
+            maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
+            conditionalPower = conditionalPower,
+            thetaH1 = thetaH1,
+            maxNumberOfIterations = maxNumberOfIterations,
+            seed = seed,
+            calcEventsFunction = calcEventsFunction,
+            selectArmsFunction = selectArmsFunction,
+            showStatistics = showStatistics,
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined
+        ))
+    }
+
+    if (simulationType %in% c("patientWise", "patientWiseBasic")) {
+        if (usesBasicOnlyArgs) {
+            stopIllegalArgument(
+                "'correlationComputation' cannot be specified if ",
+                "'simulationType' = \"patientWise\" or \"patientWiseBasic\"",
+                functionName = "getSimulationMultiArmSurvival",
+                parameter = "correlationComputation",
+                relatedParameter = "simulationType",
+                value = correlationComputation,
+                diagnosticId = "simulation.correlation_ignored_for_patient_wise"
+            )
+        }
+        return(.getSimulationMultiArmSurvivalPatientWise(
+            design = design,
+            ...,
+            thetaH0 = thetaH0,
+            activeArms = activeArms,
+            piControl = piControl,
+            piecewiseSurvivalTime = piecewiseSurvivalTime,
+            effectMatrix = effectMatrix,
+            typeOfShape = typeOfShape,
+            omegaMaxVector = omegaMaxVector,
+            kappa = kappa,
+            gED50 = gED50,
+            slope = slope,
+            doseLevels = doseLevels,
+            eventTime = eventTime,
+            accrualTime = accrualTime,
+            accrualIntensity = accrualIntensity,
+            accrualIntensityType = accrualIntensityType,
+            dropoutRate1 = dropoutRate1,
+            dropoutRate2 = dropoutRate2,
+            dropoutTime = dropoutTime,
+            maxNumberOfSubjects = maxNumberOfSubjects,
+            intersectionTest = intersectionTest,
+            directionUpper = directionUpper,
+            adaptations = adaptations,
+            typeOfSelection = typeOfSelection,
+            effectMeasure = effectMeasure,
+            successCriterion = successCriterion,
+            epsilonValue = epsilonValue,
+            rValue = rValue,
+            threshold = threshold,
+            plannedEvents = plannedEvents,
+            allocationRatioPlanned = allocationRatioPlanned,
+            minNumberOfEventsPerStage = minNumberOfEventsPerStage,
+            maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
+            conditionalPower = conditionalPower,
+            thetaH1 = thetaH1,
+            maxNumberOfIterations = maxNumberOfIterations,
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
+            seed = seed,
+            calcEventsFunction = calcEventsFunction,
+            selectArmsFunction = selectArmsFunction,
+            showStatistics = showStatistics,
+            cppEnabled = ifelse(identical(simulationType, "patientWiseBasic"), FALSE, TRUE),
+            simulationTypeIsUserDefined = simulationTypeIsUserDefined
+        ))
+    }
+}
+
+#'
+#' @title
+#' Get Simulation Multi-Arm Survival
+#'
+#' @description
+#' Returns the simulated power, stopping and selection probabilities, conditional power, and
+#' expected sample size for testing hazard ratios in a multi-arm treatment groups testing situation.
+#'
+#' @inheritParams param_omegaMaxVector
+#' @inheritParams param_intersectionTest_MultiArm
+#' @inheritParams param_typeOfSelection
+#' @inheritParams param_effectMeasure
+#' @inheritParams param_adaptations
+#' @inheritParams param_threshold
+#' @inheritParams param_effectMatrix
+#' @inheritParams param_activeArms
+#' @inheritParams param_successCriterion
+#' @inheritParams param_typeOfShapeSurvival
+#' @inheritParams param_typeOfSelection
+#' @inheritParams param_design_with_default
+#' @inheritParams param_thetaH0
+#' @inheritParams param_directionUpper
+#' @inheritParams param_allocationRatioPlanned
+#' @inheritParams param_piControl
+#' @inheritParams param_eventTime
+#' @inheritParams param_accrualTime
+#' @inheritParams param_accrualIntensity
+#' @inheritParams param_accrualIntensityType
+#' @inheritParams param_dropoutRate1
+#' @inheritParams param_dropoutRate2
+#' @inheritParams param_dropoutTime
+#' @inheritParams param_maxNumberOfSubjects_survival
+#' @inheritParams param_minNumberOfEventsPerStage
+#' @inheritParams param_maxNumberOfEventsPerStage
+#' @inheritParams param_conditionalPowerSimulation
+#' @inheritParams param_thetaH1
+#' @inheritParams param_plannedEvents
+#' @inheritParams param_maxNumberOfIterations
+#' @inheritParams param_calcEventsFunction
+#' @inheritParams param_selectArmsFunction
+#' @inheritParams param_rValue
+#' @inheritParams param_epsilonValue
+#' @inheritParams param_gED50
+#' @inheritParams param_slope
+#' @inheritParams param_kappa
+#' @inheritParams param_doseLevels
+#' @inheritParams param_seed
+#' @inheritParams param_three_dots
+#' @inheritParams param_showStatistics
+#' @inheritParams param_maxNumberOfRawDatasetsPerStage
+#'
+#' @details
+#' At given design the function simulates the analysis times, power, stopping
+#' probabilities, expected sample size and events, and selection probabilities,
+#' at given number of subjects, events, parameter configuration, and treatment
+#' arm selection rule in the multi-arm survival design situation. An allocation
+#' ratio can be specified referring to the ratio of number of subjects in the
+#' active treatment groups as compared to the control group.
+#'
+#' The definition of \code{thetaH1} makes only sense if \code{kMax} > 1
+#' and if \code{conditionalPower}, \code{minNumberOfEventsPerStage}, and
+#' \code{maxNumberOfEventsPerStage} (or \code{calcEventsFunction}) are defined.
+#'
+#' \code{calcEventsFunction}\cr
+#' This function returns the number of events at given conditional power
+#' and conditional critical value for specified testing situation.
+#' The function might depend on the variables
+#' \code{stage},
+#' \code{selectedArms},
+#' \code{plannedEvents},
+#' \code{directionUpper},
+#' \code{thetaH0},
+#' \code{allocationRatioPlanned},
+#' \code{minNumberOfEventsPerStage},
+#' \code{maxNumberOfEventsPerStage},
+#' \code{conditionalPower},
+#' \code{conditionalCriticalValue}, and
+#' \code{overallEffects}.
+#' The function has to contain the three-dots argument '...' (see examples).
+#'
+#' @template details_type_of_selection
+#' @template return_object_simulation_results
+#' @template how_to_get_help_for_generics
+#'
+#' @template examples_get_simulation_multiarm_survival
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'  
+.getSimulationMultiArmSurvivalPatientWise <- function(
+        design = NULL,
+        ...,
+        thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
+        activeArms = NA_integer_,
+        piControl = NA_real_,
+        piecewiseSurvivalTime = NULL,
+        effectMatrix = NULL,
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+        omegaMaxVector = NA_real_,
+        kappa = 1,
+        gED50 = NA_real_,
+        slope = 1,
+        doseLevels = NA_real_,
+        eventTime = 12,
+        accrualTime = c(0, 12),
+        accrualIntensity = 0.1,
+        accrualIntensityType = c("auto", "absolute", "relative"),
+        dropoutRate1 = 0,
+        dropoutRate2 = 0,
+        dropoutTime = 12,
+        maxNumberOfSubjects = NA_real_,
+        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
+        directionUpper = NA,
+        adaptations = NA,
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+        effectMeasure = c("effectEstimate", "testStatistic"),
+        successCriterion = c("all", "atLeastOne"),
+        epsilonValue = NA_real_,
+        rValue = NA_real_,
+        threshold = -Inf,
+        plannedEvents = NA_real_,
+        allocationRatioPlanned = NA_real_,
+        minNumberOfEventsPerStage = NA_real_,
+        maxNumberOfEventsPerStage = NA_real_,
+        conditionalPower = NA_real_,
+        thetaH1 = NA_real_,
+        maxNumberOfIterations = NA_integer_,
+        maxNumberOfRawDatasetsPerStage = 0,
+        seed = NA_real_,
+        calcEventsFunction = NULL,
+        selectArmsFunction = NULL,
+        showStatistics = FALSE,
+        cppEnabled = TRUE,
+        simulationTypeIsUserDefined = FALSE) {
+    piecewiseEnabled <- inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeMultiArm")
+    if (!is.null(piecewiseSurvivalTime) && !piecewiseEnabled) {
+        stopIllegalArgument("'piecewiseSurvivalTime' must be a PiecewiseSurvivalTimeMultiArm object",
+            functionName = "getSimulationMultiArmSurvival", parameter = "piecewiseSurvivalTime",
+            value = piecewiseSurvivalTime, constraint = "PiecewiseSurvivalTimeMultiArm object",
+            diagnosticId = "survival.piecewise_multiarm_class")
+    }
+    if (piecewiseEnabled) {
+        piecewiseSurvivalTime$.validate(functionName = "getSimulationMultiArmSurvival")
+        if (!is.na(kappa) && kappa != 1) {
+            stopIllegalArgument("'kappa' must be 1 for piecewise exponential survival times",
+                functionName = "getSimulationMultiArmSurvival", parameter = "kappa", value = kappa,
+                constraint = "kappa = 1 for piecewise exponential survival",
+                diagnosticId = "survival.piecewise_exponential_only")
+        }
+        if (!all(is.na(piControl))) {
+            stopConflictingArguments("'piControl' and 'piecewiseSurvivalTime' cannot both be specified",
+                functionName = "getSimulationMultiArmSurvival", parameter = "piControl",
+                value = piControl, constraint = "ordinary and piecewise survival inputs are mutually exclusive",
+                relatedParameter = "piecewiseSurvivalTime", relatedValue = piecewiseSurvivalTime,
+                diagnosticId = "survival.piecewise_conflicting_effect_inputs")
+        }
+        if (!is.null(effectMatrix)) {
+            stopConflictingArguments("'effectMatrix' and 'piecewiseSurvivalTime' cannot both be specified",
+                functionName = "getSimulationMultiArmSurvival", parameter = "effectMatrix",
+                value = effectMatrix, constraint = "ordinary and piecewise survival inputs are mutually exclusive",
+                relatedParameter = "piecewiseSurvivalTime", relatedValue = piecewiseSurvivalTime,
+                diagnosticId = "survival.piecewise_conflicting_effect_inputs")
+        }
+        if (!is.na(activeArms) && activeArms != piecewiseSurvivalTime$getNumberOfGroups()) {
+            stopIllegalArgument("'activeArms' does not match the piecewise survival specification",
+                functionName = "getSimulationMultiArmSurvival", parameter = "activeArms", value = activeArms,
+                constraint = "one active arm per piecewise group", relatedParameter = "piecewiseSurvivalTime",
+                relatedValue = piecewiseSurvivalTime,
+                diagnosticId = "survival.piecewise_active_arm_count",
+                context = list(expectedActiveArms = piecewiseSurvivalTime$getNumberOfGroups()))
+        }
+        activeArms <- piecewiseSurvivalTime$getNumberOfGroups()
+        typeOfShape <- "userDefined"
+        effectMatrix <- .getPiecewiseInitialHazardRatios(piecewiseSurvivalTime)
+        kappa <- 1
+    }
+    if (is.null(design)) {
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
+        .warnInCaseOfUnknownArguments(
+            functionName = "getSimulationMultiArmSurvival",
+            ignore = c(
+                .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+                    design,
+                    powerCalculationEnabled = TRUE
+                ),
+                "showStatistics"
+            ),
+            ...
+        )
+    } else {
+        .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
+        .warnInCaseOfUnknownArguments(
+            functionName = "getSimulationMultiArmSurvival",
+            ignore = "showStatistics",
+            ...
+        )
+        .warnInCaseOfTwoSidedPowerArgument(...)
+    }
+    .assertIsOneSidedDesign(
+        design,
+        designType = "multi-arm",
+        engineType = "simulation"
+    )
+    .assertIsValidMaxNumberOfSubjects(
+        maxNumberOfSubjects,
+        naAllowed = TRUE
+    )
+    maxNumberOfRawDatasetsPerStage <- .assertIsValidMaxNumberOfRawDatasetsPerStage(
+        maxNumberOfRawDatasetsPerStage)
+
+    if (isFALSE(cppEnabled)) {
+        message(
+            "Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise ",
+            "survival data using R code instead of C++ code. ",
+            "This approach is less efficient and should only be used for testing purposes. ",
+            "To perform a more efficient patient-wise simulation, ",
+            "specify 'simulationType' = \"patientWise\"."
+        )
+    }
+
+    calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
+
+    if (length(allocationRatioPlanned) != 1) {
+        stopIllegalArgument(
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1",
+            functionName = ".getSimulationMultiArmSurvivalPatientWise",
+            parameter = "allocationRatioPlanned",
+            value = allocationRatioPlanned
+        )
+    }
+
+    simulationResults <- .createSimulationResultsMultiArmObject(
+        design = design,
+        activeArms = activeArms,
+        effectMatrix = effectMatrix,
+        typeOfShape = typeOfShape,
+        omegaMaxVector = omegaMaxVector,
+        piControl = piControl,
+        eventTime = eventTime,
+        kappa = kappa,
+        accrualTime = accrualTime,
+        accrualIntensity = accrualIntensity,
+        dropoutRate1 = dropoutRate1,
+        dropoutRate2 = dropoutRate2,
+        dropoutTime = dropoutTime,
+        gED50 = gED50,
+        slope = slope,
+        doseLevels = doseLevels,
+        intersectionTest = intersectionTest,
+        directionUpper = directionUpper, # rates + survival only
+        adaptations = adaptations,
+        typeOfSelection = typeOfSelection,
+        effectMeasure = effectMeasure,
+        successCriterion = successCriterion,
+        epsilonValue = epsilonValue,
+        rValue = rValue,
+        threshold = threshold,
+        plannedEvents = plannedEvents, # survival only
+        maxNumberOfSubjects = maxNumberOfSubjects,
+        allocationRatioPlanned = allocationRatioPlanned,
+        minNumberOfEventsPerStage = minNumberOfEventsPerStage, # survival only
+        maxNumberOfEventsPerStage = maxNumberOfEventsPerStage, # survival only
+        conditionalPower = conditionalPower,
+        thetaH0 = thetaH0,
+        thetaH1 = thetaH1, # means + survival only
+        maxNumberOfIterations = maxNumberOfIterations,
+        seed = seed,
+        calcEventsFunction = calcEventsFunction, # survival only
+        selectArmsFunction = selectArmsFunction,
+        showStatistics = showStatistics,
+        endpoint = "survival",
+        simulationType = "patientWise",
+        simulationTypeIsUserDefined = simulationTypeIsUserDefined,
+        piecewiseSurvivalTime = piecewiseSurvivalTime
+    )
+
+    design <- simulationResults$.design
+    successCriterion <- simulationResults$successCriterion
+    effectMeasure <- simulationResults$effectMeasure
+    adaptations <- simulationResults$adaptations
+    gMax <- simulationResults$activeArms
+    kMax <- simulationResults$.design$kMax
+    intersectionTest <- simulationResults$intersectionTest
+    typeOfSelection <- simulationResults$typeOfSelection
+    effectMatrix <- t(simulationResults$effectMatrix)
+    omegaMaxVector <- simulationResults$omegaMaxVector # survival only
+    piControl <- simulationResults$piControl # rates + survival only
+    thetaH0 <- simulationResults$thetaH0
+    thetaH1 <- simulationResults$thetaH1 # means + survival only
+    plannedEvents <- simulationResults$plannedEvents # survival only
+    maxNumberOfSubjects <- simulationResults$maxNumberOfSubjects # survival only
+    conditionalPower <- simulationResults$conditionalPower
+    minNumberOfEventsPerStage <- simulationResults$minNumberOfEventsPerStage # survival only
+    maxNumberOfEventsPerStage <- simulationResults$maxNumberOfEventsPerStage # survival only
+    allocationRatioPlanned <- simulationResults$allocationRatioPlanned
+    calcEventsFunction <- simulationResults$calcEventsFunction
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
+    dropoutRate1 <- simulationResults$dropoutRate1
+    dropoutRate2 <- simulationResults$dropoutRate2
+    dropoutTime <- simulationResults$dropoutTime
+    directionUpper <- simulationResults$directionUpper
+
+    indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
+
+    if (.isTrialDesignConditionalDunnett(design)) {
+        criticalValuesDunnett <- .getCriticalValuesDunnettForSimulation(
+            alpha = design$alpha,
+            indices = indices,
+            allocationRatioPlanned = allocationRatioPlanned
+        )
+    }
+
+    cols <- length(omegaMaxVector)
+
+    accrualSetup <- getAccrualTime(
+        accrualTime = accrualTime,
+        accrualIntensity = accrualIntensity,
+        accrualIntensityType = accrualIntensityType,
+        maxNumberOfSubjects = maxNumberOfSubjects
+    )
+    if (piecewiseEnabled) {
+        simulationResults$.piecewiseSurvivalArguments <- list(
+            simulationType = if (isTRUE(cppEnabled)) {
+                "patientWise"
+            } else {
+                "patientWiseBasic"
+            },
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage)
+    }
+    if (is.na(accrualSetup$maxNumberOfSubjects)) {
+        if (accrualIntensity < 1L) {
+            stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
+                functionName = ".getSimulationMultiArmSurvivalPatientWise",
+                parameter = "accrualIntensity",
+                relatedParameter = "maxNumberOfSubjects", value = accrualIntensity
+            )
+        }
+        stopIllegalArgument("'maxNumberOfSubjects' must be defined",
+            functionName = ".getSimulationMultiArmSurvivalPatientWise",
+            parameter = "maxNumberOfSubjects",
+            value = maxNumberOfSubjects
+        )
+    }
+    simulationResults$.accrualTime <- accrualSetup
+
+    simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
+    simulationResults$.setParameterType(
+        "maxNumberOfSubjects",
+        accrualSetup$.getParameterType("maxNumberOfSubjects")
+    )
+
+    allocationFraction <- .getFraction(allocationRatioPlanned)
+    .warnInCaseOfExtremeAllocationRatios(allocationFraction[1], allocationFraction[2])
+
+    simulationResults$accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
+    simulationResults$.setParameterType("accrualTime", accrualSetup$.getParameterType("accrualTime"))
+
+    accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
+    recruitmentTimes <- .generateRecruitmentTimes(
+        allocationRatioPlanned,
+        accrualTime,
+        accrualSetup$accrualIntensity
+    )$recruit
+    recruitmentTimes <- recruitmentTimes[1:accrualSetup$maxNumberOfSubjects]
+    phi1 <- rep(-log(1 - dropoutRate1) / dropoutTime, length.out = gMax)
+    phi2 <- -log(1 - dropoutRate2) / dropoutTime
+
+    # to force last value to be last accrualTime
+    recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
+
+    loopResult <- if (isTRUE(cppEnabled)) {
+        weights <- if (.isTrialDesignFixed(design) || .isTrialDesignInverseNormal(design)) {
+            .getWeightsInverseNormal(design)
+        } else if (.isTrialDesignFisher(design)) {
+            .getWeightsFisher(design)
+        } else if (.isTrialDesignConditionalDunnett(design)) {
+            numeric(0) # not used
+        }
+
+        .performSimulationMultiArmSurvivalLoopCpp(
+            cols = cols,
+            maxNumberOfIterations = maxNumberOfIterations,
+            design = design,
+            weights = weights,
+            directionUpper = directionUpper,
+            effectMatrix = effectMatrix,
+            omegaMaxVector = omegaMaxVector,
+            piControl = piControl,
+            kappa = kappa,
+            phi1 = phi1,
+            phi2 = phi2,
+            eventTime = eventTime,
+            plannedEvents = plannedEvents,
+            recruitmentTimes = recruitmentTimes,
+            typeOfSelection = typeOfSelection,
+            effectMeasure = effectMeasure,
+            adaptations = adaptations,
+            epsilonValue = epsilonValue,
+            rValue = rValue,
+            threshold = threshold,
+            allocationFraction = allocationFraction,
+            minNumberOfEventsPerStage = minNumberOfEventsPerStage,
+            maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
+            conditionalPower = conditionalPower,
+            thetaH0 = thetaH0,
+            thetaH1 = thetaH1,
+            calcEventsFunction = calcEventsFunction,
+            calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
+            selectArmsFunction = selectArmsFunction,
+            indices = indices,
+            intersectionTest = intersectionTest,
+            criticalValuesDunnett = if (.isTrialDesignConditionalDunnett(design)) {
+                criticalValuesDunnett
+            } else {
+                NULL
+            },
+            successCriterion = successCriterion,
+            gMax = gMax,
+            kMax = kMax,
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
+            piecewiseSurvivalScenarios = .getPiecewiseSurvivalScenarios(piecewiseSurvivalTime)
+        )
+    } else {
+        .performSimulationMultiArmSurvivalLoop(
+            cols = cols,
+            maxNumberOfIterations = maxNumberOfIterations,
+            design = design,
+            directionUpper = directionUpper,
+            effectMatrix = effectMatrix,
+            omegaMaxVector = omegaMaxVector,
+            piControl = piControl,
+            kappa = kappa,
+            phi1 = phi1,
+            phi2 = phi2,
+            eventTime = eventTime,
+            plannedEvents = plannedEvents,
+            recruitmentTimes = recruitmentTimes,
+            typeOfSelection = typeOfSelection,
+            effectMeasure = effectMeasure,
+            adaptations = adaptations,
+            epsilonValue = epsilonValue,
+            rValue = rValue,
+            threshold = threshold,
+            allocationFraction = allocationFraction,
+            minNumberOfEventsPerStage = minNumberOfEventsPerStage,
+            maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
+            conditionalPower = conditionalPower,
+            thetaH0 = thetaH0,
+            thetaH1 = thetaH1,
+            calcEventsFunction = calcEventsFunction,
+            calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
+            selectArmsFunction = selectArmsFunction,
+            indices = indices,
+            intersectionTest = intersectionTest,
+            criticalValuesDunnett = if (.isTrialDesignConditionalDunnett(design)) {
+                criticalValuesDunnett
+            } else {
+                NULL
+            },
+            successCriterion = successCriterion,
+            gMax = gMax,
+            kMax = kMax,
+            maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
+            piecewiseSurvivalTime = piecewiseSurvivalTime
+        )
+    }
+
+    # extract results from the simulation
+    simulatedNumberEventsNotAchieved <- loopResult$simulatedNumberEventsNotAchieved
+    simulatedAnalysisTime <- loopResult$simulatedAnalysisTime
+    simulatedNumberOfSubjects <- loopResult$simulatedNumberOfSubjects
+    simulatedSelections <- loopResult$simulatedSelections
+    simulatedRejections <- loopResult$simulatedRejections
+    simulatedNumberOfActiveArms <- loopResult$simulatedNumberOfActiveArms
+    simulatedSingleEventsPerStage <- loopResult$simulatedSingleEventsPerStage
+    simulatedSuccessStopping <- loopResult$simulatedSuccessStopping
+    simulatedFutilityStopping <- loopResult$simulatedFutilityStopping
+    simulatedConditionalPower <- loopResult$simulatedConditionalPower
+    simulatedRejectAtLeastOne <- loopResult$simulatedRejectAtLeastOne
+    expectedNumberOfEvents <- loopResult$expectedNumberOfEvents
+    expectedNumberOfSubjects <- loopResult$expectedNumberOfSubjects
+    expectedStudyDuration <- loopResult$expectedStudyDuration
+    iterations <- loopResult$iterations
+
+    simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms
+    .addDeprecatedFieldValues(
+        simulationResults, "numberOfActiveArms",
+        simulationResults$numberOfSelectedArms, "2026-07-13"
+    )
+    simulationResults$.setParameterType(
+        "numberOfSelectedArms",
+        ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
+
+    simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
+    simulationResults$analysisTime <- simulatedAnalysisTime
+    .setEventsNotAchieved(simulationResults, accrualSetup, 
+        eventsNotAchieved = simulatedNumberEventsNotAchieved / maxNumberOfIterations)
+    simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
+    simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
+    simulationResults$.setParameterType(
+        "selectedArms",
+        ifelse(gMax == 1 || kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
+    simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
+    simulationResults$.setParameterType("rejectedArmsPerStage", C_PARAM_GENERATED)
+    simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1 || kMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
+    simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
+    simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
+    simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
+    simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
+    simulationResults$cumulativeEventsPerStage <- .convertStageWiseToOverallValues(simulatedSingleEventsPerStage)
+    for (g in 1:gMax) {
+        simulationResults$singleEventsPerStage[, , g] <- simulationResults$singleEventsPerStage[, , g] +
+            simulationResults$singleEventsPerStage[, , gMax + 1]
+        simulationResults$cumulativeEventsPerStage[, , g] <- simulationResults$cumulativeEventsPerStage[, , g] +
+            simulationResults$cumulativeEventsPerStage[, , gMax + 1]
+    }
+    simulationResults$singleEventsPerStage <- .removeLastEntryFromArray(simulationResults$singleEventsPerStage)
+    simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
+
+    simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
+    simulationResults$expectedNumberOfSubjects <- expectedNumberOfSubjects
+    simulationResults$studyDuration <- expectedStudyDuration
+    simulationResults$iterations <- iterations
+    if (kMax > 1) {
+        simulationResults$earlyStop <- simulationResults$futilityPerStage +
+            simulationResults$successPerStage[1:(kMax - 1), ]
+        simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
+    }
+
+    # set parameter types in simulationResults
+    if (kMax > 1) {
+        simulationResults$.setParameterType("expectedNumberOfSubjects", C_PARAM_GENERATED)
+        simulationResults$.setParameterType("expectedNumberOfEvents", C_PARAM_GENERATED)
+        simulationResults$.setParameterType("studyDuration", C_PARAM_GENERATED)
+    }
+    simulationResults$.setParameterType("numberOfSubjects", C_PARAM_GENERATED)
+    simulationResults$.setParameterType("analysisTime", C_PARAM_GENERATED)
+    simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
+    if (!all(is.na(simulationResults$conditionalPowerAchieved))) {
+        simulationResults$.setParameterType("conditionalPowerAchieved", C_PARAM_GENERATED)
+    }
+
+    if (kMax > 1 && any(simulationResults$rejectedArmsPerStage < 0)) {
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow",
+            functionName = ".getSimulationMultiArmSurvivalPatientWise"
+        )
+    }
+    
+    .addStudyDurationToDesignPlan(simulationResults)
+
+    simulationResults$.data <- loopResult$data
+    simulationResults$.rawData <- .createSimulationSurvivalRawData(loopResult$rawData)
+
+    return(simulationResults)
+}

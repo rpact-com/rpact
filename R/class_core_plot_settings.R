@@ -269,7 +269,8 @@ PlotSubTitleItems <- R6::R6Class("PlotSubTitleItems",
 #'
 #' @keywords internal
 #'
-getPlotSettings <- function(lineSize = 0.8,
+getPlotSettings <- function(
+        lineSize = 0.8,
         pointSize = 3,
         pointColor = NA_character_,
         mainTitleFontSize = 14,
@@ -330,7 +331,8 @@ PlotSettings <- R6::R6Class("PlotSettings",
         axesTextFontSize = NULL,
         legendFontSize = NULL,
         scalingFactor = NULL,
-        initialize = function(lineSize = 0.8,
+        initialize = function(
+                lineSize = 0.8,
                 pointSize = 3,
                 pointColor = NA_character_,
                 mainTitleFontSize = 14,
@@ -427,10 +429,16 @@ PlotSettings <- R6::R6Class("PlotSettings",
         },
 
         # Sets the axes labels
-        setAxesLabels = function(p, xAxisLabel = NULL, yAxisLabel1 = NULL, yAxisLabel2 = NULL,
-                xlab = NA_character_, ylab = NA_character_,
-                scalingFactor1 = 1, scalingFactor2 = 1) {
-            if (is.null(xAxisLabel) && !is.na(xlab)) {
+        setAxesLabels = function(
+                p,
+                xAxisLabel = NULL,
+                yAxisLabel1 = NULL,
+                yAxisLabel2 = NULL,
+                xlab = NA_character_,
+                ylab = NA_character_,
+                scalingFactor1 = 1,
+                scalingFactor2 = 1) {
+            if (!is.na(xlab)) {  
                 xAxisLabel <- xlab
             }
 
@@ -451,7 +459,7 @@ PlotSettings <- R6::R6Class("PlotSettings",
                     xAxisLabel <- bquote(bold("Theta" ~ Theta))
                 }
             }
-
+            
             p <- p + ggplot2::xlab(xAxisLabel)
             if (sum(is.na(ylab)) == 0) {
                 yAxisLabel1 <- ylab[1]
@@ -461,7 +469,8 @@ PlotSettings <- R6::R6Class("PlotSettings",
             }
             p <- p + ggplot2::ylab(yAxisLabel1)
 
-            p <- self$setSecondYAxisOnRightSide(p, yAxisLabel1, yAxisLabel2, scalingFactor1, scalingFactor2)
+            p <- self$setSecondYAxisOnRightSide(
+                p, yAxisLabel1, yAxisLabel2, scalingFactor1, scalingFactor2)
 
             return(p)
         },
@@ -513,10 +522,17 @@ PlotSettings <- R6::R6Class("PlotSettings",
                 legend.justification = justification
             ))
         },
-        setLegendPosition = function(p, legendPosition) {
+        setLegendPosition = function(p, legendPosition, finalize = TRUE) {
             .assertIsValidLegendPosition(legendPosition)
 
             legendPosition <- as.character(legendPosition)
+            if (identical(legendPosition, "auto")) {
+                p <- p + ggplot2::theme(legend.position = "right")
+                if (!finalize) {
+                    return(p)
+                }
+                return(.positionPlotLegend(.preparePlotLegend(p), self))
+            }
 
             if (legendPosition %in% c("none", "left", "right", "bottom", "top")) {
                 p <- p + ggplot2::theme(legend.position = legendPosition)
@@ -692,9 +708,11 @@ PlotSettings <- R6::R6Class("PlotSettings",
                 margin <- base::rep(margin, 4)
             }
             if (!(length(margin) %in% c(1, 4))) {
-                stop(
-                    C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'margin' (", .arrayToString(margin),
-                    ") must be a numeric vector with length 1 or 4"
+                stopRuntimeIssue("'margin' (", .arrayToString(margin), ") ",
+                    "must be a numeric vector with length 1 or 4",
+                    functionName = "setMarginAroundPlot",
+                    parameter = "margin",
+                    value = margin
                 )
             }
             p <- p + ggplot2::theme(plot.margin = ggplot2::unit(margin, "cm"))
@@ -759,8 +777,12 @@ PlotSettings <- R6::R6Class("PlotSettings",
             }
             return(p)
         },
-        plotValues = function(p, ..., plotLineEnabled = TRUE,
-                plotPointsEnabled = TRUE, pointBorder = 4) {
+        plotValues = function(
+                p,
+                ...,
+                plotLineEnabled = TRUE,
+                plotPointsEnabled = TRUE,
+                pointBorder = 4) {
             if (plotLineEnabled) {
                 if (packageVersion("ggplot2") >= "3.4.0") {
                     p <- p + ggplot2::geom_line(linewidth = self$scaleSize(self$lineSize))
@@ -773,8 +795,12 @@ PlotSettings <- R6::R6Class("PlotSettings",
             }
             return(p)
         },
-        mirrorYValues = function(p, yValues, plotLineEnabled = TRUE,
-                plotPointsEnabled = TRUE, pointBorder = 4) {
+        mirrorYValues = function(
+                p,
+                yValues,
+                plotLineEnabled = TRUE,
+                plotPointsEnabled = TRUE,
+                pointBorder = 4) {
             if (plotLineEnabled) {
                 if (packageVersion("ggplot2") >= "3.4.0") {
                     p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues),

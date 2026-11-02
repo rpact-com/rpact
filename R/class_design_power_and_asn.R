@@ -68,7 +68,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             self$theta <- theta
             self$nMax <- nMax
 
-            self$theta <- .assertIsValidThetaRange(thetaRange = theta, thetaAutoSeqEnabled = FALSE)
+            self$theta <- .assertIsValidThetaRange(theta = theta, thetaAutoSeqEnabled = FALSE)
             self$.initPowerAndAverageSampleNumber()
         },
         show = function(showType = 1, digits = NA_integer_) {
@@ -115,9 +115,9 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             .assertIsValidSidedParameter(self$.design$sided)
 
             if (self$nMax <= 0) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'nMax' must be an integer > 0",
-                    call. = FALSE
+                stopIllegalArgument("'nMax' must be an integer > 0",
+                    functionName = ".initPowerAndAverageSampleNumber",
+                    parameter = "nMax"
                 )
             }
 
@@ -234,7 +234,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                 }
 
                 probs <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
-                
+
                 if (nrow(probs) == 3) {
                     .averageSampleNumber <- self$nMax - sum((probs[3, 1:(kMax - 1)] - probs[2, 1:(kMax - 1)] + probs[1, 1:(kMax - 1)]) *
                         (informationRates[kMax] - informationRates[1:(kMax - 1)]) * self$nMax)
@@ -323,8 +323,13 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
 #'
 #' @keywords internal
 #'
-as.data.frame.PowerAndAverageSampleNumberResult <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
+as.data.frame.PowerAndAverageSampleNumberResult <- function(
+        x,
+        row.names = NULL,
+        optional = FALSE,
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE,
+        ...) {
     parameterNames <- x$.getVisibleFieldNames()
     parameterNames <- parameterNames[parameterNames != "nMax"]
     dataFrame <- .getAsDataFrame(

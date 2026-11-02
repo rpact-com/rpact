@@ -59,10 +59,11 @@
 #'
 mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
     if (length(A) != length(B) || length(B) != length(BPD) || length(BPD) != length(INF)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "input vectors must have the same length (",
-            paste0(sort(unique(c(length(A), length(B), length(BPD), length(INF)))), collapse = " != "), ")",
-            call. = FALSE
+        stopIllegalArgument("input vectors must have the same length (", paste0(sort(unique(c(
+            length(A), length(B),
+            length(BPD), length(INF)
+        ))), collapse = " != "), ")",
+        functionName = "mvnprd"
         )
     }
 
@@ -94,13 +95,17 @@ mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
 #' @param sigma Values defining correlation structure. Array of N dimensions
 #' @inheritParams param_three_dots
 #' @param eps desired accuracy. Defaults to 1e-06
-#' @param errorControl error control. If set to 1, strict error control based on
-#'        fourth derivative is used. If set to zero, error control based on halving intervals is used
+#' @param errorControl error control. If set to \code{"strict"} (default), strict error control based on
+#'        fourth derivative is used. If set to \code{"halvingIntervals"}, error control based on halving intervals is used
 #' @param intervalSimpsonsRule Interval width for Simpson's rule. Value of zero caused a default .24 to be used
 #'
 #' @export
 #'
-as251Normal <- function(lower, upper, sigma, ...,
+as251Normal <- function(
+        lower,
+        upper,
+        sigma,
+        ...,
         eps = 1e-06,
         errorControl = c("strict", "halvingIntervals"),
         intervalSimpsonsRule = 0) {
@@ -181,10 +186,11 @@ as251Normal <- function(lower, upper, sigma, ...,
 #'
 mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
     if (length(A) != length(B) || length(B) != length(BPD) || length(BPD) != length(INF) || length(INF) != length(D)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "input vectors must have the same length (",
-            paste0(sort(unique(c(length(A), length(B), length(BPD), length(INF), length(D)))), collapse = " != "), ")",
-            call. = FALSE
+        stopIllegalArgument("input vectors must have the same length (", paste0(sort(unique(c(
+            length(A), length(B),
+            length(BPD), length(INF), length(D)
+        ))), collapse = " != "), ")",
+        functionName = "mvstud"
         )
     }
 
@@ -217,13 +223,17 @@ mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0)
 #' @inheritParams param_three_dots
 #' @param df Degrees of Freedom. Use 0 for infinite D.F.
 #' @param eps desired accuracy. Defaults to 1e-06
-#' @param errorControl error control. If set to 1, strict error control based on
-#'        fourth derivative is used. If set to zero, error control based on halving intervals is used
+#' @param errorControl error control. If set to \code{"strict"} (default), strict error control based on
+#'        fourth derivative is used. If set to \code{"halvingIntervals"}, error control based on halving intervals is used
 #' @param intervalSimpsonsRule Interval width for Simpson's rule. Value of zero caused a default .24 to be used
 #'
 #' @export
 #'
-as251StudentT <- function(lower, upper, sigma, ...,
+as251StudentT <- function(
+        lower,
+        upper,
+        sigma,
+        ...,
         df,
         eps = 1e-06,
         errorControl = c("strict", "halvingIntervals"),

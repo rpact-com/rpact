@@ -24,9 +24,9 @@ A class for simulation results.
 \section{Fields}{
 
 \describe{
-\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
+\item{\code{seed}}{The seed used for random number generation. Is a single numeric value.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a single numeric value representing a  whole number.}
 }}
 
 \keyword{internal}

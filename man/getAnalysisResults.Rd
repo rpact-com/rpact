@@ -21,7 +21,8 @@ getAnalysisResults(
 \item{design}{The trial design.}
 
 \item{dataInput}{The summary data used for calculating the test results.
-This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival}
+This is an element of \code{DatasetGeneral}, \code{DatasetMeans},
+\code{DatasetRates}, or \code{DatasetSurvival}
 and should be created with the function \code{\link[=getDataset]{getDataset()}}.
 For more information see \code{\link[=getDataset]{getDataset()}}.}
 
@@ -72,15 +73,20 @@ For survival data, only a stratified analysis is possible (see Brannath et al., 
 }}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
-only applicable for one-sided testing; default is \code{TRUE}
-which means that larger values of the test statistics yield smaller p-values.}
+only applicable for one-sided testing; \code{TRUE}
+means that larger values of the test statistics yield smaller p-values.
+The default is \code{TRUE} for means, rates, and count data, and \code{FALSE} for survival data
+(power calculations, simulations, and analyses).
+In sample size calculations, the direction is derived from the specified alternative;
+a specified \code{directionUpper} must agree with it.}
 
 \item{thetaH0}{The null hypothesis value,
-default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+default is \code{0} for general estimates, the normal case, and the binary case,
 it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
+\item \emph{general estimates}: a value on the scale of the supplied estimates can be specified.
 \item \emph{means}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the mean ratio) can be specified.
 \item \emph{rates}: a value \code{!= 0}
@@ -96,7 +102,7 @@ The argument must be a vector with length equal to the number of remaining stage
 the combined sample size from both treatment groups if two groups are considered. For survival outcomes,
 it should contain the planned number of additional events.
 For multi-arm designs, it is the per-comparison (combined) sample size.
-For enrichment designs, it is the (combined) sample size for the considered sub-population.}
+For enrichment designs, it is the (combined) sample size for the considered subpopulation.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
@@ -163,6 +169,21 @@ For Fisher's combination test, the conditional power for more than one remaining
 Final stage p-values, median unbiased effect estimates, and final confidence intervals are not calculated
 for multi-arm and enrichment designs.
 }
+\section{Note}{
+
+Repeated p-values are calculated by identifying the smallest global
+significance level for which the observed test statistic would lead to
+rejection under the same design rule. Therefore, they require that the
+design can be re-created for arbitrary values of the global significance
+level. For user-defined designs with fixed userAlphaSpending values,
+this alpha-dependent design family is not uniquely defined.
+Consequently, repeated p-values are not available for such designs.
+Repeated p-values are also unavailable for sequential designs with
+\code{typeBetaSpending = "bsUser"}, regardless of whether futility is binding.
+These calculations return \code{NA} with a warning; other analysis results
+remain available.
+}
+
 \section{How to get help for generic functions}{
 
 Click on the link of a generic in the list above to go directly to the help documentation of
@@ -249,7 +270,7 @@ if (require(ggplot2)) plot(y, thetaRange = c(0, 0.4))
 
 # Example 4 Enrichment Design
 # Perform an two-stage enrichment design analysis with O'Brien & Fleming boundaries
-# where one sub-population (S1) and a full population (F) are considered as primary
+# where one subpopulation (S1) and a full population (F) are considered as primary
 # analysis sets. At interim, S1 is selected for further analysis and the sample
 # size is increased accordingly. With the Spiessens & Debois intersection test,
 # the results of a closed adaptive test procedure together with the CRP, repeated

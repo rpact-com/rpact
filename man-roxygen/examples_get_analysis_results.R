@@ -73,7 +73,7 @@
 #'
 #' # Example 4 Enrichment Design
 #' # Perform an two-stage enrichment design analysis with O'Brien & Fleming boundaries
-#' # where one sub-population (S1) and a full population (F) are considered as primary
+#' # where one subpopulation (S1) and a full population (F) are considered as primary
 #' # analysis sets. At interim, S1 is selected for further analysis and the sample
 #' # size is increased accordingly. With the Spiessens & Debois intersection test,
 #' # the results of a closed adaptive test procedure together with the CRP, repeated

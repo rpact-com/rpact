@@ -17,31 +17,53 @@
 \alias{getMedianByPi}
 \title{Survival Helper Functions for Conversion of Pi, Lambda, Median, and Hazard Ratio Values}
 \usage{
-getLambdaByPi(piValue, eventTime = 12, kappa = 1)
+getLambdaByPi(piValue, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getLambdaByMedian(median, kappa = 1)
+getLambdaByMedian(median, kappa = 1, matrixAllowed = FALSE)
 
-getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1)
+getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getHazardRatioByLambda(lambda1, lambda2)
+getHazardRatioByLambda(lambda1, lambda2, matrixAllowed = FALSE, kappa = 1)
 
-getHazardRatioByMedian(median1, median2, kappa = 1)
+getHazardRatioByMedian(median1, median2, kappa = 1, matrixAllowed = FALSE)
 
-getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
+getLambda1ByLambda2AndHazardRatio(
+  lambda2,
+  hazardRatio,
+  matrixAllowed = FALSE,
+  kappa = 1
+)
 
-getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio)
+getLambda2ByLambda1AndHazardRatio(
+  lambda1,
+  hazardRatio,
+  matrixAllowed = FALSE,
+  kappa = 1
+)
 
-getPi1ByPi2AndHazardRatio(pi2, hazardRatio, eventTime = 12, kappa = 1)
+getPi1ByPi2AndHazardRatio(
+  pi2,
+  hazardRatio,
+  eventTime = 12,
+  kappa = 1,
+  matrixAllowed = FALSE
+)
 
-getPi2ByPi1AndHazardRatio(pi1, hazardRatio, eventTime = 12, kappa = 1)
+getPi2ByPi1AndHazardRatio(
+  pi1,
+  hazardRatio,
+  eventTime = 12,
+  kappa = 1,
+  matrixAllowed = FALSE
+)
 
-getPiByLambda(lambda, eventTime = 12, kappa = 1)
+getPiByLambda(lambda, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getPiByMedian(median, eventTime = 12, kappa = 1)
+getPiByMedian(median, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 
-getMedianByLambda(lambda, kappa = 1)
+getMedianByLambda(lambda, kappa = 1, matrixAllowed = FALSE)
 
-getMedianByPi(piValue, eventTime = 12, kappa = 1)
+getMedianByPi(piValue, eventTime = 12, kappa = 1, matrixAllowed = FALSE)
 }
 \arguments{
 \item{piValue, pi1, pi2, lambda, lambda1, lambda2, median, median1, median2}{Value that shall be converted.}
@@ -59,6 +81,8 @@ of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate
 For example,
 \code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
 and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the same result.}
+
+\item{matrixAllowed}{Logical flag indicating whether a matrix is allowed as input, default is \code{FALSE}.}
 }
 \value{
 Returns a \code{\link[base]{numeric}} value or vector will be returned.
@@ -69,5 +93,11 @@ Functions to convert pi, lambda, median, and hazard ratio values into each other
 \details{
 Can be used, e.g., to convert pi, median, or lambda values into pi, median, lambda, or hazard ratio values, e.g, for usage in
 \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}} or \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
+
+For the Weibull distribution, the hazard ratio is
+\code{(lambda1 / lambda2)^kappa = (median2 / median1)^kappa}, where
+\code{lambda} is the inverse Weibull scale and \code{kappa} is the common shape parameter.
+Conversions from a hazard ratio therefore use \code{hazardRatio^(1 / kappa)} to
+recover the lambda ratio.
 }
 \keyword{internal}

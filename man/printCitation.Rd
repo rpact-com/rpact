@@ -7,7 +7,8 @@
 printCitation(inclusiveR = TRUE, language = "en", markdown = NA)
 }
 \arguments{
-\item{inclusiveR}{If \code{TRUE} (default) the information on how to cite the base R system in publications will be added.}
+\item{inclusiveR}{If \code{TRUE} (default) the information on
+how to cite the base R system in publications will be added.}
 
 \item{language}{Language code to use for the output, default is "en".}
 

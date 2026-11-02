@@ -45,13 +45,13 @@
 #'
 .warnInCaseOfExtremeAllocationRatios <- function(allocation1, allocation2) {
     if (abs(allocation1 - allocation2) > 4) {
-        warning(
+        warnNotValidated(
             "Choice of allocation scheme ('allocation1' = ",
             allocation1,
             ", 'allocation2' = ",
             allocation2,
             ") might yield unreliable results",
-            call. = FALSE
+            diagnosticId = "counts.allocation_not_validated"
         )
     }
 }
@@ -107,7 +107,6 @@
     return(NA_real_)
 }
 
-
 #'
 #' Generate Recruitment Times
 #'
@@ -147,18 +146,17 @@
 #'
 .generateRecruitmentTimes <- function(allocationRatio, accrualTime, accrualIntensity) {
     .assertIsSingleNumber(allocationRatio, "allocationRatio")
-    .assertIsNumericVector(accrualTime, "accrualTime")
-    .assertIsNumericVector(accrualIntensity, "accrualIntensity")
+    accrualTime <- .assertIsNumericVector(accrualTime, "accrualTime")
+    accrualIntensity <- .assertIsNumericVector(accrualIntensity, "accrualIntensity")
 
     if (length(accrualTime) != length(accrualIntensity)) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "length of accrualTime (",
-            length(accrualTime),
-            ") and ",
-            "accrualIntensity (",
-            length(accrualIntensity),
-            ") must be identical"
+        stopRuntimeIssue("length of accrualTime (", length(accrualTime), ") and ",
+            "accrualIntensity (", length(accrualIntensity), ") must be identical",
+            functionName = ".generateRecruitmentTimes",
+            parameter = "accrualTime",
+            value = length(accrualTime),
+            relatedParameter = "accrualIntensity",
+            relatedValue = length(accrualIntensity)
         )
     }
 
@@ -203,7 +201,6 @@
         recruit = recruit
     ))
 }
-
 
 #'
 #' Calculate Variance Estimate
@@ -251,7 +248,8 @@
 #'
 #' @noRd
 #'
-.getVarianceEstimate <- function(lambda1,
+.getVarianceEstimate <- function(
+        lambda1,
         lambda2,
         allocation,
         overdispersion,
@@ -265,9 +263,8 @@
             (1 / fixedExposureTime * (1 / lambda2 + 1 / (lambda1 * allocation)) + overdispersion * (1 + 1 / allocation))
     } else {
         if (is.na(followUpTime)) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "Cannot calculated variance estimate because follow-up time is NA"
+            stopRuntimeIssue("Cannot calculated variance estimate because follow-up time is NA",
+                functionName = ".getVarianceEstimate"
             )
         }
         timeUnderObservation1 <-
@@ -282,330 +279,8 @@
     return(varianceEstimate)
 }
 
-
-#' Find Theta Using Uniroot
-#'
-#' @description
-#' This function finds the value of \code{theta} that satisfies a given boundary condition
-#' using the \code{uniroot} method. It calculates the variance estimate and solves for
-#' \code{theta} based on the provided parameters.
-#'
-#' @param boundary A numeric value representing the boundary condition to be satisfied.
-#' @param lambda2 A numeric vector representing the event rates for group 2.
-#' @param thetaH0 A numeric value representing the null hypothesis value of \code{theta}.
-#' @param directionUpper A numeric value (1 or 0) indicating the direction of the test.
-#' @param allocationRatio A numeric value representing the allocation ratio between the two groups.
-#' @param overdispersion A numeric value representing the overdispersion parameter.
-#' @param accrualTime A numeric vector representing the accrual time intervals.
-#' @param followUpTime A numeric value representing the follow-up time.
-#' @param fixedExposureTime A numeric value representing the fixed exposure time. Default is \code{NA_real_}.
-#' @param numberOfSubjects A numeric value representing the total number of subjects.
-#' @param recruit1 A numeric vector representing the recruitment times for group 1.
-#' @param recruit2 A numeric vector representing the recruitment times for group 2.
-#'
-#' @details
-#' The function uses the \code{uniroot} method to find the root of the equation that satisfies
-#' the boundary condition. It calculates the variance estimate for the given parameters and
-#' uses it to determine the value of \code{theta}.
-#'
-#' @return
-#' A numeric value representing the value of \code{theta} that satisfies the boundary condition.
-#' Returns \code{NA_real_} if the root cannot be found.
-#'
-#' @keywords internal
-#'
-#' @noRd
-#'
-.findThetaUniRoot <- function(boundary,
-        informationRate,
-        lambda2,
-        thetaH0,
-        directionUpper,
-        allocationRatio,
-        overdispersion,
-        accrualTime,
-        followUpTime,
-        fixedExposureTime,
-        numberOfSubjects,
-        recruit1,
-        recruit2) {
-    tryCatch(
-        {
-            if ((2 * directionUpper - 1) * boundary < 0) {
-                lowerBound <- stats::optimize(
-                    function(x) {
-                        vHat <- .getVarianceEstimate(
-                            lambda1 = x * lambda2,
-                            lambda2 = lambda2,
-                            allocation = allocationRatio,
-                            overdispersion = overdispersion,
-                            accrualTime = accrualTime,
-                            followUpTime = followUpTime,
-                            fixedExposureTime = fixedExposureTime,
-                            recruit1 = recruit1[1:(allocationRatio * numberOfSubjects / (1 + allocationRatio))],
-                            recruit2[1:(numberOfSubjects / (1 + allocationRatio))]
-                        )
-
-                        if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                            stop(
-                                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                                "Cannot find theta. ",
-                                "The calculated variance estimate is invalid: ",
-                                vHat
-                            )
-                        }
-                        (log(x) - log(thetaH0)) / sqrt(vHat) * sqrt(informationRate * numberOfSubjects)
-                    },
-                    lower = 1e-05,
-                    upper = 1
-                )$minimum
-            } else {
-                lowerBound <- min(thetaH0, 1 / thetaH0)
-            }
-
-            if (is.na(lowerBound)) {
-                return(NA_real_)
-            }
-
-            effectRatio <- stats::uniroot(
-                function(x) {
-                    vHat <- .getVarianceEstimate(
-                        lambda1 = x * lambda2,
-                        lambda2 = lambda2,
-                        allocation = allocationRatio,
-                        overdispersion = overdispersion,
-                        accrualTime = accrualTime,
-                        followUpTime = followUpTime,
-                        fixedExposureTime = fixedExposureTime,
-                        recruit1 = recruit1[1:(allocationRatio * numberOfSubjects / (1 + allocationRatio))],
-                        recruit2 = recruit2[1:(numberOfSubjects / (1 + allocationRatio))]
-                    )
-
-                    if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                        stop(
-                            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                            "cannot find theta. ",
-                            "The calculated variance estimate is invalid: ",
-                            vHat
-                        )
-                    }
-
-                    (log(x) - log(thetaH0)) /
-                        sqrt(vHat) *
-                        sqrt(informationRate * numberOfSubjects) -
-                        (2 * directionUpper - 1) * boundary
-                },
-                lower = lowerBound,
-                upper = 10,
-                tol = .Machine$double.eps^0.5,
-                extendInt = "yes"
-            )$root
-        },
-        warning = function(w) {
-            effectRatio <<- NA_real_
-        },
-        error = function(e) {
-            effectRatio <<- NA_real_
-        }
-    )
-    return(effectRatio)
-}
-
-.getEffectScaleBoundaryCountData <- function(designPlan) {
-    design <- designPlan$.design
-    thetaH0 <- designPlan$thetaH0
-    lambda1 <- designPlan$lambda1
-    lambda2 <- designPlan$lambda2
-    overdispersion <- designPlan$overdispersion
-    fixedExposureTime <- designPlan$fixedExposureTime
-    followUpTime <- designPlan$followUpTime
-    studyTime <- designPlan$studyTime
-    accrualTime <- designPlan$accrualTime
-    if (length(accrualTime) > 1) {
-        accrualTime <- accrualTime[-1]
-    }
-    accrualIntensity <- designPlan$accrualIntensity
-    maxNumberOfSubjects <- designPlan$maxNumberOfSubjects
-    numberOfSubjects <- designPlan$numberOfSubjects
-    allocationRatioPlanned <- designPlan$allocationRatioPlanned
-    directionUpper <- designPlan$directionUpper
-
-    if (is.na(followUpTime) && is.na(fixedExposureTime)) {
-        followUpTime <- studyTime - max(accrualTime)
-    }
-
-    if (designPlan$.objectType == "power") {
-        nParameters <- 1
-    } else {
-        nParameters <- length(lambda1)
-    }
-
-    criticalValuesEffectScaleUpper <- matrix(, nrow = design$kMax, ncol = nParameters)
-    criticalValuesEffectScaleLower <- matrix(, nrow = design$kMax, ncol = nParameters)
-    futilityBoundsEffectScaleUpper <- matrix(, nrow = design$kMax - 1, ncol = nParameters)
-    futilityBoundsEffectScaleLower <- matrix(, nrow = design$kMax - 1, ncol = nParameters)
-
-    if (length(allocationRatioPlanned) == 1) {
-        allocationRatioPlanned <- rep(allocationRatioPlanned, nParameters)
-    }
-    if (length(followUpTime) == 1) {
-        followUpTime <- rep(followUpTime, nParameters)
-    }
-    if (length(maxNumberOfSubjects) == 1) {
-        maxNumberOfSubjects <- rep(maxNumberOfSubjects, nParameters)
-    }
-
-    directionUpper[is.na(directionUpper)] <- C_DIRECTION_UPPER_DEFAULT
-
-    if (length(directionUpper) == 1) {
-        directionUpper <- rep(directionUpper, nParameters)
-    }
-
-    informationRates <- design$informationRates
-    criticalValues <- .getCriticalValues(design)
-    futilityBounds <- .getFutilityBounds(design)
-    futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
-
-    for (iCase in 1:nParameters) {
-        allocationRatio <- allocationRatioPlanned[iCase]
-
-        if (!anyNA(accrualIntensity)) {
-            # build up general recruitment times
-            recruitmentTimes <- .generateRecruitmentTimes(
-                allocationRatio,
-                accrualTime,
-                accrualIntensity
-            )
-            recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
-            recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
-        } else if (!anyNA(accrualTime)) {
-            recruit1 <- seq(
-                0,
-                accrualTime,
-                length.out = maxNumberOfSubjects[iCase] * allocationRatio / (1 + allocationRatio)
-            )
-            recruit2 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] / (1 + allocationRatio))
-        } else {
-            recruit1 <- NA_real_
-            recruit2 <- NA_real_
-        }
-
-        # calculate theta that solves (ln(theta) - ln(thetaH0) sqrt(FisherInformation_k) = boundary
-        for (j in seq_len(length(criticalValues))) {
-            if (all(is.na(numberOfSubjects[, iCase]))) {
-                numberOfSubjectsPerStage <- maxNumberOfSubjects[iCase]
-            } else {
-                numberOfSubjectsPerStage <- numberOfSubjects[j, iCase]
-            }
-            criticalValuesEffectScaleUpper[j, iCase] <- .findThetaUniRoot(
-                criticalValues[j],
-                informationRates[j],
-                lambda2,
-                thetaH0,
-                directionUpper[iCase],
-                allocationRatio,
-                overdispersion,
-                accrualTime,
-                followUpTime[iCase],
-                fixedExposureTime,
-                numberOfSubjectsPerStage,
-                recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
-                recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
-            )
-
-            if (design$sided == 2) {
-                criticalValuesEffectScaleLower[j, iCase] <- .findThetaUniRoot(
-                    -criticalValues[j],
-                    informationRates[j],
-                    lambda2,
-                    thetaH0,
-                    directionUpper[iCase],
-                    allocationRatio,
-                    overdispersion,
-                    accrualTime,
-                    followUpTime[iCase],
-                    fixedExposureTime,
-                    numberOfSubjectsPerStage,
-                    recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
-                    recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
-                )
-            }
-        }
-
-        if (!all(is.na(futilityBounds))) {
-            for (j in seq_len(length(futilityBounds))) {
-                if (all(is.na(numberOfSubjects[, iCase]))) {
-                    numberOfSubjectsPerStage <- maxNumberOfSubjects[iCase]
-                } else {
-                    numberOfSubjectsPerStage <- numberOfSubjects[j, iCase]
-                }
-                futilityBoundsEffectScaleUpper[j, iCase] <- .findThetaUniRoot(
-                    futilityBounds[j],
-                    informationRates[j],
-                    lambda2,
-                    thetaH0,
-                    directionUpper[iCase],
-                    allocationRatio,
-                    overdispersion,
-                    accrualTime,
-                    followUpTime[iCase],
-                    fixedExposureTime,
-                    numberOfSubjectsPerStage,
-                    recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
-                    recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
-                )
-                if (
-                    design$sided == 2 &&
-                        design$kMax > 1 &&
-                        (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-                            !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")
-                    ) {
-                    futilityBoundsEffectScaleLower[j, iCase] <- .findThetaUniRoot(
-                        -futilityBounds[j],
-                        informationRates[j],
-                        lambda2,
-                        thetaH0,
-                        directionUpper[iCase],
-                        allocationRatio,
-                        overdispersion,
-                        accrualTime,
-                        followUpTime[iCase],
-                        fixedExposureTime,
-                        numberOfSubjectsPerStage,
-                        recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
-                        recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
-                    )
-                }
-            }
-        }
-    }
-
-    criticalValuesEffectScaleUpper[
-        !is.na(criticalValuesEffectScaleUpper) &
-            criticalValuesEffectScaleUpper <= 0
-    ] <- NA_real_
-    criticalValuesEffectScaleLower[
-        !is.na(criticalValuesEffectScaleLower) &
-            criticalValuesEffectScaleLower <= 0
-    ] <- NA_real_
-    futilityBoundsEffectScaleUpper[
-        !is.na(futilityBoundsEffectScaleUpper) &
-            futilityBoundsEffectScaleUpper <= 0
-    ] <- NA_real_
-    futilityBoundsEffectScaleLower[
-        !is.na(futilityBoundsEffectScaleLower) &
-            futilityBoundsEffectScaleLower <= 0
-    ] <- NA_real_
-
-    return(list(
-        criticalValuesEffectScaleUpper = matrix(criticalValuesEffectScaleUpper, nrow = design$kMax),
-        criticalValuesEffectScaleLower = matrix(criticalValuesEffectScaleLower, nrow = design$kMax),
-        futilityBoundsEffectScaleUpper = matrix(futilityBoundsEffectScaleUpper, nrow = design$kMax - 1),
-        futilityBoundsEffectScaleLower = matrix(futilityBoundsEffectScaleLower, nrow = design$kMax - 1)
-    ))
-}
-
-.getCalendarTime <- function(n1,
+.getCalendarTime <- function(
+        n1,
         n2,
         information,
         shift,
@@ -656,17 +331,18 @@
             )
         },
         error = function(e) {
-            warning(
+            warnNumericalIssue(
                 "Failed to calculate the calendar time. ",
                 "Fisher information might be bounded, e.g., due to overdispersion > 0",
-                call. = FALSE
+                diagnosticId = "counts.information_target_unreachable"
             )
         }
     )
     return(NA_real_)
 }
 
-.getMaximumSampleSizeTwoGroups <- function(allocationRatioPlanned,
+.getMaximumSampleSizeTwoGroups <- function(
+        allocationRatioPlanned,
         shift,
         accrualTime,
         followUpTime,
@@ -722,7 +398,8 @@
     )
 }
 
-.getDesignPlanCountData <- function(design,
+.getDesignPlanCountData <- function(
+        design,
         designCharacteristics,
         objectType,
         sided,
@@ -737,13 +414,22 @@
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned) {
+        allocationRatioPlanned,
+        directionUpper) {
     designPlan <- TrialDesignPlanCountData$new(
         design = design,
-        designCharacteristics = designCharacteristics
+        designCharacteristics = designCharacteristics,
+        objectType = objectType
     )
-    designPlan$.setObjectType(objectType)
     sampleSizeEnabled <- identical(objectType, "sampleSize")
+
+    directionUpper <- .setDirectionUpper(
+        designPlan,
+        design,
+        directionUpper,
+        objectType = objectType,
+        endpoint = "counts",
+        userFunctionCallEnabled = !identical(objectType, "sampleSize"))
 
     if (sampleSizeEnabled || design$kMax == 1) {
         designPlan$.setParameterType("overallReject", C_PARAM_NOT_APPLICABLE)
@@ -758,7 +444,7 @@
         designPlan$.setParameterType("studyTime", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("numberOfSubjects", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("calendarTime", C_PARAM_NOT_APPLICABLE)
-        designPlan$.setParameterType("expectedStudyDurationH1", C_PARAM_NOT_APPLICABLE)
+        designPlan$.setParameterType("studyDuration", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("expectedNumberOfSubjectsH1", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("informationOverStages", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("maxInformation", C_PARAM_NOT_APPLICABLE)
@@ -771,7 +457,7 @@
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
 
-    .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
+    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     .assertIsValidEffectCountData(
         sampleSizeEnabled = sampleSizeEnabled,
         sided = sided,
@@ -784,10 +470,9 @@
     )
 
     if (design$sided == 2 && thetaH0 != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
-            call. = FALSE
+        stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
+            functionName = ".getDesignPlanCountData",
+            diagnosticId = "planning.two_sided_requires_superiority"
         )
     }
 
@@ -841,7 +526,7 @@
         designPlan$.setParameterType("lambda2", C_PARAM_GENERATED)
     }
 
-    if (length(accrualTime) == 2 && accrualTime[1] == 0) {
+    if (length(accrualTime) == 2 && equals(accrualTime[1], 0, tolerance = 0)) {
         accrualTime <- accrualTime[-1]
         designPlan$accrualTime <- accrualTime
     }
@@ -890,6 +575,7 @@
 #' @inheritParams param_accrualTime_counts
 #' @inheritParams param_accrualIntensity_counts
 #' @inheritParams param_followUpTime_counts
+#' @inheritParams param_directionUpper
 #' @inheritParams param_maxNumberOfSubjects
 #' @inheritParams param_overdispersion_counts
 #' @inheritParams param_allocationRatioPlanned_sampleSize
@@ -913,8 +599,10 @@
 #'
 #' @export
 #'
-getSampleSizeCounts <- function(design = NULL,
+getSampleSizeCounts <- function(
+        design = NULL,
         ...,
+        directionUpper = NA,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
         lambda = NA_real_,
@@ -928,7 +616,7 @@ getSampleSizeCounts <- function(design = NULL,
         maxNumberOfSubjects = NA_integer_,
         allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "sampleSize", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = FALSE),
@@ -965,7 +653,8 @@ getSampleSizeCounts <- function(design = NULL,
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned
+        allocationRatioPlanned,
+        directionUpper
     )
     totalCases <- attr(designPlan, "totalCases")
     attr(designPlan, "totalCases") <- NULL
@@ -1025,7 +714,7 @@ getSampleSizeCounts <- function(design = NULL,
     }
     n1 <- rep(NA_real_, totalCases)
     n2 <- rep(NA_real_, totalCases)
-    expectedStudyDurationH1 <- rep(NA_real_, totalCases)
+    studyDuration <- rep(NA_real_, totalCases)
     expectedNumberOfSubjectsH1 <- rep(NA_real_, totalCases)
 
     for (iCase in 1:totalCases) {
@@ -1268,9 +957,9 @@ getSampleSizeCounts <- function(design = NULL,
         }
 
         if (!anyNA(calendarTime[, iCase])) {
-            expectedStudyDurationH1[iCase] <- calendarTime[kMax, iCase]
+            studyDuration[iCase] <- calendarTime[kMax, iCase]
             if (kMax > 1) {
-                expectedStudyDurationH1[iCase] <- calendarTime[kMax, iCase] -
+                studyDuration[iCase] <- calendarTime[kMax, iCase] -
                     sum(
                         (designCharacteristics$rejectionProbabilities[1:(kMax - 1)] +
                             designCharacteristics$futilityProbabilities[1:(kMax - 1)]) *
@@ -1302,8 +991,7 @@ getSampleSizeCounts <- function(design = NULL,
     designPlan$lambda2 <- lambda2
     designPlan$allocationRatioPlanned <- allocationRatioPlanned
 
-    designPlan$directionUpper <- (lambda1 / lambda2 > thetaH0)
-    designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
+    .setDirectionUpperDesignPlan(designPlan)
 
     designPlan$calendarTime <- calendarTime
     designPlan$.setParameterType(
@@ -1330,11 +1018,10 @@ getSampleSizeCounts <- function(design = NULL,
         )
     )
 
-    designPlan$expectedStudyDurationH1 <- expectedStudyDurationH1
-    designPlan$.setParameterType(
-        "expectedStudyDurationH1",
-        ifelse(!all(is.na(calendarTime)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
-    )
+    designPlan$studyDuration <- studyDuration
+    designPlan$.setParameterType("studyDuration",
+        ifelse(!all(is.na(calendarTime)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE))
+    .addDeprecatedFieldValues(designPlan, "expectedStudyDurationH1", designPlan$studyDuration)
 
     designPlan$expectedNumberOfSubjectsH1 <- expectedNumberOfSubjectsH1
     designPlan$.setParameterType(
@@ -1461,7 +1148,8 @@ getSampleSizeCounts <- function(design = NULL,
 #'
 #' @export
 #'
-getPowerCounts <- function(design = NULL,
+getPowerCounts <- function(
+        design = NULL,
         ...,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
@@ -1477,7 +1165,7 @@ getPowerCounts <- function(design = NULL,
         followUpTime = NA_real_,
         allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "power")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "power", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getPowerCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -1498,7 +1186,6 @@ getPowerCounts <- function(design = NULL,
     alpha <- design$alpha
     sided <- design$sided
     designCharacteristics <- getDesignCharacteristics(design)
-    shift <- designCharacteristics$shift
 
     designPlan <- .getDesignPlanCountData(
         design,
@@ -1516,8 +1203,13 @@ getPowerCounts <- function(design = NULL,
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned
+        allocationRatioPlanned,
+        directionUpper
     )
+
+    designPlan$directionUpper <- directionUpper
+    directionUpper <- .getDirectionUpper(designPlan)
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
     totalCases <- attr(designPlan, "totalCases")
     attr(designPlan, "totalCases") <- NULL
     allocationRatioPlanned <- designPlan$allocationRatioPlanned
@@ -1527,14 +1219,6 @@ getPowerCounts <- function(design = NULL,
     if (length(accrualTime) > 1) {
         accrualTime <- accrualTime[-1]
     }
-
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE
-    )
-    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
 
     futilityPerStage <- matrix(NA_real_, kMax - 1, totalCases)
     rejectPerStage <- matrix(NA_real_, kMax, totalCases)
@@ -1586,7 +1270,6 @@ getPowerCounts <- function(design = NULL,
             varianceEstimate <- nTotal * (1 / sumLambda1 + 1 / sumLambda2)
         }
         oneSidedFactor <- ifelse(sided == 1, 2 * directionUpper - 1, 1)
-
         powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
             design = design,
             theta = oneSidedFactor * log(lambda1[iCase] / lambda2 / thetaH0) / sqrt(varianceEstimate),
@@ -1598,7 +1281,7 @@ getPowerCounts <- function(design = NULL,
         overallReject[iCase] <- powerAndAverageSampleNumber$overallReject
         earlyStop[iCase] <- sum(powerAndAverageSampleNumber$earlyStop[1:(design$kMax - 1), ], na.rm = TRUE)
     }
-    
+
     designPlan$lambda1 <- lambda1
     designPlan$lambda2 <- lambda2
 

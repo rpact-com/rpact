@@ -1,3 +1,3 @@
 #' Field description: intersection test
-#' @field intersectionTest The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a character vector of length 1.
+#' @field intersectionTest The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a single character value.
 #' @keywords internal

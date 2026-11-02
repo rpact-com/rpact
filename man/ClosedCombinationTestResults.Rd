@@ -13,7 +13,7 @@ with suitable arguments to create the multi-arm analysis results of a closed com
 \section{Fields}{
 
 \describe{
-\item{\code{intersectionTest}}{The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a character vector of length 1.}
+\item{\code{intersectionTest}}{The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a single character value.}
 
 \item{\code{indices}}{Indicates which stages are available for analysis.}
 

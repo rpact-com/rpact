@@ -5,7 +5,7 @@
 \title{Parameter Description: Planned Calendar Time}
 \arguments{
 \item{plannedCalendarTime}{For simulating count data, the time points where an analysis is planned to be performed.
-Should be a vector of length \code{kMax}}
+Required for group sequential designs as a vector of length \code{kMax}; ignored for a fixed design.}
 }
 \description{
 Parameter Description: Planned Calendar Time

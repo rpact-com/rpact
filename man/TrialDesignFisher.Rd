@@ -13,9 +13,9 @@ with suitable arguments to create a Fisher combination test design.
 \section{Fields}{
 
 \describe{
-\item{\code{kMax}}{The maximum number of stages \code{K}. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{kMax}}{The maximum number of stages \code{K}. Is a single numeric value representing a  whole number.}
 
-\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a single numeric value between 0 and 1.}
 
 \item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
@@ -29,9 +29,9 @@ with suitable arguments to create a Fisher combination test design.
 
 \item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a logical vector of length 1.}
+\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a single logical value.}
 
-\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
+\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a single numeric value.}
 
 \item{\code{method}}{"equalAlpha", "fullAlpha", "noInteraction", or "userDefinedAlpha", default is "equalAlpha". For details, see Wassmer, 1999, doi: 10.1002/(SICI)1521-4036(199906)41:3\%3C279::AID-BIMJ279\%3E3.0.CO;2-V.}
 
@@ -39,15 +39,15 @@ with suitable arguments to create a Fisher combination test design.
 
 \item{\code{scale}}{The scale for Fisher's combination test. Numeric vector of length \code{kMax-1} that applies to Fisher's design with unequally spaced information rates. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}
 
-\item{\code{nonStochasticCurtailment}}{If \code{TRUE}, the stopping rule is based on the phenomenon of non-stochastic curtailment rather than stochastic reasoning. Is a logical vector of length 1.}
+\item{\code{nonStochasticCurtailment}}{If \code{TRUE}, the stopping rule is based on the phenomenon of non-stochastic curtailment rather than stochastic reasoning. Is a single logical value.}
 
-\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a numeric vector of length 1 containing a whole number.}
+\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a single numeric value representing a  whole number.}
 
-\item{\code{simAlpha}}{The observed alpha error if simulations have been performed. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{simAlpha}}{The observed alpha error if simulations have been performed. Is a single numeric value between 0 and 1.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a single numeric value representing a  whole number.}
 
-\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
+\item{\code{seed}}{The seed used for random number generation. Is a single numeric value.}
 }}
 
 \seealso{

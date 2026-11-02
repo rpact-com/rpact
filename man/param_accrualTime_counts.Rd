@@ -4,7 +4,10 @@
 \alias{param_accrualTime_counts}
 \title{Parameter Description: accrualTime for Counts}
 \arguments{
-\item{accrualTime}{If specified, the assumed accrual time interval(s) for the study, there is no default.}
+\item{accrualTime}{If specified, the assumed accrual time interval(s) for the study, there is no default.
+A single value defines the end of accrual; if a vector is specified, its first value must be \code{0}.
+If \code{followUpTime} is specified, \code{accrualTime} can have at most two elements.
+Required for \code{getSimulationCounts()}.}
 }
 \description{
 Parameter Description: accrualTime for Counts

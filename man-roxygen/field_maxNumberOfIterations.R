@@ -1,3 +1,3 @@
 #' Field description: max number of iterations
-#' @field maxNumberOfIterations The number of simulation iterations. Is a numeric vector of length 1 containing a whole number.
+#' @field maxNumberOfIterations The number of simulation iterations. Is a single numeric value representing a  whole number.
 #' @keywords internal

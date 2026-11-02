@@ -17,7 +17,9 @@
 
 .writeLinesToFile <- function(lines, fileName) {
     if (is.null(lines) || length(lines) == 0 || !is.character(lines)) {
-        warning("Empty lines. Stop to write '", fileName, "'")
+        warnRuntimeIssue("Empty lines. Stop to write ", .vQuote(fileName),
+            diagnosticId = "io.empty_output"
+        )
         return(invisible(fileName))
     }
 
@@ -105,7 +107,8 @@
 #' @keywords internal
 #' @export
 #'
-writeKeyValueFile <- function(keyValueList,
+writeKeyValueFile <- function(
+        keyValueList,
         filePath,
         ...,
         writeHeader = TRUE,
@@ -119,17 +122,18 @@ writeKeyValueFile <- function(keyValueList,
     .assertIsSingleLogical(safeKeyCheck, "safeKeyCheck")
 
     if (!is.list(keyValueList)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'keyValueList' must be a list()",
-            call. = FALSE
+        stopIllegalArgument("'keyValueList' must be a list()",
+            functionName = "writeKeyValueFile",
+            parameter = "keyValueList", value = keyValueList
         )
     }
 
     keyNames <- names(keyValueList)
     if (is.null(keyNames) || any(!nzchar(keyNames))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'keyValueList' must be a named list()",
-            call. = FALSE
+        stopIllegalArgument("'keyValueList' must be a named list()",
+            functionName = "writeKeyValueFile",
+            parameter = "keyValueList",
+            value = keyValueList
         )
     }
 
@@ -141,17 +145,18 @@ writeKeyValueFile <- function(keyValueList,
         FUN.VALUE = logical(1)
     )
     if (any(isInvalidValue)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "all values must be length-1 atomic (no lists/vectors). Problem keys: ",
-            paste(names(keyValueList)[isInvalidValue], collapse = ", "),
-            call. = FALSE
+        stopIllegalArgument("all values must be length-1 atomic (no lists/vectors). Problem keys: ", paste(names(keyValueList)[isInvalidValue],
+            collapse = ", "
+        ),
+        functionName = "writeKeyValueFile"
         )
     }
 
     if (file.exists(filePath) && !overwrite) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "file exists and overwrite = FALSE: ", sQuote(filePath),
-            call. = FALSE
+        stopIllegalArgument("file exists and overwrite = FALSE: ", sQuote(filePath),
+            functionName = "writeKeyValueFile",
+            parameter = filePath,
+            diagnosticId = "io.overwrite_disabled"
         )
     }
 
@@ -183,8 +188,8 @@ writeKeyValueFile <- function(keyValueList,
 
     convertValueToString <- function(value) {
         if (length(value) != 1L) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "value must be length 1"
+            stopRuntimeIssue("value must be length 1",
+                functionName = "convertValueToString"
             )
         }
 
@@ -236,8 +241,9 @@ writeKeyValueFile <- function(keyValueList,
         key <- keyNames[index]
 
         if (isTRUE(safeKeyCheck) && !grepl("^[A-Za-z0-9_.-]+$", key)) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "invalid key name '", key, "'. Allowed: A-Za-z0-9_.-"
+            stopRuntimeIssue("invalid key name ", .pQuote(key), ". Allowed: A-Za-z0-9_.-",
+                functionName = "writeKeyValueFile",
+                parameter = "key", value = key
             )
         }
 
@@ -313,7 +319,8 @@ writeKeyValueFile <- function(keyValueList,
 #' @keywords internal
 #' @export
 #'
-readKeyValueFile <- function(filePath,
+readKeyValueFile <- function(
+        filePath,
         ...,
         inferTypes = TRUE,
         duplicateKeys = c("error", "last", "first"),
@@ -324,9 +331,10 @@ readKeyValueFile <- function(filePath,
     duplicateKeys <- match.arg(duplicateKeys)
 
     if (!file.exists(filePath)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "file not found: ", sQuote(filePath),
-            call. = FALSE
+        stopIllegalArgument("file not found: ", sQuote(filePath),
+            functionName = "readKeyValueFile",
+            parameter = filePath,
+            diagnosticId = "io.input_file_missing"
         )
     }
 
@@ -422,15 +430,17 @@ readKeyValueFile <- function(filePath,
         }
 
         if (isTRUE(safeKeyCheck) && !grepl("^[A-Za-z0-9_.-]+$", key)) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "invalid key name in file: ", sQuote(key), ". Allowed: A-Za-z0-9_.-"
+            stopRuntimeIssue("invalid key name in file: ", sQuote(key), ". Allowed: A-Za-z0-9_.-",
+                functionName = "readKeyValueFile",
+                parameter = key
             )
         }
 
         if (key %in% seenKeys) {
             if (duplicateKeys == "error") {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "duplicate key in file: ", sQuote(key)
+                stopRuntimeIssue("duplicate key in file: ", sQuote(key),
+                    functionName = "readKeyValueFile",
+                    parameter = key
                 )
             }
             if (duplicateKeys == "first") {

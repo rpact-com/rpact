@@ -211,7 +211,7 @@ test_that("Testing generic functions: no errors occur", {
     expect_type(as.matrix(powerAndASN), "double")
     expect_type(as.matrix(designSet), "character")
     expect_type(as.matrix(dataset), "double")
-    expect_type(as.matrix(stageResults), "character")
+    expect_type(as.matrix(stageResults), "double")
     expect_type(as.matrix(designPlan), "double")
     expect_type(as.matrix(simulationResults), "double")
     expect_type(as.matrix(piecewiseSurvivalTime), "double")

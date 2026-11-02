@@ -13,17 +13,17 @@ with suitable arguments to create a fixed design.
 \section{Fields}{
 
 \describe{
-\item{\code{kMax}}{The maximum number of stages \code{K}. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{kMax}}{The maximum number of stages \code{K}. Is a single numeric value representing a  whole number.}
 
-\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a single numeric value between 0 and 1.}
 
 \item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
+\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a single numeric value.}
 
-\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a numeric vector of length 1 containing a whole number.}
+\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a single numeric value representing a  whole number.}
 
-\item{\code{twoSidedPower}}{Specifies if power is defined two-sided at each stage of the trial. Is a logical vector of length 1.}
+\item{\code{twoSidedPower}}{Specifies if power is defined two-sided at each stage of the trial. Is a single logical value.}
 }}
 
 \seealso{

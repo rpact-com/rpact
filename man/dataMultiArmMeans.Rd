@@ -12,6 +12,7 @@ dataMultiArmMeans
 }
 \description{
 A dataset containing the sample sizes, means, and standard deviations of four groups.
-Use \code{getDataset(dataMultiArmMeans)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+Use \code{getDataset(dataMultiArmMeans)} to create a dataset object that can
+be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 }
 \keyword{internal}

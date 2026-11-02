@@ -18,12 +18,34 @@
 #' @include f_logger.R
 NULL
 
+# single quote
+.sQuote <- function(x) {
+    return(paste0("'", x, "'"))
+}
+
+# parameter quote
+.pQuote <- function(x) {
+    return(paste0("'", x, "'"))
+}
+
+# value quote
+.vQuote <- function(x) {
+    return(paste0("'", x, "'"))
+}
+
+# double quote
+.dQuote <- function(x) {
+    return(paste0('"', x, '"'))
+}
+
 .getLogicalEnvironmentVariable <- function(variableName) {
     result <- as.logical(Sys.getenv(variableName))
     return(ifelse(is.na(result), FALSE, result))
 }
 
-.getParsedEnvironmentVariable <- function(value, type = c("unknown", "character", "integer", "numeric", "logical")) {
+.getParsedEnvironmentVariable <- function(
+        value,
+        type = c("unknown", "character", "integer", "numeric", "logical")) {
     type <- match.arg(type)
     if (identical(type, "character")) {
         return(as.character(value))
@@ -44,7 +66,11 @@ NULL
     return(toupper(gsub("\\.", "_", optionKey)))
 }
 
-.getEnvironmentVariable <- function(envKey, optionKey = NULL, ..., type = c("unknown", "character", "integer", "numeric", "logical")) {
+.getEnvironmentVariable <- function(
+        envKey,
+        optionKey = NULL,
+        ...,
+        type = c("unknown", "character", "integer", "numeric", "logical")) {
     type <- match.arg(type)
 
     value <- Sys.getenv(envKey)
@@ -102,7 +128,7 @@ NULL
     return(s)
 }
 
-.formatCamelCaseSingleWord <- function(x, title = FALSE) {
+.formatCamelCaseSingleWord <- function(x, title = FALSE, ..., sep = " ") {
     if (length(x) == 0 || nchar(trimws(x)) == 0) {
         return(x)
     }
@@ -117,11 +143,12 @@ NULL
             y <- .firstCharacterToUpperCase(y)
         }
         value <- ifelse(title, .firstCharacterToUpperCase(parts[i]), parts[i])
-        result <- paste0(result, value, " ", y)
+        result <- paste0(result, value, sep, y)
     }
     if (length(parts) > length(indices)) {
         result <- paste0(result, parts[length(parts)])
     }
+    result <- gsub(paste0(sep, "$"), "", result)
     return(trimws(result))
 }
 
@@ -243,11 +270,12 @@ NULL
                 }
             },
             error = function(e) {
-                stop(
-                    C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                    "the object '", paramName, "' has not been defined anywhere. ",
-                    "Please define it first, e.g., run '", paramName, " <- 1'",
-                    call. = FALSE
+                stopMissingArgument("the object ", .pQuote(paramName),
+                    " has not been defined anywhere. ",
+                    "Please define it first, e.g., run '",
+                    paramName, " <- 1'",
+                    functionName = ".isDefinedArgument",
+                    parameter = paramName
                 )
             }
         )
@@ -272,7 +300,8 @@ NULL
         warning = function(e) {
             paramName <- deparse(substitute(arg))
             .logWarn(
-                "Failed to execute '.isDefinedArgument(%s)' ('%s' is an instance of class '%s'): %s",
+                "Failed to execute '.isDefinedArgument(%s)' ",
+                "('%s' is an instance of class '%s'): %s",
                 paramName, paramName, .getClassName(arg), e
             )
         }
@@ -375,19 +404,24 @@ getTestLabel <- function(x) {
     return(.arrayToString(x, mode = "vector", digits = 4, maxLength = 10L, maxCharacters = 40L))
 }
 
-.arrayToString <- function(x, ..., separator = ", ",
+.arrayToString <- function(
+        x,
+        ...,
+        separator = ", ",
         vectorLookAndFeelEnabled = FALSE,
         encapsulate = FALSE,
+        compactEnabled = FALSE,
         digits = 3,
         maxLength = 80L,
         maxCharacters = 160L,
         mode = c("csv", "vector", "and", "or")) {
     .assertIsSingleInteger(digits, "digits", naAllowed = TRUE, validateType = FALSE)
-    .assertIsInClosedInterval(digits, "digits", lower = 0, upper = NULL)
+    .assertIsInClosedInterval(digits, "digits", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsSingleInteger(maxLength, "maxLength", naAllowed = FALSE, validateType = FALSE)
     .assertIsInClosedInterval(maxLength, "maxLength", lower = 1, upper = NULL)
     .assertIsSingleInteger(maxCharacters, "maxCharacters", naAllowed = FALSE, validateType = FALSE)
     .assertIsInClosedInterval(maxCharacters, "maxCharacters", lower = 3, upper = NULL)
+    .assertIsSingleLogical(compactEnabled, "compactEnabled")
 
     if (missing(x) || is.null(x) || length(x) == 0) {
         return("NULL")
@@ -420,15 +454,45 @@ getTestLabel <- function(x) {
         for (i in 1:nrow(x)) {
             row <- x[i, ]
             if (encapsulate) {
-                row <- paste0("'", row, "'")
+                row <- .sQuote(row)
             }
             result <- c(result, paste0("(", paste(row, collapse = separator), ")"))
         }
         return(.getConcatenatedValues(result, separator = separator, mode = mode))
     }
 
-    if (encapsulate) {
-        x <- paste0("'", x, "'")
+    if (compactEnabled) {
+        values <- as.character(x)
+        integerIndices <- !is.na(x) & grepl("^-?(0|[1-9][0-9]*)$", values)
+        integerValues <- rep(NA_real_, length(values))
+        integerValues[integerIndices] <- suppressWarnings(as.numeric(values[integerIndices]))
+        integerIndices[!is.finite(integerValues)] <- FALSE
+
+        result <- character()
+        index <- 1L
+        while (index <= length(values)) {
+            lastIndex <- index
+            if (integerIndices[index]) {
+                while (lastIndex < length(values) &&
+                    integerIndices[lastIndex + 1L] &&
+                    integerValues[lastIndex + 1L] == integerValues[lastIndex] + 1) {
+                    lastIndex <- lastIndex + 1L
+                }
+            }
+
+            if (lastIndex - index + 1L >= 5L) {
+                result <- c(result, values[index], values[index + 1L], "...", values[lastIndex])
+            } else {
+                currentValues <- values[index:lastIndex]
+                quoteIndices <- !integerIndices[index:lastIndex] & !is.na(x[index:lastIndex])
+                currentValues[quoteIndices] <- encodeString(currentValues[quoteIndices], quote = '"')
+                result <- c(result, currentValues)
+            }
+            index <- lastIndex + 1L
+        }
+        x <- result
+    } else if (encapsulate) {
+        x <- .sQuote(x)
     }
 
     if (length(x) > maxLength) {
@@ -504,15 +568,26 @@ getTestLabel <- function(x) {
 
 .getInputForZeroOutputInsideTolerance <- function(input, output, tolerance = .Machine$double.eps^0.25) {
     if (is.null(tolerance) || is.na(tolerance)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' must be a valid double", call. = FALSE)
+        stopIllegalArgument("'tolerance' must be a valid double",
+            functionName = ".getInputForZeroOutputInsideTolerance",
+            parameter = "tolerance",
+            value = tolerance
+        )
     }
 
     if (tolerance < 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' (", tolerance, ") must be >= 0", call. = FALSE)
+        stopIllegalArgument("'tolerance' (", tolerance, ") must be >= 0",
+            functionName = ".getInputForZeroOutputInsideTolerance",
+            parameter = "tolerance", value = tolerance
+        )
     }
 
     if (is.null(input)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'input' must be a valid double or NA", call. = FALSE)
+        stopIllegalArgument("'input' must be a valid double or NA",
+            functionName = ".getInputForZeroOutputInsideTolerance",
+            parameter = "input",
+            value = input
+        )
     }
 
     if (is.null(output) || is.na(output)) {
@@ -526,7 +601,11 @@ getTestLabel <- function(x) {
     return(NA_real_)
 }
 
-.getInputProducingZeroOutput <- function(input1, output1, input2, output2,
+.getInputProducingZeroOutput <- function(
+        input1,
+        output1,
+        input2,
+        output2,
         tolerance = .Machine$double.eps^0.25) {
     if ((is.na(output1) || is.null(output1)) &&
             (is.na(output2) || is.null(output2))) {
@@ -567,7 +646,8 @@ getTestLabel <- function(x) {
 #'
 #' @noRd
 #'
-.getOneDimensionalRoot <- function(fun,
+.getOneDimensionalRoot <- function(
+        fun,
         ...,
         lower,
         upper,
@@ -658,22 +738,22 @@ getTestLabel <- function(x) {
 
     if (!acceptResultsOutOfTolerance) {
         if (!suppressWarnings) {
-            warning(.getCallingFunctionInformation(callingFunctionInformation),
+            warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                 "NA returned because root search by 'uniroot' produced a function result (",
                 unirootResult$f.root, ") that differs from target 0 ",
                 "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
                 ", last function argument was ", unirootResult$root, ")",
-                call. = FALSE
+                diagnosticId = "numerical.root_search_failed"
             )
         }
         return(NA_real_)
     } else if (!suppressWarnings) {
-        warning(.getCallingFunctionInformation(callingFunctionInformation),
+        warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
             "Root search by 'uniroot' produced a function result (", unirootResult$f.root, ") ",
             "that differs from target 0 ",
             "(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
             ", last function argument was ", unirootResult$root, ")",
-            call. = FALSE
+            diagnosticId = "numerical.root_search_failed"
         )
     }
 
@@ -705,7 +785,11 @@ getTestLabel <- function(x) {
 #'
 #' @noRd
 #'
-.getOneDimensionalRootBisectionMethod <- function(fun, ..., lower, upper,
+.getOneDimensionalRootBisectionMethod <- function(
+        fun,
+        ...,
+        lower,
+        upper,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
         acceptResultsOutOfTolerance = FALSE,
         maxSearchIterations = 50,
@@ -739,10 +823,10 @@ getTestLabel <- function(x) {
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
             if (!suppressWarnings) {
-                warning(.getCallingFunctionInformation(callingFunctionInformation),
+                warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                     "Root search via 'bisection' stopped: maximum number of search iterations reached. ",
                     "Check if lower and upper search bounds were calculated correctly",
-                    call. = FALSE
+                    diagnosticId = "numerical.root_search_failed"
                 )
             }
             .plotMonotoneFunctionRootSearch(fun, lowerStart, upperStart)
@@ -757,20 +841,20 @@ getTestLabel <- function(x) {
 
         if (!acceptResultsOutOfTolerance) {
             if (!suppressWarnings) {
-                warning(.getCallingFunctionInformation(callingFunctionInformation),
+                warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                     "NA returned because root search via 'bisection' produced a function result (",
                     result, ") that differs from target 0 ",
                     "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                    call. = FALSE
+                    diagnosticId = "numerical.root_search_failed"
                 )
             }
             return(NA_real_)
         } else if (!suppressWarnings) {
-            warning(.getCallingFunctionInformation(callingFunctionInformation),
+            warnNumericalIssue(.getCallingFunctionInformation(callingFunctionInformation),
                 "Root search via 'bisection' produced a function result (", result, ") ",
                 "that differs from target 0 ",
                 "(tolerance is ", tolerance, ", last function argument was ", argument, ")",
-                call. = FALSE
+                diagnosticId = "numerical.root_search_failed"
             )
         }
     }
@@ -824,17 +908,15 @@ getTestLabel <- function(x) {
 
 .isFirstValueGreaterThanSecondValue <- function(firstValue, secondValue) {
     if (is.null(firstValue) || length(firstValue) != 1 || is.na(firstValue)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'firstValue' (", firstValue, ") must be a valid numeric value",
-            call. = FALSE
+        stopIllegalArgument("'firstValue' (", firstValue, ") must be a valid numeric value",
+            functionName = ".isFirstValueGreaterThanSecondValue",
+            parameter = "firstValue", value = firstValue
         )
     }
     if (is.null(secondValue) || length(secondValue) != 1 || is.na(secondValue)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'secondValue' (", secondValue, ") must be a valid numeric value",
-            call. = FALSE
+        stopIllegalArgument("'secondValue' (", secondValue, ") must be a valid numeric value",
+            functionName = ".isFirstValueGreaterThanSecondValue",
+            parameter = "secondValue", value = secondValue
         )
     }
     return(firstValue > secondValue)
@@ -842,17 +924,15 @@ getTestLabel <- function(x) {
 
 .isFirstValueSmallerThanSecondValue <- function(firstValue, secondValue) {
     if (is.null(firstValue) || length(firstValue) != 1 || is.na(firstValue)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'firstValue' (", firstValue, ") must be a valid numeric value",
-            call. = FALSE
+        stopIllegalArgument("'firstValue' (", firstValue, ") must be a valid numeric value",
+            functionName = ".isFirstValueSmallerThanSecondValue",
+            parameter = "firstValue", value = firstValue
         )
     }
     if (is.null(secondValue) || length(secondValue) != 1 || is.na(secondValue)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'secondValue' (", secondValue, ") must be a valid numeric value",
-            call. = FALSE
+        stopIllegalArgument("'secondValue' (", secondValue, ") must be a valid numeric value",
+            functionName = ".isFirstValueSmallerThanSecondValue",
+            parameter = "secondValue", value = secondValue
         )
     }
     return(firstValue < secondValue)
@@ -866,19 +946,29 @@ getTestLabel <- function(x) {
     parameterSet$.setParameterType(parameterName, parameterType)
 }
 
-.setValueAndParameterType <- function(parameterSet, parameterName, value, defaultValue,
+.setValueAndParameterType <- function(
+        parameterSet,
+        parameterName,
+        value,
+        defaultValue,
         notApplicableIfNA = FALSE) {
     .assertIsParameterSetClass(parameterSet, "parameterSet")
 
     if (is.null(parameterSet)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null", call. = FALSE)
+        stopIllegalArgument("'parameterSet' must be not null",
+            functionName = ".setValueAndParameterType",
+            parameter = "parameterSet",
+            value = parameterSet
+        )
     }
 
     if (!(parameterName %in% names(parameterSet))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'",
-            call. = FALSE
+        stopIllegalArgument(.getClassName(parameterSet, quote = TRUE),
+            " does not contain a field with name ", .pQuote(parameterName),
+            functionName = ".setValueAndParameterType",
+            parameter = "parameterName", value = parameterName,
+            relatedParameter = "parameterSet",
+            relatedValue = names(parameterSet)
         )
     }
 
@@ -925,7 +1015,7 @@ getTestLabel <- function(x) {
 }
 
 .getNextHigherValue <- function(x) {
-    .assertIsNumericVector(x, "x")
+    x <- .assertIsNumericVector(x, "x")
     values <- c()
     for (value in x) {
         value <- round(value, 15)
@@ -942,7 +1032,7 @@ getTestLabel <- function(x) {
     if (is.null(theta) || length(theta) == 0 || all(is.na(theta))) {
         theta <- seq(-1, 1, 0.02)
     }
-    theta <- .assertIsValidThetaRange(thetaRange = theta)
+    theta <- .assertIsValidThetaRange(theta = theta)
     return(theta)
 }
 
@@ -954,11 +1044,14 @@ getTestLabel <- function(x) {
     minValue <- variedParameter[1]
     maxValue <- variedParameter[2]
     if (minValue == maxValue) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", variedParameterName, "' with length 2 must contain minimum != maximum (",
-            minValue, " == ", maxValue, ")",
-            call. = FALSE
+        stopIllegalArgument(.pQuote(variedParameterName),
+            " with length 2 must contain minimum != maximum (", minValue,
+            " == ", maxValue, ")",
+            functionName = ".getVariedParameterVector",
+            parameter = "variedParameterName",
+            value = variedParameterName,
+            relatedParameter = "minValue",
+            relatedValue = minValue
         )
     }
     by <- .getVariedParameterVectorByValue(variedParameter)
@@ -1003,7 +1096,8 @@ getTestLabel <- function(x) {
 #' @description
 #' How to cite \code{rpact} and \code{R} in publications.
 #'
-#' @param inclusiveR If \code{TRUE} (default) the information on how to cite the base R system in publications will be added.
+#' @param inclusiveR If \code{TRUE} (default) the information on
+#'        how to cite the base R system in publications will be added.
 #' @param language Language code to use for the output, default is "en".
 #' @param markdown If \code{TRUE}, the output will be created in Markdown.
 #'
@@ -1070,8 +1164,8 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
     return(as.character(x))
 }
 
-.getFunctionAsString <- function(fun, stringWrapPrefix = " ") {
-    .assertIsFunction(fun)
+.getFunctionAsString <- function(fun, stringWrapPrefix = " ", funArgName = "fun") {
+    .assertIsFunction(fun, funArgName = funArgName)
 
     s <- utils::capture.output(print(fun))
     s <- s[!grepl("bytecode", s)]
@@ -1083,8 +1177,8 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
     return(s)
 }
 
-.getFunctionArgumentNames <- function(fun, ignoreThreeDots = FALSE) {
-    .assertIsFunction(fun)
+.getFunctionArgumentNames <- function(fun, ignoreThreeDots = FALSE, funArgName = "fun") {
+    .assertIsFunction(fun, funArgName = funArgName)
     args <- methods::formalArgs(fun)
     if (ignoreThreeDots) {
         args <- args[args != "..."]
@@ -1123,12 +1217,15 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
 #' @param var The variable/parameter name.
 #'
 #' @details
-#' This function identifies and returns the caption that will be used in print outputs of an rpact result object.
+#' This function identifies and returns the caption that
+#' will be used in print outputs of an rpact result object.
 #'
 #' @seealso
-#' \code{\link[=getParameterName]{getParameterName()}} for getting the parameter name for a given caption.
+#' \code{\link[=getParameterName]{getParameterName()}} for
+#' getting the parameter name for a given caption.
 #'
-#' @return Returns a \code{\link[base]{character}} of specifying the corresponding caption of a given parameter name.
+#' @return Returns a \code{\link[base]{character}} of specifying
+#' the corresponding caption of a given parameter name.
 #' Returns \code{NULL} if the specified \code{parameterName} does not exist.
 #'
 #' @examples
@@ -1143,10 +1240,9 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
 getParameterCaption <- function(obj, var) {
     fCall <- match.call(expand.dots = FALSE)
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
-            "(", .getClassName(obj), ") must be an rpact result object",
-            call. = FALSE
+        stopIllegalArgument("'obj' ", "(", .getClassName(obj), ") must be an rpact result object",
+            functionName = "getParameterCaption",
+            parameter = "obj", value = obj
         )
     }
     parameterName <- .getParameterSetVar(fCall, var)
@@ -1165,7 +1261,8 @@ getParameterCaption <- function(obj, var) {
 #' @param var The variable/parameter name.
 #'
 #' @details
-#' This function identifies and returns the type that will be used in print outputs of an rpact result object.
+#' This function identifies and returns the type that will
+#' be used in print outputs of an rpact result object.
 #'
 #' @seealso
 #' \code{\link[=getParameterName]{getParameterName()}} for getting the parameter name for a given caption.
@@ -1187,10 +1284,9 @@ getParameterType <- function(obj, var) {
     fCall <- match.call(expand.dots = FALSE)
     parameterName <- .getParameterSetVar(fCall, var)
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
-            "(", .getClassName(obj), ") must be an rpact result object",
-            call. = FALSE
+        stopIllegalArgument("'obj' ", "(", .getClassName(obj), ") must be an rpact result object",
+            functionName = "getParameterType",
+            parameter = "obj", value = obj
         )
     }
 
@@ -1230,10 +1326,9 @@ getParameterType <- function(obj, var) {
 #'
 getParameterName <- function(obj, parameterCaption) {
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
-            "(", .getClassName(obj), ") must be an rpact result object",
-            call. = FALSE
+        stopIllegalArgument("'obj' ", "(", .getClassName(obj), ") must be an rpact result object",
+            functionName = "getParameterName",
+            parameter = "obj", value = obj
         )
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
@@ -1275,12 +1370,17 @@ getParameterName <- function(obj, parameterCaption) {
 
 .removeLastEntryFromArray <- function(x) {
     if (!is.array(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'x' (", .getClassName(x), ") must be an array", call. = FALSE)
+        stopIllegalArgument("'x' (", .getClassName(x), ") must be an array",
+            functionName = ".removeLastEntryFromArray",
+            parameter = "x", value = x
+        )
     }
 
     dataDim <- dim(x)
     if (length(dataDim) != 3) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "function .removeLastEntryFromArray() only works for 3-dimensional arrays")
+        stopRuntimeIssue("function .removeLastEntryFromArray() only works for 3-dimensional arrays",
+            functionName = ".removeLastEntryFromArray"
+        )
     }
     if (dataDim[3] < 2) {
         return(NA_real_)
@@ -1291,31 +1391,76 @@ getParameterName <- function(obj, parameterCaption) {
     return(array(data = subData, dim = dataDim))
 }
 
+.moveColumnToFirstPosition <- function(data, columnName) {
+    if (!is.data.frame(data)) {
+        stopIllegalArgument(sQuote("data"), " (", .getClassName(data), ") must be a data.frame",
+            parameter = "data",
+            value = .getClassName(data), 
+            constraint = "data.frame",
+            functionName = ".moveColumnToFirstPosition"
+        )
+    }
+    .assertIsSingleCharacter(columnName, "columnName", naAllowed = FALSE)
+    
+    if (!(columnName %in% colnames(data))) {
+        return(data)
+    }
+
+    colNames <- colnames(data)
+    if (which(colnames(data) == columnName) == 1) {
+        return(data)
+    }
+
+    data <- data[, c(columnName, colNames[colNames != columnName])]
+    return(data)
+}
+
 .moveColumn <- function(data, columnName, insertPositionColumnName) {
     if (!is.data.frame(data)) {
-        stop("Illegal argument: 'data' (", .getClassName(data), ") must be a data.frame", call. = FALSE)
+        stopIllegalArgument(sQuote("data"), " (", .getClassName(data), ") must be a data.frame",
+            parameter = "data",
+            value = .getClassName(data), constraint = "data.frame",
+            functionName = ".moveColumn"
+        )
     }
     if (is.null(insertPositionColumnName) || length(insertPositionColumnName) != 1 ||
             is.na(insertPositionColumnName) || !is.character(insertPositionColumnName)) {
-        stop(
-            "Illegal argument: 'insertPositionColumnName' (", .getClassName(insertPositionColumnName),
+        stopIllegalArgument(sQuote("insertPositionColumnName"), " (", .getClassName(insertPositionColumnName),
             ") must be a valid character value",
-            call. = FALSE
+            parameter = "insertPositionColumnName", value = insertPositionColumnName,
+            constraint = "valid character value",
+            functionName = ".moveColumn"
         )
     }
     if (is.null(columnName) || length(columnName) != 1 || is.na(columnName) || !is.character(columnName)) {
-        stop("Illegal argument: 'columnName' (", .getClassName(columnName), ") must be a valid character value", call. = FALSE)
+        stopIllegalArgument(sQuote("columnName"), " (", .getClassName(columnName), ") ",
+            "must be a valid character value",
+            parameter = "columnName", value = columnName, constraint = "valid character value",
+            functionName = ".moveColumn"
+        )
     }
 
     colNames <- colnames(data)
     if (!(columnName %in% colNames)) {
-        stop("Illegal argument: 'columnName' (", columnName, ") does not exist in the specified data.frame 'data'", call. = FALSE)
+        stopIllegalArgument(sQuote("columnName"),
+            " (", columnName, ") does not exist in the specified data.frame 'data'",
+            parameter = "columnName",
+            value = columnName,
+            constraint = "existing column in data",
+            relatedParameter = "data",
+            relatedValue = colNames,
+            functionName = ".moveColumn"
+        )
     }
     if (!(insertPositionColumnName %in% colNames)) {
-        stop(
-            "Illegal argument: 'insertPositionColumnName' (", insertPositionColumnName,
-            ") does not exist in the specified data.frame 'data'",
-            call. = FALSE
+        stopIllegalArgument(sQuote("insertPositionColumnName"),
+            " (", insertPositionColumnName, ") does not exist in the specified data.frame 'data'",
+            parameter = "insertPositionColumnName",
+            value = insertPositionColumnName,
+            constraint = "existing column in data",
+            relatedParameter = "data",
+            relatedValue = colNames,
+            functionName = ".moveColumn"
         )
     }
     if (columnName == insertPositionColumnName) {
@@ -1328,7 +1473,10 @@ getParameterName <- function(obj, parameterCaption) {
         if (insertPositioIndex == length(colNames)) {
             data <- data[, c(colNames[1:insertPositioIndex], columnName)]
         } else {
-            data <- data[, c(colNames[1:insertPositioIndex], columnName, colNames[(insertPositioIndex + 1):length(colNames)])]
+            data <- data[, c(
+                colNames[1:insertPositioIndex], columnName,
+                colNames[(insertPositioIndex + 1):length(colNames)]
+            )]
         }
     }
     return(data)
@@ -1362,8 +1510,12 @@ getParameterName <- function(obj, parameterCaption) {
 #'
 #' @noRd
 #'
-.isConditionTrue <- function(x, condType = c("and", "or"), xName = NA_character_,
-        level = 0, showDebugMessages = FALSE) {
+.isConditionTrue <- function(
+        x,
+        condType = c("and", "or"),
+        xName = NA_character_,
+        level = 0,
+        showDebugMessages = FALSE) {
     if (is.logical(x)) {
         if (showDebugMessages) {
             message(rep("\t", level), x, "")
@@ -1376,16 +1528,20 @@ getParameterName <- function(obj, parameterCaption) {
     if (is.list(x)) {
         listNames <- names(x)
         if (is.null(listNames) || anyNA(listNames) || any(trimws(listNames) == "")) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "list (", .arrayToString(unlist(x)), ") must be named")
+            stopRuntimeIssue("list (", .arrayToString(unlist(x)), ") must be named",
+                functionName = ".isConditionTrue"
+            )
         }
 
         results <- logical(0)
         for (listName in listNames) {
             type <- gsub("\\d*", "", listName)
             if (!(type %in% c("and", "or"))) {
-                stop(
-                    C_EXCEPTION_TYPE_RUNTIME_ISSUE, "all list names (", type, " / ", listName,
-                    ") must have the format 'and[number]' or 'or[number]', where [number] is an integer"
+                stopRuntimeIssue("all list names (", type, " / ", listName, ") ",
+                    "must have the format 'and[number]' or 'or[number]', where [number] is an integer",
+                    functionName = ".isConditionTrue",
+                    parameter = "and[number]",
+                    relatedParameter = "or[number]"
                 )
             }
 
@@ -1413,20 +1569,35 @@ getParameterName <- function(obj, parameterCaption) {
         return(result)
     }
 
-    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "x must be of type logical or list (is ", .getClassName(x))
+    stopRuntimeIssue("x must be of type logical or list (is ", .getClassName(x),
+        functionName = ".isConditionTrue",
+        parameter = "x", value = x
+    )
 }
 
-.getClassName <- function(x) {
-    return(as.character(class(x))[1])
+.getClassName <- function(x, quote = FALSE) {
+    s <- as.character(class(x))[1]
+    if (quote) {
+        s <- .sQuote(s)
+    }
+    return(s)
 }
 
 .isPackageInstalled <- function(packageName) {
     return(nzchar(try(system.file(package = packageName), silent = TRUE)))
 }
 
-.getQNorm <- function(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE, epsilon = C_QNORM_EPSILON) {
+.getQNorm <- function(
+        p,
+        mean = 0,
+        sd = 1,
+        lower.tail = TRUE,
+        log.p = FALSE,
+        epsilon = C_QNORM_EPSILON) {
     if (any(p < -1e-07 | p > 1 + 1e-07, na.rm = TRUE)) {
-        warning("Tried to get qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)")
+        warnNumericalIssue("Tried to get qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)",
+            diagnosticId = "numerical.infinite_normal_quantile"
+        )
     }
 
     p[p <= 0] <- epsilon
@@ -1440,13 +1611,22 @@ getParameterName <- function(obj, parameterCaption) {
     return(result)
 }
 
-.getOneMinusQNorm <- function(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE, ..., epsilon = C_QNORM_EPSILON) {
+.getOneMinusQNorm <- function(
+        p,
+        mean = 0,
+        sd = 1,
+        lower.tail = TRUE,
+        log.p = FALSE,
+        ...,
+        epsilon = C_QNORM_EPSILON) {
     if (all(is.na(p))) {
         return(p)
     }
 
     if (any(p < -1e-07 | p > 1 + 1e-07, na.rm = TRUE)) {
-        warning("Tried to get 1 - qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)")
+        warnNumericalIssue("Tried to get 1 - qnorm() from ", .arrayToString(p), " which is out of interval (0, 1)",
+            diagnosticId = "numerical.infinite_normal_quantile"
+        )
     }
 
     p[p <= 0] <- epsilon
@@ -1483,32 +1663,35 @@ getParameterName <- function(obj, parameterCaption) {
 
 .moveValue <- function(values, value, insertPositionValue) {
     if (is.null(insertPositionValue) || length(insertPositionValue) != 1 || is.na(insertPositionValue)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'insertPositionValue' (", class(insertPositionValue), ") must be a valid single value",
-            call. = FALSE
+        stopIllegalArgument("'insertPositionValue' (", .getClassName(insertPositionValue), ") ",
+            "must be a valid single value",
+            functionName = ".moveValue",
+            parameter = "insertPositionValue",
+            value = insertPositionValue
         )
     }
     if (is.null(value) || length(value) != 1 || is.na(value)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'value' (", class(value), ") must be a valid single value",
-            call. = FALSE
+        stopIllegalArgument("'value' (", .getClassName(value), ") must be a valid single value",
+            functionName = ".moveValue",
+            parameter = "value",
+            value = value
         )
     }
     if (!(value %in% values)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'value' (", value, ") does not exist in the specified vector 'values'",
-            call. = FALSE
+        stopIllegalArgument("'value' (", value, ") does not exist in the specified vector 'values'",
+            functionName = ".moveValue",
+            parameter = "value",
+            value = value,
+            relatedParameter = "values"
         )
     }
     if (!(insertPositionValue %in% values)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'insertPositionValue' (", insertPositionValue,
-            ") does not exist in the specified vector 'values'",
-            call. = FALSE
+        stopIllegalArgument("'insertPositionValue' (", insertPositionValue, ") ",
+            "does not exist in the specified vector 'values'",
+            functionName = ".moveValue",
+            parameter = "insertPositionValue",
+            value = insertPositionValue,
+            relatedParameter = "values"
         )
     }
     if (value == insertPositionValue) {
@@ -1522,7 +1705,10 @@ getParameterName <- function(obj, parameterCaption) {
         if (insertPositioIndex == length(values)) {
             values <- c(values[1:insertPositioIndex], value)
         } else {
-            values <- c(values[1:insertPositioIndex], value, values[(insertPositioIndex + 1):length(values)])
+            values <- c(
+                values[1:insertPositioIndex], value,
+                values[(insertPositioIndex + 1):length(values)]
+            )
         }
     }
     return(values)
@@ -1541,7 +1727,7 @@ getParameterName <- function(obj, parameterCaption) {
     maxValue <- max(values)
     by <- (maxValue - minValue) / (length(values) - 1)
     valuesTemp <- seq(minValue, maxValue, by)
-    if (isTRUE(all.equal(values, valuesTemp, tolerance = 1e-10))) {
+    if (equals(values, valuesTemp, tolerance = 1e-10)) {
         return(paste0("seq(", minValue, ", ", maxValue, ", ", by, ")"))
     }
 
@@ -1563,11 +1749,11 @@ getParameterName <- function(obj, parameterCaption) {
     type <- match.arg(type)
     optionKey <- paste0("rpact.auto.markdown.", type)
     if (isFALSE(.getEnvironmentVariable(
-        .getEnvironmentVariableKey(optionKey),
-        optionKey,
-        default = TRUE,
-        type = "logical"
-    ))) {
+            .getEnvironmentVariableKey(optionKey),
+            optionKey,
+            default = TRUE,
+            type = "logical"
+        ))) {
         return(FALSE)
     }
 
@@ -1590,12 +1776,14 @@ getParameterName <- function(obj, parameterCaption) {
 #' options("rpact.multivar.dist.eps" = 1e-06)
 #'
 #' @noRd
-.getMultivariateDistribution <- function(...,
+.getMultivariateDistribution <- function(
+        ...,
         type = c("normal", "t", "quantile", "tQuantile"),
         upper,
         sigma,
         eps = NA_real_,
-        df = NA_real_, alpha = NA_real_) {
+        df = NA_real_,
+        alpha = NA_real_) {
     type <- match.arg(type)
 
     if (is.null(eps) || length(eps) != 1 || is.na(eps)) {
@@ -1673,11 +1861,37 @@ getParameterName <- function(obj, parameterCaption) {
     }
 }
 
-.addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues) {
+#'
+#' @title Add deprecated field values
+#'
+#' @description
+#' Internal helper that assigns values to a field of a parameter set and
+#' marks that field as deprecated. This is used to maintain backward
+#' compatibility when fields are removed or replaced.
+#'
+#' @param parameterSet The parameter set object (typically an object with
+#'        list-like access and management methods).
+#' @param fieldName Character scalar. Name of the field to mark deprecated.
+#' @param fieldValues Values to assign to the deprecated field.
+#'
+#' @return The modified `parameterSet` invisibly.
+#'
+#' @keywords internal
+#' @noRd
+#'
+.addDeprecatedFieldValues <- function(
+        parameterSet,
+        fieldName,
+        fieldValues,
+        deprecationDate = NULL) {
     if (!fieldName %in% names(parameterSet)) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "'", .getClassName(parameterSet), "' does not contain a field with name '", fieldName, "'"
+        stopRuntimeIssue("", .getClassName(parameterSet, quote = TRUE), " does not ",
+            "contain a field with name ", .pQuote(fieldName),
+            functionName = ".addDeprecatedFieldValues",
+            parameter = "fieldName",
+            value = fieldName,
+            relatedParameter = "parameterSet",
+            relatedValue = names(parameterSet)
         )
     }
 
@@ -1723,7 +1937,10 @@ getParameterName <- function(obj, parameterCaption) {
                 }
             },
             error = function(e) {
-                message("Failed to reset pipe operator queue attribute ", sQuote(attrName), ": ", e$message)
+                message(
+                    "Failed to reset pipe operator queue attribute ",
+                    sQuote(attrName), ": ", e$message
+                )
             }
         )
     }
@@ -1739,7 +1956,7 @@ getParameterName <- function(obj, parameterCaption) {
     ))
 }
 
-.getCriticalValues <- function(design, indices = NULL) {   
+.getCriticalValues <- function(design, indices = NULL) {
     criticalValues <- abs(design$criticalValues)
     if (!is.null(indices)) {
         return(criticalValues[indices])
@@ -1748,15 +1965,16 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 .getFutilityBounds <- function(
-        design, 
-        indices = NULL, 
-        ..., 
+        design,
+        indices = NULL,
+        ...,
         phase = c("unknown", "design", "planning", "analysis"),
         adjustLengthToKMax = FALSE) {
-        
     phase <- match.arg(phase)
     futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
-        design$directionUpper, type = "negateIfLower", phase = phase)
+        design$directionUpper,
+        type = "negateIfLower", phase = phase
+    )
     if (adjustLengthToKMax) {
         futilityBounds <- c(futilityBounds, C_FUTILITY_BOUNDS_DEFAULT)
     }
@@ -1798,9 +2016,11 @@ getParameterName <- function(obj, parameterCaption) {
 
     futilityBoundsFormatted <- futilityBounds
     if (!is.null(design) && isFALSE(design$directionUpper)) {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- Inf
+        futilityBoundsFormatted[!is.na(futilityBounds) &
+            futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- Inf
     } else {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- -Inf
+        futilityBoundsFormatted[!is.na(futilityBounds) &
+            futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- -Inf
     }
     return(futilityBoundsFormatted)
 }
@@ -1812,9 +2032,11 @@ getParameterName <- function(obj, parameterCaption) {
 
     futilityBoundsFormatted <- futilityBounds
     if (isFALSE(design$directionUpper)) {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- C_FUTILITY_BOUNDS_MAX_VALUE
+        futilityBoundsFormatted[!is.na(futilityBounds) &
+            futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- C_FUTILITY_BOUNDS_MAX_VALUE
     } else {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- C_FUTILITY_BOUNDS_MIN_VALUE
+        futilityBoundsFormatted[!is.na(futilityBounds) &
+            futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- C_FUTILITY_BOUNDS_MIN_VALUE
     }
     return(futilityBoundsFormatted)
 }
@@ -1845,10 +2067,13 @@ getParameterName <- function(obj, parameterCaption) {
     }
 
     if (length(directionUpper) > 1 && length(value) != length(directionUpper)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'value' (", .arrayToString(value), ") and ",
+        stopIllegalArgument("'value' (", .arrayToString(value), ") and ",
             "'directionUpper' (", .arrayToString(directionUpper), ") must have the same length",
-            call. = FALSE
+            functionName = ".applyDirectionOfAlternative",
+            parameter = "value",
+            value = value,
+            relatedParameter = "directionUpper",
+            relatedValue = directionUpper
         )
     }
 
@@ -1866,7 +2091,9 @@ getParameterName <- function(obj, parameterCaption) {
             values,
             .applyDirectionOfAlternativeSingle(
                 value = value[i],
-                directionUpper = ifelse(length(directionUpper) == 1, directionUpper, directionUpper[i]),
+                directionUpper = ifelse(length(directionUpper) == 1,
+                    directionUpper, directionUpper[i]
+                ),
                 type = type
             )
         )
@@ -1874,7 +2101,8 @@ getParameterName <- function(obj, parameterCaption) {
     return(values)
 }
 
-.applyDirectionOfAlternativeSingle <- function(...,
+.applyDirectionOfAlternativeSingle <- function(
+        ...,
         value,
         directionUpper,
         type = c(
@@ -1973,11 +2201,19 @@ getParameterName <- function(obj, parameterCaption) {
 saveOptions <- function() {
     tryCatch(
         {
-            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
-                return(invisible(FALSE))
-            }
+            pkgConfigDir <- .getEnvironmentVariable(
+                "RPACT_CONFIG_DIR_SAVE",
+                "rpact.config.dir.save",
+                default = "#?#",
+                type = "character"
+            )
+            if (!dir.exists(pkgConfigDir)) {
+                if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                    return(invisible(FALSE))
+                }
 
-            pkgConfigDir <- rappdirs::user_config_dir("rpact")
+                pkgConfigDir <- rappdirs::user_config_dir("rpact")
+            }
             if (!dir.exists(pkgConfigDir)) {
                 dir.create(pkgConfigDir, recursive = TRUE, showWarnings = FALSE)
             }
@@ -1990,7 +2226,8 @@ saveOptions <- function() {
             optionFileContent <- character()
             for (optionName in optionNames) {
                 optionValue <- getOption(optionName)
-                if (!is.null(optionValue)) {
+                if (!is.null(optionValue) && length(optionValue) == 1 &&
+                        (is.character(optionValue) || is.numeric(optionValue) || is.logical(optionValue))) {
                     optionFileContent <- c(optionFileContent, paste0(optionName, ": ", optionValue))
                 }
             }
@@ -1999,7 +2236,9 @@ saveOptions <- function() {
             return(invisible(file.exists(optionsFile)))
         },
         error = function(e) {
-            warning("Failed to save rpact options: ", e$message, call. = FALSE)
+            warnRuntimeIssue("Failed to save rpact options: ", e$message,
+                diagnosticId = "io.options_write_failed"
+            )
             return(invisible(FALSE))
         }
     )
@@ -2051,7 +2290,9 @@ resetOptions <- function(persist = TRUE) {
             return(invisible(TRUE))
         },
         error = function(e) {
-            warning("Failed to reset rpact options: ", e$message, call. = FALSE)
+            warnRuntimeIssue("Failed to reset rpact options: ", e$message,
+                diagnosticId = "io.options_write_failed"
+            )
             return(invisible(FALSE))
         }
     )
@@ -2060,15 +2301,25 @@ resetOptions <- function(persist = TRUE) {
 .loadOptions <- function() {
     tryCatch(
         {
-            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
-                packageStartupMessage(
-                    "Package \"rappdirs\" is needed for saving and loading rpact options. ",
-                    "Please install using, e.g., install.packages(\"rappdirs\")"
-                )
-                return(invisible(FALSE))
+            pkgConfigDir <- .getEnvironmentVariable(
+                "RPACT_CONFIG_DIR_LOAD",
+                "rpact.config.dir.load",
+                default = "#?#",
+                type = "character"
+            )
+
+            if (!dir.exists(pkgConfigDir)) {
+                if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                    packageStartupMessage(
+                        "Package \"rappdirs\" is needed for saving and loading rpact options. ",
+                        "Please install using, e.g., install.packages(\"rappdirs\")"
+                    )
+                    return(invisible(FALSE))
+                }
+
+                pkgConfigDir <- rappdirs::user_config_dir("rpact")
             }
 
-            pkgConfigDir <- rappdirs::user_config_dir("rpact")
             if (!dir.exists(pkgConfigDir)) {
                 return(invisible(FALSE))
             }
@@ -2110,4 +2361,227 @@ resetOptions <- function(persist = TRUE) {
             return(invisible(FALSE))
         }
     )
+}
+
+equals <- function(x, y, ..., tolerance = 1e-12) {
+    comparisonEnvironment <- parent.frame()
+
+    compare <- function(x, y) {
+        attributesEqual <- function(x, y) {
+            xAttributes <- attributes(x)
+            yAttributes <- attributes(y)
+
+            if (
+                length(xAttributes) != length(yAttributes) ||
+                    !identical(names(xAttributes), names(yAttributes))
+                ) {
+                return(FALSE)
+            }
+
+            for (i in seq_along(xAttributes)) {
+                if (!compare(xAttributes[[i]], yAttributes[[i]])) {
+                    return(FALSE)
+                }
+            }
+
+            return(TRUE)
+        }
+
+        if (is.environment(x) || is.environment(y)) {
+            return(identical(x, y))
+        }
+
+        if (is.list(x) || is.list(y)) {
+            if (!is.list(x) || !is.list(y) || length(x) != length(y)) {
+                return(FALSE)
+            }
+
+            if (!attributesEqual(x, y)) {
+                return(FALSE)
+            }
+
+            for (i in seq_along(x)) {
+                if (!compare(x[[i]], y[[i]])) {
+                    return(FALSE)
+                }
+            }
+
+            return(TRUE)
+        }
+
+        if (
+            length(x) == 1 && length(y) == 1 &&
+                (is.logical(x) || is.numeric(x)) &&
+                (is.logical(y) || is.numeric(y)) &&
+                is.na(x) && is.na(y) && !is.nan(x) && !is.nan(y)
+            ) {
+            return(attributesEqual(x, y))
+        }
+
+        if (any(is.numeric(x)) && any(is.nan(x))) {
+            return(identical(x, y))
+        }
+
+        if (any(is.numeric(y)) && any(is.nan(y))) {
+            return(identical(x, y))
+        }
+
+        tryCatch(
+            isTRUE(eval(
+                quote(all.equal(x, y, tolerance = tolerance)),
+                envir = list(x = x, y = y, tolerance = tolerance),
+                enclos = comparisonEnvironment
+            )),
+            error = function(e) FALSE
+        )
+    }
+
+    return(compare(x, y))
+}
+
+.isPi1Default <- function(pi1, type = c("sampleSize", "power"), endpoint = c("rates", "survival")) {
+    if (all(is.na(pi1))) {
+        return(NA)
+    }
+    
+    type <- match.arg(type)
+    endpoint <- match.arg(endpoint)
+    pi1Default <- .getPi1Default(type = type, endpoint = endpoint)
+    return(identical(pi1, pi1Default))
+}
+
+.isPi2Default <- function(pi2, endpoint = c("rates", "survival")) {
+    if (all(is.na(pi2))) {
+        return(NA)
+    }
+    
+    endpoint <- match.arg(endpoint)
+    pi2Default <- .getPi2Default(endpoint = endpoint)
+    return(identical(pi2, pi2Default))
+}
+
+.getPi1Default <- function(type = c("sampleSize", "power"), endpoint = c("rates", "survival")) {
+    type <- match.arg(type)
+    endpoint <- match.arg(endpoint)
+    if (type == "sampleSize") {
+        if (endpoint == "rates") {
+            return(C_PI_1_SAMPLE_SIZE_RATES_DEFAULT)
+        }
+        if (endpoint == "survival") {
+            return(C_PI_1_SAMPLE_SIZE_SURVIVAL_DEFAULT)
+        }
+    }
+
+    if (endpoint == "rates") {
+        return(C_PI_1_POWER_RATES_DEFAULT)
+    }
+
+    return(C_PI_1_POWER_SURVIVAL_DEFAULT)
+}
+
+.getPi2Default <- function(endpoint = c("rates", "survival")) {
+    endpoint <- match.arg(endpoint)
+    if (endpoint == "rates") {
+        return(C_PI_2_RATES_DEFAULT)
+    }
+
+    return(C_PI_2_SURVIVAL_DEFAULT)
+}
+
+.setPi1 <- function(
+        parameterSet,
+        pi1,
+        ...,
+        parameterName = c("pi1", "piTreatment"),
+        type = c("sampleSize", "power"),
+        endpoint = c("rates", "survival"),
+        closedInterval = FALSE) {
+    parameterName <- match.arg(parameterName)
+    type <- match.arg(type)
+    endpoint <- match.arg(endpoint)
+    .assertIsSingleLogical(closedInterval, "closedInterval")
+    .assertIsNumericVector(pi1, parameterName, naAllowed = TRUE)
+    defaultValue <- NA_real_
+    if (all(is.na(pi1))) {
+        defaultValue <- .getPi1Default(type = type, endpoint = endpoint)
+        pi1 <- defaultValue
+    }
+    if (closedInterval) {
+        .assertIsInClosedInterval(pi1, parameterName, lower = 0, upper = 1)
+    } else {
+        .assertIsInOpenInterval(pi1, parameterName, lower = 0, upper = 1)
+    }
+    .setValueAndParameterType(parameterSet, parameterName, pi1, defaultValue)
+    return(invisible(pi1))
+}
+
+.setPi2 <- function(
+        parameterSet,
+        pi2,
+        ...,
+        parameterName = c("pi2", "piControl"),
+        endpoint = c("rates", "survival"),
+        applyToObject = TRUE,
+        closedInterval = FALSE) {
+    parameterName <- match.arg(parameterName)
+    endpoint <- match.arg(endpoint)
+    .assertIsSingleLogical(applyToObject, "applyToObject")
+    .assertIsSingleLogical(closedInterval, "closedInterval")
+    .assertIsSingleNumber(pi2, parameterName, naAllowed = TRUE)
+    defaultValue <- NA_real_
+    if (applyToObject && is.na(pi2)) {
+        defaultValue <- .getPi2Default(endpoint = endpoint)
+        pi2 <- defaultValue
+    }
+    if (closedInterval) {
+        .assertIsInClosedInterval(pi2, parameterName,
+            lower = 0, upper = 1, naAllowed = !applyToObject
+        )
+    } else {
+        .assertIsInOpenInterval(pi2, parameterName,
+            lower = 0, upper = 1, naAllowed = !applyToObject
+        )
+    }
+    if (applyToObject) {
+        .setValueAndParameterType(parameterSet, parameterName, pi2, defaultValue)
+    }
+    return(invisible(pi2))
+}
+
+.setDirectionUpper <- function(
+        parameterSet,
+        design,
+        directionUpper,
+        ...,
+        objectType = c("sampleSize", "power", "analysis"),
+        endpoint = c("means", "rates", "survival", "counts"),
+        userFunctionCallEnabled = TRUE) {
+                       
+    .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
+    endpoint <- match.arg(endpoint)
+    defaultValue <- ifelse(identical(endpoint, "survival"),
+        C_DIRECTION_UPPER_SURVIVAL_DEFAULT, C_DIRECTION_UPPER_DEFAULT
+    )
+    if (identical(objectType, "sampleSize")) {
+        defaultValue <- NA
+    }
+    forceUserDefinedDirectionUpper <- !is.na(directionUpper)
+    if (isTRUE(userFunctionCallEnabled)) {
+        directionUpper <- .assertIsValidDirectionUpper(
+            directionUpper,
+            design,
+            objectType = objectType,
+            userFunctionCallEnabled = userFunctionCallEnabled,
+            default = defaultValue
+        )
+    }
+    .setValueAndParameterType(parameterSet, "directionUpper", directionUpper, defaultValue)
+    if (userFunctionCallEnabled && forceUserDefinedDirectionUpper) {
+        parameterSet$.setParameterType("directionUpper", C_PARAM_USER_DEFINED)
+    }
+    else if (identical(objectType, "sampleSize")) {
+        parameterSet$.setParameterType("directionUpper", C_PARAM_DERIVED)
+    }
+    
+    return(invisible(directionUpper))
 }

@@ -38,7 +38,10 @@ getObjectRCode(
 )
 }
 \arguments{
-\item{obj}{The result object.}
+\item{obj}{The result object, including a \code{TrialComparison} or its summary.
+Comparison reconstruction isolates each object's preconditions. Argument
+overrides are unsupported for comparisons, and their code is not word-wrapped
+so object names and callback bodies remain intact.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}

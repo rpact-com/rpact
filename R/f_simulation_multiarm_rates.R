@@ -17,7 +17,8 @@
 #' @include f_simulation_multiarm.R
 NULL
 
-.getSimulationRatesMultiArmStageSubjects <- function(...,
+.getSimulationRatesMultiArmStageSubjects <- function(
+        ...,
         stage,
         directionUpper,
         conditionalPower,
@@ -25,6 +26,7 @@ NULL
         plannedSubjects,
         allocationRatioPlanned,
         selectedArms,
+        thetaH0,
         piTreatmentsH1,
         piControlH1,
         overallRates,
@@ -50,16 +52,20 @@ NULL
             } else {
                 piAssumedH1 <- piTreatmentsH1
             }
-            pim <- (allocationRatioPlanned[stage] * piAssumedH1 + piAssumedControlH1) / (1 + allocationRatioPlanned[stage])
+            fm <- .getFarringtonManningValues(
+                rate1 = piAssumedH1, rate2 = piAssumedControlH1, theta = thetaH0,
+                allocation = allocationRatioPlanned[stage], method = "diff"
+            )
 
             if (conditionalCriticalValue[stage] > 8) {
                 newSubjects <- maxNumberOfSubjectsPerStage[stage + 1]
             } else {
                 newSubjects <- (max(0, conditionalCriticalValue[stage] *
-                    sqrt(pim * (1 - pim) * (1 + allocationRatioPlanned[stage])) +
+                    sqrt(fm$ml1 * (1 - fm$ml1) +
+                        fm$ml2 * (1 - fm$ml2) * allocationRatioPlanned[stage]) +
                     .getQNorm(conditionalPower) * sqrt(piAssumedH1 * (1 - piAssumedH1) +
                         piAssumedControlH1 * (1 - piAssumedControlH1) * allocationRatioPlanned[stage])))^2 /
-                    (max(1e-07, (2 * directionUpper - 1) * (piAssumedH1 - piAssumedControlH1)))^2
+                    (max(1e-07, (2 * directionUpper - 1) * (piAssumedH1 - piAssumedControlH1 - thetaH0)))^2
                 newSubjects <- min(
                     max(minNumberOfSubjectsPerStage[stage + 1], newSubjects),
                     maxNumberOfSubjectsPerStage[stage + 1]
@@ -74,11 +80,28 @@ NULL
     return(newSubjects)
 }
 
-.getSimulatedStageRatesMultiArm <- function(design, directionUpper, piVector, piControl,
-        plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue,
-        threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage, conditionalPower, piTreatmentsH1, piControlH1,
-        calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
+.getSimulatedStageRatesMultiArm <- function(
+        design,
+        directionUpper,
+        piVector,
+        piControl,
+        plannedSubjects,
+        typeOfSelection,
+        effectMeasure,
+        adaptations,
+        epsilonValue,
+        rValue,
+        threshold,
+        allocationRatioPlanned,
+        minNumberOfSubjectsPerStage,
+        maxNumberOfSubjectsPerStage,
+        conditionalPower,
+        thetaH0,
+        piTreatmentsH1,
+        piControlH1,
+        calcSubjectsFunction,
+        calcSubjectsFunctionIsUserDefined,
+        selectArmsFunction) {
     kMax <- length(plannedSubjects)
     gMax <- length(piVector)
     simRates <- matrix(NA_real_, nrow = gMax + 1, ncol = kMax)
@@ -120,16 +143,19 @@ NULL
                 simRates[treatmentArm, k] <- stats::rbinom(1, subjectsPerStage[treatmentArm, k], piVector[treatmentArm]) /
                     subjectsPerStage[treatmentArm, k]
 
-                rm <- (subjectsPerStage[treatmentArm, k] * simRates[treatmentArm, k] +
-                    subjectsPerStage[gMax + 1, k] * simRates[gMax + 1, k]) /
-                    (subjectsPerStage[treatmentArm, k] + subjectsPerStage[gMax + 1, k])
-
-                if (simRates[treatmentArm, k] - simRates[gMax + 1, k] == 0) {
+                rateDifference <- simRates[treatmentArm, k] - simRates[gMax + 1, k] - thetaH0
+                if (rateDifference == 0) {
                     testStatistics[treatmentArm, k] <- 0
                 } else {
+                    fm <- .getFarringtonManningValues(
+                        rate1 = simRates[treatmentArm, k], rate2 = simRates[gMax + 1, k],
+                        theta = thetaH0,
+                        allocation = subjectsPerStage[treatmentArm, k] / subjectsPerStage[gMax + 1, k],
+                        method = "diff"
+                    )
                     testStatistics[treatmentArm, k] <- (2 * directionUpper - 1) *
-                        (simRates[treatmentArm, k] - simRates[gMax + 1, k]) /
-                        sqrt(rm * (1 - rm) * (1 / subjectsPerStage[treatmentArm, k] + 1 / subjectsPerStage[gMax + 1, k]))
+                        rateDifference / sqrt(fm$ml1 * (1 - fm$ml1) / subjectsPerStage[treatmentArm, k] +
+                            fm$ml2 * (1 - fm$ml2) / subjectsPerStage[gMax + 1, k])
                 }
 
                 separatePValues[treatmentArm, k] <- 1 - stats::pnorm(testStatistics[treatmentArm, k])
@@ -143,15 +169,27 @@ NULL
                 overallEffectSizes[treatmentArm, k] <- (2 * directionUpper - 1) *
                     (overallRates[treatmentArm, k] - overallRatesControl[k])
 
-                rmOverall <- (allocationRatioPlanned[k] * overallRates[treatmentArm, k] +
-                    overallRatesControl[k]) / (allocationRatioPlanned[k] + 1)
-
-                if (overallEffectSizes[treatmentArm, k] == 0) {
+                overallRateDifference <- overallRates[treatmentArm, k] - overallRatesControl[k] - thetaH0
+                if (overallRateDifference == 0) {
                     overallTestStatistics[treatmentArm, k] <- 0
-                } else {
+                } else if (thetaH0 == 0) {
+                    rmOverall <- (allocationRatioPlanned[k] * overallRates[treatmentArm, k] +
+                        overallRatesControl[k]) / (allocationRatioPlanned[k] + 1)
                     overallTestStatistics[treatmentArm, k] <- overallEffectSizes[treatmentArm, k] /
-                        sqrt(rmOverall * (1 - rmOverall) * sqrt(1 / sum(subjectsPerStage[treatmentArm, 1:k]) +
-                            1 / sum(subjectsPerStage[gMax + 1, 1:k])))
+                        sqrt(rmOverall * (1 - rmOverall) * (
+                            1 / sum(subjectsPerStage[treatmentArm, 1:k]) +
+                            1 / sum(subjectsPerStage[gMax + 1, 1:k])
+                            ))
+                } else {
+                    activeSubjects <- sum(subjectsPerStage[treatmentArm, 1:k])
+                    controlSubjects <- sum(subjectsPerStage[gMax + 1, 1:k])
+                    fmOverall <- .getFarringtonManningValues(
+                        rate1 = overallRates[treatmentArm, k], rate2 = overallRatesControl[k],
+                        theta = thetaH0, allocation = activeSubjects / controlSubjects, method = "diff"
+                    )
+                    overallTestStatistics[treatmentArm, k] <- (2 * directionUpper - 1) * overallRateDifference /
+                        sqrt(fmOverall$ml1 * (1 - fmOverall$ml1) / activeSubjects +
+                            fmOverall$ml2 * (1 - fmOverall$ml2) / controlSubjects)
                 }
             }
         }
@@ -196,6 +234,7 @@ NULL
                     plannedSubjects = plannedSubjects,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     piTreatmentsH1 = piTreatmentsH1,
                     piControlH1 = piControlH1,
                     overallRates = overallRates,
@@ -228,6 +267,7 @@ NULL
                     plannedSubjects = plannedSubjects,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedArms = selectedArms,
+                    thetaH0 = thetaH0,
                     piTreatmentsH1 = piTreatmentsH1,
                     piControlH1 = piControlH1,
                     overallRates = overallRates,
@@ -237,11 +277,12 @@ NULL
                 )
 
                 if (is.null(newSubjects) || length(newSubjects) != 1 || !is.numeric(newSubjects) || is.na(newSubjects)) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                    stopIllegalArgument(
                         "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
                         "the output must be a single numeric value",
-                        call. = FALSE
+                        functionName = ".getSimulatedStageRatesMultiArm",
+                        parameter = "calcSubjectsFunction", value = calcSubjectsFunction,
+                        diagnosticId = "simulation.subject_callback_result_invalid"
                     )
                 }
 
@@ -286,7 +327,7 @@ NULL
                     )
             }
 
-            thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
+            thetaStandardized <- (2 * directionUpper - 1) * (thetaStandardized - thetaH0)
 
             conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
                 thetaStandardized * sqrt((1 + allocationRatioPlanned[k]) / allocationRatioPlanned[k]) *
@@ -321,7 +362,8 @@ NULL
 #'        highest response for \code{"linear"} and \code{"sigmoidEmax"} model,
 #'        default is \code{seq(0, 1, 0.2)}.
 #' @param piControl If specified, the assumed probability in the control arm
-#'        for simulation and under which the sample size recalculation is performed.
+#'        for simulation and under which the sample size recalculation is performed, default is 
+#'        \code{0.2}.
 #' @param piTreatmentsH1 If specified, the assumed probability in the active treatment arm(s)
 #'        under which the sample size recalculation is performed.
 #' @param piControlH1 If specified, the assumed probability in the reference group
@@ -336,7 +378,7 @@ NULL
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfShapeRates
 #' @inheritParams param_typeOfSelection
-#' @inheritParams param_design_with_default
+#' @inheritParams param_design_multiarm
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_plannedSubjects
@@ -385,19 +427,23 @@ NULL
 #' \code{piControlH1}.
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
+#' @template details_type_of_selection
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'
 #' @template examples_get_simulation_multiarm_rates
+#' @inheritParams param_thetaH0
 #'
 #' @export
 #'
-getSimulationMultiArmRates <- function(design = NULL, ...,
+getSimulationMultiArmRates <- function(
+        design = NULL,
+        ...,
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        piMaxVector = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
-        piControl = 0.2, # C_PI_2_DEFAULT
+        piMaxVector = NA_real_,
+        piControl = NA_real_,
         gED50 = NA_real_,
         slope = 1,
         doseLevels = NA_real_,
@@ -415,15 +461,16 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
         conditionalPower = NA_real_,
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT,
         piTreatmentsH1 = NA_real_,
         piControlH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        maxNumberOfIterations = NA_integer_, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectArmsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMultiArmRates",
             ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -443,11 +490,6 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     .assertIsOneSidedDesign(design, designType = "multi-arm", engineType = "simulation")
 
     calcSubjectsFunctionIsUserDefined <- !is.null(calcSubjectsFunction)
-
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design,
-        objectType = "power", userFunctionCallEnabled = TRUE
-    )
 
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
@@ -473,6 +515,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage, # means + rates only
         maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage, # means + rates only
         conditionalPower            = conditionalPower,
+        thetaH0                     = thetaH0,
         piTreatmentsH1              = piTreatmentsH1, # rates only
         piControlH1                 = piControlH1, # rates only
         maxNumberOfIterations       = maxNumberOfIterations,
@@ -480,7 +523,9 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         calcSubjectsFunction        = calcSubjectsFunction, # means + rates only
         selectArmsFunction          = selectArmsFunction,
         showStatistics              = showStatistics,
-        endpoint                    = "rates"
+        endpoint                    = "rates",
+        simulationType              = "testStatisticBased",
+        simulationTypeIsUserDefined = FALSE
     )
 
     design <- simulationResults$.design
@@ -494,13 +539,16 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     effectMatrix <- t(simulationResults$effectMatrix)
     piMaxVector <- simulationResults$piMaxVector # rates only
     piControl <- simulationResults$piControl # rates only
+    thetaH0 <- simulationResults$thetaH0
     piTreatmentsH1 <- simulationResults$piTreatmentsH1 # rates only
     piControlH1 <- simulationResults$piControlH1 # rates only
     conditionalPower <- simulationResults$conditionalPower
     minNumberOfSubjectsPerStage <- simulationResults$minNumberOfSubjectsPerStage
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
+    maxNumberOfIterations <- simulationResults$maxNumberOfIterations
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
+    directionUpper <- simulationResults$directionUpper
 
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
@@ -539,6 +587,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     dataSubjectsActiveArm <- rep(NA_real_, len)
     dataNumberOfSubjects <- rep(NA_real_, len)
     dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
+    dataSelectedForNextStage <- rep(NA, len)
     dataRejectPerStage <- rep(NA, len)
     dataFutilityStop <- rep(NA_real_, len)
     dataSuccessStop <- rep(NA, len)
@@ -569,6 +618,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
                 minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage,
                 maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage,
                 conditionalPower = conditionalPower,
+                thetaH0 = thetaH0,
                 piTreatmentsH1 = piTreatmentsH1,
                 piControlH1 = piControlH1,
                 calcSubjectsFunction = calcSubjectsFunction,
@@ -634,6 +684,9 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
                     dataSubjectsActiveArm[index] <- round(stageResults$subjectsPerStage[g, k], 1)
                     dataNumberOfSubjects[index] <- round(sum(stageResults$subjectsPerStage[, k], na.rm = TRUE), 1)
                     dataNumberOfCumulatedSubjects[index] <- round(sum(stageResults$subjectsPerStage[, 1:k], na.rm = TRUE), 1)
+                    if (k < kMax) {
+                        dataSelectedForNextStage[index] <- closedTest$selectedArms[g, k + 1]
+                    }
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -691,11 +744,26 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         simulatedConditionalPower[2:kMax, ] <- as.matrix(simulatedConditionalPower[2:kMax, ] / iterations[2:kMax, ])
     }
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
-    simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms / iterations - 1
+    simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations - 1
+    .addDeprecatedFieldValues(
+        simulationResults, "numberOfActiveArms",
+        simulationResults$numberOfSelectedArms, "2026-07-13"
+    )
+    simulationResults$.setParameterType(
+        "numberOfSelectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
 
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
+    simulationResults$.setParameterType(
+        "selectedArms",
+        ifelse(gMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
     simulationResults$successPerStage <- simulatedSuccessStopping / maxNumberOfIterations
+    if (gMax == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
     simulationResults$futilityPerStage <- simulatedFutilityStopping / maxNumberOfIterations
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     if (kMax > 1) {
@@ -713,13 +781,16 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stopRuntimeIssue(
+            "internal error, simulation not possible due to numerical overflow",
+            functionName = "getSimulationMultiArmRates"
+        )
     }
 
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
-        armNumber = dataArmNumber,
+        activeArm = dataArmNumber,
         piMax = dataAlternative,
         effect = dataEffect,
         numberOfSubjects = dataNumberOfSubjects,
@@ -731,6 +802,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         pValue = dataPValuesSeparate,
         conditionalCriticalValue = round(dataConditionalCriticalValue, 6),
         conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6),
+        selectedForNextStage = dataSelectedForNextStage,
         rejectPerStage = dataRejectPerStage,
         successStop = dataSuccessStop,
         futilityPerStage = dataFutilityStop

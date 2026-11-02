@@ -32,8 +32,16 @@ using namespace Rcpp;
 // i.e., it determines whether an event or a dropout
 // was observed, calculates the time under risk, and the logrank statistic.
 //
-// @param accrualTime An double vector
+// @param accrualTime double vector of accrual times
+// @param survivalTime double vector of survival times
+// @param dropoutTime double vector of dropout times
+// @param treatmentGroup integer vector of treatment group (1 or 2)
+// @param time double time point of the analysis
+// @param directionUpper bool if true, the upper tail is considered
+// @param thetaH0 double the hazard ratio under the null hypothesis
+// @param returnRawData bool if true, the raw data are returned in a list
 //
+// [[Rcpp::export(name = ".logRankTestCpp")]]
 List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		NumericVector dropoutTime, IntegerVector treatmentGroup,
 		double time, bool directionUpper, double thetaH0, bool returnRawData) {
@@ -58,6 +66,8 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 			}
 			else if (treatmentGroup[i] == 2) {
 				subjectsT2++;
+			} else {
+				stop("treatmentGroup must be either 1 or 2");
 			}
 
 			if (treatmentGroup[i] > 0 && accrualTime[i] + survivalTime[i] < time &&
@@ -84,11 +94,10 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		}
 	}
 
-	int numberOfSubjets = subjectsT1 + subjectsT2;
+	int numberOfSubjectsIncluded = subjectsT1 + subjectsT2;
 
-	NumericVector timeUnderObservationSorted = clone(timeUnderObservation).sort();
-	IntegerVector sortedIndex = match(timeUnderObservationSorted, timeUnderObservation);
-	sortedIndex = sortedIndex - 1;
+	IntegerVector sortedIndex = order(timeUnderObservation) - 1;
+	NumericVector timeUnderObservationSorted = timeUnderObservation[sortedIndex];
 	LogicalVector eventSorted = event[sortedIndex];
 	IntegerVector treatmentGroupSorted = treatmentGroup[sortedIndex];
 	eventSorted = eventSorted[treatmentGroupSorted > 0];
@@ -104,12 +113,12 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		if (eventSorted[i]) {
 			if (treatmentGroupSorted[i] == 1) {
 				if (subjectsT1 + subjectsT2 > 0) {
-				  numerator += 1 - thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2);
+					numerator += 1 - thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2);
 				}
 				events1++;
 			} else if (treatmentGroupSorted[i] == 2) {
 				if (subjectsT1 + subjectsT2 > 0) {
-				  numerator -= thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2);
+					numerator -= thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2);
 				}
 				events2++;
 			}
@@ -127,22 +136,22 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 	}
 
 	double logRank;
-	
 	if (denominator > 0) {
 		logRank = numerator / sqrt(denominator);
 	} else {
-	 	logRank = 0;
+		logRank = 0.0;
 	}
-	
 	if (!R_IsNA(directionUpper) && !directionUpper) {
-	logRank = -logRank;
+		logRank = -logRank;
 	}
 
-	NumericVector out(4);
+	NumericVector out(6);
 	out[0] = logRank;
-	out[1] = numberOfSubjets;
+	out[1] = numberOfSubjectsIncluded;
 	out[2] = events1;
 	out[3] = events2;
+	out[4] = numerator;
+	out[5] = denominator;
 
 	if (returnRawData) {
 		return List::create(
@@ -151,11 +160,11 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 			_["event"] = event,
 			_["dropoutEvent"] = dropoutEvent
 		);
+	} else {
+		return List::create(
+			_["result"] = out
+		);
 	}
-
-	return List::create(
-		_["result"] = out
-	);
 }
 
 NumericVector getIndependentIncrements(int stage, NumericVector eventsOverStages, NumericVector logRankOverStages) {
@@ -193,7 +202,7 @@ NumericVector getTestStatistics(int stage, int designNumber, NumericVector infor
 	}
 
 	// Inverse normal design
-	if (designNumber == 2) {
+	if (designNumber == 2L) {
 
 		if (stage == 1) {
 			return NumericVector::create(logRankOverStages[0], 1 - getNormalDistribution((double) logRankOverStages[0]));
@@ -562,12 +571,18 @@ NumericMatrix getExtendedSurvivalDataSet(IntegerVector treatmentGroup,
 		if (treatmentGroup[i] == 1) {
 			survivalTime[i] = getRandomPiecewiseExponentialDistribution(cdfValues1, lambdaVec1, piecewiseSurvivalTime);
 			if (phi1 > 0) {
+				// Although the survival CDF boundaries are passed here, rep(phi1, ...)
+				// makes every interval hazard identical, so the inverse reduces exactly
+				// to an exponential dropout time with rate phi1 in every branch.
 				dropoutTime[i] = getRandomPiecewiseExponentialDistribution(
 					cdfValues1, rep(phi1, lambdaVec1.size()), piecewiseSurvivalTime);
 			}
 		} else {
 			survivalTime[i] = getRandomPiecewiseExponentialDistribution(cdfValues2, lambdaVec2, piecewiseSurvivalTime);
 			if (phi2 > 0) {
+				// Although the survival CDF boundaries are passed here, rep(phi2, ...)
+				// makes every interval hazard identical, so the inverse reduces exactly
+				// to an exponential dropout time with rate phi2 in every branch.
 				dropoutTime[i] = getRandomPiecewiseExponentialDistribution(
 					cdfValues2, rep(phi2, lambdaVec2.size()), piecewiseSurvivalTime);
 			}
@@ -983,5 +998,4 @@ List getSimulationSurvivalCpp(
 		_["data"] = data
 	);
 }
-
 

@@ -33,6 +33,21 @@ The repeated p-values are provided up to the specified stage.
 In multi-arm trials, the repeated p-values are defined separately for each
 treatment comparison within the closed testing procedure.
 }
+\section{Note}{
+
+Repeated p-values are calculated by identifying the smallest global
+significance level for which the observed test statistic would lead to
+rejection under the same design rule. Therefore, they require that the
+design can be re-created for arbitrary values of the global significance
+level. For user-defined designs with fixed userAlphaSpending values,
+this alpha-dependent design family is not uniquely defined.
+Consequently, repeated p-values are not available for such designs.
+Repeated p-values are also unavailable for sequential designs with
+\code{typeBetaSpending = "bsUser"}, regardless of whether futility is binding.
+These calculations return \code{NA} with a warning; other analysis results
+remain available.
+}
+
 \examples{
 \dontrun{
 design <- getDesignInverseNormal(kMax = 2)

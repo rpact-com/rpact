@@ -34,9 +34,13 @@ The following generics (R generic functions) are available for this result objec
 Creates a dataset object and returns it.
 }
 \details{
-The different dataset types \code{DatasetMeans}, of \code{DatasetRates}, or
+The different dataset types \code{DatasetGeneral}, \code{DatasetMeans}, \code{DatasetRates}, or
 \code{DatasetSurvival} can be created as follows:
 \itemize{
+\item An element of \code{\link{DatasetGeneral}} for general estimates is created by \cr
+\code{getDataset(est =, se =, df =)} where \code{est}, \code{se}, and optionally \code{df}
+are vectors with stage-wise estimates, standard errors, and degrees of freedom. If \code{df}
+is omitted, the degrees of freedom are set to \code{Inf}, corresponding to a normal approximation.
 \item An element of \code{\link{DatasetMeans}} for one sample is created by \cr
 \code{getDataset(sampleSizes =, means =, stDevs =)} where \cr
 \code{sampleSizes}, \code{means}, \code{stDevs} are vectors with stage-wise sample sizes,
@@ -87,8 +91,8 @@ was dropped at interim. Number of events and logrank statistics are entered for 
 comparison to control (see Examples).
 
 For enrichment designs, the comparison of two samples is provided for an unstratified
-(sub-population wise) or stratified data input.\cr
-For non-stratified (sub-population wise) data input the data sets are defined for the sub-populations
+(subpopulation wise) or stratified data input.\cr
+For non-stratified (subpopulation wise) data input the data sets are defined for the sub-populations
 S1, S2, ..., F, where F refers to the full populations. Use of \code{getDataset(S1 = , S2, ..., F = )}
 defines the data set to be used in \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 For stratified data input the data sets are defined for the strata S1, S12, S2, ..., R, where R
@@ -104,6 +108,25 @@ and the independent increments are calculated.
 }
 \examples{
 \dontrun{
+# Create a Dataset of General Estimates without specifying degrees
+# of freedom (internally, df is set to Inf for all stages):
+datasetOfGeneralEstimates <- getDataset(
+    est = c(0.10, 0.25, 0.38),
+    se  = c(0.20, 0.18, 0.15)
+)
+datasetOfGeneralEstimates
+datasetOfGeneralEstimates$degreesOfFreedom
+
+# It is also possible to specify the degrees of freedom for each stage.
+# Typically these come from a linear model analysis, e.g. with repeated measures
+# using the [`mmrm`](https://cran.r-project.org/package=mmrm) package.
+datasetOfLeastSquareMeans <- getDataset(
+    est = c(0.10, 0.25, 0.38),
+    se  = c(0.20, 0.18, 0.15),
+    df  = c(10.3, 12.5, 15.1)
+)
+datasetOfLeastSquareMeans
+
 # Create a Dataset of Means (one group):
 datasetOfMeans <- getDataset(
     n      = c(22, 11, 22, 11),

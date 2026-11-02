@@ -24,33 +24,33 @@ to create an object of this type.
 
 \item{\code{accrualTime}}{The assumed accrual time intervals for the study. Is a numeric vector.}
 
-\item{\code{allocation1}}{The number of subjects to be assigned to treatment 1 in subsequent order. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{allocation1}}{The number of subjects to be assigned to treatment 1 in subsequent order. Is a single numeric value representing a  whole number.}
 
-\item{\code{allocation2}}{The number of subjects to be assigned to treatment 2 in subsequent order. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{allocation2}}{The number of subjects to be assigned to treatment 2 in subsequent order. Is a single numeric value representing a  whole number.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.}
 
 \item{\code{calcEventsFunction}}{An optional function that can be entered to define how event size is recalculated. By default, recalculation is performed with conditional power with specified \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage}.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a single numeric value between 0 and 1.}
 
 \item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.}
 
 \item{\code{cumulativeEventsPerStage}}{The cumulative number of events per stage. Is a numeric matrix.}
 
-\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a single logical value.}
 
-\item{\code{dropoutRate1}}{The assumed drop-out rate in the treatment group. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{dropoutRate1}}{The assumed drop-out rate in the treatment group. Is a single numeric value between 0 and 1.}
 
-\item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a single numeric value between 0 and 1.}
 
-\item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a numeric vector of length 1.}
+\item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.}
 
 \item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
 \item{\code{eventsNotAchieved}}{The simulated number of cases how often the number of events was not reached. Is a numeric matrix.}
 
-\item{\code{eventTime}}{The assumed time under which the event rates are calculated. Is a numeric vector of length 1.}
+\item{\code{eventTime}}{The assumed time under which the event rates are calculated. Is a single numeric value.}
 
 \item{\code{expectedNumberOfEvents}}{The expected number of events under specified alternative. Is a numeric vector.}
 
@@ -62,23 +62,23 @@ to create an object of this type.
 
 \item{\code{hazardRatio}}{The hazard ratios under consideration. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a single numeric value representing a  whole number.}
 
-\item{\code{kappa}}{The shape of the Weibull distribution if \code{kappa!=1}. Is a numeric vector of length 1.}
+\item{\code{kappa}}{The shape of the Weibull distribution if \code{kappa!=1}. Is a single numeric value.}
 
 \item{\code{lambda1}}{The assumed hazard rate in the treatment group. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a numeric vector of length 1.}
+\item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a single numeric value.}
 
 \item{\code{maxNumberOfEventsPerStage}}{Determines the maximum number of events per stage for data-driven sample size recalculation. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{maxNumberOfIterations}}{The number of simulation iterations. Is a numeric vector of length 1 containing a whole number.}
+\item{\code{maxNumberOfIterations}}{The number of simulation iterations. Is a single numeric value representing a  whole number.}
 
 \item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations. Is a numeric vector.}
 
 \item{\code{median1}}{The assumed median survival time in the treatment group. Is a numeric vector.}
 
-\item{\code{median2}}{The assumed median survival time in the reference group. Is a numeric vector of length 1.}
+\item{\code{median2}}{The assumed median survival time in the reference group. Is a single numeric value.}
 
 \item{\code{minNumberOfEventsPerStage}}{Determines the minimum number of events per stage for data-driven sample size recalculation. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
@@ -92,7 +92,7 @@ to create an object of this type.
 
 \item{\code{pi1}}{The assumed event rate in the treatment group. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{pi2}}{The assumed event rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{pi2}}{The assumed event rate in the control group. Is a single numeric value between 0 and 1.}
 
 \item{\code{piecewiseSurvivalTime}}{The time intervals for the piecewise definition of the exponential survival time cumulative distribution function. Is a numeric vector.}
 
@@ -100,13 +100,13 @@ to create an object of this type.
 
 \item{\code{rejectPerStage}}{The probability to reject a hypothesis per stage of the trial. Is a numeric matrix.}
 
-\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
+\item{\code{seed}}{The seed used for random number generation. Is a single numeric value.}
 
 \item{\code{singleEventsPerStage}}{The single number of events per stage. Is a numeric matrix.}
 
 \item{\code{studyDuration}}{The study duration for specified effect size. Is a positive numeric vector.}
 
-\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a single numeric value.}
 
 \item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio. Is a numeric vector.}
 }}

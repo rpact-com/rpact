@@ -18,23 +18,23 @@ Class for the definition of event probabilities.
 
 \item{\code{accrualIntensity}}{The absolute accrual intensities. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{kappa}}{The shape of the Weibull distribution if \code{kappa!=1}. Is a numeric vector of length 1.}
+\item{\code{kappa}}{The shape of the Weibull distribution if \code{kappa!=1}. Is a single numeric value.}
 
 \item{\code{piecewiseSurvivalTime}}{The time intervals for the piecewise definition of the exponential survival time cumulative distribution function. Is a numeric vector.}
 
 \item{\code{lambda1}}{The assumed hazard rate in the treatment group. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a numeric vector of length 1.}
+\item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a single numeric value.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a single positive numeric value.}
 
 \item{\code{hazardRatio}}{The hazard ratios under consideration. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{dropoutRate1}}{The assumed drop-out rate in the treatment group. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{dropoutRate1}}{The assumed drop-out rate in the treatment group. Is a single numeric value between 0 and 1.}
 
-\item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.}
+\item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a single numeric value between 0 and 1.}
 
-\item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a numeric vector of length 1.}
+\item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.}
 
 \item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations. Is a numeric vector.}
 
