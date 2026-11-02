@@ -471,7 +471,7 @@ getComparisonPlotParameters <- function(
             if (input$isComparison) {
                 "plot(x"
             } else {
-                ".plotComparison(data"
+                "plot(getComparison(x)"
             }, ", xParamName = ", encodeString(exampleX, quote = '"'),
             ", yParamName = ", yCode, ")"
         )

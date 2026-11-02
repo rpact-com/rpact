@@ -1,5 +1,5 @@
 ## |
-## |  *Time classes piecewise exponential survival multi-group simulations*
+## |  *Time classes for piecewise exponential survival multi-group simulations*
 ## |
 ## |  This file is part of the R package rpact:
 ## |  Confirmatory Adaptive Clinical Trial Design and Analysis
