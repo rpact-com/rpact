@@ -88,6 +88,95 @@ NULL
     return(eval(call(formatFunctionName, paramValue)))
 }
 
+.getDataFrameConsoleLines <- function(dataFrame, digits, columnNameWidth = 14L) {
+    if (nrow(dataFrame) == 0L || ncol(dataFrame) == 0L) {
+        return(utils::capture.output(print.data.frame(dataFrame, digits = digits)))
+    }
+
+    maxRows <- max(1L, floor(getOption("max.print") / ncol(dataFrame)))
+    omittedRows <- max(0L, nrow(dataFrame) - maxRows)
+    dataFrame <- utils::head(dataFrame, maxRows)
+    values <- as.matrix(format(dataFrame, digits = digits, trim = TRUE))
+    headers <- lapply(colnames(values), function(caption) {
+        return(strwrap(caption, width = columnNameWidth))
+    })
+    columnWidths <- vapply(seq_len(ncol(values)), function(i) {
+        return(max(nchar(c(values[, i], headers[[i]]), type = "width"), na.rm = TRUE))
+    }, integer(1))
+    rowNames <- rownames(values)
+    rowNameWidth <- max(nchar(rowNames, type = "width"))
+    lines <- character()
+    firstColumn <- 1L
+    while (firstColumn <= ncol(values)) {
+        lastColumn <- firstColumn
+        usedWidth <- rowNameWidth + 1L + columnWidths[firstColumn]
+        while (lastColumn < ncol(values) &&
+                usedWidth + 1L + columnWidths[lastColumn + 1L] <= getOption("width")) {
+            lastColumn <- lastColumn + 1L
+            usedWidth <- usedWidth + 1L + columnWidths[lastColumn]
+        }
+        columns <- seq.int(firstColumn, lastColumn)
+        headerHeight <- max(lengths(headers[columns]))
+        for (lineIndex in seq_len(headerHeight)) {
+            cells <- vapply(columns, function(i) {
+                caption <- ""
+                if (lineIndex <= length(headers[[i]])) {
+                    caption <- headers[[i]][lineIndex]
+                }
+                return(format(caption, width = columnWidths[i], justify = "right"))
+            }, character(1))
+            lines <- c(lines, paste(c(strrep(" ", rowNameWidth), cells), collapse = " "))
+        }
+        for (rowIndex in seq_len(nrow(values))) {
+            cells <- vapply(columns, function(i) {
+                return(format(values[rowIndex, i], width = columnWidths[i], justify = "right"))
+            }, character(1))
+            rowName <- format(rowNames[rowIndex], width = rowNameWidth, justify = "right")
+            lines <- c(lines, paste(c(rowName, cells), collapse = " "))
+        }
+        firstColumn <- lastColumn + 1L
+        if (firstColumn <= ncol(values)) {
+            lines <- c(lines, "")
+        }
+    }
+    if (omittedRows > 0L) {
+        lines <- c(lines, paste0("[ reached getOption(\"max.print\") -- omitted ", omittedRows, " rows ]"))
+    }
+    return(lines)
+}
+
+.showDataFrame <- function(
+        dataFrame,
+        parameterSet,
+        niceColumnNamesEnabled = TRUE,
+        digits = NA_integer_,
+        consoleOutputEnabled = TRUE) {
+    if (niceColumnNamesEnabled) {
+        columnNames <- names(dataFrame)
+        for (i in seq_along(columnNames)) {
+            caption <- .getParameterCaption(columnNames[i], parameterSet)
+            if (!is.null(caption)) {
+                columnNames[i] <- caption
+            }
+        }
+        names(dataFrame) <- columnNames
+    }
+
+    if (is.na(digits)) {
+        digits <- NULL
+    }
+    if (!consoleOutputEnabled) {
+        values <- as.matrix(format(dataFrame, digits = digits, trim = TRUE))
+        .showMatrix(parameterSet, values,
+            digits = getOption("digits"), consoleOutputEnabled = FALSE,
+            rowLabel = "", escapeMarkdown = TRUE
+        )
+        return(invisible())
+    }
+    output <- paste(.getDataFrameConsoleLines(dataFrame, digits = digits), collapse = "\n")
+    parameterSet$.cat(output, "\n\n", consoleOutputEnabled = consoleOutputEnabled)
+}
+
 .getParameterValueFormatted <- function(obj, parameterName) {
     tryCatch(
         {

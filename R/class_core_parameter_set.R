@@ -1679,7 +1679,8 @@ summary.ParameterSet <- function(
                 inherits(object, "SimulationResults") ||
                 inherits(object, "AnalysisResults") ||
                 inherits(object, "TrialDesignCharacteristics") ||
-                inherits(object, "PerformanceScore"))) {
+                inherits(object, "PerformanceScore") ||
+                .isQuantitativeSummaryObject(object))) {
         output <- match.arg(output)
         return(.createSummary(object, digits = digits, output = output))
     }

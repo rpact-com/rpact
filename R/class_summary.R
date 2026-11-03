@@ -108,6 +108,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
         .show = function(showType = 1, digits = NA_integer_, ..., consoleOutputEnabled = TRUE) {
+            if (.isQuantitativeSummaryObject(self$object)) {
+                .showSummaryQuantitative(self, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+                return(invisible())
+            }
+
             if (self$output %in% c("all", "title")) {
                 if (is.null(self$title) || length(self$title) == 0) {
                     self$title <- .createSummaryTitleObject(self$object)

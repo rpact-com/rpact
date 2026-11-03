@@ -138,8 +138,10 @@ OperatingCharcteristicsMeans <- R6::R6Class(
                 self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Output",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                self$.cat("Output:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                .showDataFrame(self$probabilities, self,
+                    niceColumnNamesEnabled = TRUE, digits = digits,
+                    consoleOutputEnabled = consoleOutputEnabled
                 )
                 self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
             }
@@ -147,9 +149,6 @@ OperatingCharcteristicsMeans <- R6::R6Class(
         .toString = function(startWithUpperCase = FALSE) {
             s <- "operating-characteristics for comparing means"
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
-        },
-        .catMarkdownText = function() {
-            self$.show()
         }
     )
 )

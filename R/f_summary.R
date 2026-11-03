@@ -167,6 +167,10 @@ NULL
         markdown <- FALSE
     }
 
+    if (.isQuantitativeSummaryObject(object)) {
+        return(.createSummaryQuantitative(object, digits = digits, output = output, markdown = markdown))
+    }
+
     if (inherits(object, "TrialDesignCharacteristics")) {
         return(.createSummaryDesignPlan(object,
             digits = digits,

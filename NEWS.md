@@ -27,6 +27,7 @@
 
 ## Improvements, issues, and changes
 
+* Quantitative decision rules and operating characteristics now support `summary()`, including standard summary precision and output selections, wrapped console tables, and Markdown tables. Operating-characteristics summaries retain all six decision categories and show a separate table for each sample-size scenario.
 * Markdown comparison tables now keep each coordinate label, such as "Stage 1" or "Situation 1", together using Unicode non-breaking spaces. Ordinary spaces between dimensions permit flexible line wrapping without semicolons or HTML line-break tags.
 * Parameter listings now align their colon column using applicable parameter captions without a fixed four-character padding allowance. Technical summaries account separately for parameter type prefixes. Caption padding remains capped at 40 characters, and longer captions are retained in full.
 * Repeated p-values are now unavailable (`NA` with a warning) for sequential designs with user-defined beta spending (`typeBetaSpending = "bsUser"`), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.
