@@ -15,6 +15,15 @@
 ## |
 
 C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
+    targetValue = "Target value",
+    lowerReferenceValue = "Lower reference value",
+    upperPercentile = "Upper percentile",
+    lowerPercentile = "Lower percentile",
+    probabilities = "Probabilities",
+    category = "Category",
+    probability = "Probability",
+    nControl = "Number of subjects (control)",
+    nTreatment = "Number of subjects (treatment)",
     iterations = "Iterations",
     seed = "Seed",
     groups = "Treatment groups",

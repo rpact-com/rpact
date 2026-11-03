@@ -15,6 +15,13 @@
 ## |
 
 C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS", list(
+    targetValue = ".formatMeans",
+    lowerReferenceValue = ".formatMeans",
+    upperPercentile = ".formatProbabilities",
+    lowerPercentile = ".formatProbabilities",
+    probability = ".formatProbabilities",
+    nControl = ".formatSampleSizes",
+    nTreatment = ".formatSampleSizes",
     means = ".formatMeans",
     estimates = ".formatMeans",
     degreesOfFreedom = ".formatMeans",
