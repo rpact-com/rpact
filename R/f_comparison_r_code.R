@@ -1,4 +1,18 @@
-## | Trial comparison R code generation. Part of the R package rpact.
+## |
+## |  *Result comparison*
+## |
+## |  This file is part of the R package rpact:
+## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |
+## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  Licensed under "GNU Lesser General Public License" version 3
+## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |
+## |  RPACT company website: https://www.rpact.com
+## |  rpact package website: https://www.rpact.org
+## |
+## |  Contact us for information about our services: info@rpact.com
+## |
 
 .getTrialComparisonRCode <- function(object, leadingArguments, includeDefaultParameters,
         prefix, postfix, stringWrapPrefix, newArgumentValues, tolerance,
@@ -33,3 +47,4 @@
     }
     result
 }
+

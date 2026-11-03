@@ -33,6 +33,7 @@ NULL
 #' @template field_maxNumberOfSubjectsCanBeCalculatedDirectly
 #' @template field_absoluteAccrualIntensityEnabled
 #' @template field_accrualTime
+#' @template field_accrualTimeOriginal
 #' @template field_accrualIntensity
 #' @template field_accrualIntensityRelative
 #' @template field_maxNumberOfSubjects

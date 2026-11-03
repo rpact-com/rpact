@@ -67,7 +67,14 @@ spans multiple categories, apply all relevant files:
   [.github/agents/rpact_general.agent.md](.github/agents/rpact_general.agent.md).
 - **Creating unit tests or improving test coverage:** Read
   [.github/agents/rpact_testcoverage.agent.md](.github/agents/rpact_testcoverage.agent.md)
-  and follow the test location requirements below.
+  and the authoritative test instructions in the resolved `rpact.tests/AGENTS.md`
+  (for a sibling checkout, see
+  [../rpact.tests/AGENTS.md](../rpact.tests/AGENTS.md)). Locate that package using
+  configured projects or workspace folders; do not assume a machine-specific
+  path. Before creating, modifying, generating, or running rpact tests or test
+  templates, follow that file, its referenced instructions, and applicable
+  subdirectory instructions. If it cannot be located or accessed, ask for its
+  path and workspace access before proceeding with tests.
 - **Tasks involving GitHub:** Read
   [.github/agents/rpact_github.agent.md](.github/agents/rpact_github.agent.md).
 
@@ -182,7 +189,8 @@ the validation branch, rather than embedding those choices only in the message.
   changed are replaced with the appropriate enriched helpers. The target for
   the package is exactly one direct call, in `.stopWithError()`.
 - For behavior changes, run relevant tests and verify the error category and
-  metadata where applicable, following the test location rules below. Do not
+  metadata where applicable, following the test instructions in
+  [rpact.tests/AGENTS.md](../rpact.tests/AGENTS.md). Do not
   assume metadata will be attached by the default `simpleError` fallback;
   inspect metadata through an appropriate configured condition factory when
   testing it.
@@ -338,115 +346,101 @@ For example:
 #'
 ```
 
-## Unit tests and test templates
+## Documenting new R6 classes and additional fields
 
-The rpact-specific rules in this section, including the optional
-`rpact.validator` template workflow, apply only to direct development of the
-`rpact` package and its tests. When working on another package, such as
-`rpact.code.api` or `rpact.cloud`, create and maintain that package's tests in
-its own `tests/testthat` directory, following its applicable instructions and
-existing test conventions. Do not create or modify tests for another package
-in `rpact.tests` or apply the rpact-specific template rules to those tests.
-Using `rpact` as a dependency does not make a package's tests rpact tests.
-For tasks spanning multiple packages, apply these rules only to tests of
-`rpact`; keep tests of each other package in that package.
+Whenever a new R6 class is introduced or an existing class gains fields,
+complete the following documentation workflow as part of the same task.
+Constructor documentation alone is not sufficient documentation of a class
+and its fields.
 
-All rpact unit tests are hosted and developed in the separate `rpact.tests`
-package, except for the small example test `test-pkgname.R` in the `rpact`
-package.
+1. Inspect comparable classes, for example
+   `R/class_time_accrual.R`, `R/class_time_piecewise_survival.R`, and
+   `R/class_time_piecewise_survival_multigroup.R`. Give each new class its own
+   Roxygen block immediately before its `R6::R6Class()` declaration, with
+   `@name`, explicit `@title` and `@description`, field templates, and useful
+   `@details` and `@seealso` entries. Follow the Roxygen formatting rules above.
+   Use `@keywords internal` for internal class generators, following existing
+   classes; do not export a class generator merely to document it. Explain how
+   users obtain instances through the supported constructor functions.
+2. Inventory the public data fields of the affected class and its relevant
+   base classes. Document all public data fields, including inherited fields
+   needed to understand a specialized class. Update the base-class
+   documentation when a shared field is added. Internal implementation members
+   such as dot-prefixed fields are not automatically part of this inventory.
+   Check actual field values and their use in the implementation before
+   describing their types, dimensions, defaults, or statistical meaning.
+3. Maintain field descriptions centrally in
+   `man-raw/class_field_descriptions.xlsx`, not directly in generated
+   `man-roxygen/field_*.R` files or as duplicated inline `@field` prose.
+   Inspect the workbook's existing conventions and preserve unrelated sheets,
+   values, formatting, and workbook features. In the `field_templates` sheet,
+   reuse a suitable existing row or add a complete row containing
+   `field_name_readable`, `field_id`, `field_name_unique`, `field_description`,
+   `field_type`, and the applicable `is_unique` value following existing rows.
+   `field_id` must be the actual R field name; `field_name_unique` determines
+   the template filename. Select an existing type from
+   `field_type_descriptions`; use `C_DATATYPE_NONE` when the description itself
+   explains a type that the existing type descriptions cannot express.
+   Describe units, dimensions and their order, group or scenario roles,
+   optional `NULL`/`NA` values, and supplied versus derived values where relevant.
+   Do not leave new descriptions as TODOs: the generator normally excludes them.
+4. Reuse a template only if its meaning and type fit the field in the affected
+   class. When the same field name has different semantics or dimensions in
+   different classes, add a separate workbook row with the same `field_id`
+   and a distinct `field_name_unique`, following existing suffix conventions.
+   For example, `lambdaControl_piecewise` documents the interval-specific
+   vector without changing the existing scalar `lambdaControl` description.
+5. Read `man-raw/create_class_field_descriptions.R` and run its template
+   generation and diagnostic commands from the rpact repository root, with
+   `rpact.dev` available. The current commands are:
 
-- Create all new rpact unit tests in `rpact.tests/tests/testthat`. Do not create
-  new unit tests in the `rpact` repository.
-- When improving existing tests, check whether they have a corresponding
-  template in `rpact.tests/tests-raw/testthat`. Update that template as needed
-  to keep the tests and their source templates consistent.
-- Locate the `rpact.tests` package using the coding agent's configured projects
-  and workspace folders. It may also be available as a sibling directory of
-  `rpact`; do not assume a machine-specific absolute path.
-- If `rpact.tests` cannot be located or accessed, ask the user to provide its
-  local path and make it accessible to the coding agent, for example by adding
-  it to the agent's workspace. Do not create tests in the `rpact` repository as
-  a fallback.
+   ```r
+   rpact.dev::createFieldDescriptionRoxygenTemplates(
+       overwrite = TRUE,
+       analyzeIssues = FALSE
+   )
+   rpact.dev::searchForRefClassFieldIssues()
+   ```
 
-### Optional template-based regression tests with rpact.validator
+   Review the generated diff, because `overwrite = TRUE` regenerates templates
+   beyond the affected class. Preserve unrelated work and investigate any
+   pre-existing discrepancy between the workbook and generated templates;
+   do not silently introduce unrelated documentation changes. Make corrections
+   in the workbook and regenerate the affected templates rather than editing
+   generated descriptions by hand.
+6. Reference the generated templates in each affected class's Roxygen block,
+   using actual Roxygen syntax, for example:
 
-When creating general regression tests that freeze the current state of rpact
-result objects, consider the template-based workflow provided by
-`rpact.validator`. Prefer this option for capturing object parameters and
-calculated results without manually writing repetitive assertions. Handwritten
-tests remain an option for targeted behavior, edge cases, or checks that are
-better expressed explicitly.
+   ```r
+   #' @template field_piecewiseSurvivalTime
+   #' @template field_lambdaControl_piecewise
+   #' @template field_hazardRatios
+   ```
 
-For template-based tests, create or update the source template in
-`rpact.tests/tests-raw/testthat`. Declare the test title with `@test_that`, create
-the result object, and pass it to `rpact.validator::getUnitTestObject()` together
-with its variable name as a string. For example:
+   Use `field_<field_name_unique>` as the template name. Do not add Markdown
+   bold markers around `@template`. Explain class-specific relationships and
+   interpretation in `@details` while keeping field descriptions central.
+7. Regenerate the affected `man/*.Rd` files with the package's Roxygen
+   configuration and review their content and links. Keep unrelated help files
+   intact; a targeted generation must not delete other documentation topics.
+   Verify that every field in the inventory appears with the correct
+   description and that the generated templates match the workbook, including
+   their appended type descriptions. Parse/check the affected Rd files with
+   `tools::parse_Rd()` and `tools::checkRd()`.
+   Inspect diagnostic output rather than trusting an issue count: if the field
+   checker fails to read a class, a reported zero issues does not establish
+   coverage. Perform the field inventory and Rd comparison directly in that
+   case and report the diagnostic limitation. If a full documentation run is
+   blocked by an unrelated failure, generate and validate the affected topics
+   separately where possible and report the remaining limitation.
 
-```r
-#' @test_that 'getDesignInverseNormal' with default parameters: parameters and results are as expected
-
-design1 <- getDesignInverseNormal()
-rpact.validator::getUnitTestObject(design1, "design1")
-```
-
-Rendering the templates generates executable `test_that()` blocks with
-`expect_equal()` assertions for the captured object fields, including expected
-values, tolerances, and `getTestLabel()` labels. For this example, these include
-checks of `design1$alphaSpent`, `design1$criticalValues`, and
-`design1$stageLevels`. The generated test files belong in
-`rpact.tests/tests/testthat`, as required above.
-
-Before rendering, locate and verify both package directories and ensure that
-`rpact.validator` is available. Set `rpactProjectPath` and
-`rpactTestsProjectPath` to the resolved local paths of `rpact` and `rpact.tests`,
-respectively; do not hard-code machine-specific paths in shared instructions.
-
-Regeneration must be controlled through the following exact template comment
-(preserve its spelling, capitalization, and spacing):
-
-```r
-#' @exit Do not create the unit tests again
-```
-
-When `enforceCreationOfAllUnitTests = FALSE`, a template containing this comment
-is skipped and its unit test file is not regenerated. Always keep
-`enforceCreationOfAllUnitTests = FALSE`; never set it to `TRUE`.
-
-Before every call to `rpact.validator::createRpactUnitTests()`:
-
-- Identify the specific template whose unit test file is to be generated or
-  regenerated.
-- Check all templates in `rpact.tests/tests-raw/testthat`. Every template except
-  the selected template must contain the exact `@exit` comment above. If it is
-  missing, insert it at the beginning of that template before proceeding.
-- Ensure the selected template does not contain the `@exit` comment; remove it
-  from that template if necessary to enable generation.
-- Run the generator only after these checks and edits are complete, keeping
-  `enforceCreationOfAllUnitTests = FALSE`.
-
-Render using:
-
-```r
-rpact.validator::createRpactUnitTests(
-    packageProjectBaseDirectory = rpactProjectPath,
-    qualityAssuranceBaseDirectory = rpactTestsProjectPath,
-    testFilesProjectBaseDirectory = rpactTestsProjectPath,
-    copyUnitTestFilesToTestthatDir = TRUE,
-    enforceCreationOfAllUnitTests = FALSE,
-    ignoreFilesRegex = NA_character_,
-    qaSubDirs = list(
-        templates = file.path("tests-raw", "testthat"),
-        output = "tests-raw"
-    )
-)
-```
-
-Treat the templates as the source for generated tests: make changes in the
-corresponding template and regenerate the test files rather than maintaining
-changes only in generated output. Review the generated assertions and run the
-relevant tests. Capturing the current state establishes a regression baseline;
-it does not independently establish statistical correctness. Do not regenerate
-expected values merely to make an unexpected regression pass.
+The `man-raw` directory is currently gitignored. Its workbook is still the
+authoritative local source and must be updated alongside the generated
+templates and Rd files. Do not force-add it or change ignore rules unless
+requested. Mention this local source change when reporting completion. If the
+workbook or generator is unavailable, locate the maintained copy or ask for
+its location; do not invent a replacement source or silently maintain only
+the generated output.
 
 ## New vignettes
 

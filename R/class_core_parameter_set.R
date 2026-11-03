@@ -695,30 +695,28 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 )
             }
             prefix <- ifelse(showParameterType, self$.showParameterType(paramName), "")
+            captionWidth <- self$.getNChar(includeAllParameters = showParameterType)
+            if (nchar(prefix) > 0) {
+                captionWidth <- captionWidth + nchar(prefix) + 1
+            }
             variableNameFormatted <- .getFormattedVariableName(
                 name = paramCaption,
-                n = self$.getNChar(), prefix = prefix
+                n = captionWidth, prefix = prefix
             )
 
             output <- paste(variableNameFormatted, paramValueFormatted, "\n")
             self$.cat(output, consoleOutputEnabled = consoleOutputEnabled)
             invisible(output)
         },
-        .getNChar = function() {
+        .getNChar = function(includeAllParameters = FALSE) {
             fieldNames <- self$.getVisibleFieldNames()
-            if (length(fieldNames) == 0) {
-                return(40)
-            }
-
             fieldCaptions <- character()
             for (parameterName in fieldNames) {
-                paramCaption <- .getParameterCaption(parameterName, self)
-                if (is.null(paramCaption)) {
-                    paramCaption <- paste0("%", parameterName, "%")
+                if (includeAllParameters || self$isApplicableParameter(parameterName)) {
+                    fieldCaptions <- c(fieldCaptions, .getParameterCaption(parameterName, self))
                 }
-                fieldCaptions <- c(fieldCaptions, paramCaption)
             }
-            return(min(40, max(nchar(fieldCaptions))) + 4)
+            return(min(40, max(c(1, nchar(fieldCaptions)))))
         },
         .showParameterTypeDescription = function(consoleOutputEnabled = consoleOutputEnabled) {
             self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)

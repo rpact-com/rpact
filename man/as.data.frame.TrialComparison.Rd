@@ -23,12 +23,14 @@
 
 \item{...}{Further arguments. Currently unused.}
 
-\item{niceColumnNamesEnabled}{If \code{TRUE}, use descriptive column names.}
+\item{niceColumnNamesEnabled}{Logical. If \code{TRUE}, nice looking column
+names will be used; syntactic names (variable names) otherwise
+(see \code{\link[base]{make.names}}).}
 
 \item{includeAllParameters}{If \code{TRUE}, include all parameters supported by
 the existing data-frame methods of the individual objects.}
 
-\item{removeConstantParameters}{If TRUE, retain identifiers and only parameters
+\item{removeConstantParameters}{If \code{TRUE}, retain identifiers and only parameters
 with different object profiles, using the same rules as \code{summary()}.}
 }
 \value{

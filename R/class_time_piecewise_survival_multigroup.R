@@ -1,5 +1,5 @@
 ## |
-## |  *Time classes*
+## |  *Time classes for piecewise exponential survival multi-group simulations*
 ## |
 ## |  This file is part of the R package rpact:
 ## |  Confirmatory Adaptive Clinical Trial Design and Analysis
@@ -27,7 +27,14 @@ NULL
 #' Groups, intervals, and situations occupy the first, second, and third hazard-ratio
 #' dimensions. Use the specialized constructors to specify their statistical roles.
 #'
+#' @template field_piecewiseSurvivalTime
+#' @template field_lambdaControls
+#' @template field_hazardRatios
+#' @template field_medianTreatments
+#' @template field_groupType
+#'
 #' @name PiecewiseSurvivalTimeMultiGroup
+#'
 #' @keywords internal
 #'
 PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup",
@@ -171,64 +178,116 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
             }
             self$.cat("Piecewise exponential ", self$groupType, " survival time\n\n",
                 heading = 1, consoleOutputEnabled = consoleOutputEnabled)
-            
-            for (i in seq_len(self$getNumberOfSituations())) {
-                if (!is.null(self$medianTreatments)) {
-                    self$.cat("\nTreatment medians - ", dimnames(self$hazardRatios)[[3]][i],
-                        " (exponential per interval):\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    self$.showMatrix(matrix(self$medianTreatments[, , i], nrow = self$getNumberOfGroups(),
-                        dimnames = dimnames(self$medianTreatments)[1:2]), digits, consoleOutputEnabled)
-                }
-                self$.cat("\nHazard ratios - ", dimnames(self$hazardRatios)[[3]][i], ":\n",
-                    heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                self$.showMatrix(matrix(self$hazardRatios[, , i], nrow = self$getNumberOfGroups(),
-                    dimnames = dimnames(self$hazardRatios)[1:2]), digits, consoleOutputEnabled)
-            }
-            
+
             controls <- self$lambdaControls
             if (self$groupType == "multi-arm") {
                 self$.cat("Control hazards (common to all treatment arms):\n",
                     heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                 controls <- controls[1, , drop = FALSE]
                 rownames(controls) <- "Control"
+                controlParameter <- "lambdaControl"
             } else {
                 self$.cat("Control hazards:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                controlParameter <- "lambdaControls"
             }
-            self$.showMatrix(controls, digits, consoleOutputEnabled)
-            controlMedians <- self[["medianControls"]]
-            if (self$groupType == "multi-arm" && !is.null(self[["medianControl"]])) {
-                controlMedians <- matrix(self$medianControl, nrow = 1,
-                    dimnames = list("Control", colnames(controls)))
-            }
-            if (!is.null(controlMedians)) {
-                self$.cat("\nControl medians (exponential per interval):\n",
-                    heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                self$.showMatrix(controlMedians, digits, consoleOutputEnabled)
-            }
-            
+            self$.showMatrix(controls, controlParameter, digits, consoleOutputEnabled)
+            self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("Details:\n\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
+            self$.showPiecewiseParameterGroup(self$.getUserDefinedParameters(),
+                "User defined parameters", digits, consoleOutputEnabled)
+            self$.showPiecewiseParameterGroup(self$.getDefaultParameters(),
+                "Default parameters", digits, consoleOutputEnabled)
+            self$.showPiecewiseParameterGroup(self$.getDerivedParameters(),
+                "Generated parameters", digits, consoleOutputEnabled)
+            self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+
             return(invisible(self))
         },
-        .showMatrix = function(values, digits, consoleOutputEnabled) {
-            if (is.na(digits)) {
-                digits <- getOption("digits")
+        .getNChar = function(includeAllParameters = FALSE) {
+            if (includeAllParameters) {
+                return(super$.getNChar(includeAllParameters = TRUE))
             }
-            if (!consoleOutputEnabled) {
-                tableColumns <- ncol(values) + 1L
-                self$.cat(c("Group", colnames(values)), tableColumns = tableColumns,
-                    consoleOutputEnabled = FALSE)
-                self$.cat(rep("-----", tableColumns), tableColumns = tableColumns,
-                    consoleOutputEnabled = FALSE)
-                formattedValues <- format(values, digits = digits, trim = TRUE)
-                for (i in seq_len(nrow(values))) {
-                    self$.cat(c(rownames(values)[i], formattedValues[i, ]),
-                        tableColumns = tableColumns, consoleOutputEnabled = FALSE)
+            # Only parameter lines determine the colon column, never table headings
+            # or captions of inactive fields. Long captions remain complete.
+            parameters <- self$.getVisibleFieldNames()
+            parameters <- setdiff(parameters, c("lambdaControls", "medianControls",
+                "hazardRatios", "medianTreatments"))
+            captions <- character()
+            for (parameter in parameters) {
+                if (self$isApplicableParameter(parameter)) {
+                    captions <- c(captions, .getParameterCaption(parameter, self))
                 }
-                self$.cat("\n", consoleOutputEnabled = FALSE)
-                return(invisible())
             }
-            for (line in capture.output(print(values, digits = digits))) {
-                self$.cat(line, "\n", consoleOutputEnabled = consoleOutputEnabled)
+            return(min(40, max(c(1, nchar(captions)))))
+        },
+        .showPiecewiseParameterGroup = function(parameters, title, digits, consoleOutputEnabled) {
+            # The common control matrix repeats lambdaControl in the multi-arm class.
+            # Retain its metadata and technical output, but avoid duplicate normal output.
+            if (self$groupType == "multi-arm") {
+                parameters <- setdiff(parameters, "lambdaControls")
             }
+            if (length(parameters) == 0) {
+                self$.showParametersOfOneGroup(parameters, title,
+                    consoleOutputEnabled = consoleOutputEnabled)
+                return(invisible(NULL))
+            }
+            parameterOrder <- c("piecewiseSurvivalTime", "lambdaControl", "lambdaControls",
+                "medianControl", "medianControls", "medianTreatments", "hazardRatios", "groupType")
+            parameters <- c(intersect(parameterOrder, parameters), setdiff(parameters, parameterOrder))
+            self$.cat(title, ":\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+            for (parameter in parameters) {
+                values <- self[[parameter]]
+                if (parameter %in% c("hazardRatios", "medianTreatments")) {
+                    caption <- if (parameter == "hazardRatios") {
+                        "Hazard ratios"
+                    } else {
+                        "Treatment medians"
+                    }
+                    for (i in seq_len(self$getNumberOfSituations())) {
+                        suffix <- if (parameter == "medianTreatments") {
+                            " (exponential per interval)"
+                        } else {
+                            ""
+                        }
+                        self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat(caption, " - ", dimnames(values)[[3]][i], suffix, ":\n",
+                            heading = 3, consoleOutputEnabled = consoleOutputEnabled)
+                        self$.showMatrix(matrix(values[, , i], nrow = self$getNumberOfGroups(),
+                            dimnames = dimnames(values)[1:2]), parameter, digits, consoleOutputEnabled)
+                    }
+                } else if (parameter %in% c("lambdaControls", "medianControls")) {
+                    caption <- if (parameter == "lambdaControls") {
+                        "Control hazards"
+                    } else {
+                        "Control medians (exponential per interval)"
+                    }
+                    self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(caption, ":\n", heading = 3,
+                        consoleOutputEnabled = consoleOutputEnabled)
+                    self$.showMatrix(values, parameter, digits, consoleOutputEnabled)
+                } else {
+                    self$.showParameter(parameter, consoleOutputEnabled = consoleOutputEnabled)
+                }
+            }
+            self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+            return(invisible(NULL))
+        },
+        .showMatrix = function(values, parameterName, digits, consoleOutputEnabled) {
+            formatFunction <- .getParameterFormatFunction(parameterName, self)
+            formattedValues <- .getParameterValueFormattedByFormatFunctionName(
+                formatFunction, as.vector(values), self)
+            # Only transpose the formatted view; the simulation representation stays unchanged.
+            formattedValues <- t(matrix(formattedValues, nrow = nrow(values), dimnames = dimnames(values)))
+            names(dimnames(formattedValues)) <- c("Interval", "Group")
+            if (consoleOutputEnabled) {
+                for (line in capture.output(print(noquote(formattedValues)))) {
+                    self$.cat(line, "\n", consoleOutputEnabled = TRUE)
+                }
+            } else {
+                .showMatrix(self, formattedValues, digits, consoleOutputEnabled = FALSE,
+                    rowLabel = "Interval", escapeMarkdown = TRUE)
+            }
+            return(invisible(NULL))
         },
         .printAsDataFrame = function(parameterNames = NULL, niceColumnNamesEnabled = FALSE,
                 includeAllParameters = FALSE, handleParameterNamesAsToBeExcluded = FALSE,
@@ -240,6 +299,40 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
     )
 )
 
+#'
+#' @name PiecewiseSurvivalTimeMultiArm
+#'
+#' @title
+#' Piecewise Exponential Survival Time for Multiple Treatment Arms
+#'
+#' @description
+#' Class for piecewise exponential survival times in patient-wise multi-arm
+#' simulations, with a common control hazard for all active treatment arms.
+#'
+#' @template field_piecewiseSurvivalTime
+#' @template field_lambdaControl_piecewise
+#' @template field_lambdaControls
+#' @template field_hazardRatios
+#' @template field_medianControl_piecewise
+#' @template field_medianTreatments
+#' @template field_groupType
+#'
+#' @details
+#' Create objects with [getPiecewiseSurvivalTimeMultiArm()]. The class inherits
+#' from \code{PiecewiseSurvivalTimeMultiGroup} and \code{TimeDefinition}.
+#' Rows of \code{lambdaControls} repeat the common control hazards for each
+#' active arm. The dimensions of \code{hazardRatios} and \code{medianTreatments}
+#' are active arm, interval, and situation, in that order.
+#' Interval starts begin at zero and the last interval is open-ended.
+#' Supplied interval medians parameterize exponential hazards through
+#' \code{log(2) / median}; they are not the medians of the complete piecewise
+#' survival distributions. Derived hazards and hazard ratios are retained
+#' alongside the supplied medians.
+#'
+#' @seealso [getPiecewiseSurvivalTimeMultiArm()], [PiecewiseSurvivalTimeEnrichment]
+#'
+#' @keywords internal
+#'
 PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
     inherit = PiecewiseSurvivalTimeMultiGroup,
     public = list(
@@ -284,6 +377,40 @@ PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
     )
 )
 
+#'
+#' @name PiecewiseSurvivalTimeEnrichment
+#'
+#' @title
+#' Piecewise Exponential Survival Time for Population Enrichment
+#'
+#' @description
+#' Class for piecewise exponential survival times in patient-wise population-
+#' enrichment simulations, with control hazards and treatment effects specified
+#' for disjoint population subsets.
+#'
+#' @template field_piecewiseSurvivalTime
+#' @template field_lambdaControls
+#' @template field_hazardRatios
+#' @template field_medianControls
+#' @template field_medianTreatments
+#' @template field_groupType
+#'
+#' @details
+#' Create objects with [getPiecewiseSurvivalTimeEnrichment()]. The class inherits
+#' from \code{PiecewiseSurvivalTimeMultiGroup} and \code{TimeDefinition}.
+#' Rows of \code{lambdaControls} and \code{medianControls} correspond to disjoint
+#' population subsets. The dimensions of \code{hazardRatios} and
+#' \code{medianTreatments} are subset, interval, and situation, in that order.
+#' Interval starts begin at zero and the last interval is open-ended.
+#' Supplied interval medians parameterize exponential hazards through
+#' \code{log(2) / median}; they are not the medians of the complete piecewise
+#' survival distributions. Derived hazards and hazard ratios are retained
+#' alongside the supplied medians.
+#'
+#' @seealso [getPiecewiseSurvivalTimeEnrichment()], [PiecewiseSurvivalTimeMultiArm]
+#'
+#' @keywords internal
+#'
 PiecewiseSurvivalTimeEnrichment <- R6::R6Class("PiecewiseSurvivalTimeEnrichment",
     inherit = PiecewiseSurvivalTimeMultiGroup,
     public = list(
