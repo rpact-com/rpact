@@ -250,6 +250,8 @@ NULL
 #'
 #' @template details_survival_conditional_power
 #'
+#' @template details_observed_survival_dropout
+#'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'

@@ -54,6 +54,12 @@ NULL
         return(result)
     }
 
+    if (length(piecewiseLambda) == 1L) {
+        totalHazard <- phi + piecewiseLambda
+        result[available] <- phi / totalHazard * (-expm1(-totalHazard * pmax(0, time[available])))
+        return(result)
+    }
+
     starts <- piecewiseSurvivalTime
     ends <- c(starts[-1], Inf)
     cumulativeHazard <- 0
@@ -136,9 +142,10 @@ NULL
         for (i in seq_len(numberOfResults)) {
             lambda1 <- designPlan$lambda1[i]
             if (designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
-                lambda1 <- .getLambda(groupNumber = 1, lambda1 = NA_real_,
-                    lambda2 = designPlan$lambda2, hazardRatio = designPlan$hazardRatio[i])
+                lambda1 <- NA_real_
             }
+            lambda1 <- .getLambda(groupNumber = 1, lambda1 = lambda1,
+                lambda2 = designPlan$lambda2, hazardRatio = designPlan$hazardRatio[i], kappa = designPlan$kappa)
             result[, i] <- .getDropoutProportionsGroupwise(
                 time = horizons[i], accrualTimeVector = designPlan$accrualTime,
                 accrualIntensity = designPlan$accrualIntensity,
@@ -2137,6 +2144,8 @@ getNumberOfSubjects <- function(
 #'
 #' @template details_piecewise_accrual
 #'
+#' @template details_expected_survival_dropout
+#'
 #' @template return_object_trial_design_plan
 #' @template how_to_get_help_for_generics
 #'
@@ -2682,6 +2691,8 @@ getSampleSizeSurvival <- function(
 #' @template details_piecewise_survival
 #'
 #' @template details_piecewise_accrual
+#'
+#' @template details_expected_survival_dropout
 #'
 #' @template return_object_trial_design_plan
 #' @template how_to_get_help_for_generics

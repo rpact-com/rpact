@@ -9,7 +9,10 @@ Trial design plan for survival data.
 \details{
 This object cannot be created directly;
 use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
-with suitable arguments to create a design plan for a dataset of survival data.
+or \code{\link[=getPowerSurvival]{getPowerSurvival()}} with suitable arguments to create a survival design plan.
+Expected dropout proportions use the final planned analysis horizon for each
+alternative scenario, with no stage dimension. See the constructor help for
+the deterministic planned-accrual denominator and competing-event assumptions.
 }
 \section{Fields}{
 
