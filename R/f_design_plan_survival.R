@@ -138,6 +138,9 @@ NULL
     result <- matrix(NA_real_, nrow = 2, ncol = numberOfResults)
     if (isTRUE(designPlan$accountForObservationTimes) && length(designPlan$analysisTime) > 0) {
         horizons <- designPlan$analysisTime[designPlan$.design$kMax, ]
+        if (length(horizons) == 1L) {
+            horizons <- rep(horizons, numberOfResults)
+        }
         phi <- -log1p(-c(designPlan$dropoutRate1, designPlan$dropoutRate2)) / designPlan$dropoutTime
         for (i in seq_len(numberOfResults)) {
             lambda1 <- designPlan$lambda1[i]
