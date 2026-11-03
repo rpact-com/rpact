@@ -45,6 +45,31 @@ NULL
     return(lambda1)
 }
 
+.getDropoutIncidence <- function(time, piecewiseLambda, piecewiseSurvivalTime, phi) {
+    # Inputs are normalized by PiecewiseSurvivalTime; times are follow-up times.
+    result <- rep(NA_real_, length(time))
+    available <- !is.na(time)
+    result[available] <- 0
+    if (phi == 0 || !any(available)) {
+        return(result)
+    }
+
+    starts <- piecewiseSurvivalTime
+    ends <- c(starts[-1], Inf)
+    cumulativeHazard <- 0
+    for (j in seq_along(piecewiseLambda)) {
+        duration <- pmax(0, pmin(time[available], ends[j]) - starts[j])
+        totalHazard <- phi + piecewiseLambda[j]
+        result[available] <- result[available] +
+            phi / totalHazard * exp(-phi * starts[j] - cumulativeHazard) *
+            (-expm1(-totalHazard * duration))
+        if (j < length(piecewiseLambda)) {
+            cumulativeHazard <- cumulativeHazard + piecewiseLambda[j] * (ends[j] - starts[j])
+        }
+    }
+    return(result)
+}
+
 .getEventProbabilityFunction <- function(..., time, piecewiseLambda, piecewiseSurvivalTime, phi, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa != 1 && phi > 0) {
