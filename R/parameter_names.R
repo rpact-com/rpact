@@ -189,6 +189,8 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     followUpTime = "Follow up time",
     dropoutRate1 = "Drop-out rate (1)",
     dropoutRate2 = "Drop-out rate (2)",
+    expectedDropoutProportion1 = "Expected dropout proportion (1)",
+    expectedDropoutProportion2 = "Expected dropout proportion (2)",
     dropoutTime = "Drop-out time",
     eventsFixed = "Number of events fixed",
     expectedEventsH0 = "Expected number of events under H0",

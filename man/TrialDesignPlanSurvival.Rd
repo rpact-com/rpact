@@ -70,6 +70,10 @@ with suitable arguments to create a design plan for a dataset of survival data.
 
 \item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.}
 
+\item{\code{expectedDropoutProportion1}}{Expected observed dropout proportion in arm 1 at the final planned analysis time, allowing for competing events and deterministic planned accrual. One probability per alternative scenario without a stage dimension; NA when the final horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by the horizon, with fractional planning counts retained. Is a numeric vector.}
+
+\item{\code{expectedDropoutProportion2}}{Expected observed dropout proportion in arm 2 at the final planned analysis time, allowing for competing events and deterministic planned accrual. One probability per alternative scenario without a stage dimension; NA when the final horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by the horizon, with fractional planning counts retained. Is a numeric vector.}
+
 \item{\code{chi}}{The calculated event probability at end of trial. Is a numeric vector.}
 
 \item{\code{expectedNumberOfEvents}}{The expected number of events under specified alternative. Is a numeric vector.}

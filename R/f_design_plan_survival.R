@@ -127,6 +127,33 @@ NULL
     return(result)
 }
 
+.addExpectedDropoutProportions <- function(designPlan) {
+    numberOfResults <- length(designPlan$hazardRatio)
+    result <- matrix(NA_real_, nrow = 2, ncol = numberOfResults)
+    if (isTRUE(designPlan$accountForObservationTimes) && length(designPlan$analysisTime) > 0) {
+        horizons <- designPlan$analysisTime[designPlan$.design$kMax, ]
+        phi <- -log1p(-c(designPlan$dropoutRate1, designPlan$dropoutRate2)) / designPlan$dropoutTime
+        for (i in seq_len(numberOfResults)) {
+            lambda1 <- designPlan$lambda1[i]
+            if (designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
+                lambda1 <- .getLambda(groupNumber = 1, lambda1 = NA_real_,
+                    lambda2 = designPlan$lambda2, hazardRatio = designPlan$hazardRatio[i])
+            }
+            result[, i] <- .getDropoutProportionsGroupwise(
+                time = horizons[i], accrualTimeVector = designPlan$accrualTime,
+                accrualIntensity = designPlan$accrualIntensity,
+                lambda1 = lambda1, lambda2 = designPlan$lambda2,
+                piecewiseSurvivalTime = designPlan$piecewiseSurvivalTime, phi = phi,
+                allocationRatioPlanned = rep(designPlan$allocationRatioPlanned, length.out = numberOfResults)[i]
+            )
+        }
+    }
+    designPlan$expectedDropoutProportion1 <- result[1, ]
+    designPlan$expectedDropoutProportion2 <- result[2, ]
+    designPlan$.setParameterType("expectedDropoutProportion1", C_PARAM_DERIVED)
+    designPlan$.setParameterType("expectedDropoutProportion2", C_PARAM_DERIVED)
+}
+
 .getEventProbabilityFunction <- function(..., time, piecewiseLambda, piecewiseSurvivalTime, phi, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa != 1 && phi > 0) {
@@ -597,6 +624,7 @@ NULL
 
     .addStudyDurationToDesignPlan(designPlan)
     .setDirectionUpperDesignPlan(designPlan)
+    .addExpectedDropoutProportions(designPlan)
 
     return(designPlan)
 }
@@ -2925,6 +2953,8 @@ getPowerSurvival <- function(
     .addEffectScaleBoundaryDataToDesignPlan(designPlan)
     .addStudyDurationToDesignPlan(designPlan)
     .hideFutilityStopsIfNotApplicable(designPlan)
+
+    .addExpectedDropoutProportions(designPlan)
 
     return(designPlan)
 }
