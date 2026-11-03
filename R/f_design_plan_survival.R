@@ -70,6 +70,63 @@ NULL
     return(result)
 }
 
+.getDropoutProportionsGroupwise <- function(time, accrualTimeVector, accrualIntensity,
+        lambda1, lambda2, piecewiseSurvivalTime, phi, allocationRatioPlanned = 1) {
+    result <- rep(NA_real_, 2)
+    if (length(time) != 1L || !is.finite(time)) {
+        return(result)
+    }
+    if (accrualTimeVector[1] != 0) {
+        accrualTimeVector <- c(0, accrualTimeVector)
+    }
+    starts <- head(accrualTimeVector, -1)
+    ends <- pmin(time, tail(accrualTimeVector, -1))
+    widths <- pmax(0, ends - starts)
+    counts <- rep(accrualIntensity, length.out = length(widths)) * widths
+    if (sum(counts) == 0) {
+        return(result)
+    }
+    weights <- counts / sum(counts)
+    allocation <- c(allocationRatioPlanned, 1) / (1 + allocationRatioPlanned)
+    lambdas <- list(lambda1, lambda2)
+    for (g in 1:2) {
+        if (!is.finite(allocation[g]) || allocation[g] == 0) {
+            next
+        }
+        if (phi[g] == 0) {
+            result[g] <- 0
+            next
+        }
+        result[g] <- 0
+        for (j in which(counts > 0)) {
+            lower <- time - ends[j]
+            upper <- time - starts[j]
+            breaks <- sort(unique(c(lower, upper,
+                piecewiseSurvivalTime[piecewiseSurvivalTime > lower & piecewiseSurvivalTime < upper])))
+            integral <- 0
+            for (m in seq_len(length(breaks) - 1L)) {
+                part <- tryCatch(
+                    stats::integrate(function(u) {
+                        return(.getDropoutIncidence(u, lambdas[[g]], piecewiseSurvivalTime, phi[g]))
+                    }, breaks[m], breaks[m + 1L], rel.tol = 1e-9, abs.tol = 1e-11),
+                    error = function(e) {
+                        stopRuntimeIssue("Dropout accrual integration failed: ", conditionMessage(e),
+                            functionName = ".getDropoutProportionsGroupwise",
+                            constraint = "convergent one-dimensional dropout incidence integration",
+                            diagnosticId = "survival.dropout_accrual_integration_failed",
+                            context = list(arm = g, accrualInterval = j, horizon = time,
+                                lower = breaks[m], upper = breaks[m + 1L], operation = "integrate")
+                        )
+                    }
+                )
+                integral <- integral + part$value
+            }
+            result[g] <- result[g] + weights[j] * integral / widths[j]
+        }
+    }
+    return(result)
+}
+
 .getEventProbabilityFunction <- function(..., time, piecewiseLambda, piecewiseSurvivalTime, phi, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa != 1 && phi > 0) {
