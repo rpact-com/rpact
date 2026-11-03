@@ -191,6 +191,10 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     dropoutRate2 = "Drop-out rate (2)",
     expectedDropoutProportion1 = "Expected dropout proportion (1)",
     expectedDropoutProportion2 = "Expected dropout proportion (2)",
+    observedDropoutProportion1 = "Observed dropout proportion (1)",
+    observedDropoutProportion2 = "Observed dropout proportion (2)",
+    dropoutObservationTime1 = "Dropout observation time (1)",
+    dropoutObservationTime2 = "Dropout observation time (2)",
     dropoutTime = "Drop-out time",
     eventsFixed = "Number of events fixed",
     expectedEventsH0 = "Expected number of events under H0",
@@ -458,6 +462,12 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     
     if (identical(parameterName, "dropoutRate2") && !equals(obj$activeArms, 1L)) {
         return("Drop-out rate (control)")
+    }
+
+    if (inherits(obj, "SimulationResultsMultiArmSurvival") &&
+            grepl("^(observedDropoutProportion|dropoutObservationTime)2$", parameterName)) {
+        return(paste0(substr(C_PARAMETER_NAMES[[parameterName]], 1,
+            nchar(C_PARAMETER_NAMES[[parameterName]]) - 4L), " (control)"))
     }
 
     pluralExt <- ifelse(tableOutputEnabled, "", "s")

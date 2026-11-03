@@ -578,6 +578,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	std::fill(conditionalCriticalValue.begin(), conditionalCriticalValue.end(), NA_REAL);
 	NumericVector conditionalPowerPerStage(kMax);
 	std::fill(conditionalPowerPerStage.begin(), conditionalPowerPerStage.end(), NA_REAL);
+    NumericMatrix dropoutEnrolled(gMax * 2, kMax), dropoutDropped(gMax * 2, kMax);
+    std::fill(dropoutEnrolled.begin(), dropoutEnrolled.end(), NA_REAL);
+    std::fill(dropoutDropped.begin(), dropoutDropped.end(), NA_REAL);
 	LogicalMatrix selectedPopulations(gMax, kMax);
 	selectedPopulations(_, 0) = rep(TRUE, gMax); // First stage all populations selected
 	LogicalMatrix selectedsubGroupsIndices(pMax, kMax);
@@ -849,6 +852,15 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			}
 		}
 
+        for (int g = 0; g < gMax; ++g) {
+            LogicalVector inPopulation = charInSet(subGroupVector, createSubGroupsFromPopulation(gMax, g + 1));
+            for (int a = 0; a < 2; ++a) {
+                LogicalVector member = inPopulation & (treatments == a + 1);
+                captureDropoutCounts(recruitmentTimes, survivalTime, dropoutTime, member,
+                    analysisTime[k], dropoutEnrolled, dropoutDropped, g * 2 + a, k);
+            }
+        }
+
 		// Calculate separate p-values
 		for (int g = 0; g < gMax; g++) {
 			if (!R_IsNA(testStatistics(g, k))) {
@@ -1058,7 +1070,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	}
 
 	List result = List::create(
-		_["eventsNotAchieved"] = eventsNotAchieved,
+		_["dropoutEnrolled"] = dropoutEnrolled,
+        _["dropoutDropped"] = dropoutDropped,
+        _["eventsNotAchieved"] = eventsNotAchieved,
 		_["populationEventsPerStage"] = populationEventsPerStage,
 		_["subsetEventsPerStage"] = subsetEventsPerStage,
 		_["plannedEvents"] = plannedEvents,
@@ -1180,6 +1194,8 @@ List performSimulationEnrichmentSurvivalLoop(
 	NumericMatrix iterations(kMax, cols);
 	IntegerMatrix rawDataPerStage(cols, kMax);
 	List rawDataSets;
+    NumericMatrix dropoutRecords(cols * maxNumberOfIterations * gMax * 2, 7);
+    std::fill(dropoutRecords.begin(), dropoutRecords.end(), NA_REAL);
 	
 	// Initialize all these with zeros
 	std::fill(simulatedNumberEventsNotAchieved.begin(), simulatedNumberEventsNotAchieved.end(), 0);
@@ -1325,6 +1341,13 @@ List performSimulationEnrichmentSurvivalLoop(
 			LogicalVector successStop = closedTest["successStop"];
 			LogicalVector futilityStop = closedTest["futilityStop"];
 			NumericMatrix separatePValuesTest = closedTest["separatePValues"];
+
+            finishDropoutRecords(dropoutRecords,
+                (i * maxNumberOfIterations + j) * gMax * 2, i + 1, j + 1,
+                as<NumericMatrix>(stageResults["dropoutEnrolled"]),
+                as<NumericMatrix>(stageResults["dropoutDropped"]), analysisTime,
+                selectedPopulationsTest, eventsNotAchieved, successStop, futilityStop,
+                gMax, 2, false);
 
 			int stopStage = -1;
 			for (int k = 0; k < kMax; k++) {
@@ -1570,6 +1593,7 @@ List performSimulationEnrichmentSurvivalLoop(
 		_["expectedStudyDuration"] = expectedStudyDuration,
 		_["iterations"] = iterations,
 		_["data"] = filteredData,
-		_["rawData"] = rawDataSets
+		_["dropoutRecords"] = dropoutRecords,
+        _["rawData"] = rawDataSets
 	);
 }

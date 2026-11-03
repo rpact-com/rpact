@@ -312,6 +312,7 @@ NULL
     analysisTime <- rep(NA_real_, kMax)
     numberOfSubjects <- rep(NA_real_, kMax)
     eventsNotAchieved <- rep(FALSE, kMax)
+    dropoutEnrolled <- dropoutDropped <- matrix(NA_real_, nrow = gMax + 1, ncol = kMax)
 
     if (.isTrialDesignFisher(design)) {
         weights <- .getWeightsFisher(design)
@@ -489,6 +490,12 @@ NULL
             singleEventsPerStage[retainedArms, k] <- singleEventsPerStage[retainedArms, k] -
                 cumulativeEventsPerArmAndStage[retainedArms, k - 1]
         }
+        for (g in seq_len(gMax + 1L)) {
+            counts <- .captureDropoutCounts(survivalDataSet, analysisTime[k], survivalDataSet$treatmentArm == g)
+            dropoutEnrolled[g, k] <- counts[1]
+            dropoutDropped[g, k] <- counts[2]
+        }
+
         separatePValues[, k] <- 1 - stats::pnorm(testStatistics[, k])
         overallEffects[, k] <- thetaH0 * exp(
             (2 * directionUpper - 1) *
@@ -643,6 +650,8 @@ NULL
     }
 
     result <- list(
+        dropoutEnrolled = dropoutEnrolled,
+        dropoutDropped = dropoutDropped,
         eventsNotAchieved = eventsNotAchieved,
         singleEventsPerStage = singleEventsPerStage,
         cumulativeEventsPerStage = cumulativeEventsPerStage,
@@ -721,6 +730,7 @@ NULL
     iterations <- matrix(0, nrow = kMax, ncol = cols)
     rawDataPerStage <- matrix(0L, nrow = cols, ncol = kMax)
     rawDataSets <- list()
+    dropoutRecords <- matrix(NA_real_, nrow = cols * maxNumberOfIterations * (gMax + 1), ncol = 7)
 
     len <- maxNumberOfIterations * kMax * gMax * cols
 
@@ -811,6 +821,10 @@ NULL
                     successCriterion = successCriterion
                 )
             }
+
+            recordRows <- ((i - 1L) * maxNumberOfIterations + j - 1L) * (gMax + 1) + seq_len(gMax + 1)
+            dropoutRecords[recordRows, ] <- .finishDropoutRecords(stageResults, closedTest, i, j,
+                groups = gMax + 1L, arms = 1, sharedControl = TRUE)
 
             stopStage <- NA_integer_
             for (k in seq_len(kMax)) {
@@ -1014,6 +1028,7 @@ NULL
         expectedStudyDuration = expectedStudyDuration,
         iterations = iterations,
         data = data,
+        dropoutRecords = dropoutRecords,
         rawData = rawDataSets
     )
 }

@@ -418,6 +418,9 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
     std::fill(conditionalCriticalValue.begin(), conditionalCriticalValue.end(), NA_REAL);
     NumericVector conditionalPowerPerStage(kMax);
     std::fill(conditionalPowerPerStage.begin(), conditionalPowerPerStage.end(), NA_REAL);
+    NumericMatrix dropoutEnrolled(gMax + 1, kMax), dropoutDropped(gMax + 1, kMax);
+    std::fill(dropoutEnrolled.begin(), dropoutEnrolled.end(), NA_REAL);
+    std::fill(dropoutDropped.begin(), dropoutDropped.end(), NA_REAL);
     LogicalMatrix selectedArms(gMax, kMax);
     std::fill(selectedArms.begin(), selectedArms.end(), false);
     selectedArms(_, 0) = rep(true, gMax); // First stage has all arms selected.
@@ -631,6 +634,12 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
             }
         }
         
+        for (int g = 0; g <= gMax; ++g) {
+            LogicalVector member = treatments == g + 1;
+            captureDropoutCounts(recruitmentTimes, survivalTime, dropoutTime, member,
+                analysisTime[k], dropoutEnrolled, dropoutDropped, g, k);
+        }
+
         // Store increments before averaging; selection differs between iterations.
         for (int g = 0; g <= gMax; g++) {
             if (g == gMax || selectedArms(g, k)) {
@@ -848,6 +857,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
     }
        
     List result = List::create(
+        _["dropoutEnrolled"] = dropoutEnrolled,
+        _["dropoutDropped"] = dropoutDropped,
         _["eventsNotAchieved"] = eventsNotAchieved,
         _["singleEventsPerStage"] = singleEventsPerStage,
         _["cumulativeEventsPerStage"] = cumulativeEventsPerStage,
@@ -975,6 +986,8 @@ List performSimulationMultiArmSurvivalLoop(
 	NumericMatrix iterations(kMax, cols);
 	IntegerMatrix rawDataPerStage(cols, kMax);
 	List rawDataSets;
+    NumericMatrix dropoutRecords(cols * maxNumberOfIterations * (gMax + 1), 7);
+    std::fill(dropoutRecords.begin(), dropoutRecords.end(), NA_REAL);
 	
 	// Initialize all these with zeros
 	std::fill(simulatedNumberEventsNotAchieved.begin(), simulatedNumberEventsNotAchieved.end(), 0);
@@ -1111,6 +1124,13 @@ List performSimulationMultiArmSurvivalLoop(
 			LogicalVector successStop = closedTest["successStop"];
 			LogicalVector futilityStop = closedTest["futilityStop"];
 			NumericMatrix separatePValuesTest = closedTest["separatePValues"];
+
+            finishDropoutRecords(dropoutRecords,
+                (i * maxNumberOfIterations + j) * (gMax + 1), i + 1, j + 1,
+                as<NumericMatrix>(stageResults["dropoutEnrolled"]),
+                as<NumericMatrix>(stageResults["dropoutDropped"]), analysisTime,
+                selectedArmsTest, eventsNotAchieved, successStop, futilityStop,
+                gMax + 1, 1, true);
 
 			int stopStage = -1;
 			for (int k = 0; k < kMax; k++) {
@@ -1369,6 +1389,7 @@ List performSimulationMultiArmSurvivalLoop(
 		_["expectedStudyDuration"] = expectedStudyDuration,
 		_["iterations"] = iterations,
 		_["data"] = filteredData,
-		_["rawData"] = rawDataSets
+		_["dropoutRecords"] = dropoutRecords,
+        _["rawData"] = rawDataSets
 	);
 }

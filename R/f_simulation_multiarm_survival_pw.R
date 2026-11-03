@@ -911,5 +911,7 @@ getSimulationMultiArmSurvival <- function(
     simulationResults$.data <- loopResult$data
     simulationResults$.rawData <- .createSimulationSurvivalRawData(loopResult$rawData)
 
+    .addObservedDropoutProportions(simulationResults, loopResult$dropoutRecords, cols, gMax, multiArm = TRUE)
+
     return(simulationResults)
 }

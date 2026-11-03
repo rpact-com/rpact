@@ -439,6 +439,8 @@ NULL
         enrichment = TRUE
     )
     
+    .addObservedDropoutProportions(simulationResults, loopResult$dropoutRecords, cols, gMax)
+
     return(simulationResults)
 }
 

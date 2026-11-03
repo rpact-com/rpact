@@ -247,6 +247,17 @@ NULL
 }
 
 .getParameterSetParameterCaptionPerRow <- function(parameterSet, paramName, paramCaption, matrixRow) {
+    if (grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", paramName)) {
+        if (inherits(parameterSet, "SimulationResultsEnrichmentSurvival")) {
+            population <- .getCategoryCaptionEnrichment(parameterSet, paramName, matrixRow)
+            return(paste0(paramCaption, ", population ", population))
+        }
+        if (inherits(parameterSet, "SimulationResultsMultiArmSurvival")) {
+            label <- substr(paramCaption, 1, nchar(paramCaption) - 4L)
+            return(paste0(label, " (active arm ", matrixRow, ")"))
+        }
+    }
+
     if (.isMultiArmAnalysisResults(parameterSet)) {
         return(paste0(paramCaption, " (", matrixRow, ")"))
     }

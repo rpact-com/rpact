@@ -973,5 +973,7 @@ getSimulationSurvival <- function(
     
     .addStudyDurationToDesignPlan(simulationResults)
 
+    .addObservedDropoutProportions(simulationResults, resultData$dropoutRecords, numberOfResults)
+
     return(simulationResults)
 }
