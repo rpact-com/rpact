@@ -464,6 +464,11 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
         return("Drop-out rate (control)")
     }
 
+    if (inherits(obj, "SimulationResultsEnrichmentSurvival") &&
+            identical(parameterName, "dropoutObservationTime1")) {
+        return("Drop-out observation time")
+    }
+
     if (inherits(obj, "SimulationResultsMultiArmSurvival") &&
             grepl("^(observedDropoutProportion|dropoutObservationTime)2$", parameterName)) {
         return(paste0(substr(C_PARAMETER_NAMES[[parameterName]], 1,

@@ -89,6 +89,10 @@ NULL
 }
 
 .getParameterValueFormatted <- function(obj, parameterName) {
+    if (inherits(obj, "SimulationResultsEnrichmentSurvival") &&
+            identical(parameterName, "dropoutObservationTime2")) {
+        return(NULL)
+    }
     tryCatch(
         {
             result <- obj$.extractParameterNameAndValue(parameterName)

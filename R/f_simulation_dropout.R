@@ -85,6 +85,10 @@
 }
 
 .addDropoutSummaryItems <- function(result, summaryFactory) {
+    if (inherits(result, "SimulationResultsEnrichmentSurvival")) {
+        .addEnrichmentDropoutSummaryItems(result, summaryFactory)
+        return(invisible(NULL))
+    }
     fields <- c("expectedDropoutProportion1", "expectedDropoutProportion2",
         "observedDropoutProportion1", "observedDropoutProportion2",
         "dropoutObservationTime1", "dropoutObservationTime2")
@@ -112,6 +116,38 @@
                 }
                 summaryFactory$addItem(title, formatted)
             }
+        }
+    }
+}
+
+.addEnrichmentDropoutSummaryItems <- function(result, summaryFactory) {
+    fields <- c("observedDropoutProportion1", "observedDropoutProportion2", "dropoutObservationTime1")
+    values <- lapply(fields, function(field) {
+        value <- result[[field]]
+        if (is.null(value) || result$isNotApplicableParameter(field)) {
+            return(NULL)
+        }
+        if (is.null(dim(value))) {
+            value <- matrix(value, nrow = 1)
+        }
+        return(value)
+    })
+    if (any(vapply(values, is.null, logical(1)))) {
+        return(invisible(NULL))
+    }
+
+    for (i in seq_len(ncol(values[[1]]))) {
+        caption <- "Observed drop-out by population"
+        if (ncol(values[[1]]) > 1) {
+            caption <- paste0(caption, ", scenario ", i)
+        }
+        summaryFactory$addItem(caption, "")
+        for (g in seq_len(nrow(values[[1]]))) {
+            populationCaption <- .getSummaryGroupCaption(result, fields[1], nrow(values[[1]]), g)
+            summaryFactory$addItem(populationCaption, "")
+            summaryFactory$addItem("    Proportion (1)", .formatRates(values[[1]][g, i]))
+            summaryFactory$addItem("    Proportion (2)", .formatRates(values[[2]][g, i]))
+            summaryFactory$addItem("    Time", .formatDropoutObservationTime(values[[3]][g, i]))
         }
     }
 }

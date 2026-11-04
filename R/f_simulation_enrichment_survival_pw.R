@@ -516,6 +516,11 @@ NULL
 #' the planned increase in events among the selected subgroups. Events already
 #' observed in those subgroups at the preceding analysis count toward the target.
 #'
+#' Printed drop-out observation times are reported once per population because
+#' both treatment arms share the population's finishing analysis. The summary
+#' groups both arm-specific proportions and one observation time under each
+#' population. The arm-specific result fields remain available for extraction.
+#'
 #' For piecewise exponential event times, include a
 #' \code{PiecewiseSurvivalTimeEnrichment} object in
 #' \code{effectList$piecewiseSurvivalTime}. Its hazard ratios are represented
