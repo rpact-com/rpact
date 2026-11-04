@@ -258,7 +258,7 @@ NULL
         }
         if (inherits(parameterSet, "SimulationResultsMultiArmSurvival")) {
             label <- substr(paramCaption, 1, nchar(paramCaption) - 4L)
-            return(paste0(label, " (active arm ", matrixRow, ")"))
+            return(paste0(label, " (arm ", matrixRow, ")"))
         }
     }
 

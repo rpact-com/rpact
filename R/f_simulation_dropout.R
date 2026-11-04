@@ -89,6 +89,10 @@
         .addEnrichmentDropoutSummaryItems(result, summaryFactory)
         return(invisible(NULL))
     }
+    if (inherits(result, "SimulationResultsMultiArmSurvival")) {
+        .addMultiArmDropoutSummaryItems(result, summaryFactory)
+        return(invisible(NULL))
+    }
     fields <- c("expectedDropoutProportion1", "expectedDropoutProportion2",
         "observedDropoutProportion1", "observedDropoutProportion2",
         "dropoutObservationTime1", "dropoutObservationTime2")
@@ -116,6 +120,44 @@
                 }
                 summaryFactory$addItem(title, formatted)
             }
+        }
+    }
+}
+
+.addMultiArmDropoutSummaryItems <- function(result, summaryFactory) {
+    fields <- c("observedDropoutProportion1", "observedDropoutProportion2",
+        "dropoutObservationTime1", "dropoutObservationTime2")
+    values <- lapply(fields, function(field) {
+        value <- result[[field]]
+        if (is.null(value) || result$isNotApplicableParameter(field)) {
+            return(NULL)
+        }
+        if (is.null(dim(value))) {
+            value <- matrix(value, nrow = 1)
+        }
+        return(value)
+    })
+    if (any(vapply(values, is.null, logical(1)))) {
+        return(invisible(NULL))
+    }
+
+    proportions <- rbind(values[[1]], values[[2]])
+    times <- rbind(values[[3]], values[[4]])
+    armCaptions <- c(paste0("Treatment arm ", seq_len(nrow(values[[1]]))), "Control")
+    listItemPrefix <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_LIST_ITEM_PREFIX", "rpact.summary.list.item.prefix",
+        default = C_SUMMARY_LIST_ITEM_PREFIX_DEFAULT, type = "character"
+    )
+    for (i in seq_len(ncol(proportions))) {
+        caption <- "Observed drop-out by arm"
+        if (ncol(proportions) > 1) {
+            caption <- paste0(caption, ", scenario ", i)
+        }
+        summaryFactory$addItem(caption, "")
+        for (g in seq_len(nrow(proportions))) {
+            summaryFactory$addItem(paste0(listItemPrefix, armCaptions[g]), "")
+            summaryFactory$addItem("    Proportion", .formatRates(proportions[g, i]))
+            summaryFactory$addItem("    Time", .formatDropoutObservationTime(times[g, i]))
         }
     }
 }

@@ -100,6 +100,10 @@ NULL
 #' legacy test-statistic-based approach for backward compatibility if no patient-wise-specific
 #' arguments are provided.
 #'
+#' The summary groups observed drop-out proportions and observation times by
+#' active treatment arm, followed by the shared control arm. Each arm uses its
+#' own finishing analysis, including active arms discontinued at an interim.
+#'
 #' For piecewise exponential event times, create \code{piecewiseSurvivalTime}
 #' with \code{getPiecewiseSurvivalTimeMultiArm()}. Hazard ratios are represented
 #' as an active-arm-by-interval-by-situation array; equivalently, they can be
