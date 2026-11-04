@@ -108,7 +108,7 @@
                 }
                 formatted <- .formatRates(values[g, i])
                 if (startsWith(field, "dropoutObservationTime")) {
-                    formatted <- .formatTime(values[g, i])
+                    formatted <- .formatDropoutObservationTime(values[g, i])
                 }
                 summaryFactory$addItem(title, formatted)
             }
