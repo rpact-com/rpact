@@ -39,8 +39,7 @@ notes: Friedrich Pahlke and Daniel Sabanés Bové
 ```{r}
 #| label: setup
 #| include: false
-#suppressPackageStartupMessages(library(rpact))
-devtools::load_all("D:/R/workspace/rpact.qtd")
+suppressPackageStartupMessages(library(rpact))
 suppressPackageStartupMessages(library(ggplot2))
 knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
 options("rpact.print.heading.base.number" = -1)
