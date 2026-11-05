@@ -1,4 +1,18 @@
-## Public plot methods for quantitative trial design objects.
+## |
+## |  *Public plot methods for quantitative trial design objects*
+## |
+## |  This file is part of the R package rpact:
+## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |
+## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  Licensed under "GNU Lesser General Public License" version 3
+## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |
+## |  RPACT company website: https://www.rpact.com
+## |  rpact package website: https://www.rpact.org
+## |
+## |  Contact us for information about our services: info@rpact.com
+## |
 
 #'
 #' @title
@@ -362,7 +376,7 @@ plot.OperatingCharcteristics <- function(x, plotCat = c(3, 6), main = NA_charact
         p <- .plotQtdSensitivity(data, sensitivity, category, functionName, contourLevels)
         defaultTitle <- "Sensitivity of decision probabilities"
     } else {
-        data <- .getQtdDecisionPerformance(data, weights, desiredDecisions, functionName)
+        data <- .getQtdDecisionPerformance(data, weights, desiredDecisions, functionName, effectColumnName = "alternative")
         p <- ggplot2::ggplot(data, ggplot2::aes(.data[["observedDecision"]], .data[["desiredDecision"]], fill = .data[["probability"]])) +
             ggplot2::geom_tile(color = "white") +
             ggplot2::geom_text(ggplot2::aes(label = paste0(formatC(100 * .data[["probability"]], digits = 1, format = "f"), "%"))) +

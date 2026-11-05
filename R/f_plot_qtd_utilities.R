@@ -1,4 +1,18 @@
-## Shared preparation and validation for quantitative trial design plots.
+## |
+## |  *Shared preparation and validation for quantitative trial design plots*
+## |
+## |  This file is part of the R package rpact:
+## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |
+## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  Licensed under "GNU Lesser General Public License" version 3
+## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |
+## |  RPACT company website: https://www.rpact.com
+## |  rpact package website: https://www.rpact.org
+## |
+## |  Contact us for information about our services: info@rpact.com
+## |
 
 .getQtdPlotCaptions <- function(object) {
     if (inherits(object, "TrialDesignPlanQuantitative")) {
@@ -28,7 +42,7 @@
 
 .assertQtdPlotChoice <- function(value, parameter, allowedValues, functionName) {
     if (length(value) != 1L || is.na(value) || !(value %in% allowedValues)) {
-        stopIllegalArgument("'", parameter, "' must be one of: ", paste(allowedValues, collapse = ", "),
+        stopIllegalArgument(.sQuote(parameter), " must be one of: ", paste(allowedValues, collapse = ", "),
             functionName = functionName, parameter = parameter, value = value,
             constraint = "one of the allowed choices", diagnosticId = "qtd.plot.invalid_choice",
             context = list(allowedValues = allowedValues)
@@ -39,25 +53,34 @@
 .assertQtdPlotNumeric <- function(value, parameter, functionName, lower = -Inf, upper = Inf,
         expectedLength = NULL, integer = FALSE, openLower = FALSE, openUpper = FALSE) {
     if (is.null(value)) {
-        stopMissingArgument("'", parameter, "' must be supplied for this plot",
-            functionName = functionName, parameter = parameter,
-            constraint = "required numeric input", diagnosticId = "qtd.plot.missing_numeric_input"
+        stopMissingArgument(.sQuote(parameter), " must be supplied for this plot",
+            functionName = functionName, 
+            parameter = parameter,
+            constraint = "required numeric input", 
+            diagnosticId = "qtd.plot.missing_numeric_input"
         )
     }
     if (!is.numeric(value) || length(value) == 0L || anyNA(value) || any(!is.finite(value)) ||
             (integer && any(value != floor(value)))) {
-        stopIllegalArgument("'", parameter, "' must contain finite ",
-            ifelse(integer, "integers", "numeric values"),
-            functionName = functionName, parameter = parameter, value = value,
+        stopIllegalArgument(.sQuote(parameter), " must contain finite ",
+                ifelse(integer, "integers", "numeric values"),
+            functionName = functionName, 
+            parameter = parameter, 
+            value = value,
             constraint = "nonempty finite numeric vector of the required type",
-            diagnosticId = "qtd.plot.invalid_numeric_input", context = list(integerRequired = integer)
+            diagnosticId = "qtd.plot.invalid_numeric_input", 
+            context = list(integerRequired = integer)
         )
     }
     if (!is.null(expectedLength) && length(value) != expectedLength) {
-        stopArgumentLengthOutOfBounds("'", parameter, "' has an invalid length",
-            functionName = functionName, parameter = parameter, value = value,
-            constraint = "exactly the expected number of entries", expectedLength = expectedLength,
-            actualLength = length(value), diagnosticId = "qtd.plot.invalid_length"
+        stopArgumentLengthOutOfBounds(.sQuote(parameter), " must have length ", expectedLength,
+            functionName = functionName, 
+            parameter = parameter, 
+            value = value,
+            constraint = "exactly the expected number of entries", 
+            expectedLength = expectedLength,
+            actualLength = length(value), 
+            diagnosticId = "qtd.plot.invalid_length"
         )
     }
     outside <- value < lower | value > upper
@@ -68,7 +91,7 @@
         outside <- outside | value == upper
     }
     if (any(outside)) {
-        stopArgumentOutOfRange("'", parameter, "' is outside its allowed range",
+        stopArgumentOutOfRange(.sQuote(parameter), " is outside its allowed range",
             functionName = functionName, parameter = parameter, value = value,
             lowerBound = lower, upperBound = upper,
             constraint = paste0(ifelse(openLower, "(", "["), lower, ", ", upper,
@@ -382,7 +405,7 @@
 .assertQtdPlotRange <- function(value, parameter, functionName, lower = -Inf) {
     .assertQtdPlotNumeric(value, parameter, functionName, lower = lower, expectedLength = 2L)
     if (value[1L] >= value[2L]) {
-        stopIllegalArgument("'", parameter, "' must be strictly increasing",
+        stopIllegalArgument(.sQuote(parameter), " must be strictly increasing",
             functionName = functionName, parameter = parameter, value = value,
             constraint = "first endpoint < second endpoint", diagnosticId = "qtd.plot.invalid_range"
         )
@@ -489,20 +512,30 @@
     return(p)
 }
 
-.getQtdDecisionPerformance <- function(data, weights, desiredDecisions, functionName) {
-    effects <- unique(data$alternative)
+.getQtdDecisionPerformance <- function(data, weights, desiredDecisions, functionName, effectColumnName = "alternative") {
+    effects <- unique(data[[effectColumnName]])
     .assertQtdPlotNumeric(weights, "weights", functionName, lower = 0, expectedLength = length(effects))
     if (is.null(desiredDecisions)) {
         stopMissingArgument("'desiredDecisions' must be supplied for the decision-performance plot",
-            functionName = functionName, parameter = "desiredDecisions",
+            functionName = functionName, 
+            parameter = "desiredDecisions",
             constraint = "one desired decision per selected effect",
-            diagnosticId = "qtd.plot.missing_desired_decisions", context = list(effects = effects)
+            diagnosticId = "qtd.plot.missing_desired_decisions", 
+            context = list(effects = effects)
         )
     }
+    
+    
+    print(effects)
+    .assertIsCharacter(desiredDecisions, "desiredDecisions", naAllowed = FALSE)
+    .assertHasLength(desiredDecisions, "desiredDecisions", len = length(effects), lenArgName = effectColumnName, naAllowed = FALSE)
     if (abs(sum(weights) - 1) > 1e-10) {
         stopIllegalArgument("'weights' must sum to one",
-            functionName = functionName, parameter = "weights", value = weights,
-            constraint = "nonnegative weights summing to one", diagnosticId = "qtd.plot.weights_not_normalized",
+            functionName = functionName, 
+            parameter = "weights", 
+            value = weights,
+            constraint = "nonnegative weights summing to one", 
+            diagnosticId = "qtd.plot.weights_not_normalized",
             context = list(weightSum = sum(weights), effects = effects)
         )
     }
@@ -511,22 +544,27 @@
         stopArgumentLengthOutOfBounds("Supply one desired decision per selected effect",
             functionName = functionName, parameter = "desiredDecisions", value = desiredDecisions,
             constraint = "one desired decision per selected effect",
-            expectedLength = length(effects), actualLength = length(desiredDecisions),
-            relatedParameter = "alternatives", relatedValue = effects,
+            expectedLength = length(effects), 
+            actualLength = length(desiredDecisions),
+            relatedParameter = "alternatives", 
+            relatedValue = effects,
             diagnosticId = "qtd.plot.desired_decision_length"
         )
     }
     if (!is.character(desiredDecisions) ||
             anyNA(desiredDecisions) || any(!(desiredDecisions %in% decisions))) {
         stopIllegalArgument("Supply one desired decision per selected effect",
-            functionName = functionName, parameter = "desiredDecisions", value = desiredDecisions,
+            functionName = functionName, parameter = "desiredDecisions", 
+            value = desiredDecisions,
             constraint = "one Go, Indeterminate or Stop per selected effect",
-            relatedParameter = "alternatives", relatedValue = effects,
-            diagnosticId = "qtd.plot.invalid_desired_decisions", context = list(allowedValues = decisions)
+            relatedParameter = "alternatives", 
+            relatedValue = effects,
+            diagnosticId = "qtd.plot.invalid_desired_decisions", 
+            context = list(allowedValues = decisions)
         )
     }
     data <- .uniqueQtdEffectRows(data)
-    indices <- match(data$alternative, effects)
+    indices <- match(data[[effectColumnName]], effects)
     data$desiredDecision <- desiredDecisions[indices]
     data$observedDecision <- .getQtdCoarseCategory(data$category)
     data$probability <- data$probability * weights[indices]
