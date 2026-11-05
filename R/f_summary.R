@@ -924,7 +924,7 @@ NULL
                 designPlan$isGeneratedParameter("expectedNumberOfSubjects")) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedNumberOfSubjects",
-                parameterCaption = "Expected number of subjects under H1",
+                parameterCaption = "Expected number of subjects",
                 roundDigits = digitSettings$digitsSampleSize,
                 transpose = TRUE,
                 lastStage = design$kMax
@@ -938,7 +938,7 @@ NULL
         )
         summaryFactory$addParameter(designPlan,
             parameterName = parameterName,
-            parameterCaption = "Expected number of subjects under H1",
+            parameterCaption = "Expected number of subjects",
             roundDigits = digitSettings$digitsSampleSize,
             transpose = TRUE,
             validateParameterType = !countDataEnabled,
@@ -1030,7 +1030,7 @@ NULL
         if (!is.na(parameterNameEventsH1)) {
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterNameEventsH1,
-                parameterCaption = "Expected number of events under H1",
+                parameterCaption = "Expected number of events",
                 roundDigits = digitSettings$digitsSampleSize,
                 transpose = TRUE,
                 lastStage = design$kMax
@@ -1229,7 +1229,7 @@ NULL
             !is.null(designPlan[["earlyStop"]])) {
         summaryFactory$addParameter(
             designPlan,
-            parameterName = "earlyStop",
+            parameterName = "earlyStop", 
             parameterCaption = paste0(
                 "Stopping probability",
                 ifelse(survivalPatientWiseEnabled, " by stage", "")
@@ -1279,7 +1279,7 @@ NULL
                 if (!is.null(probsH0)) {
                     summaryFactory$addParameter(
                         probsH0,
-                        parameterName = "earlyStop",
+                        parameterName = "earlyStop", 
                         parameterCaption = "Stopping probability by stage (under H0)",
                         roundDigits = digitSettings$digitsProbabilities,
                         smoothedZeroFormat = TRUE
@@ -1290,7 +1290,7 @@ NULL
                     x <- design
                 }
                 summaryFactory$addParameter(x,
-                    parameterName = "earlyStop",
+                    parameterName = "earlyStop", 
                     values = probsH1$earlyStop,
                     parameterCaption = "Stopping probability by stage",
                     roundDigits = digitSettings$digitsProbabilities,
