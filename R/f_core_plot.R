@@ -32,6 +32,11 @@ NULL
 
     .assertIsSingleInteger(type, "type", validateType = FALSE)
 
+    qtdCaptions <- .getQtdPlotCaptions(obj)
+    if (type %in% seq_along(qtdCaptions)) {
+        return(.addNumberToPlotCaption(qtdCaptions[type], type, numberInCaptionEnabled))
+    }
+
     if (inherits(obj, "TrialDesignPlan")) {
         if (type == 1) {
             if (.isTrialDesignPlanSurvival(obj)) {
@@ -504,7 +509,9 @@ getAvailablePlotTypes <- function(
     }
 
     types <- integer(0)
-    if (inherits(obj, "TrialDesignPlan")) {
+    if (length(.getQtdPlotCaptions(obj)) > 0L) {
+        types <- seq_along(.getQtdPlotCaptions(obj))
+    } else if (inherits(obj, "TrialDesignPlan")) {
         if (obj$.design$kMax > 1) {
             types <- c(types, 1)
             if (!.isTrialDesignPlanCountData(obj)) {
