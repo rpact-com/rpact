@@ -1,6 +1,21 @@
 ---
 title: Quantitative Trial Decisions for Means and Rates with rpact
-author: '[[](#)]{.author-row} [[Friedrich Pahlke](https://www.linkedin.com/in/pahlke "Visit Friedrich Pahlke''s LinkedIn Profile"){.author-linkedin}]{.author-row} [[Daniel Sabanés Bové](https://www.linkedin.com/in/danielsabanesbove/ "Visit Daniel Sabanés Bové''s LinkedIn Profile"){.author-linkedin}]{.author-row}'
+author: '[[](#)]{.author-row} [[Friedrich
+  Pahlke](https://www.linkedin.com/in/pahlke "Visit Friedrich Pahlke''s LinkedIn Profile"){.author-linkedin}
+  [<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512
+  512"><path fill="#a6ce39" d="M294.8 188.2h-45.9V342h47.5c67.6 0 83.1-51.3 83.1-76.9
+  0-41.6-26.5-76.9-84.7-76.9zM256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393
+  8 256 8zm-80.8 360.8h-29.8v-207.5h29.8zm-14.9-231.1a19.6 19.6 0 1 1 19.6-19.6 19.6
+  19.6 0 0 1 -19.6 19.6zM300 369h-81V161.3h80.6c76.7 0 110.4 54.8 110.4 103.9C410
+  318.4 368.4 369 300 369z"/></svg>](https://orcid.org/0000-0003-2105-2582 "Visit
+  Friedrich Pahlke''s ORCID Profile"){.author-orcid}]{.author-row} [[Daniel Sabanés Bové](https://www.linkedin.com/in/danielsabanesbove/
+  "Visit Daniel Sabanés Bové''s LinkedIn Profile"){.author-linkedin} [<svg xmlns="http://www.w3.org/2000/svg"
+  height="16" width="16" viewBox="0 0 512 512"><path fill="#a6ce39" d="M294.8 188.2h-45.9V342h47.5c67.6
+  0 83.1-51.3 83.1-76.9 0-41.6-26.5-76.9-84.7-76.9zM256 8C119 8 8 119 8 256s111 248
+  248 248 248-111 248-248S393 8 256 8zm-80.8 360.8h-29.8v-207.5h29.8zm-14.9-231.1a19.6
+  19.6 0 1 1 19.6-19.6 19.6 19.6 0 0 1 -19.6 19.6zM300 369h-81V161.3h80.6c76.7 0 110.4
+  54.8 110.4 103.9C410 318.4 368.4 369 300 369z"/></svg>](https://orcid.org/0000-0002-0176-9239
+  "Visit Daniel Sabanés Bové''s ORCID Profile"){.author-orcid}]{.author-row}'
 lang: en
 date: last-modified
 project:
@@ -55,21 +70,30 @@ example retain the original numbers. The continuous example retains the original
 decision thresholds and percentiles; additional planning assumptions are
 identified explicitly.
 
-The examples require a development version of rpact providing
+The examples require the [QTD development version of
+rpact](https://github.com/rpact-com/rpact/tree/dev/qtd) providing
 `getDesignQuantitative()`, `getOperatingCharcteristicsMeans()`, and
 `getOperatingCharcteristicsRates()`, together with their QTD print, summary, and
 plot methods. The spelling `Charcteristics` follows the current function names.
+
+## How to intall the QTD development version
+
+```{r}
+#| label: install-dev
+#| eval: false
+pak::pkg_install("rpact-com/rpact@dev/qtd", upgrade = TRUE)
+```
 
 # Defining a Quantitative Decision Rule
 
 ## Reference values and percentiles
 
-| Argument | Interpretation | Default | |:--|:--|:--| | `targetValue` | Target
-value (TV), also called target difference (TD) | Required | |
-`lowerReferenceValue` | Lower reference value (LRV), also called minimum
-acceptable difference (MAD) | Required | | `lowerPercentile` | Percentile
-defining the lower interval limit | `0.2` | | `upperPercentile` | Percentile
-defining the upper interval limit | `0.9` |
+| Argument | Interpretation | Default | 
+|:--|:--|:--| 
+| `targetValue` | Target value (TV), also called target difference (TD) | Required | 
+| `lowerReferenceValue` | Lower reference value (LRV), also called minimum acceptable difference (MAD) | Required | 
+| `lowerPercentile` | Percentile defining the lower interval limit | `0.2` | 
+| `upperPercentile` | Percentile defining the upper interval limit | `0.9` |
 
 Use reference values on a scale on which larger effects are beneficial, with LRV
 no larger than TV. The percentiles satisfy $0 < p_L < p_U < 1$. For a normally
@@ -110,12 +134,13 @@ gives **Stop**. The six-category view distinguishes particularly strong evidence
 and the two reasons for an indeterminate decision.
 
 | Six-category decision | Interval configuration | Three-category decision |
-|:--|:--|:--| | Go (Fixed) | $L \geq \mathrm{TV}$ | Go | | Go |
-$\mathrm{LRV} \leq L < \mathrm{TV}$ and $U \geq \mathrm{TV}$ | Go | |
-Indeterminate 1 | $L < \mathrm{LRV}$ and $U \geq \mathrm{TV}$ | Indeterminate |
+|:--|:--|:--| 
+| Go (Fixed) | $L \geq \mathrm{TV}$ | Go | 
+| Go | $\mathrm{LRV} \leq L < \mathrm{TV}$ and $U \geq \mathrm{TV}$ | Go | 
+| Indeterminate 1 | $L < \mathrm{LRV}$ and $U \geq \mathrm{TV}$ | Indeterminate |
 | Indeterminate 2 | $L \geq \mathrm{LRV}$ and $U < \mathrm{TV}$ | Indeterminate
-| | Stop | $L < \mathrm{LRV}$ and $\mathrm{LRV} \leq U < \mathrm{TV}$ | Stop | |
-Stop (Fixed) | $U < \mathrm{LRV}$ | Stop |
+| | Stop | $L < \mathrm{LRV}$ and $\mathrm{LRV} \leq U < \mathrm{TV}$ | Stop | 
+| Stop (Fixed) | $U < \mathrm{LRV}$ | Stop |
 
 The original demonstration describes the criteria using “greater than”. The
 implementation includes equality at the corresponding reference boundary as
@@ -146,15 +171,16 @@ benefit-risk assessment are separate considerations. These are planning
 assumptions from the demonstration, rather than reported outcomes of the public
 trial.
 
-| Quantity | Original value | rpact argument | |:--|:--|:--| | Minimum
-acceptable difference | −5 percentage points | `lowerReferenceValue = -0.05` | |
-Target difference | 0 percentage points | `targetValue = 0` | | Lower / upper
-percentiles | 20% / 90% | `lowerPercentile = 0.2`, `upperPercentile = 0.9` | |
-Control event probability | 15% | `pi2 = 0.15` | | Treatment event-probability
-range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` | | Sample sizes,
-control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
-| Beneficial direction | Lower treatment rate | `directionUpper = FALSE` | |
-Original interval construction | QTD1 | `intervalMethod = "qtd1"` |
+| Quantity | Original value | rpact argument | 
+|:--|:--|:--| 
+| Minimum acceptable difference | −5 percentage points | `lowerReferenceValue = -0.05` | 
+| Target difference | 0 percentage points | `targetValue = 0` | 
+| Lower / upper percentiles | 20% / 90% | `lowerPercentile = 0.2`, `upperPercentile = 0.9` | 
+| Control event probability | 15% | `pi2 = 0.15` | 
+| Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` | 
+| Sample sizes, control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
+| Beneficial direction | Lower treatment rate | `directionUpper = FALSE` | 
+| Original interval construction | QTD1 | `intervalMethod = "qtd1"` |
 
 The embedded input screenshot also contains unchecked sample-size rows. They are
 inactive GUI placeholders and are not scenarios in the example. The embedded
@@ -221,28 +247,31 @@ summary(ratesScenarios, digits = 4)
 The next table transcribes the **displayed values from the presentation
 exactly**. Triplets are ordered Go / Indeterminate / Stop.
 
-| Scenario | True improvement | 75 control / 75 treatment | 75 control / 150
-treatment | |:--|--:|:--|:--| | Very good | 5% | 0.85 / 0.14 / 0.01 | 0.91 /
-0.07 / 0.01 | | Good | 0% | 0.51 / 0.39 / 0.10 | 0.57 / 0.33 / 0.10 | |
-Indifferent | −2.5% | 0.33 / 0.47 / 0.20 | 0.36 / 0.43 / 0.21 | | Poor | −5% |
-0.20 / 0.48 / 0.32 | 0.20 / 0.45 / 0.35 | | Very poor | −10% | 0.05 / 0.34 /
-0.60 | 0.04 / 0.28 / 0.68 |
+| Scenario | True improvement | 75 control / 75 treatment | 75 control / 150 treatment | 
+|:--|--:|:--|:--| 
+| Very good | 5% | 0.85 / 0.14 / 0.01 | 0.91 / 0.07 / 0.01 | 
+| Good | 0% | 0.51 / 0.39 / 0.10 | 0.57 / 0.33 / 0.10 | 
+| Indifferent | −2.5% | 0.33 / 0.47 / 0.20 | 0.36 / 0.43 / 0.21 | 
+| Poor | −5% | 0.20 / 0.48 / 0.32 | 0.20 / 0.45 / 0.35 | 
+| Very poor | −10% | 0.05 / 0.34 / 0.60 | 0.04 / 0.28 / 0.68 |
 
 The presentation values have limited precision and are not renormalized. Some
 triplets sum to 0.99, and some entries reflect the source's display choices
 rather than conventional rounding. The calculated table below retains six
 decimal places under the same assumptions and QTD1 construction.
 
-```{r}
+```{r}	
 #| label: kestrel-calculated-table
 scenarioPlot <- plot(ratesScenarios, type = 4, plotCat = 3)
 scenarioTable <- reshape(
-    scenarioPlot$data[c("scenario", "nControl", "nTreatment", "pi1", "alternative", "category", "probability")],
+    scenarioPlot$data[c("scenario", "nControl", "nTreatment", 
+        "pi1", "alternative", "category", "probability")],
     idvar = c("scenario", "nControl", "nTreatment", "pi1", "alternative"),
     timevar = "category",
     direction = "wide"
 )
-scenarioTable <- scenarioTable[order(scenarioTable$scenario, match(scenarioTable$pi1, scenarioRates)), ]
+scenarioTable <- scenarioTable[order(scenarioTable$scenario, 
+    match(scenarioTable$pi1, scenarioRates)), ]
 scenarioTable$Scenario <- scenarioNames[match(scenarioTable$pi1, scenarioRates)]
 knitr::kable(
     scenarioTable[c("Scenario", "nControl", "nTreatment", "pi1", "alternative",
@@ -263,19 +292,24 @@ a conventional superiority null hypothesis.
 The compact results screenshot displays treatment probabilities from 0.10 to
 0.24 in steps of 0.02. The following table retains all its displayed values.
 
-| Control N | Treatment N | Control rate | Treatment rate | Go | Indeterminate |
-Stop | |--:|--:|--:|--:|--:|--:|--:| | 75 | 75 | 0.15 | 0.10 | 0.8485 | 0.1384 |
-0.0132 | | 75 | 75 | 0.15 | 0.12 | 0.7278 | 0.2383 | 0.0339 | | 75 | 75 | 0.15 |
-0.14 | 0.5831 | 0.3442 | 0.0728 | | 75 | 75 | 0.15 | 0.16 | 0.435 | 0.4307 |
-0.1343 | | 75 | 75 | 0.15 | 0.18 | 0.3026 | 0.479 | 0.2183 | | 75 | 75 | 0.15 |
-0.20 | 0.1971 | 0.4822 | 0.3206 | | 75 | 75 | 0.15 | 0.22 | 0.1208 | 0.4454 |
-0.4337 | | 75 | 75 | 0.15 | 0.24 | 0.0699 | 0.3812 | 0.5489 | | 75 | 150 | 0.15
-| 0.10 | 0.9149 | 0.0749 | 0.0102 | | 75 | 150 | 0.15 | 0.12 | 0.8065 | 0.164 |
-0.0295 | | 75 | 150 | 0.15 | 0.14 | 0.6552 | 0.276 | 0.0688 | | 75 | 150 | 0.15
-| 0.16 | 0.4854 | 0.3793 | 0.1353 | | 75 | 150 | 0.15 | 0.18 | 0.3263 | 0.4417 |
-0.232 | | 75 | 150 | 0.15 | 0.20 | 0.1993 | 0.4466 | 0.354 | | 75 | 150 | 0.15 |
-0.22 | 0.1112 | 0.3996 | 0.4892 | | 75 | 150 | 0.15 | 0.24 | 0.057 | 0.3209 |
-0.6222 |
+| Control N | Treatment N | Control rate | Treatment rate | Go | Indeterminate | Stop | 
+|--:|--:|--:|--:|--:|--:|--:| 
+| 75 |  75 | 0.15 | 0.10 | 0.8485 | 0.1384 | 0.0132 | 
+| 75 |  75 | 0.15 | 0.12 | 0.7278 | 0.2383 | 0.0339 | 
+| 75 |  75 | 0.15 | 0.14 | 0.5831 | 0.3442 | 0.0728 | 
+| 75 |  75 | 0.15 | 0.16 | 0.435  | 0.4307 | 0.1343 | 
+| 75 |  75 | 0.15 | 0.18 | 0.3026 | 0.479  | 0.2183 | 
+| 75 |  75 | 0.15 | 0.20 | 0.1971 | 0.4822 | 0.3206 | 
+| 75 |  75 | 0.15 | 0.22 | 0.1208 | 0.4454 | 0.4337 | 
+| 75 |  75 | 0.15 | 0.24 | 0.0699 | 0.3812 | 0.5489 | 
+| 75 | 150 | 0.15 | 0.10 | 0.9149 | 0.0749 | 0.0102 | 
+| 75 | 150 | 0.15 | 0.12 | 0.8065 | 0.164  | 0.0295 | 
+| 75 | 150 | 0.15 | 0.14 | 0.6552 | 0.276  | 0.0688 | 
+| 75 | 150 | 0.15 | 0.16 | 0.4854 | 0.3793 | 0.1353 | 
+| 75 | 150 | 0.15 | 0.18 | 0.3263 | 0.4417 | 0.232  | 
+| 75 | 150 | 0.15 | 0.20 | 0.1993 | 0.4466 | 0.354  | 
+| 75 | 150 | 0.15 | 0.22 | 0.1112 | 0.3996 | 0.4892 | 
+| 75 | 150 | 0.15 | 0.24 | 0.057  | 0.3209 | 0.6222 |
 
 The full-data screenshot begins at `pi1 = 0.100` with step `0.001`. Its first
 row displays six-category probabilities 0.535233, 0.313223, 0.138351, 0,
@@ -295,10 +329,12 @@ visibleTable <- reshape(
     direction = "wide"
 )
 visibleTable <- visibleTable[order(visibleTable$pi1), ]
-visibleTable$Go <- visibleTable[["probability.Go (Fixed)"]] + visibleTable$probability.Go
+visibleTable$Go <- visibleTable[["probability.Go (Fixed)"]] + 
+    visibleTable$probability.Go
 visibleTable$Indeterminate <- visibleTable[["probability.Indeterminate 1"]] +
     visibleTable[["probability.Indeterminate 2"]]
-visibleTable$Stop <- visibleTable$probability.Stop + visibleTable[["probability.Stop (Fixed)"]]
+visibleTable$Stop <- visibleTable$probability.Stop + 
+    visibleTable[["probability.Stop (Fixed)"]]
 knitr::kable(visibleTable, digits = 6, row.names = FALSE)
 ```
 
@@ -537,13 +573,12 @@ plot(
 The Kestrel event-count map above illustrates type 3. Four interval methods are
 supported by both this plot and the Rates constructor:
 
-| `intervalMethod` | Construction | |:--|:--| | `"qtd1"` | Original QTD1
-approximation using Wilson score limits rounded to four decimal places in its
-variance construction | | `"farringtonManning"` | Risk-difference score-test
-inversion using constrained maximum-likelihood variance | |
-`"miettinenNurminen"` | Score inversion with variance correction $N/(N-1)$,
-where $N=n_C+n_T$ | | `"newcombe"` | Square-and-add combination of unrounded
-Wilson limits without continuity correction |
+| `intervalMethod` | Construction | 
+|:--|:--| 
+| `"qtd1"` | Original QTD1 approximation using Wilson score limits rounded to four decimal places in its variance construction | 
+| `"farringtonManning"` | Risk-difference score-test inversion using constrained maximum-likelihood variance | 
+| `"miettinenNurminen"` | Score inversion with variance correction $N/(N-1)$, where $N=n_C+n_T$ | 
+| `"newcombe"` | Square-and-add combination of unrounded Wilson limits without continuity correction |
 
 QTD1 requires `lowerPercentile <= 0.5 <= upperPercentile`. The other methods
 allow ordered percentiles anywhere in $(0,1)$, including both on the same side
@@ -613,14 +648,14 @@ getAvailablePlotTypes(meansOC, output = "numcap")
 getAvailablePlotTypes(ratesOC, output = "caption")
 ```
 
-| `type` | Display | Main additional arguments | |--:|:--|:--| | 1 | OC curves |
-`plotCat`, `alternatives` or `pi1`, `plotPointsEnabled`, `xAxis` | | 2 | Stacked
-probabilities | `plotCat`, `alternatives` or `pi1`, `xAxis` | | 3 |
-Probabilities versus total sample size | Selected effects, multiple sample sizes
-| | 4 | Selected effect scenarios | `alternatives` or `pi1` | | 5 | Sensitivity
-heatmap | `sensitivity`, `category`, `contourLevels`, `stDev` or `pi2` | | 6 |
-Desired versus observed decisions | `weights`, `desiredDecisions`, selected
-effects |
+| `type` | Display | Main additional arguments | 
+|--:|:--|:--| 
+| 1 | OC curves | `plotCat`, `alternatives` or `pi1`, `plotPointsEnabled`, `xAxis` | 
+| 2 | Stacked probabilities | `plotCat`, `alternatives` or `pi1`, `xAxis` | 
+| 3 | Probabilities versus total sample size | Selected effects, multiple sample sizes | 
+| 4 | Selected effect scenarios | `alternatives` or `pi1` | 
+| 5 | Sensitivity heatmap | `sensitivity`, `category`, `contourLevels`, `stDev` or `pi2` | 
+| 6 | Desired versus observed decisions | `weights`, `desiredDecisions`, selected effects |
 
 `alternatives` selects already calculated effects. For Rates, `pi1` instead
 selects treatment rates; supply only one selection argument. Rates selections
