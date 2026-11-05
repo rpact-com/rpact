@@ -13,6 +13,8 @@ Inherits the sample-size matrix and probability table from
 stored internally. Each sample-size scenario contains all six categories
 and the supplied treatment rates in their original order, including repeats.
 Console and Markdown printing use the standard ParameterSet mechanism.
+Use \code{\link[=summary]{summary()}} for decision-rule assumptions and probability tables, and
+\code{\link[=plot.OperatingCharcteristics]{plot.OperatingCharcteristics()}} for the shared QTD plot families.
 }
 \seealso{
 \code{\link[=getOperatingCharcteristicsRates]{getOperatingCharcteristicsRates()}}, \code{\link[=getDesignQuantitative]{getDesignQuantitative()}}

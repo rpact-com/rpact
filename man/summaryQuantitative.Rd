@@ -8,7 +8,8 @@ A \code{SummaryFactory} object supporting console and Markdown output.
 }
 \description{
 The standard \code{\link[=summary]{summary()}} method supports quantitative decision rules from
-\code{\link[=getDesignQuantitative]{getDesignQuantitative()}} and results from \code{\link[=getOperatingCharcteristicsMeans]{getOperatingCharcteristicsMeans()}}.
+\code{\link[=getDesignQuantitative]{getDesignQuantitative()}} and results from \code{\link[=getOperatingCharcteristicsMeans]{getOperatingCharcteristicsMeans()}}
+and \code{\link[=getOperatingCharcteristicsRates]{getOperatingCharcteristicsRates()}}.
 }
 \details{
 Use \code{summary(rule)} for the target value, lower reference value and decision
@@ -16,6 +17,9 @@ percentiles. Use \code{summary(oc)} for the decision rule, assumptions and categ
 probabilities. Each sample-size scenario has a separate table, with one row
 per alternative and one column per decision category. Categories are retained
 separately; probabilities are neither recomputed nor aggregated.
+Rates tables show the treatment event probability and the beneficial risk
+difference. Their assumptions include the control event probability,
+beneficial direction and selected interval method.
 
 The \code{digits} and \code{output} arguments follow \code{\link[=summary.ParameterSet]{summary.ParameterSet()}}. The
 output parts are \code{"title"}, \code{"overview"}, \code{"body"} and \code{"all"}. For a decision
@@ -27,6 +31,15 @@ so later changes to the original do not change an existing summary.
 
 Print a summary with \code{print(summary(oc), markdown = TRUE)} to obtain Markdown
 with probability tables. Console tables use wrapped, readable column names.
+}
+\examples{
+rule <- getDesignQuantitative(targetValue = 0, lowerReferenceValue = -0.05)
+rates <- getOperatingCharcteristicsRates(rule,
+    numberOfSubjects = matrix(c(75, 75, 75, 150), ncol = 2, byrow = TRUE),
+    pi1 = c(0.1, 0.15, 0.175, 0.2, 0.25), pi2 = 0.15, directionUpper = FALSE)
+summary(rates)
+cat(print(summary(rates), markdown = TRUE)[1], "\n")
+
 }
 \seealso{
 \code{\link[=summary.ParameterSet]{summary.ParameterSet()}}

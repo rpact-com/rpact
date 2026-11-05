@@ -28,7 +28,8 @@ NULL
 #'
 #' @description
 #' The standard [summary()] method supports quantitative decision rules from
-#' [getDesignQuantitative()] and results from [getOperatingCharcteristicsMeans()].
+#' [getDesignQuantitative()] and results from [getOperatingCharcteristicsMeans()]
+#' and [getOperatingCharcteristicsRates()].
 #'
 #' @details
 #' Use `summary(rule)` for the target value, lower reference value and decision
@@ -36,6 +37,9 @@ NULL
 #' probabilities. Each sample-size scenario has a separate table, with one row
 #' per alternative and one column per decision category. Categories are retained
 #' separately; probabilities are neither recomputed nor aggregated.
+#' Rates tables show the treatment event probability and the beneficial risk
+#' difference. Their assumptions include the control event probability,
+#' beneficial direction and selected interval method.
 #'
 #' The `digits` and `output` arguments follow [summary.ParameterSet()]. The
 #' output parts are `"title"`, `"overview"`, `"body"` and `"all"`. For a decision
@@ -52,10 +56,18 @@ NULL
 #'
 #' @seealso [summary.ParameterSet()]
 #'
+#' @examples
+#' rule <- getDesignQuantitative(targetValue = 0, lowerReferenceValue = -0.05)
+#' rates <- getOperatingCharcteristicsRates(rule,
+#'     numberOfSubjects = matrix(c(75, 75, 75, 150), ncol = 2, byrow = TRUE),
+#'     pi1 = c(0.1, 0.15, 0.175, 0.2, 0.25), pi2 = 0.15, directionUpper = FALSE)
+#' summary(rates)
+#' cat(print(summary(rates), markdown = TRUE)[1], "\n")
+#'
 NULL
 
 .isQuantitativeSummaryObject <- function(object) {
-    return(inherits(object, "TrialDesignPlanQuantitative") || inherits(object, "OperatingCharcteristicsMeans"))
+    return(inherits(object, "TrialDesignPlanQuantitative") || .isQtdOperatingCharacteristics(object))
 }
 
 .createSummaryQuantitative <- function(object, digits, output, markdown = FALSE) {
@@ -76,7 +88,7 @@ NULL
             values <- .formatSampleSizes(values)
         } else if (is.numeric(values)) {
             digits <- digitSettings$digitsGeneral
-            if (parameterName %in% c("upperPercentile", "lowerPercentile")) {
+            if (parameterName %in% c("upperPercentile", "lowerPercentile", "pi1", "pi2")) {
                 digits <- digitSettings$digitsProbabilities
             }
             values <- trimws(.formatSummaryValues(values, digits = digits))
@@ -96,12 +108,15 @@ NULL
     rows <- (scenario - 1L) * rowsPerScenario + seq_len(rowsPerScenario)
     probabilities <- probabilities[rows, , drop = FALSE]
     firstCategory <- probabilities$category == categories[1L]
-    result <- data.frame(
-        alternative = trimws(.formatSummaryValues(probabilities$alternative[firstCategory],
-            digits = digitSettings$digitsGeneral
-        )),
-        stringsAsFactors = FALSE
-    )
+    settings <- .getQtdEndpointSettings(object)
+    result <- data.frame(row.names = seq_len(sum(firstCategory)))
+    for (column in settings$summaryColumns) {
+        digits <- digitSettings$digitsGeneral
+        if (column == "pi1") {
+            digits <- digitSettings$digitsProbabilities
+        }
+        result[[column]] <- trimws(.formatSummaryValues(probabilities[[column]][firstCategory], digits = digits))
+    }
     for (category in categories) {
         result[[category]] <- trimws(.formatSummaryValues(
             probabilities$probability[probabilities$category == category],
@@ -118,7 +133,7 @@ NULL
     if (!is.na(digits)) {
         digitSettings <- .getSummaryDigits(digits)
     }
-    operatingCharacteristics <- inherits(object, "OperatingCharcteristicsMeans")
+    operatingCharacteristics <- .isQtdOperatingCharacteristics(object)
     ruleParameters <- c("targetValue", "lowerReferenceValue", "upperPercentile", "lowerPercentile")
 
     if (summaryFactory$output %in% c("all", "title")) {
@@ -134,7 +149,7 @@ NULL
             )
             summaryFactory$.cat("Assumptions:\n\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
             .showQuantitativeSummaryParameters(summaryFactory, object,
-                c("normalApproximation", "groups", "stDev"), digitSettings, consoleOutputEnabled
+                .getQtdEndpointSettings(object)$assumptions, digitSettings, consoleOutputEnabled
             )
         } else {
             summaryFactory$.cat("Fixed quantitative trial decision rule.\n\n",

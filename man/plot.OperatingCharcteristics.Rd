@@ -12,6 +12,9 @@
   type = 1L,
   alternatives = NULL,
   stDev = NULL,
+  pi1 = NULL,
+  pi2 = NULL,
+  xAxis = NULL,
   sensitivity = "sampleSize",
   category = "Go",
   weights = NULL,
@@ -27,7 +30,8 @@
 )
 }
 \arguments{
-\item{x}{Operating characteristics from \code{\link[=getOperatingCharcteristicsMeans]{getOperatingCharcteristicsMeans()}}.}
+\item{x}{Operating characteristics from \code{\link[=getOperatingCharcteristicsMeans]{getOperatingCharcteristicsMeans()}}
+or \code{\link[=getOperatingCharcteristicsRates]{getOperatingCharcteristicsRates()}}.}
 
 \item{plotCat}{Number of decision categories, either 3 (default) or 6.}
 
@@ -41,19 +45,37 @@ versus total sample size, 4 selected effect scenarios, 5 sensitivity heatmap,
 or 6 weighted desired-versus-observed decisions. A single matching caption
 from \code{\link[=getAvailablePlotTypes]{getAvailablePlotTypes()}} is also accepted.}
 
-\item{alternatives}{Optional subset of the true effects already computed in x.}
+\item{alternatives}{Optional subset of the true effects already computed in x.
+For rates, these select the corresponding treatment rates at the object's
+original control rate, also when a different \code{pi2} grid is requested.}
 
 \item{stDev}{Optional positive standard deviations for recalculating the OC
 grid with the existing normal calculation. NULL uses stored probabilities.}
 
-\item{sensitivity}{For type 5: "sampleSize", "stDev", or "allocation".}
+\item{pi1}{For rates, an optional ordered subset of the treatment rates already
+computed in x. Supply either \code{pi1} or \code{alternatives}, not both.}
+
+\item{pi2}{For rates, optional control event probabilities in \verb{[0, 1]} for
+recalculation with the stored interval method. The treatment-rate grid stays
+fixed. NULL uses stored probabilities.}
+
+\item{xAxis}{NULL selects the endpoint default: \code{"effect"} for means and
+\code{"treatmentRate"} for rates. Rates also support \code{"effect"} for the beneficial
+risk difference. This controls types 1--4 and sample-size sensitivity maps.}
+
+\item{sensitivity}{For type 5: \code{"sampleSize"}, \code{"allocation"}, or the
+endpoint-specific assumption (\code{"stDev"} for means, \code{"pi2"} for rates).
+A \code{"pi2"} map always uses treatment rate and control rate as its two axes.}
 
 \item{category}{For type 5, the displayed category; default "Go".}
 
 \item{weights, desiredDecisions}{For type 6, one nonnegative weight and one
 desired decision per selected effect. Weights must sum to one. Desired
 decisions are "Go", "Indeterminate", or "Stop". All three observed decisions
-remain visible; no implicit treatment of Indeterminate as Stop is applied.}
+remain visible; no implicit treatment of Indeterminate as Stop is applied.
+For rates, provide one entry per distinct selected treatment rate, in \code{pi1}
+selection order (or original input order). The same distribution is applied
+separately to each control-rate panel.}
 
 \item{contourLevels}{Optional probability levels for sensitivity-map contours.}
 
@@ -91,13 +113,22 @@ they do not extrapolate to uncomputed combinations.
 Type 6 uses an explicitly supplied discrete effect distribution and definition
 of the desired decision. Its cells are joint probabilities after summing
 conditional decision probabilities weighted by the supplied effect weights.
-Diagonal cells are correct decisions under that supplied definition. These
+Matching desired and observed decisions count as correct under that definition. These
 quantities are neither default type-I/type-II error rates nor posterior
 probabilities. The data retain the desired and observed decisions and a
 logical \code{correct} column. Probabilities are never rounded before aggregation.
 The plot attribute \code{qtdEffectDistribution} records the supplied effect,
 weight and desired-decision tuples. Each panel reports its probability of a
 correct decision under this definition.
+
+Rates plots facet by control rate and include the interval method and
+beneficial direction in their subtitle. On treatment-rate axes, the reference
+lines are transformed to \code{pi2 + reference} for increasing beneficial rates,
+or \code{pi2 - reference} for decreasing beneficial rates. Unattainable reference
+rates outside \verb{[0, 1]} are omitted. All plotting probabilities come from the
+stored results or the same endpoint calculation used by their constructor.
+For rates, \code{qtdEffectDistribution} identifies treatment rates in a \code{pi1}
+column; for means it retains the \code{effect} column.
 }
 \examples{
 rule <- getDesignQuantitative(targetValue = 1, lowerReferenceValue = 0)
@@ -111,5 +142,15 @@ plot(oc, type = 4, alternatives = c(0, 1, 1.5))
 plot(oc, type = 5, sensitivity = "stDev", stDev = c(0.8, 1, 1.2))
 plot(oc, type = 6, alternatives = c(0, 1, 1.5),
     weights = c(0.3, 0.3, 0.4), desiredDecisions = c("Stop", "Go", "Go"))
+binaryRule <- getDesignQuantitative(targetValue = 0, lowerReferenceValue = -0.05)
+rates <- getOperatingCharcteristicsRates(binaryRule,
+    numberOfSubjects = matrix(c(25, 25, 50, 50, 75, 75), ncol = 2, byrow = TRUE),
+    pi1 = seq(0.1, 0.25, by = 0.025), pi2 = 0.15, directionUpper = FALSE)
+plot(rates)
+plot(rates, type = 2)
+plot(rates, xAxis = "effect")
+plot(rates, type = 5, sensitivity = "pi2", pi2 = c(0.1, 0.15, 0.2))
+plot(rates, type = 6, pi1 = c(0.1, 0.15, 0.2),
+    weights = c(0.3, 0.4, 0.3), desiredDecisions = c("Go", "Go", "Stop"))
 
 }

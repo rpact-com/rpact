@@ -195,6 +195,7 @@ Collate:
     'f_simulation_plot.R'
     'f_summary.R'
     'f_summary_qtd.R'
+    'f_qtd_utilities.R'
     'f_design_qtd.R'
     'f_design_plan_qtd_means.R'
     'f_design_plan_qtd_rates.R'

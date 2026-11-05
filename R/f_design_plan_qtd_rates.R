@@ -25,6 +25,8 @@
 #' stored internally. Each sample-size scenario contains all six categories
 #' and the supplied treatment rates in their original order, including repeats.
 #' Console and Markdown printing use the standard ParameterSet mechanism.
+#' Use [summary()] for decision-rule assumptions and probability tables, and
+#' [plot.OperatingCharcteristics()] for the shared QTD plot families.
 #'
 #' @seealso [getOperatingCharcteristicsRates()], [getDesignQuantitative()]
 #'
@@ -88,23 +90,9 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
         #' @param consoleOutputEnabled Whether to print or collect the output.
         #'
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
-            self$.resetCat()
-            if (showType != 1) {
+            if (!.showQtdOperatingCharacteristics(self, showType, digits, consoleOutputEnabled)) {
                 super$.show(showType = showType, digits = digits,
                     consoleOutputEnabled = consoleOutputEnabled)
-            } else {
-                self$.cat("Parameters and output of ", self$.toString(), ":\n\n",
-                    heading = 1, consoleOutputEnabled = consoleOutputEnabled)
-                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled)
-                self$.showParametersOfOneGroup(self$.getDerivedParameters(), "Derived from user defined parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled)
-                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled)
-                self$.cat("Output:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                .showDataFrame(self$probabilities, self, niceColumnNamesEnabled = TRUE,
-                    digits = digits, consoleOutputEnabled = consoleOutputEnabled)
-                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
             }
         },
         #'
@@ -124,14 +112,16 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
 )
 
 .calcOperatingCharacteristicsRates <- function(design, numberOfSubjects, pi1, pi2,
-        directionUpper, intervalMethod) {
+        directionUpper, intervalMethod, decisionMaps = NULL) {
     categories <- .getQtdCategories()
     alternative <- pi1 - pi2
     if (!directionUpper) {
         alternative <- -alternative
     }
     result <- vector("list", nrow(numberOfSubjects))
-    decisionMaps <- new.env(parent = emptyenv())
+    if (is.null(decisionMaps)) {
+        decisionMaps <- new.env(parent = emptyenv())
+    }
     for (scenario in seq_len(nrow(numberOfSubjects))) {
         sizes <- unname(numberOfSubjects[scenario, ])
         key <- paste(sizes, collapse = "/")
@@ -199,7 +189,7 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
 #' Counts and probabilities are computed without requiring ggplot2 or Java.
 #'
 #' @return An `OperatingCharcteristicsRates` object supporting console and
-#'   Markdown printing. Its `probabilities` data frame contains `category`,
+#'   Markdown printing, summaries and the QTD plot families. Its `probabilities` data frame contains `category`,
 #'   `probability`, `nControl`, `nTreatment`, `alternative`, `pi1`, and `pi2`.
 #'   `alternative` is the true risk difference in the beneficial direction.
 #'
@@ -214,7 +204,7 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
 #' cat(print(oc, markdown = TRUE)[1], "\n")
 #'
 #' @seealso [getDesignQuantitative()], [getOperatingCharcteristicsMeans()],
-#'   [OperatingCharcteristicsRates]
+#'   [OperatingCharcteristicsRates], [summaryQuantitative], [plot.OperatingCharcteristics()]
 #'
 #' @export
 #'

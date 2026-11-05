@@ -37,7 +37,7 @@ If TRUE (default), the effect is \code{pi1 - pi2}; if FALSE, it is \code{pi2 - p
 }
 \value{
 An \code{OperatingCharcteristicsRates} object supporting console and
-Markdown printing. Its \code{probabilities} data frame contains \code{category},
+Markdown printing, summaries and the QTD plot families. Its \code{probabilities} data frame contains \code{category},
 \code{probability}, \code{nControl}, \code{nTreatment}, \code{alternative}, \code{pi1}, and \code{pi2}.
 \code{alternative} is the true risk difference in the beneficial direction.
 }
@@ -75,5 +75,5 @@ cat(print(oc, markdown = TRUE)[1], "\n")
 }
 \seealso{
 \code{\link[=getDesignQuantitative]{getDesignQuantitative()}}, \code{\link[=getOperatingCharcteristicsMeans]{getOperatingCharcteristicsMeans()}},
-\link{OperatingCharcteristicsRates}
+\link{OperatingCharcteristicsRates}, \link{summaryQuantitative}, \code{\link[=plot.OperatingCharcteristics]{plot.OperatingCharcteristics()}}
 }

@@ -18,7 +18,7 @@
     if (inherits(object, "TrialDesignPlanQuantitative")) {
         return(c("Decision rule intervals", "Normal decision regions", "Binary event-count decision map"))
     }
-    if (inherits(object, "OperatingCharcteristicsMeans")) {
+    if (.isQtdOperatingCharacteristics(object)) {
         return(c("Operating characteristics", "Stacked decision probabilities", "Decision probabilities by sample size",
             "Selected effect scenarios", "Sensitivity of decision probabilities", "Desired and observed decisions"))
     }
@@ -151,30 +151,43 @@
     return(data.frame(estimate = estimate, standardError = standardError))
 }
 
-.getQtdPlotData <- function(object, plotCat, stDev = NULL) {
+.getQtdPlotData <- function(object, plotCat, stDev = NULL, pi2 = NULL) {
     functionName <- "plot.OperatingCharcteristics"
-    if (!inherits(object, "OperatingCharcteristicsMeans")) {
-        stopIllegalArgument("This plot requires operating characteristics for means",
-            functionName = functionName, parameter = "x", value = object,
-            constraint = "OperatingCharcteristicsMeans", diagnosticId = "qtd.plot.unsupported_endpoint"
-        )
-    }
+    settings <- .getQtdEndpointSettings(object, functionName = functionName)
     .assertQtdPlotRule(object$.design, functionName)
-    .assertQtdPlotNumeric(object$stDev, "stDev", functionName, lower = 0,
-        openLower = TRUE, expectedLength = 1L)
-    deviations <- object$stDev
-    if (!is.null(stDev)) {
-        .assertQtdPlotNumeric(stDev, "stDev", functionName, lower = 0, openLower = TRUE)
-        deviations <- unique(stDev)
+    supplied <- list(stDev = stDev, pi2 = pi2)
+    parameter <- settings$assumptionColumn
+    otherParameter <- setdiff(names(supplied), parameter)
+    if (!is.null(supplied[[otherParameter]])) {
+        stopIllegalArgument("'", otherParameter, "' is not applicable to the ", settings$endpoint, " endpoint",
+            functionName = functionName, parameter = otherParameter, value = supplied[[otherParameter]],
+            constraint = paste0("use ", parameter, " for this endpoint"),
+            relatedParameter = "endpoint", relatedValue = settings$endpoint,
+            diagnosticId = "qtd.plot.endpoint_argument_not_applicable")
     }
+    upper <- Inf
+    if (settings$endpoint == "rates") {
+        upper <- 1
+    }
+    .assertQtdPlotNumeric(object[[parameter]], parameter, functionName, lower = 0, upper = upper,
+        openLower = settings$endpoint == "means", expectedLength = 1L)
+    values <- object[[parameter]]
+    if (!is.null(supplied[[parameter]])) {
+        .assertQtdPlotNumeric(supplied[[parameter]], parameter, functionName, lower = 0, upper = upper,
+            openLower = settings$endpoint == "means")
+        values <- unique(supplied[[parameter]])
+    }
+    decisionMaps <- new.env(parent = emptyenv())
     result <- list()
-    for (i in seq_along(deviations)) {
-        if (is.null(stDev)) {
+    for (i in seq_along(values)) {
+        if (is.null(supplied[[parameter]])) {
             data <- object$probabilities
-        } else {
+        } else if (settings$endpoint == "means") {
             data <- .calcOperatingCharacteristicsMeans(object$.design, unname(object$numberOfSubjects),
-                object$alternative, deviations[i]
-            )
+                object$alternative, values[i])
+        } else {
+            data <- .calcOperatingCharacteristicsRates(object$.design, unname(object$numberOfSubjects),
+                object$pi1, values[i], object$directionUpper, object$intervalMethod, decisionMaps)
         }
         rowsPerScenario <- length(object$alternative) * 6L
         data$scenario <- rep(seq_len(nrow(object$numberOfSubjects)), each = rowsPerScenario)
@@ -182,8 +195,12 @@
         data$category <- as.character(data$category)
         if (plotCat == 3L) {
             data$category <- .getQtdCoarseCategory(data$category)
-            data <- stats::aggregate(probability ~ category + scenario + effectIndex +
-                nControl + nTreatment + alternative + stDev, data = data, FUN = sum)
+            columns <- c("category", "scenario", "effectIndex", "nControl", "nTreatment",
+                "alternative", parameter)
+            if (settings$endpoint == "rates") {
+                columns <- c(columns, "pi1")
+            }
+            data <- stats::aggregate(stats::reformulate(columns, response = "probability"), data = data, FUN = sum)
         }
         data$category <- factor(data$category, levels = .getQtdCategories(plotCat))
         data$sampleSize <- paste0("C: ", data$nControl, " / T: ", data$nTreatment)
@@ -375,6 +392,8 @@
 .getQtdFacetLabeller <- function() {
     return(ggplot2::labeller(stDev = function(value) {
         return(paste0("SD = ", value))
+    }, pi2 = function(value) {
+        return(paste0("Control rate = ", value))
     }, category = ggplot2::label_value, scenarioLabel = ggplot2::label_value,
         allocationLabel = ggplot2::label_value))
 }
@@ -388,9 +407,65 @@
     return(result)
 }
 
-.addQtdReferenceLines <- function(p, rule, horizontal = FALSE) {
-    references <- data.frame(value = c(rule$lowerReferenceValue, rule$targetValue),
-        reference = c("LRV", "TV"))
+.getQtdOcPlotSubtitle <- function(object, data, settings) {
+    if (settings$endpoint == "means") {
+        return(.getQtdPlotSubtitle(object$.design, unique(data$stDev)))
+    }
+    return(paste0(.getQtdPlotSubtitle(object$.design), "; control rate = ",
+        paste(unique(data$pi2), collapse = ", "), "; interval method = ", object$intervalMethod,
+        "; beneficial direction: ", ifelse(object$directionUpper, "higher treatment rate", "lower treatment rate")))
+}
+
+.getQtdOcPlotReferences <- function(object, data, settings) {
+    if (settings$xAxis != "treatmentRate") {
+        return(NULL)
+    }
+    references <- expand.grid(reference = c("LRV", "TV"), pi2 = unique(data$pi2), stringsAsFactors = FALSE)
+    direction <- 1
+    if (!object$directionUpper) {
+        direction <- -1
+    }
+    values <- c(LRV = object$.design$lowerReferenceValue, TV = object$.design$targetValue)
+    references$value <- references$pi2 + direction * values[references$reference]
+    return(references[references$value >= 0 & references$value <= 1, , drop = FALSE])
+}
+
+.selectQtdOcPlotData <- function(data, object, alternatives, pi1, settings, functionName) {
+    if (settings$endpoint == "means") {
+        if (!is.null(pi1)) {
+            stopIllegalArgument("'pi1' is only applicable to rates operating characteristics",
+                functionName = functionName, parameter = "pi1", value = pi1,
+                constraint = "pi1 is a rates endpoint argument", relatedParameter = "endpoint", relatedValue = "means",
+                diagnosticId = "qtd.plot.endpoint_argument_not_applicable")
+        }
+        return(.selectQtdAlternatives(data, alternatives, functionName))
+    }
+    if (!is.null(alternatives) && !is.null(pi1)) {
+        stopConflictingArguments("Select scenarios through either 'pi1' or 'alternatives'",
+            functionName = functionName, parameter = "pi1", value = pi1,
+            relatedParameter = "alternatives", relatedValue = alternatives,
+            constraint = "at most one scenario selection argument",
+            diagnosticId = "qtd.plot.conflicting_scenario_selection")
+    }
+    if (!is.null(alternatives)) {
+        baseline <- data.frame(alternative = object$alternative, pi1 = object$pi1)
+        selected <- .selectQtdAlternatives(baseline, alternatives, functionName)
+        pi1 <- unique(selected$pi1)
+    }
+    if (is.null(pi1)) {
+        pi1 <- unique(object$pi1)
+    }
+    return(.selectQtdAlternatives(data, pi1, functionName, effectColumnName = "pi1", parameterName = "pi1"))
+}
+
+.addQtdReferenceLines <- function(p, rule, horizontal = FALSE, references = NULL) {
+    if (is.null(references)) {
+        references <- data.frame(value = c(rule$lowerReferenceValue, rule$targetValue),
+            reference = c("LRV", "TV"))
+    }
+    if (nrow(references) == 0L) {
+        return(p)
+    }
     if (horizontal) {
         return(p + ggplot2::geom_hline(data = references,
             ggplot2::aes(yintercept = .data[["value"]], linetype = .data[["reference"]]), color = "grey40"))
@@ -412,12 +487,13 @@
     }
 }
 
-.selectQtdAlternatives <- function(data, alternatives, functionName) {
+.selectQtdAlternatives <- function(data, alternatives, functionName,
+        effectColumnName = "alternative", parameterName = "alternatives") {
     if (is.null(alternatives)) {
         return(data)
     }
-    .assertQtdPlotNumeric(alternatives, "alternatives", functionName)
-    choices <- unique(data$alternative)
+    .assertQtdPlotNumeric(alternatives, parameterName, functionName)
+    choices <- unique(data[[effectColumnName]])
     indices <- vapply(alternatives, function(value) {
         matches <- which(abs(choices - value) <= 1e-12 * max(1, abs(value)))
         if (length(matches) == 0L) {
@@ -426,22 +502,23 @@
         return(matches[1L])
     }, integer(1))
     if (anyNA(indices) || anyDuplicated(indices)) {
-        stopIllegalArgument("'alternatives' must select distinct computed effects",
-            functionName = functionName, parameter = "alternatives", value = alternatives,
+        stopIllegalArgument("'", parameterName, "' must select distinct computed values",
+            functionName = functionName, parameter = parameterName, value = alternatives,
             constraint = "distinct effects already evaluated in the object",
             diagnosticId = "qtd.plot.uncomputed_alternatives", context = list(availableEffects = choices)
         )
     }
     selected <- choices[indices]
-    result <- data[data$alternative %in% selected, , drop = FALSE]
-    result <- result[order(match(result$alternative, selected)), , drop = FALSE]
+    result <- data[data[[effectColumnName]] %in% selected, , drop = FALSE]
+    result <- result[order(match(result[[effectColumnName]], selected)), , drop = FALSE]
     return(result)
 }
 
-.uniqueQtdEffectRows <- function(data, includeSampleSize = FALSE) {
-    keys <- c("category", "scenario", "alternative", "stDev")
+.uniqueQtdEffectRows <- function(data, includeSampleSize = FALSE,
+        effectColumnName = "alternative", assumptionColumn = "stDev") {
+    keys <- c("category", "scenario", effectColumnName, assumptionColumn)
     if (includeSampleSize) {
-        keys <- c("category", "nControl", "nTreatment", "alternative", "stDev")
+        keys <- c("category", "nControl", "nTreatment", effectColumnName, assumptionColumn)
     }
     return(data[!duplicated(data[keys]), , drop = FALSE])
 }
@@ -457,34 +534,48 @@
     }
 }
 
-.plotQtdSensitivity <- function(data, sensitivity, category, functionName, contourLevels = NULL) {
-    .assertQtdPlotChoice(sensitivity, "sensitivity", c("sampleSize", "stDev", "allocation"), functionName)
+.plotQtdSensitivity <- function(data, sensitivity, category, functionName, contourLevels = NULL, settings) {
+    .assertQtdPlotChoice(sensitivity, "sensitivity", settings$sensitivity, functionName)
     .assertQtdPlotChoice(category, "category", levels(data$category), functionName)
     data <- data[as.character(data$category) == category, , drop = FALSE]
-    data <- .uniqueQtdEffectRows(data, includeSampleSize = TRUE)
+    data <- .uniqueQtdEffectRows(data, includeSampleSize = TRUE,
+        effectColumnName = settings$effectColumn, assumptionColumn = settings$assumptionColumn)
+    assumption <- paste0(settings$assumptionCaption, " = ", data[[settings$assumptionColumn]])
     if (sensitivity == "sampleSize") {
         .assertQtdSampleSizeVariation(data, functionName)
-        data$x <- data$alternative
+        data$x <- data[[settings$xColumn]]
         data$y <- data$totalSubjects
-        data$panel <- paste0("SD = ", data$stDev, "; T/C = ", signif(data$allocationRatio, 5))
-        xlab <- "True treatment effect"
+        data$panel <- paste0(assumption, "; T/C = ", signif(data$allocationRatio, 5))
+        xlab <- settings$xCaption
         ylab <- "Total number of subjects"
-    } else if (sensitivity == "stDev") {
-        data$x <- data$alternative
-        data$y <- data$stDev
+    } else if (sensitivity == settings$assumptionColumn) {
+        data$x <- data[[settings$xColumn]]
+        xlab <- settings$xCaption
+        if (sensitivity == "pi2") {
+            data$x <- data$pi1
+            xlab <- "True treatment event rate"
+        }
+        data$y <- data[[settings$assumptionColumn]]
         data$panel <- data$scenarioLabel
-        xlab <- "True treatment effect"
         ylab <- "Standard deviation"
+        if (sensitivity == "pi2") {
+            ylab <- "True control event rate"
+        }
     } else {
-        if (length(unique(data$alternative)) != 1L) {
+        if (length(unique(data[[settings$effectColumn]])) != 1L) {
             stopIllegalArgument("An allocation map requires exactly one selected effect",
-                functionName = functionName, parameter = "alternatives", value = unique(data$alternative),
+                functionName = functionName, parameter = settings$effectColumn,
+                value = unique(data[[settings$effectColumn]]),
                 constraint = "one selected effect", diagnosticId = "qtd.plot.allocation_requires_single_effect"
             )
         }
         data$x <- data$nControl
         data$y <- data$nTreatment
-        data$panel <- paste0("SD = ", data$stDev, "; effect = ", data$alternative)
+        effectLabel <- "effect"
+        if (settings$endpoint == "rates") {
+            effectLabel <- "pi1"
+        }
+        data$panel <- paste0(assumption, "; ", effectLabel, " = ", data[[settings$effectColumn]])
         xlab <- "Number of control subjects"
         ylab <- "Number of treatment subjects"
     }
@@ -512,7 +603,8 @@
     return(p)
 }
 
-.getQtdDecisionPerformance <- function(data, weights, desiredDecisions, functionName, effectColumnName = "alternative") {
+.getQtdDecisionPerformance <- function(data, weights, desiredDecisions, functionName,
+        effectColumnName = "alternative", assumptionColumn = "stDev") {
     effects <- unique(data[[effectColumnName]])
     
     .assertQtdPlotNumeric(weights, "weights", functionName, lower = 0, expectedLength = length(effects))
@@ -553,22 +645,25 @@
             context = list(allowedValues = decisions)
         )
     }
-    data <- .uniqueQtdEffectRows(data)
+    data <- .uniqueQtdEffectRows(data, effectColumnName = effectColumnName, assumptionColumn = assumptionColumn)
     indices <- match(data[[effectColumnName]], effects)
     data$desiredDecision <- desiredDecisions[indices]
     data$observedDecision <- .getQtdCoarseCategory(data$category)
     data$probability <- data$probability * weights[indices]
-    result <- stats::aggregate(probability ~ desiredDecision + observedDecision + scenario + scenarioLabel + stDev,
-        data = data, FUN = sum)
+    columns <- c("desiredDecision", "observedDecision", "scenario", "scenarioLabel", assumptionColumn)
+    result <- stats::aggregate(stats::reformulate(columns, response = "probability"), data = data, FUN = sum)
     result$desiredDecision <- factor(result$desiredDecision, levels = decisions)
     result$observedDecision <- factor(result$observedDecision, levels = decisions)
     result$correct <- result$desiredDecision == result$observedDecision
     result$correctProbability <- stats::ave(ifelse(result$correct, result$probability, 0),
-        result$scenario, result$stDev, FUN = sum)
+        result$scenario, result[[assumptionColumn]], FUN = sum)
     result$performanceLabel <- paste0(result$scenarioLabel, "\nPr(correct) = ",
         formatC(100 * result$correctProbability, digits = 1, format = "f"), "%")
     distribution <- data.frame(effect = effects, weight = weights, desiredDecision = desiredDecisions)
-    distribution <- distribution[order(distribution$effect), , drop = FALSE]
+    if (effectColumnName != "alternative") {
+        names(distribution)[1L] <- effectColumnName
+    }
+    distribution <- distribution[order(distribution[[1L]]), , drop = FALSE]
     rownames(distribution) <- NULL
     attr(result, "effectDistribution") <- distribution
     return(result)

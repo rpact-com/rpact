@@ -130,35 +130,8 @@ OperatingCharcteristicsMeans <- R6::R6Class(
             self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
-            "Method for automatically printing trial operating-characteristics"
-            self$.resetCat()
-            if (showType == 3) {
-                .createSummary(self, digits = digits)$.show(
-                    showType = 1,
-                    digits = digits, consoleOutputEnabled = consoleOutputEnabled
-                )
-            } else if (showType == 2) {
+            if (!.showQtdOperatingCharacteristics(self, showType, digits, consoleOutputEnabled)) {
                 super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
-            } else {
-                self$.cat("Parameters and output of ", self$.toString(), ":\n\n",
-                    heading = 1,
-                    consoleOutputEnabled = consoleOutputEnabled
-                )
-                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                )
-                self$.showParametersOfOneGroup(self$.getDerivedParameters(), "Derived from user defined parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                )
-                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                )
-                self$.cat("Output:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                .showDataFrame(self$probabilities, self,
-                    niceColumnNamesEnabled = TRUE, digits = digits,
-                    consoleOutputEnabled = consoleOutputEnabled
-                )
-                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
