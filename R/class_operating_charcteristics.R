@@ -14,19 +14,28 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-#' 
-#' OperatingCharcteristics R6 class
 #'
+#' @name OperatingCharcteristics
+#'
+#' @title
+#' Operating Characteristics for Quantitative Trial Decisions
+#'
+#' @description
 #' A lightweight container for operating-characteristics results produced by the
 #' QTD helpers. Instances store the originating design, tested sample-size
 #' scenarios and the resulting category probabilities used for plotting and
 #' reporting.
 #'
-#' @field design An object (usually of class \code{TrialDesignPlanQuantitative})
-#'   describing the decision rule used to generate the results.
-#' @field numberOfSubjects Numeric matrix with per-arm sample sizes (one row per
-#'   scenario).
-#' @field probabilities A data.frame with the computed category probabilities.
+#' @template field_numberOfSubjects_qtd
+#' @template field_probabilities_qtd
+#'
+#' @details
+#' This internal base class supplies inherited fields for
+#' `OperatingCharcteristicsMeans` and `OperatingCharcteristicsRates`.
+#' Obtain result objects through [getOperatingCharcteristicsMeans()] or
+#' [getOperatingCharcteristicsRates()]. The originating design is stored internally.
+#'
+#' @seealso [getOperatingCharcteristicsMeans()], [getOperatingCharcteristicsRates()]
 #'
 #' @return An R6 object of class \code{OperatingCharcteristics}.
 #'
@@ -35,10 +44,8 @@
 #' nMatrix <- matrix(c(50, 100), ncol = 2, byrow = TRUE)
 #' # oc <- getOperatingCharcteristicsMeans(design = rule, numberOfSubjects = nMatrix)
 #'
-#' @export
-#' 
 #' @keywords internal
-#' 
+#'
 OperatingCharcteristics <- R6::R6Class(
     "OperatingCharcteristics",
     inherit = ParameterSet,
@@ -46,6 +53,14 @@ OperatingCharcteristics <- R6::R6Class(
         .design = NULL,
         numberOfSubjects = NULL,
         probabilities = NULL,
+        #'
+        #' @description
+        #' Initializes the shared quantitative operating-characteristics fields.
+        #'
+        #' @param design The originating quantitative decision rule.
+        #' @param numberOfSubjects Matrix of control and treatment sample sizes.
+        #' @param probabilities Computed probability data frame.
+        #'
         initialize = function(
                 design,
                 numberOfSubjects,

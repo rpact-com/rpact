@@ -20,6 +20,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     upperPercentile = "Upper percentile",
     lowerPercentile = "Lower percentile",
     probabilities = "Probabilities",
+    intervalMethod = "Interval method",
     category = "Category",
     probability = "Probability",
     nControl = "Number of subjects (control)",

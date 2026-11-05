@@ -197,6 +197,7 @@ Collate:
     'f_summary_qtd.R'
     'f_design_qtd.R'
     'f_design_plan_qtd_means.R'
+    'f_design_plan_qtd_rates.R'
     'f_plot_qtd_utilities.R'
     'f_qtd_binary_intervals.R'
     'f_plot_qtd.R'

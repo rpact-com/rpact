@@ -204,8 +204,8 @@
 }
 
 .getQtdBinaryDecisionData <- function(rule, numberOfSubjects, directionUpper, controlRate = NULL,
-        treatmentRate = NULL, plotCat = 6L, intervalMethod = "qtd1") {
-    functionName <- "plot.TrialDesignPlanQuantitative"
+        treatmentRate = NULL, plotCat = 6L, intervalMethod = "qtd1",
+        functionName = "plot.TrialDesignPlanQuantitative") {
     .assertQtdPlotChoice(intervalMethod, "intervalMethod",
         c("qtd1", "farringtonManning", "miettinenNurminen", "newcombe"), functionName)
     if (intervalMethod == "qtd1" && (rule$lowerPercentile > 0.5 || rule$upperPercentile < 0.5)) {

@@ -20,6 +20,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     upperPercentile = "Upper percentile",
     lowerPercentile = "Lower percentile",
     probabilities = "Probabilities",
+    intervalMethod = "Interval method",
     category = "Category",
     probability = "Probability",
     nControl = "Number of subjects (control)",
