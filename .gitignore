@@ -51,3 +51,5 @@ testthat-problems.rds
 /tests/testthat/test-f_simulation_multiarm_survival_patient_wise_dummy.R
 /src/rpact.so
 /.luarc.json
+/vignettes/rpact_quantitative_trial_design_files
+/vignettes/rpact_quantitative_trial_design.html

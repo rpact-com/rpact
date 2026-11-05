@@ -1,0 +1,932 @@
+---
+title: Quantitative Trial Decisions for Means and Rates with rpact
+author: '[[](#)]{.author-row} [[Friedrich Pahlke](https://www.linkedin.com/in/pahlke "Visit Friedrich Pahlke''s LinkedIn Profile"){.author-linkedin}]{.author-row} [[Daniel Sabanés Bové](https://www.linkedin.com/in/danielsabanesbove/ "Visit Daniel Sabanés Bové''s LinkedIn Profile"){.author-linkedin}]{.author-row}'
+lang: en
+date: last-modified
+project:
+  execute-dir: project
+license: CC BY-SA
+affiliation: RPACT
+format: html
+image: /photos/by_friedrich_pahlke_25.jpg
+editor:
+  markdown:
+    wrap: none
+description: This document illustrates quantitative Go, Indeterminate, and Stop decisions for continuous and binary endpoints with rpact. It covers decision rules, operating characteristics, console and Markdown summaries, all QTD plot types, interval methods, sensitivity analyses, and a complete numerical demonstration.
+categories:
+  - Planning
+  - Means
+  - Rates
+  - Quantitative Trial Design
+notes: Friedrich Pahlke and Daniel Sabanés Bové
+---
+
+```{r}
+#| label: setup
+#| include: false
+#suppressPackageStartupMessages(library(rpact))
+devtools::load_all("D:/R/workspace/rpact.qtd")
+suppressPackageStartupMessages(library(ggplot2))
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6)
+options("rpact.print.heading.base.number" = -1)
+Sys.setenv("RPACT_LOG_LEVEL" = "DISABLED")
+options(width = 120)
+```
+
+# Introduction
+
+A development decision often depends on two questions: is the treatment effect
+sufficiently promising relative to a minimum acceptable difference, and could it
+reach a target difference? Quantitative trial design (QTD) makes these
+requirements explicit and calculates the probabilities of the resulting
+decisions under specified trial assumptions.
+
+This vignette demonstrates the QTD functions in [rpact](https://www.rpact.org)
+for two independent groups with **continuous endpoints (Means)** and **binary
+endpoints (Rates)**. Rates here are event probabilities, rather than event
+counts per unit of exposure. We define a decision rule, inspect its output,
+calculate operating characteristics, and illustrate every QTD plot type,
+including sensitivity and weighted decision-performance displays.
+
+The worked example is called **Kestrel**, a fictional project name replacing
+internal project and organization labels in the original QTD demonstration. Its
+binary-endpoint assumptions, displayed probability tables, and observed-event
+example retain the original numbers. The continuous example retains the original
+decision thresholds and percentiles; additional planning assumptions are
+identified explicitly.
+
+The examples require a development version of rpact providing
+`getDesignQuantitative()`, `getOperatingCharcteristicsMeans()`, and
+`getOperatingCharcteristicsRates()`, together with their QTD print, summary, and
+plot methods. The spelling `Charcteristics` follows the current function names.
+
+# Defining a Quantitative Decision Rule
+
+## Reference values and percentiles
+
+| Argument | Interpretation | Default | |:--|:--|:--| | `targetValue` | Target
+value (TV), also called target difference (TD) | Required | |
+`lowerReferenceValue` | Lower reference value (LRV), also called minimum
+acceptable difference (MAD) | Required | | `lowerPercentile` | Percentile
+defining the lower interval limit | `0.2` | | `upperPercentile` | Percentile
+defining the upper interval limit | `0.9` |
+
+Use reference values on a scale on which larger effects are beneficial, with LRV
+no larger than TV. The percentiles satisfy $0 < p_L < p_U < 1$. For a normally
+approximated effect estimate $\widehat\theta$ with standard error $s$, the
+limits are
+
+$$
+L = \widehat\theta + \Phi^{-1}(p_L)s,
+\qquad
+U = \widehat\theta + \Phi^{-1}(p_U)s.
+$$
+
+These are percentile-specific frequentist bounds. The 20th and 90th percentiles
+do not describe a symmetric 90% confidence interval and are not posterior
+quantiles.
+
+```{r}
+#| label: binary-rule
+binaryRule <- getDesignQuantitative(
+    targetValue = 0,
+    lowerReferenceValue = -0.05,
+    lowerPercentile = 0.2,
+    upperPercentile = 0.9
+)
+print(binaryRule)
+summary(binaryRule)
+```
+
+For a harmful binary outcome we will use $\theta = p_C - p_T$. Thus, LRV =
+$-0.05$ allows an increase of up to five percentage points in the treatment
+event probability, and TV = $0$ represents equal event probabilities.
+
+## Three and six decision categories
+
+The main criteria are $L \geq \mathrm{LRV}$ and $U \geq \mathrm{TV}$. Meeting
+both gives **Go**, meeting one gives **Indeterminate**, and meeting neither
+gives **Stop**. The six-category view distinguishes particularly strong evidence
+and the two reasons for an indeterminate decision.
+
+| Six-category decision | Interval configuration | Three-category decision |
+|:--|:--|:--| | Go (Fixed) | $L \geq \mathrm{TV}$ | Go | | Go |
+$\mathrm{LRV} \leq L < \mathrm{TV}$ and $U \geq \mathrm{TV}$ | Go | |
+Indeterminate 1 | $L < \mathrm{LRV}$ and $U \geq \mathrm{TV}$ | Indeterminate |
+| Indeterminate 2 | $L \geq \mathrm{LRV}$ and $U < \mathrm{TV}$ | Indeterminate
+| | Stop | $L < \mathrm{LRV}$ and $\mathrm{LRV} \leq U < \mathrm{TV}$ | Stop | |
+Stop (Fixed) | $U < \mathrm{LRV}$ | Stop |
+
+The original demonstration describes the criteria using “greater than”. The
+implementation includes equality at the corresponding reference boundary as
+shown above. This matters for discrete data. “Fixed” identifies the extreme
+decision categories. How a team acts on the middle categories can also depend on
+the competitive situation and other evidence.
+
+Calculations retain six exclusive category probabilities. `plotCat = 3` adds the
+two Go, the two Indeterminate, and the two Stop probabilities for display;
+`plotCat = 6` shows them separately. Rule plots default to six categories and OC
+plots to three.
+
+# The Kestrel Binary-Endpoint Example
+
+## Clinical setting and exact input assumptions
+
+The source demonstration considers a phase II study in de novo renal transplant
+recipients involving sotrastaurin (AEB071).[^aeb071] Three experimental regimens
+and one active control regimen based on mycophenolic acid and tacrolimus are
+planned with **75 patients per group and 1:1:1:1 randomization**. The QTD
+exercise compares either one experimental group or two pooled experimental
+groups against control. The comparisons therefore use **75 control versus 75
+treatment patients** and **75 control versus 150 treatment patients**.
+
+The endpoint is composite efficacy failure, so lower event probabilities are
+beneficial. The exercise addresses efficacy only; safety and the overall
+benefit-risk assessment are separate considerations. These are planning
+assumptions from the demonstration, rather than reported outcomes of the public
+trial.
+
+| Quantity | Original value | rpact argument | |:--|:--|:--| | Minimum
+acceptable difference | −5 percentage points | `lowerReferenceValue = -0.05` | |
+Target difference | 0 percentage points | `targetValue = 0` | | Lower / upper
+percentiles | 20% / 90% | `lowerPercentile = 0.2`, `upperPercentile = 0.9` | |
+Control event probability | 15% | `pi2 = 0.15` | | Treatment event-probability
+range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` | | Sample sizes,
+control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
+| Beneficial direction | Lower treatment rate | `directionUpper = FALSE` | |
+Original interval construction | QTD1 | `intervalMethod = "qtd1"` |
+
+The embedded input screenshot also contains unchecked sample-size rows. They are
+inactive GUI placeholders and are not scenarios in the example. The embedded
+full-data image reveals a treatment-rate step of 0.001. Rates and reference
+differences are entered as proportions, so five percentage points are entered as
+`0.05`.
+
+```{r}
+#| label: kestrel-rates
+demoSizes <- matrix(
+    c(75, 75, 75, 150),
+    ncol = 2,
+    byrow = TRUE,
+    dimnames = list(NULL, c("control", "treatment"))
+)
+ratesOC <- getOperatingCharcteristicsRates(
+    design = binaryRule,
+    numberOfSubjects = demoSizes,
+    pi1 = seq(0.10, 0.25, by = 0.001),
+    pi2 = 0.15,
+    directionUpper = FALSE,
+    intervalMethod = "qtd1"
+)
+```
+
+`numberOfSubjects` is a positive integer matrix with control in column 1 and
+treatment in column 2. Each row is a scenario. `pi1` is a vector of treatment
+event probabilities in $[0,1]$ and `pi2` is a single control event probability
+in $[0,1]$. The constructor requires `design`, `numberOfSubjects`, `pi1`, and
+`pi2`. Its optional arguments are `directionUpper = TRUE` and
+`intervalMethod = "qtd1"`; this example explicitly reverses the direction.
+Additional arguments in `...` are checked for unknown names.
+
+With `directionUpper = TRUE`, the beneficial risk difference is `pi1 - pi2`;
+with `FALSE`, it is `pi2 - pi1`. The returned `alternative` field uses that
+beneficial direction. Exact binomial summation over all possible event-count
+pairs produces the category probabilities. The interval construction itself
+remains approximate.
+
+## The five named scenarios
+
+```{r}
+#| label: kestrel-scenarios
+scenarioNames <- c("Very good", "Good", "Indifferent", "Poor", "Very poor")
+improvements <- c(0.05, 0, -0.025, -0.05, -0.10)
+scenarioRates <- c(0.10, 0.15, 0.175, 0.20, 0.25)
+knitr::kable(data.frame(
+    Scenario = scenarioNames,
+    `True improvement (percentage points)` = 100 * improvements,
+    `Treatment event probability` = scenarioRates,
+    check.names = FALSE
+))
+ratesScenarios <- getOperatingCharcteristicsRates(
+    design = binaryRule,
+    numberOfSubjects = demoSizes,
+    pi1 = scenarioRates,
+    pi2 = 0.15,
+    directionUpper = FALSE,
+    intervalMethod = "qtd1"
+)
+summary(ratesScenarios, digits = 4)
+```
+
+The next table transcribes the **displayed values from the presentation
+exactly**. Triplets are ordered Go / Indeterminate / Stop.
+
+| Scenario | True improvement | 75 control / 75 treatment | 75 control / 150
+treatment | |:--|--:|:--|:--| | Very good | 5% | 0.85 / 0.14 / 0.01 | 0.91 /
+0.07 / 0.01 | | Good | 0% | 0.51 / 0.39 / 0.10 | 0.57 / 0.33 / 0.10 | |
+Indifferent | −2.5% | 0.33 / 0.47 / 0.20 | 0.36 / 0.43 / 0.21 | | Poor | −5% |
+0.20 / 0.48 / 0.32 | 0.20 / 0.45 / 0.35 | | Very poor | −10% | 0.05 / 0.34 /
+0.60 | 0.04 / 0.28 / 0.68 |
+
+The presentation values have limited precision and are not renormalized. Some
+triplets sum to 0.99, and some entries reflect the source's display choices
+rather than conventional rounding. The calculated table below retains six
+decimal places under the same assumptions and QTD1 construction.
+
+```{r}
+#| label: kestrel-calculated-table
+scenarioPlot <- plot(ratesScenarios, type = 4, plotCat = 3)
+scenarioTable <- reshape(
+    scenarioPlot$data[c("scenario", "nControl", "nTreatment", "pi1", "alternative", "category", "probability")],
+    idvar = c("scenario", "nControl", "nTreatment", "pi1", "alternative"),
+    timevar = "category",
+    direction = "wide"
+)
+scenarioTable <- scenarioTable[order(scenarioTable$scenario, match(scenarioTable$pi1, scenarioRates)), ]
+scenarioTable$Scenario <- scenarioNames[match(scenarioTable$pi1, scenarioRates)]
+knitr::kable(
+    scenarioTable[c("Scenario", "nControl", "nTreatment", "pi1", "alternative",
+        "probability.Go", "probability.Indeterminate", "probability.Stop")],
+    digits = 6,
+    row.names = FALSE
+)
+```
+
+For a five-percentage-point improvement, the Go probability is approximately
+0.848456 with 75 patients per group and 0.914933 with 75 control and 150
+treatment patients. At equal event rates, these probabilities are approximately
+0.508129 and 0.570745. Go under this rule therefore does not imply rejection of
+a conventional superiority null hypothesis.
+
+## Results embedded as graphics
+
+The compact results screenshot displays treatment probabilities from 0.10 to
+0.24 in steps of 0.02. The following table retains all its displayed values.
+
+| Control N | Treatment N | Control rate | Treatment rate | Go | Indeterminate |
+Stop | |--:|--:|--:|--:|--:|--:|--:| | 75 | 75 | 0.15 | 0.10 | 0.8485 | 0.1384 |
+0.0132 | | 75 | 75 | 0.15 | 0.12 | 0.7278 | 0.2383 | 0.0339 | | 75 | 75 | 0.15 |
+0.14 | 0.5831 | 0.3442 | 0.0728 | | 75 | 75 | 0.15 | 0.16 | 0.435 | 0.4307 |
+0.1343 | | 75 | 75 | 0.15 | 0.18 | 0.3026 | 0.479 | 0.2183 | | 75 | 75 | 0.15 |
+0.20 | 0.1971 | 0.4822 | 0.3206 | | 75 | 75 | 0.15 | 0.22 | 0.1208 | 0.4454 |
+0.4337 | | 75 | 75 | 0.15 | 0.24 | 0.0699 | 0.3812 | 0.5489 | | 75 | 150 | 0.15
+| 0.10 | 0.9149 | 0.0749 | 0.0102 | | 75 | 150 | 0.15 | 0.12 | 0.8065 | 0.164 |
+0.0295 | | 75 | 150 | 0.15 | 0.14 | 0.6552 | 0.276 | 0.0688 | | 75 | 150 | 0.15
+| 0.16 | 0.4854 | 0.3793 | 0.1353 | | 75 | 150 | 0.15 | 0.18 | 0.3263 | 0.4417 |
+0.232 | | 75 | 150 | 0.15 | 0.20 | 0.1993 | 0.4466 | 0.354 | | 75 | 150 | 0.15 |
+0.22 | 0.1112 | 0.3996 | 0.4892 | | 75 | 150 | 0.15 | 0.24 | 0.057 | 0.3209 |
+0.6222 |
+
+The full-data screenshot begins at `pi1 = 0.100` with step `0.001`. Its first
+row displays six-category probabilities 0.535233, 0.313223, 0.138351, 0,
+0.01232, and 0.000873, with aggregate probabilities 0.848456, 0.138351, and
+0.013193. Small displayed zeros can represent rounded positive probabilities.
+The following calculation reconstructs the visible section and its
+three-category sums from unrounded results.
+
+```{r}
+#| label: kestrel-full-data
+visibleRows <- subset(ratesOC$probabilities,
+    nTreatment == 75 & pi1 >= 0.100 & pi1 <= 0.112)
+visibleTable <- reshape(
+    visibleRows[c("pi1", "pi2", "nControl", "nTreatment", "category", "probability")],
+    idvar = c("pi1", "pi2", "nControl", "nTreatment"),
+    timevar = "category",
+    direction = "wide"
+)
+visibleTable <- visibleTable[order(visibleTable$pi1), ]
+visibleTable$Go <- visibleTable[["probability.Go (Fixed)"]] + visibleTable$probability.Go
+visibleTable$Indeterminate <- visibleTable[["probability.Indeterminate 1"]] +
+    visibleTable[["probability.Indeterminate 2"]]
+visibleTable$Stop <- visibleTable$probability.Stop + visibleTable[["probability.Stop (Fixed)"]]
+knitr::kable(visibleTable, digits = 6, row.names = FALSE)
+```
+
+## Translating the rule into observed event counts
+
+The presentation fixes **16 events among 75 control patients**. For 75 treatment
+patients it gives Go for **0–15** events, Indeterminate for **16–22**, and Stop
+for **23–75**. The QTD1 event-count map reproduces these ranges.
+
+```{r}
+#| label: binary-event-map
+#| fig-cap: "QTD1 decisions for 75 patients per group. The vertical line marks 16 control events."
+eventMap <- plot(
+    binaryRule,
+    type = 3,
+    numberOfSubjects = c(75, 75),
+    directionUpper = FALSE,
+    intervalMethod = "qtd1",
+    observedControl = 16,
+    controlRate = 0.15,
+    treatmentRate = 0.10,
+    plotCat = 3
+)
+eventMap
+```
+
+Here `numberOfSubjects` is a vector of length two, unlike the OC constructors'
+matrix. `observedControl` adds the vertical line. Supplying `controlRate` and
+`treatmentRate` together adds joint binomial cell probabilities to the plot data
+without changing the decisions.
+
+```{r}
+#| label: observed-event-ranges
+controlSlice <- subset(eventMap$data, eventsControl == 16)
+observedRanges <- aggregate(eventsTreatment ~ category, controlSlice, range)
+knitr::kable(data.frame(
+    Decision = observedRanges$category,
+    Minimum = observedRanges$eventsTreatment[, 1],
+    Maximum = observedRanges$eventsTreatment[, 2]
+))
+aggregate(cellProbability ~ category, eventMap$data, sum)
+```
+
+Aggregated cell probabilities are unconditional OC probabilities at the supplied
+true rates. The count ranges condition on the observed control count and should
+not be interpreted as those unconditional probabilities.
+
+# Continuous Endpoints: Means
+
+The continuous exercise refers to AFQ056[^afq056] and specifies **MAD = 2.9**,
+**TD = 4**, a **50th-percentile lower bound**, and an **80th-percentile upper
+bound**. These four values are retained exactly.
+
+```{r}
+#| label: means-rule
+meansRule <- getDesignQuantitative(
+    targetValue = 4,
+    lowerReferenceValue = 2.9,
+    lowerPercentile = 0.5,
+    upperPercentile = 0.8
+)
+summary(meansRule)
+```
+
+The slide supplies no standard deviation, sample sizes, or true-effect grid for
+this exercise. For the following demonstrations we additionally assume a common
+**standard deviation of 6**, mean differences from **0 to 6 in steps of 0.1**,
+and sample-size pairs **(25, 25), (50, 50), (75, 75), (25, 50), (50, 100), (75,
+150)**. These are illustrative additions.
+
+```{r}
+#| label: means-operating-characteristics
+planningSizes <- matrix(
+    c(25, 25, 50, 50, 75, 75, 25, 50, 50, 100, 75, 150),
+    ncol = 2,
+    byrow = TRUE,
+    dimnames = list(NULL, c("control", "treatment"))
+)
+meansOC <- getOperatingCharcteristicsMeans(
+    design = meansRule,
+    numberOfSubjects = planningSizes,
+    normalApproximation = TRUE,
+    groups = 2,
+    alternative = seq(0, 6, by = 0.1),
+    stDev = 6
+)
+```
+
+| Argument | Meaning and supported options | |:--|:--| | `design` | Quantitative
+decision rule | | `numberOfSubjects` | Positive integer matrix, one scenario per
+row, columns control then treatment | | `normalApproximation` | Must be `TRUE`
+in the current implementation | | `groups` | Must be `2` in the current
+implementation | | `alternative` | Vector of true mean differences, treatment
+minus control; default `seq(0, 1, 0.2)` | | `stDev` | Positive common
+within-group standard deviation; default `1` | | `...` | Reserved additional
+arguments; no further QTD calculation options are used here |
+
+The sampling standard error is $s = \sigma\sqrt{1/n_C + 1/n_T}$. The normal
+sampling distribution of the estimated difference gives the six decision
+probabilities analytically. This calculation uses a specified common standard
+deviation rather than a t-distribution. Means has no `directionUpper` argument:
+formulate the endpoint so that larger differences represent greater benefit. At
+the lower percentile 0.5, $\Phi^{-1}(0.5)=0$ and $L=\widehat\theta$.
+
+# Printing, Summarizing, and Accessing Results
+
+`print()` distinguishes user-defined, derived, and default parameters and
+displays the long-format probability table. The compact five-scenario object
+makes this output manageable.
+
+```{r}
+#| label: print-rates
+print(ratesScenarios)
+```
+
+`summary()` gives the rule and assumptions, followed by one table per
+sample-size scenario, with one row per input effect and six probability columns.
+Rates tables include treatment probability and beneficial risk difference.
+
+```{r}
+#| label: summary-means
+meansScenarios <- getOperatingCharcteristicsMeans(
+    design = meansRule,
+    numberOfSubjects = demoSizes,
+    alternative = c(0, 2.9, 4, 6),
+    stDev = 6
+)
+summary(meansScenarios, digits = 4)
+```
+
+`output` selects `"all"` (default), `"title"`, `"overview"`, or `"body"`. The OC
+overview contains the rule and assumptions; its body contains the tables. For a
+decision rule, the body contains its four parameters. `digits` controls display
+precision, following the summary settings `rpact.summary.digits` and
+`rpact.summary.digits.probs`, without changing stored probabilities.
+
+```{r}
+#| label: summary-parts
+summary(ratesScenarios, output = "title")
+summary(ratesScenarios, output = "overview")
+summary(binaryRule, output = "body", digits = 4)
+```
+
+Both the original object and its summary support Markdown for reports. The
+second expression embeds the summary tables directly into the document.
+
+```{r}
+#| label: markdown-object
+#| eval: false
+print(ratesScenarios)
+```
+
+```{r}
+#| label: markdown-summary
+summary(ratesScenarios, digits = 4)
+```
+
+The `probabilities` field is a data frame of unrounded values. Columns include
+`category`, `probability`, `nControl`, `nTreatment`, and `alternative`, plus
+`stDev` for Means or `pi1` and `pi2` for Rates. Each scenario contains six
+category blocks, with effects retained in input order within each block.
+Repeated rates and sample-size scenarios are retained; use all relevant
+identifiers when filtering. A summary stores a deep copy, so later changes to
+the original object do not change an existing summary.
+
+```{r}
+#| label: access-probabilities
+head(ratesScenarios$probabilities)
+meansScenarios$numberOfSubjects
+```
+
+# Plots of the Decision Rule
+
+There are three rule plot types. `getAvailablePlotTypes()` supplies numbers or
+captions. A matching caption can replace the numeric `type`.
+
+```{r}
+#| label: discover-rule-plots
+getAvailablePlotTypes(binaryRule, output = "numcap")
+```
+
+## Type 1: Decision rule intervals
+
+Without supplied data, type 1 creates illustrative intervals with varying
+standard errors to show all six categories. They are interval configurations
+rather than six observed results or a common-sample-size calculation.
+
+```{r}
+#| label: rule-intervals
+#| fig-cap: "Illustrative interval configurations for the binary decision thresholds."
+plot(binaryRule, type = 1, plotCat = 6)
+```
+
+Supply `estimates` and `standardErrors` together to classify normally
+approximated intervals. `labels` supplies one character label per estimate. This
+example uses the continuous exercise's reference values and percentiles.
+
+```{r}
+#| label: supplied-intervals
+#| fig-cap: "Hypothetical continuous-endpoint results under the AFQ056 exercise's rule."
+plot(
+    meansRule,
+    type = "Decision rule intervals",
+    estimates = c(2.4, 3.0, 3.6, 4.5),
+    standardErrors = c(0.5, 0.8, 0.6, 0.5),
+    labels = c("Kestrel A", "Kestrel B", "Kestrel C", "Kestrel D"),
+    plotCat = 3
+)
+```
+
+## Type 2: Normal decision regions
+
+This plot shows decisions against the **observed effect estimate** and
+**standard error**, rather than the true effects used in OC plots. `effectRange`
+and `standardErrorRange` are increasing pairs. `gridSize` is the number of
+evaluated values on each axis (2 to 1000, default 200). Optional estimates and
+standard errors overlay points.
+
+```{r}
+#| label: normal-regions
+#| fig-cap: "Decision regions for observed mean differences and standard errors."
+plot(
+    meansRule,
+    type = 2,
+    effectRange = c(0, 6),
+    standardErrorRange = c(0, 2),
+    gridSize = 200,
+    estimates = c(3.0, 4.5),
+    standardErrors = c(0.8, 0.5),
+    plotCat = 6
+)
+```
+
+## Type 3: Binary event-count maps and interval methods
+
+The Kestrel event-count map above illustrates type 3. Four interval methods are
+supported by both this plot and the Rates constructor:
+
+| `intervalMethod` | Construction | |:--|:--| | `"qtd1"` | Original QTD1
+approximation using Wilson score limits rounded to four decimal places in its
+variance construction | | `"farringtonManning"` | Risk-difference score-test
+inversion using constrained maximum-likelihood variance | |
+`"miettinenNurminen"` | Score inversion with variance correction $N/(N-1)$,
+where $N=n_C+n_T$ | | `"newcombe"` | Square-and-add combination of unrounded
+Wilson limits without continuity correction |
+
+QTD1 requires `lowerPercentile <= 0.5 <= upperPercentile`. The other methods
+allow ordered percentiles anywhere in $(0,1)$, including both on the same side
+of 0.5. They use the lower-tail construction below 0.5, the upper-tail
+construction above 0.5, and the observed difference at 0.5. See the
+methodological references below.
+
+This comparison uses additional illustrative sample sizes of 25 per group to
+keep calculation of all four maps economical.
+
+```{r}
+#| label: interval-method-maps
+#| fig-height: 8
+#| fig-cap: "All four interval constructions for 25 patients per group."
+intervalMethods <- c("qtd1", "farringtonManning", "miettinenNurminen", "newcombe")
+methodPlots <- lapply(intervalMethods, function(method) {
+    return(plot(binaryRule, type = 3, numberOfSubjects = c(25, 25),
+        directionUpper = FALSE, intervalMethod = method, plotCat = 6))
+})
+combinedMap <- methodPlots[[1]]
+combinedMap$data <- do.call(rbind, lapply(methodPlots, function(p) {
+    return(p$data)
+}))
+combinedMap$data$intervalMethod <- factor(combinedMap$data$intervalMethod, levels = intervalMethods)
+combinedMap + facet_wrap(~intervalMethod, ncol = 2) +
+    labs(subtitle = "LRV = -0.05; TV = 0; percentiles = 0.2 / 0.9; C/T = 25/25; lower treatment rates are beneficial")
+```
+
+Maps contain at most one million cells, including zero-event rows and columns.
+Interval methods can classify boundary count pairs differently and change the OC
+probabilities. To use another method throughout an OC analysis, specify it in
+the constructor:
+
+```{r}
+#| label: alternative-method-direction
+scoreRates <- getOperatingCharcteristicsRates(
+    design = binaryRule,
+    numberOfSubjects = matrix(c(25, 25), ncol = 2),
+    pi1 = c(0.10, 0.15, 0.20),
+    pi2 = 0.15,
+    directionUpper = FALSE,
+    intervalMethod = "miettinenNurminen"
+)
+summary(scoreRates)
+higherIsBetter <- getOperatingCharcteristicsRates(
+    design = getDesignQuantitative(targetValue = 0.10, lowerReferenceValue = 0),
+    numberOfSubjects = matrix(c(25, 25), ncol = 2),
+    pi1 = c(0.15, 0.25, 0.35),
+    pi2 = 0.15,
+    directionUpper = TRUE,
+    intervalMethod = "newcombe"
+)
+summary(higherIsBetter)
+```
+
+The second example illustrates a beneficial response rather than a harmful
+event. Its reference values concern `pi1 - pi2`.
+
+# Plots of Operating Characteristics
+
+All six OC plot types support both endpoints. Their numbers refer to the OC
+object rather than the decision-rule object.
+
+```{r}
+#| label: discover-oc-plots
+getAvailablePlotTypes(meansOC, output = "numcap")
+getAvailablePlotTypes(ratesOC, output = "caption")
+```
+
+| `type` | Display | Main additional arguments | |--:|:--|:--| | 1 | OC curves |
+`plotCat`, `alternatives` or `pi1`, `plotPointsEnabled`, `xAxis` | | 2 | Stacked
+probabilities | `plotCat`, `alternatives` or `pi1`, `xAxis` | | 3 |
+Probabilities versus total sample size | Selected effects, multiple sample sizes
+| | 4 | Selected effect scenarios | `alternatives` or `pi1` | | 5 | Sensitivity
+heatmap | `sensitivity`, `category`, `contourLevels`, `stDev` or `pi2` | | 6 |
+Desired versus observed decisions | `weights`, `desiredDecisions`, selected
+effects |
+
+`alternatives` selects already calculated effects. For Rates, `pi1` instead
+selects treatment rates; supply only one selection argument. Rates selections
+through `alternatives` refer to beneficial effects at the **original** control
+rate. When `pi2` is varied, the corresponding treatment rates stay fixed and
+their risk differences change with the control rate.
+
+## Type 1: Operating-characteristics curves
+
+The binary plot reproduces the original graphical comparison, with
+treatment-rate range 0.10–0.25 and reference rates 0.15 and 0.20 corresponding
+to TV and LRV.
+
+```{r}
+#| label: rates-oc-curves
+#| fig-cap: "Kestrel OC curves for 75 control versus 75 or 150 treatment patients."
+plot(ratesOC, type = 1, plotCat = 3, plotPointsEnabled = FALSE,
+    main = "Kestrel: binary operating characteristics")
+```
+
+Rates defaults to `xAxis = "treatmentRate"`; `"effect"` shows beneficial risk
+difference. Reference lines are transformed separately for each control-rate
+panel. Unattainable reference rates outside $[0,1]$ are omitted.
+
+```{r}
+#| label: rates-effect-axis
+#| fig-height: 8
+#| fig-cap: "Binary OC curves on the beneficial risk-difference scale, retaining six categories."
+plot(ratesOC, type = 1, xAxis = "effect", plotCat = 6,
+    plotPointsEnabled = FALSE)
+```
+
+Means uses the true mean difference. By default `plotPointsEnabled = NA` adds
+points for grids of at most ten distinct effects. `TRUE` and `FALSE` override
+this behavior for OC curves.
+
+```{r}
+#| label: means-oc-curves
+#| fig-cap: "Continuous OC curves at selected true mean differences."
+plot(meansOC, type = 1, alternatives = c(0, 2.9, 4, 6), plotPointsEnabled = TRUE)
+```
+
+## Type 2: Stacked decision probabilities
+
+Stacked plots show the composition of probabilities for each sample-size
+scenario. Areas interpolate linearly between supplied grid points without
+calculating additional effects; use a sufficiently dense grid for a smooth
+display.
+
+```{r}
+#| label: stacked-probabilities
+#| fig-height: 8
+#| fig-cap: "Stacked probabilities for continuous and binary endpoints."
+plot(meansOC, type = 2, plotCat = 3)
+plot(ratesOC, type = "Stacked decision probabilities", plotCat = 6)
+```
+
+## Type 3: Decision probabilities by sample size
+
+This plot needs multiple total sample sizes. Allocation ratios are separated so
+that different treatment-to-control allocations are not joined into one curve.
+The original binary example has only one total N for each allocation ratio. For
+meaningful sample-size curves we use the additional `planningSizes` grid.
+
+```{r}
+#| label: sample-size-curves
+#| fig-height: 8
+#| fig-cap: "Decision probabilities by sample size with separate allocation ratios."
+ratesPlanning <- getOperatingCharcteristicsRates(
+    design = binaryRule,
+    numberOfSubjects = planningSizes,
+    pi1 = seq(0.10, 0.25, by = 0.005),
+    pi2 = 0.15,
+    directionUpper = FALSE
+)
+plot(meansOC, type = 3, alternatives = c(0, 2.9, 4, 6))
+plot(ratesPlanning, type = 3, pi1 = c(0.10, 0.15, 0.20))
+```
+
+## Type 4: Selected effect scenarios
+
+This plot compares actual grid points as discrete scenarios without
+interpolation. Types 3 and 4 always show points, independently of
+`plotPointsEnabled`.
+
+```{r}
+#| label: selected-effect-plots
+#| fig-cap: "Selected mean differences and the five original Kestrel treatment-rate scenarios."
+plot(meansOC, type = 4, alternatives = c(0, 2.9, 4, 6))
+plot(ratesScenarios, type = 4, pi1 = scenarioRates)
+```
+
+## Type 5: Sensitivity of decision probabilities
+
+Sensitivity plots show one `category`, default `"Go"`. With `plotCat = 3`,
+choose Go, Indeterminate, or Stop; with `plotCat = 6`, use a detailed category
+name. Data must form a rectangular grid with at least two coordinates on each
+axis. Maps use evaluated combinations and do not extrapolate to missing
+scenarios.
+
+### Sample-size sensitivity
+
+`sensitivity = "sampleSize"` is the default. It varies effect or treatment rate
+and total sample size, separately by allocation ratio and endpoint assumption.
+`contourLevels` optionally supplies probabilities in $[0,1]$ for contours.
+
+```{r}
+#| label: sample-size-sensitivity
+#| fig-cap: "Sensitivity to effect and total sample size, using added planning scenarios."
+plot(meansOC, type = 5, sensitivity = "sampleSize", category = "Go",
+    contourLevels = c(0.2, 0.5, 0.8))
+plot(ratesPlanning, type = 5, sensitivity = "sampleSize", category = "Indeterminate")
+```
+
+### Standard-deviation sensitivity for Means
+
+A positive `stDev` vector recalculates OC probabilities using the normal
+calculation. `sensitivity = "stDev"` places these values on the vertical axis.
+`stDev` can also create assumption panels for the other OC types. Recalculation
+for plotting does not replace the stored probabilities.
+
+```{r}
+#| label: sd-sensitivity
+#| fig-height: 8
+#| fig-cap: "Continuous Go probabilities across standard deviations of 4 to 8."
+plot(meansOC, type = 5, sensitivity = "stDev", stDev = seq(4, 8, by = 1),
+    category = "Go", contourLevels = c(0.2, 0.5, 0.8))
+```
+
+### Control-rate sensitivity for Rates
+
+`sensitivity = "pi2"` and a `pi2` vector recalculate probabilities for different
+true control rates using the stored interval method and direction. This map
+always uses treatment and control rates as axes. Treatment rates stay fixed.
+`stDev` applies only to Means and `pi2` only to Rates.
+
+```{r}
+#| label: control-rate-sensitivity
+#| fig-cap: "Kestrel Go probabilities at control rates from 0.10 to 0.20."
+plot(ratesOC, type = 5, sensitivity = "pi2", pi2 = seq(0.10, 0.20, by = 0.025),
+    category = "Go", contourLevels = c(0.2, 0.5, 0.8))
+```
+
+### Allocation sensitivity
+
+Allocation maps require one selected effect and a complete grid of control and
+treatment sample sizes. The additional grid below varies both arms
+independently.
+
+```{r}
+#| label: allocation-sensitivity
+#| fig-cap: "Allocation sensitivity at mean difference 4 and equal binary event rates 0.15."
+allocationSizes <- as.matrix(expand.grid(control = c(25, 75), treatment = c(25, 75)))
+meansAllocation <- getOperatingCharcteristicsMeans(
+    design = meansRule,
+    numberOfSubjects = allocationSizes,
+    alternative = 4,
+    stDev = 6
+)
+ratesAllocation <- getOperatingCharcteristicsRates(
+    design = binaryRule,
+    numberOfSubjects = allocationSizes,
+    pi1 = 0.15,
+    pi2 = 0.15,
+    directionUpper = FALSE
+)
+plot(meansAllocation, type = 5, sensitivity = "allocation", category = "Go")
+plot(ratesAllocation, type = 5, sensitivity = "allocation", category = "Stop")
+```
+
+## Type 6: Desired and observed decisions
+
+This display needs an explicit distribution over selected true-effect scenarios.
+Supply one nonnegative entry per effect through `weights`, summing to one, and
+one desired decision (`"Go"`, `"Indeterminate"`, or `"Stop"`) through
+`desiredDecisions`. Both follow selection order. These are additional
+decision-analysis assumptions, not estimates supplied by the trial.
+
+Each cell is a joint probability: conditional decision probabilities multiplied
+by scenario weights and summed over scenarios. Matching desired and observed
+decisions count as correct under this definition. Indeterminate remains separate
+and is not treated as Stop. These are neither conventional type-I/type-II error
+rates nor posterior probabilities. Each panel reports its probability of a
+correct decision under the supplied definition.
+
+```{r}
+#| label: weighted-decisions
+#| fig-height: 8
+#| fig-cap: "Desired and observed decisions under explicitly chosen effect distributions."
+meansPerformance <- plot(
+    meansOC,
+    type = 6,
+    alternatives = c(0, 2.9, 4, 6),
+    weights = c(0.25, 0.25, 0.25, 0.25),
+    desiredDecisions = c("Stop", "Indeterminate", "Go", "Go")
+)
+meansPerformance
+ratesPerformance <- plot(
+    ratesScenarios,
+    type = 6,
+    pi1 = scenarioRates,
+    weights = c(0.2, 0.2, 0.2, 0.2, 0.2),
+    desiredDecisions = c("Go", "Go", "Indeterminate", "Stop", "Stop")
+)
+ratesPerformance
+```
+
+The data include `desiredDecision`, `observedDecision`, and `correct`. The
+`qtdEffectDistribution` attribute records the exact effect distribution and
+desired decisions. For Rates it identifies scenarios by `pi1`. If several `pi2`
+values are supplied, the same distribution over treatment rates and desired
+decisions applies separately to each control-rate panel.
+
+```{r}
+#| label: performance-data
+attr(ratesPerformance, "qtdEffectDistribution")
+head(ratesPerformance$data[c("desiredDecision", "observedDecision", "probability", "correct")])
+```
+
+# Plot Appearance, Source Data, and Exports
+
+All QTD plots accept `main`, `xlab`, `ylab`, `palette`, `legendPosition`,
+`plotSettings`, and `showSource`. With `palette = NULL`, decision categories use
+semantic colors and sample-size curves use the rpact hue palette. Sensitivity
+and performance use a continuous probability scale. The default legend position
+is `"auto"`; standard positions such as `"bottom"` and `"none"` are also
+supported.
+
+```{r}
+#| label: plot-settings
+#| fig-cap: "Kestrel OC curves customized with the shared rpact plot settings."
+kestrelPlot <- plot(
+    ratesOC,
+    type = 1,
+    plotCat = 3,
+    plotPointsEnabled = FALSE,
+    main = "Kestrel: probability of each development decision",
+    xlab = "True composite efficacy failure probability on treatment",
+    ylab = "Probability",
+    palette = "Set1",
+    legendPosition = "bottom",
+    plotSettings = getPlotSettings(
+        lineSize = 1,
+        pointSize = 2,
+        mainTitleFontSize = 14,
+        axesTextFontSize = 10,
+        legendFontSize = 10
+    )
+)
+kestrelPlot
+```
+
+Results are ggplot objects supporting additional ggplot2 layers and themes.
+`data` contains the unrounded plot data. `showSource = TRUE` also prints them; a
+compact scenario object keeps this output manageable.
+
+```{r}
+#| label: show-plot-source
+sourcePlot <- plot(ratesScenarios, type = 4, showSource = TRUE)
+head(sourcePlot$data)
+```
+
+The original GUI offered PNG plots, a full-data CSV, and a compact summary CSV.
+The equivalent R workflow makes filenames and table contents explicit. This
+optional export code is not executed when rendering the vignette.
+
+```{r}
+#| label: exports
+#| eval: false
+ggplot2::ggsave("kestrel_plot.png", kestrelPlot, width = 10, height = 6, dpi = 300)
+utils::write.csv(ratesOC$probabilities, "kestrel_data.csv", row.names = FALSE)
+utils::write.csv(scenarioTable, "kestrel_table.csv", row.names = FALSE)
+writeLines(as.character(print(summary(ratesScenarios), markdown = TRUE)), "kestrel_summary.md")
+```
+
+# References
+
+- Farrington, C. P. and Manning, G. (1990). Test statistics and sample size
+  formulae for comparative binomial trials with null hypothesis of non-zero risk
+  difference or non-unity relative risk. *Statistics in Medicine*, 9, 1447–1454.
+  [doi:10.1002/sim.4780091208](https://doi.org/10.1002/sim.4780091208).
+- Miettinen, O. and Nurminen, M. (1985). Comparative analysis of two rates.
+  *Statistics in Medicine*, 4, 213–226.
+  [doi:10.1002/sim.4780040211](https://doi.org/10.1002/sim.4780040211).
+- Newcombe, R. G. (1998). Interval estimation for the difference between
+  independent proportions: comparison of eleven methods. *Statistics in
+  Medicine*, 17, 873–890. [Publication
+  link](https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8%3C873::AID-SIM779%3E3.0.CO;2-I).
+- Armitage, P. (1989). Inference and decision in clinical trials. *Journal of
+  Clinical Epidemiology*, 42, 293–299.
+- Spiegelhalter, D. J., Abrams, K. R., and Myles, J. P. (2004). *Bayesian
+  Approaches to Clinical Trials and Health-Care Evaluation*. Wiley, Section 6.3.
+  Background reading cited in the original demonstration; the implemented
+  calculations above use frequentist interval constructions.
+
+[^aeb071]: AEB071 is the publicly documented code for sotrastaurin. The
+[NCT01064791 study record](https://clinicaltrials.gov/study/NCT01064791) and [EU
+trial results record
+2009-015456-14](https://www.clinicaltrialsregister.eu/ctr-search/trial/2009-015456-14/results)
+identify the renal-transplant study, including protocol CAEB071A2214. Kestrel
+names this teaching example, not a new compound. Public records establish the
+terminology; numerical QTD assumptions here come from the supplied
+demonstration.
+
+[^afq056]: AFQ056 is the publicly documented code for mavoglurant, an mGluR5
+antagonist; see [the 2014 pharmacological characterization indexed in
+PubMed](https://pubmed.ncbi.nlm.nih.gov/25316499/). The numbers 2.9, 4, 0.5, and
+0.8 reproduce the supplied continuous exercise and are not claimed to be
+published efficacy results.

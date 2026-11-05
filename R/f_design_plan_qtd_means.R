@@ -24,6 +24,9 @@
             
     stopifnot(is.numeric(numberOfSubjects) && length(numberOfSubjects) == 2)
 
+    # Matrix column names identify arms, not result-table row names.
+    numberOfSubjects <- unname(numberOfSubjects)
+
     s <- stDev * sqrt((1 / numberOfSubjects[2]) + (1 / numberOfSubjects[1]))
 
     qL <- qnorm(design$lowerPercentile)
