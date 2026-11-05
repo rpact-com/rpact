@@ -56,6 +56,22 @@ If saving the cache fails, report that limitation; the next task must perform
 the full check again. If a later build reveals a toolchain failure, invalidate
 the cache so that the next task checks the toolchain again.
 
+## Agent working files and directories
+
+Agents such as Codex must store all task-specific working files and directories
+under `_dev/agents/`, relative to the rpact repository root. Create this
+directory if it does not yet exist, before writing any working files.
+
+Use descriptive task-specific subdirectories there for scratch scripts,
+exploratory checks, temporary test fixtures, logs, test output, temporary package
+libraries, and other intermediate artifacts. Do not create new agent working
+files directly in `_dev/` or elsewhere in the repository.
+
+This rule concerns temporary working artifacts. Maintained source files,
+documentation, and permanent regression tests belong in their prescribed
+locations; follow `rpact.tests/AGENTS.md` for rpact tests. The Windows preflight
+cache retains its explicitly required path, `_dev/windows-preflight.json`.
+
 ## Task-specific guidance
 
 Read and follow the applicable instruction files before starting work. If a task
