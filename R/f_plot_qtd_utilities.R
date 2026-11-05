@@ -514,21 +514,8 @@
 
 .getQtdDecisionPerformance <- function(data, weights, desiredDecisions, functionName, effectColumnName = "alternative") {
     effects <- unique(data[[effectColumnName]])
+    
     .assertQtdPlotNumeric(weights, "weights", functionName, lower = 0, expectedLength = length(effects))
-    if (is.null(desiredDecisions)) {
-        stopMissingArgument("'desiredDecisions' must be supplied for the decision-performance plot",
-            functionName = functionName, 
-            parameter = "desiredDecisions",
-            constraint = "one desired decision per selected effect",
-            diagnosticId = "qtd.plot.missing_desired_decisions", 
-            context = list(effects = effects)
-        )
-    }
-    
-    
-    print(effects)
-    .assertIsCharacter(desiredDecisions, "desiredDecisions", naAllowed = FALSE)
-    .assertHasLength(desiredDecisions, "desiredDecisions", len = length(effects), lenArgName = effectColumnName, naAllowed = FALSE)
     if (abs(sum(weights) - 1) > 1e-10) {
         stopIllegalArgument("'weights' must sum to one",
             functionName = functionName, 
@@ -539,26 +526,29 @@
             context = list(weightSum = sum(weights), effects = effects)
         )
     }
-    decisions <- .getQtdCategories(3L)
-    if (length(desiredDecisions) != length(effects)) {
-        stopArgumentLengthOutOfBounds("Supply one desired decision per selected effect",
-            functionName = functionName, parameter = "desiredDecisions", value = desiredDecisions,
+    
+    if (is.null(desiredDecisions)) {
+        stopMissingArgument("'desiredDecisions' must be supplied for the decision-performance plot",
+            functionName = functionName, 
+            parameter = "desiredDecisions",
             constraint = "one desired decision per selected effect",
-            expectedLength = length(effects), 
-            actualLength = length(desiredDecisions),
-            relatedParameter = "alternatives", 
-            relatedValue = effects,
-            diagnosticId = "qtd.plot.desired_decision_length"
+            diagnosticId = "qtd.plot.missing_desired_decisions", 
+            context = list(effects = effects)
         )
     }
-    if (!is.character(desiredDecisions) ||
-            anyNA(desiredDecisions) || any(!(desiredDecisions %in% decisions))) {
-        stopIllegalArgument("Supply one desired decision per selected effect",
-            functionName = functionName, parameter = "desiredDecisions", 
+    
+    .assertIsCharacter(desiredDecisions, "desiredDecisions", naAllowed = FALSE)
+    .assertHasLength(desiredDecisions, "desiredDecisions", len = length(effects), lenArgName = effectColumnName, naAllowed = FALSE)
+    decisions <- .getQtdCategories(3L)
+    if (any(!(desiredDecisions %in% decisions))) {
+        stopIllegalArgument("'desiredDecisions' must be one of the allowed decision categories ", 
+                .arrayToString(decisions, encapsulate = TRUE, mode = "or"),
+            functionName = functionName, 
+            parameter = "desiredDecisions", 
             value = desiredDecisions,
             constraint = "one Go, Indeterminate or Stop per selected effect",
-            relatedParameter = "alternatives", 
-            relatedValue = effects,
+            relatedParameter = "available decisions categories", 
+            relatedValue = decisions,
             diagnosticId = "qtd.plot.invalid_desired_decisions", 
             context = list(allowedValues = decisions)
         )
