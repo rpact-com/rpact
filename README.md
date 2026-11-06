@@ -217,8 +217,8 @@ H1: effect = 5, standard deviation = 12.
 | Efficacy boundary (t)                             | 7.169  | 3.520  |
 | Cumulative power                                  | 0.2096 | 0.8000 |
 | Number of subjects                                | 92.1   | 184.2  |
-| Expected number of subjects under H1              | 164.9  |        |
-| Stopping probability                              | 0.2096 |        |
+| Expected number of subjects                       |        | 164.9  |
+| Stopping probability                              |        | 0.2096 |
 | Efficacy stopping probability by stage (under H0) | 0.0026 |        |
 | Efficacy stopping probability by stage            | 0.2096 |        |
 

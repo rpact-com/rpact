@@ -24,11 +24,12 @@ NULL
         call = NULL, call. = TRUE) {
     message <- .getErrorMessage(...)
     warningClass <- c(paste0("rpact_", tolower(code), "_warning"), "rpact_warning")
-    factory <- getOption(paste0("rpact.warning.factory.",
-        gsub("_", ".", tolower(code)), ".condition"))
+    optionId <- paste0("rpact.warning.factory.", gsub("_", ".", tolower(code)), ".condition")
+    factory <- getOption(optionId)
     if (!is.function(factory)) {
         factory <- getOption("rpact.warning.factory.condition")
     }
+    
     condition <- simpleWarning(message, call = if (isTRUE(call.)) call else NULL)
     class(condition) <- unique(c(warningClass, class(condition)))
     if (is.function(factory) || isTRUE(getOption("rpact.warning.context", FALSE))) {
@@ -58,8 +59,14 @@ NULL
             }
         }
     }
+    
+    if (isFALSE(as.logical(getOption(paste0(
+            "rpact.warning.", gsub("_", ".", tolower(code)), ".enabled"))))) {
+        return(invisible(NULL))
+    }
+    
     base::warning(condition)
-    invisible(NULL)
+    return(invisible(NULL))
 }
 
 #' @noRd
