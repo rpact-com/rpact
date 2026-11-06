@@ -27,10 +27,10 @@
 names will be used; syntactic names (variable names) otherwise
 (see \code{\link[base]{make.names}}).}
 
-\item{includeAllParameters}{If TRUE, include all parameters in the comparison,
-even if they are constant across all objects. If FALSE, only parameters}
+\item{includeAllParameters}{If \code{TRUE}, include all parameters supported by
+the existing data-frame methods of the individual objects.}
 
-\item{removeConstantParameters}{If TRUE, retain identifiers and only parameters
+\item{removeConstantParameters}{If \code{TRUE}, retain identifiers and only parameters
 with different object profiles, using the same rules as \code{summary()}.}
 }
 \value{

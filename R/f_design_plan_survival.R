@@ -45,6 +45,125 @@ NULL
     return(lambda1)
 }
 
+.getDropoutIncidence <- function(time, piecewiseLambda, piecewiseSurvivalTime, phi) {
+    # Inputs are normalized by PiecewiseSurvivalTime; times are follow-up times.
+    result <- rep(NA_real_, length(time))
+    available <- !is.na(time)
+    result[available] <- 0
+    if (phi == 0 || !any(available)) {
+        return(result)
+    }
+
+    if (length(piecewiseLambda) == 1L) {
+        totalHazard <- phi + piecewiseLambda
+        result[available] <- phi / totalHazard * (-expm1(-totalHazard * pmax(0, time[available])))
+        return(result)
+    }
+
+    starts <- piecewiseSurvivalTime
+    ends <- c(starts[-1], Inf)
+    cumulativeHazard <- 0
+    for (j in seq_along(piecewiseLambda)) {
+        duration <- pmax(0, pmin(time[available], ends[j]) - starts[j])
+        totalHazard <- phi + piecewiseLambda[j]
+        result[available] <- result[available] +
+            phi / totalHazard * exp(-phi * starts[j] - cumulativeHazard) *
+            (-expm1(-totalHazard * duration))
+        if (j < length(piecewiseLambda)) {
+            cumulativeHazard <- cumulativeHazard + piecewiseLambda[j] * (ends[j] - starts[j])
+        }
+    }
+    return(result)
+}
+
+.getDropoutProportionsGroupwise <- function(time, accrualTimeVector, accrualIntensity,
+        lambda1, lambda2, piecewiseSurvivalTime, phi, allocationRatioPlanned = 1) {
+    result <- rep(NA_real_, 2)
+    if (length(time) != 1L || !is.finite(time)) {
+        return(result)
+    }
+    if (accrualTimeVector[1] != 0) {
+        accrualTimeVector <- c(0, accrualTimeVector)
+    }
+    starts <- head(accrualTimeVector, -1)
+    ends <- pmin(time, tail(accrualTimeVector, -1))
+    widths <- pmax(0, ends - starts)
+    counts <- rep(accrualIntensity, length.out = length(widths)) * widths
+    if (sum(counts) == 0) {
+        return(result)
+    }
+    weights <- counts / sum(counts)
+    allocation <- c(allocationRatioPlanned, 1) / (1 + allocationRatioPlanned)
+    lambdas <- list(lambda1, lambda2)
+    for (g in 1:2) {
+        if (!is.finite(allocation[g]) || allocation[g] == 0) {
+            next
+        }
+        if (phi[g] == 0) {
+            result[g] <- 0
+            next
+        }
+        result[g] <- 0
+        for (j in which(counts > 0)) {
+            lower <- time - ends[j]
+            upper <- time - starts[j]
+            breaks <- sort(unique(c(lower, upper,
+                piecewiseSurvivalTime[piecewiseSurvivalTime > lower & piecewiseSurvivalTime < upper])))
+            integral <- 0
+            for (m in seq_len(length(breaks) - 1L)) {
+                part <- tryCatch(
+                    stats::integrate(function(u) {
+                        return(.getDropoutIncidence(u, lambdas[[g]], piecewiseSurvivalTime, phi[g]))
+                    }, breaks[m], breaks[m + 1L], rel.tol = 1e-9, abs.tol = 1e-11),
+                    error = function(e) {
+                        stopRuntimeIssue("Dropout accrual integration failed: ", conditionMessage(e),
+                            functionName = ".getDropoutProportionsGroupwise",
+                            constraint = "convergent one-dimensional dropout incidence integration",
+                            diagnosticId = "survival.dropout_accrual_integration_failed",
+                            context = list(arm = g, accrualInterval = j, horizon = time,
+                                lower = breaks[m], upper = breaks[m + 1L], operation = "integrate")
+                        )
+                    }
+                )
+                integral <- integral + part$value
+            }
+            result[g] <- result[g] + weights[j] * integral / widths[j]
+        }
+    }
+    return(result)
+}
+
+.addExpectedDropoutProportions <- function(designPlan) {
+    numberOfResults <- length(designPlan$hazardRatio)
+    result <- matrix(NA_real_, nrow = 2, ncol = numberOfResults)
+    if (isTRUE(designPlan$accountForObservationTimes) && length(designPlan$analysisTime) > 0) {
+        horizons <- designPlan$analysisTime[designPlan$.design$kMax, ]
+        if (length(horizons) == 1L) {
+            horizons <- rep(horizons, numberOfResults)
+        }
+        phi <- -log1p(-c(designPlan$dropoutRate1, designPlan$dropoutRate2)) / designPlan$dropoutTime
+        for (i in seq_len(numberOfResults)) {
+            lambda1 <- designPlan$lambda1[i]
+            if (designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
+                lambda1 <- NA_real_
+            }
+            lambda1 <- .getLambda(groupNumber = 1, lambda1 = lambda1,
+                lambda2 = designPlan$lambda2, hazardRatio = designPlan$hazardRatio[i], kappa = designPlan$kappa)
+            result[, i] <- .getDropoutProportionsGroupwise(
+                time = horizons[i], accrualTimeVector = designPlan$accrualTime,
+                accrualIntensity = designPlan$accrualIntensity,
+                lambda1 = lambda1, lambda2 = designPlan$lambda2,
+                piecewiseSurvivalTime = designPlan$piecewiseSurvivalTime, phi = phi,
+                allocationRatioPlanned = rep(designPlan$allocationRatioPlanned, length.out = numberOfResults)[i]
+            )
+        }
+    }
+    designPlan$expectedDropoutProportion1 <- result[1, ]
+    designPlan$expectedDropoutProportion2 <- result[2, ]
+    designPlan$.setParameterType("expectedDropoutProportion1", C_PARAM_DERIVED)
+    designPlan$.setParameterType("expectedDropoutProportion2", C_PARAM_DERIVED)
+}
+
 .getEventProbabilityFunction <- function(..., time, piecewiseLambda, piecewiseSurvivalTime, phi, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa != 1 && phi > 0) {
@@ -515,6 +634,7 @@ NULL
 
     .addStudyDurationToDesignPlan(designPlan)
     .setDirectionUpperDesignPlan(designPlan)
+    .addExpectedDropoutProportions(designPlan)
 
     return(designPlan)
 }
@@ -2027,6 +2147,8 @@ getNumberOfSubjects <- function(
 #'
 #' @template details_piecewise_accrual
 #'
+#' @template details_expected_survival_dropout
+#'
 #' @template return_object_trial_design_plan
 #' @template how_to_get_help_for_generics
 #'
@@ -2573,6 +2695,8 @@ getSampleSizeSurvival <- function(
 #'
 #' @template details_piecewise_accrual
 #'
+#' @template details_expected_survival_dropout
+#'
 #' @template return_object_trial_design_plan
 #' @template how_to_get_help_for_generics
 #'
@@ -2843,6 +2967,8 @@ getPowerSurvival <- function(
     .addEffectScaleBoundaryDataToDesignPlan(designPlan)
     .addStudyDurationToDesignPlan(designPlan)
     .hideFutilityStopsIfNotApplicable(designPlan)
+
+    .addExpectedDropoutProportions(designPlan)
 
     return(designPlan)
 }

@@ -25,6 +25,58 @@ using namespace Rcpp;
 #ifndef PKG_RPACT_H2
 #define PKG_RPACT_H2
 
+// Capture counts while the current recruitment assignments are still in force.
+inline void captureDropoutCounts(const NumericVector& accrual, const NumericVector& survival,
+        const NumericVector& dropout, const LogicalVector& member, double time,
+        NumericMatrix& enrolled, NumericMatrix& dropped, int row, int stage) {
+    enrolled(row, stage) = 0;
+    dropped(row, stage) = 0;
+    for (int i = 0; i < accrual.size(); ++i) {
+        if (member[i] == TRUE && accrual[i] <= time) {
+            enrolled(row, stage)++;
+            if (!NumericVector::is_na(dropout[i]) && dropout[i] < survival[i] &&
+                    accrual[i] + dropout[i] <= time) {
+                dropped(row, stage)++;
+            }
+        }
+    }
+}
+
+// One row per replication, population and arm. No averaging of pooled counts.
+inline void finishDropoutRecords(NumericMatrix& records, int offset, int scenario, int iteration,
+        const NumericMatrix& enrolled, const NumericMatrix& dropped, const NumericVector& times,
+        const LogicalMatrix& selected, const LogicalVector& eventsNotAchieved,
+        const LogicalVector& success, const LogicalVector& futility, int groups, int arms,
+        bool sharedControl = false) {
+    for (int g = 0; g < groups; ++g) {
+        int last = -1;
+        for (int k = 0; k < times.size(); ++k) {
+            if (eventsNotAchieved[k] == TRUE || !R_finite(times[k])) {
+                break;
+            }
+            if ((sharedControl && g == groups - 1) || selected(g, k) == TRUE) {
+                last = k;
+            }
+            if (success[k] == TRUE || (k < futility.size() && futility[k] == TRUE)) {
+                break;
+            }
+        }
+        for (int a = 0; a < arms; ++a) {
+            int groupRow = g * arms + a;
+            int row = offset + groupRow;
+            records(row, 0) = scenario;
+            records(row, 1) = iteration;
+            records(row, 2) = g + 1;
+            records(row, 3) = a + 1;
+            if (last >= 0) {
+                records(row, 4) = times[last];
+                records(row, 5) = enrolled(groupRow, last);
+                records(row, 6) = dropped(groupRow, last);
+            }
+        }
+    }
+}
+
 // Validated once in R, then reused for all patients in a simulation iteration.
 // Use the same exponential draws as the R reference implementation.
 class PiecewiseSurvivalSampler {

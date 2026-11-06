@@ -138,6 +138,7 @@ updateSubGroupVector <- function(
     analysisTime <- rep(NA_real_, kMax)
     numberOfSubjects <- rep(NA_real_, kMax)
     eventsNotAchieved <- rep(FALSE, kMax)
+    dropoutEnrolled <- dropoutDropped <- matrix(NA_real_, nrow = gMax * 2, ncol = kMax)
 
     ##  Create data set for first stage  ##
     treatmentsAndSubGroups <- .getTreatmentsSubgroups(maxNumberOfSubjects, allocationFraction, subGroups, prevalences)
@@ -370,6 +371,17 @@ updateSubGroupVector <- function(
             overallTestStatistics[!selectedPopulations[, k], k] <- NA_real_
         }
 
+        for (g in seq_len(gMax)) {
+            inPopulation <- survivalDataSet$subGroup %in% .createSubGroupsFromPopulationCpp(gMax, g)
+            for (a in 1:2) {
+                row <- (g - 1L) * 2L + a
+                counts <- .captureDropoutCounts(survivalDataSet, analysisTime[k],
+                    inPopulation & survivalDataSet$treatmentArm == a)
+                dropoutEnrolled[row, k] <- counts[1]
+                dropoutDropped[row, k] <- counts[2]
+            }
+        }
+
         separatePValues[, k] <- 1 - stats::pnorm(testStatistics[, k])
 
         overallEffects[, k] <- thetaH0 * exp(
@@ -529,6 +541,8 @@ updateSubGroupVector <- function(
     }
 
     result <- list(
+        dropoutEnrolled = dropoutEnrolled,
+        dropoutDropped = dropoutDropped,
         eventsNotAchieved = eventsNotAchieved,
         populationEventsPerStage = populationEventsPerStage,
         subsetEventsPerStage = subsetEventsPerStage,
@@ -732,6 +746,7 @@ updateSubGroupVector <- function(
     iterations <- matrix(0, nrow = kMax, ncol = cols)
     rawDataPerStage <- matrix(0L, nrow = cols, ncol = kMax)
     rawDataSets <- list()
+    dropoutRecords <- matrix(NA_real_, nrow = cols * maxNumberOfIterations * (gMax * 2), ncol = 7)
 
     len <- maxNumberOfIterations * kMax * gMax * cols
 
@@ -869,6 +884,10 @@ updateSubGroupVector <- function(
                 intersectionTest = intersectionTest,
                 successCriterion = successCriterion
             )
+
+            recordRows <- ((i - 1L) * maxNumberOfIterations + j - 1L) * (gMax * 2) + seq_len(gMax * 2)
+            dropoutRecords[recordRows, ] <- .finishDropoutRecords(stageResults, closedTest, i, j,
+                groups = gMax, arms = 2, sharedControl = FALSE)
 
             stopStage <- NA_integer_
             for (k in seq_len(kMax)) {
@@ -1134,6 +1153,8 @@ updateSubGroupVector <- function(
         rawDataSets,
         enrichment = TRUE
     )
+
+    .addObservedDropoutProportions(simulationResults, dropoutRecords, cols, gMax)
 
     return(simulationResults)
 }

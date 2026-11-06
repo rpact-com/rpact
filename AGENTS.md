@@ -56,6 +56,22 @@ If saving the cache fails, report that limitation; the next task must perform
 the full check again. If a later build reveals a toolchain failure, invalidate
 the cache so that the next task checks the toolchain again.
 
+## Agent working files and directories
+
+Agents such as Codex must store all task-specific working files and directories
+under `_dev/agents/`, relative to the rpact repository root. Create this
+directory if it does not yet exist, before writing any working files.
+
+Use descriptive task-specific subdirectories there for scratch scripts,
+exploratory checks, temporary test fixtures, logs, test output, temporary package
+libraries, and other intermediate artifacts. Do not create new agent working
+files directly in `_dev/` or elsewhere in the repository.
+
+This rule concerns temporary working artifacts. Maintained source files,
+documentation, and permanent regression tests belong in their prescribed
+locations; follow `rpact.tests/AGENTS.md` for rpact tests. The Windows preflight
+cache retains its explicitly required path, `_dev/windows-preflight.json`.
+
 ## Task-specific guidance
 
 Read and follow the applicable instruction files before starting work. If a task
@@ -67,7 +83,14 @@ spans multiple categories, apply all relevant files:
   [.github/agents/rpact_general.agent.md](.github/agents/rpact_general.agent.md).
 - **Creating unit tests or improving test coverage:** Read
   [.github/agents/rpact_testcoverage.agent.md](.github/agents/rpact_testcoverage.agent.md)
-  and follow the test location requirements below.
+  and the authoritative test instructions in the resolved `rpact.tests/AGENTS.md`
+  (for a sibling checkout, see
+  [../rpact.tests/AGENTS.md](../rpact.tests/AGENTS.md)). Locate that package using
+  configured projects or workspace folders; do not assume a machine-specific
+  path. Before creating, modifying, generating, or running rpact tests or test
+  templates, follow that file, its referenced instructions, and applicable
+  subdirectory instructions. If it cannot be located or accessed, ask for its
+  path and workspace access before proceeding with tests.
 - **Tasks involving GitHub:** Read
   [.github/agents/rpact_github.agent.md](.github/agents/rpact_github.agent.md).
 
@@ -182,7 +205,8 @@ the validation branch, rather than embedding those choices only in the message.
   changed are replaced with the appropriate enriched helpers. The target for
   the package is exactly one direct call, in `.stopWithError()`.
 - For behavior changes, run relevant tests and verify the error category and
-  metadata where applicable, following the test location rules below. Do not
+  metadata where applicable, following the test instructions in
+  [rpact.tests/AGENTS.md](../rpact.tests/AGENTS.md). Do not
   assume metadata will be attached by the default `simpleError` fallback;
   inspect metadata through an appropriate configured condition factory when
   testing it.
@@ -433,116 +457,6 @@ requested. Mention this local source change when reporting completion. If the
 workbook or generator is unavailable, locate the maintained copy or ask for
 its location; do not invent a replacement source or silently maintain only
 the generated output.
-
-## Unit tests and test templates
-
-The rpact-specific rules in this section, including the optional
-`rpact.validator` template workflow, apply only to direct development of the
-`rpact` package and its tests. When working on another package, such as
-`rpact.code.api` or `rpact.cloud`, create and maintain that package's tests in
-its own `tests/testthat` directory, following its applicable instructions and
-existing test conventions. Do not create or modify tests for another package
-in `rpact.tests` or apply the rpact-specific template rules to those tests.
-Using `rpact` as a dependency does not make a package's tests rpact tests.
-For tasks spanning multiple packages, apply these rules only to tests of
-`rpact`; keep tests of each other package in that package.
-
-All rpact unit tests are hosted and developed in the separate `rpact.tests`
-package, except for the small example test `test-pkgname.R` in the `rpact`
-package.
-
-- Create all new rpact unit tests in `rpact.tests/tests/testthat`. Do not create
-  new unit tests in the `rpact` repository.
-- When improving existing tests, check whether they have a corresponding
-  template in `rpact.tests/tests-raw/testthat`. Update that template as needed
-  to keep the tests and their source templates consistent.
-- Locate the `rpact.tests` package using the coding agent's configured projects
-  and workspace folders. It may also be available as a sibling directory of
-  `rpact`; do not assume a machine-specific absolute path.
-- If `rpact.tests` cannot be located or accessed, ask the user to provide its
-  local path and make it accessible to the coding agent, for example by adding
-  it to the agent's workspace. Do not create tests in the `rpact` repository as
-  a fallback.
-
-### Optional template-based regression tests with rpact.validator
-
-When creating general regression tests that freeze the current state of rpact
-result objects, consider the template-based workflow provided by
-`rpact.validator`. Prefer this option for capturing object parameters and
-calculated results without manually writing repetitive assertions. Handwritten
-tests remain an option for targeted behavior, edge cases, or checks that are
-better expressed explicitly.
-
-For template-based tests, create or update the source template in
-`rpact.tests/tests-raw/testthat`. Declare the test title with `@test_that`, create
-the result object, and pass it to `rpact.validator::getUnitTestObject()` together
-with its variable name as a string. For example:
-
-```r
-#' @test_that 'getDesignInverseNormal' with default parameters: parameters and results are as expected
-
-design1 <- getDesignInverseNormal()
-rpact.validator::getUnitTestObject(design1, "design1")
-```
-
-Rendering the templates generates executable `test_that()` blocks with
-`expect_equal()` assertions for the captured object fields, including expected
-values, tolerances, and `getTestLabel()` labels. For this example, these include
-checks of `design1$alphaSpent`, `design1$criticalValues`, and
-`design1$stageLevels`. The generated test files belong in
-`rpact.tests/tests/testthat`, as required above.
-
-Before rendering, locate and verify both package directories and ensure that
-`rpact.validator` is available. Set `rpactProjectPath` and
-`rpactTestsProjectPath` to the resolved local paths of `rpact` and `rpact.tests`,
-respectively; do not hard-code machine-specific paths in shared instructions.
-
-Regeneration must be controlled through the following exact template comment
-(preserve its spelling, capitalization, and spacing):
-
-```r
-#' @exit Do not create the unit tests again
-```
-
-When `enforceCreationOfAllUnitTests = FALSE`, a template containing this comment
-is skipped and its unit test file is not regenerated. Always keep
-`enforceCreationOfAllUnitTests = FALSE`; never set it to `TRUE`.
-
-Before every call to `rpact.validator::createRpactUnitTests()`:
-
-- Identify the specific template whose unit test file is to be generated or
-  regenerated.
-- Check all templates in `rpact.tests/tests-raw/testthat`. Every template except
-  the selected template must contain the exact `@exit` comment above. If it is
-  missing, insert it at the beginning of that template before proceeding.
-- Ensure the selected template does not contain the `@exit` comment; remove it
-  from that template if necessary to enable generation.
-- Run the generator only after these checks and edits are complete, keeping
-  `enforceCreationOfAllUnitTests = FALSE`.
-
-Render using:
-
-```r
-rpact.validator::createRpactUnitTests(
-    packageProjectBaseDirectory = rpactProjectPath,
-    qualityAssuranceBaseDirectory = rpactTestsProjectPath,
-    testFilesProjectBaseDirectory = rpactTestsProjectPath,
-    copyUnitTestFilesToTestthatDir = TRUE,
-    enforceCreationOfAllUnitTests = FALSE,
-    ignoreFilesRegex = NA_character_,
-    qaSubDirs = list(
-        templates = file.path("tests-raw", "testthat"),
-        output = "tests-raw"
-    )
-)
-```
-
-Treat the templates as the source for generated tests: make changes in the
-corresponding template and regenerate the test files rather than maintaining
-changes only in generated output. Review the generated assertions and run the
-relevant tests. Capturing the current state establishes a regression baseline;
-it does not independently establish statistical correctness. Do not regenerate
-expected values merely to make an unexpected regression pass.
 
 ## New vignettes
 

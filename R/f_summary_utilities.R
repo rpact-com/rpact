@@ -672,6 +672,9 @@ print.SummaryFactory <- function(
             }
         }
     }
+    else if (!is.na(lastStage) && !is.matrix(values) && lastStage > length(values)) {
+        values <- c(rep(NA_real_, lastStage - length(values)), values)
+    }
     
     if (is.list(parameterSet) && is.matrix(values)) {
         parameterSet <- parameterSet[["parameterSet"]]

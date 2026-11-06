@@ -100,6 +100,10 @@ NULL
 #' legacy test-statistic-based approach for backward compatibility if no patient-wise-specific
 #' arguments are provided.
 #'
+#' The summary groups observed drop-out proportions and observation times by
+#' active treatment arm, followed by the shared control arm. Each arm uses its
+#' own finishing analysis, including active arms discontinued at an interim.
+#'
 #' For piecewise exponential event times, create \code{piecewiseSurvivalTime}
 #' with \code{getPiecewiseSurvivalTimeMultiArm()}. Hazard ratios are represented
 #' as an active-arm-by-interval-by-situation array; equivalently, they can be
@@ -130,6 +134,8 @@ NULL
 #'
 #' @template details_type_of_selection
 #' @template details_survival_conditional_power
+#'
+#' @template details_observed_survival_dropout
 #'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
@@ -432,6 +438,8 @@ getSimulationMultiArmSurvival <- function(
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
 #' @template details_type_of_selection
+#' @template details_observed_survival_dropout
+#'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'
@@ -910,6 +918,8 @@ getSimulationMultiArmSurvival <- function(
 
     simulationResults$.data <- loopResult$data
     simulationResults$.rawData <- .createSimulationSurvivalRawData(loopResult$rawData)
+
+    .addObservedDropoutProportions(simulationResults, loopResult$dropoutRecords, cols, gMax, multiArm = TRUE)
 
     return(simulationResults)
 }
