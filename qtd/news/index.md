@@ -24,16 +24,16 @@
   performance. Rates plots support treatment-rate or
   beneficial-risk-difference axes and control-rate sensitivity with a
   fixed treatment-rate grid.
-- The new function
-  [`getDesignFixed()`](https://docs.rpact.org/qtd/reference/getDesignFixed.md)
-  can be used to create a fixed (single-stage) trial design. This
-  convenience wrapper constructs an object of class `TrialDesignFixed`
-  with `kMax = 1`.
 
 ## rpact 4.5.0
 
 ### New features
 
+- The new function
+  [`getDesignFixed()`](https://docs.rpact.org/qtd/reference/getDesignFixed.md)
+  can be used to create a fixed (single-stage) trial design. This
+  convenience wrapper constructs an object of class `TrialDesignFixed`
+  with `kMax = 1`.
 - [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/qtd/reference/getSimulationMultiArmSurvival.md)
   and
   [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/qtd/reference/getSimulationEnrichmentSurvival.md)

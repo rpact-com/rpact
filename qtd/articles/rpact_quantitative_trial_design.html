@@ -77,7 +77,7 @@
 </h2>
 <p>A development decision often depends on two questions: is the treatment effect sufficiently promising relative to a minimum acceptable difference, and could it reach a target difference? Quantitative trial design (QTD) makes these requirements explicit and calculates the probabilities of the resulting decisions under specified trial assumptions.</p>
 <p>This vignette demonstrates the QTD functions in <a href="https://www.rpact.org" class="external-link">rpact</a> for two independent groups with <strong>continuous endpoints (Means)</strong> and <strong>binary endpoints (Rates)</strong>. Rates here are event probabilities, rather than event counts per unit of exposure. We define a decision rule, inspect its output, calculate operating characteristics, and illustrate every QTD plot type, including sensitivity and weighted decision-performance displays.</p>
-<p>The worked example is called <strong>Kestrel</strong>, a fictional project name replacing internal project and organization labels in the original QTD demonstration. Its binary-endpoint assumptions, displayed probability tables, and observed-event example retain the original numbers. The continuous example retains the original decision thresholds and percentiles; additional planning assumptions are identified explicitly.</p>
+<p>The examples in this vignette were inspired by a presentation by Björn Bornkamp and David Ohlssen on quantitative trial design. The worked example uses the fictional project name <strong>Kestrel</strong>. All decision rules, planning assumptions, and numerical results needed to follow the examples are provided below.</p>
 <p>The examples require the <a href="https://github.com/rpact-com/rpact/tree/dev/qtd" class="external-link">QTD development version of rpact</a> providing <code><a href="../reference/getDesignQuantitative.html">getDesignQuantitative()</a></code>, <code><a href="../reference/getOperatingCharcteristicsMeans.html">getOperatingCharcteristicsMeans()</a></code>, and <code><a href="../reference/getOperatingCharcteristicsRates.html">getOperatingCharcteristicsRates()</a></code>, together with their QTD print, summary, and plot methods. The spelling <code>Charcteristics</code> follows the current function names.</p>
 <section class="level2"><h3 id="how-to-install-the-qtd-development-version">How to install the QTD development version<a class="anchor" aria-label="anchor" href="#how-to-install-the-qtd-development-version"></a>
 </h3>
@@ -229,14 +229,14 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </tr>
 </tbody>
 </table>
-<p>The original demonstration describes the criteria using “greater than”. The implementation includes equality at the corresponding reference boundary as shown above. This matters for discrete data. “Fixed” identifies the extreme decision categories. How a team acts on the middle categories can also depend on the competitive situation and other evidence.</p>
+<p>The implementation includes equality at the corresponding reference boundary as shown above. This matters for discrete data. “Fixed” identifies the extreme decision categories. How a team acts on the middle categories can also depend on the competitive situation and other evidence.</p>
 <p>Calculations retain six exclusive category probabilities. <code>plotCat = 3</code> adds the two Go, the two Indeterminate, and the two Stop probabilities for display; <code>plotCat = 6</code> shows them separately. Rule plots default to six categories and OC plots to three.</p>
 </section></section><section class="section level2"><h2 id="the-kestrel-binary-endpoint-example">The Kestrel Binary-Endpoint Example<a class="anchor" aria-label="anchor" href="#the-kestrel-binary-endpoint-example"></a>
 </h2>
 <section class="level2"><h3 id="clinical-setting-and-exact-input-assumptions">Clinical setting and exact input assumptions<a class="anchor" aria-label="anchor" href="#clinical-setting-and-exact-input-assumptions"></a>
 </h3>
-<p>The source demonstration considers a phase II study in de novo renal transplant recipients involving sotrastaurin (AEB071).<a class="footnote-ref" role="doc-noteref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;AEB071 is the publicly documented code for sotrastaurin. The &lt;a href=&quot;https://clinicaltrials.gov/study/NCT01064791&quot; class=&quot;external-link&quot;&gt;NCT01064791 study record&lt;/a&gt; and &lt;a href=&quot;https://www.clinicaltrialsregister.eu/ctr-search/trial/2009-015456-14/results&quot; class=&quot;external-link&quot;&gt;EU trial results record 2009-015456-14&lt;/a&gt; identify the renal-transplant study, including protocol CAEB071A2214. Kestrel names this teaching example, not a new compound. Public records establish the terminology; numerical QTD assumptions here come from the supplied demonstration.&lt;/p&gt;"><sup>1</sup></a> Three experimental regimens and one active control regimen based on mycophenolic acid and tacrolimus are planned with <strong>75 patients per group and 1:1:1:1 randomization</strong>. The QTD exercise compares either one experimental group or two pooled experimental groups against control. The comparisons therefore use <strong>75 control versus 75 treatment patients</strong> and <strong>75 control versus 150 treatment patients</strong>.</p>
-<p>The endpoint is composite efficacy failure, so lower event probabilities are beneficial. The exercise addresses efficacy only; safety and the overall benefit-risk assessment are separate considerations. These are planning assumptions from the demonstration, rather than reported outcomes of the public trial.</p>
+<p>Consider a phase II study in de novo renal transplant recipients involving sotrastaurin (AEB071).<a class="footnote-ref" role="doc-noteref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;AEB071 is the publicly documented code for sotrastaurin. The &lt;a href=&quot;https://clinicaltrials.gov/study/NCT01064791&quot; class=&quot;external-link&quot;&gt;NCT01064791 study record&lt;/a&gt; and &lt;a href=&quot;https://www.clinicaltrialsregister.eu/ctr-search/trial/2009-015456-14/results&quot; class=&quot;external-link&quot;&gt;EU trial results record 2009-015456-14&lt;/a&gt; identify the renal-transplant study, including protocol CAEB071A2214. Kestrel names this teaching example, not a new compound. The numerical QTD assumptions are illustrative planning assumptions, not reported trial results.&lt;/p&gt;"><sup>1</sup></a> Three experimental regimens and one active control regimen based on mycophenolic acid and tacrolimus are planned with <strong>75 patients per group and 1:1:1:1 randomization</strong>. The QTD example compares either one experimental group or two pooled experimental groups against control. The comparisons therefore use <strong>75 control versus 75 treatment patients</strong> and <strong>75 control versus 150 treatment patients</strong>.</p>
+<p>The endpoint is composite efficacy failure, so lower event probabilities are beneficial. The example addresses efficacy only; safety and the overall benefit-risk assessment are separate considerations. These are planning assumptions for this example, rather than reported outcomes of the public trial.</p>
 <table class="table caption-top">
 <colgroup>
 <col style="width: 33%">
@@ -245,7 +245,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </colgroup>
 <thead><tr class="header">
 <th style="text-align: left;">Quantity</th>
-<th style="text-align: left;">Original value</th>
+<th style="text-align: left;">Value</th>
 <th style="text-align: left;">rpact argument</th>
 </tr></thead>
 <tbody>
@@ -288,13 +288,13 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 <td style="text-align: left;"><code>directionUpper = FALSE</code></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Original interval construction</td>
+<td style="text-align: left;">Interval construction</td>
 <td style="text-align: left;">QTD1</td>
 <td style="text-align: left;"><code>intervalMethod = "qtd1"</code></td>
 </tr>
 </tbody>
 </table>
-<p>The embedded input screenshot also contains unchecked sample-size rows. They are inactive GUI placeholders and are not scenarios in the example. The embedded full-data image reveals a treatment-rate step of 0.001. Rates and reference differences are entered as proportions, so five percentage points are entered as <code>0.05</code>.</p>
+<p>We evaluate treatment event probabilities from 0.10 to 0.25 in steps of 0.001 for both sample-size scenarios. Rates and reference differences are entered as proportions, so five percentage points are entered as <code>0.05</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">demoSizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
@@ -568,7 +568,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </table>
 </div>
 </div>
-<p>The next table transcribes the <strong>displayed values from the presentation exactly</strong>. Triplets are ordered Go / Indeterminate / Stop.</p>
+<p>The next table gives a compact probability overview for the five scenarios. Triplets are ordered Go / Indeterminate / Stop.</p>
 <table class="table caption-top">
 <colgroup>
 <col style="width: 25%">
@@ -615,7 +615,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </tr>
 </tbody>
 </table>
-<p>The presentation values have limited precision and are not renormalized. Some triplets sum to 0.99, and some entries reflect the source’s display choices rather than conventional rounding. The calculated table below retains six decimal places under the same assumptions and QTD1 construction.</p>
+<p>The compact overview uses limited precision and is not renormalized; some triplets sum to 0.99. Use the calculated table below for numerical comparisons: it reports the QTD1 probabilities to six decimal places under the same assumptions.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scenarioPlot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, type <span class="op">=</span> <span class="fl">4</span>, plotCat <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
@@ -763,9 +763,9 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </div>
 </div>
 <p>For a five-percentage-point improvement, the Go probability is approximately 0.848456 with 75 patients per group and 0.914933 with 75 control and 150 treatment patients. At equal event rates, these probabilities are approximately 0.508129 and 0.570745. Go under this rule therefore does not imply rejection of a conventional superiority null hypothesis.</p>
-</section><section class="level2"><h3 id="results-embedded-as-graphics">Results embedded as graphics<a class="anchor" aria-label="anchor" href="#results-embedded-as-graphics"></a>
+</section><section class="level2"><h3 id="detailed-probability-tables">Detailed probability tables<a class="anchor" aria-label="anchor" href="#detailed-probability-tables"></a>
 </h3>
-<p>The compact results screenshot displays treatment probabilities from 0.10 to 0.24 in steps of 0.02. The following table retains all its displayed values.</p>
+<p>The following table summarizes the three-category probabilities for treatment event probabilities from 0.10 to 0.24 in steps of 0.02.</p>
 <table class="table caption-top" style="width:100%;">
 <colgroup>
 <col style="width: 14%">
@@ -932,7 +932,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </tr>
 </tbody>
 </table>
-<p>The full-data screenshot begins at <code>pi1 = 0.100</code> with step <code>0.001</code>. Its first row displays six-category probabilities 0.535233, 0.313223, 0.138351, 0, 0.01232, and 0.000873, with aggregate probabilities 0.848456, 0.138351, and 0.013193. Small displayed zeros can represent rounded positive probabilities. The following calculation reconstructs the visible section and its three-category sums from unrounded results.</p>
+<p>The full probability grid begins at <code>pi1 = 0.100</code> with step <code>0.001</code>. For 75 patients per group at <code>pi1 = 0.100</code>, the six-category probabilities are approximately 0.535233, 0.313223, 0.138351, 0, 0.01232, and 0.000873, with aggregate probabilities 0.848456, 0.138351, and 0.013193. Small displayed zeros can represent rounded positive probabilities. The following calculation shows the first grid points and their three-category sums from unrounded results.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">visibleRows</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">ratesOC</span><span class="op">$</span><span class="va">probabilities</span>,</span>
@@ -1185,7 +1185,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </div>
 </section><section class="level2"><h3 id="translating-the-rule-into-observed-event-counts">Translating the rule into observed event counts<a class="anchor" aria-label="anchor" href="#translating-the-rule-into-observed-event-counts"></a>
 </h3>
-<p>The presentation fixes <strong>16 events among 75 control patients</strong>. For 75 treatment patients it gives Go for <strong>0–15</strong> events, Indeterminate for <strong>16–22</strong>, and Stop for <strong>23–75</strong>. The QTD1 event-count map reproduces these ranges.</p>
+<p>Suppose we observe <strong>16 events among 75 control patients</strong>. With 75 treatment patients, the rule gives Go for <strong>0–15</strong> events, Indeterminate for <strong>16–22</strong>, and Stop for <strong>23–75</strong>. The QTD1 event-count map shows these decision regions.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">eventMap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -1255,7 +1255,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 <p>Aggregated cell probabilities are unconditional OC probabilities at the supplied true rates. The count ranges condition on the observed control count and should not be interpreted as those unconditional probabilities.</p>
 </section></section><section class="section level2"><h2 id="continuous-endpoints-means">Continuous Endpoints: Means<a class="anchor" aria-label="anchor" href="#continuous-endpoints-means"></a>
 </h2>
-<p>The continuous exercise refers to AFQ056<a class="footnote-ref" role="doc-noteref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;AFQ056 is the publicly documented code for mavoglurant, an mGluR5 antagonist; see &lt;a href=&quot;https://pubmed.ncbi.nlm.nih.gov/25316499/&quot; class=&quot;external-link&quot;&gt;the 2014 pharmacological characterization indexed in PubMed&lt;/a&gt;. The numbers 2.9, 4, 0.5, and 0.8 reproduce the supplied continuous exercise and are not claimed to be published efficacy results.&lt;/p&gt;"><sup>2</sup></a> and specifies <strong>MAD = 2.9</strong>, <strong>TD = 4</strong>, a <strong>50th-percentile lower bound</strong>, and an <strong>80th-percentile upper bound</strong>. These four values are retained exactly.</p>
+<p>The continuous-endpoint example concerns AFQ056<a class="footnote-ref" role="doc-noteref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;AFQ056 is the publicly documented code for mavoglurant, an mGluR5 antagonist; see &lt;a href=&quot;https://pubmed.ncbi.nlm.nih.gov/25316499/&quot; class=&quot;external-link&quot;&gt;the 2014 pharmacological characterization indexed in PubMed&lt;/a&gt;. The numbers 2.9, 4, 0.5, and 0.8 are illustrative decision-rule settings, not published efficacy results.&lt;/p&gt;"><sup>2</sup></a> and specifies <strong>MAD = 2.9</strong>, <strong>TD = 4</strong>, a <strong>50th-percentile lower bound</strong>, and an <strong>80th-percentile upper bound</strong>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">meansRule</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span></span>
@@ -1280,7 +1280,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </ul>
 </div>
 </div>
-<p>The slide supplies no standard deviation, sample sizes, or true-effect grid for this exercise. For the following demonstrations we additionally assume a common <strong>standard deviation of 6</strong>, mean differences from <strong>0 to 6 in steps of 0.1</strong>, and sample-size pairs <strong>(25, 25), (50, 50), (75, 75), (25, 50), (50, 100), (75, 150)</strong>. These are illustrative additions.</p>
+<p>For the following calculations, we assume a common <strong>standard deviation of 6</strong>, mean differences from <strong>0 to 6 in steps of 0.1</strong>, and sample-size pairs <strong>(25, 25), (50, 50), (75, 75), (25, 50), (50, 100), (75, 150)</strong>. These assumptions are illustrative.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">planningSizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
@@ -2422,7 +2422,7 @@ $`3`
 </div>
 </div>
 </div>
-<p>Supply <code>estimates</code> and <code>standardErrors</code> together to classify normally approximated intervals. <code>labels</code> supplies one character label per estimate. This example uses the continuous exercise’s reference values and percentiles.</p>
+<p>Supply <code>estimates</code> and <code>standardErrors</code> together to classify normally approximated intervals. <code>labels</code> supplies one character label per estimate. This example uses the continuous-endpoint rule’s reference values and percentiles.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -2436,7 +2436,7 @@ $`3`
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure><p><img src="rpact_quantitative_trial_design_files/figure-html/supplied-intervals-1.png" width="960"></p>
-<figcaption>Hypothetical continuous-endpoint results under the AFQ056 exercise’s rule.</figcaption></figure>
+<figcaption>Hypothetical continuous-endpoint results under the AFQ056 example’s rule.</figcaption></figure>
 </div>
 </div>
 </div>
@@ -2800,7 +2800,7 @@ $`6`
 <p><code>alternatives</code> selects already calculated effects. For Rates, <code>pi1</code> instead selects treatment rates; supply only one selection argument. Rates selections through <code>alternatives</code> refer to beneficial effects at the <strong>original</strong> control rate. When <code>pi2</code> is varied, the corresponding treatment rates stay fixed and their risk differences change with the control rate.</p>
 <section class="level2"><h3 id="type-1-operating-characteristics-curves">Type 1: Operating-characteristics curves<a class="anchor" aria-label="anchor" href="#type-1-operating-characteristics-curves"></a>
 </h3>
-<p>The binary plot reproduces the original graphical comparison, with treatment-rate range 0.10–0.25 and reference rates 0.15 and 0.20 corresponding to TV and LRV.</p>
+<p>The binary plot compares the two sample-size scenarios, with treatment-rate range 0.10–0.25 and reference rates 0.15 and 0.20 corresponding to TV and LRV.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesOC</span>, type <span class="op">=</span> <span class="fl">1</span>, plotCat <span class="op">=</span> <span class="fl">3</span>, plotPointsEnabled <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -2858,7 +2858,7 @@ $`6`
 </div>
 </section><section class="level2"><h3 id="type-3-decision-probabilities-by-sample-size">Type 3: Decision probabilities by sample size<a class="anchor" aria-label="anchor" href="#type-3-decision-probabilities-by-sample-size"></a>
 </h3>
-<p>This plot needs multiple total sample sizes. Allocation ratios are separated so that different treatment-to-control allocations are not joined into one curve. The original binary example has only one total N for each allocation ratio. For meaningful sample-size curves we use the additional <code>planningSizes</code> grid.</p>
+<p>This plot needs multiple total sample sizes. Allocation ratios are separated so that different treatment-to-control allocations are not joined into one curve. The Kestrel binary example has only one total N for each allocation ratio. For meaningful sample-size curves we use the additional <code>planningSizes</code> grid.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ratesPlanning</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsRates.html">getOperatingCharcteristicsRates</a></span><span class="op">(</span></span>
@@ -2893,7 +2893,7 @@ $`6`
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure><p><img src="rpact_quantitative_trial_design_files/figure-html/selected-effect-plots-1.png" width="960"></p>
-<figcaption>Selected mean differences and the five original Kestrel treatment-rate scenarios.</figcaption></figure>
+<figcaption>Selected mean differences and the five Kestrel treatment-rate scenarios.</figcaption></figure>
 </div>
 </div>
 <div class="sourceCode cell-code" id="cb46"><pre class="downlit sourceCode r">
@@ -2901,7 +2901,7 @@ $`6`
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure><p><img src="rpact_quantitative_trial_design_files/figure-html/selected-effect-plots-2.png" width="960"></p>
-<figcaption>Selected mean differences and the five original Kestrel treatment-rate scenarios.</figcaption></figure>
+<figcaption>Selected mean differences and the five Kestrel treatment-rate scenarios.</figcaption></figure>
 </div>
 </div>
 </div>
@@ -3172,7 +3172,7 @@ $`6`
 6 2: C: 75 / T: 150           225               2         0.1</code></pre>
 </div>
 </div>
-<p>The original GUI offered PNG plots, a full-data CSV, and a compact summary CSV. The equivalent R workflow makes filenames and table contents explicit. This optional export code is not executed when rendering the vignette.</p>
+<p>Plots can be saved as PNG files, and full probability data and compact summary tables can be exported as CSV files. The following code illustrates this workflow with explicit filenames and table contents. This optional export code is not executed when rendering the vignette.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"kestrel_plot.png"</span>, <span class="va">kestrelPlot</span>, width <span class="op">=</span> <span class="fl">10</span>, height <span class="op">=</span> <span class="fl">6</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
@@ -3187,7 +3187,7 @@ $`6`
 <li>Miettinen, O. and Nurminen, M. (1985). Comparative analysis of two rates. <em>Statistics in Medicine</em>, 4, 213–226. <a href="https://doi.org/10.1002/sim.4780040211" class="external-link">doi:10.1002/sim.4780040211</a>.</li>
 <li>Newcombe, R. G. (1998). Interval estimation for the difference between independent proportions: comparison of eleven methods. <em>Statistics in Medicine</em>, 17, 873–890. <a href="https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8%3C873::AID-SIM779%3E3.0.CO;2-I" class="external-link">Publication link</a>.</li>
 <li>Armitage, P. (1989). Inference and decision in clinical trials. <em>Journal of Clinical Epidemiology</em>, 42, 293–299.</li>
-<li>Spiegelhalter, D. J., Abrams, K. R., and Myles, J. P. (2004). <em>Bayesian Approaches to Clinical Trials and Health-Care Evaluation</em>. Wiley, Section 6.3. Background reading cited in the original demonstration; the implemented calculations above use frequentist interval constructions.</li>
+<li>Spiegelhalter, D. J., Abrams, K. R., and Myles, J. P. (2004). <em>Bayesian Approaches to Clinical Trials and Health-Care Evaluation</em>. Wiley, Section 6.3. Background reading on Bayesian decision making; the implemented calculations above use frequentist interval constructions.</li>
 </ul></section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);

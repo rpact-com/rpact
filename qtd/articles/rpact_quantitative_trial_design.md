@@ -17,12 +17,11 @@ exposure. We define a decision rule, inspect its output, calculate
 operating characteristics, and illustrate every QTD plot type, including
 sensitivity and weighted decision-performance displays.
 
-The worked example is called **Kestrel**, a fictional project name
-replacing internal project and organization labels in the original QTD
-demonstration. Its binary-endpoint assumptions, displayed probability
-tables, and observed-event example retain the original numbers. The
-continuous example retains the original decision thresholds and
-percentiles; additional planning assumptions are identified explicitly.
+The examples in this vignette were inspired by a presentation by Björn
+Bornkamp and David Ohlssen on quantitative trial design. The worked
+example uses the fictional project name **Kestrel**. All decision rules,
+planning assumptions, and numerical results needed to follow the
+examples are provided below.
 
 The examples require the [QTD development version of
 rpact](https://github.com/rpact-com/rpact/tree/dev/qtd) providing
@@ -126,7 +125,6 @@ an indeterminate decision.
 |  | Stop | $`L < \mathrm{LRV}`$ and $`\mathrm{LRV} \leq U < \mathrm{TV}`$ |
 | Stop (Fixed) | $`U < \mathrm{LRV}`$ | Stop |
 
-The original demonstration describes the criteria using “greater than”.
 The implementation includes equality at the corresponding reference
 boundary as shown above. This matters for discrete data. “Fixed”
 identifies the extreme decision categories. How a team acts on the
@@ -142,22 +140,22 @@ six categories and OC plots to three.
 
 ### Clinical setting and exact input assumptions
 
-The source demonstration considers a phase II study in de novo renal
-transplant recipients involving sotrastaurin (AEB071).[^1] Three
-experimental regimens and one active control regimen based on
-mycophenolic acid and tacrolimus are planned with **75 patients per
-group and 1:1:1:1 randomization**. The QTD exercise compares either one
-experimental group or two pooled experimental groups against control.
-The comparisons therefore use **75 control versus 75 treatment
-patients** and **75 control versus 150 treatment patients**.
+Consider a phase II study in de novo renal transplant recipients
+involving sotrastaurin (AEB071).[^1] Three experimental regimens and one
+active control regimen based on mycophenolic acid and tacrolimus are
+planned with **75 patients per group and 1:1:1:1 randomization**. The
+QTD example compares either one experimental group or two pooled
+experimental groups against control. The comparisons therefore use **75
+control versus 75 treatment patients** and **75 control versus 150
+treatment patients**.
 
 The endpoint is composite efficacy failure, so lower event probabilities
-are beneficial. The exercise addresses efficacy only; safety and the
+are beneficial. The example addresses efficacy only; safety and the
 overall benefit-risk assessment are separate considerations. These are
-planning assumptions from the demonstration, rather than reported
-outcomes of the public trial.
+planning assumptions for this example, rather than reported outcomes of
+the public trial.
 
-| Quantity | Original value | rpact argument |
+| Quantity | Value | rpact argument |
 |:---|:---|:---|
 | Minimum acceptable difference | −5 percentage points | `lowerReferenceValue = -0.05` |
 | Target difference | 0 percentage points | `targetValue = 0` |
@@ -166,13 +164,12 @@ outcomes of the public trial.
 | Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` |
 | Sample sizes, control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
 | Beneficial direction | Lower treatment rate | `directionUpper = FALSE` |
-| Original interval construction | QTD1 | `intervalMethod = "qtd1"` |
+| Interval construction | QTD1 | `intervalMethod = "qtd1"` |
 
-The embedded input screenshot also contains unchecked sample-size rows.
-They are inactive GUI placeholders and are not scenarios in the example.
-The embedded full-data image reveals a treatment-rate step of 0.001.
-Rates and reference differences are entered as proportions, so five
-percentage points are entered as `0.05`.
+We evaluate treatment event probabilities from 0.10 to 0.25 in steps of
+0.001 for both sample-size scenarios. Rates and reference differences
+are entered as proportions, so five percentage points are entered as
+`0.05`.
 
 ``` r
 
@@ -279,8 +276,8 @@ summary(ratesScenarios, digits = 4)
 | 4 | 0.20000 | -0.0500 | 0.03674 | 0.16258 | 0.44665 | 0 | 0.25795 | 0.09608 |
 | 5 | 0.25000 | -0.1000 | 0.00387 | 0.03559 | 0.27701 | 0 | 0.34143 | 0.34210 |
 
-The next table transcribes the **displayed values from the presentation
-exactly**. Triplets are ordered Go / Indeterminate / Stop.
+The next table gives a compact probability overview for the five
+scenarios. Triplets are ordered Go / Indeterminate / Stop.
 
 | Scenario | True improvement | 75 control / 75 treatment | 75 control / 150 treatment |
 |:---|---:|:---|:---|
@@ -290,11 +287,10 @@ exactly**. Triplets are ordered Go / Indeterminate / Stop.
 | Poor | −5% | 0.20 / 0.48 / 0.32 | 0.20 / 0.45 / 0.35 |
 | Very poor | −10% | 0.05 / 0.34 / 0.60 | 0.04 / 0.28 / 0.68 |
 
-The presentation values have limited precision and are not renormalized.
-Some triplets sum to 0.99, and some entries reflect the source’s display
-choices rather than conventional rounding. The calculated table below
-retains six decimal places under the same assumptions and QTD1
-construction.
+The compact overview uses limited precision and is not renormalized;
+some triplets sum to 0.99. Use the calculated table below for numerical
+comparisons: it reports the QTD1 probabilities to six decimal places
+under the same assumptions.
 
 ``` r
 
@@ -337,11 +333,10 @@ probabilities are approximately 0.508129 and 0.570745. Go under this
 rule therefore does not imply rejection of a conventional superiority
 null hypothesis.
 
-### Results embedded as graphics
+### Detailed probability tables
 
-The compact results screenshot displays treatment probabilities from
-0.10 to 0.24 in steps of 0.02. The following table retains all its
-displayed values.
+The following table summarizes the three-category probabilities for
+treatment event probabilities from 0.10 to 0.24 in steps of 0.02.
 
 | Control N | Treatment N | Control rate | Treatment rate |     Go | Indeterminate |   Stop |
 |----------:|------------:|-------------:|---------------:|-------:|--------------:|-------:|
@@ -362,12 +357,13 @@ displayed values.
 |        75 |         150 |         0.15 |           0.22 | 0.1112 |        0.3996 | 0.4892 |
 |        75 |         150 |         0.15 |           0.24 |  0.057 |        0.3209 | 0.6222 |
 
-The full-data screenshot begins at `pi1 = 0.100` with step `0.001`. Its
-first row displays six-category probabilities 0.535233, 0.313223,
-0.138351, 0, 0.01232, and 0.000873, with aggregate probabilities
-0.848456, 0.138351, and 0.013193. Small displayed zeros can represent
-rounded positive probabilities. The following calculation reconstructs
-the visible section and its three-category sums from unrounded results.
+The full probability grid begins at `pi1 = 0.100` with step `0.001`. For
+75 patients per group at `pi1 = 0.100`, the six-category probabilities
+are approximately 0.535233, 0.313223, 0.138351, 0, 0.01232, and
+0.000873, with aggregate probabilities 0.848456, 0.138351, and 0.013193.
+Small displayed zeros can represent rounded positive probabilities. The
+following calculation shows the first grid points and their
+three-category sums from unrounded results.
 
 ``` r
 
@@ -407,10 +403,10 @@ knitr::kable(visibleTable, digits = 6, row.names = FALSE)
 
 ### Translating the rule into observed event counts
 
-The presentation fixes **16 events among 75 control patients**. For 75
-treatment patients it gives Go for **0–15** events, Indeterminate for
-**16–22**, and Stop for **23–75**. The QTD1 event-count map reproduces
-these ranges.
+Suppose we observe **16 events among 75 control patients**. With 75
+treatment patients, the rule gives Go for **0–15** events, Indeterminate
+for **16–22**, and Stop for **23–75**. The QTD1 event-count map shows
+these decision regions.
 
 ``` r
 
@@ -472,9 +468,9 @@ probabilities.
 
 ## Continuous Endpoints: Means
 
-The continuous exercise refers to AFQ056[^2] and specifies **MAD =
-2.9**, **TD = 4**, a **50th-percentile lower bound**, and an
-**80th-percentile upper bound**. These four values are retained exactly.
+The continuous-endpoint example concerns AFQ056[^2] and specifies **MAD
+= 2.9**, **TD = 4**, a **50th-percentile lower bound**, and an
+**80th-percentile upper bound**.
 
 ``` r
 
@@ -496,11 +492,10 @@ Fixed quantitative trial decision rule.
 - *Upper percentile*: 0.8000
 - *Lower percentile*: 0.5000
 
-The slide supplies no standard deviation, sample sizes, or true-effect
-grid for this exercise. For the following demonstrations we additionally
-assume a common **standard deviation of 6**, mean differences from **0
-to 6 in steps of 0.1**, and sample-size pairs **(25, 25), (50, 50), (75,
-75), (25, 50), (50, 100), (75, 150)**. These are illustrative additions.
+For the following calculations, we assume a common **standard deviation
+of 6**, mean differences from **0 to 6 in steps of 0.1**, and
+sample-size pairs **(25, 25), (50, 50), (75, 75), (25, 50), (50, 100),
+(75, 150)**. These assumptions are illustrative.
 
 ``` r
 
@@ -850,8 +845,8 @@ Illustrative interval configurations for the binary decision thresholds.
 
 Supply `estimates` and `standardErrors` together to classify normally
 approximated intervals. `labels` supplies one character label per
-estimate. This example uses the continuous exercise’s reference values
-and percentiles.
+estimate. This example uses the continuous-endpoint rule’s reference
+values and percentiles.
 
 ``` r
 
@@ -867,7 +862,7 @@ plot(
 
 ![](rpact_quantitative_trial_design_files/figure-html/supplied-intervals-1.png)
 
-Hypothetical continuous-endpoint results under the AFQ056 exercise’s
+Hypothetical continuous-endpoint results under the AFQ056 example’s
 rule.
 
 ### Type 2: Normal decision regions
@@ -1074,7 +1069,7 @@ control rate.
 
 ### Type 1: Operating-characteristics curves
 
-The binary plot reproduces the original graphical comparison, with
+The binary plot compares the two sample-size scenarios, with
 treatment-rate range 0.10–0.25 and reference rates 0.15 and 0.20
 corresponding to TV and LRV.
 
@@ -1146,7 +1141,7 @@ Stacked probabilities for continuous and binary endpoints.
 
 This plot needs multiple total sample sizes. Allocation ratios are
 separated so that different treatment-to-control allocations are not
-joined into one curve. The original binary example has only one total N
+joined into one curve. The Kestrel binary example has only one total N
 for each allocation ratio. For meaningful sample-size curves we use the
 additional `planningSizes` grid.
 
@@ -1188,8 +1183,7 @@ plot(meansOC, type = 4, alternatives = c(0, 2.9, 4, 6))
 
 ![](rpact_quantitative_trial_design_files/figure-html/selected-effect-plots-1.png)
 
-Selected mean differences and the five original Kestrel treatment-rate
-scenarios.
+Selected mean differences and the five Kestrel treatment-rate scenarios.
 
 ``` r
 
@@ -1198,8 +1192,7 @@ plot(ratesScenarios, type = 4, pi1 = scenarioRates)
 
 ![](rpact_quantitative_trial_design_files/figure-html/selected-effect-plots-2.png)
 
-Selected mean differences and the five original Kestrel treatment-rate
-scenarios.
+Selected mean differences and the five Kestrel treatment-rate scenarios.
 
 ### Type 5: Sensitivity of decision probabilities
 
@@ -1526,10 +1519,10 @@ head(sourcePlot$data)
     5 2: C: 75 / T: 150           225               2         0.1
     6 2: C: 75 / T: 150           225               2         0.1
 
-The original GUI offered PNG plots, a full-data CSV, and a compact
-summary CSV. The equivalent R workflow makes filenames and table
-contents explicit. This optional export code is not executed when
-rendering the vignette.
+Plots can be saved as PNG files, and full probability data and compact
+summary tables can be exported as CSV files. The following code
+illustrates this workflow with explicit filenames and table contents.
+This optional export code is not executed when rendering the vignette.
 
 ``` r
 
@@ -1557,9 +1550,9 @@ writeLines(as.character(print(summary(ratesScenarios), markdown = TRUE)), "kestr
   *Journal of Clinical Epidemiology*, 42, 293–299.
 - Spiegelhalter, D. J., Abrams, K. R., and Myles, J. P. (2004).
   *Bayesian Approaches to Clinical Trials and Health-Care Evaluation*.
-  Wiley, Section 6.3. Background reading cited in the original
-  demonstration; the implemented calculations above use frequentist
-  interval constructions.
+  Wiley, Section 6.3. Background reading on Bayesian decision making;
+  the implemented calculations above use frequentist interval
+  constructions.
 
 [^1]: AEB071 is the publicly documented code for sotrastaurin. The
     [NCT01064791 study
@@ -1568,11 +1561,11 @@ writeLines(as.character(print(summary(ratesScenarios), markdown = TRUE)), "kestr
     2009-015456-14](https://www.clinicaltrialsregister.eu/ctr-search/trial/2009-015456-14/results)
     identify the renal-transplant study, including protocol
     CAEB071A2214. Kestrel names this teaching example, not a new
-    compound. Public records establish the terminology; numerical QTD
-    assumptions here come from the supplied demonstration.
+    compound. The numerical QTD assumptions are illustrative planning
+    assumptions, not reported trial results.
 
 [^2]: AFQ056 is the publicly documented code for mavoglurant, an mGluR5
     antagonist; see [the 2014 pharmacological characterization indexed
     in PubMed](https://pubmed.ncbi.nlm.nih.gov/25316499/). The numbers
-    2.9, 4, 0.5, and 0.8 reproduce the supplied continuous exercise and
-    are not claimed to be published efficacy results.
+    2.9, 4, 0.5, and 0.8 are illustrative decision-rule settings, not
+    published efficacy results.
