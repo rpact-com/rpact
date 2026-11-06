@@ -53,3 +53,4 @@ testthat-problems.rds
 /.luarc.json
 /vignettes/rpact_quantitative_trial_design_files
 /vignettes/rpact_quantitative_trial_design.html
+/vignettes/.quarto/

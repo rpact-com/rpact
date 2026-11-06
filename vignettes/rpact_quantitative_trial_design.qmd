@@ -22,8 +22,16 @@ project:
   execute-dir: project
 license: CC BY-SA
 affiliation: RPACT
-format: html
-image: /photos/by_friedrich_pahlke_25.jpg
+format:
+  html:
+    minimal: true
+    theme: none
+    embed-resources: true
+    html-math-method: mathjax
+vignette: >
+  %\VignetteIndexEntry{Quantitative Trial Decisions for Means and Rates with rpact}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
 editor:
   markdown:
     wrap: none
@@ -75,7 +83,7 @@ rpact](https://github.com/rpact-com/rpact/tree/dev/qtd) providing
 `getOperatingCharcteristicsRates()`, together with their QTD print, summary, and
 plot methods. The spelling `Charcteristics` follows the current function names.
 
-## How to intall the QTD development version
+## How to install the QTD development version
 
 ```{r}
 #| label: install-dev

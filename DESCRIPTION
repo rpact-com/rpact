@@ -85,11 +85,12 @@ LinkingTo: Rcpp
 Suggests:
     callr,
     parallelly,
+    quarto (>= 1.4.0),
 	ggplot2 (>= 3.5.0),
 	testthat (>= 3.0.0),
 	rmarkdown (>= 1.10),
     rappdirs (>= 0.3.3)
-VignetteBuilder: knitr, rmarkdown
+VignetteBuilder: knitr, rmarkdown, quarto
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true

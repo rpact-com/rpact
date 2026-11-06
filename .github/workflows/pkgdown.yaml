@@ -2,7 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, dev/qtd]
   release:
     types: [published]
   workflow_dispatch:
@@ -11,16 +11,24 @@ name: pkgdown
 
 jobs:
   pkgdown:
+    if: >-
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/master' ||
+      github.ref == 'refs/heads/dev/qtd' ||
+      (github.event_name == 'release' &&
+       (github.event.release.target_commitish == 'main' ||
+        github.event.release.target_commitish == 'master'))
     runs-on: ubuntu-latest
-    # Only restrict concurrency for non-PR jobs
+    # Both destinations share gh-pages: serialize their deployments.
     concurrency:
-      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+      group: pkgdown-gh-pages
+      cancel-in-progress: false
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -28,19 +36,40 @@ jobs:
         with:
           use-public-rspm: true
 
+      - uses: quarto-dev/quarto-actions/setup@v2
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
+          install-quarto: false
 
       - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+        env:
+          QTD_PREVIEW: ${{ github.ref == 'refs/heads/dev/qtd' }}
+        run: |
+          override <- list()
+          if (identical(Sys.getenv("QTD_PREVIEW"), "true")) {
+              override <- list(
+                  url = "https://docs.rpact.org/qtd/",
+                  navbar = list(title = "rpact QTD Preview"),
+                  template = list(includes = list(before_body = paste0(
+                      '<div class="alert alert-warning" role="status">',
+                      '<strong>QTD Preview &ndash; unreleased.</strong> ',
+                      'Documentation built from <code>dev/qtd</code>. ',
+                      '<a href="https://docs.rpact.org/">Stable documentation</a>.',
+                      '</div>'
+                  )))
+              )
+          }
+          pkg <- pkgdown::as_pkgdown(".", override = override)
+          pkgdown::build_site_github_pages(pkg, new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
-      - name: Deploy to GitHub pages 🚀
-        if: github.event_name != 'pull_request'
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           clean: false
           branch: gh-pages
           folder: docs
+          target-folder: ${{ github.ref == 'refs/heads/dev/qtd' && 'qtd' || '.' }}
