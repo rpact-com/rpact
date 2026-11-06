@@ -447,15 +447,25 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
         arguments[argumentName] <- newArgumentValues[argumentName]
     }
     expressions <- vapply(names(arguments), function(argumentName) {
+        argumentValue <- arguments[[argumentName]]
+        controls <- c("keepNA", "keepInteger", "niceNames", "showAttributes", "digits17")
+        expression <- deparse(argumentValue, width.cutoff = 500L, control = controls)
+        if (is.numeric(argumentValue)) {
+            # Some decimal literals can parse to an adjacent double, even with 17 digits.
+            reconstructed <- tryCatch(
+                eval(parse(text = expression), envir = baseenv()),
+                error = function(e) {
+                    return(NULL)
+                }
+            )
+            if (!identical(reconstructed, argumentValue)) {
+                expression <- deparse(argumentValue, width.cutoff = 500L,
+                    control = c(setdiff(controls, "digits17"), "hexNumeric"))
+            }
+        }
         return(paste0(
             argumentName, " = ",
-            paste(
-                deparse(arguments[[argumentName]],
-                    width.cutoff = 500L,
-                    control = c("keepNA", "keepInteger", "niceNames", "showAttributes", "digits17")
-                ),
-                collapse = "\n"
-            )
+            paste(expression, collapse = "\n")
         ))
     }, character(1))
     code <- paste0(prefix, functionName, "(", paste(c(leadingArguments, expressions), collapse = ", "), ")")

@@ -37,6 +37,14 @@ to create an object of this type.
 
 \item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.}
 
+\item{\code{observedDropoutProportion1}}{Mean replication-specific observed dropout proportion in arm 1, counting dropout before the event and by the arm or population's last contributing analysis. Only replications with a finite finishing horizon and positive enrolled-subject denominator contribute; NA if none contribute. Available only for patient-wise simulation. Numeric vector over scenarios for two-arm trials; in multi-arm trials, arm 1 is a matrix of active-arm rows and scenario columns (a vector for one active arm), and arm 2 is a vector over scenarios for shared control. In enrichment trials, both arms have population rows (subpopulations followed by the full population) and scenario columns, or a vector for one population. Discontinued arms and populations are retained; overlapping populations include their shared subjects. There is no stage dimension. NULL for test-statistic-based simulation.}
+
+\item{\code{observedDropoutProportion2}}{Mean replication-specific observed dropout proportion in arm 2, counting dropout before the event and by the arm or population's last contributing analysis. Only replications with a finite finishing horizon and positive enrolled-subject denominator contribute; NA if none contribute. Available only for patient-wise simulation. Numeric vector over scenarios for two-arm trials; in multi-arm trials, arm 1 is a matrix of active-arm rows and scenario columns (a vector for one active arm), and arm 2 is a vector over scenarios for shared control. In enrichment trials, both arms have population rows (subpopulations followed by the full population) and scenario columns, or a vector for one population. Discontinued arms and populations are retained; overlapping populations include their shared subjects. There is no stage dimension. NULL for test-statistic-based simulation.}
+
+\item{\code{dropoutObservationTime1}}{Mean finishing analysis time in arm 1 over exactly the replications contributing to the corresponding observed dropout proportion, in the same time units as accrual and survival. NA if no replication contributes. Available only for patient-wise simulation. Numeric vector over scenarios for two-arm trials; in multi-arm trials, arm 1 is a matrix of active-arm rows and scenario columns (a vector for one active arm), and arm 2 is a vector over scenarios for shared control. In enrichment trials, both arms have population rows (subpopulations followed by the full population) and scenario columns, or a vector for one population. Discontinued arms and populations are retained; overlapping populations include their shared subjects. There is no stage dimension. NULL for test-statistic-based simulation.}
+
+\item{\code{dropoutObservationTime2}}{Mean finishing analysis time in arm 2 over exactly the replications contributing to the corresponding observed dropout proportion, in the same time units as accrual and survival. NA if no replication contributes. Available only for patient-wise simulation. Numeric vector over scenarios for two-arm trials; in multi-arm trials, arm 1 is a matrix of active-arm rows and scenario columns (a vector for one active arm), and arm 2 is a vector over scenarios for shared control. In enrichment trials, both arms have population rows (subpopulations followed by the full population) and scenario columns, or a vector for one population. Discontinued arms and populations are retained; overlapping populations include their shared subjects. There is no stage dimension. NULL for test-statistic-based simulation.}
+
 \item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
 \item{\code{effectList}}{The list of subsets, prevalences and effect sizes with columns and number of rows reflecting the different situations to be considered.}
@@ -118,6 +126,22 @@ and subgroup.}
 \item{\code{threshold}}{The selection criterion: treatment arm/population is only selected if \code{effectMeasure} exceeds \code{threshold}. Either a single numeric value or a numeric vector of length \code{activeArms} referring to a separate threshold condition for each treatment arm.}
 
 \item{\code{typeOfSelection}}{The way the treatment arms or populations are selected at interim. Is a single character value.}
+
+\item{\code{analysisTime}}{The estimated time of analysis. Is a numeric matrix.}
+
+\item{\code{eventsNotAchieved}}{The simulated number of cases how often the number of events was not reached. Is a numeric matrix.}
+
+\item{\code{numberOfSubjects}}{In simulation results data set: The number of subjects under consideration when the interim analysis takes place.}
+
+\item{\code{piecewiseSurvivalTime}}{The time intervals for the piecewise definition of the exponential survival time cumulative distribution function. Is a numeric vector.}
+
+\item{\code{maxNumberOfEventsPerStage}}{Determines the maximum number of events per stage for data-driven sample size recalculation. Is a numeric vector of length \code{kMax} containing whole numbers.}
+
+\item{\code{minNumberOfEventsPerStage}}{Determines the minimum number of events per stage for data-driven sample size recalculation. Is a numeric vector of length \code{kMax} containing whole numbers.}
+
+\item{\code{plannedEvents}}{Determines the number of cumulated (overall) events in survival designs when the interim stages are planned. For two treatment arms, is the number of events for both treatment arms. For multi-arm designs, refers to the overall number of events for the selected arms plus control. Is a numeric vector of length \code{kMax} containing whole numbers.}
+
+\item{\code{maxStudyDuration}}{The maximum study duration in survival designs. Is a numeric vector.}
 }}
 
 \keyword{internal}

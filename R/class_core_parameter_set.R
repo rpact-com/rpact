@@ -1187,6 +1187,25 @@ ParameterSet <- R6::R6Class("ParameterSet",
 
     usedParameterNames <- character()
     for (parameterName in parameterNames) {
+        # These summaries have group rows, not stage rows. Keep one column per group.
+        if (grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", parameterName) &&
+                is.matrix(parameterSet[[parameterName]])) {
+            groupValues <- parameterSet[[parameterName]]
+            for (g in seq_len(nrow(groupValues))) {
+                group <- paste0("arm", g)
+                if (inherits(parameterSet, "SimulationResultsEnrichmentSurvival")) {
+                    group <- .getCategoryCaptionEnrichment(parameterSet, parameterName, g)
+                }
+                caption <- paste0(parameterName, ".", group)
+                if (niceColumnNamesEnabled) {
+                    caption <- .getParameterSetParameterCaptionPerRow(parameterSet, parameterName,
+                        .getParameterCaption(parameterName, parameterSet), g)
+                }
+                dataFrame[[caption]] <- rep(groupValues[g, ], numberOfStages)
+            }
+            usedParameterNames <- c(usedParameterNames, parameterName)
+            next
+        }
         tryCatch(
             {
                 if (!(parameterName %in% c(

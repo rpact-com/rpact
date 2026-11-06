@@ -1395,6 +1395,8 @@ NULL
         }
     }
 
+    .addDropoutSummaryItems(designPlan, summaryFactory)
+
     if (!is.null(performanceScore)) {
         print(performanceScore)
         summaryFactory$addParameter(performanceScore,
