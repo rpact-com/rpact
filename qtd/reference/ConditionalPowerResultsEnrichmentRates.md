@@ -1,0 +1,53 @@
+# Conditional Power Results Enrichment Rates
+
+Class for conditional power calculations of enrichment rates data
+
+## Details
+
+This object cannot be created directly; use
+[`getConditionalPower`](https://docs.rpact.org/qtd/reference/getConditionalPower.md)
+with suitable arguments to create the results of a group sequential or a
+combination test design.
+
+## Fields
+
+- `nPlanned`:
+
+  The sample size planned for each of the subsequent stages. Is a
+  numeric vector of length `kMax` containing whole numbers.
+
+- `allocationRatioPlanned`:
+
+  The planned allocation ratio (`n1 / n2`) for the groups. For multi-arm
+  designs, it is the allocation ratio relating the active arm(s) to the
+  control. Is a single positive numeric value.
+
+- `iterations`:
+
+  The number of iterations used for simulations. Is a single numeric
+  value representing a whole number.
+
+- `seed`:
+
+  The seed used for random number generation. Is a single numeric value.
+
+- `simulated`:
+
+  Describes if the power for Fisher's combination test has been
+  simulated. Only applicable when using Fisher designs. Is a single
+  logical value.
+
+- `conditionalPower`:
+
+  The conditional power at each stage of the trial. Is a single numeric
+  value between 0 and 1.
+
+- `piTreatments`:
+
+  The assumed rates in the treatment groups for multi-arm and enrichment
+  designs, i.e., designs with multiple subsets.
+
+- `piControls`:
+
+  The assumed rates in the control group for enrichment designs, i.e.,
+  designs with multiple subsets.

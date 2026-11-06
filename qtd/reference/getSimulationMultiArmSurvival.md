@@ -1,0 +1,678 @@
+# Get Simulation Multi-Arm Survival
+
+Returns the simulated power, stopping and selection probabilities,
+conditional power, and expected sample size for testing hazard ratios in
+a multi-arm treatment groups testing situation.
+
+Depending on `simulationType`, either a patient-wise survival simulation
+is performed, a patient-wise basic approximation is used, or normally
+distributed log-rank test statistics are simulated. The default
+`simulationType = "auto"` chooses the simulation approach automatically
+based on the explicitly specified arguments. The null hypothesis is
+defined by the hazard ratio `thetaH0`; values other than 1 can be used,
+for example, to simulate non-inferiority designs.
+
+## Usage
+
+``` r
+getSimulationMultiArmSurvival(
+  design = NULL,
+  ...,
+  simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+  thetaH0 = 1,
+  activeArms = NA_integer_,
+  piControl = NA_real_,
+  piecewiseSurvivalTime = NULL,
+  effectMatrix = NULL,
+  typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+  omegaMaxVector = NA_real_,
+  kappa = 1,
+  gED50 = NA_real_,
+  slope = 1,
+  doseLevels = NA_real_,
+  eventTime = 12,
+  accrualTime = c(0, 12),
+  accrualIntensity = 0.1,
+  accrualIntensityType = c("auto", "absolute", "relative"),
+  dropoutRate1 = 0,
+  dropoutRate2 = 0,
+  dropoutTime = 12,
+  maxNumberOfSubjects = NA_real_,
+  intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
+  directionUpper = NA,
+  adaptations = NA,
+  typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+  effectMeasure = c("effectEstimate", "testStatistic"),
+  successCriterion = c("all", "atLeastOne"),
+  correlationComputation = c("alternative", "null"),
+  epsilonValue = NA_real_,
+  rValue = NA_real_,
+  threshold = -Inf,
+  plannedEvents = NA_real_,
+  allocationRatioPlanned = NA_real_,
+  minNumberOfEventsPerStage = NA_real_,
+  maxNumberOfEventsPerStage = NA_real_,
+  conditionalPower = NA_real_,
+  thetaH1 = NA_real_,
+  maxNumberOfIterations = NA_integer_,
+  maxNumberOfRawDatasetsPerStage = 0,
+  seed = NA_real_,
+  calcEventsFunction = NULL,
+  selectArmsFunction = NULL,
+  showStatistics = FALSE
+)
+```
+
+## Arguments
+
+- design:
+
+  The trial design. If no trial design is specified, a fixed sample size
+  design is used. In this case, Type I error rate `alpha`, Type II error
+  rate `beta`, `twoSidedPower`, and `sided` can be directly entered as
+  argument where necessary. Must be created with
+  [`getDesignInverseNormal()`](https://docs.rpact.org/qtd/reference/getDesignInverseNormal.md),
+  [`getDesignFisher()`](https://docs.rpact.org/qtd/reference/getDesignFisher.md),
+  [`getDesignConditionalDunnett()`](https://docs.rpact.org/qtd/reference/getDesignConditionalDunnett.md),
+  or
+  [`getDesignFixed()`](https://docs.rpact.org/qtd/reference/getDesignFixed.md);
+  designs created with
+  [`getDesignGroupSequential()`](https://docs.rpact.org/qtd/reference/getDesignGroupSequential.md)
+  are not supported.
+
+- ...:
+
+  Ensures that all arguments (starting from the "...") are to be named
+  and that a warning will be displayed if unknown arguments are passed.
+
+- simulationType:
+
+  Character value specifying the simulation approach: `"auto"`,
+  `"patientWise"`, `"testStatisticBased"`, or `"patientWiseBasic"`. If
+  `"auto"` is specified, the simulation type is selected automatically
+  based on the explicitly specified arguments. If patient-wise-specific
+  arguments such as `piControl`, `eventTime`, `accrualTime`,
+  `accrualIntensity`, `accrualIntensityType`, `dropoutRate1`,
+  `dropoutRate2`, `dropoutTime`, `maxNumberOfSubjects`, or `kappa` are
+  provided, a patient-wise simulation approach is used; otherwise the
+  test-statistic-based simulation is used for backward compatibility.
+
+- thetaH0:
+
+  The null hypothesis value, default is `0` for general estimates, the
+  normal case, and the binary case, it is `1` for the survival case
+  (testing the hazard ratio).  
+    
+  For non-inferiority designs, `thetaH0` is the non-inferiority bound.
+  That is, in case of (one-sided) testing of
+
+  - *general estimates*: a value on the scale of the supplied estimates
+    can be specified.
+
+  - *means*: a value `!= 0` (or a value `!= 1` for testing the mean
+    ratio) can be specified.
+
+  - *rates*: a value `!= 0` (or a value `!= 1` for testing the risk
+    ratio `pi1 / pi2`) can be specified.
+
+  - *survival data*: a bound for testing H0:
+    `hazard ratio = thetaH0 != 1` can be specified.
+
+  - *count data*: a bound for testing H0:
+    `lambda1 / lambda2 = thetaH0 != 1` can be specified.
+
+  For testing a rate in one sample, a value `thetaH0` in (0, 1) has to
+  be specified for defining the null hypothesis H0: `pi = thetaH0`.
+
+- activeArms:
+
+  The number of active treatment arms to be compared with control,
+  default is `3`. Must not exceed `8`.
+
+- piControl:
+
+  The assumed event probability in the control arm by `eventTime`,
+  default is `0.5`. If specified and `simulationType = "auto"`, the
+  patient-wise simulation is used, which requires `maxNumberOfSubjects`
+  or an absolute `accrualIntensity`.
+
+- piecewiseSurvivalTime:
+
+  A `PiecewiseSurvivalTimeMultiArm` object created by
+  [`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/qtd/reference/getPiecewiseSurvivalTimeMultiArm.md).
+  It specifies common interval start times, the control hazard in every
+  interval, and an active-arm-by-interval hazard-ratio matrix for every
+  situation. It can only be used for patient-wise simulation with
+  `kappa = 1`, and cannot be combined with `piControl` or
+  `effectMatrix`.
+
+- effectMatrix:
+
+  Matrix of effect sizes with `activeArms` columns and one or more rows,
+  where each row represents a different situation to consider.
+
+- typeOfShape:
+
+  The shape of the dose-response relationship over the treatment groups.
+  This can be either `"linear"`, `"sigmoidEmax"`, or `"userDefined"`,
+  default is `"linear"`.  
+  For `"linear"`, `omegaMaxVector` specifies the range of effect sizes
+  for the treatment group with highest response. If `"sigmoidEmax"` is
+  selected, `gED50` and `slope` has to be entered to specify the ED50
+  and the slope of the sigmoid Emax model. For `"sigmoidEmax"`,
+  `omegaMaxVector` specifies the range of effect sizes for the treatment
+  group with response according to infinite dose. If `"userDefined"` is
+  selected, `effectMatrix` has to be entered.
+
+- omegaMaxVector:
+
+  Range of hazard ratios with highest response for `"linear"` and
+  `"sigmoidEmax"` model, default is `seq(1, 0.4, -0.2)`.
+
+- kappa:
+
+  A numeric value \> 0. A `kappa != 1` will be used for the
+  specification of the shape of the Weibull distribution. Default is
+  `1`, i.e., the exponential survival distribution is used instead of
+  the Weibull distribution. Note that the Weibull distribution cannot be
+  used for the piecewise definition of the survival time distribution,
+  i.e., only `piecewiselambda` (as a single value) and `kappa` can be
+  specified. This function is equivalent to
+  `pweibull(q = time, shape = kappa, scale = 1 / lambda)` of the `stats`
+  package.  
+  For example,
+  `getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)`
+  and `pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)` provide the
+  same result.
+
+- gED50:
+
+  If `typeOfShape = "sigmoidEmax"` is selected, `gED50` has to be
+  entered to specify the ED50 of the sigmoid Emax model.
+
+- slope:
+
+  If `typeOfShape = "sigmoidEmax"` is selected, `slope` can be entered
+  to specify the slope of the sigmoid Emax model, default is 1.
+
+- doseLevels:
+
+  The dose levels for the dose response relationship. If not specified,
+  these dose levels are `1,...,activeArms`.
+
+- eventTime:
+
+  The assumed time under which the event rates are calculated, default
+  is `12`.
+
+- accrualTime:
+
+  The assumed accrual time intervals for the study, default is
+  `c(0, 12)` (for details see
+  [`getAccrualTime()`](https://docs.rpact.org/qtd/reference/getAccrualTime.md)).
+
+- accrualIntensity:
+
+  A numeric vector of accrual intensities, default is the relative
+  intensity `0.1` (for details see
+  [`getAccrualTime()`](https://docs.rpact.org/qtd/reference/getAccrualTime.md)).
+
+- accrualIntensityType:
+
+  A character value specifying the accrual intensity input type. Must be
+  one of `"auto"`, `"absolute"`, or `"relative"`; default is `"auto"`,
+  i.e., if all values are \< 1 the type is `"relative"`, otherwise it is
+  `"absolute"`.
+
+- dropoutRate1:
+
+  The assumed drop-out rate in the treatment group, default is `0`. For
+  multi-arm simulations, this can be a vector of length equal to the
+  number of active arms, specifying different drop-out rates for each
+  active arm.
+
+- dropoutRate2:
+
+  The assumed drop-out rate in the control group, default is `0`.
+
+- dropoutTime:
+
+  The assumed time for drop-out rates in the control and the treatment
+  group, default is `12`.
+
+- maxNumberOfSubjects:
+
+  `maxNumberOfSubjects > 0` needs to be specified. If accrual time and
+  accrual intensity are specified, this will be calculated. Must be a
+  positive integer of length 1.
+
+- intersectionTest:
+
+  Defines the multiple test for the intersection hypotheses in the
+  closed system of hypotheses. Five options are available in multi-arm
+  designs: `"Dunnett"`, `"Bonferroni"`, `"Simes"`, `"Sidak"`, and
+  `"Hierarchical"`, default is `"Dunnett"`.
+
+- directionUpper:
+
+  Logical. Specifies the direction of the alternative, only applicable
+  for one-sided testing; `TRUE` means that larger values of the test
+  statistics yield smaller p-values. The default is `TRUE` for means,
+  rates, and count data, and `FALSE` for survival data (power
+  calculations, simulations, and analyses). In sample size calculations,
+  the direction is derived from the specified alternative; a specified
+  `directionUpper` must agree with it.
+
+- adaptations:
+
+  A logical vector of length `kMax - 1` indicating whether or not an
+  adaptation takes place at interim k, default is `rep(TRUE, kMax - 1)`.
+
+- typeOfSelection:
+
+  Rule for selecting treatment arms (multi-arm designs) or populations
+  (enrichment designs) for continuation after an interim analysis. The
+  default `"best"` selects only the single best arm or population;
+  `"rBest"` (also accepted as `"rbest"`) selects the best `rValue`;
+  `"epsilon"` selects those within `epsilonValue` of the best; `"all"`
+  retains all remaining arms or populations; and `"userDefined"` applies
+  `selectArmsFunction` or `selectPopulationsFunction`. Selection is
+  applied at interims with `adaptations = TRUE`. See the section
+  *Treatment arm and population selection* for details and an example of
+  gradual elimination.
+
+- effectMeasure:
+
+  Criterion for treatment arm/population selection, either based on test
+  statistic (`"testStatistic"`) or effect estimate (difference for means
+  and rates or ratio for survival) (`"effectEstimate"`), default is
+  `"effectEstimate"`.
+
+- successCriterion:
+
+  Defines when the study is stopped for efficacy at interim. Two options
+  are available: `"all"` stops the trial if the efficacy criterion is
+  fulfilled for all selected treatment arms/populations, `"atLeastOne"`
+  stops if at least one of the selected treatment arms/populations is
+  shown to be superior to control at interim, default is `"all"`.
+
+- correlationComputation:
+
+  If `correlationComputation = "alternative"`, for simulating log-rank
+  statistics in the many-to-one design, a correlation matrix according
+  to Deng et al. (Biometrics, 2019) accounting for the respective
+  alternative is used; if `correlationComputation = "null"`, a constant
+  correlation matrix valid under the null, i.e., not accounting for the
+  alternative is used, default is `"alternative"`.
+
+- epsilonValue:
+
+  For `typeOfSelection = "epsilon"` (select treatment arm / population
+  not worse than epsilon compared to the best), the parameter
+  `epsilonValue` has to be specified. Must be a numeric of length 1.
+
+- rValue:
+
+  For `typeOfSelection = "rbest"` (select the `rValue` best treatment
+  arms / populations), the parameter `rValue` has to be specified.
+
+- threshold:
+
+  Selection criterion: treatment arm / population is selected only if
+  `effectMeasure` exceeds `threshold`, default is `-Inf`. `threshold`
+  can also be a vector of length `activeArms` referring to a separate
+  threshold condition over the treatment arms.
+
+- plannedEvents:
+
+  `plannedEvents` is a numeric vector of length `kMax` (the number of
+  stages of the design) that determines the number of cumulated
+  (overall) events in survival designs when the interim stages are
+  planned. For two treatment arms, it is the number of events for both
+  treatment arms. For multi-arm designs, `plannedEvents` refers to the
+  overall number of events for the selected arms plus control.
+
+- allocationRatioPlanned:
+
+  The planned allocation ratio `n1 / n2` for a two treatment groups
+  design, default is `1`. For multi-arm designs, it is the allocation
+  ratio relating the active arm(s) to the control. For simulating means
+  and rates for a two treatment groups design, it can be a vector of
+  length `kMax`, the number of stages. It can be a vector of length
+  `kMax`, too, for multi-arm and enrichment designs. In these cases, a
+  change of allocating subjects to treatment groups over the stages can
+  be assessed. Note that internally `allocationRatioPlanned` is treated
+  as a vector of length `kMax`, not a scalar.
+
+- minNumberOfEventsPerStage:
+
+  When performing a data driven sample size recalculation, the numeric
+  vector `minNumberOfEventsPerStage` with length kMax determines the
+  minimum number of events per stage (i.e., not cumulated), the first
+  element is not taken into account.
+
+- maxNumberOfEventsPerStage:
+
+  When performing a data driven sample size recalculation, the numeric
+  vector `maxNumberOfEventsPerStage` with length `kMax` determines the
+  maximum number of events per stage (i.e., not cumulated), the first
+  element is not taken into account.
+
+- conditionalPower:
+
+  If `conditionalPower` together with `minNumberOfSubjectsPerStage` and
+  `maxNumberOfSubjectsPerStage` (or `minNumberOfEventsPerStage` and
+  `maxNumberOfEventsPerStage` for survival designs) is specified, a
+  sample size recalculation based on the specified conditional power is
+  performed. It is defined as the power for the subsequent stage given
+  the current data. By default, the conditional power will be calculated
+  under the observed effect size. Optionally, you can also specify
+  `thetaH1` and `stDevH1` (for simulating means), `pi1H1` and `pi2H1`
+  (for simulating rates; `piTreatmentsH1` and `piControlH1` in multi-arm
+  designs, `piTreatmentH1` and `piControlH1` in enrichment designs), or
+  `thetaH1` (for simulating hazard ratios) as parameters under which it
+  is calculated and the sample size recalculation is performed.
+
+- thetaH1:
+
+  If specified, the value of the alternative under which the conditional
+  power or sample size recalculation calculation is performed. Must be a
+  numeric of length 1.
+
+- maxNumberOfIterations:
+
+  The number of simulation iterations, default is `1000`. Must be a
+  positive integer of length 1.
+
+- maxNumberOfRawDatasetsPerStage:
+
+  The maximum number of patient-level datasets to retain for each
+  scenario and stopping stage. The default is `0`, which retains no
+  patient-level data. Use
+  [`getRawData()`](https://docs.rpact.org/qtd/reference/getRawData.md)
+  to retrieve retained datasets.
+
+- seed:
+
+  The seed to reproduce the simulation, default is a random seed.
+
+- calcEventsFunction:
+
+  Optionally, a function can be entered that defines the way of
+  performing the sample size recalculation. By default, event number
+  recalculation is performed with conditional power and specified
+  `minNumberOfEventsPerStage` and `maxNumberOfEventsPerStage` (see
+  details and examples).
+
+- selectArmsFunction:
+
+  Optionally, a function can be entered that defines the way of how
+  treatment arms are selected. This function is allowed to depend on
+  `effectVector` with length `activeArms`, `stage`, `conditionalPower`,
+  `conditionalCriticalValue`, `plannedSubjects/plannedEvents`,
+  `allocationRatioPlanned`, `selectedArms`, `thetaH1` (for means and
+  survival), `stDevH1` (for means), `overallEffects`, and for rates
+  additionally: `piTreatmentsH1`, `piControlH1`, `overallRates`, and
+  `overallRatesControl` (see examples).
+
+- showStatistics:
+
+  Logical. If `TRUE`, summary statistics of the simulated data are
+  displayed for the `print` command, otherwise the output is suppressed,
+  default is `FALSE`.
+
+## Value
+
+Returns a
+[`SimulationResults`](https://docs.rpact.org/qtd/reference/SimulationResults.md)
+object. The following generics (R generic functions) are available for
+this object:
+
+- [`names()`](https://docs.rpact.org/qtd/reference/names.FieldSet.md) to
+  obtain the field names,
+
+- [`print()`](https://docs.rpact.org/qtd/reference/print.FieldSet.md) to
+  print the object,
+
+- [`summary()`](https://docs.rpact.org/qtd/reference/summary.ParameterSet.md)
+  to display a summary of the object,
+
+- [`plot()`](https://docs.rpact.org/qtd/reference/plot.SimulationResults.md)
+  to plot the object,
+
+- [`as.data.frame()`](https://docs.rpact.org/qtd/reference/as.data.frame.ParameterSet.md)
+  to coerce the object to a
+  [`data.frame`](https://rdrr.io/r/base/data.frame.html),
+
+- [`as.matrix()`](https://docs.rpact.org/qtd/reference/as.matrix.FieldSet.md)
+  to coerce the object to a
+  [`matrix`](https://rdrr.io/r/base/matrix.html).
+
+## Details
+
+At given design the function simulates the analysis times, power,
+stopping probabilities, expected sample size and events, and selection
+probabilities, at given number of subjects, events, parameter
+configuration, and treatment arm selection rule in the multi-arm
+survival design situation. An allocation ratio can be specified
+referring to the ratio of number of subjects in the active treatment
+groups as compared to the control group.
+
+If `simulationType = "patientWise"`, patient-wise survival data are
+simulated based on the specified accrual, event-time, and dropout
+assumptions. If `simulationType = "patientWiseBasic"`, a simplified
+patient-wise survival approach is used. If
+`simulationType = "testStatisticBased"`, normally distributed log-rank
+test statistics are simulated instead. The default
+`simulationType = "auto"` selects the simulation approach automatically
+based on the explicitly specified arguments and uses the legacy
+test-statistic-based approach for backward compatibility if no
+patient-wise-specific arguments are provided.
+
+For piecewise exponential event times, create `piecewiseSurvivalTime`
+with
+[`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/qtd/reference/getPiecewiseSurvivalTimeMultiArm.md).
+Hazard ratios are represented as an active-arm-by-interval-by-situation
+array; equivalently, they can be supplied to the constructor as a named
+list of active-arm-by-interval matrices. The situation dimension changes
+slowest, so printing the object displays one active-arm-by-interval
+matrix for each situation.
+
+The definition of `thetaH1` makes only sense if `kMax` \> 1 and if
+`conditionalPower`, `minNumberOfEventsPerStage`, and
+`maxNumberOfEventsPerStage` (or `calcEventsFunction`) are defined.
+
+`calcEventsFunction`  
+This function returns the number of events at given conditional power
+and conditional critical value for specified testing situation. The
+function might depend on the variables `stage`, `selectedArms`,
+`plannedEvents`, `directionUpper`, `thetaH0`, `allocationRatioPlanned`,
+`minNumberOfEventsPerStage`, `maxNumberOfEventsPerStage`,
+`conditionalPower`, `conditionalCriticalValue`, and `overallEffects`.
+The function has to contain the three-dots argument '...' (see
+examples).
+
+## Treatment arm and population selection
+
+Selection determines which treatment arms or populations continue to the
+next stage. It is applied at interim analysis `k` only if
+`adaptations[k] = TRUE`; the default enables selection at every interim.
+Otherwise, the current selection is retained. Once dropped, an arm or
+population cannot be selected again. In multi-arm designs, these rules
+apply to the active treatment arms; the control group is retained.
+
+The ranking uses the cumulative interim data and the criterion specified
+by `effectMeasure`: the estimated treatment effect for
+`"effectEstimate"` (the default), or the test statistic for
+`"testStatistic"`. The selection functions use a vector `effectVector`
+on a scale where larger values rank better. For survival endpoints with
+`effectMeasure = "effectEstimate"`, this is the estimated hazard ratio
+for `directionUpper = TRUE` and its reciprocal for
+`directionUpper = FALSE`.
+
+- `"best"` (default):
+
+  Selects only the single best remaining arm or population. Thus, with
+  three active arms and selection enabled at the first interim, only one
+  arm continues to stage 2. It does not drop just the worst arm. If
+  several have the same best value, the first in the original order is
+  selected.
+
+- `"rBest"`:
+
+  Selects the `rValue` highest-ranked remaining arms or populations,
+  subject to availability. Specify `rValue` as a positive integer. For
+  example, `rValue = 2` selects the best two; `rValue = 1` gives the
+  same selection as `"best"`. The same `rValue` is used at every enabled
+  interim, so this option does not mean dropping one arm or population
+  at each interim. The spelling `"rbest"` is also accepted.
+
+- `"epsilon"`:
+
+  Selects the best and all other remaining arms or populations whose
+  selection value is at most `epsilonValue` below the best value,
+  including equality. Specify `epsilonValue` on the scale of
+  `effectVector`. The number selected depends on the observed
+  differences and can vary between simulation runs. For example,
+  selection values `c(0.20, 0.35, 0.40)` and `epsilonValue = 0.10`
+  retain the second and third arms or populations. For response-rate
+  differences, `0.10` represents 10 percentage points.
+
+- `"all"`:
+
+  Retains all remaining arms or populations without ranking them. This
+  disables dropping based on relative performance, but threshold
+  conditions and stopping rules still apply.
+
+- `"userDefined"`:
+
+  Uses `selectArmsFunction` in multi-arm designs or
+  `selectPopulationsFunction` in enrichment designs. Supply a function
+  returning a logical vector in the original arm or population order,
+  with `TRUE` indicating selection. Its length must equal the original
+  number of active arms or populations. The function can use `stage`,
+  `effectVector`, and the other arguments listed in the corresponding
+  parameter description. Use this option for rules whose number selected
+  changes by stage, such as dropping the worst remaining arm at each
+  interim.
+
+For the four built-in rules, selected arms or populations must
+additionally have a selection value strictly above `threshold`. The
+default `threshold = -Inf` imposes no additional restriction.
+Consequently, fewer than the requested number may continue, or none may
+continue. For `"userDefined"`, implement any threshold condition in the
+supplied function. Efficacy and futility stopping rules apply separately
+from selection.
+
+For example, the following multi-arm selection function drops one worst
+remaining arm at each enabled interim, while retaining at least one arm.
+Pass it as `selectArmsFunction = dropWorstArm` together with
+`typeOfSelection = "userDefined"`. If three arms are still available at
+the first interim, it retains two; at the next enabled interim it
+retains one, provided the trial continues.
+
+
+    dropWorstArm <- function(effectVector, selectedArms, stage) {
+        keep <- selectedArms[seq_along(effectVector), stage] & !is.na(effectVector)
+        if (sum(keep) > 1L) {
+            remaining <- which(keep)
+            worst <- remaining[which.min(effectVector[remaining])]
+            keep[worst] <- FALSE
+        }
+        keep
+    }
+
+## Conditional power under piecewise hazards
+
+Conditional power is calculated using a scalar hazard ratio estimated
+from the interim data or specified through `thetaH1`. The calculation
+uses a proportional-hazards working model, including when survival times
+are generated from piecewise hazards with interval-specific hazard
+ratios. The interval-specific hazards are not used to project future
+test-statistic drift in this calculation.
+
+Accordingly, `conditionalPowerAchieved` reports conditional power under
+the scalar effect assumption for the selected number of events. It is
+not an empirical rejection probability and, when hazard ratios vary over
+time, need not equal the conditional rejection probability under the
+specified piecewise survival model. The default event-number
+recalculation uses the same working model; a custom `calcEventsFunction`
+can define a different recalculation rule.
+
+## How to get help for generic functions
+
+Click on the link of a generic in the list above to go directly to the
+help documentation of the `rpact` specific implementation of the
+generic. Note that you can use the R function
+[`methods`](https://rdrr.io/r/utils/methods.html) to get all the methods
+of a generic and to identify the object specific name of it, e.g., use
+`methods("plot")` to get all the methods for the `plot` generic. There
+you can find, e.g., `plot.AnalysisResults` and obtain the specific help
+documentation linked above by typing
+[`?plot.AnalysisResults`](https://docs.rpact.org/qtd/reference/plot.AnalysisResults.md).
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Assess different selection rules for a two-stage survival design with 
+# O'Brien & Fleming alpha spending boundaries and (non-binding) stopping 
+# for futility if the test statistic is negative. 
+# Number of events at the second stage is adjusted based on conditional 
+# power 80% and specified minimum and maximum number of Events.
+design <- getDesignInverseNormal(typeOfDesign = "asOF", futilityBounds = 0)
+
+y1 <- getSimulationMultiArmSurvival(design = design, activeArms = 4, 
+    intersectionTest = "Simes", typeOfShape = "sigmoidEmax", 
+    omegaMaxVector = seq(1, 2, 0.5), gED50 = 2, slope = 4, 
+    typeOfSelection = "best", conditionalPower = 0.8, 
+    minNumberOfEventsPerStage = c(NA_real_, 30), 
+    maxNumberOfEventsPerStage = c(NA_real_, 90),
+    maxNumberOfIterations = 50, 
+    plannedEvents = c(75, 120))
+
+y2 <- getSimulationMultiArmSurvival(design = design, activeArms = 4, 
+    intersectionTest = "Simes", typeOfShape = "sigmoidEmax", 
+    omegaMaxVector = seq(1,2,0.5), gED50 = 2, slope = 4,
+    typeOfSelection = "epsilon", epsilonValue = 0.2, 
+    effectMeasure = "effectEstimate",
+    conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA_real_, 30), 
+    maxNumberOfEventsPerStage = c(NA_real_, 90),
+    maxNumberOfIterations = 50, 
+     plannedEvents = c(75, 120))
+
+y1$effectMatrix
+
+y1$rejectAtLeastOne
+y2$rejectAtLeastOne
+
+y1$selectedArms
+y2$selectedArms
+
+# Non-inferiority with one active arm (H0: hazard ratio = 1.2)
+simulationResultsNonInferiority <- getSimulationMultiArmSurvival(
+    design = getDesignFixed(sided = 1), thetaH0 = 1.2,
+    directionUpper = FALSE, activeArms = 1,
+    typeOfShape = "userDefined", effectMatrix = matrix(1),
+    piControl = 0.3, plannedEvents = 80,
+    allocationRatioPlanned = 1, maxNumberOfSubjects = 400,
+    accrualTime = c(0, 20), accrualIntensity = 20,
+    maxNumberOfIterations = 50, simulationType = "patientWise")
+
+# Piecewise exponential event times for two active arms and two situations
+piecewiseTime <- getPiecewiseSurvivalTimeMultiArm(
+    piecewiseSurvivalTime = c(0, 6),
+    lambdaControl = c(0.08, 0.12),
+    hazardRatios = list(
+        favorable = rbind(lowDose = c(0.9, 0.8), highDose = c(0.8, 0.6)),
+        conservative = rbind(lowDose = c(1, 0.9), highDose = c(0.9, 0.75))
+    )
+)
+simulationResultsPiecewise <- getSimulationMultiArmSurvival(
+    design = getDesignFixed(), simulationType = "patientWise",
+    piecewiseSurvivalTime = piecewiseTime, directionUpper = FALSE,
+    plannedEvents = 80, maxNumberOfSubjects = 300,
+    accrualTime = c(0, 12), accrualIntensity = 25,
+    maxNumberOfIterations = 50)
+} # }
+```
