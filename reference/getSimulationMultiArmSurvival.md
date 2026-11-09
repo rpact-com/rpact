@@ -12,6 +12,17 @@ based on the explicitly specified arguments. The null hypothesis is
 defined by the hazard ratio `thetaH0`; values other than 1 can be used,
 for example, to simulate non-inferiority designs.
 
+A finishing horizon is the last analysis at which the arm or population
+contributes. Discontinued arms and populations finish at their
+discontinuation analysis; continuing groups and shared control finish at
+their last applicable analysis. Overlapping enrichment populations
+retain their shared subjects. Multi-arm treatment summaries have
+active-arm rows and scenario columns, while shared control is a vector
+over scenarios. Enrichment summaries have population rows
+(subpopulations followed by the full population) and scenario columns. A
+single arm or population is stored as a vector; there is no stage
+dimension. The two-arm outputs are vectors over alternative scenarios.
+
 ## Usage
 
 ``` r
@@ -469,6 +480,11 @@ based on the explicitly specified arguments and uses the legacy
 test-statistic-based approach for backward compatibility if no
 patient-wise-specific arguments are provided.
 
+The summary groups observed drop-out proportions and observation times
+by active treatment arm, followed by the shared control arm. Each arm
+uses its own finishing analysis, including active arms discontinued at
+an interim.
+
 For piecewise exponential event times, create `piecewiseSurvivalTime`
 with
 [`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeMultiArm.md).
@@ -491,6 +507,16 @@ function might depend on the variables `stage`, `selectedArms`,
 `conditionalPower`, `conditionalCriticalValue`, and `overallEffects`.
 The function has to contain the three-dots argument '...' (see
 examples).
+
+These outputs require patient histories and are unavailable for
+`simulationType = "testStatisticBased"`. Existing recruitment and
+allocation mechanisms are retained. The input dropout probability at
+`dropoutTime` describes the dropout distribution without competing
+events; it is not the simulated observed proportion. Analytic expected
+proportions condition on deterministic planned accrual at a fixed final
+planned horizon, whereas simulation includes random analysis times,
+early stopping and selection. Compare them only with matching horizon,
+enrollment and allocation assumptions.
 
 ## Treatment arm and population selection
 

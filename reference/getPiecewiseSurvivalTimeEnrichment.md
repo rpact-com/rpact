@@ -79,13 +79,19 @@ recycling across intervals or groups is performed.
 ``` r
 piecewiseTime <- getPiecewiseSurvivalTimeEnrichment(
     piecewiseSurvivalTime = c(0, 6),
-    lambdaControls = rbind(markerPositive = c(0.08, 0.12),
-        markerNegative = c(0.05, 0.09)),
+    lambdaControls = rbind(
+        markerPositive = c(0.08, 0.12),
+        markerNegative = c(0.05, 0.09)
+    ),
     hazardRatios = list(
-        favorable = rbind(markerPositive = c(0.65, 0.55),
-            markerNegative = c(0.9, 0.8)),
-        conservative = rbind(markerPositive = c(0.8, 0.7),
-            markerNegative = c(1, 0.9))
+        favorable = rbind(
+            markerPositive = c(0.65, 0.55),
+            markerNegative = c(0.9, 0.8)
+        ),
+        conservative = rbind(
+            markerPositive = c(0.8, 0.7),
+            markerNegative = c(1, 0.9)
+        )
     )
 )
 as.data.frame(piecewiseTime)

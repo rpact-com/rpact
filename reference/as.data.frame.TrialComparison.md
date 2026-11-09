@@ -44,13 +44,13 @@ as.data.frame(
 
 - includeAllParameters:
 
-  If TRUE, include all parameters in the comparison, even if they are
-  constant across all objects. If FALSE, only parameters
+  If `TRUE`, include all parameters supported by the existing data-frame
+  methods of the individual objects.
 
 - removeConstantParameters:
 
-  If TRUE, retain identifiers and only parameters with different object
-  profiles, using the same rules as
+  If `TRUE`, retain identifiers and only parameters with different
+  object profiles, using the same rules as
   [`summary()`](https://rdrr.io/r/base/summary.html).
 
 ## Value

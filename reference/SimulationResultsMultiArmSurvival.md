@@ -78,6 +78,68 @@ to create an object of this type.
   The assumed time for drop-out rates in the control and treatment
   group. Is a single numeric value.
 
+- `observedDropoutProportion1`:
+
+  Mean replication-specific observed dropout proportion in arm 1,
+  counting dropout before the event and by the arm or population's last
+  contributing analysis. Only replications with a finite finishing
+  horizon and positive enrolled-subject denominator contribute; NA if
+  none contribute. Available only for patient-wise simulation. Numeric
+  vector over scenarios for two-arm trials; in multi-arm trials, arm 1
+  is a matrix of active-arm rows and scenario columns (a vector for one
+  active arm), and arm 2 is a vector over scenarios for shared control.
+  In enrichment trials, both arms have population rows (subpopulations
+  followed by the full population) and scenario columns, or a vector for
+  one population. Discontinued arms and populations are retained;
+  overlapping populations include their shared subjects. There is no
+  stage dimension. NULL for test-statistic-based simulation.
+
+- `observedDropoutProportion2`:
+
+  Mean replication-specific observed dropout proportion in arm 2,
+  counting dropout before the event and by the arm or population's last
+  contributing analysis. Only replications with a finite finishing
+  horizon and positive enrolled-subject denominator contribute; NA if
+  none contribute. Available only for patient-wise simulation. Numeric
+  vector over scenarios for two-arm trials; in multi-arm trials, arm 1
+  is a matrix of active-arm rows and scenario columns (a vector for one
+  active arm), and arm 2 is a vector over scenarios for shared control.
+  In enrichment trials, both arms have population rows (subpopulations
+  followed by the full population) and scenario columns, or a vector for
+  one population. Discontinued arms and populations are retained;
+  overlapping populations include their shared subjects. There is no
+  stage dimension. NULL for test-statistic-based simulation.
+
+- `dropoutObservationTime1`:
+
+  Mean finishing analysis time in arm 1 over exactly the replications
+  contributing to the corresponding observed dropout proportion, in the
+  same time units as accrual and survival. NA if no replication
+  contributes. Available only for patient-wise simulation. Numeric
+  vector over scenarios for two-arm trials; in multi-arm trials, arm 1
+  is a matrix of active-arm rows and scenario columns (a vector for one
+  active arm), and arm 2 is a vector over scenarios for shared control.
+  In enrichment trials, both arms have population rows (subpopulations
+  followed by the full population) and scenario columns, or a vector for
+  one population. Discontinued arms and populations are retained;
+  overlapping populations include their shared subjects. There is no
+  stage dimension. NULL for test-statistic-based simulation.
+
+- `dropoutObservationTime2`:
+
+  Mean finishing analysis time in arm 2 over exactly the replications
+  contributing to the corresponding observed dropout proportion, in the
+  same time units as accrual and survival. NA if no replication
+  contributes. Available only for patient-wise simulation. Numeric
+  vector over scenarios for two-arm trials; in multi-arm trials, arm 1
+  is a matrix of active-arm rows and scenario columns (a vector for one
+  active arm), and arm 2 is a vector over scenarios for shared control.
+  In enrichment trials, both arms have population rows (subpopulations
+  followed by the full population) and scenario columns, or a vector for
+  one population. Discontinued arms and populations are retained;
+  overlapping populations include their shared subjects. There is no
+  stage dimension. NULL for test-statistic-based simulation.
+
 - `earlyStop`:
 
   The probability to stopping the trial either for efficacy or futility.
@@ -279,3 +341,75 @@ to create an object of this type.
 
   The assumed median survival time in the reference group. Is a single
   numeric value.
+
+- `analysisTime`:
+
+  The estimated time of analysis. Is a numeric matrix.
+
+- `effectMeasure`:
+
+  Criterion for treatment arm/population selection, either based on test
+  statistic (`"testStatistic"`) or effect estimate (`"effectEstimate"`).
+  Is a single character value.
+
+- `eventsNotAchieved`:
+
+  The simulated number of cases how often the number of events was not
+  reached. Is a numeric matrix.
+
+- `numberOfSubjects`:
+
+  In simulation results data set: The number of subjects under
+  consideration when the interim analysis takes place.
+
+- `piControl`:
+
+  The assumed probability in the control arm for simulation and under
+  which the sample size recalculation is performed. Is a single numeric
+  value between 0 and 1.
+
+- `piecewiseSurvivalTime`:
+
+  The time intervals for the piecewise definition of the exponential
+  survival time cumulative distribution function. Is a numeric vector.
+
+- `successCriterion`:
+
+  Defines when the study is stopped for efficacy at interim. `"all"`
+  stops the trial if the efficacy criterion has been fulfilled for all
+  selected treatment arms/populations, `"atLeastOne"` stops if at least
+  one of the selected treatment arms/populations is shown to be superior
+  to control at interim. Is a single character value.
+
+- `typeOfSelection`:
+
+  The way the treatment arms or populations are selected at interim. Is
+  a single character value.
+
+- `calcEventsFunction`:
+
+  An optional function that can be entered to define how event size is
+  recalculated. By default, recalculation is performed with conditional
+  power with specified `minNumberOfEventsPerStage` and
+  `maxNumberOfEventsPerStage`.
+
+- `thetaH1`:
+
+  The assumed effect under the alternative hypothesis. For survival
+  designs, refers to the hazard ratio. Is a numeric vector.
+
+- `maxStudyDuration`:
+
+  The maximum study duration in survival designs. Is a numeric vector.
+
+- `doseLevels`:
+
+  Dose levels supplied for the dose-response relationship, one per
+  active arm. Numeric vector, or NULL when a user-defined effect matrix
+  is used.
+
+- `numberOfActiveArms`:
+
+  Deprecated alias of numberOfSelectedArms. Numeric matrix with stage
+  rows and scenario columns, giving the mean number of selected active
+  arms at each analysis.

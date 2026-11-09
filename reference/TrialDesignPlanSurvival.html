@@ -45,7 +45,10 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This object cannot be created directly;
 use <code><a href="getSampleSizeSurvival.html">getSampleSizeSurvival()</a></code>
-with suitable arguments to create a design plan for a dataset of survival data.</p>
+or <code><a href="getPowerSurvival.html">getPowerSurvival()</a></code> with suitable arguments to create a survival design plan.
+Expected dropout proportions use the final planned analysis horizon for each
+alternative scenario, with no stage dimension. See the constructor help for
+the deterministic planned-accrual denominator and competing-event assumptions.</p>
     </div>
     <div class="section level2">
     <h2 id="fields">Fields<a class="anchor" aria-label="anchor" href="#fields"></a></h2>
@@ -161,6 +164,14 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 <dt><code>dropoutTime</code></dt>
 <dd><p>The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.</p></dd>
+
+
+<dt><code>expectedDropoutProportion1</code></dt>
+<dd><p>Expected observed dropout proportion in arm 1 at the final planned analysis time, allowing for competing events and deterministic planned accrual. One probability per alternative scenario without a stage dimension; NA when the final horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by the horizon, with fractional planning counts retained. Is a numeric vector.</p></dd>
+
+
+<dt><code>expectedDropoutProportion2</code></dt>
+<dd><p>Expected observed dropout proportion in arm 2 at the final planned analysis time, allowing for competing events and deterministic planned accrual. One probability per alternative scenario without a stage dimension; NA when the final horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by the horizon, with fractional planning counts retained. Is a numeric vector.</p></dd>
 
 
 <dt><code>chi</code></dt>

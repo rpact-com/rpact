@@ -4,6 +4,17 @@ Returns the analysis times, power, stopping probabilities, conditional
 power, and expected sample size for testing the hazard ratio in a two
 treatment groups survival design.
 
+A finishing horizon is the last analysis at which the arm or population
+contributes. Discontinued arms and populations finish at their
+discontinuation analysis; continuing groups and shared control finish at
+their last applicable analysis. Overlapping enrichment populations
+retain their shared subjects. Multi-arm treatment summaries have
+active-arm rows and scenario columns, while shared control is a vector
+over scenarios. Enrichment summaries have population rows
+(subpopulations followed by the full population) and scenario columns. A
+single arm or population is stored as a vector; there is no stage
+dimension. The two-arm outputs are vectors over alternative scenarios.
+
 ## Usage
 
 ``` r
@@ -371,6 +382,16 @@ function might depend on variables `stage`, `conditionalPower`,
 `minNumberOfEventsPerStage`, `maxNumberOfEventsPerStage`,
 `allocationRatioPlanned`, `conditionalCriticalValue`, The function has
 to contain the three-dots argument '...' (see examples).
+
+These outputs require patient histories and are unavailable for
+`simulationType = "testStatisticBased"`. Existing recruitment and
+allocation mechanisms are retained. The input dropout probability at
+`dropoutTime` describes the dropout distribution without competing
+events; it is not the simulated observed proportion. Analytic expected
+proportions condition on deterministic planned accrual at a fixed final
+planned horizon, whereas simulation includes random analysis times,
+early stopping and selection. Compare them only with matching horizon,
+enrollment and allocation assumptions.
 
 ## Piecewise survival time
 

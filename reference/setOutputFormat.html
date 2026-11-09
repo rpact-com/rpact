@@ -122,6 +122,10 @@ should be saved persistently. Default is <code>TRUE</code>.</p></dd>
     <p>Output formats can be written to a text file (see <code><a href="getOutputFormat.html">getOutputFormat()</a></code>).
 To load your personal output formats read a formerly saved file at the beginning of your
 work with <code>rpact</code>, e.g. execute <code>setOutputFormat(file = "my_rpact_output_formats.txt")</code>.</p>
+<p>Drop-out observation times use a separate output format with the same default
+precision as study duration. For example, use
+<code>setOutputFormat("dropoutObservationTime1", digits = 4, nsmall = 4)</code>
+to change it for both arms without changing other time formats.</p>
 <p>Note that the <code>parameterName</code> must not match exactly, e.g., for p-values the
 following parameter names will be recognized amongst others:</p><ol><li><p><code>p value</code></p></li>
 <li><p><code>p.values</code></p></li>

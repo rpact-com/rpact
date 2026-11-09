@@ -6,8 +6,13 @@ Trial design plan for survival data.
 
 This object cannot be created directly; use
 [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
-with suitable arguments to create a design plan for a dataset of
-survival data.
+or
+[`getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.md)
+with suitable arguments to create a survival design plan. Expected
+dropout proportions use the final planned analysis horizon for each
+alternative scenario, with no stage dimension. See the constructor help
+for the deterministic planned-accrual denominator and competing-event
+assumptions.
 
 ## Fields
 
@@ -148,6 +153,24 @@ survival data.
 
   The assumed time for drop-out rates in the control and treatment
   group. Is a single numeric value.
+
+- `expectedDropoutProportion1`:
+
+  Expected observed dropout proportion in arm 1 at the final planned
+  analysis time, allowing for competing events and deterministic planned
+  accrual. One probability per alternative scenario without a stage
+  dimension; NA when the final horizon is unavailable or no subjects
+  have accrued. The denominator includes only enrollment by the horizon,
+  with fractional planning counts retained. Is a numeric vector.
+
+- `expectedDropoutProportion2`:
+
+  Expected observed dropout proportion in arm 2 at the final planned
+  analysis time, allowing for competing events and deterministic planned
+  accrual. One probability per alternative scenario without a stage
+  dimension; NA when the final horizon is unavailable or no subjects
+  have accrued. The denominator includes only enrollment by the horizon,
+  with fractional planning counts retained. Is a numeric vector.
 
 - `chi`:
 

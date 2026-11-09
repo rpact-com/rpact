@@ -3,6 +3,19 @@
 Returns the power, stopping probabilities, and expected sample size for
 testing the hazard ratio in a two treatment groups survival design.
 
+Planning conditions on deterministic piecewise constant accrual and
+planned allocation, retaining fractional accrued counts without
+rounding. Within each accrual interval the individual competing-risk
+dropout incidence is averaged over enrollment dates and weighted by
+planned enrollment by the horizon. The denominator includes only
+subjects accrued by that time. The horizon is the final planned
+analysis, not an average over early stopping. An unavailable final
+horizon (including calculations without observation times) or no accrued
+subjects gives NA; otherwise zero dropout gives zero. Exponential and
+piecewise exponential event times are supported. The existing
+restriction against Weibull event times with nonzero dropout remains in
+place.
+
 ## Usage
 
 ``` r
@@ -272,6 +285,11 @@ The formula of Kim & Tsiatis (Biometrics, 1990) is used to calculate the
 expected number of events under the alternative (see also Lakatos & Lan,
 Statistics in Medicine, 1992). These formulas are generalized to
 piecewise survival times and non-constant piecewise accrual over time.  
+
+Accrual averages use one-dimensional numerical integration, split at
+event-hazard boundaries, with relative tolerance `1e-9` and absolute
+tolerance `1e-11`. Existing event-count and analysis-time calculations
+are unchanged.
 
 ## Piecewise survival time
 

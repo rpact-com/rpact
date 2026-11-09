@@ -23,7 +23,19 @@
   simulation enables scenarios based on individual patient accrual,
   event, censoring, dropout, and maximum-subject constraints while
   preserving the previous test-statistic-based workflow for existing use
-  cases.
+  cases. Survival planning reports derived `expectedDropoutProportion1`
+  and `expectedDropoutProportion2` at each scenario’s final planned
+  analysis time, accounting for competing events and deterministic
+  planned accrual. Patient-wise two-arm, multi-arm, and enrichment
+  survival simulations report `observedDropoutProportion1` and
+  `observedDropoutProportion2`, averaged from replication-specific
+  proportions at each arm or population’s finishing analysis, including
+  discontinued groups. The accompanying `dropoutObservationTime1` and
+  `dropoutObservationTime2` are mean finishing horizons over the same
+  eligible replications. These outputs differ from the input dropout
+  probabilities, have no stage dimension, and are unavailable for
+  test-statistic-based simulations. Existing event, power, sample-size
+  and analysis-time calculations are unchanged.
 - The new functions
   [`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeMultiArm.md)
   and
@@ -138,10 +150,6 @@
 
 ### Improvements, issues, and changes
 
-- Markdown comparison tables now keep each coordinate label, such as
-  “Stage 1” or “Situation 1”, together using Unicode non-breaking
-  spaces. Ordinary spaces between dimensions permit flexible line
-  wrapping without semicolons or HTML line-break tags.
 - Parameter listings now align their colon column using applicable
   parameter captions without a fixed four-character padding allowance.
   Technical summaries account separately for parameter type prefixes.

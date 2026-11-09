@@ -87,7 +87,7 @@ piecewiseTime <- getPiecewiseSurvivalTimeMultiArm(
 piecewiseTime
 #> Piecewise exponential multi-arm survival time
 #> 
-#> Control hazards (common to all treatment arms):
+#> Control hazards (common to all comparisons):
 #>         Group
 #> Interval Control
 #>   0 - <6 0.080  
@@ -124,7 +124,7 @@ getPiecewiseSurvivalTimeMultiArm(
 )
 #> Piecewise exponential multi-arm survival time
 #> 
-#> Control hazards (common to all treatment arms):
+#> Control hazards (common to all comparisons):
 #>         Group
 #> Interval Control
 #>   0 - <6 0.0578 
