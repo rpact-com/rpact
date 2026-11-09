@@ -4604,14 +4604,15 @@ NULL
         availablePlotTypes <- c(availablePlotTypes, "all")
     }
     
-    if (!(type %in% availablePlotTypes)) {
+    if (!all(type %in% availablePlotTypes)) {
+        typeNotAvailable <- type[!type %in% availablePlotTypes]
         stopIllegalArgument(
-            "'type' (", type, ") is not available; ",
+            "'type' (", .arrayToString(typeNotAvailable), ") is not available; ",
             ifelse(length(availablePlotTypes) == 1, "available is only", "available values are"), " ",
             .arrayToString(availablePlotTypes, mode = "or", compactEnabled = TRUE),
             functionName = functionName,
             parameter = "type",
-            value = type,
+            value = typeNotAvailable,
             relatedParameter = "availablePlotTypes",
             relatedValue = getAvailablePlotTypes(x, output = "numcap")
         )
