@@ -1,4 +1,18 @@
-# Internal dropout summaries shared by the patient-wise survival engines.
+## |
+## |  *Internal dropout summaries shared by the patient-wise survival engines*
+## |
+## |  This file is part of the R package rpact:
+## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |
+## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  Licensed under "GNU Lesser General Public License" version 3
+## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |
+## |  RPACT company website: https://www.rpact.com
+## |  rpact package website: https://www.rpact.org
+## |
+## |  Contact us for information about our services: info@rpact.com
+## |
 
 .captureDropoutCounts <- function(data, time, member) {
     enrolled <- member & data$accrualTime <= time
@@ -7,7 +21,13 @@
     return(c(sum(enrolled), sum(dropped)))
 }
 
-.finishDropoutRecords <- function(stageResults, closedTest, scenario, iteration, groups, arms,
+.finishDropoutRecords <- function(
+        stageResults,
+        closedTest,
+        scenario,
+        iteration,
+        groups,
+        arms,
         sharedControl = FALSE) {
     selected <- closedTest$selectedArms
     if (is.null(selected)) {
@@ -31,8 +51,10 @@
             row <- (g - 1L) * arms + a
             result[row, 1:4] <- c(scenario, iteration, g, a)
             if (!is.na(last)) {
-                result[row, 5:7] <- c(stageResults$analysisTime[last],
-                    stageResults$dropoutEnrolled[row, last], stageResults$dropoutDropped[row, last])
+                result[row, 5:7] <- c(
+                    stageResults$analysisTime[last],
+                    stageResults$dropoutEnrolled[row, last], stageResults$dropoutDropped[row, last]
+                )
             }
         }
     }
@@ -93,9 +115,11 @@
         .addMultiArmDropoutSummaryItems(result, summaryFactory)
         return(invisible(NULL))
     }
-    fields <- c("expectedDropoutProportion1", "expectedDropoutProportion2",
+    fields <- c(
+        "expectedDropoutProportion1", "expectedDropoutProportion2",
         "observedDropoutProportion1", "observedDropoutProportion2",
-        "dropoutObservationTime1", "dropoutObservationTime2")
+        "dropoutObservationTime1", "dropoutObservationTime2"
+    )
     for (field in fields) {
         values <- result[[field]]
         if (is.null(values) || result$isNotApplicableParameter(field)) {
@@ -125,8 +149,10 @@
 }
 
 .addMultiArmDropoutSummaryItems <- function(result, summaryFactory) {
-    fields <- c("observedDropoutProportion1", "observedDropoutProportion2",
-        "dropoutObservationTime1", "dropoutObservationTime2")
+    fields <- c(
+        "observedDropoutProportion1", "observedDropoutProportion2",
+        "dropoutObservationTime1", "dropoutObservationTime2"
+    )
     values <- lapply(fields, function(field) {
         value <- result[[field]]
         if (is.null(value) || result$isNotApplicableParameter(field)) {
