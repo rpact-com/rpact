@@ -1,5 +1,5 @@
 ## |
-## |  *Time classes piecewise exponential survival multi-group simulations*
+## |  *Time classes for piecewise exponential survival multi-group simulations*
 ## |
 ## |  This file is part of the R package rpact:
 ## |  Confirmatory Adaptive Clinical Trial Design and Analysis
@@ -181,7 +181,7 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
 
             controls <- self$lambdaControls
             if (self$groupType == "multi-arm") {
-                self$.cat("Control hazards (common to all treatment arms):\n",
+                self$.cat("Control hazards (common to all comparisons):\n",
                     heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                 controls <- controls[1, , drop = FALSE]
                 rownames(controls) <- "Control"

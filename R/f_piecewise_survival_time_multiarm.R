@@ -77,10 +77,15 @@ NULL
 #'
 #' @export
 #'
-getPiecewiseSurvivalTimeMultiArm <- function(piecewiseSurvivalTime = NULL,
-        lambdaControl = NULL, hazardRatios = NULL, medianControl = NULL, medianTreatments = NULL) {
+getPiecewiseSurvivalTimeMultiArm <- function(
+        piecewiseSurvivalTime = NULL,
+        lambdaControl = NULL,
+        hazardRatios = NULL, # TODO rename to hazardRatio
+        medianControl = NULL,
+        medianTreatments = NULL) {
     return(PiecewiseSurvivalTimeMultiArm$new(piecewiseSurvivalTime, lambdaControl, hazardRatios,
-        medianControl = medianControl, medianTreatments = medianTreatments))
+        medianControl = medianControl, medianTreatments = medianTreatments
+    ))
 }
 
 #'
@@ -129,13 +134,19 @@ getPiecewiseSurvivalTimeMultiArm <- function(piecewiseSurvivalTime = NULL,
 #' @examples
 #' piecewiseTime <- getPiecewiseSurvivalTimeEnrichment(
 #'     piecewiseSurvivalTime = c(0, 6),
-#'     lambdaControls = rbind(markerPositive = c(0.08, 0.12),
-#'         markerNegative = c(0.05, 0.09)),
+#'     lambdaControls = rbind(
+#'         markerPositive = c(0.08, 0.12),
+#'         markerNegative = c(0.05, 0.09)
+#'     ),
 #'     hazardRatios = list(
-#'         favorable = rbind(markerPositive = c(0.65, 0.55),
-#'             markerNegative = c(0.9, 0.8)),
-#'         conservative = rbind(markerPositive = c(0.8, 0.7),
-#'             markerNegative = c(1, 0.9))
+#'         favorable = rbind(
+#'             markerPositive = c(0.65, 0.55),
+#'             markerNegative = c(0.9, 0.8)
+#'         ),
+#'         conservative = rbind(
+#'             markerPositive = c(0.8, 0.7),
+#'             markerNegative = c(1, 0.9)
+#'         )
 #'     )
 #' )
 #' as.data.frame(piecewiseTime)
@@ -148,8 +159,13 @@ getPiecewiseSurvivalTimeMultiArm <- function(piecewiseSurvivalTime = NULL,
 #'
 #' @export
 #'
-getPiecewiseSurvivalTimeEnrichment <- function(piecewiseSurvivalTime = NULL,
-        lambdaControls = NULL, hazardRatios = NULL, medianControls = NULL, medianTreatments = NULL) {
+getPiecewiseSurvivalTimeEnrichment <- function(
+        piecewiseSurvivalTime = NULL,
+        lambdaControls = NULL,
+        hazardRatios = NULL,
+        medianControls = NULL,
+        medianTreatments = NULL) {
     return(PiecewiseSurvivalTimeEnrichment$new(piecewiseSurvivalTime, lambdaControls, hazardRatios,
-        medianControls = medianControls, medianTreatments = medianTreatments))
+        medianControls = medianControls, medianTreatments = medianTreatments
+    ))
 }

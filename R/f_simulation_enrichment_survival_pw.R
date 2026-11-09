@@ -96,6 +96,8 @@ NULL
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
 #' @template details_type_of_selection
+#' @template details_observed_survival_dropout
+#'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'
@@ -439,6 +441,8 @@ NULL
         enrichment = TRUE
     )
     
+    .addObservedDropoutProportions(simulationResults, loopResult$dropoutRecords, cols, gMax)
+
     return(simulationResults)
 }
 
@@ -512,6 +516,11 @@ NULL
 #' the planned increase in events among the selected subgroups. Events already
 #' observed in those subgroups at the preceding analysis count toward the target.
 #'
+#' Printed drop-out observation times are reported once per population because
+#' both treatment arms share the population's finishing analysis. The summary
+#' groups both arm-specific proportions and one observation time under each
+#' population. The arm-specific result fields remain available for extraction.
+#'
 #' For piecewise exponential event times, include a
 #' \code{PiecewiseSurvivalTimeEnrichment} object in
 #' \code{effectList$piecewiseSurvivalTime}. Its hazard ratios are represented
@@ -543,6 +552,8 @@ NULL
 #'
 #' @template details_type_of_selection
 #' @template details_survival_conditional_power
+#'
+#' @template details_observed_survival_dropout
 #'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics

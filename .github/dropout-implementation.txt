@@ -1,0 +1,72 @@
+Survival dropout implementation contract (step 2)
+
+\subsection{Observed dropout proportions for survival trials}
+\label{fs:survival:dropoutProportions}
+Enrollment, event time, and exponential dropout time are independent within each
+arm. The input dropout probability $d_g$ at time $t_D$ specifies the hazard
+$\phi_g=-\log(1-d_g)/t_D$; it is not an observed dropout proportion.
+For follow-up $u\geq0$, the observed dropout incidence is
+\[
+ F_{D,g}(u)=\int_0^u\phi_g\exp(-\phi_g x)S_g(x)\,dx.
+\]
+Events compete with dropout. Exponential and piecewise exponential event hazards
+are supported; the Weibull/nonzero-dropout extension is deferred.
+
+Analytic planning conditions on deterministic piecewise constant accrual and
+planned allocation. Fractional planned counts are retained without rounding.
+For interval $[a_j,a_{j+1}]$ and arm-specific intensity $r_{g,j}$, let
+$c_j(t)=\min(t,a_{j+1})$ and
+$n_{g,j}(t)=r_{g,j}\max(0,c_j(t)-a_j)$. For $n_g(t)=\sum_j n_{g,j}(t)>0$,
+\[
+ q_g(t)=\sum_{j:n_{g,j}(t)>0}\frac{n_{g,j}(t)}{n_g(t)}
+ \frac{\int_{a_j}^{c_j(t)}F_{D,g}(t-a)\,da}{c_j(t)-a_j}.
+\]
+The denominator includes only subjects accrued by the horizon. Constant planned
+allocation scales numerator and denominator equally within an arm.
+\texttt{getSampleSizeSurvival()} and \texttt{getPowerSurvival()} report
+\texttt{expectedDropoutProportion1} and \texttt{expectedDropoutProportion2}
+as derived probabilities, one per alternative scenario without a stage dimension,
+at that scenario's final planned analysis time. No early-stopping weighting is
+used. An unavailable final horizon or zero accrued arm count gives NA; otherwise
+zero dropout gives zero.
+
+Patient-wise two-arm, multi-arm, and enrichment survival simulation retains the
+existing recruitment and allocation mechanisms. In replication $r$, each arm or
+population finishes at its last contributing analysis $T_{r,g}$, including the
+analysis of discontinuation. Shared control uses its last applicable analysis;
+overlapping enrichment populations retain their membership. Count dropout only
+before the event and by $T_{r,g}$, with denominator $N_{r,g}(T_{r,g})$ enrolled
+subjects. Average $D_{r,g}/N_{r,g}$ over replications with a usable horizon and
+positive denominator, rather than pooling counts. Report the corresponding mean
+horizon over exactly these replications. The field stems are
+\texttt{observedDropoutProportion} and \texttt{dropoutObservationTime}; labels are
+``Observed dropout proportion'' and ``Dropout observation time''. Retain contributor
+counts internally. Both summaries are NA if no replication contributes.
+These outputs are unavailable for test-statistic-based simulation. Comparisons
+with analytic results require matching horizon, enrollment and allocation assumptions.
+
+Verification acceptance criteria
+
+\subsubsection{Survival dropout proportion verification}
+\label{tp:survival:dropoutProportions}
+Requirements: FS Sec.~\ref{fs:survival:dropoutProportions}.
+Analytic checks cover zero dropout, exponential closed forms, unequal allocation
+and arm-specific dropout, fractional counts during accrual, zero enrollment,
+piecewise accrual and event hazards at and around boundaries. Compare with
+independent quadrature (absolute error below $10^{-8}$) and a competing-risk
+simulation on a fixed discrete enrollment schedule (within five Monte Carlo
+standard errors); assess continuous/discrete enrollment approximation separately.
+For both APIs verify final-stage horizon selection, fixed and sequential designs,
+multiple scenarios, missing final horizons, derived classification and labels
+without stage indices. Existing event counts, sample sizes, power and times must
+remain unchanged.
+
+Simulation checks cover all three patient-wise APIs, unequal and zero dropout,
+empty denominators and no eligible replications, multiple arms/scenarios,
+overlapping enrichment populations, early stopping and selection. Reconstruct
+counts at each arm/population's finishing horizon, including discontinued groups
+and shared control. Check contributor counts, averaging replication-specific
+proportions rather than pooled counts, and mean horizons over identical eligible
+replications. Test-statistic simulation must not report these summaries.
+Analytic comparisons require matching fixed horizons, enrollment and allocation,
+with Monte Carlo uncertainty separated from accrual approximation.

@@ -708,6 +708,8 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
 #' @template field_dropoutRate1
 #' @template field_dropoutRate2
 #' @template field_dropoutTime
+#' @template field_expectedDropoutProportion1
+#' @template field_expectedDropoutProportion2
 #' @template field_chi
 #' @template field_expectedNumberOfEvents
 #' @template field_eventsFixed
@@ -746,7 +748,10 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
 #' @details
 #' This object cannot be created directly;
 #' use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
-#' with suitable arguments to create a design plan for a dataset of survival data.
+#' or [getPowerSurvival()] with suitable arguments to create a survival design plan.
+#' Expected dropout proportions use the final planned analysis horizon for each
+#' alternative scenario, with no stage dimension. See the constructor help for
+#' the deterministic planned-accrual denominator and competing-event assumptions.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
@@ -795,6 +800,8 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
         dropoutRate1 = NULL,
         dropoutRate2 = NULL,
         dropoutTime = NULL,
+        expectedDropoutProportion1 = NULL,
+        expectedDropoutProportion2 = NULL,
         chi = NULL,
         expectedNumberOfEvents = NULL,
         eventsFixed = NULL,
