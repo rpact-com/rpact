@@ -15,7 +15,7 @@ getPiecewiseSurvivalTimeEnrichment(
 \arguments{
 \item{piecewiseSurvivalTime}{Numeric interval start times beginning with 0.}
 
-\item{lambdaControls}{Positive subset-by-interval control-hazard matrix.
+\item{lambdaControls}{Non-negative, finite subset-by-interval control-hazard matrix.
 If both control hazards and hazard ratios have row names, their names and
 order must agree.
 Specify either \code{lambdaControls} or \code{medianControls}.}
@@ -41,8 +41,9 @@ patient-wise population-enrichment simulation.
 }
 \details{
 At least two finite, strictly increasing interval starts are required. The last
-interval is open-ended. Hazards must be finite and strictly positive. Group and
-situation names must be unique and non-empty. Unnamed groups are positional;
+interval is open-ended. Hazards must be finite and non-negative; zero denotes
+an interval without events. Hazard ratios must be finite and strictly positive.
+Group and situation names must be unique and non-empty. Unnamed groups are positional;
 named groups must agree in order. Interval columns are positional and receive
 labels derived from the interval starts. Only piecewise exponential event times
 are supported; simulation requires \code{kappa = 1}.

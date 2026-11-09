@@ -912,15 +912,23 @@ qpwexp <- function(q, ..., s = NA_real_, lambda = NA_real_, kappa = 1) {
 }
 
 .getPiecewiseExponentialRandomNumbersFast <- function(n, piecewiseSurvivalTime, piecewiseLambda) {
-    result <- rexp(n, rate = piecewiseLambda[1])
+    result <- if (piecewiseLambda[1] == 0) {
+        rep(Inf, n)
+    } else {
+        rexp(n, rate = piecewiseLambda[1])
+    }
     if (length(piecewiseSurvivalTime) > 1) {
         for (i in 2:length(piecewiseSurvivalTime)) {
             result <- ifelse(result < piecewiseSurvivalTime[i],
-                result, piecewiseSurvivalTime[i] + rexp(n, rate = piecewiseLambda[i])
+                result, piecewiseSurvivalTime[i] + if (piecewiseLambda[i] == 0) {
+                    rep(Inf, n)
+                } else {
+                    rexp(n, rate = piecewiseLambda[i])
+                }
             )
         }
     }
-    result
+    return(result)
 }
 
 #' @rdname utilitiesForPiecewiseExponentialDistribution

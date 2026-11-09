@@ -15,7 +15,7 @@ getPiecewiseSurvivalTimeMultiArm(
 \arguments{
 \item{piecewiseSurvivalTime}{Numeric interval start times beginning with 0.}
 
-\item{lambdaControl}{Positive control hazards, one per interval.
+\item{lambdaControl}{Non-negative, finite control hazards, one per interval.
 Specify either \code{lambdaControl} or \code{medianControl}.}
 
 \item{hazardRatios}{One active-arm-by-interval matrix, a named list of such
@@ -38,8 +38,9 @@ patient-wise multi-arm simulation.
 }
 \details{
 At least two finite, strictly increasing interval starts are required. The last
-interval is open-ended. Hazards must be finite and strictly positive. Group and
-situation names must be unique and non-empty. Unnamed groups are positional;
+interval is open-ended. Hazards must be finite and non-negative; zero denotes
+an interval without events. Hazard ratios must be finite and strictly positive.
+Group and situation names must be unique and non-empty. Unnamed groups are positional;
 named groups must agree in order. Interval columns are positional and receive
 labels derived from the interval starts. Only piecewise exponential event times
 are supported; simulation requires \code{kappa = 1}.
