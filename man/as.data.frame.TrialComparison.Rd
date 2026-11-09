@@ -11,7 +11,8 @@
   ...,
   niceColumnNamesEnabled = FALSE,
   includeAllParameters = FALSE,
-  removeConstantParameters = FALSE
+  removeConstantParameters = FALSE,
+  transposed = FALSE
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ the existing data-frame methods of the individual objects.}
 
 \item{removeConstantParameters}{If \code{TRUE}, retain identifiers and only parameters
 with different object profiles, using the same rules as \code{summary()}.}
+
+\item{transposed}{If \code{TRUE}, return parameters as rows and comparison situations
+as columns. Mixed column types are converted to a common type by transposition.}
 }
 \value{
 An unrounded data.frame. All columns are returned by default.

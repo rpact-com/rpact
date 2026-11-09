@@ -5,7 +5,7 @@
 \alias{plot.TrialComparisonSummary}
 \title{Plot a Trial Comparison}
 \usage{
-\method{plot}{TrialComparison}(x, xParamName = NULL, yParamName = NULL, ...)
+\method{plot}{TrialComparison}(x, xParamName = NULL, yParamName = NULL, ..., data = NULL)
 
 \method{plot}{TrialComparisonSummary}(x, xParamName = NULL, yParamName = NULL, ..., showSummary = FALSE)
 }
@@ -21,6 +21,9 @@ can be controlled through \code{yAxisSide} passed to \code{\link[=plot.TrialComp
 
 \item{...}{Arguments passed to \code{\link[=plot.TrialComparison]{plot.TrialComparison()}}, including categories,
 grouping, titles and line/point settings. Explicit axis selections prevail.}
+
+\item{data}{Optional comparison data frame with additional annotation columns.
+Rows must follow the order of \code{as.data.frame(x)}.}
 
 \item{showSummary}{If TRUE, also print the summary before creating its plot.}
 }

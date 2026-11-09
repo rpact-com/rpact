@@ -100,7 +100,10 @@ empty$add(getDesignFixed())
 combined$delete(1)
 combined$delete("sequential")
 \dontrun{
-plot(comparison, xParamName = "objectNumber", yParamName = "criticalValues", plotLineEnabled = FALSE)
+plot(comparison, 
+    xParamName = "objectNumber", 
+    yParamName = "criticalValues", 
+    plotLineEnabled = FALSE)
 }
 
 }
