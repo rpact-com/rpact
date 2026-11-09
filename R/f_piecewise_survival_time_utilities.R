@@ -21,7 +21,7 @@
 #' @include f_error_handling.R
 NULL
 
-.assertPiecewiseNumeric <- function(value, parameter, functionName, dimension = NULL) {
+.assertPiecewiseNumeric <- function(value, parameter, functionName, dimension = NULL, allowZero = FALSE) {
     if (is.null(value) || length(value) == 0) {
         stopMissingArgument("'", parameter, "' must contain numeric values",
             functionName = functionName, parameter = parameter, value = value,
@@ -42,7 +42,15 @@ NULL
             context = list(expectedDimensions = dimension, actualDimensions = dim(value))
         )
     }
-    if (any(!is.finite(value)) || any(value <= 0)) {
+    if (allowZero) {
+        if (any(!is.finite(value)) || any(value < 0)) {
+            stopArgumentOutOfRange("all ", parameter, " must be finite and greater than or equal to 0",
+                functionName = functionName, parameter = parameter, value = value,
+                constraint = "finite values in [0, Inf)", lowerBound = 0,
+                diagnosticId = "survival.piecewise_nonnegative_hazards"
+            )
+        }
+    } else if (any(!is.finite(value)) || any(value <= 0)) {
         stopArgumentOutOfRange("all ", parameter, " must be finite and greater than 0",
             functionName = functionName, parameter = parameter, value = value,
             constraint = "finite values in (0, Inf)", lowerBound = 0,
@@ -166,6 +174,7 @@ NULL
     if (is.null(medians)) {
         return(hazards)
     }
+    
     converted <- .getPiecewiseMedianHazards(medians, medianParameter, functionName, dimension)
     actualLength <- if (is.null(dimension)) {
         length(medians)
@@ -317,7 +326,7 @@ NULL
             context = list(allowedValues = c("multi-arm", "enrichment"))
         )
     }
-    .assertPiecewiseNumeric(lambdaControls, "lambdaControls", functionName, dimension = 2)
+    .assertPiecewiseNumeric(lambdaControls, "lambdaControls", functionName, dimension = 2, allowZero = TRUE)
     .assertPiecewiseNames(rownames(lambdaControls), nrow(lambdaControls), "groupNames", functionName)
     .assertPiecewiseNames(colnames(lambdaControls), ncol(lambdaControls), "intervalNames", functionName)
     ratios <- .normalizePiecewiseHazardRatios(hazardRatios,
@@ -356,7 +365,7 @@ NULL
     dimnames(ratios)[[2]] <- intervalNames
     storage.mode(lambdaControls) <- "double"
     activeHazards <- sweep(ratios, c(1, 2), lambdaControls, `*`)
-    .assertPiecewiseNumeric(activeHazards, "activeHazards", functionName, dimension = 3)
+    .assertPiecewiseNumeric(activeHazards, "activeHazards", functionName, dimension = 3, allowZero = TRUE)
     return(list(
         piecewiseSurvivalTime = times, lambdaControls = lambdaControls,
         hazardRatios = ratios, groupType = groupType

@@ -29,7 +29,7 @@ NULL
 #' patient-wise multi-arm simulation.
 #'
 #' @param piecewiseSurvivalTime Numeric interval start times beginning with 0.
-#' @param lambdaControl Positive control hazards, one per interval.
+#' @param lambdaControl Non-negative, finite control hazards, one per interval.
 #'   Specify either `lambdaControl` or `medianControl`.
 #' @param hazardRatios One active-arm-by-interval matrix, a named list of such
 #'   matrices (one per situation), or an active-arm-by-interval-by-situation
@@ -44,8 +44,9 @@ NULL
 #'
 #' @details
 #' At least two finite, strictly increasing interval starts are required. The last
-#' interval is open-ended. Hazards must be finite and strictly positive. Group and
-#' situation names must be unique and non-empty. Unnamed groups are positional;
+#' interval is open-ended. Hazards must be finite and non-negative; zero denotes
+#' an interval without events. Hazard ratios must be finite and strictly positive.
+#' Group and situation names must be unique and non-empty. Unnamed groups are positional;
 #' named groups must agree in order. Interval columns are positional and receive
 #' labels derived from the interval starts. Only piecewise exponential event times
 #' are supported; simulation requires `kappa = 1`.
@@ -100,7 +101,7 @@ getPiecewiseSurvivalTimeMultiArm <- function(
 #' patient-wise population-enrichment simulation.
 #'
 #' @param piecewiseSurvivalTime Numeric interval start times beginning with 0.
-#' @param lambdaControls Positive subset-by-interval control-hazard matrix.
+#' @param lambdaControls Non-negative, finite subset-by-interval control-hazard matrix.
 #'   If both control hazards and hazard ratios have row names, their names and
 #'   order must agree.
 #'   Specify either `lambdaControls` or `medianControls`.
@@ -118,8 +119,9 @@ getPiecewiseSurvivalTimeMultiArm <- function(
 #'
 #' @details
 #' At least two finite, strictly increasing interval starts are required. The last
-#' interval is open-ended. Hazards must be finite and strictly positive. Group and
-#' situation names must be unique and non-empty. Unnamed groups are positional;
+#' interval is open-ended. Hazards must be finite and non-negative; zero denotes
+#' an interval without events. Hazard ratios must be finite and strictly positive.
+#' Group and situation names must be unique and non-empty. Unnamed groups are positional;
 #' named groups must agree in order. Interval columns are positional and receive
 #' labels derived from the interval starts. Only piecewise exponential event times
 #' are supported; simulation requires `kappa = 1`.

@@ -106,7 +106,10 @@ NULL
 #' combined$delete(1)
 #' combined$delete("sequential")
 #' \dontrun{
-#' plot(comparison, xParamName = "objectNumber", yParamName = "criticalValues", plotLineEnabled = FALSE)
+#' plot(comparison, 
+#'     xParamName = "objectNumber", 
+#'     yParamName = "criticalValues", 
+#'     plotLineEnabled = FALSE)
 #' }
 #'
 #' @export
@@ -678,17 +681,22 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #'   the existing data-frame methods of the individual objects.
 #' @param removeConstantParameters If `TRUE`, retain identifiers and only parameters
 #'   with different object profiles, using the same rules as `summary()`.
+#' @param transposed If `TRUE`, return parameters as rows and comparison situations
+#'   as columns. Mixed column types are converted to a common type by transposition.
 #'
 #' @return An unrounded data.frame. All columns are returned by default.
 #'
 #' @export
 #'
 as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE, ...,
-        niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, removeConstantParameters = FALSE) {
+        niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE,
+        removeConstantParameters = FALSE, transposed = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame.TrialComparison", ...)
     .assertIsSingleLogical(removeConstantParameters, "removeConstantParameters")
     .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
+    .assertIsSingleLogical(transposed, "transposed")
     data <- .getTrialComparisonData(x$getObjects(), includeAllParameters = includeAllParameters)
+    objectNumbers <- data$objectNumber
     allNames <- names(data)
     if (removeConstantParameters) {
         info <- .getTrialComparisonInfo(x, data)
@@ -701,10 +709,24 @@ as.data.frame.TrialComparison <- function(x, row.names = NULL, optional = FALSE,
             includeAllParameters = includeAllParameters))
         names(data) <- labels[match(names(data), allNames)]
     }
+    if (transposed) {
+        situationNames <- vapply(seq_along(objectNumbers), function(i) {
+            number <- objectNumbers[i]
+            suffix <- ""
+            if (sum(objectNumbers == number) > 1L) {
+                suffix <- paste0(".", sum(objectNumbers[seq_len(i)] == number))
+            }
+            return(paste0("Situation ", number, suffix))
+        }, character(1))
+        values <- as.data.frame(t(as.matrix(data)), stringsAsFactors = FALSE)
+        names(values) <- situationNames
+        data <- cbind(data.frame(Parameter = names(data), stringsAsFactors = FALSE), values)
+        rownames(data) <- NULL
+    }
     if (!is.null(row.names)) {
         rownames(data) <- row.names
     }
-    data
+    return(data)
 }
 
 .comparisonIdentifiers <- c("objectNumber", "objectName", "stages", "stage", "situation")
@@ -1395,13 +1417,27 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #'   can be controlled through `yAxisSide` passed to [plot.TrialComparison()].
 #' @param ... Arguments passed to [plot.TrialComparison()], including categories,
 #'   grouping, titles and line/point settings. Explicit axis selections prevail.
+#' @param data Optional comparison data frame with additional annotation columns.
+#'   Rows must follow the order of `as.data.frame(x)`.
 #'
 #' @return A ggplot object. Ambiguous selections raise an error listing candidate
 #'   descriptions and a concrete example.
 #'
 #' @export
 #'
-plot.TrialComparison <- function(x, xParamName = NULL, yParamName = NULL, ...) {
+plot.TrialComparison <- function(x, xParamName = NULL, yParamName = NULL, ..., data = NULL) {
+    if (!is.null(data)) {
+        expectedRows <- nrow(as.data.frame(x))
+        if (!is.data.frame(data) || nrow(data) != expectedRows) {
+            stopIllegalDataInput("'data' must be a data frame with one row per comparison situation",
+                functionName = "plot.TrialComparison", parameter = "data", value = data,
+                constraint = "a data frame with one row per comparison situation",
+                diagnosticId = "comparison.plot_data_rows_invalid",
+                context = list(expectedRows = expectedRows, actualRows = NROW(data)))
+        }
+        return(.plotComparison(data, xParamName = xParamName, yParamName = yParamName,
+            objects = x$getObjects(), ...))
+    }
     return(.plotComparison(x, xParamName = xParamName, yParamName = yParamName, ...))
 }
 

@@ -83,7 +83,10 @@ NULL
     on.exit(unlink(c(stdout, stderr)), add = TRUE)
     tryCatch(
         callr::r(function(scope, headingLevel) {
-            rpact:::.testInstalledBasicPackagesInProcess(scope = scope, headingLevel = headingLevel)
+            get(".testInstalledBasicPackagesInProcess",
+                envir = asNamespace("rpact"), inherits = FALSE)(
+                scope = scope, headingLevel = headingLevel
+            )
         }, args = list(scope = scope, headingLevel = headingLevel), libpath = .libPaths(),
         stdout = stdout, stderr = stderr, stdin = NULL, poll_connection = FALSE,
         user_profile = FALSE),
@@ -859,7 +862,8 @@ testPackage <- function(
     commands <- c(
         deparse(substitute(.libPaths(paths), list(paths = .libPaths())), width.cutoff = 500L),
         deparse(
-            substitute(rpact:::.runPackageUnitTests(
+            substitute(get(".runPackageUnitTests",
+                envir = asNamespace("rpact"), inherits = FALSE)(
                 files = testFiles, workers = count, reporterArguments = arguments, resultFile = path
             ), list(testFiles = files, count = workers, arguments = reporterArguments, path = resultFile)),
             width.cutoff = 500L
