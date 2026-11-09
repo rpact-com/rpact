@@ -529,11 +529,9 @@ getAvailablePlotTypes <- function(
             if (obj$.design$kMax > 1) {
                 types <- c(types, 5, 6)
             }
-            if (obj$.design$kMax > 1) {
-                paramName <- .getEndpointDependentEffectParameterName(obj)
-                if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
-                    types <- c(types, 7)
-                }
+            paramName <- .getEndpointDependentEffectParameterName(obj)
+            if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+                types <- c(types, 7)
             }
             if (obj$.design$kMax > 1) {
                 types <- c(types, 8)
