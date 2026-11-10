@@ -447,7 +447,7 @@ and its fields.
    ```r
    #' @template field_piecewiseSurvivalTime
    #' @template field_lambdaControl_piecewise
-   #' @template field_hazardRatios
+   #' @template field_hazardRatio
    ```
 
    Use `field_<field_name_unique>` as the template name. Do not add Markdown

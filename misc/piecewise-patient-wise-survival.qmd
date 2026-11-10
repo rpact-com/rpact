@@ -45,7 +45,8 @@ The resulting object is supplied through `piecewiseSurvivalTime`. It replaces th
 Control hazards may alternatively be specified by `medianControl` (one value per
 interval for multi-arm simulations) or `medianControls` (a subgroup-by-interval
 matrix for enrichment simulations). `medianTreatments` accepts the same matrix,
-list, or array shapes as `hazardRatios` and replaces that input. The two choices
+list, or array shapes as `hazardRatio`
+and replaces that input. The two choices
 are independent: control medians can be combined with hazard ratios, or treatment
 medians with explicit control hazards. Each pair of alternative inputs is
 mutually exclusive; inputs are not recycled across intervals, groups, or situations.

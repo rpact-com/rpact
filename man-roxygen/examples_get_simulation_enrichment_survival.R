@@ -52,7 +52,7 @@
 #' piecewiseTime <- getPiecewiseSurvivalTimeEnrichment(
 #'     piecewiseSurvivalTime = c(0, 6),
 #'     lambdaControls = rbind(S = c(0.08, 0.12), R = c(0.05, 0.09)),
-#'     hazardRatios = list(
+#'     hazardRatio = list(
 #'         favorable = rbind(S = c(0.65, 0.55), R = c(0.9, 0.8)),
 #'         conservative = rbind(S = c(0.8, 0.7), R = c(1, 0.9))
 #'     )

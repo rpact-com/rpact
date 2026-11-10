@@ -31,14 +31,14 @@ NULL
 #' @param piecewiseSurvivalTime Numeric interval start times beginning with 0.
 #' @param lambdaControl Non-negative, finite control hazards, one per interval.
 #'   Specify either `lambdaControl` or `medianControl`.
-#' @param hazardRatios One active-arm-by-interval matrix, a named list of such
+#' @param hazardRatio One active-arm-by-interval matrix, a named list of such
 #'   matrices (one per situation), or an active-arm-by-interval-by-situation
 #'   array. In the array, situation is the slowest-changing dimension.
-#'   Specify either `hazardRatios` or `medianTreatments`.
+#'   Specify either `hazardRatio` or `medianTreatments`.
 #' @param medianControl Positive, finite exponential control medians, one per
 #'   interval, as an alternative to `lambdaControl`. Values are not recycled.
 #' @param medianTreatments Positive, finite exponential treatment medians, in the
-#'   same matrix, list, or array format as `hazardRatios`, as an alternative to it.
+#'   same matrix, list, or array format as `hazardRatio`, as an alternative to it.
 #'
 #' @return A \code{PiecewiseSurvivalTimeMultiArm} object.
 #'
@@ -62,14 +62,14 @@ NULL
 #' is performed.
 #'
 #' @examples
-#' hazardRatios <- getPiecewiseHazardRatioArray(
+#' hazardRatio <- getPiecewiseHazardRatioArray(
 #'     favorable = rbind(lowDose = c(0.9, 0.8), highDose = c(0.8, 0.6)),
 #'     conservative = rbind(lowDose = c(1, 0.9), highDose = c(0.9, 0.75))
 #' )
 #' piecewiseTime <- getPiecewiseSurvivalTimeMultiArm(
 #'     piecewiseSurvivalTime = c(0, 6),
 #'     lambdaControl = c(0.08, 0.12),
-#'     hazardRatios = hazardRatios
+#'     hazardRatio = hazardRatio
 #' )
 #' piecewiseTime
 #'
@@ -84,10 +84,10 @@ NULL
 getPiecewiseSurvivalTimeMultiArm <- function(
         piecewiseSurvivalTime = NULL,
         lambdaControl = NULL,
-        hazardRatios = NULL, # TODO rename to hazardRatio
+        hazardRatio = NULL,
         medianControl = NULL,
         medianTreatments = NULL) {
-    return(PiecewiseSurvivalTimeMultiArm$new(piecewiseSurvivalTime, lambdaControl, hazardRatios,
+    return(PiecewiseSurvivalTimeMultiArm$new(piecewiseSurvivalTime, lambdaControl, hazardRatio,
         medianControl = medianControl, medianTreatments = medianTreatments
     ))
 }
@@ -105,15 +105,15 @@ getPiecewiseSurvivalTimeMultiArm <- function(
 #'   If both control hazards and hazard ratios have row names, their names and
 #'   order must agree.
 #'   Specify either `lambdaControls` or `medianControls`.
-#' @param hazardRatios One subset-by-interval matrix, a named list of such
+#' @param hazardRatio One subset-by-interval matrix, a named list of such
 #'   matrices (one per situation), or a subset-by-interval-by-situation array.
 #'   In the array, situation is the slowest-changing dimension.
-#'   Specify either `hazardRatios` or `medianTreatments`.
+#'   Specify either `hazardRatio` or `medianTreatments`.
 #' @param medianControls Positive, finite exponential control medians in a
 #'   subset-by-interval matrix, as an alternative to `lambdaControls`. Names and
 #'   dimensions follow the same rules as for `lambdaControls`.
 #' @param medianTreatments Positive, finite exponential treatment medians, in the
-#'   same matrix, list, or array format as `hazardRatios`, as an alternative to it.
+#'   same matrix, list, or array format as `hazardRatio`, as an alternative to it.
 #'
 #' @return A \code{PiecewiseSurvivalTimeEnrichment} object.
 #'
@@ -143,7 +143,7 @@ getPiecewiseSurvivalTimeMultiArm <- function(
 #'         markerPositive = c(0.08, 0.12),
 #'         markerNegative = c(0.05, 0.09)
 #'     ),
-#'     hazardRatios = list(
+#'     hazardRatio = list(
 #'         favorable = rbind(
 #'             markerPositive = c(0.65, 0.55),
 #'             markerNegative = c(0.9, 0.8)
@@ -167,10 +167,10 @@ getPiecewiseSurvivalTimeMultiArm <- function(
 getPiecewiseSurvivalTimeEnrichment <- function(
         piecewiseSurvivalTime = NULL,
         lambdaControls = NULL,
-        hazardRatios = NULL,
+        hazardRatio = NULL,
         medianControls = NULL,
         medianTreatments = NULL) {
-    return(PiecewiseSurvivalTimeEnrichment$new(piecewiseSurvivalTime, lambdaControls, hazardRatios,
+    return(PiecewiseSurvivalTimeEnrichment$new(piecewiseSurvivalTime, lambdaControls, hazardRatio,
         medianControls = medianControls, medianTreatments = medianTreatments
     ))
 }

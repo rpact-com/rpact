@@ -38,12 +38,12 @@
             values <- c(values, list(.formatRatios(specification$lambdaControls[group, ])))
         }
     }
-    groupNames <- dimnames(specification$hazardRatios)[[1]]
-    situationNames <- dimnames(specification$hazardRatios)[[3]]
+    groupNames <- dimnames(specification$hazardRatio)[[1]]
+    situationNames <- dimnames(specification$hazardRatio)[[3]]
     for (situation in seq_along(situationNames)) {
         for (group in seq_along(groupNames)) {
             captions <- c(captions, paste0("Hazard ratios (", groupNames[group], "), ", situationNames[situation]))
-            values <- c(values, list(.formatRatios(specification$hazardRatios[group, , situation])))
+            values <- c(values, list(.formatRatios(specification$hazardRatio[group, , situation])))
         }
     }
     simulationResults$.cat(indent, "Piecewise survival parameters:\n",
@@ -79,11 +79,11 @@
                 formatVector(specification$lambdaControls[group, ])))
         }
     }
-    groupNames <- dimnames(specification$hazardRatios)[[1]]
-    situationNames <- dimnames(specification$hazardRatios)[[3]]
+    groupNames <- dimnames(specification$hazardRatio)[[1]]
+    situationNames <- dimnames(specification$hazardRatio)[[3]]
     for (situation in seq_along(situationNames)) {
         ratios <- vapply(seq_along(groupNames), function(group) {
-            return(paste0(groupNames[group], " = ", formatVector(specification$hazardRatios[group, , situation])))
+            return(paste0(groupNames[group], " = ", formatVector(specification$hazardRatio[group, , situation])))
         }, character(1))
         text <- .concatenateSummaryText(text, paste0("hazard ratios for ", situationNames[situation],
             " (in interval order): ", paste(ratios, collapse = "; ")))
@@ -94,7 +94,7 @@
 .getPiecewiseInitialHazardRatios <- function(piecewiseSurvivalTime) {
     piecewiseSurvivalTime$.validate()
     # Initial ratios are compatibility inputs, not effects averaged over time.
-    hazardRatios <- piecewiseSurvivalTime$hazardRatios
+    hazardRatios <- piecewiseSurvivalTime$hazardRatio
     return(t(matrix(hazardRatios[, 1, , drop = FALSE],
         nrow = dim(hazardRatios)[1], ncol = dim(hazardRatios)[3],
         dimnames = dimnames(hazardRatios)[c(1, 3)])))
@@ -102,14 +102,14 @@
 
 .alignPiecewiseSurvivalGroups <- function(piecewiseSurvivalTime, groups) {
     if (is.null(piecewiseSurvivalTime) ||
-            identical(dimnames(piecewiseSurvivalTime$hazardRatios)[[1]], groups)) {
+            identical(dimnames(piecewiseSurvivalTime$hazardRatio)[[1]], groups)) {
         return(piecewiseSurvivalTime)
     }
     # Effect-list validation orders subgroups; keep the hazards in that same order
     # without changing the specification supplied by the caller.
     aligned <- piecewiseSurvivalTime$clone()
     aligned$.validate()
-    actualGroups <- dimnames(aligned$hazardRatios)[[1]]
+    actualGroups <- dimnames(aligned$hazardRatio)[[1]]
     .assertPiecewiseNames(groups, length(actualGroups), "subGroups", ".alignPiecewiseSurvivalGroups")
     if (!setequal(groups, actualGroups)) {
         stopConflictingArguments("subgroup names must match the piecewise survival specification",
@@ -119,7 +119,7 @@
     }
     indices <- match(groups, actualGroups)
     aligned$lambdaControls <- aligned$lambdaControls[indices, , drop = FALSE]
-    aligned$hazardRatios <- aligned$hazardRatios[indices, , , drop = FALSE]
+    aligned$hazardRatio <- aligned$hazardRatio[indices, , , drop = FALSE]
     if (!is.null(aligned[["medianControls"]])) {
         aligned$medianControls <- aligned$medianControls[indices, , drop = FALSE]
     }

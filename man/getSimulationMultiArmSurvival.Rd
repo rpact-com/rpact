@@ -531,7 +531,7 @@ simulationResultsNonInferiority <- getSimulationMultiArmSurvival(
 piecewiseTime <- getPiecewiseSurvivalTimeMultiArm(
     piecewiseSurvivalTime = c(0, 6),
     lambdaControl = c(0.08, 0.12),
-    hazardRatios = list(
+    hazardRatio = list(
         favorable = rbind(lowDose = c(0.9, 0.8), highDose = c(0.8, 0.6)),
         conservative = rbind(lowDose = c(1, 0.9), highDose = c(0.9, 0.75))
     )

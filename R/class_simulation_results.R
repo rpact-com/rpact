@@ -396,7 +396,7 @@ SimulationResults <- R6::R6Class(
                     }
                     if (inherits(self[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
                         self$.cat("  Situations: ",
-                            paste(dimnames(self$piecewiseSurvivalTime$hazardRatios)[[3]], collapse = ", "),
+                            paste(dimnames(self$piecewiseSurvivalTime$hazardRatio)[[3]], collapse = ", "),
                             " (in this order)\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
 

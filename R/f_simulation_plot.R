@@ -246,7 +246,7 @@ NULL
         piecewiseSpecification <- NULL
     }
     scenarioLabels <- if (!is.null(piecewiseSpecification)) {
-        dimnames(piecewiseSpecification$hazardRatios)[[3]]
+        dimnames(piecewiseSpecification$hazardRatio)[[3]]
     } else {
         NULL
     }

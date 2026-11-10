@@ -765,7 +765,7 @@ NULL
             matrix(
                 allPiecewiseActiveHazards[, , i, drop = FALSE],
                 nrow = gMax,
-                dimnames = dimnames(piecewiseSurvivalTime$hazardRatios)[1:2]
+                dimnames = dimnames(piecewiseSurvivalTime$hazardRatio)[1:2]
             )
         } else {
             NULL

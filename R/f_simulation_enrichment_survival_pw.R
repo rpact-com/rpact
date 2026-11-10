@@ -629,12 +629,12 @@ getSimulationEnrichmentSurvival <- function(
                 diagnosticId = "survival.piecewise_conflicting_effect_inputs")
         }
         if (!identical(as.character(effectList$subGroups),
-                dimnames(piecewiseSurvivalTime$hazardRatios)[[1]])) {
+                dimnames(piecewiseSurvivalTime$hazardRatio)[[1]])) {
             stopIllegalArgument("the subgroup names in 'effectList' and the piecewise specification must agree",
                 functionName = "getSimulationEnrichmentSurvival", parameter = "effectList$subGroups",
                 value = effectList$subGroups, constraint = "identical subgroup names in identical order",
                 relatedParameter = "piecewiseSurvivalTime$groupNames",
-                relatedValue = dimnames(piecewiseSurvivalTime$hazardRatios)[[1]],
+                relatedValue = dimnames(piecewiseSurvivalTime$hazardRatio)[[1]],
                 diagnosticId = "survival.piecewise_group_identity")
         }
         effectList$piecewiseSurvivalTime <- NULL
