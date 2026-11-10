@@ -494,6 +494,58 @@ NULL
     invisible(results)
 }
 
+.getTestReportMetaData <- function(metaData, metaDataFile, testFileTargetDirectory) {
+    if (!is.null(metaDataFile)) {
+        .assertIsSingleCharacter(metaDataFile, "metaDataFile", naAllowed = FALSE)
+        if (!file.exists(metaDataFile)) {
+            stopIllegalArgument("The specified 'metaDataFile' (", metaDataFile, ") does not exist",
+                functionName = "testPackage",
+                parameter = "metaDataFile", 
+                value = metaDataFile,
+                constraint = "the file must exist and be readable",
+                diagnosticId = "qa.meta_data_file_missing"
+            )
+        }
+    }
+
+    if (!is.null(metaData) && !is.list(metaData)) {
+        stopIllegalArgument("'metaData' must be a named list",
+            functionName = "testPackage",
+            parameter = "metaData", 
+            value = metaData,
+            constraint = "the 'metaData' argument must be a named list",
+            diagnosticId = "qa.meta_data_invalid"
+        )
+        if (length(metaData) > 0 && !is.null(metaDataFile)) {
+            warnArgumentIgnored("'metaDataFile' will be ignored because 'metaData' is provided",
+                parameter = "metaDataFile", 
+                value = metaDataFile,
+                relatedParameter = "metaData", 
+                relatedValue = metaData,
+                constraint = "when 'metaData' is provided, 'metaDataFile' is ignored",
+                diagnosticId = "qa.meta_data_ignored"
+            )
+        }
+    }
+    
+    if (!is.null(metaData) && length(metaData) > 0) {
+        if (is.null(metaDataFile)) {
+            metaDataFile <- file.path(testFileTargetDirectory, "meta_data.txt")
+        }
+        writeKeyValueFile(
+            keyValueList = metaData,
+            filePath = metaDataFile,
+            safeKeyCheck = FALSE
+        )
+    }
+    else if (!is.null(metaDataFile)) {
+        metaData <- readKeyValueFile(metaDataFile)
+    }
+    
+    return(metaData)
+}
+
+#' 
 #' @title
 #' Test and Validate the rpact Package Installation
 #'
@@ -622,7 +674,7 @@ testPackage <- function(
     .assertIsSingleLogical(testInstalledBasicPackages, "testInstalledBasicPackages", naAllowed = FALSE)
     .assertIsSingleLogical(openHtmlReport, "openHtmlReport", naAllowed = FALSE)
     .assertIsSingleLogical(keepSourceFiles, "keepSourceFiles", naAllowed = FALSE)
-
+    
     token <- .getConnectionArgument(connection, "token")
     secret <- .getConnectionArgument(connection, "secret")
     credentialsAvailable <- (!is.null(token) && !is.null(secret) &&
@@ -636,21 +688,8 @@ testPackage <- function(
 
     pkgName <- "rpact"
     testFileTargetDirectory <- .getTestFileTargetDirectory(outDir, testFileDirectory, executionMode, pkgName)
-    if (!is.null(metaData) && length(metaData) > 0) {
-        if (is.null(metaDataFile)) {
-            metaDataFile <- file.path(testFileTargetDirectory, "meta_data.txt")
-        }
-        writeKeyValueFile(
-            keyValueList = metaData,
-            filePath = metaDataFile,
-            safeKeyCheck = FALSE
-        )
-    }
-
-    if (!is.null(metaDataFile)) {
-        metaData <- readKeyValueFile(metaDataFile)
-    }
-
+    metaData <- .getTestReportMetaData(metaData, metaDataFile, testFileTargetDirectory)
+    
     reportType <- match.arg(reportType)
     scope <- match.arg(scope)
 
