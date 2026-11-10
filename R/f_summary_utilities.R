@@ -843,7 +843,7 @@ print.SummaryFactory <- function(
 
                 if (inherits(parameterSet[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
                     userDefinedEffectMatrix <- FALSE
-                    variedParameterValues <- dimnames(parameterSet$piecewiseSurvivalTime$hazardRatios)[[3]]
+                    variedParameterValues <- dimnames(parameterSet$piecewiseSurvivalTime$hazardRatio)[[3]]
                     variedParameterCaption <- "situation"
                     numberOfVariants <- length(variedParameterValues)
                 } else if (grepl("SimulationResultsEnrichment", .getClassName(parameterSet))) {

@@ -1388,7 +1388,7 @@ getAvailablePlotTypes <- function(
     if (!is.null(piecewiseSpecification)) {
         p <- p + ggplot2::scale_x_continuous(
             breaks = seq_len(piecewiseSpecification$getNumberOfSituations()),
-            labels = dimnames(piecewiseSpecification$hazardRatios)[[3]])
+            labels = dimnames(piecewiseSpecification$hazardRatio)[[3]])
     } else if (xParameterName == "informationRates") {
         p <- .setXAxisScale(p, data, addZero = TRUE, digits = 3)
     }

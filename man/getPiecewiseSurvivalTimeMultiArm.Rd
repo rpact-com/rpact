@@ -7,7 +7,7 @@
 getPiecewiseSurvivalTimeMultiArm(
   piecewiseSurvivalTime = NULL,
   lambdaControl = NULL,
-  hazardRatios = NULL,
+  hazardRatio = NULL,
   medianControl = NULL,
   medianTreatments = NULL
 )
@@ -18,16 +18,16 @@ getPiecewiseSurvivalTimeMultiArm(
 \item{lambdaControl}{Non-negative, finite control hazards, one per interval.
 Specify either \code{lambdaControl} or \code{medianControl}.}
 
-\item{hazardRatios}{One active-arm-by-interval matrix, a named list of such
+\item{hazardRatio}{One active-arm-by-interval matrix, a named list of such
 matrices (one per situation), or an active-arm-by-interval-by-situation
 array. In the array, situation is the slowest-changing dimension.
-Specify either \code{hazardRatios} or \code{medianTreatments}.}
+Specify either \code{hazardRatio} or \code{medianTreatments}.}
 
 \item{medianControl}{Positive, finite exponential control medians, one per
 interval, as an alternative to \code{lambdaControl}. Values are not recycled.}
 
 \item{medianTreatments}{Positive, finite exponential treatment medians, in the
-same matrix, list, or array format as \code{hazardRatios}, as an alternative to it.}
+same matrix, list, or array format as \code{hazardRatio}, as an alternative to it.}
 }
 \value{
 A \code{PiecewiseSurvivalTimeMultiArm} object.
@@ -56,14 +56,14 @@ them are marked as derived. No automatic recycling across intervals or groups
 is performed.
 }
 \examples{
-hazardRatios <- getPiecewiseHazardRatioArray(
+hazardRatio <- getPiecewiseHazardRatioArray(
     favorable = rbind(lowDose = c(0.9, 0.8), highDose = c(0.8, 0.6)),
     conservative = rbind(lowDose = c(1, 0.9), highDose = c(0.9, 0.75))
 )
 piecewiseTime <- getPiecewiseSurvivalTimeMultiArm(
     piecewiseSurvivalTime = c(0, 6),
     lambdaControl = c(0.08, 0.12),
-    hazardRatios = hazardRatios
+    hazardRatio = hazardRatio
 )
 piecewiseTime
 

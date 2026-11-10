@@ -7,7 +7,7 @@
 getPiecewiseSurvivalTimeEnrichment(
   piecewiseSurvivalTime = NULL,
   lambdaControls = NULL,
-  hazardRatios = NULL,
+  hazardRatio = NULL,
   medianControls = NULL,
   medianTreatments = NULL
 )
@@ -20,17 +20,17 @@ If both control hazards and hazard ratios have row names, their names and
 order must agree.
 Specify either \code{lambdaControls} or \code{medianControls}.}
 
-\item{hazardRatios}{One subset-by-interval matrix, a named list of such
+\item{hazardRatio}{One subset-by-interval matrix, a named list of such
 matrices (one per situation), or a subset-by-interval-by-situation array.
 In the array, situation is the slowest-changing dimension.
-Specify either \code{hazardRatios} or \code{medianTreatments}.}
+Specify either \code{hazardRatio} or \code{medianTreatments}.}
 
 \item{medianControls}{Positive, finite exponential control medians in a
 subset-by-interval matrix, as an alternative to \code{lambdaControls}. Names and
 dimensions follow the same rules as for \code{lambdaControls}.}
 
 \item{medianTreatments}{Positive, finite exponential treatment medians, in the
-same matrix, list, or array format as \code{hazardRatios}, as an alternative to it.}
+same matrix, list, or array format as \code{hazardRatio}, as an alternative to it.}
 }
 \value{
 A \code{PiecewiseSurvivalTimeEnrichment} object.
@@ -65,7 +65,7 @@ piecewiseTime <- getPiecewiseSurvivalTimeEnrichment(
         markerPositive = c(0.08, 0.12),
         markerNegative = c(0.05, 0.09)
     ),
-    hazardRatios = list(
+    hazardRatio = list(
         favorable = rbind(
             markerPositive = c(0.65, 0.55),
             markerNegative = c(0.9, 0.8)

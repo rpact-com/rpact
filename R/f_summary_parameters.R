@@ -271,7 +271,7 @@ NULL
     if (inherits(designPlan[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
         return(list(
             groupCaption = paste0(parameterCaption, ", situation = ",
-                dimnames(designPlan$piecewiseSurvivalTime$hazardRatios)[[3]][variedParamNumber]),
+                dimnames(designPlan$piecewiseSurvivalTime$hazardRatio)[[3]][variedParamNumber]),
             legendEntry = list()
         ))
     }

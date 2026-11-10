@@ -795,7 +795,8 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 #' \code{futilityPerStage} is a trial-level futility-stopping decision repeated for
 #' the arm rows of the stage.
 #' For piecewise multi-arm survival simulations, \code{scenario} identifies the
-#' situation by its one-based position in \code{piecewiseSurvivalTime$hazardRatios}.
+#' situation by its one-based position in the third dimension of
+#' \code{piecewiseSurvivalTime$hazardRatio}.
 #' It matches \code{scenario} in \code{getRawData()} and remains distinct when
 #' situations have identical first-interval effects. The \code{effect} and
 #' \code{omegaMax} columns describe the first interval only.
@@ -1166,7 +1167,7 @@ getRawData <- function(x, aggregate = FALSE) {
     }
 
     if (!aggregate) {
-        rawData <- rawData[, !names(rawData) %in% c("lastObservationTime", "event", "dropoutEvent"), drop = FALSE]
+        rawData <- rawData[, !names(rawData) %in% c("lastObservationTime"), drop = FALSE]
         rawData <- .getTweakedSimulationData(rawData)
         return(rawData)
     }
