@@ -27,7 +27,11 @@ alongside the supplied medians.
 
 \item{\code{lambdaControls}}{Positive, finite control hazards, with groups in rows and piecewise survival intervals in columns. Groups are active treatment arms sharing the same control hazards in multi-arm specifications, or disjoint population subsets in enrichment specifications. Is a numeric matrix.}
 
-\item{\code{hazardRatio}}{Positive, finite treatment-to-control hazard ratios in a group-by-interval-by-situation numeric array. Groups are active treatment arms or disjoint population subsets. Situations occupy the third, slowest-changing dimension. Values are supplied directly or derived from the supplied interval medians.}
+\item{\code{hazardRatio}}{Positive, finite treatment-to-control hazard ratios in a
+group-by-interval-by-situation numeric array. Groups are active
+treatment arms or disjoint population subsets. Situations occupy the
+third, slowest-changing dimension. Values are supplied directly or
+derived from the supplied interval medians.}
 
 \item{\code{medianControls}}{The supplied positive, finite exponential control medians in a subset-by-interval numeric matrix, or NULL when control hazards were supplied directly. These parameterize interval hazards as \code{log(2) / medianControls}, rather than the medians of the complete piecewise survival distributions.}
 

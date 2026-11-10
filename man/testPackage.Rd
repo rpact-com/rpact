@@ -70,6 +70,8 @@ Default is an empty list.
 For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.}
 
 \item{metaDataFile}{An optional path to a text file containing metadata: one entry per line in the form \code{KEY=VALUE}.
+Ignored with a warning when a non-empty \code{metaData} list is supplied.
+Supplied metadata is saved as \code{meta_data.txt} in the test target directory.
 For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.}
 
 \item{workers}{Number of parallel R test processes. The default \code{NULL} uses
