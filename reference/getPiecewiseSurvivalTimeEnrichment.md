@@ -23,9 +23,9 @@ getPiecewiseSurvivalTimeEnrichment(
 
 - lambdaControls:
 
-  Positive subset-by-interval control-hazard matrix. If both control
-  hazards and hazard ratios have row names, their names and order must
-  agree. Specify either `lambdaControls` or `medianControls`.
+  Non-negative, finite subset-by-interval control-hazard matrix. If both
+  control hazards and hazard ratios have row names, their names and
+  order must agree. Specify either `lambdaControls` or `medianControls`.
 
 - hazardRatios:
 
@@ -52,13 +52,14 @@ A `PiecewiseSurvivalTimeEnrichment` object.
 ## Details
 
 At least two finite, strictly increasing interval starts are required.
-The last interval is open-ended. Hazards must be finite and strictly
-positive. Group and situation names must be unique and non-empty.
-Unnamed groups are positional; named groups must agree in order.
-Interval columns are positional and receive labels derived from the
-interval starts. Only piecewise exponential event times are supported;
-simulation requires `kappa = 1`. The returned time definition inherits
-from `ParameterSet` and supports
+The last interval is open-ended. Hazards must be finite and
+non-negative; zero denotes an interval without events. Hazard ratios
+must be finite and strictly positive. Group and situation names must be
+unique and non-empty. Unnamed groups are positional; named groups must
+agree in order. Interval columns are positional and receive labels
+derived from the interval starts. Only piecewise exponential event times
+are supported; simulation requires `kappa = 1`. The returned time
+definition inherits from `ParameterSet` and supports
 [`names()`](https://rdrr.io/r/base/names.html),
 [`print()`](https://rdrr.io/r/base/print.html),
 [`summary()`](https://rdrr.io/r/base/summary.html),

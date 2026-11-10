@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9326</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,8 @@
 <span>  <span class="va">...</span>,</span>
 <span>  niceColumnNamesEnabled <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  includeAllParameters <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  removeConstantParameters <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  removeConstantParameters <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  transposed <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -88,6 +89,11 @@ the existing data-frame methods of the individual objects.</p></dd>
 <dt id="arg-removeconstantparameters">removeConstantParameters<a class="anchor" aria-label="anchor" href="#arg-removeconstantparameters"></a></dt>
 <dd><p>If <code>TRUE</code>, retain identifiers and only parameters
 with different object profiles, using the same rules as <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>.</p></dd>
+
+
+<dt id="arg-transposed">transposed<a class="anchor" aria-label="anchor" href="#arg-transposed"></a></dt>
+<dd><p>If <code>TRUE</code>, return parameters as rows and comparison situations
+as columns. Mixed column types are converted to a common type by transposition.</p></dd>
 
 </dl></div>
     <div class="section level2">

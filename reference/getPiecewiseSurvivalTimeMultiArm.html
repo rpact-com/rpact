@@ -9,7 +9,7 @@ patient-wise multi-arm simulation."><meta property="og:image" content="https://d
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9326</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,7 @@ patient-wise multi-arm simulation.</p>
 
 
 <dt id="arg-lambdacontrol">lambdaControl<a class="anchor" aria-label="anchor" href="#arg-lambdacontrol"></a></dt>
-<dd><p>Positive control hazards, one per interval.
+<dd><p>Non-negative, finite control hazards, one per interval.
 Specify either <code>lambdaControl</code> or <code>medianControl</code>.</p></dd>
 
 
@@ -91,8 +91,9 @@ same matrix, list, or array format as <code>hazardRatios</code>, as an alternati
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>At least two finite, strictly increasing interval starts are required. The last
-interval is open-ended. Hazards must be finite and strictly positive. Group and
-situation names must be unique and non-empty. Unnamed groups are positional;
+interval is open-ended. Hazards must be finite and non-negative; zero denotes
+an interval without events. Hazard ratios must be finite and strictly positive.
+Group and situation names must be unique and non-empty. Unnamed groups are positional;
 named groups must agree in order. Interval columns are positional and receive
 labels derived from the interval starts. Only piecewise exponential event times
 are supported; simulation requires <code>kappa = 1</code>.

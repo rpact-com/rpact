@@ -13,7 +13,8 @@ as.data.frame(
   ...,
   niceColumnNamesEnabled = FALSE,
   includeAllParameters = FALSE,
-  removeConstantParameters = FALSE
+  removeConstantParameters = FALSE,
+  transposed = FALSE
 )
 ```
 
@@ -52,6 +53,12 @@ as.data.frame(
   If `TRUE`, retain identifiers and only parameters with different
   object profiles, using the same rules as
   [`summary()`](https://rdrr.io/r/base/summary.html).
+
+- transposed:
+
+  If `TRUE`, return parameters as rows and comparison situations as
+  columns. Mixed column types are converted to a common type by
+  transposition.
 
 ## Value
 

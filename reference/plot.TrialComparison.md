@@ -8,7 +8,7 @@ The summary method plots the objects contained in the comparison.
 
 ``` r
 # S3 method for class 'TrialComparison'
-plot(x, xParamName = NULL, yParamName = NULL, ...)
+plot(x, xParamName = NULL, yParamName = NULL, ..., data = NULL)
 
 # S3 method for class 'TrialComparisonSummary'
 plot(x, xParamName = NULL, yParamName = NULL, ..., showSummary = FALSE)
@@ -34,6 +34,11 @@ plot(x, xParamName = NULL, yParamName = NULL, ..., showSummary = FALSE)
   Arguments passed to `plot.TrialComparison()`, including categories,
   grouping, titles and line/point settings. Explicit axis selections
   prevail.
+
+- data:
+
+  Optional comparison data frame with additional annotation columns.
+  Rows must follow the order of `as.data.frame(x)`.
 
 - showSummary:
 

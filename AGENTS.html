@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9326</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -153,6 +153,11 @@
 <span>    <span class="fu">.assertComparisonLimit</span><span class="op">(</span><span class="va">limits</span><span class="op">[[</span><span class="va">parameter</span><span class="op">]</span><span class="op">]</span>, <span class="va">parameter</span>, <span class="st">"summary.TrialComparison"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Apply this rule to nested loops as well. Existing unbraced loops are not examples to follow.</p>
+</div>
+<div class="section level2">
+<h2 id="header-for-new-r-source-files">Header for new R source files<a class="anchor" aria-label="anchor" href="#header-for-new-r-source-files"></a></h2>
+<p>Every new <code>.R</code> file must begin with the complete header from <a href=".github/templates/r-source-header.txt">.github/templates/r-source-header.txt</a>. Copy the template verbatim, preserving the <code>## |</code> comment style, and leave a blank line between the header and the file’s code or Roxygen documentation. Use this general header without adding a file-specific title or copyright years. Preserve any required third-party copyright and license notices in addition to the header; do not overwrite them or apply incompatible licensing to third-party code. For generated <code>.R</code> files, arrange for the generation workflow to include the header while preserving required generator notices.</p>
+<p>The template is a maintained development resource, not package R code. Keep it under <code>.github/templates/</code>, outside <code>R/</code> and <code>inst/</code>. The existing <code>.Rbuildignore</code> rules exclude <code>.github</code> and <code>AGENTS.md</code> from the source package; retain these exclusions so the template and agent instructions do not affect CRAN checks.</p>
 </div>
 <div class="section level2">
 <h2 id="r-source-formatting-and-syntax">R source formatting and syntax<a class="anchor" aria-label="anchor" href="#r-source-formatting-and-syntax"></a></h2>

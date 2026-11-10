@@ -220,6 +220,9 @@ empty$add(getDesignFixed())
 combined$delete(1)
 combined$delete("sequential")
 if (FALSE) { # \dontrun{
-plot(comparison, xParamName = "objectNumber", yParamName = "criticalValues", plotLineEnabled = FALSE)
+plot(comparison, 
+    xParamName = "objectNumber", 
+    yParamName = "criticalValues", 
+    plotLineEnabled = FALSE)
 } # }
 ```
