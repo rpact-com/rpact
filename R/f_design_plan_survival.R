@@ -615,15 +615,7 @@ NULL
     designPlan$maxNumberOfEvents <- designPlan$cumulativeEventsPerStage[designPlan$.design$kMax, ]
     designPlan$.setParameterType("maxNumberOfEvents", C_PARAM_GENERATED)
 
-    if (!anyNA(designPlan$followUpTime)) {
-        if (any(designPlan$followUpTime < -1e-02)) {
-            warnInvalidInput("Accrual duration longer than maximum study ",
-                "duration (time to maximum number of events); followUpTime = ",
-                .arrayToString(designPlan$followUpTime),
-                diagnosticId = "survival.accrual_duration_inconsistent"
-            )
-        }
-    } else {
+    if (anyNA(designPlan$followUpTime)) {
         warnNumericalIssue("Follow-up time could not be calculated for hazardRatio = ",
             .arrayToString(designPlan$hazardRatio),
             diagnosticId = "survival.event_target_calculation_failed"
