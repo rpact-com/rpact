@@ -4,19 +4,11 @@
 
 ### New features
 
-- [`as.data.frame.TrialComparison()`](https://docs.rpact.org/reference/as.data.frame.TrialComparison.md)
-  supports `transposed = TRUE` to display parameters as rows and
-  comparison situations as columns.
-  [`plot.TrialComparison()`](https://docs.rpact.org/reference/plot.TrialComparison.md)
-  accepts an optional annotated comparison data frame through `data`,
-  allowing applications to group plots by additional metadata.
-
 - The new function
   [`getDesignFixed()`](https://docs.rpact.org/reference/getDesignFixed.md)
   can be used to create a fixed (single-stage) trial design. This
   convenience wrapper constructs an object of class `TrialDesignFixed`
   with `kMax = 1`.
-
 - [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md)
   and
   [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.md)
@@ -44,7 +36,6 @@
   probabilities, have no stage dimension, and are unavailable for
   test-statistic-based simulations. Existing event, power, sample-size
   and analysis-time calculations are unchanged.
-
 - The new functions
   [`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeMultiArm.md)
   and
@@ -65,27 +56,23 @@
   console and Markdown output, data-frame and matrix conversion, and
   R-code reconstruction with
   [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md).
-
 - [`getDataset()`](https://docs.rpact.org/reference/getDataset.md) now
   supports datasets of general, endpoint-independent estimates through
   the new `DatasetGeneral` class. Stage-wise estimates and standard
   errors can be provided using `est` and `se`; degrees of freedom (`df`)
   are optional and default internally to `Inf`, corresponding to a
   normal approximation.
-
 - rpact options can now be configured through environment variables,
   which is useful for reproducible scripts, CI jobs, validation runs,
   and shared project profiles; see the new vignette [Hidden rpact
   Features: Options and Environment
   Variables](https://www.rpact.org/vignettes/utilities/rpact_hidden_features/).
-
 - Optimized the display of `criticalValues` and `futilityBounds` for
   designs with `directionUpper = FALSE`. If the direction of the
   alternative is already specified when creating a design, e.g., with
   `getDesignGroupSequential(directionUpper = FALSE)`, the boundaries are
   now shown in the correct direction, typically as negative values. This
   also applies to futility bounds generated for beta-spending designs.
-
 - The new function
   [`getFisherInformation()`](https://docs.rpact.org/reference/getFisherInformation.md)
   can be used to calculate cumulative or stage-wise Fisher information
@@ -105,7 +92,6 @@
   [`getFutilityBounds()`](https://docs.rpact.org/reference/getFutilityBounds.md);
   the required Fisher information and its cumulative or stage-wise type
   are then determined internally from the requested target scale.
-
 - For survival endpoints, the default value of `directionUpper` has
   changed from `TRUE` to `FALSE`. Accordingly, the default event rates
   have been adjusted to provide meaningful examples for an alternative
@@ -121,7 +107,6 @@
   provided solely to validate that this derived direction is consistent
   with a `directionUpper` value that may already have been set in the
   design.
-
 - [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
   supports parallel test execution on Windows, Linux, and macOS while
   retaining its HTML and PDF reports. The new `workers` argument
@@ -130,7 +115,6 @@
   priorities are respected, and the result includes the worker count and
   separate timings for unit tests, R basic package tests, and HTML/PDF
   rendering.
-
 - Added
   [`getComparison()`](https://docs.rpact.org/reference/getComparison.md)
   and the R6 `TrialComparison` class for comparing designs, design

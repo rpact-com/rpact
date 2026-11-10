@@ -49,7 +49,7 @@ simulations, with a common control hazard for all active treatment arms.</p>
     <p>Create objects with <code><a href="getPiecewiseSurvivalTimeMultiArm.html">getPiecewiseSurvivalTimeMultiArm()</a></code>. The class inherits
 from <code>PiecewiseSurvivalTimeMultiGroup</code> and <code>TimeDefinition</code>.
 Rows of <code>lambdaControls</code> repeat the common control hazards for each
-active arm. The dimensions of <code>hazardRatios</code> and <code>medianTreatments</code>
+active arm. The dimensions of <code>hazardRatio</code> and <code>medianTreatments</code>
 are active arm, interval, and situation, in that order.
 Interval starts begin at zero and the last interval is open-ended.
 Supplied interval medians parameterize exponential hazards through
@@ -73,8 +73,8 @@ alongside the supplied medians.</p>
 <dd><p>Positive, finite control hazards, with groups in rows and piecewise survival intervals in columns. Groups are active treatment arms sharing the same control hazards in multi-arm specifications, or disjoint population subsets in enrichment specifications. Is a numeric matrix.</p></dd>
 
 
-<dt><code>hazardRatios</code></dt>
-<dd><p>Positive, finite treatment-to-control hazard ratios in a group-by-interval-by-situation numeric array. Groups are active treatment arms or disjoint population subsets. Situations occupy the third, slowest-changing dimension.</p></dd>
+<dt><code>hazardRatio</code></dt>
+<dd><p>Positive, finite treatment-to-control hazard ratios in a group-by-interval-by-situation numeric array. Groups are active treatment arms or disjoint population subsets. Situations occupy the third, slowest-changing dimension. Values are supplied directly or derived from the supplied interval medians.</p></dd>
 
 
 <dt><code>medianControl</code></dt>
@@ -82,7 +82,7 @@ alongside the supplied medians.</p>
 
 
 <dt><code>medianTreatments</code></dt>
-<dd><p>The supplied positive, finite exponential treatment medians in a group-by-interval-by-situation numeric array, or NULL when hazard ratios were supplied directly. Dimensions and names match <code>hazardRatios</code>. These parameterize interval treatment hazards, rather than the medians of the complete piecewise survival distributions.</p></dd>
+<dd><p>The supplied positive, finite exponential treatment medians in a group-by-interval-by-situation numeric array, or NULL when hazard ratios were supplied directly. Dimensions and names match <code>hazardRatio</code>. These parameterize interval treatment hazards, rather than the medians of the complete piecewise survival distributions.</p></dd>
 
 
 <dt><code>groupType</code></dt>

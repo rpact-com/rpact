@@ -48,7 +48,7 @@ patient-wise multi-arm simulation.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getPiecewiseSurvivalTimeMultiArm</span><span class="op">(</span></span>
 <span>  piecewiseSurvivalTime <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lambdaControl <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  hazardRatios <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  hazardRatio <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  medianControl <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  medianTreatments <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -67,11 +67,11 @@ patient-wise multi-arm simulation.</p>
 Specify either <code>lambdaControl</code> or <code>medianControl</code>.</p></dd>
 
 
-<dt id="arg-hazardratios">hazardRatios<a class="anchor" aria-label="anchor" href="#arg-hazardratios"></a></dt>
+<dt id="arg-hazardratio">hazardRatio<a class="anchor" aria-label="anchor" href="#arg-hazardratio"></a></dt>
 <dd><p>One active-arm-by-interval matrix, a named list of such
 matrices (one per situation), or an active-arm-by-interval-by-situation
 array. In the array, situation is the slowest-changing dimension.
-Specify either <code>hazardRatios</code> or <code>medianTreatments</code>.</p></dd>
+Specify either <code>hazardRatio</code> or <code>medianTreatments</code>.</p></dd>
 
 
 <dt id="arg-mediancontrol">medianControl<a class="anchor" aria-label="anchor" href="#arg-mediancontrol"></a></dt>
@@ -81,7 +81,7 @@ interval, as an alternative to <code>lambdaControl</code>. Values are not recycl
 
 <dt id="arg-mediantreatments">medianTreatments<a class="anchor" aria-label="anchor" href="#arg-mediantreatments"></a></dt>
 <dd><p>Positive, finite exponential treatment medians, in the
-same matrix, list, or array format as <code>hazardRatios</code>, as an alternative to it.</p></dd>
+same matrix, list, or array format as <code>hazardRatio</code>, as an alternative to it.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -111,14 +111,14 @@ is performed.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">hazardRatios</span> <span class="op">&lt;-</span> <span class="fu"><a href="getPiecewiseHazardRatioArray.html">getPiecewiseHazardRatioArray</a></span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">hazardRatio</span> <span class="op">&lt;-</span> <span class="fu"><a href="getPiecewiseHazardRatioArray.html">getPiecewiseHazardRatioArray</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    favorable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>lowDose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.8</span><span class="op">)</span>, highDose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.6</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    conservative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>lowDose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.9</span><span class="op">)</span>, highDose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">piecewiseTime</span> <span class="op">&lt;-</span> <span class="fu">getPiecewiseSurvivalTimeMultiArm</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    piecewiseSurvivalTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    lambdaControl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.08</span>, <span class="fl">0.12</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    hazardRatios <span class="op">=</span> <span class="va">hazardRatios</span></span></span>
+<span class="r-in"><span>    hazardRatio <span class="op">=</span> <span class="va">hazardRatio</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">piecewiseTime</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential multi-arm survival time</span>

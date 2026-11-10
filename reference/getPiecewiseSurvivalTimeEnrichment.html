@@ -48,7 +48,7 @@ patient-wise population-enrichment simulation.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getPiecewiseSurvivalTimeEnrichment</span><span class="op">(</span></span>
 <span>  piecewiseSurvivalTime <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lambdaControls <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  hazardRatios <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  hazardRatio <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  medianControls <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  medianTreatments <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -69,11 +69,11 @@ order must agree.
 Specify either <code>lambdaControls</code> or <code>medianControls</code>.</p></dd>
 
 
-<dt id="arg-hazardratios">hazardRatios<a class="anchor" aria-label="anchor" href="#arg-hazardratios"></a></dt>
+<dt id="arg-hazardratio">hazardRatio<a class="anchor" aria-label="anchor" href="#arg-hazardratio"></a></dt>
 <dd><p>One subset-by-interval matrix, a named list of such
 matrices (one per situation), or a subset-by-interval-by-situation array.
 In the array, situation is the slowest-changing dimension.
-Specify either <code>hazardRatios</code> or <code>medianTreatments</code>.</p></dd>
+Specify either <code>hazardRatio</code> or <code>medianTreatments</code>.</p></dd>
 
 
 <dt id="arg-mediancontrols">medianControls<a class="anchor" aria-label="anchor" href="#arg-mediancontrols"></a></dt>
@@ -84,7 +84,7 @@ dimensions follow the same rules as for <code>lambdaControls</code>.</p></dd>
 
 <dt id="arg-mediantreatments">medianTreatments<a class="anchor" aria-label="anchor" href="#arg-mediantreatments"></a></dt>
 <dd><p>Positive, finite exponential treatment medians, in the
-same matrix, list, or array format as <code>hazardRatios</code>, as an alternative to it.</p></dd>
+same matrix, list, or array format as <code>hazardRatio</code>, as an alternative to it.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -120,7 +120,7 @@ is performed.</p>
 <span class="r-in"><span>        markerPositive <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.08</span>, <span class="fl">0.12</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        markerNegative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.09</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span>,</span></span>
-<span class="r-in"><span>    hazardRatios <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    hazardRatio <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>        favorable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>            markerPositive <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.65</span>, <span class="fl">0.55</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>            markerNegative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.8</span><span class="op">)</span></span></span>
