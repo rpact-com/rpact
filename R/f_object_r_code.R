@@ -256,7 +256,7 @@ NULL
     }
 
     if (inherits(obj, "PerformanceScore")) {
-        return("gePerformanceScore")
+        return("getPerformanceScore")
     }
 
     if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
@@ -600,6 +600,11 @@ getObjectRCode <- function(
     if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
         stringWrapParagraphWidth <- NULL
     }
+    if (inherits(obj, c("FisherInformation", "TrialDesignOptimalConditionalErrorCharacteristics"))) {
+        return(.getComparisonSpecialRCode(obj, leadingArguments, includeDefaultParameters,
+            prefix, postfix, stringWrapPrefix, newArgumentValues, tolerance,
+            pipeOperator, pipeOperatorPostfix, output, explicitPrint))
+    }
     if (inherits(obj, "TrialComparison")) {
         return(.getTrialComparisonRCode(obj,
             leadingArguments = leadingArguments, includeDefaultParameters = includeDefaultParameters,
@@ -609,7 +614,8 @@ getObjectRCode <- function(
     }
 
     if (inherits(obj, "TrialComparisonSummary")) {
-        summaryArguments <- c(list(digits = obj$.digits), obj$.limits, list(output = obj$output))
+        summaryArguments <- c(list(digits = obj$.digits), obj$.limits,
+            list(output = obj$output, harmonizeColumnNames = .getComparisonSummaryHarmonization(obj)))
         arguments <- paste(vapply(names(summaryArguments), function(name) {
             paste0(name, " = ", paste(deparse(summaryArguments[[name]]), collapse = ""))
         }, ""), collapse = ", ")
@@ -660,7 +666,7 @@ getObjectRCode <- function(
         )
         precondition <- c(precondition, preconditionSimulationResults)
         if (pipeOperator == "none") {
-            leadingArguments <- c(leadingArguments, "simulationResults = simulationResults")
+            leadingArguments <- c(leadingArguments, "simulationResult = simulationResults")
         }
     }
     if (!is.null(obj[[".dataInput"]]) && (is.null(leadingArguments) || !any(grepl("data", leadingArguments)))) {

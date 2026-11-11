@@ -2,6 +2,18 @@
 
 ## New features
 
+* Comparison plots accept `xlab` and `ylab` to override automatic axis captions. `ylab` controls the primary y axis; a secondary axis retains its automatic caption. The plot-title argument is named `main` instead of `mainTitle`.
+
+* Trial comparisons now accept `PowerAndAverageSampleNumberResult` objects through `getComparison()`, `compare()`, and `%vs%`, including summaries, plots, and R-code reconstruction. Comparisons retain `nMax` and the generic ASN scale, distinguish stage-wise and overall stopping probabilities, and support original names through `harmonizeColumnNames = FALSE`.
+
+* `getComparison()` unwraps a single `TrialComparisonSummary` and returns its underlying comparison by reference. Summaries can also be combined with other objects or nested in lists when creating a new comparison.
+
+* `summary.TrialComparison()` gains `harmonizeColumnNames = TRUE`. Set it to `FALSE` to compare original parameter names. Summaries retain the naming mode for plotting, selection previews, and R-code reconstruction.
+
+* `as.data.frame.TrialComparison()` gains `harmonizeColumnNames = TRUE`. Set it to `FALSE` to retain original parameter names and omit fields included only for harmonization. The option also applies with filtering, readable labels, transposition, and reporting output.
+
+* Comparison column mappings additionally harmonize fixed survival event counts to cumulative events in comparisons with interim analyses, and available sample-size H1 expectations to `expectedNumberOfSubjects` and `expectedNumberOfEvents`. The mappings preserve H0/H0-H1 expectations, simulation assumptions for conditional power, sequential fixed-design references, and conflicting target values.
+
 * Mixed comparisons with interim analyses harmonize fixed plans' sample sizes (`nFixed`, `nFixed1`, `nFixed2`) to `numberOfSubjects`, `numberOfSubjects1`, and `numberOfSubjects2`, using an extensible internal column mapping. The same columns are used in summaries, tables, and plots; original objects and sequential fixed-design reference values are preserved.
 
 * Comparison summaries treat constant numeric vector cells as their scalar value, so standard deviations shown as `1` and `1, 1` are shared across fixed and sequential plans. Nonconstant profiles and missing values remain distinct; stored data are unchanged.

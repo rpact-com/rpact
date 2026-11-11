@@ -6,11 +6,11 @@
 \usage{
 getComparisonPlotParameters(
   data,
-  xParamName = NULL,
-  yParamName = NULL,
+  xAxis = NULL,
+  yAxis = NULL,
   ...,
-  categoryParamName = NULL,
-  groupParamName = NULL,
+  category = NULL,
+  group = NULL,
   objects = NULL,
   yAxisSide = "auto"
 )
@@ -18,20 +18,20 @@ getComparisonPlotParameters(
 \arguments{
 \item{data}{A comparison data frame, a \code{TrialComparison}, or its summary.}
 
-\item{xParamName, yParamName}{Optional explicit axis column names. \code{yParamName}
+\item{xAxis, yAxis}{Optional explicit axis column names. \code{yAxis}
 may be a vector of distinct numeric columns. Automatic
 axes must be varying numeric columns. Every y column must be numeric;
 an explicitly selected x-axis may also be categorical.}
 
 \item{...}{Further arguments. Currently unused.}
 
-\item{categoryParamName}{Optional character vector of category column names.
+\item{category}{Optional character vector of category column names.
 All selected columns jointly define the categories. NULL selects \code{objectName},
 \code{objectNumber}, or \code{designNumber}, in that order, when it identifies multiple
 objects and is not selected as an axis or group. NA_character_ disables
 automatic categories, as does character(0). No category is needed for a single object.}
 
-\item{groupParamName}{Optional explicit grouping column.}
+\item{group}{Optional explicit grouping column.}
 
 \item{objects}{Optional original objects for role-aware selection when \code{data}
 is a data frame. A \code{TrialComparison} supplies its own objects automatically.}
@@ -42,8 +42,9 @@ vector assigning individual parameters. Unspecified named entries remain
 automatic. The same argument is accepted by \code{\link[=plot.TrialComparison]{plot.TrialComparison()}}.}
 }
 \value{
-A list containing \code{xParamName}, \code{yParamName}, \code{categoryParamName},
-\code{groupParamName}, \code{yAxisSide}, \code{yAxisTransformation}, \code{yAxisRanges}, \code{message},
+A list containing \code{xAxis}, \code{yAxis}, \code{category},
+\code{group}, \code{connectAcrossObjects}, \code{yAxisSide}, \code{yAxisTransformation},
+\code{yAxisRanges}, \code{message},
 \code{candidates}, and \code{issues}. \code{yAxisSide} is named by the selected parameters;
 the right-axis plotting transformation is \code{value * scale + offset} from
 \code{yAxisTransformation}. \code{yAxisRanges} contains the reference ranges used
@@ -57,6 +58,12 @@ Proposes axes and an object category without creating a plot. Selection
 problems are returned as text so applications can display them before plotting.
 }
 \details{
+With original objects available, comparisons in which each object contributes
+one point at a distinct finite numeric x value are connected across objects
+when only that input varies and the object scope is shared. Automatic object
+categories are omitted in this case and \code{connectAcrossObjects} is TRUE.
+Explicit categories or groups retain their separate curves.
+
 Explicit selections prevail. When original objects are available, inputs and
 design settings are preferred for x and results for y, as in the comparison
 plot method. Without original objects, only varying numeric columns determine
@@ -83,7 +90,7 @@ comparison <- getComparison(
     first = getDesignFixed(alpha = 0.025),
     second = getDesignFixed(alpha = 0.05)
 )
-selection <- getComparisonPlotParameters(comparison, yParamName = "criticalValues")
-selection[c("xParamName", "yParamName", "categoryParamName", "message")]
+selection <- getComparisonPlotParameters(comparison, yAxis = "criticalValues")
+selection[c("xAxis", "yAxis", "category", "message")]
 
 }

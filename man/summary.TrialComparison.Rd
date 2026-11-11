@@ -12,7 +12,8 @@
   maxProfiles = 3L,
   maxObjects = 6L,
   maxValues = 4L,
-  output = c("all", "title", "overview", "body")
+  output = c("all", "title", "overview", "body"),
+  harmonizeColumnNames = TRUE
 )
 }
 \arguments{
@@ -32,21 +33,34 @@ sections. Increase this to inspect further differences.}
 \item{maxValues}{Maximum profile values shown per preview.}
 
 \item{output}{One of "all", "title", "overview", or "body".}
+
+\item{harmonizeColumnNames}{If \code{TRUE} (default), compare the harmonized
+columns described in \code{\link[=getComparison]{getComparison()}}. If \code{FALSE}, compare the original
+parameter names, as in \code{as.data.frame(object, harmonizeColumnNames = FALSE)}.}
 }
 \value{
 A \code{TrialComparisonSummary} inheriting from \code{SummaryFactory}. Its
 \code{parameterInfo} contains metadata, full exact profiles and object group IDs.
 The displayed summary is a snapshot; call \code{summary()} again after changing
-an underlying object. Input roles take precedence when roles differ across
-the compared object types.
+an underlying object. The \code{harmonizeColumnNames} attribute of \code{parameterInfo}
+records the selected naming mode for plotting and R-code reconstruction.
+Input roles take precedence when roles differ across the compared object types.
 }
 \description{
 Summarizes differences between the object profiles in a trial comparison.
 }
 \details{
+Constant numeric vector cells compare equal to their scalar value regardless
+of vector length. Nonconstant vectors, missing values, and their positions
+remain part of the exact comparison. The stored comparison data are unchanged.
+This value normalization also applies when column-name harmonization is disabled.
+Plotting a summary retains its selected column-name mode unless custom data
+are supplied.
+
 Parameter captions are resolved separately for each original object, including
 its design when a parameter comes from that design. \code{parameterInfo$paramName}
-retains the original column names; \code{paramCaption} contains the display label
+retains the column names selected by \code{harmonizeColumnNames}; \code{paramCaption}
+contains the display label
 and \code{paramCaptions} contains captions in object order (NA for absent parameters).
 These captions are captured with the summary. Distinct object-specific captions
 are shown together and identified alongside the corresponding object labels;

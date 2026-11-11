@@ -18,13 +18,15 @@
 ## |
 
 .getComparisonPlotInput <- function(data, objects = NULL) {
+    harmonizeColumnNames <- TRUE
     if (inherits(data, "TrialComparisonSummary")) {
+        harmonizeColumnNames <- .getComparisonSummaryHarmonization(data)
         data <- data$object
     }
     isComparison <- inherits(data, "TrialComparison")
     if (isComparison) {
         objects <- data$getObjects()
-        data <- as.data.frame(data)
+        data <- as.data.frame(data, harmonizeColumnNames = harmonizeColumnNames)
     }
     return(list(data = data, objects = objects, isComparison = isComparison))
 }
@@ -618,8 +620,11 @@ getComparisonPlotParameters <- function(
 #' @param category Optional character vector of category columns. Multiple
 #'   columns define their joint combinations. NULL selects categories automatically;
 #'   NA_character_ or character(0) disables categories.
-#' @param mainTitle Plot title. When omitted, generated from the original objects
+#' @param main Plot title. When omitted, generated from the original objects
 #'   using the same title as print and summary. Supply NULL or NA to hide it.
+#' @param xlab,ylab Axis labels. NA uses automatic parameter captions; NULL hides
+#'   the label. `ylab` overrides the primary y-axis label, including a single
+#'   right-positioned axis. A secondary y axis retains its automatic caption.
 #' @param legendTitle Category/group legend title. When omitted, object identifiers
 #'   use Design, Calculation, Simulation, or a combination derived from the original
 #'   objects or comparison metadata. Other categories use their parameter captions.
@@ -732,7 +737,9 @@ getComparisonPlotParameters <- function(
         ...,
         group = NULL,
         category = NULL,
-        mainTitle = NULL,
+        main = NULL,
+        xlab = NA_character_,
+        ylab = NA_character_,
         legendTitle = NULL,
         plotLineEnabled = TRUE,
         plotPointsEnabled = TRUE,
@@ -747,6 +754,12 @@ getComparisonPlotParameters <- function(
         parameterLegendPosition = NULL) {
     .warnInCaseOfUnknownArguments(functionName = ".plotComparison", ...)
     .assertGgplotIsInstalled()
+    for (parameter in c("main", "xlab", "ylab")) {
+        value <- get(parameter)
+        if (!is.null(value) && !identical(value, NA)) {
+            .assertIsSingleCharacter(value, parameter, naAllowed = TRUE)
+        }
+    }
     .assertComparisonLegendPosition(categoryLegendPosition, "categoryLegendPosition")
     .assertComparisonLegendPosition(parameterLegendPosition, "parameterLegendPosition")
     categoryLegendPosition <- unname(categoryLegendPosition)
@@ -767,8 +780,8 @@ getComparisonPlotParameters <- function(
         .stopComparisonPlotSelection(selection, functionName)
     }
     input <- .getComparisonPlotInput(data, objects)
-    if (missing(mainTitle)) {
-        mainTitle <- .toCapitalizedSingleCharacter(.getTrialComparisonTitle(input$objects))
+    if (missing(main)) {
+        main <- .toCapitalizedSingleCharacter(.getTrialComparisonTitle(input$objects))
     }
     data <- input$data
     xAxis <- selection$xAxis
@@ -878,7 +891,7 @@ getComparisonPlotParameters <- function(
         }
     }
 
-    if (grepl("situation|stage|objectNumber|kMax|sided", xAxis, ignore.case = TRUE)) {
+    if (is.numeric(data[[xAxis]]) && grepl("situation|stage|objectNumber|kMax|sided", xAxis, ignore.case = TRUE)) {
         breaks <- sort(unique(round(na.omit(data[[xAxis]]))))
         p <- p + ggplot2::scale_x_continuous(breaks = breaks)
     }
@@ -888,7 +901,7 @@ getComparisonPlotParameters <- function(
         groups <- intersect(c("objectNumber", "designNumber"), names(data))[1L]
     }
     groups <- groups[!is.na(groups)]
-    stages <- setdiff(intersect(c("stages", "stage"), names(data)), c(xAxis, yAxis))
+    stages <- setdiff(.getComparisonCoordinateNames(data), c(xAxis, yAxis))
     groups <- unique(c(groups, stages, parameterColumn))
     if (length(groups)) {
         groupColumn <- tail(make.unique(c(names(data), ".comparisonGroup")), 1L)
@@ -906,8 +919,8 @@ getComparisonPlotParameters <- function(
     }
 
     # set main title
-    if (!is.null(mainTitle) && length(mainTitle) == 1 && !is.na(mainTitle)) {
-        p <- plotSettings$setMainTitle(p, mainTitle)
+    if (!is.null(main) && length(main) == 1 && !is.na(main)) {
+        p <- plotSettings$setMainTitle(p, main)
     } else {
         p <- p + ggplot2::theme(plot.title = ggplot2::element_blank())
     }
@@ -979,16 +992,27 @@ getComparisonPlotParameters <- function(
     }
     p <- plotSettings$setColorPalette(p, palette)
     p <- plotSettings$enlargeAxisTicks(p)
-    p <- p + ggplot2::labs(
-        x = unname(.comparisonYCaptions(xAxis, input$objects)),
-        y = paste(captions, collapse = " / ")
-    )
+    xLabel <- if (!is.null(xlab) && is.na(xlab)) {
+        unname(.comparisonYCaptions(xAxis, input$objects))
+    } else {
+        xlab
+    }
+    yLabel <- if (!is.null(ylab) && is.na(ylab)) {
+        paste(captions, collapse = " / ")
+    } else {
+        ylab
+    }
+    p <- p + ggplot2::labs(x = xLabel, y = yLabel)
     if (twoAxes) {
         scale <- transformation$scale
         offset <- transformation$offset
         axisRange <- selection$yAxisRanges$left
         p <- p + ggplot2::scale_y_continuous(
-            name = paste(captions[sides == "left"], collapse = " / "),
+            name = if (!is.null(ylab) && is.na(ylab)) {
+                paste(captions[sides == "left"], collapse = " / ")
+            } else {
+                ylab
+            },
             limits = function(limits) {
                 range(c(limits, axisRange))
             },
@@ -997,7 +1021,7 @@ getComparisonPlotParameters <- function(
             )
         )
     } else if (any(sides == "right")) {
-        p <- p + ggplot2::scale_y_continuous(name = paste(captions, collapse = " / "), position = "right")
+        p <- p + ggplot2::scale_y_continuous(name = yLabel, position = "right")
     }
     p <- .preparePlotLegend(p)
     categoryAesthetics <- if (groupEnabled && categoryEnabled) {

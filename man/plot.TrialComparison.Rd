@@ -5,17 +5,37 @@
 \alias{plot.TrialComparisonSummary}
 \title{Plot a Trial Comparison}
 \usage{
-\method{plot}{TrialComparison}(x, xParamName = NULL, yParamName = NULL, ..., data = NULL)
+\method{plot}{TrialComparison}(
+  x,
+  xAxis = NULL,
+  yAxis = NULL,
+  ...,
+  data = NULL,
+  category = NULL,
+  group = NULL,
+  main = NULL,
+  xlab = NA_character_,
+  ylab = NA_character_
+)
 
-\method{plot}{TrialComparisonSummary}(x, xParamName = NULL, yParamName = NULL, ..., showSummary = FALSE)
+\method{plot}{TrialComparisonSummary}(
+  x,
+  xAxis = NULL,
+  yAxis = NULL,
+  ...,
+  showSummary = FALSE,
+  category = NULL,
+  group = NULL,
+  data = NULL
+)
 }
 \arguments{
 \item{x}{A \code{TrialComparison} or its summary.}
 
-\item{xParamName, yParamName}{Optional axis column names. Omitted axes are
+\item{xAxis, yAxis}{Optional axis column names. Omitted axes are
 selected only when there is exactly one candidate: inputs/design settings
 are preferred for x, results for y, then other varying numeric columns.
-Identifier columns are excluded; stages remain eligible axes. \code{yParamName}
+Identifier columns are excluded; stages remain eligible axes. \code{yAxis}
 may also explicitly select multiple numeric parameters. Their axis sides
 can be controlled through \code{yAxisSide} passed to \code{\link[=plot.TrialComparison]{plot.TrialComparison()}}.}
 
@@ -23,7 +43,21 @@ can be controlled through \code{yAxisSide} passed to \code{\link[=plot.TrialComp
 grouping, titles and line/point settings. Explicit axis selections prevail.}
 
 \item{data}{Optional comparison data frame with additional annotation columns.
-Rows must follow the order of \code{as.data.frame(x)}.}
+Rows must follow the order of \code{as.data.frame(x)}. Without custom data,
+summary plots retain the summary's column-name harmonization setting.}
+
+\item{category}{Optional column names defining categories. Multiple columns
+define joint categories. NULL selects automatically; NA_character_ or
+character(0) disables categories.}
+
+\item{group}{Optional column name defining an additional grouping.}
+
+\item{main}{Plot title. When omitted, generated from the original objects.
+NULL or NA hides the title.}
+
+\item{xlab, ylab}{Axis labels. NA uses automatic parameter captions; NULL hides
+the label. \code{ylab} overrides the primary y-axis label, including a single
+right-positioned axis. A secondary y axis retains its automatic caption.}
 
 \item{showSummary}{If TRUE, also print the summary before creating its plot.}
 }

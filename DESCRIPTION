@@ -166,6 +166,7 @@ Collate:
     'f_analysis_multiarm_survival.R'
     'f_as251.R'
     'f_comparison.R'
+    'f_comparison_adapters.R'
     'f_comparison_parameters.R'
     'f_comparison_plot.R'
     'f_comparison_r_code.R'

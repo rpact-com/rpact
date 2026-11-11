@@ -29,14 +29,21 @@ NULL
 #'
 #' @description
 #' Creates a comparison of existing designs, design characteristics, sample size
-#' or power plans, and simulation results without recalculating them.
+#' or power plans, simulation results, and power/ASN results without recalculating
+#' them. A single
+#' comparison summary returns its underlying comparison.
 #'
-#' @param objects Optional objects, lists of objects or `TrialComparison` objects.
+#' @param objects Optional objects, lists of objects, `TrialComparison` objects,
+#'   or `TrialComparisonSummary` objects.
 #'   NULL is treated as an empty list.
-#' @param ... Designs, design characteristics, plans, simulations, lists thereof, or `TrialComparison`
-#'   objects. Entries from `...` precede entries from `objects`.
+#' @param ... Designs, design characteristics, plans, simulations,
+#'   `PowerAndAverageSampleNumberResult` objects, lists thereof,
+#'   `TrialComparison` objects, or `TrialComparisonSummary` objects. Entries
+#'   from `...` precede entries from `objects`.
 #'
-#' @return An R6 `TrialComparison` inheriting from `ParameterSet`.
+#' @return An R6 `TrialComparison` inheriting from `ParameterSet`. For a single
+#'   `TrialComparisonSummary`, its underlying comparison is returned by reference;
+#'   otherwise a new collection is created.
 #'
 #' @details
 #' The comparison retains references to its objects. Changes to an original
@@ -50,6 +57,13 @@ NULL
 #' return NULL. The [fetch.TrialComparison()]
 #' method provides the same object access through `fetch(comparison, name)` or
 #' `fetch(comparison, position)`.
+#' A single summary can be unwrapped with `summaryObject |> getComparison()`,
+#' returning exactly `summaryObject$object`. Changes to the returned collection
+#' therefore affect that underlying comparison. In combinations or nested lists,
+#' summaries contribute their underlying comparisons' current objects; a new
+#' collection is created without changing the source collections. Summary display
+#' settings are not transferred to the comparison.
+#'
 #' Lists and comparisons are recursively expanded in their original order.
 #' Names on individual objects are retained; container names are discarded.
 #' Supplied non-empty names must be unique across the expanded collection;
@@ -89,7 +103,26 @@ NULL
 #' `numberOfSubjects2`. The corresponding stored group sizes are included for
 #' sequential plans. Comparisons of fixed plans alone retain the fixed names.
 #' With `includeAllParameters = TRUE`, sequential plans' `nFixed` reference values
-#' remain separate from their stage-wise sample sizes. Original objects are unchanged.
+#' remain separate from their stage-wise sample sizes. Fixed survival plans also
+#' use `cumulativeEventsPerStage` for `eventsFixed` when interim analyses occur
+#' in the comparison; sequential plans retain their fixed-design event reference.
+#'
+#' Available sample-size expectations `expectedNumberOfSubjectsH1` and
+#' `expectedEventsH1` use `expectedNumberOfSubjects` and `expectedNumberOfEvents`.
+#' These expectations refer to each scenario's supplied alternative. Harmonization
+#' does not change alternatives or stopping rules, combine H0/H0-H1 expectations,
+#' or reinterpret simulation assumptions used for conditional power.
+#' Conflicting non-missing target values remain in separate columns.
+#' Power/ASN results from [getPowerAndAverageSampleNumber()] retain their generic
+#' `theta`, `nMax`, and `averageSampleNumber` scales. Individual `theta` scenarios
+#' retain their stage coordinates even in full exports. The comparison includes `nMax`
+#' even when the compact source data frame omits it; no endpoint or conversion to
+#' subjects or events is inferred. With column harmonization enabled, their
+#' stage-wise `earlyStop` becomes `earlyStopPerStage`, `overallEarlyStop` becomes
+#' `earlyStop`, and `overallFutility` becomes `futilityStop`. `calculatedPower`
+#' merges into `overallReject` when the values agree. Original names remain
+#' available with `harmonizeColumnNames = FALSE` in data frames and summaries.
+#' Original objects are unchanged.
 #'
 #' Console and Markdown output are bounded. Limits and display rounding do not
 #' change the underlying data. [as.data.frame.TrialComparison()] returns the full
@@ -98,11 +131,16 @@ NULL
 #' executing generated simulation code reruns the corresponding simulations.
 #'
 #' @examples
+#' asn <- getPowerAndAverageSampleNumber(getDesignGroupSequential(kMax = 2),
+#'     theta = c(0, 0.2), nMax = 100)
+#' getComparison(asn, asn)
+#'
 #' comparison <- getComparison(list(
 #'     fixed = getDesignFixed(), sequential = getDesignGroupSequential(kMax = 2)
 #' ))
 #' print(comparison)
-#' summary(comparison)
+#' comparisonSummary <- summary(comparison)
+#' identical(comparisonSummary |> getComparison(), comparison)
 #' head(as.data.frame(comparison))
 #' withCharacteristics <- getComparison(
 #'     getDesignGroupSequential(kMax = 2),
@@ -125,7 +163,14 @@ NULL
 #' @export
 #'
 getComparison <- function(..., objects = NULL) {
-    return(TrialComparison$new(.collectComparisonObjects(list(...), objects)))
+    arguments <- list(...)
+    if (!is.null(objects)) {
+        arguments <- c(arguments, list(objects))
+    }
+    if (length(arguments) == 1L && inherits(arguments[[1L]], "TrialComparisonSummary")) {
+        return(arguments[[1L]]$object)
+    }
+    return(TrialComparison$new(.collectComparisonObjects(arguments)))
 }
 
 #'
@@ -147,7 +192,8 @@ getComparison <- function(..., objects = NULL) {
 #' @details
 #' For supported `ParameterSet` objects, `compare(x, y)` calls
 #' [getComparison()] with `x` and `y`. Supported classes are `TrialDesign`,
-#' `TrialDesignCharacteristics`, `TrialDesignPlan`, and `SimulationResults`.
+#' `TrialDesignCharacteristics`, `TrialDesignPlan`, `SimulationResults`, and
+#' `PowerAndAverageSampleNumberResult`.
 #' If `x` is a `TrialComparison`, it calls `x$add(y)` instead. The input
 #' validation and collection rules of [getComparison()] apply in both cases.
 #' Objects are retained by reference without recalculating them.
@@ -182,7 +228,7 @@ compare.ParameterSet <- function(x, y) {
     if (missing(y)) {
         return(getComparison(x))
     }
-    
+
     if (inherits(x, "TrialComparison")) {
         return(x$add(y))
     }
@@ -207,7 +253,8 @@ compare.ParameterSet <- function(x, y) {
 #' @details
 #' Summary operands contribute their underlying `object`. For `ParameterSet`
 #' operands, the supported classes are those accepted by [getComparison()]:
-#' designs, design characteristics, sample size or power plans, and simulations.
+#' designs, design characteristics, sample size or power plans, simulations, and
+#' power/ASN results.
 #' Existing comparisons contribute their contained objects in order, retaining
 #' names and references. The operands' collection membership is not modified.
 #' The validation and unique-name rules of [getComparison()] apply.
@@ -229,13 +276,16 @@ compare.ParameterSet <- function(x, y) {
 #'     compare(getSampleSizeMeans(alternative = 0.44))
 #' comp2 <- comp1 %vs% compare(getSampleSizeMeans(alternative = 0.59))
 #' comp2
+#' comp2 |> getComparison()
 #'
 #' \dontrun{
 #' getSampleSizeMeans(alternative = 0.22, stDev = 0.5) %vs%
 #'     getSampleSizeMeans(alternative = 0.44, stDev = 1) %vs%
 #'     getSampleSizeMeans(alternative = 0.59, stDev = 1) |>
-#'     plot(xAxis = "alternative",
-#'         yAxis = c("nFixed", "criticalValuesEffectScale"), category = "stDev")
+#'     plot(
+#'         xAxis = "alternative",
+#'         yAxis = c("nFixed", "criticalValuesEffectScale"), category = "stDev"
+#'     )
 #' }
 #'
 #' @rdname versus
@@ -259,6 +309,9 @@ compare.ParameterSet <- function(x, y) {
     result <- list()
     for (i in seq_along(arguments)) {
         object <- arguments[[i]]
+        if (inherits(object, "TrialComparisonSummary")) {
+            object <- object$object
+        }
         if (inherits(object, "TrialComparison")) {
             entries <- object$getObjects()
         } else if (is.list(object) && !is.data.frame(object)) {
@@ -270,7 +323,7 @@ compare.ParameterSet <- function(x, y) {
         }
         result <- c(result, entries)
     }
-    result
+    return(result)
 }
 
 .assertComparisonObjectNames <- function(objects, functionName) {
@@ -296,17 +349,23 @@ compare.ParameterSet <- function(x, y) {
     )
 }
 
-.getTrialComparisonData <- function(objects, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE) {
+.getTrialComparisonData <- function(
+        objects,
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE,
+        harmonizeColumnNames = TRUE) {
     .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
     .assertIsSingleLogical(includeAllParameters, "includeAllParameters")
+    .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
     if (!length(objects)) {
         return(data.frame())
     }
 
-    .getComparisonData(objects,
+    return(.getComparisonData(objects,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
-        includeAllParameters = includeAllParameters
-    )
+        includeAllParameters = includeAllParameters,
+        harmonizeColumnNames = harmonizeColumnNames
+    ))
 }
 
 #'
@@ -492,7 +551,7 @@ TrialComparison <- R6::R6Class("TrialComparison",
             if (!length(additions)) {
                 return(self)
             }
-            
+
             combined <- c(private$.objects, additions)
             # Validate the complete candidate before changing the stored list.
             .assertComparisonObjectNames(combined, functionName = "TrialComparison$add")
@@ -851,6 +910,10 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #' @inheritParams param_niceColumnNamesEnabled
 #' @param includeAllParameters If `TRUE`, include all parameters supported by
 #'   the existing data-frame methods of the individual objects.
+#' @param harmonizeColumnNames If `TRUE` (default), apply the class-specific
+#'   mappings described below. If `FALSE`, retain original parameter names and
+#'   omit extra fields that are included only to support these mappings.
+#'   Readable labels remain controlled by `niceColumnNamesEnabled`.
 #' @param removeConstantParameters If `TRUE`, retain identifiers and only parameters
 #'   with different object profiles, using the same rules as `summary()`.
 #' @param transposed If `TRUE`, return parameters as rows and comparison situations
@@ -871,11 +934,17 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #'   additionally inherit from `TrialComparisonTable` for automatic knitr output.
 #'
 #' @details
-#' Fixed-plan sample size columns are harmonized when the comparison includes
+#' With `harmonizeColumnNames = TRUE`, fixed-plan sample size columns are harmonized when the comparison includes
 #' interim analyses: `nFixed`, `nFixed1`, and `nFixed2` become `numberOfSubjects`,
-#' `numberOfSubjects1`, and `numberOfSubjects2`. See [getComparison()] for details.
+#' `numberOfSubjects1`, and `numberOfSubjects2`. Fixed survival events use
+#' `cumulativeEventsPerStage` in mixed comparisons with interim analyses.
+#' Available sample-size H1 expectations use `expectedNumberOfSubjects` and
+#' `expectedNumberOfEvents`, referring to each scenario's supplied alternative.
+#' See [getComparison()] for the class-specific rules and reference values.
 #'
-#' Shared profiles use the same exact comparison as [summary.TrialComparison()].
+#' Shared profiles use the same exact comparison as [summary.TrialComparison()],
+#' applied to the selected harmonized or original columns. The summary's
+#' `harmonizeColumnNames` argument can be set independently of this data-frame option.
 #' Filtering precedes rounding, readable labels and transposition. Common scalar
 #' parameters are returned once; common stage or situation profiles retain their
 #' coordinates. Reporting modes render HTML in a horizontally scrollable container
@@ -893,6 +962,7 @@ as.data.frame.TrialComparison <- function(
         ...,
         niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE,
+        harmonizeColumnNames = TRUE,
         removeConstantParameters = FALSE,
         transposed = FALSE,
         removeVariableParameters = FALSE,
@@ -902,6 +972,7 @@ as.data.frame.TrialComparison <- function(
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame.TrialComparison", ...)
     .assertIsSingleLogical(removeConstantParameters, "removeConstantParameters")
     .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
+    .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
     .assertIsSingleLogical(transposed, "transposed")
     .assertIsSingleLogical(removeVariableParameters, "removeVariableParameters")
     .assertIsSingleLogical(ceilingEnabled, "ceilingEnabled")
@@ -910,14 +981,16 @@ as.data.frame.TrialComparison <- function(
             (!is.na(digits) && (!is.finite(digits) || digits != trunc(digits)))) {
         stopIllegalArgument("'digits' must be a finite integer or NA",
             functionName = "as.data.frame.TrialComparison", parameter = "digits", value = digits,
-            constraint = "one finite integer or NA", diagnosticId = "comparison.table_digits_invalid")
+            constraint = "one finite integer or NA", diagnosticId = "comparison.table_digits_invalid"
+        )
     }
     .assertIsSingleCharacter(output, "output")
     if (!output %in% c("data.frame", "auto", "html", "pdf")) {
         stopIllegalArgument("Unknown comparison table output mode",
             functionName = "as.data.frame.TrialComparison", parameter = "output", value = output,
             constraint = "one of data.frame, auto, html, pdf",
-            diagnosticId = "comparison.table_output_invalid")
+            diagnosticId = "comparison.table_output_invalid"
+        )
     }
     if (removeConstantParameters && removeVariableParameters) {
         stopConflictingArguments("Cannot remove both constant and variable parameters",
@@ -925,10 +998,14 @@ as.data.frame.TrialComparison <- function(
             parameter = "removeVariableParameters", value = removeVariableParameters,
             relatedParameter = "removeConstantParameters", relatedValue = removeConstantParameters,
             constraint = "at most one parameter filter may be TRUE",
-            diagnosticId = "comparison.table_filters_conflict")
+            diagnosticId = "comparison.table_filters_conflict"
+        )
     }
     objects <- x$getObjects()
-    data <- .getTrialComparisonData(objects, includeAllParameters = includeAllParameters)
+    data <- .getTrialComparisonData(objects,
+        includeAllParameters = includeAllParameters,
+        harmonizeColumnNames = harmonizeColumnNames
+    )
     objectNumbers <- data$objectNumber
     allNames <- names(data)
     if (removeConstantParameters) {
@@ -940,7 +1017,7 @@ as.data.frame.TrialComparison <- function(
     if (removeVariableParameters && nrow(data) > 0L) {
         info <- .getTrialComparisonInfo(x, data)
         common <- info$paramName[info$nProfiles == 1L]
-        coordinates <- intersect(c("stages", "stage", "situation"), names(data))
+        coordinates <- unique(c(.getComparisonCoordinateNames(data), intersect("situation", names(data))))
         varyingProfiles <- vapply(data[common], function(values) {
             return(length(unique(values)) > 1L)
         }, logical(1))
@@ -955,8 +1032,10 @@ as.data.frame.TrialComparison <- function(
         objectNumbers <- rep(1L, nrow(data))
         rownames(data) <- NULL
     }
-    countParameters <- c(.getOutputFormatParameterNames("rpact.output.format.sample.size"),
-        .getOutputFormatParameterNames("rpact.output.format.event"))
+    countParameters <- c(
+        .getOutputFormatParameterNames("rpact.output.format.sample.size"),
+        .getOutputFormatParameterNames("rpact.output.format.event")
+    )
     countParameters <- countParameters[!grepl("variance", countParameters, ignore.case = TRUE)]
     for (parameter in setdiff(names(data), .comparisonIdentifiers)) {
         if (is.numeric(data[[parameter]]) && !is.object(data[[parameter]])) {
@@ -979,7 +1058,8 @@ as.data.frame.TrialComparison <- function(
     if (niceColumnNamesEnabled) {
         labels <- names(.getTrialComparisonData(x$getObjects(),
             niceColumnNamesEnabled = TRUE,
-            includeAllParameters = includeAllParameters
+            includeAllParameters = includeAllParameters,
+            harmonizeColumnNames = harmonizeColumnNames
         ))
         names(data) <- labels[match(names(data), allNames)]
         identifiers <- labels[match(identifiers, allNames)]
@@ -1060,10 +1140,14 @@ as.data.frame.TrialComparison <- function(
     if (parameter %in% .comparisonScope) {
         return("Object types and scope")
     }
+    if (grepl("^observed", parameter) || parameter %in% c("time", "treatmentArm", "populations", "situations", "type", "nPlanned")) {
+        return("Inputs and design settings")
+    }
+    sourceParameter <- sub("^(optimal_|design_|simulation_)", "", parameter)
     types <- unlist(lapply(objects, function(object) {
-        c(object$.parameterTypes[[parameter]], if (!is.null(object[[".design"]])) {
-            object$.design$.parameterTypes[[parameter]]
-        })
+        return(unlist(lapply(.getComparisonMetadataSources(object), function(source) {
+            return(source$.parameterTypes[[sourceParameter]])
+        }), use.names = FALSE))
     }), use.names = FALSE)
     if (any(types %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))) {
         return("Inputs and design settings")
@@ -1073,12 +1157,20 @@ as.data.frame.TrialComparison <- function(
 
 .getTrialComparisonTitle <- function(objects, summaryEnabled = FALSE) {
     categories <- vapply(objects, function(object) {
+        context <- .getComparisonAdapterContext(object)
+        if (!is.null(context)) {
+            return(context$target)
+        }
         if (inherits(object, "SimulationResults")) {
             return("Power simulation")
         }
 
         if (inherits(object, c("TrialDesign", "TrialDesignCharacteristics"))) {
             return("Design")
+        }
+
+        if (inherits(object, "PowerAndAverageSampleNumberResult")) {
+            return("Power and average sample size (ASN)")
         }
 
         if (inherits(object, "TrialDesignPlan")) {
@@ -1110,6 +1202,14 @@ as.data.frame.TrialComparison <- function(
 }
 
 .comparisonObjectType <- function(object, startWithUpperCase = TRUE) {
+    context <- .getComparisonAdapterContext(object)
+    if (!is.null(context)) {
+        return(if (startWithUpperCase) {
+            .firstCharacterToUpperCase(context$target)
+        } else {
+            tolower(context$target)
+        })
+    }
     label <- object$.toString(startWithUpperCase = FALSE)
     if (inherits(object, "TrialDesignPlan") && !inherits(object, "SimulationResults")) {
         label <- paste(.formatCamelCase(object$.objectType), label)
@@ -1157,13 +1257,14 @@ as.data.frame.TrialComparison <- function(
 
 .comparisonCaption <- function(parameter, object = NULL, tableOutputEnabled = FALSE) {
     if (!is.null(object) && !parameter %in% c(.comparisonScope, .comparisonIdentifiers)) {
-        if (!parameter %in% names(object)) {
-            design <- .getTrialDesign(object)
-            if (is.null(design) || !parameter %in% names(design)) {
-                return(NA_character_)
-            }
-            object <- design
+        sources <- .getComparisonMetadataSources(object)
+        matching <- vapply(sources, function(source) {
+            return(parameter %in% names(source))
+        }, logical(1))
+        if (!any(matching)) {
+            return(NA_character_)
         }
+        object <- sources[[which(matching)[1L]]]
     }
     caption <- .getParameterCaption(parameter, obj = object, tableOutputEnabled = tableOutputEnabled)
     if (is.null(caption) || length(caption) != 1L || is.na(caption) || !nzchar(caption)) {
@@ -1223,11 +1324,22 @@ as.data.frame.TrialComparison <- function(
     if (length(unique(values)) <= 1L) {
         return(data.frame(value = values[1L]))
     }
-    keys <- intersect(c("stages", "stage", "situation"), names(data))
-    profile <- data[c(keys, parameter)]
-    names(profile)[ncol(profile)] <- "value"
+    coordinates <- .getComparisonCoordinateNames(data)
+    semanticCoordinates <- setdiff(coordinates, c("stages", "stage"))
+    keys <- if (length(semanticCoordinates)) {
+        coordinates
+    } else {
+        intersect(c("stages", "stage", "situation"), names(data))
+    }
+    profile <- data[keys]
+    profile$value <- values
     # Collapse a repeated dimension, retaining the positions of missing values.
-    for (key in keys) {
+    collapseKeys <- if (length(semanticCoordinates)) {
+        character()
+    } else {
+        keys
+    }
+    for (key in collapseKeys) {
         groups <- split(seq_len(nrow(profile)), profile[[key]])
         if (length(groups) && all(vapply(groups, function(i) length(unique(values[i])) == 1L, logical(1)))) {
             profile <- unique(profile[c(key, "value")])
@@ -1356,7 +1468,7 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
     }
 
     metrics <- intersect(c(
-        "kMax", "alpha", "beta", "maxNumberOfSubjects", "maxNumberOfEvents",
+        "kMax", "alpha", "beta", "nMax", "averageSampleNumber", "maxNumberOfSubjects", "maxNumberOfEvents",
         "nFixed", "overallReject", "expectedNumberOfSubjects", "expectedNumberOfEvents", "studyDuration"
     ), info$paramName[!info$isEmpty])
     shownMetrics <- head(metrics, maxMetrics)
@@ -1418,22 +1530,30 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
 #' @param maxProfiles Maximum number of distinct profiles shown per parameter.
 #' @param maxObjects Maximum object numbers/names listed per profile.
 #' @param maxValues Maximum profile values shown per preview.
+#' @param harmonizeColumnNames If `TRUE` (default), compare the harmonized
+#'   columns described in [getComparison()]. If `FALSE`, compare the original
+#'   parameter names, as in `as.data.frame(object, harmonizeColumnNames = FALSE)`.
 #' @param output One of "all", "title", "overview", or "body".
 #'
 #' @return A `TrialComparisonSummary` inheriting from `SummaryFactory`. Its
 #'   `parameterInfo` contains metadata, full exact profiles and object group IDs.
 #'   The displayed summary is a snapshot; call `summary()` again after changing
-#'   an underlying object. Input roles take precedence when roles differ across
-#'   the compared object types.
+#'   an underlying object. The `harmonizeColumnNames` attribute of `parameterInfo`
+#'   records the selected naming mode for plotting and R-code reconstruction.
+#'   Input roles take precedence when roles differ across the compared object types.
 #'
 #' @details
 #' Constant numeric vector cells compare equal to their scalar value regardless
 #' of vector length. Nonconstant vectors, missing values, and their positions
 #' remain part of the exact comparison. The stored comparison data are unchanged.
+#' This value normalization also applies when column-name harmonization is disabled.
+#' Plotting a summary retains its selected column-name mode unless custom data
+#' are supplied.
 #'
 #' Parameter captions are resolved separately for each original object, including
 #' its design when a parameter comes from that design. `parameterInfo$paramName`
-#' retains the original column names; `paramCaption` contains the display label
+#' retains the column names selected by `harmonizeColumnNames`; `paramCaption`
+#' contains the display label
 #' and `paramCaptions` contains captions in object order (NA for absent parameters).
 #' These captions are captured with the summary. Distinct object-specific captions
 #' are shown together and identified alongside the corresponding object labels;
@@ -1460,15 +1580,23 @@ summary.TrialComparison <- function(
         maxProfiles = 3L,
         maxObjects = 6L,
         maxValues = 4L,
-        output = c("all", "title", "overview", "body")) {
+        output = c("all", "title", "overview", "body"),
+        harmonizeColumnNames = TRUE) {
     .warnInCaseOfUnknownArguments(functionName = "summary.TrialComparison", ...)
+    .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
     limits <- list(maxParameters = maxParameters, maxProfiles = maxProfiles, maxObjects = maxObjects, maxValues = maxValues)
     for (parameter in names(limits)) {
         .assertComparisonLimit(limits[[parameter]], parameter, "summary.TrialComparison")
     }
-    info <- .getTrialComparisonInfo(object)
+    data <- .getTrialComparisonData(object$getObjects(), harmonizeColumnNames = harmonizeColumnNames)
+    info <- .getTrialComparisonInfo(object, data)
+    attr(info, "harmonizeColumnNames") <- harmonizeColumnNames
     getComparisonParameterDescriptions(info[FALSE, ], digits = digits)
-    TrialComparisonSummary$new(object, info, limits, digits, match.arg(output))
+    return(TrialComparisonSummary$new(object, info, limits, digits, match.arg(output)))
+}
+
+.getComparisonSummaryHarmonization <- function(object) {
+    return(!isFALSE(attr(object$parameterInfo, "harmonizeColumnNames", exact = TRUE)))
 }
 
 TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
@@ -1764,7 +1892,12 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         }
         emit("\n")
     }
-    emit("Full data: as.data.frame(x). Exact profiles: summary(x)$parameterInfo.\n")
+    if (.getComparisonSummaryHarmonization(summary)) {
+        emit("Full data: as.data.frame(x). Exact profiles: summary(x)$parameterInfo.\n")
+    } else {
+        emit("Full data: as.data.frame(x, harmonizeColumnNames = FALSE).\n")
+        emit("Exact profiles: summary(x, harmonizeColumnNames = FALSE)$parameterInfo.\n")
+    }
     return(invisible(summary))
 }
 
@@ -1782,6 +1915,11 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #'   Identifier columns are excluded; stages remain eligible axes. `yAxis`
 #'   may also explicitly select multiple numeric parameters. Their axis sides
 #'   can be controlled through `yAxisSide` passed to [plot.TrialComparison()].
+#' @param main Plot title. When omitted, generated from the original objects.
+#'   NULL or NA hides the title.
+#' @param xlab,ylab Axis labels. NA uses automatic parameter captions; NULL hides
+#'   the label. `ylab` overrides the primary y-axis label, including a single
+#'   right-positioned axis. A secondary y axis retains its automatic caption.
 #' @param category Optional column names defining categories. Multiple columns
 #'   define joint categories. NULL selects automatically; NA_character_ or
 #'   character(0) disables categories.
@@ -1789,15 +1927,28 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #' @param ... Arguments passed to [plot.TrialComparison()], including categories,
 #'   grouping, titles and line/point settings. Explicit axis selections prevail.
 #' @param data Optional comparison data frame with additional annotation columns.
-#'   Rows must follow the order of `as.data.frame(x)`.
+#'   Rows must follow the order of `as.data.frame(x)`. Without custom data,
+#'   summary plots retain the summary's column-name harmonization setting.
 #'
 #' @return A ggplot object. Ambiguous selections raise an error listing candidate
 #'   descriptions and a concrete example.
 #'
 #' @export
 #'
-plot.TrialComparison <- function(x, xAxis = NULL, yAxis = NULL, ...,
-        data = NULL, category = NULL, group = NULL) {
+plot.TrialComparison <- function(
+        x,
+        xAxis = NULL,
+        yAxis = NULL,
+        ...,
+        data = NULL,
+        category = NULL,
+        group = NULL,
+        main = NULL,
+        xlab = NA_character_,
+        ylab = NA_character_) {
+    if (missing(main)) {
+        main <- .toCapitalizedSingleCharacter(.getTrialComparisonTitle(x$getObjects()))
+    }
     if (!is.null(data)) {
         expectedRows <- nrow(as.data.frame(x))
         if (!is.data.frame(data) || nrow(data) != expectedRows) {
@@ -1812,12 +1963,16 @@ plot.TrialComparison <- function(x, xAxis = NULL, yAxis = NULL, ...,
             xAxis = xAxis,
             yAxis = yAxis,
             category = category, group = group,
+            main = main, xlab = xlab, ylab = ylab,
             objects = x$getObjects(),
             ...
         ))
     }
-    return(.plotComparison(x, xAxis = xAxis, yAxis = yAxis,
-        category = category, group = group, ...))
+    return(.plotComparison(x,
+        xAxis = xAxis, yAxis = yAxis,
+        category = category, group = group,
+        main = main, xlab = xlab, ylab = ylab, ...
+    ))
 }
 
 #'
@@ -1833,14 +1988,26 @@ plot.TrialComparison <- function(x, xAxis = NULL, yAxis = NULL, ...,
 #'
 #' @export
 #'
-plot.TrialComparisonSummary <- function(x, xAxis = NULL, yAxis = NULL, ...,
-        showSummary = FALSE, category = NULL, group = NULL) {
+plot.TrialComparisonSummary <- function(
+        x,
+        xAxis = NULL,
+        yAxis = NULL,
+        ...,
+        showSummary = FALSE,
+        category = NULL,
+        group = NULL,
+        data = NULL) {
     .assertIsSingleLogical(showSummary, "showSummary")
     if (showSummary) {
         print(x)
     }
-    return(plot(x$object, xAxis = xAxis, yAxis = yAxis,
-        category = category, group = group, ...))
+    if (is.null(data) && !.getComparisonSummaryHarmonization(x)) {
+        data <- as.data.frame(x$object, harmonizeColumnNames = FALSE)
+    }
+    return(plot(x$object,
+        xAxis = xAxis, yAxis = yAxis,
+        category = category, group = group, data = data, ...
+    ))
 }
 
 .comparisonHasConsumerCall <- function(calls) {
