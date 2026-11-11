@@ -2,25 +2,9 @@
 
 ## New features
 
-* Comparison plots accept `xlab` and `ylab` to override automatic axis captions. `ylab` controls the primary y axis; a secondary axis retains its automatic caption. The plot-title argument is named `main` instead of `mainTitle`.
+* Comparison plot selectors `xAxis`, `yAxis`, `category`, and `group` accept parameter captions and unquoted names, as well as character variables and technical column names. Resolution respects available harmonized columns, reports ambiguous labels, and is shared with `getComparisonPlotParameters()`.
 
-* Trial comparisons now accept `PowerAndAverageSampleNumberResult` objects through `getComparison()`, `compare()`, and `%vs%`, including summaries, plots, and R-code reconstruction. Comparisons retain `nMax` and the generic ASN scale, distinguish stage-wise and overall stopping probabilities, and support original names through `harmonizeColumnNames = FALSE`.
-
-* `getComparison()` unwraps a single `TrialComparisonSummary` and returns its underlying comparison by reference. Summaries can also be combined with other objects or nested in lists when creating a new comparison.
-
-* `summary.TrialComparison()` gains `harmonizeColumnNames = TRUE`. Set it to `FALSE` to compare original parameter names. Summaries retain the naming mode for plotting, selection previews, and R-code reconstruction.
-
-* `as.data.frame.TrialComparison()` gains `harmonizeColumnNames = TRUE`. Set it to `FALSE` to retain original parameter names and omit fields included only for harmonization. The option also applies with filtering, readable labels, transposition, and reporting output.
-
-* Comparison column mappings additionally harmonize fixed survival event counts to cumulative events in comparisons with interim analyses, and available sample-size H1 expectations to `expectedNumberOfSubjects` and `expectedNumberOfEvents`. The mappings preserve H0/H0-H1 expectations, simulation assumptions for conditional power, sequential fixed-design references, and conflicting target values.
-
-* Mixed comparisons with interim analyses harmonize fixed plans' sample sizes (`nFixed`, `nFixed1`, `nFixed2`) to `numberOfSubjects`, `numberOfSubjects1`, and `numberOfSubjects2`, using an extensible internal column mapping. The same columns are used in summaries, tables, and plots; original objects and sequential fixed-design reference values are preserved.
-
-* Comparison summaries treat constant numeric vector cells as their scalar value, so standard deviations shown as `1` and `1, 1` are shared across fixed and sequential plans. Nonconstant profiles and missing values remain distinct; stored data are unchanged.
-
-* The `%vs%` operator combines trial planning objects, comparisons, and their summaries through `getComparison()` and returns a comparison summary. It supports chaining and plotting with explicit axis selections. `compare(x)` can now create a comparison from a single object.
-
-* Comparison plots and `getComparisonPlotParameters()` use `xAxis`, `yAxis`, `category`, and `group` for column selections.
+* Trial comparisons additionally accept event probabilities, recruitment results (`NumberOfSubjects`), conditional-power results (including multiarm and enrichment), performance scores, and Fisher information. Time, stage, scenario and group coordinates and relevant input context are preserved. Optimal conditional-error characteristics are supported internally without exporting their constructors. Deprecated `TrialDesignSet` objects remain excluded.
 
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
 * `getSimulationMultiArmSurvival()` and `getSimulationEnrichmentSurvival()` now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument `simulationType` can be used to choose between the new C++ implementation (`"patientWise"`), the previous test-statistic-based approach (`"testStatisticBased"`), and a basic R reference implementation (`"patientWiseBasic"`) intended for validation and testing. The default `"auto"` setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.
@@ -47,8 +31,11 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 * Added `getComparison()` and the R6 `TrialComparison` class for comparing designs, design characteristics, sample size and power calculations, and simulations. Named or unnamed objects, nested lists, and existing comparisons can be combined, extended with `add()`, and edited with `delete()`; `getObjects()`, `fetch()`, `$`, and `[[` provide access to the contained objects. Duplicate names are rejected. Compact print and summary output presents shared and differing parameter profiles using descriptive object labels, context-specific captions, and titles, with display limits for large comparisons. Full data-frame conversion, Markdown output, and R-code reconstruction are supported, including stage coordinates for fixed designs and robust numeric type inference. The `plot()` of a `TrialComparison` result supports multiple category columns and y parameters, with automatic or explicit left/right axis assignment through `yAxisSide`. `getComparisonPlotParameters()` previews selections, axis transformations, and diagnostic messages. Comparison axes use context-specific parameter captions for both single and multiple y parameters. Comparison legends use object-aware titles and adaptive category/parameter layouts, with measured wrapping, independent positions, and font reductions limited to ten percent. Automatic legend placement (`legendPosition = "auto"`) is the default across all rpact plots with legends, while manual positions and legacy `NA` behaviour remain available. Comparison operations and package testing provide structured errors through the central error helpers, preserving worker failure details.
 `compare()` starts a trial comparison from supported planning objects and extends an existing `TrialComparison` by reference, supporting pipelines such as `design |> compare(plan1) |> compare(plan2)`.
 Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
+* The `%vs%` operator combines trial planning objects, comparisons, and their summaries through `getComparison()` and returns a comparison summary. It supports chaining and plotting with explicit axis selections. `compare(x)` can now create a comparison from a single object.
 
 ## Improvements, issues, and changes
+
+* Ambiguous comparison plot axes now produce compact, structured error messages with parameter names and captions, console-aware wrapping, bounded candidate lists, and one role-aware example. Full selection diagnostics and existing error classes are retained; no new dependency is required.
 
 * Comparison plots now connect single-point objects along a common numeric input when only that input varies and the object scope is shared. Explicit categories and groups, additional varying inputs, and objects containing multiple points retain separate curves.
 

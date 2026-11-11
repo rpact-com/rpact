@@ -32,7 +32,7 @@
 \arguments{
 \item{x}{A \code{TrialComparison} or its summary.}
 
-\item{xAxis, yAxis}{Optional axis column names. Omitted axes are
+\item{xAxis, yAxis}{Optional axis column names or captions. Omitted axes are
 selected only when there is exactly one candidate: inputs/design settings
 are preferred for x, results for y, then other varying numeric columns.
 Identifier columns are excluded; stages remain eligible axes. \code{yAxis}
@@ -69,4 +69,26 @@ descriptions and a concrete example.
 Plots selected variables from a trial comparison.
 
 The summary method plots the objects contained in the comparison.
+}
+\details{
+\code{xAxis}, \code{yAxis}, \code{category}, and \code{group} accept technical column names,
+captions from the parameter dictionary, and object-specific captions as in
+\code{\link[=fetch]{fetch()}}. For example, \code{"Alternative"} and \code{"Alternatives"} both select
+\code{alternative}. Names may also be unquoted, including inside \code{c(...)}.
+Defined variables and other expressions are evaluated in the calling environment.
+Exact column names take precedence over captions. Other names must resolve
+unambiguously to a column present in the comparison export; harmonized names
+are taken into account. With fixed plans alone, \code{"Number of subjects"} can
+select \code{nFixed}. Unknown names, ambiguous captions and duplicate selections
+(including two aliases for one column) raise selection errors.
+}
+\examples{
+comparison <- getSampleSizeMeans(alternative = 0.22, stDev = 0.5) |>
+    compare(getSampleSizeMeans(alternative = 0.44, stDev = 1)) |>
+    compare(getSampleSizeMeans(alternative = 0.59, stDev = 1))
+plot(comparison, xAxis = "Alternative",
+    yAxis = c("Number of subjects", "Critical values (treatment effect scale)"),
+    category = "Standard deviation")
+plot(comparison, xAxis = alternative, yAxis = numberOfSubjects, group = stDev)
+
 }

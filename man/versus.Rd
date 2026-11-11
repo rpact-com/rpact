@@ -22,7 +22,9 @@ resulting comparison. Repeated use extends the summarized comparison.
 Summary operands contribute their underlying \code{object}. For \code{ParameterSet}
 operands, the supported classes are those accepted by \code{\link[=getComparison]{getComparison()}}:
 designs, design characteristics, sample size or power plans, simulations, and
-power/ASN results.
+power/ASN results, event probabilities, recruitment results, conditional power,
+performance scores, Fisher information, and optimal conditional-error
+characteristics.
 Existing comparisons contribute their contained objects in order, retaining
 names and references. The operands' collection membership is not modified.
 The validation and unique-name rules of \code{\link[=getComparison]{getComparison()}} apply.

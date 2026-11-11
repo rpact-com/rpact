@@ -37,7 +37,10 @@ NULL
 #'   or `TrialComparisonSummary` objects.
 #'   NULL is treated as an empty list.
 #' @param ... Designs, design characteristics, plans, simulations,
-#'   `PowerAndAverageSampleNumberResult` objects, lists thereof,
+#'   `PowerAndAverageSampleNumberResult`, `EventProbabilities`, `NumberOfSubjects`,
+#'   `ConditionalPowerResults` (including subclasses), `PerformanceScore`,
+#'   `FisherInformation`, or `TrialDesignOptimalConditionalErrorCharacteristics`
+#'   objects, lists thereof,
 #'   `TrialComparison` objects, or `TrialComparisonSummary` objects. Entries
 #'   from `...` precede entries from `objects`.
 #'
@@ -124,6 +127,21 @@ NULL
 #' available with `harmonizeColumnNames = FALSE` in data frames and summaries.
 #' Original objects are unchanged.
 #'
+#' Event probabilities and recruitment results retain their time coordinates and
+#' assumptions. Conditional-power results retain planned stages, treatment arms
+#' or populations, and observed stage and data context; no analysis is rerun.
+#' Performance scores retain scenario alternatives, simulation inputs and design
+#' settings. Fisher information retains selected stages, situations, the source
+#' plan when available, and its cumulative or stage-wise type; these scales are
+#' not harmonized. Profiles and plot groups respect time, arm, population and
+#' situation coordinates.
+#'
+#' Optimal conditional-error characteristics are supported internally, including
+#' their theta-by-stage results and atomic design settings. Their constructor and
+#' characteristic functions remain unexported. Function-valued settings are not
+#' compared as scalar parameters. Deprecated `TrialDesignSet` objects and standalone
+#' optimal conditional-error designs are not supported.
+#'
 #' Console and Markdown output are bounded. Limits and display rounding do not
 #' change the underlying data. [as.data.frame.TrialComparison()] returns the full
 #' comparison table. [plot.TrialComparison()] selects axes only when unambiguous.
@@ -192,8 +210,10 @@ getComparison <- function(..., objects = NULL) {
 #' @details
 #' For supported `ParameterSet` objects, `compare(x, y)` calls
 #' [getComparison()] with `x` and `y`. Supported classes are `TrialDesign`,
-#' `TrialDesignCharacteristics`, `TrialDesignPlan`, `SimulationResults`, and
-#' `PowerAndAverageSampleNumberResult`.
+#' `TrialDesignCharacteristics`, `TrialDesignPlan`, `SimulationResults`,
+#' `PowerAndAverageSampleNumberResult`, `EventProbabilities`, `NumberOfSubjects`,
+#' `ConditionalPowerResults` (including subclasses), `PerformanceScore`,
+#' `FisherInformation`, and `TrialDesignOptimalConditionalErrorCharacteristics`.
 #' If `x` is a `TrialComparison`, it calls `x$add(y)` instead. The input
 #' validation and collection rules of [getComparison()] apply in both cases.
 #' Objects are retained by reference without recalculating them.
@@ -254,7 +274,9 @@ compare.ParameterSet <- function(x, y) {
 #' Summary operands contribute their underlying `object`. For `ParameterSet`
 #' operands, the supported classes are those accepted by [getComparison()]:
 #' designs, design characteristics, sample size or power plans, simulations, and
-#' power/ASN results.
+#' power/ASN results, event probabilities, recruitment results, conditional power,
+#' performance scores, Fisher information, and optimal conditional-error
+#' characteristics.
 #' Existing comparisons contribute their contained objects in order, retaining
 #' names and references. The operands' collection membership is not modified.
 #' The validation and unique-name rules of [getComparison()] apply.
@@ -1909,7 +1931,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #' Plots selected variables from a trial comparison.
 #'
 #' @param x A `TrialComparison` or its summary.
-#' @param xAxis,yAxis Optional axis column names. Omitted axes are
+#' @param xAxis,yAxis Optional axis column names or captions. Omitted axes are
 #'   selected only when there is exactly one candidate: inputs/design settings
 #'   are preferred for x, results for y, then other varying numeric columns.
 #'   Identifier columns are excluded; stages remain eligible axes. `yAxis`
@@ -1933,6 +1955,27 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #' @return A ggplot object. Ambiguous selections raise an error listing candidate
 #'   descriptions and a concrete example.
 #'
+#' @details
+#' `xAxis`, `yAxis`, `category`, and `group` accept technical column names,
+#' captions from the parameter dictionary, and object-specific captions as in
+#' [fetch()]. For example, `"Alternative"` and `"Alternatives"` both select
+#' `alternative`. Names may also be unquoted, including inside `c(...)`.
+#' Defined variables and other expressions are evaluated in the calling environment.
+#' Exact column names take precedence over captions. Other names must resolve
+#' unambiguously to a column present in the comparison export; harmonized names
+#' are taken into account. With fixed plans alone, `"Number of subjects"` can
+#' select `nFixed`. Unknown names, ambiguous captions and duplicate selections
+#' (including two aliases for one column) raise selection errors.
+#'
+#' @examples
+#' comparison <- getSampleSizeMeans(alternative = 0.22, stDev = 0.5) |>
+#'     compare(getSampleSizeMeans(alternative = 0.44, stDev = 1)) |>
+#'     compare(getSampleSizeMeans(alternative = 0.59, stDev = 1))
+#' plot(comparison, xAxis = "Alternative",
+#'     yAxis = c("Number of subjects", "Critical values (treatment effect scale)"),
+#'     category = "Standard deviation")
+#' plot(comparison, xAxis = alternative, yAxis = numberOfSubjects, group = stDev)
+#'
 #' @export
 #'
 plot.TrialComparison <- function(
@@ -1946,6 +1989,10 @@ plot.TrialComparison <- function(
         main = NULL,
         xlab = NA_character_,
         ylab = NA_character_) {
+    xAxis <- .comparisonPlotColumnArgument(substitute(xAxis), parent.frame())
+    yAxis <- .comparisonPlotColumnArgument(substitute(yAxis), parent.frame())
+    category <- .comparisonPlotColumnArgument(substitute(category), parent.frame())
+    group <- .comparisonPlotColumnArgument(substitute(group), parent.frame())
     if (missing(main)) {
         main <- .toCapitalizedSingleCharacter(.getTrialComparisonTitle(x$getObjects()))
     }
@@ -1997,6 +2044,10 @@ plot.TrialComparisonSummary <- function(
         category = NULL,
         group = NULL,
         data = NULL) {
+    xAxis <- .comparisonPlotColumnArgument(substitute(xAxis), parent.frame())
+    yAxis <- .comparisonPlotColumnArgument(substitute(yAxis), parent.frame())
+    category <- .comparisonPlotColumnArgument(substitute(category), parent.frame())
+    group <- .comparisonPlotColumnArgument(substitute(group), parent.frame())
     .assertIsSingleLogical(showSummary, "showSummary")
     if (showSummary) {
         print(x)

@@ -1167,7 +1167,6 @@ getRawData <- function(x, aggregate = FALSE) {
     }
 
     if (!aggregate) {
-        rawData <- rawData[, !names(rawData) %in% c("lastObservationTime"), drop = FALSE]
         rawData <- .getTweakedSimulationData(rawData)
         return(rawData)
     }

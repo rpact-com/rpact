@@ -31,6 +31,56 @@
     return(list(data = data, objects = objects, isComparison = isComparison))
 }
 
+.comparisonPlotColumnArgument <- function(expression, environment) {
+    if (is.symbol(expression) && !exists(as.character(expression), envir = environment, inherits = TRUE)) {
+        return(as.character(expression))
+    }
+    if (is.call(expression) && identical(expression[[1L]], quote(c))) {
+        values <- lapply(as.list(expression)[-1L], .comparisonPlotColumnArgument, environment = environment)
+        return(do.call(c, values))
+    }
+    return(eval(expression, envir = environment))
+}
+
+.resolveComparisonPlotColumn <- function(value, data, objects) {
+    columns <- names(data)
+    if (value %in% columns) {
+        return(value)
+    }
+    value <- trimws(value)
+    if (value %in% columns) {
+        return(value)
+    }
+    candidates <- getDictionaryKeyByValue(C_PARAMETER_NAMES, value)
+    for (object in objects) {
+        name <- getParameterName(object, value)
+        candidates <- c(candidates, sub("^.*\\$", "", name[!is.na(name)]))
+    }
+    # Compare captions only for columns that are actually present in this export.
+    for (column in columns) {
+        captions <- c(.comparisonCaption(column), vapply(objects, function(object) {
+            return(.comparisonCaption(column, object))
+        }, character(1)))
+        if (value %in% captions) {
+            candidates <- c(candidates, column)
+        }
+    }
+    present <- intersect(candidates, columns)
+    if (length(present)) {
+        return(present)
+    }
+    # Resolve absent source/target names through the existing harmonization map.
+    # Exact existing columns always take precedence, including raw summary exports.
+    candidates <- unique(c(value, candidates))
+    for (object in objects) {
+        mapping <- .getComparisonColumnMapping(object, hasInterimAnalyses = TRUE)
+        targets <- unname(mapping[names(mapping) %in% candidates])
+        sources <- names(mapping)[mapping %in% candidates]
+        present <- c(present, intersect(c(targets, sources), columns))
+    }
+    return(unique(present))
+}
+
 .canConnectComparisonObjects <- function(data, objects, xAxis) {
     if (length(objects) < 2L || is.null(xAxis) ||
             !"objectNumber" %in% names(data) || !is.numeric(data[[xAxis]]) ||
@@ -51,13 +101,92 @@
     return(all(roles == "Results and derived parameters"))
 }
 
+.wrapComparisonPlotMessage <- function(text, width, prefix = "", continuation = prefix) {
+    lines <- strwrap(text, width = max(1L, width - nchar(continuation)))
+    if (!length(lines)) {
+        return(character())
+    }
+    prefixes <- c(prefix, rep(continuation, length(lines) - 1L))
+    return(paste0(prefixes, lines))
+}
+
+.formatComparisonPlotMessage <- function(issues) {
+    if (!length(issues)) {
+        return(NULL)
+    }
+    width <- max(40L, min(100L, getOption("width", 80L)))
+    axisIssues <- vapply(issues, function(issue) {
+        return(identical(issue$diagnosticId, "comparison.plot_axis_ambiguous"))
+    }, logical(1))
+    if (!any(axisIssues)) {
+        paragraphs <- lapply(issues, function(issue) {
+            return(.wrapComparisonPlotMessage(issue$message, width))
+        })
+        return(paste(unlist(paragraphs), collapse = "\n"))
+    }
+    axes <- issues[axisIssues]
+    parameters <- vapply(axes, `[[`, character(1), "parameter")
+    buildMessage <- function(limit) {
+        lines <- c(.wrapComparisonPlotMessage("Cannot select plot axes unambiguously.", width),
+            .wrapComparisonPlotMessage(paste0("Please specify ",
+                paste(parameters, collapse = " and "), " explicitly."), width))
+        for (issue in axes) {
+            candidates <- issue$context$candidates
+            lines <- c(lines, "", paste0("Available for ", issue$parameter, ":"))
+            if (!length(candidates)) {
+                lines <- c(lines, .wrapComparisonPlotMessage(
+                    "No varying numeric columns are available.", width, "  "))
+            }
+            for (i in seq_len(min(length(candidates), limit))) {
+                caption <- issue$context$captions[i]
+                label <- candidates[i]
+                if (!is.na(caption) && nzchar(caption) && caption != label) {
+                    label <- paste0(label, ": ", .comparisonText(caption, 70L))
+                }
+                lines <- c(lines, .wrapComparisonPlotMessage(label, width, "  - ", "    "))
+            }
+            remaining <- length(candidates) - limit
+            if (remaining > 0L) {
+                lines <- c(lines, paste0("  ... and ", remaining, " more."))
+            }
+        }
+        otherIssues <- issues[!axisIssues]
+        if (length(otherIssues)) {
+            lines <- c(lines, "", "Other selection problems:")
+            for (issue in head(otherIssues, 5L)) {
+                lines <- c(lines, .wrapComparisonPlotMessage(issue$message, width, "  - ", "    "))
+            }
+        }
+        example <- axes[[1L]]$context$example
+        if (length(example) && nzchar(example) && !grepl("\n", example, fixed = TRUE)) {
+            lines <- c(lines, "", .wrapComparisonPlotMessage(example, width))
+        } else if (length(example) && nzchar(example)) {
+            code <- paste0("  ", strsplit(example, "\n", fixed = TRUE)[[1L]])
+            for (i in rev(seq_along(code))) {
+                if (nchar(code[i]) > width && grepl(" = ", code[i], fixed = TRUE)) {
+                    parts <- strsplit(code[i], " = ", fixed = TRUE)[[1L]]
+                    code <- append(code[-i], c(paste0(parts[1L], " ="),
+                        paste0("        ", paste(parts[-1L], collapse = " = "))), after = i - 1L)
+                }
+            }
+            lines <- c(lines, "", "Example:", code)
+        }
+        return(paste(lines, collapse = "\n"))
+    }
+    # Leave room for the central error prefix and the default R error buffer.
+    message <- buildMessage(5L)
+    for (limit in 4:1) {
+        if (nchar(message, type = "bytes") <= 850L) {
+            break
+        }
+        message <- buildMessage(limit)
+    }
+    return(message)
+}
+
 .finishComparisonPlotParameters <- function(result, issues) {
     result$issues <- issues
-    result["message"] <- list(if (length(issues)) {
-        paste(vapply(issues, `[[`, character(1), "message"), collapse = "\n")
-    } else {
-        NULL
-    })
+    result["message"] <- list(.formatComparisonPlotMessage(issues))
     return(result)
 }
 
@@ -223,9 +352,12 @@
 #' @description
 #' Proposes axes and an object category without creating a plot. Selection
 #' problems are returned as text so applications can display them before plotting.
+#' The four column selectors accept technical names, dictionary captions, and
+#' object-specific captions, as in [fetch()]. Unbound names may be supplied
+#' without quotes; defined variables and expressions are evaluated normally.
 #'
 #' @param data A comparison data frame, a `TrialComparison`, or its summary.
-#' @param xAxis,yAxis Optional explicit axis column names. `yAxis`
+#' @param xAxis,yAxis Optional explicit axis names or captions. `yAxis`
 #'   may be a vector of distinct numeric columns. Automatic
 #'   axes must be varying numeric columns. Every y column must be numeric;
 #'   an explicitly selected x-axis may also be categorical.
@@ -250,7 +382,7 @@
 #'   the right-axis plotting transformation is `value * scale + offset` from
 #'   `yAxisTransformation`. `yAxisRanges` contains the reference ranges used
 #'   for scaling, not ggplot's expanded panel limits. Unresolved selections
-#'   are NULL. `message` is NULL on success, otherwise contains all selection
+#'   are NULL. `message` is NULL on success, otherwise summarizes selection
 #'   problems. `candidates` lists eligible columns for each selection; `issues`
 #'   contains diagnostic metadata used by [plot.TrialComparison()].
 #'
@@ -260,6 +392,12 @@
 #' when only that input varies and the object scope is shared. Automatic object
 #' categories are omitted in this case and `connectAcrossObjects` is TRUE.
 #' Explicit categories or groups retain their separate curves.
+#'
+#' Axis-selection messages use a short problem statement, separate candidate
+#' lists with names and captions, and one example using eligible axes. Text wraps
+#' to the console width (up to 100 characters). Candidate lists show at most five
+#' entries per axis and may be shortened further to keep the message compact.
+#' Full candidates and parameter descriptions remain available in `issues`.
 #'
 #' Explicit selections prevail. When original objects are available, inputs and
 #' design settings are preferred for x and results for y, as in the comparison
@@ -301,6 +439,10 @@ getComparisonPlotParameters <- function(
         group = NULL,
         objects = NULL,
         yAxisSide = "auto") {
+    xAxis <- .comparisonPlotColumnArgument(substitute(xAxis), parent.frame())
+    yAxis <- .comparisonPlotColumnArgument(substitute(yAxis), parent.frame())
+    category <- .comparisonPlotColumnArgument(substitute(category), parent.frame())
+    group <- .comparisonPlotColumnArgument(substitute(group), parent.frame())
     .warnInCaseOfUnknownArguments(functionName = "getComparisonPlotParameters", ...)
     input <- .getComparisonPlotInput(data, objects)
     data <- input$data
@@ -383,6 +525,32 @@ getComparisonPlotParameters <- function(
             next
         }
 
+        originalValue <- value
+        if (is.character(value) && is.null(dim(value)) && length(value) && !anyNA(value) && all(nzchar(value))) {
+            resolved <- lapply(value, .resolveComparisonPlotColumn, data = data, objects = objects)
+            ambiguous <- lengths(resolved) > 1L
+            if (any(ambiguous)) {
+                matches <- vapply(which(ambiguous), function(i) {
+                    return(paste0("'", value[i], "' matches ", paste(resolved[[i]], collapse = ", ")))
+                }, character(1))
+                addIssue(paste0("Ambiguous column selection for '", parameter, "': ",
+                    paste(matches, collapse = "; ")),
+                    parameter = parameter, value = originalValue,
+                    constraint = "each parameter name or caption must identify exactly one available column",
+                    diagnosticId = "comparison.plot_column_ambiguous",
+                    context = list(matchingColumns = stats::setNames(resolved[ambiguous], value[ambiguous]),
+                        availableColumns = names(data)))
+                result[parameter] <- list(NULL)
+                invalid[parameter] <- TRUE
+                next
+            }
+            for (i in seq_along(value)) {
+                if (length(resolved[[i]]) == 1L) {
+                    value[i] <- resolved[[i]]
+                }
+            }
+            result[[parameter]] <- value
+        }
         multipleAllowed <- parameter %in% c("category", "yAxis")
         valid <- is.character(value) && is.null(dim(value)) && length(value) > 0L && !anyNA(value) &&
             all(nzchar(value)) && all(value %in% names(data)) &&
@@ -398,7 +566,7 @@ getComparisonPlotParameters <- function(
             }
             addIssue(paste0("Invalid column selection for '", parameter, "' (", .arrayToString(value, maxLength = 5), ")"),
                 parameter = parameter,
-                value = value,
+                value = originalValue,
                 constraint = constraint,
                 diagnosticId = "comparison.plot_column_invalid",
                 context = list(availableColumns = names(data), invalidColumns = if (is.character(value)) {
@@ -480,32 +648,37 @@ getComparisonPlotParameters <- function(
             constraint = "supply an axis name when there is not exactly one candidate",
             type = "missingArgument",
             diagnosticId = "comparison.plot_axis_ambiguous",
-            context = list(candidates = candidates, descriptions = descriptions)
+            context = list(candidates = candidates, descriptions = descriptions,
+                captions = vapply(candidates, function(candidate) {
+                    return(.comparisonCaptionLabel(candidate, vapply(objects, function(object) {
+                        return(.comparisonCaption(candidate, object))
+                    }, character(1))))
+                }, character(1)))
         )
     }
     exampleX <- if (!is.null(result$xAxis)) {
         result$xAxis
     } else {
-        head(setdiff(available, result$yAxis), 1L)
+        head(setdiff(result$candidates$xAxis, result$yAxis), 1L)
     }
     exampleY <- if (!is.null(result$yAxis)) {
         result$yAxis
     } else {
-        head(setdiff(available, exampleX), 1L)
+        head(setdiff(result$candidates$yAxis, exampleX), 1L)
     }
     example <- if (length(exampleX) == 1L && length(exampleY) >= 1L) {
         yCode <- if (length(exampleY) == 1L) {
             encodeString(exampleY, quote = '"')
         } else {
-            paste0("c(", paste(encodeString(exampleY, quote = '"'), collapse = ", "), ")")
+            paste0("c(\n        ", paste(encodeString(exampleY, quote = '"'), collapse = ",\n        "), "\n    )")
         }
         paste0(
             if (input$isComparison) {
                 "plot(x"
             } else {
-                "plot(getComparison(x)"
-            }, ", xAxis = ", encodeString(exampleX, quote = '"'),
-            ", yAxis = ", yCode, ")"
+                "getComparisonPlotParameters(data"
+            }, ",\n    xAxis = ", encodeString(exampleX, quote = '"'),
+            ",\n    yAxis = ", yCode, ")"
         )
     } else {
         "Choose numeric axis columns from the comparison data."
@@ -513,7 +686,6 @@ getComparisonPlotParameters <- function(
     for (i in seq_along(issues)) {
         if (issues[[i]]$diagnosticId == "comparison.plot_axis_ambiguous") {
             issues[[i]]$context$example <- example
-            issues[[i]]$message <- paste(issues[[i]]$message, example)
         }
     }
     identities <- setdiff(
@@ -752,6 +924,10 @@ getComparisonPlotParameters <- function(
         yAxisSide = "auto",
         categoryLegendPosition = NULL,
         parameterLegendPosition = NULL) {
+    xAxis <- .comparisonPlotColumnArgument(substitute(xAxis), parent.frame())
+    yAxis <- .comparisonPlotColumnArgument(substitute(yAxis), parent.frame())
+    category <- .comparisonPlotColumnArgument(substitute(category), parent.frame())
+    group <- .comparisonPlotColumnArgument(substitute(group), parent.frame())
     .warnInCaseOfUnknownArguments(functionName = ".plotComparison", ...)
     .assertGgplotIsInstalled()
     for (parameter in c("main", "xlab", "ylab")) {

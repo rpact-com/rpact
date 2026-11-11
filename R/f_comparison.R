@@ -101,7 +101,9 @@
 #'
 #' @param objects A non-empty list of objects inheriting from `TrialDesign`,
 #'   `TrialDesignCharacteristics`, `TrialDesignPlan`, `SimulationResults`, or
-#'   `PowerAndAverageSampleNumberResult`.
+#'   `PowerAndAverageSampleNumberResult`, `EventProbabilities`, `NumberOfSubjects`,
+#'   `ConditionalPowerResults`, `PerformanceScore`, `FisherInformation`, or
+#'   `TrialDesignOptimalConditionalErrorCharacteristics`.
 #'   Optional names are retained in the column `objectName`.
 #' @param ... Further arguments. Currently unused.
 #' @param niceColumnNamesEnabled If `TRUE`, use descriptive column names.
@@ -153,7 +155,7 @@
     .assertIsSingleLogical(includeAllParameters, "includeAllParameters")
     .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
     if (!is.list(objects) || is.data.frame(objects) || length(objects) == 0) {
-        stopIllegalArgument("'objects' must be a non-empty list of rpact designs, design characteristics, plans, simulation results, or power/ASN results",
+        stopIllegalArgument("'objects' must be a non-empty list of supported rpact comparison objects",
             functionName = ".getComparisonData", parameter = "objects", value = objects,
             constraint = "a non-empty list, excluding data.frames",
             diagnosticId = "comparison.objects_invalid"

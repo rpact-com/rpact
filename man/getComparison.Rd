@@ -14,7 +14,10 @@ getComparison(..., objects = NULL)
 }
 \arguments{
 \item{...}{Designs, design characteristics, plans, simulations,
-\code{PowerAndAverageSampleNumberResult} objects, lists thereof,
+\code{PowerAndAverageSampleNumberResult}, \code{EventProbabilities}, \code{NumberOfSubjects},
+\code{ConditionalPowerResults} (including subclasses), \code{PerformanceScore},
+\code{FisherInformation}, or \code{TrialDesignOptimalConditionalErrorCharacteristics}
+objects, lists thereof,
 \code{TrialComparison} objects, or \code{TrialComparisonSummary} objects. Entries
 from \code{...} precede entries from \code{objects}.}
 
@@ -117,6 +120,21 @@ stage-wise \code{earlyStop} becomes \code{earlyStopPerStage}, \code{overallEarly
 merges into \code{overallReject} when the values agree. Original names remain
 available with \code{harmonizeColumnNames = FALSE} in data frames and summaries.
 Original objects are unchanged.
+
+Event probabilities and recruitment results retain their time coordinates and
+assumptions. Conditional-power results retain planned stages, treatment arms
+or populations, and observed stage and data context; no analysis is rerun.
+Performance scores retain scenario alternatives, simulation inputs and design
+settings. Fisher information retains selected stages, situations, the source
+plan when available, and its cumulative or stage-wise type; these scales are
+not harmonized. Profiles and plot groups respect time, arm, population and
+situation coordinates.
+
+Optimal conditional-error characteristics are supported internally, including
+their theta-by-stage results and atomic design settings. Their constructor and
+characteristic functions remain unexported. Function-valued settings are not
+compared as scalar parameters. Deprecated \code{TrialDesignSet} objects and standalone
+optimal conditional-error designs are not supported.
 
 Console and Markdown output are bounded. Limits and display rounding do not
 change the underlying data. \code{\link[=as.data.frame.TrialComparison]{as.data.frame.TrialComparison()}} returns the full

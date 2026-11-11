@@ -1814,8 +1814,8 @@ getEventProbabilities <- function(
 
     setting <- getPiecewiseSurvivalTime(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
-        lambda2 = lambda2,
-        lambda1 = lambda1,
+        lambda2 = lambda2, 
+        lambda1 = lambda1, 
         hazardRatio = hazardRatio,
         kappa = kappa,
         delayedResponseAllowed = TRUE,

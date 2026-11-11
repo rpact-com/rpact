@@ -29,8 +29,10 @@ The \code{ParameterSet} method starts or extends a trial comparison.
 \details{
 For supported \code{ParameterSet} objects, \code{compare(x, y)} calls
 \code{\link[=getComparison]{getComparison()}} with \code{x} and \code{y}. Supported classes are \code{TrialDesign},
-\code{TrialDesignCharacteristics}, \code{TrialDesignPlan}, \code{SimulationResults}, and
-\code{PowerAndAverageSampleNumberResult}.
+\code{TrialDesignCharacteristics}, \code{TrialDesignPlan}, \code{SimulationResults},
+\code{PowerAndAverageSampleNumberResult}, \code{EventProbabilities}, \code{NumberOfSubjects},
+\code{ConditionalPowerResults} (including subclasses), \code{PerformanceScore},
+\code{FisherInformation}, and \code{TrialDesignOptimalConditionalErrorCharacteristics}.
 If \code{x} is a \code{TrialComparison}, it calls \code{x$add(y)} instead. The input
 validation and collection rules of \code{\link[=getComparison]{getComparison()}} apply in both cases.
 Objects are retained by reference without recalculating them.

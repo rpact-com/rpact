@@ -36,6 +36,9 @@ NULL
 #'
 #' @details
 #' Specify a master design and one or more design parameters or a list of designs.
+#' 
+#' @section Deprecated:
+#' Use [getComparison()] instead.
 #'
 #' @return Returns a \code{\link{TrialDesignSet}} object.
 #' The following generics (R generic functions) are available for this result object:
@@ -89,8 +92,6 @@ NULL
 #' if (require(ggplot2)) plot(designSet, type = 8, nMax = 20)
 #' }
 #' 
-#' @deprecated Use [getComparison()] instead.
-#'
 #' @export
 #'
 getDesignSet <- function(...) {
