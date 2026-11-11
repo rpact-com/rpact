@@ -54,3 +54,7 @@ testthat-problems.rds
 /vignettes/rpact_quantitative_trial_design_files
 /vignettes/rpact_quantitative_trial_design.html
 /vignettes/.quarto/
+/vignettes/qtd1.qmd
+/vignettes/qtd1and3.qmd
+/vignettes/qtd1-prototype.qmd
+/vignettes/qtd3.qmd
