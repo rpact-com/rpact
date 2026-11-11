@@ -2,46 +2,142 @@
 % Please edit documentation in R/class_operating_charcteristics.R
 \name{OperatingCharcteristics}
 \alias{OperatingCharcteristics}
-\title{Operating Characteristics for Quantitative Trial Decisions}
-\arguments{
-\item{design}{The originating quantitative decision rule.}
-
-\item{numberOfSubjects}{Matrix of control and treatment sample sizes.}
-
-\item{probabilities}{Computed probability data frame.}
-}
-\value{
-An R6 object of class \code{OperatingCharcteristics}.
-}
+\title{Operating Characteristics for Quantitative Decisions}
 \description{
-A lightweight container for operating-characteristics results produced by the
-QTD helpers. Instances store the originating design, tested sample-size
-scenarios and the resulting category probabilities used for plotting and
-reporting.
-
-Initializes the shared quantitative operating-characteristics fields.
+Internal ParameterSet container shared by means and rates results.
+Obtain concrete instances through the endpoint-specific OC functions.
 }
 \details{
-This internal base class supplies inherited fields for
-\code{OperatingCharcteristicsMeans} and \code{OperatingCharcteristicsRates}.
-Obtain result objects through \code{\link[=getOperatingCharacteristicsMeans]{getOperatingCharacteristicsMeans()}} or
-\code{\link[=getOperatingCharacteristicsRates]{getOperatingCharacteristicsRates()}}. The originating design is stored internally.
-}
-\section{Fields}{
-
-\describe{
-\item{\code{numberOfSubjects}}{Supplied sample-size scenarios. Rows correspond to scenarios; the two columns contain the positive integer numbers of control and treatment subjects, in that order. Repeated scenarios are retained. Is a numeric matrix.}
-
-\item{\code{probabilities}}{Computed data frame of decision-category probabilities. Contains one block per sample-size scenario, with all six categories and all supplied effect or rate scenarios. Columns identify the category, probability, control and treatment sample sizes, true effect and endpoint-specific assumptions.}
-}}
-
-\examples{
-rule <- getDesignQuantitative(targetValue = 1, lowerReferenceValue = 0)
-nMatrix <- matrix(c(50, 100), ncol = 2, byrow = TRUE)
-# oc <- getOperatingCharacteristicsMeans(design = rule, numberOfSubjects = nMatrix)
-
+The originating rule is stored in the internal .design field. Priors and the
+control mean are NULL when not applicable. Bayesian results store four exclusive
+categories; frequentist results store six. Sampling probabilities are conditional
+on the supplied true effect or response rates; they are not predictive assurance.
 }
 \seealso{
 \code{\link[=getOperatingCharacteristicsMeans]{getOperatingCharacteristicsMeans()}}, \code{\link[=getOperatingCharacteristicsRates]{getOperatingCharacteristicsRates()}}
 }
 \keyword{internal}
+\section{Super classes}{
+\code{\link[rpact:FieldSet]{FieldSet}} -> \code{\link[rpact:ParameterSet]{ParameterSet}} -> \code{OperatingCharcteristics}
+}
+\section{Public fields}{
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{numberOfSubjects}}{Supplied sample-size scenarios. Rows correspond to scenarios; the two columns contain the positive integer numbers of control and treatment subjects, in that order. Repeated scenarios are retained. Is a numeric matrix.}
+
+    \item{\code{probabilities}}{Calculated data frame of decision-category probabilities. Frequentist results store six categories; Bayesian results store Go, Indeterminate 1, Indeterminate 2 and Stop. Within each sample-size scenario, categories form blocks retaining supplied effect order and repeats. Probabilities are on the scale 0 to 1.}
+
+    \item{\code{priorDist}}{Supplied normal-mixture effect prior (RBesT normMix) or a two-element list of control and treatment mean priors, in that order. NULL for frequentist results and rates results. Default Bayesian effect prior is mixnorm(c(1, 0, 100)).}
+
+    \item{\code{priorDist1}}{Supplied RBesT betaMix prior for the treatment event probability. NULL for frequentist results and means results. Default Bayesian prior is mixbeta(c(1, 1/3, 1/3)).}
+
+    \item{\code{priorDist2}}{Supplied RBesT betaMix prior for the control event probability. NULL for frequentist results and means results. Default Bayesian prior is mixbeta(c(1, 1/3, 1/3)).}
+
+    \item{\code{controlMean}}{Single supplied true control mean when separate Bayesian mean priors are used. The true treatment mean is controlMean plus alternative. NULL for an effect prior, frequentist results and rates results.}
+  }
+  \if{html}{\out{</div>}}
+}
+\section{Methods}{
+\subsection{Public methods}{
+  \itemize{
+    \item \href{#method-OperatingCharcteristics-initialize}{\code{OperatingCharcteristics$new()}}
+    \item \href{#method-OperatingCharcteristics-clone}{\code{OperatingCharcteristics$clone()}}
+  }
+}
+\if{html}{\out{<details><summary>Inherited methods</summary>
+<ul>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".cat"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.cat'><code>FieldSet$.cat()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".catMarkdownText"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.catMarkdownText'><code>FieldSet$.catMarkdownText()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".getFieldNames"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.getFieldNames'><code>FieldSet$.getFieldNames()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".getFields"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.getFields'><code>FieldSet$.getFields()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".getVisibleFieldNames"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.getVisibleFieldNames'><code>FieldSet$.getVisibleFieldNames()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".resetCat"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.resetCat'><code>FieldSet$.resetCat()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".containsMultidimensionalParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.containsMultidimensionalParameters'><code>ParameterSet$.containsMultidimensionalParameters()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".extractParameterNameAndValue"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.extractParameterNameAndValue'><code>ParameterSet$.extractParameterNameAndValue()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".formatDataFrameParametersAsCharacter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.formatDataFrameParametersAsCharacter'><code>ParameterSet$.formatDataFrameParametersAsCharacter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getDataFrameColumnCaption"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getDataFrameColumnCaption'><code>ParameterSet$.getDataFrameColumnCaption()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getDefaultParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getDefaultParameters'><code>ParameterSet$.getDefaultParameters()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getDerivedParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getDerivedParameters'><code>ParameterSet$.getDerivedParameters()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getGeneratedParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getGeneratedParameters'><code>ParameterSet$.getGeneratedParameters()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getInputParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getInputParameters'><code>ParameterSet$.getInputParameters()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getMultidimensionalNumberOfStages"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getMultidimensionalNumberOfStages'><code>ParameterSet$.getMultidimensionalNumberOfStages()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getNChar"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getNChar'><code>ParameterSet$.getNChar()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getNumberOfRows"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getNumberOfRows'><code>ParameterSet$.getNumberOfRows()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getParameterType"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getParameterType'><code>ParameterSet$.getParameterType()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getParameterValueIfUserDefinedOrDefault"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getParameterValueIfUserDefinedOrDefault'><code>ParameterSet$.getParameterValueIfUserDefinedOrDefault()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getParametersOfOneGroup"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getParametersOfOneGroup'><code>ParameterSet$.getParametersOfOneGroup()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getParametersToShow"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getParametersToShow'><code>ParameterSet$.getParametersToShow()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getSubListByNames"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getSubListByNames'><code>ParameterSet$.getSubListByNames()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getUndefinedParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getUndefinedParameters'><code>ParameterSet$.getUndefinedParameters()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getUnidimensionalNumberOfStages"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getUnidimensionalNumberOfStages'><code>ParameterSet$.getUnidimensionalNumberOfStages()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getUserDefinedParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getUserDefinedParameters'><code>ParameterSet$.getUserDefinedParameters()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getVariedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getVariedParameter'><code>ParameterSet$.getVariedParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getVisibleFieldNamesOrdered"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getVisibleFieldNamesOrdered'><code>ParameterSet$.getVisibleFieldNamesOrdered()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".initParameterTypes"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.initParameterTypes'><code>ParameterSet$.initParameterTypes()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".printAsDataFrame"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.printAsDataFrame'><code>ParameterSet$.printAsDataFrame()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".setParameterType"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.setParameterType'><code>ParameterSet$.setParameterType()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".show"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.show'><code>ParameterSet$.show()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showAllParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showAllParameters'><code>ParameterSet$.showAllParameters()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameter'><code>ParameterSet$.showParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameterFormatted"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameterFormatted'><code>ParameterSet$.showParameterFormatted()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameterSingle"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameterSingle'><code>ParameterSet$.showParameterSingle()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameterType"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameterType'><code>ParameterSet$.showParameterType()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameterTypeDescription"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameterTypeDescription'><code>ParameterSet$.showParameterTypeDescription()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParametersOfOneGroup"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParametersOfOneGroup'><code>ParameterSet$.showParametersOfOneGroup()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showUnknownParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showUnknownParameters'><code>ParameterSet$.showUnknownParameters()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".toString"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.toString'><code>ParameterSet$.toString()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isApplicableParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isApplicableParameter'><code>ParameterSet$isApplicableParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isDefaultParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isDefaultParameter'><code>ParameterSet$isDefaultParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isDefinedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isDefinedParameter'><code>ParameterSet$isDefinedParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isDerivedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isDerivedParameter'><code>ParameterSet$isDerivedParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isGeneratedOrDerivedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isGeneratedOrDerivedParameter'><code>ParameterSet$isGeneratedOrDerivedParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isGeneratedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isGeneratedParameter'><code>ParameterSet$isGeneratedParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isNotApplicableParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isNotApplicableParameter'><code>ParameterSet$isNotApplicableParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isNotGeneratedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isNotGeneratedParameter'><code>ParameterSet$isNotGeneratedParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isNotUserDefinedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isNotUserDefinedParameter'><code>ParameterSet$isNotUserDefinedParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isUndefinedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isUndefinedParameter'><code>ParameterSet$isUndefinedParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isUserDefinedOrDerivedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isUserDefinedOrDerivedParameter'><code>ParameterSet$isUserDefinedOrDerivedParameter()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isUserDefinedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isUserDefinedParameter'><code>ParameterSet$isUserDefinedParameter()</code></a></span></li>
+</ul>
+</details>}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-OperatingCharcteristics-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-OperatingCharcteristics-initialize}{}}}
+\subsection{\code{OperatingCharcteristics$new()}}{
+  Initializes the shared quantitative operating-characteristics fields.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OperatingCharcteristics$new(design, numberOfSubjects, probabilities = NA_real_)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{design}}{The originating quantitative decision rule.}
+      \item{\code{numberOfSubjects}}{Matrix of control and treatment sample sizes.}
+      \item{\code{probabilities}}{Computed probability data frame.}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-OperatingCharcteristics-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-OperatingCharcteristics-clone}{}}}
+\subsection{\code{OperatingCharcteristics$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OperatingCharcteristics$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
+
+}

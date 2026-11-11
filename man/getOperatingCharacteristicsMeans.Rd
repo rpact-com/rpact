@@ -2,7 +2,7 @@
 % Please edit documentation in R/f_design_plan_qtd_means.R
 \name{getOperatingCharacteristicsMeans}
 \alias{getOperatingCharacteristicsMeans}
-\title{Compute operating characteristics for a fixed quantitative design}
+\title{Operating Characteristics for Quantitative Decisions Comparing Means}
 \usage{
 getOperatingCharacteristicsMeans(
   design,
@@ -11,73 +11,74 @@ getOperatingCharacteristicsMeans(
   normalApproximation = TRUE,
   groups = 2,
   alternative = seq(0, 1, 0.2),
-  stDev = 1
+  stDev = 1,
+  priorDist = NULL,
+  controlMean = NULL
 )
 }
 \arguments{
-\item{design}{An object of class \code{TrialDesignPlanQuantitative}
-describing the decision rule (target value, lower reference value,
-and percentiles defining the decision boundaries).}
+\item{design}{A rule from \code{\link[=getDesignQuantitative]{getDesignQuantitative()}}.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and
-that a warning will be displayed if unknown arguments are passed.}
+\item{...}{Additional arguments are checked for unknown names.}
 
-\item{numberOfSubjects}{Numeric matrix with two columns (control, treatment)
-and one or more rows. Each row defines a scenario for the per-arm sample
-sizes to evaluate. All entries must be positive integers.}
+\item{numberOfSubjects}{Positive integer matrix with columns control, treatment;
+each row is a sample-size scenario.}
 
-\item{normalApproximation}{Logical scalar. Whether to use the normal
-approximation for the sampling distribution of the difference in means.
-Must be TRUE for this implementation. Default: TRUE.}
+\item{normalApproximation}{Frequentist option, currently TRUE. Omit for Bayes.}
 
-\item{groups}{Integer scalar. Number of groups; currently only 2 is
-supported (control and treatment). Default: 2.}
+\item{groups}{Number of groups; currently two.}
 
-\item{alternative}{Numeric vector. Grid of true mean differences (treatment -
-control) at which to evaluate the operating characteristics. Default:
-seq(0, 1, 0.2).}
+\item{alternative}{Finite vector of true treatment-minus-control effects.}
 
-\item{stDev}{Numeric scalar. Common standard deviation for the endpoint in
-each group. Must be positive. Default: 1.}
+\item{stDev}{Positive common SD or, for Bayes, two known SDs ordered control,
+treatment. Defaults to one. Sampling uncertainty of SDs is not modeled.}
+
+\item{priorDist}{Bayesian RBesT normMix prior on the effect or a list of two
+normMix priors ordered control, treatment. NULL selects mixnorm(c(1, 0, 100)).
+Only identity-link normal mixtures are supported.}
+
+\item{controlMean}{True control mean, required only with separate group priors.}
 }
 \value{
-An object of class \code{OperatingCharcteristicsMeans} (R6). The
-object contains fields: \code{design}, \code{numberOfSubjects},
-\code{normalApproximation}, \code{alternative}, \code{stDev}, and
-\code{probabilities} (a data.frame with columns \code{category},
-\code{probability}, \code{nControl}, \code{nTreatment}, \code{alternative},
-and \code{stDev}).
+An OperatingCharcteristicsMeans object with the rule, assumptions and
+category-block probability data frame. Bayesian data additionally retain
+stDevControl and stDevTreatment; the scalar stDev facet is their root mean square.
 }
 \description{
-getOperatingCharacteristicsMeans computes the operating characteristics
-(probabilities of the decision categories) for a fixed (non-adaptive)
-two-group design with a quantitative endpoint using a normal
-approximation. The decision boundaries are defined by a
-\code{TrialDesignPlanQuantitative} object (created by
-\code{getDesignQuantitative}).
+Computes frequentist or Bayesian decision probabilities, selected by the class
+of the quantitative design rule.
 }
 \details{
-The function validates inputs and then calls internal helpers to compute
-category probabilities for each combination of sample sizes and
-alternatives. The categories follow the fixed-design decision rule
-convention used by the QTD module: "Go (Fixed)", "Go", "Indeterminate 1",
-"Indeterminate 2", "Stop", and "Stop (Fixed)". Probabilities are
-returned as part of an \code{OperatingCharcteristicsMeans} R6 object which
-contains both the design and a data.frame of probabilities for plotting and
-reporting.
+Bayesian calculations require RBesT. Single-component normal priors use the
+analytic conjugate normal calculation; normal mixtures use RBesT oc1S (effect
+prior) or oc2S (group priors). The effect-prior sampling variance is
+stDevControl^2/nControl + stDevTreatment^2/nTreatment. For group priors,
+the true treatment mean is controlMean + alternative.
+
+RBesT mixture OCs use numerical decision-boundary searches and integration.
+Agreement with independent references is therefore approximate, typically around
+1e-4 with the package defaults; exact threshold ties and near-boundary values
+require care. No t-based or unknown-variance Bayesian model is implied.
+Bayesian probabilities are conditional sampling OCs at fixed true effects,
+not prior-predictive probabilities. All explicit categories are validated for
+exclusion before the residual category is calculated.
+
+There are six frequentist categories, or four Bayesian categories: Go,
+Indeterminate 1, Indeterminate 2 and Stop. Three-category plots merge the two
+intermediate categories. Sample-size scenarios, effect order and repeats are
+retained. Bayesian priors and controlMean are stored for summaries, sensitivity
+recalculation and \code{\link[=getObjectRCode]{getObjectRCode()}}.
 }
 \examples{
-# Create a decision rule
-decisionRule <- getDesignQuantitative(targetValue = 1.5, lowerReferenceValue = 0)
+rule <- getDesignQuantitative(1)
+getOperatingCharacteristicsMeans(rule, numberOfSubjects = matrix(c(20, 30), ncol = 2))
+if (requireNamespace("RBesT", quietly = TRUE)) {
+    bayes <- getDesignQuantitative(1, bayesian = TRUE)
+    getOperatingCharacteristicsMeans(bayes,
+        numberOfSubjects = matrix(c(20, 30), ncol = 2), alternative = c(0, 1, 2))
+}
 
-# Evaluate operating characteristics for two sample-size scenarios
-nMatrix <- matrix(c(50, 100, 75, 150), ncol = 2, byrow = TRUE)
-oc <- getOperatingCharacteristicsMeans(
-    design = decisionRule,
-    numberOfSubjects = nMatrix,
-    alternative = seq(0, 2, 0.5),
-    stDev = 1
-)
-oc$probabilities
-
+}
+\seealso{
+\code{\link[=getDesignQuantitative]{getDesignQuantitative()}}, \code{\link[=getOperatingCharacteristicsRates]{getOperatingCharacteristicsRates()}}
 }

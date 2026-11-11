@@ -1,3 +1,3 @@
 #' Field description: decision probabilities QTD
-#' @field probabilities Computed data frame of decision-category probabilities. Contains one block per sample-size scenario, with all six categories and all supplied effect or rate scenarios. Columns identify the category, probability, control and treatment sample sizes, true effect and endpoint-specific assumptions.
+#' @field probabilities Calculated data frame of decision-category probabilities. Frequentist results store six categories; Bayesian results store Go, Indeterminate 1, Indeterminate 2 and Stop. Within each sample-size scenario, categories form blocks retaining supplied effect order and repeats. Probabilities are on the scale 0 to 1.
 #' @keywords internal

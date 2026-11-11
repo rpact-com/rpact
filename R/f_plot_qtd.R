@@ -236,7 +236,9 @@ plot.TrialDesignPlanQuantitative <- function(x, ..., type = 1L, estimates = NULL
 #'
 #' @param x Operating characteristics from [getOperatingCharacteristicsMeans()]
 #'   or [getOperatingCharacteristicsRates()].
-#' @param plotCat Number of decision categories, either 3 (default) or 6.
+#' @param plotCat Number of decision categories: 3 (default), 6 for frequentist
+#'   results or 4 for Bayesian results. Bayesian sensitivity recalculations retain
+#'   the original priors and use the Bayesian calculation.
 #' @param main Optional title. The original positional `plotCat` and `main`
 #'   arguments are retained for compatibility.
 #' @param ... Additional arguments are checked for unknown names.
@@ -351,7 +353,11 @@ plot.OperatingCharcteristics <- function(x, plotCat = c(3, 6), main = NA_charact
     if (identical(as.character(plotCat), c("3", "6"))) {
         plotCat <- 3L
     }
-    .assertQtdPlotChoice(plotCat, "plotCat", c(3L, 6L), functionName)
+    allowedCategories <- c(3L, 6L)
+    if (inherits(x$.design, "TrialDesignPlanQuantitativeBayes")) {
+        allowedCategories <- c(3L, 4L)
+    }
+    .assertQtdPlotChoice(plotCat, "plotCat", allowedCategories, functionName)
     .assertQtdPlotChoice(type, "type", 1:6, functionName)
     settings <- .getQtdEndpointSettings(x, xAxis, functionName)
     data <- .getQtdPlotData(x, plotCat, stDev, pi2)

@@ -67,7 +67,7 @@ NULL
 NULL
 
 .isQuantitativeSummaryObject <- function(object) {
-    return(inherits(object, "TrialDesignPlanQuantitative") || .isQtdOperatingCharacteristics(object))
+    return(inherits(object, "TrialDesignPlanQuantitativeBase") || .isQtdOperatingCharacteristics(object))
 }
 
 .createSummaryQuantitative <- function(object, digits, output, markdown = FALSE) {
@@ -84,6 +84,22 @@ NULL
         digitSettings, consoleOutputEnabled) {
     for (parameterName in parameterNames) {
         values <- object[[parameterName]]
+        if (inherits(values, "QuantitativeDecisionThresholds")) {
+            values <- paste0("P(effect ", ifelse(values$lowerTail, "<= ", "> "),
+                values$quantiles, ") > ", values$probabilities)
+        } else if (inherits(values, "mix") || inherits(values, "normMix") || inherits(values, "betaMix") ||
+                (is.list(values) && length(values) == 2L)) {
+            formatPrior <- function(prior) {
+                return(paste0(class(prior)[1L], ": ", paste(vapply(seq_len(ncol(prior)), function(i) {
+                    return(paste(signif(prior[, i], 5), collapse = ", "))
+                }, character(1)), collapse = "; ")))
+            }
+            if (is.list(values)) {
+                values <- paste(vapply(values, formatPrior, character(1)), collapse = " / ")
+            } else {
+                values <- formatPrior(values)
+            }
+        }
         if (parameterName == "groups") {
             values <- .formatSampleSizes(values)
         } else if (is.numeric(values)) {
@@ -135,6 +151,13 @@ NULL
     }
     operatingCharacteristics <- .isQtdOperatingCharacteristics(object)
     ruleParameters <- c("targetValue", "lowerReferenceValue", "upperPercentile", "lowerPercentile")
+    rule <- object
+    if (operatingCharacteristics) {
+        rule <- object$.design
+    }
+    if (inherits(rule, "TrialDesignPlanQuantitativeBayes")) {
+        ruleParameters <- c("go", "stop", "indeterminate1", "percentileMapping")
+    }
 
     if (summaryFactory$output %in% c("all", "title")) {
         summaryFactory$.cat(summaryFactory$title, "\n\n",

@@ -33,7 +33,9 @@
 \item{x}{Operating characteristics from \code{\link[=getOperatingCharacteristicsMeans]{getOperatingCharacteristicsMeans()}}
 or \code{\link[=getOperatingCharacteristicsRates]{getOperatingCharacteristicsRates()}}.}
 
-\item{plotCat}{Number of decision categories, either 3 (default) or 6.}
+\item{plotCat}{Number of decision categories: 3 (default), 6 for frequentist
+results or 4 for Bayesian results. Bayesian sensitivity recalculations retain
+the original priors and use the Bayesian calculation.}
 
 \item{main}{Optional title. The original positional \code{plotCat} and \code{main}
 arguments are retained for compatibility.}

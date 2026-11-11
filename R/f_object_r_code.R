@@ -590,6 +590,14 @@ getObjectRCode <- function(
     }
 
     .assertIsParameterSetClass(obj, "ParameterSet")
+    if (inherits(obj, "TrialDesignPlanQuantitativeBase") ||
+            inherits(obj, "QuantitativeDecisionThresholds") || .isQtdOperatingCharacteristics(obj)) {
+        code <- .getQtdRCodeExpression(obj, newArgumentValues)
+        return(.formatRCode(paste0(prefix, code), precondition = character(),
+            stringWrapParagraphWidth = stringWrapParagraphWidth, postfix = postfix,
+            stringWrapPrefix = stringWrapPrefix, pipeOperator = pipeOperator,
+            pipeOperatorPostfix = pipeOperatorPostfix, output = output, explicitPrint = explicitPrint))
+    }
     if (inherits(obj, "PiecewiseSurvivalTimeMultiGroup")) {
         return(.getPiecewiseSurvivalRCode(obj, leadingArguments, newArgumentValues,
             prefix, postfix, stringWrapPrefix, pipeOperator, pipeOperatorPostfix, output, explicitPrint))

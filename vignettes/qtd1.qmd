@@ -1,0 +1,52 @@
+# Design doc for QTD1
+
+This design doc is used to align on a high-level plan for the reimplementation of the QTD1 app functionality.
+
+## Background
+
+-   QTD1 was developed first, based on request by internal management.
+-   Its methodology is very similar to the section on "Quantitative decision criteria and trial performance metrics" in the Lalonde et al (2007) paper.
+    -   The names are different from those in the paper.
+-   `QTD1_demo.pptx` shows a presentation on how the app would be used.
+-   The computation code of QTD1 is organized in an R package format, but was never released externally.
+-   The GUI code is in Java and was developed by a contractor and is not available.
+    -   Shiny was not yet available at the time of development, therefore Java was used.
+    -   That should not be a problem because the app consists of a single page with a few input fields only and a single plot output, so we can implement it without having the Java code.
+-   To start the binary application, unzip file `QTD_1.1.1.zip` and execute `bin/QTD.exe`
+    -   Note: First need to install old Java SDK and JRE for 32bit on Windows, see [here](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html).
+
+## Motivation
+
+-   The current QTD1 app is not working correctly anymore (reproducibility issues).
+-   The IT security department does not like the fact that the app is installed on desktop computers directly, instead of being hosted on a server.
+
+Therefore a new implementation is needed.
+
+## Objectives
+
+Develop a Shiny app that replicates the functionality of QTD1:
+
+-   R code should be available when requested by the user.
+-   The underlying computations shall be implemented in an open source R package, that can also be used without the Shiny app.
+    -   The names of quantities etc should be based on the LaLonde paper instead of on the QTD1 app, to be easily useable by external users too.
+-   Follow good software engineering practices, in particular the [`openstatsguide`](https://openstatsware.org/guide.html).
+
+## Proposal
+
+-   Develop the required statistical calculations in new functions in the `rpact` R package
+    -   It fits within the scope of the package because `rpact` includes fixed design analyses and operating characteristics
+    -   In terms of additional statistical methods, little will be needed (maybe score test based confidence intervals for binary proportions)
+    -   Detailed design to be included here below later
+    -   The code will be automatically included in the validation process of the `rpact` package
+    -   Open source available on CRAN as part of `rpact`
+-   Develop the Shiny app to be a module of the RPACT Cloud
+    -   Code would not be public, but free usage up to certain usage limit for the public
+    -   The app would be hosted on the RPACT Cloud, see [here](https://cloud.rpact.com)
+    -   Installation as part of RPACT Cloud in Novartis internally, easily available in the existing RPACT Cloud deployment, deployment instructions and source code available in the Novartis-specific GitHub repository, see [here](https://github.com/rpact-com/rpact.cloud.novartis)
+    -   Other companies licensing RPACT Cloud can also use the app then internally in their own RPACT Cloud
+
+## References
+
+-   Lalonde RL, Kowalski KG, Hutmacher MM, Ewy W, Nichols DJ, Milligan PA, Corrigan BW, Lockwood PA, Marshall SA, Benincosa LJ, Tensfeldt TG, Parivar K, Amantea M, Glue P, Koide H, Miller R. Model-based drug development. Clin Pharmacol Ther. 2007 Jul;82(1):21-32. doi: 10.1038/sj.clpt.6100235. Epub 2007 May 23. PMID: 17522597.
+-   A quick search externally did not show any obvious R packages on CRAN, but then again the calculations are relatively simple.
+-   Exploristics is selling a proprietary software that seems to be similar, see [here](https://exploristics.com/wp-content/uploads/2021/02/Exploristics_BioStatistics_Services_KerusCloud_Case_Study_Supporting_Go_No_Go_Decision_Making.pdf)

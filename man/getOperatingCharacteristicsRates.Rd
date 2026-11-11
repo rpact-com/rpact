@@ -11,7 +11,9 @@ getOperatingCharacteristicsRates(
   pi1,
   pi2,
   directionUpper = TRUE,
-  intervalMethod = "qtd1"
+  intervalMethod = "qtd1",
+  priorDist1 = NULL,
+  priorDist2 = NULL
 )
 }
 \arguments{
@@ -34,6 +36,9 @@ If TRUE (default), the effect is \code{pi1 - pi2}; if FALSE, it is \code{pi2 - p
 \item{intervalMethod}{One of \code{"qtd1"} (default), \code{"farringtonManning"},
 \code{"miettinenNurminen"}, or \code{"newcombe"}, as described in
 \code{\link[=plot.TrialDesignPlanQuantitative]{plot.TrialDesignPlanQuantitative()}}.}
+
+\item{priorDist1, priorDist2}{Bayesian RBesT betaMix priors for treatment and
+control, respectively. NULL selects mixbeta(c(1, 1/3, 1/3)) for each arm.}
 }
 \value{
 An \code{OperatingCharcteristicsRates} object supporting console and
@@ -46,6 +51,16 @@ Calculates probabilities of all six quantitative decision categories by
 exact summation over two independent binomial event counts.
 }
 \details{
+Bayesian rules use RBesT postmix and decision2S on the complete binomial
+count grid, followed by exact binomial probability summation. This avoids
+truncation by eps and mixed-tail boundary sentinel edge cases observed with
+oc2S in RBesT 1.12.0. Strict posterior comparisons follow RBesT. The four
+Bayesian categories are Go, Indeterminate 1, Indeterminate 2 and Stop;
+exact probability-threshold ties belong to Indeterminate 2. Omit intervalMethod
+for Bayesian rules. Priors are stored for reproducible output and recalculation.
+Only identity-link beta mixtures are supported. The count-grid limit applies
+to Bayesian rules as well; evaluation of large grids can be expensive.
+
 Decision boundaries use the same interval calculations and equality rules
 as the binary decision map. The QTD1 method reproduces the original program,
 including Wilson limits rounded to four decimal places in its variance

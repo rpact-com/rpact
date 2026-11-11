@@ -15,6 +15,9 @@
 ## |
 
 .getQtdPlotCaptions <- function(object) {
+    if (inherits(object, "TrialDesignPlanQuantitativeBayes")) {
+        return(c("Posterior intervals", "Posterior decision regions", "Binary posterior decision map"))
+    }
     if (inherits(object, "TrialDesignPlanQuantitative")) {
         return(c("Decision rule intervals", "Normal decision regions", "Binary event-count decision map"))
     }
@@ -28,6 +31,9 @@
 .getQtdCategories <- function(plotCat = 6L) {
     if (plotCat == 3L) {
         return(c("Go", "Indeterminate", "Stop"))
+    }
+    if (plotCat == 4L) {
+        return(c("Go", "Indeterminate 1", "Indeterminate 2", "Stop"))
     }
     return(c("Go (Fixed)", "Go", "Indeterminate 1", "Indeterminate 2", "Stop", "Stop (Fixed)"))
 }
@@ -102,6 +108,10 @@
 }
 
 .assertQtdPlotRule <- function(rule, functionName) {
+    if (inherits(rule, "TrialDesignPlanQuantitativeBayes")) {
+        .validateQtdBayesRule(rule, functionName)
+        return(invisible(TRUE))
+    }
     if (!inherits(rule, "TrialDesignPlanQuantitative")) {
         stopIllegalArgument("'x' must contain a quantitative decision rule",
             functionName = functionName, parameter = "x", value = rule,
@@ -152,6 +162,9 @@
 }
 
 .getQtdPlotData <- function(object, plotCat, stDev = NULL, pi2 = NULL) {
+    if (inherits(object$.design, "TrialDesignPlanQuantitativeBayes")) {
+        return(.getQtdBayesPlotData(object, plotCat, stDev, pi2))
+    }
     functionName <- "plot.OperatingCharcteristics"
     settings <- .getQtdEndpointSettings(object, functionName = functionName)
     .assertQtdPlotRule(object$.design, functionName)
@@ -399,6 +412,9 @@
 }
 
 .getQtdPlotSubtitle <- function(rule, stDev = NULL) {
+    if (inherits(rule, "TrialDesignPlanQuantitativeBayes")) {
+        return(paste0("Bayesian decision rule; mapping = ", rule$percentileMapping))
+    }
     result <- paste0("LRV = ", rule$lowerReferenceValue, "; TV = ", rule$targetValue,
         "; percentiles = ", rule$lowerPercentile, " / ", rule$upperPercentile)
     if (!is.null(stDev)) {
@@ -408,6 +424,9 @@
 }
 
 .getQtdOcPlotSubtitle <- function(object, data, settings) {
+    if (inherits(object$.design, "TrialDesignPlanQuantitativeBayes")) {
+        return(.getQtdPlotSubtitle(object$.design))
+    }
     if (settings$endpoint == "means") {
         return(.getQtdPlotSubtitle(object$.design, unique(data$stDev)))
     }
@@ -426,7 +445,9 @@
         direction <- -1
     }
     values <- c(LRV = object$.design$lowerReferenceValue, TV = object$.design$targetValue)
+    values <- values[is.finite(values)]
     references$value <- references$pi2 + direction * values[references$reference]
+    references <- references[is.finite(references$value), , drop = FALSE]
     return(references[references$value >= 0 & references$value <= 1, , drop = FALSE])
 }
 
@@ -463,6 +484,7 @@
         references <- data.frame(value = c(rule$lowerReferenceValue, rule$targetValue),
             reference = c("LRV", "TV"))
     }
+    references <- references[is.finite(references$value), , drop = FALSE]
     if (nrow(references) == 0L) {
         return(p)
     }

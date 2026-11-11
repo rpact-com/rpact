@@ -2,6 +2,8 @@
 
 ## New features
 
+* Quantitative trial design now supports Bayesian decision rules through `getDesignQuantitative(bayesian = TRUE)` and custom criteria from `getQuantitativeDecisionThresholds()`. The common means and rates OC functions dispatch by design class and support RBesT normal or beta mixture priors. Bayesian results include four exclusive decision categories, posterior decision maps, summaries, sensitivity plots and reproducible R code. Percentile interpretation is explicit through `percentileMapping`; the default preserves the quantile interpretation. RBesT is an optional suggested dependency.
+
 * Introduced quantitative trial design (QTD) for fixed two-group trials with continuous or binary endpoints. The new function `getDesignQuantitative()` defines decision rules through a target value, a lower reference value, and two percentiles. The new functions `getOperatingCharacteristicsMeans()` and `getOperatingCharacteristicsRates()` calculate probabilities for six Go, Indeterminate, and Stop categories across sample-size and effect scenarios, using a normal approximation for means and exact binomial summation for rates. Binary calculations offer QTD1 (default), Farrington–Manning, Miettinen–Nurminen, and Newcombe interval methods through `intervalMethod`. The new QTD result objects include console and Markdown tables, summaries with a probability table per sample-size scenario, and ggplot2 plots of decision rules, operating characteristics, sample-size and scenario comparisons, sensitivity, and explicitly weighted decision performance. Rates plots support treatment-rate or beneficial-risk-difference axes and control-rate sensitivity with a fixed treatment-rate grid.
 
 

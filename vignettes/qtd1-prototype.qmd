@@ -1,0 +1,2633 @@
+---
+title: "Prototype for QTD1 Fixed Design in rpact"
+author: "Daniel, Friedrich, Gernot"
+date: last-modified
+format: html
+bibliography: references.bib
+toc: true
+toc-depth: 5
+toc-title: "Contents"
+toc-location: left
+---
+
+\DeclareMathOperator{\Var}{Var}
+
+## Objective
+
+Develop a prototype for the QTD1 fixed design functionality in the `rpact` R package, including both the frequentist and Bayesian decision rules.
+
+## Requirements
+
+-   The names of quantities etc should be based on the @lalonde2007 paper instead of on the original QTD1 app, to be easily useable by external users too.
+-   Leverage the existing `rpact` function `getObjectRCode()` to retrieve the full underlying code for any object, so we can reuse this functionality directly
+-   Fixed design analyses and operating characteristics producing the same plots as the original QTD1 app
+-   Include Bayesian analyses with dual criteria and fixed design as in the original QTD3 app
+-   In addition, add a new function that allows to easily create the decision rules based on the rule:
+    -   Want to have a statistically significant effect (motivates the lower bound)
+        - Frequentist: two-sided CI at 95% confidence level being greater than 0
+        - Bayes: at least 95% probability greater than 0
+    -   Want to have an observed effect that is clinically relevant (motivates the target value)
+        - Frequentist: can be translated to the one-sided CI at 50% confidence level being greater than the target value
+        - Bayes: at least 50% probability greater than the target value
+
+## Analysis of original QTD1
+
+### Continuous endpoint
+
+Let's start with the continuous endpoint functionality of the QTD1 app.
+
+#### App
+
+Here we also denote the old and new terminology, in the "old $\rightarrow$ new" format.
+
+-   Inputs:
+    -   No. of decision outcome categories: 3 or 6
+    -   Target Difference (TD) $\rightarrow$ Target Value (TV)
+    -   Minimum Acceptable Difference (MAD) $\rightarrow$ Lower Reference Value (LRV)
+    -   Expected Drug/Comparator Effect Difference (range) $\rightarrow$ Expected Value (range)
+    -   Standard Deviation (SD)
+    -   N per group (control and drug)
+        -   several scenarios can be provided
+    -   CI Upper Bound $\rightarrow$ Upper CI Level
+    -   CI Lower Bound $\rightarrow$ Lower CI Level
+-   Decision Rule has 6 outcomes (these can be merged into 3 Go, Indeterminate, Stop categories):
+    -   Go (fixed) if: Lower Percentile \> TV
+    -   Go if: Lower Percentile \> LRV and Upper Percentile \> TV
+    -   Indeterminate (1) if: Lower Percentile \< LRV and Upper Percentile \> TV
+    -   Indeterminate (2) if: Lower Percentile \> LRV and Upper Percentile \< TV
+    -   Stop if: Lower Percentile \< LRV and Upper Percentile \< TV
+    -   Stop (fixed) if : Upper Percentile \< LRV
+-   Outputs:
+    -   Faceted line plot which shows the operating characteristics of the fixed design:
+        -   x-axis: Expected Value
+        -   y-axis: Probability of Decision
+        -   Facet: Decision (6 outcomes as defined above)
+        -   colors: scenario (different N's per group)
+        -   vertical lines: at LRV and TV
+    -   Tables with
+        -   numbers which are the basis of the plot
+        -   summary table of results
+
+#### R Code
+
+The code is available in the single file `qtd1-code.R` in this folder.
+
+```{r}
+library(here)
+source(here("qtd/qtd1-code.R"))
+# Also produce the R script file from this Quarto file:
+knitr::purl(input = here("qtd/qtd1-prototype.qmd"), output = here("qtd/qtd1-prototype.R"))
+```
+
+The following functions are used:
+
+-   `checkArgs()`: assertions
+-   `OC.ct()`: operating characteristics for continuous endpoints across design scenarios
+-   `OC.ct.GO()`: calculates probabilities of decision outcomes based on standard normal CDF for one design scenario
+-   `plot.OC()`: plots the operating characteristics
+-   `summTable()`: creates the summary table of results
+
+Let's look at one example:
+
+```{r}
+library(lattice)
+
+oc_res <- OC.ct(
+    nmat = matrix(
+        data = c(
+            # control and treatment sample sizes
+            50,
+            60,
+            60,
+            70
+        ),
+        nrow = 2,
+        ncol = 2,
+        byrow = TRUE
+    ),
+    theta.LB = 0, # lower bound of the expected value range
+    theta.UB = 200, # upper bound of the expected value range
+    sd = 200, # standard deviation
+    MAD = 0, # lower reference value
+    TD = 100, # target value
+    LB = 0.2, # lower CI level for the decision rule
+    UB = 0.9, # upper CI level for the decision rule
+    file = NULL, # no file output
+    plotOC = FALSE, # don't plot the operating characteristics yet
+    plotCat = 6, # number of decision outcome categories
+    main = "", # no main title
+    len = 150 # length of the expected value range
+)
+str(oc_res)
+```
+
+We can now also create the summary table:
+
+```{r}
+oc_tab <- summTable(oc_res)
+oc_tab
+```
+
+And create the plot:
+
+```{r}
+plot.OC(
+    oc_res,
+    plotCat = 6,
+    main = "Operating Characteristics for QTD1 Continuous Endpoint"
+)
+```
+
+#### Algorithm
+
+The code part which calculates the probabilities for the 6 categories is as follows:
+
+```{r}
+#| eval: false
+s <- sd * sqrt((1 / n.trt) + (1 / n.con))
+qL <- qnorm(LB)
+qU <- qnorm(UB)
+p.1 <- 1 - pnorm(TD - qL * s, theta, s)
+mm <- max(MAD - s * qL, TD - s * qU)
+p.2 <- pnorm(TD - qL * s, theta, s) - pnorm(mm, theta, s)
+p.3 <- pnorm(MAD - qL * s, theta, s) -
+    pnorm(
+        TD - s * qU,
+        theta,
+        s
+    )
+p.3 <- pmax(p.3, 0)
+p.4 <- pnorm(TD - s * qU, theta, s) -
+    pnorm(
+        MAD - qL * s,
+        theta,
+        s
+    )
+p.4 <- pmax(p.4, 0)
+mm <- min(MAD - s * qL, TD - s * qU)
+p.5 <- pnorm(mm, theta, s) - pnorm(MAD - s * qU, theta, s)
+p.6 <- pnorm(MAD - s * qU, theta, s)
+```
+
+We can thus extract the algorithm for the continuous endpoint as follows:
+
+Say $\sigma$ is the standard deviation, $n_{T}$ is the sample size for the treatment group, and $n_{C}$ is the sample size for the control group. Let $t_{T}$ be the target value and $t_{L}$ be the lower reference value. The confidence levels of interest are $b_L$ (lower one, e.g. $0.2$) and $b_U$ (upper one, e.g. $0.9$), and these correspond to the lower confidence bound (or percentile) $\hat{\theta}_{L}$ and the upper confidence bound (or percentile) $\hat{\theta}_{U}$. Let $\Phi(\cdot \vert \mu, \tau)$ denote the normal CDF with mean $\mu$ and standard deviation $\tau$.
+
+The estimator is the mean difference between the treatment and control group observations $\hat{\theta}$, and it has a normal distribution with mean $\theta$ (the true mean difference) and standard deviation $s = \sigma \sqrt{\frac{1}{n_{T}} + \frac{1}{n_{C}}}$.
+
+Then we have $q_{L} = \Phi^{-1}(b_L)$ as the standard normal lower quantile. The corresponding lower percentile is $\hat{\theta}_{L} = \hat{\theta} + q_{L}s$. Analogously, $q_{U} = \Phi^{-1}(b_U)$ is the standard normal upper quantile. The corresponding upper percentile is $\hat{\theta}_{U} = \hat{\theta} + q_{U}s$.
+
+##### $p_{1}$
+
+The first quantity is $p_{1} = 1 - \Phi(t_{T} - q_{L} s \vert \theta, s)$, which is the probability of the first decision outcome ("Go fixed"), because:
+
+$$
+\begin{align*}
+p_{1} 
+&= 1 - \Phi(t_{T} - q_{L}s \vert \theta, s) \\
+&= 1 - \mathbb{P}(\hat{\theta} < t_{T} - q_{L}s) \\
+&= \mathbb{P}(\hat{\theta} > t_{T} - q_{L}s) \\
+&= \mathbb{P}(\hat{\theta} + q_{L}s > t_{T}) \\
+&= \mathbb{P}(\hat{\theta}_{L} > t_{T})
+\end{align*}
+$$
+
+which is indeed the probability that the lower percentile $\hat{\theta}_{L}$ is greater than the target value $t_{T}$.
+
+##### $p_{2}$
+
+The second quantity is $p_{2} = \Phi(t_{T} - q_{L}s \vert \theta, s) - \Phi(t_{M} \vert \theta, s)$, where $t_{M} = \max(t_{L} - q_{L}s, t_{T} - q_{U}s)$, which is the probability of the second decision outcome ("Go"). This is because:
+
+$$
+\begin{align*}
+p_{2}
+&= \Phi(t_{T} - q_{L}s \vert \theta, s) - \Phi(t_{M} \vert \theta, s) \\
+&= \mathbb{P}(\hat{\theta} < t_{T} - q_{L}s) - \mathbb{P}(\hat{\theta} < t_{M}) \\
+&= \mathbb{P}(\hat{\theta} + q_{L}s < t_{T}) - \mathbb{P}(\hat{\theta} < \max(t_{L} - q_{L}s, t_{T} - q_{U}s)) \\
+&= \mathbb{P}(\hat{\theta}_{L} < t_{T}) - \mathbb{P}(\hat{\theta} < t_{L} - q_{L}s \vee \hat{\theta} < t_{T} - q_{U}s) \\
+&= \mathbb{P}(\hat{\theta}_{L} < t_{T}) - \mathbb{P}(\hat{\theta}_{L} < t_{L} \vee \hat{\theta}_{U} < t_{T}) \\
+&= \mathbb{P}(\hat{\theta}_{L} < t_{T} \wedge \hat{\theta}_{L} > t_{L} \wedge \hat{\theta}_{U} > t_{T})
+\end{align*}
+$$
+
+where the last equality holds because $\mathbb{P}(A \wedge B) = \mathbb{P}(A) - \mathbb{P}(A \wedge \bar{B})$, which simplifies here to $\mathbb{P}(A) - \mathbb{P}(\bar{B})$ because $\bar{B} \subset A$.
+
+So $p_{2}$ is indeed the probability that the lower percentile $\hat{\theta}_{L}$ is less than the target value $t_{T}$ (so we are not in the "Go (fixed)" decision case), while the upper percentile $\hat{\theta}_{U}$ is greater than the target value $t_{T}$, and the lower percentile $\hat{\theta}_{L}$ is greater than the lower reference value $t_{L}$.
+
+##### $p_{3}$
+
+The third quantity is $p_{3} = \max(\Phi(t_{L} - q_{L}s \vert \theta, s) - \Phi(t_{T} - q_{U}s \vert \theta, s), 0)$, which is the probability of the first indeterminate decision outcome ("Indeterminate (1)"). This is because:
+
+$$
+\begin{align*}
+\Phi(t_{L} - q_{L}s \vert \theta, s) - \Phi(t_{T} - q_{U}s \vert \theta, s)
+&= \mathbb{P}(\hat{\theta} < t_{L} - q_{L}s) - \mathbb{P}(\hat{\theta} < t_{T} - q_{U}s) \\
+&= \mathbb{P}(\hat{\theta} + q_{L}s < t_{L}) - \mathbb{P}(\hat{\theta} + q_{U}s < t_{T}) \\
+&= \mathbb{P}(\hat{\theta}_{L} < t_{L}) - \mathbb{P}(\hat{\theta}_{U} < t_{T})
+\end{align*}
+$$
+
+the maximum of this and 0 is then supposed to be equal to $\mathbb{P}(\hat{\theta}_{L} < t_{L} \wedge \hat{\theta}_{U} > t_{T})$, which is the probability that the lower percentile $\hat{\theta}_{L}$ is less than the lower reference value $t_{L}$, while the upper percentile $\hat{\theta}_{U}$ is greater than the target value $t_{T}$.
+
+The reason why the maximum with 0 is taken is that here
+
+$$
+\begin{align*}
+\mathbb{P}(\hat{\theta}_{L} < t_{L} \wedge \hat{\theta}_{U} > t_{T})
+&= \mathbb{P}(\hat{\theta}_{L} < t_{L}) - \mathbb{P}(\hat{\theta}_{L} < t_{L} \wedge \hat{\theta}_{U} < t_{T}) \\
+&\neq \mathbb{P}(\hat{\theta}_{L} < t_{L}) - \mathbb{P}(\hat{\theta}_{U} < t_{T})
+\end{align*}
+$$
+
+because $\hat{\theta}_{U} < t_{T}$ does not imply $\hat{\theta}_{L} < t_{L}$.
+
+Therefore we can see, similar to above for $p_{2}$, it would actually be more precise and we could avoid the post-hoc maximum operation if we use instead
+
+$$
+\begin{align*}
+\mathbb{P}(\hat{\theta}_{L} < t_{L} \wedge \hat{\theta}_{U} < t_{T}) 
+&= \mathbb{P}(\hat{\theta} + q_{L}s < t_{L} \wedge \hat{\theta} + q_{U}s < t_{T}) \\
+&= \mathbb{P}(\hat{\theta} < t_{L} - q_{L}s \wedge \hat{\theta} < t_{T} - q_{U}s) \\
+&= \mathbb{P}(\hat{\theta} < \min(t_{L} - q_{L}s, t_{T} - q_{U}s)) \\
+&= \Phi(t_{m} \vert \theta, s)
+\end{align*}
+$$
+
+where $t_{m} = \min(t_{L} - q_{L}s, t_{T} - q_{U}s)$. This gives us the new definition of $p_{3}$:
+
+$$
+p_{3} = \Phi(t_{L} - q_{L}s \vert \theta, s) - \Phi(t_{m} \vert \theta, s)
+$$
+
+But obviously this is equivalent, so the original definition of $p_{3}$ is still correct.
+
+##### $p_{4}$
+
+Following the discussion about $p_{3}$ formulation, we directly use here the new equivalent definition of $p_{4}$ as $p_{4} = \Phi(t_{T} - q_{U}s \vert \theta, s) - \Phi(t_{m} \vert \theta, s)$, which is the probability of the second indeterminate decision outcome ("Indeterminate (2)"), because:
+
+$$
+\begin{align*}
+p_{4}
+&= \Phi(t_{T} - q_{U}s \vert \theta, s) - \Phi(t_{m} \vert \theta, s) \\
+&= \mathbb{P}(\hat{\theta} < t_{T} - q_{U}s) - \mathbb{P}(\hat{\theta} < t_{m}) \\
+&= \mathbb{P}(\hat{\theta} + q_{U}s < t_{T}) - \mathbb{P}(\hat{\theta} < \min(t_{L} - q_{L}s, t_{T} - q_{U}s)) \\
+&= \mathbb{P}(\hat{\theta}_{U} < t_{T}) - \mathbb{P}(\hat{\theta}_{L} < t_{L} \wedge \hat{\theta}_{U} < t_{T}) \\
+&= \mathbb{P}(\hat{\theta}_{U} < t_{T} \wedge \hat{\theta}_{L} > t_{L})
+\end{align*}
+$$
+
+which is indeed the probability that the upper percentile $\hat{\theta}_{U}$ is less than the target value $t_{T}$, while the lower percentile $\hat{\theta}_{L}$ is greater than the lower reference value $t_{L}$.
+
+##### $p_{5}$
+
+The fifth quantity is $p_{5} = \Phi(t_{m} \vert \theta, s) - \Phi(t_{L} - q_{U}s \vert \theta, s)$, which is the probability of the first stop decision outcome ("Stop"). This is because:
+
+$$
+\begin{align*}
+p_{5}
+&= \Phi(t_{m} \vert \theta, s) - \Phi(t_{L} - q_{U}s \vert \theta, s) \\
+&= \mathbb{P}(\hat{\theta} < t_{m}) - \mathbb{P}(\hat{\theta} < t_{L} - q_{U}s) \\
+&= \mathbb{P}(\hat{\theta} < \min(t_{L} - q_{L}s, t_{T} - q_{U}s)) - \mathbb{P}(\hat{\theta} + q_{U}s < t_{L}) \\
+&= \mathbb{P}(\hat{\theta}_{L} < t_{L} \wedge \hat{\theta}_{U} < t_{T}) - \mathbb{P}(\hat{\theta}_{U} < t_{L}) \\
+&= \mathbb{P}(\hat{\theta}_{L} < t_{L} \wedge t_{L} < \hat{\theta}_{U} < t_{T})
+\end{align*}
+$$
+
+which is indeed the probability that the lower percentile $\hat{\theta}_{L}$ is less than the lower reference value $t_{L}$, while the upper percentile $\hat{\theta}_{U}$ is between the lower reference value $t_{L}$ and the target value $t_{T}$.
+
+##### $p_{6}$
+
+The sixth quantity is $p_{6} = \Phi(t_{L} - q_{U}s \vert \theta, s)$, which is the probability of the second stop decision outcome ("Stop fixed"). We can by now see easily that this is equal to $\mathbb{P}(\hat{\theta}_{U} < t_{L})$, so it is the probability that the upper percentile $\hat{\theta}_{U}$ is less than the lower reference value $t_{L}$.
+
+### Binary endpoint
+
+Let's also look at the binary endpoint functionality.
+
+#### App
+
+Here we just summarize the differences vs. the continuous endpoint app:
+
+-   Inputs:
+    -   Increasing Response Benefits the Subject? No/Yes (additional)
+    -   Expected Drug Response in % (Range) (instead of Expected Value)
+    -   Expected Comparator Response in % (fixed) (instead of SD)
+
+The output is in the same format and the decision rule is the same.
+
+#### R Code
+
+The following functions are used specifically for the binary endpoint:
+
+-   `OC.bin()`: operating characteristics for binary endpoints across design scenarios
+-   `OC.bin.scoreCI()`: calculates the score confidence interval for one treatment arm
+-   `OC.bin.tab()`: for a given design (sample sizes per arm)
+    -   enumerates all possible trial outcomes (number of responses per arm)
+    -   calculates the score confidence intervals for each arm and both $b_{L}$ and $b_{U}$ confidence levels
+    -   based on these, calculates the lower and upper percentiles for the response difference
+-   `OC.bin.GO()`: based on the enumerated trial outcomes, sums the probabilities for the 6 decision outcomes
+
+Let's look at one example:
+
+```{r}
+oc_bin_res <- OC.bin(
+    nmat = matrix(
+        data = c(
+            # control and treatment sample sizes
+            50,
+            60,
+            60,
+            70
+        ),
+        nrow = 2,
+        ncol = 2,
+        byrow = TRUE
+    ),
+    p.trt.LB = 0, # expected response in drug grid start
+    p.trt.UB = 1, # expected response in drug grid end
+    p.con = 0.5, # expected response in comparator group
+    MAD = 0.2, # lower reference value on the response difference scale
+    TD = 0.4, # target value on the response difference scale
+    LB = 0.2, # lower CI level
+    UB = 0.9, # upper CI level
+    lower = TRUE, # whether lower response is better (default) or higher response (optional FALSE)
+    plotCat = 6,
+    len = 150 # number of grid points on expected response in drug
+)
+str(oc_bin_res)
+```
+
+We can now also create the summary table:
+
+```{r}
+oc_bin_tab <- summTable(oc_bin_res)
+oc_bin_tab
+```
+
+And create the plot:
+
+```{r}
+plot.OC(
+    oc_bin_res,
+    plotCat = 6,
+    main = "Operating Characteristics for QTD1 Binary Endpoint"
+)
+```
+
+We can see here that by default a lower response rate is interpreted as a benefit to the patient, e.g. the reference lines are showing the control response rate (here 50%) minus the lower reference value (20%) and the target value (40%), so 30% and 10%, respectively.
+
+#### Algorithm
+
+The most complex part of the algorithm mentioned in the R code overview above is the calculation of the lower and upper percentiles for the response difference, which is done in `OC.bin.tab()`. This is the relevant code part (here we just show the direction where lower response is better, i.e. `lower = TRUE`), where we focus on the lower percentile - the upper percentile is calculated exactly in the analogous way:
+
+```{r}
+#| eval: false
+
+tmpmat <- data.frame(expand.grid(0:n.con, 0:n.trt)) # all possible trial outcomes
+names(tmpmat) <- c("y.con", "y.trt") # first column is control responses, second is treatment responses
+tmpmat$RD <- ((tmpmat[, 1]) / (n.con)) - ((tmpmat[, 2]) / (n.trt)) # risk (response proportion) differences: control - treatment
+
+tmpmat[, c("con.MAD.L", "con.MAD.U")] <- OC.bin.scoreCI(
+    # calculate score CI for control arm
+    tmpmat$y.con,
+    n = n.con,
+    conf.level = 1 - (LB * 2) # with lower confidence level, e.g. 0.6 for LB = 0.2
+)
+tmpmat[, c("trt.MAD.L", "trt.MAD.U")] <- OC.bin.scoreCI(
+    # calculate score CI for treatment arm
+    tmpmat$y.trt,
+    n = n.trt,
+    conf.level = 1 - (LB * 2) # also with the same lower confidence level
+)
+
+madL <- tmpmat$con.MAD.L * (1 - tmpmat$con.MAD.L) # lower bound of the variance in the control arm
+madU <- tmpmat$trt.MAD.U * (1 - tmpmat$trt.MAD.U) # upper bound of the variance in the treatment arm
+sdMAD <- sqrt(madL / n.con + madU / n.trt) # calculate the standard deviation of the risk difference estimate
+tmpmat$lower <- tmpmat$RD + qnorm(LB) * sdMAD # calculate the lower percentile for the risk difference
+```
+
+This is the Newcombe or score confidence interval for the proportion difference, see @newcombe1998 (method no. 10, "Method based on the Wilson score method for the single proportion, without continuity correction"). This is also implemented e.g. in the `tern` package [here](https://github.com/insightsengineering/tern/blob/main/R/desctools_binom_diff.R#L91).
+
+## Analysis of original QTD3 for fixed design
+
+Now let's have a look at the QTD3 app when used for a fixed design, using Bayesian decision rules.
+
+### Decision rule idea
+
+- Again dual criteria are used here, formulated for the treatment effect $\delta$
+  - First criterion: "statistical significance" (in quotation marks here because it is Bayesian)
+  - Second criterion: "clinical relevance"
+- Go scenario:
+  - Posterior probability of the treatment effect being larger than the null hypothesis value is larger than 97.5%
+    - In general: $\mathbb{P}(\delta > s_{1} | y) > p_{1}$
+  - Posterior probability of the treatment effect being larger than the target value is larger than 50%
+    - In general: $\mathbb{P}(\delta > s_{2} | y) > p_{2}$
+- Stop scenario:
+  - Posterior probability of the treatment effect being *smaller* than the null hypothesis value is *above 50%*
+    - In general: $\mathbb{P}(\delta < f_{1} | y) > q_{1}$
+  - Posterior probability of the treatment effect being *smaller* than the target value is *above 80%*
+    - In general: $\mathbb{P}(\delta < f_{2} | y) > q_{2}$
+- Indeterminate scenario:
+  - Everything inbetween
+  - Note that there are only 3 outcome categories here, and not 6 as in the QTD1 app
+    - **Question**: Should we just omit the 6 categories option altogether?
+       - yes, but we still want to distinguish between the two indeterminate cases, see below
+- Posterior probability rules are specified (potentially differently) also for the interim analyses
+  - **Question**: Sebastian mentioned that using `RBesT` this would instead use predictive probabilities for the final study outcome
+    - Is that ok? 
+
+### Indeterminate cases
+
+Here we would like to differentiate between two indeterminate cases:
+
+- Indeterminate (1): Posterior probability of the treatment effect being larger than the null hypothesis value is *lower* than 97.5%, but the posterior probability of the treatment effect being larger than the target value is larger than 50%
+
+- Indeterminate (2): Any other case which is not Go or Stop or Indeterminate (1)
+  
+![QTD3 Decision Rule. y-axis has the posterior density of the treatment effect, x-axis has the treatment effect. In this case, the decision would be "Go", because both criteria are fulfilled.](images/bayes-criteria1.jpg)
+
+### Continuous endpoint
+
+- Here $\delta = \mu_{T} - \mu_{C}$ is the treatment effect, where 
+  - $\mu_{T}$ is the mean of the treatment group and 
+  - $\mu_{C}$ is the mean of the control group
+- Normal distribution (known variance) with normal prior distributions
+- Can use numerical integration when the prior is on $\delta$
+- But when the priors are on $\mu_{T}$ and $\mu_{C}$, then uses simulations for the operating characteristics
+
+### Binary endpoint
+
+- Treatment effect choice:
+    - Either $\delta = \pi_{T} - \pi_{C}$, where $\pi_{T}$ is the response rate in the treatment group and $\pi_{C}$ is the response rate in the control group
+    - Or $\delta = \pi_{T}(1 - \pi_{C}) / ((1 - \pi_{T})\pi_{C})$, which is the odds ratio (OR) of the treatment group response rate to the control group response rate
+- Number of responders independent and identically Binomially distributed in control and treatment groups
+- Implemented non-informative prior distribution:
+  - $\text{Beta}(1/3, 1/3)$ (see @kerman2011)
+- Informative prior distribution is specified in terms of prior observed rate: $\pi_{0}$, prior sample size: $n_{0}$
+  - This is translated to a $\text{Beta}(1/3 + n_{0}\pi_{0} , 1/3 + n_{0}(1-\pi_{0}))$ prior
+  - Prior median $\approx \pi_{0}$, sum of beta distribution parameters: $n_{0}+2/3$
+- Again uses exhaustive enumeration of all possible trial outcomes
+  - combined with numerical integration
+- Optional normal approximation
+
+### Outputs
+
+- Plot of outcome probabilities for the 3 decision outcomes, similar as for QTD1
+- Expected sample size vs. treatment effect
+- Tables for both
+- R code which was used to create the results
+
+## How `RBesT` evaluates operating characteristics
+
+We can read in the vignette [here](https://opensource.nibr.com/RBesT/articles/introduction_normal.html#operating-characteristics-of-design-options) how `RBesT` evaluates the operating characteristics of design options using dual criteria based on Bayesian posterior probabilities.
+
+- `RBesT` requires the input of decision rules via 
+  - for two samples: `decision2S` function and then calculates the operating characteristics with the `oc2S` function.
+    - prior distributions separately for both treatment and control groups
+  - for one sample: `decision1S` function and then calculates the operating characteristics with the `oc1S` function.
+    - prior distribution for the treatment effect $\delta$
+-  Note that it is even possible to use more than two criteria (so `pc` and `qc` can have one, two or more elements)
+- We can then just define the Stop decision rule analogously to the Go decision rule
+
+Here is an example:
+
+- Go is defined as $\mathbb{P}(\delta > 0 | y) > 0.95$ and $\mathbb{P}(\delta > 50 | y) > 0.5$
+- Stop is defined as $\mathbb{P}(\delta < 0 | y) > 0.5$ and $\mathbb{P}(\delta < 20 | y) > 0.8$
+- Indeterminate is everything inbetween, but if we want we can distinguish between:
+  - Indeterminate (1): $\mathbb{P}(\delta > 50 | y) > 0.5$ but $\mathbb{P}(\delta > 0 | y) < 0.95$
+  - Indeterminate (2): $\mathbb{P}(\delta > 0 | y) > 0.95$ but $\mathbb{P}(\delta > 50 | y) < 0.5$
+  - Inderminate (3): all other cases which are not Go, Stop, Indeterminate (1) or Indeterminate (2)
+
+```{r}
+library(RBesT)
+
+# Define the Go decision rule for the treatment effect with dual criteria.
+go_rule <- decision1S(
+    pc = c(0.95, 0.5), # posterior probabilities for the decision rule
+    qc = c(0, 50), # quantiles for the decision rule
+    lower.tail = FALSE # probabilities should be "greater than"
+)
+go_rule
+
+# Define the Stop decision rule for the treatment effect with dual criteria.
+stop_rule <- decision1S(
+    pc = c(0.5, 0.8), # posterior probabilities for the decision rule
+    qc = c(0, 20), # quantiles for the decision rule
+    lower.tail = TRUE # probabilities should be "less than"
+)
+stop_rule
+
+# Define two different indeterminate decision rules for the treatment effect with dual criteria.
+indeterminate_rule1 <- decision1S(
+    pc = c(0.5, 0.05),
+    qc = c(50, 0),
+    lower.tail = c(FALSE, TRUE)
+)
+indeterminate_rule2 <- decision1S(
+    pc = c(0.95, 0.5),
+    qc = c(0, 50),
+    lower.tail = c(FALSE, TRUE)
+)
+
+# Define the normal prior distribution on the treatment effect.
+s <- 20
+flat_prior <- mixnorm(
+    c(1, 0, 100), # weight 1, mean 0, standard deviation 100
+    sigma = s # fixed standard deviation for the normal observations
+)
+
+oc_go <- oc1S(
+    prior = flat_prior,
+    n = 10,
+    decision = go_rule
+)
+oc_stop <- oc1S(
+    prior = flat_prior,
+    n = 10,
+    decision = stop_rule
+)
+oc_indeterminate1 <- oc1S(
+    prior = flat_prior,
+    n = 10,
+    decision = indeterminate_rule1
+)
+oc_indeterminate2 <- oc1S(
+    prior = flat_prior,
+    n = 10,
+    decision = indeterminate_rule2
+)
+
+delta_grid <- seq(-20, 80, length.out = 200) # treatment effect grid
+prob_go <- oc_go(delta_grid) # probabilities for the Go decision rule
+prob_stop <- oc_stop(delta_grid) # probabilities for the Stop decision rule
+prob_indeterminate1 <- oc_indeterminate1(delta_grid) # probabilities for the first Indeterminate decision rule
+prob_indeterminate2 <- oc_indeterminate2(delta_grid) # probabilities for the second Indeterminate decision rule
+prob_indeterminate3 <- 1 - prob_go - prob_stop - prob_indeterminate1 - prob_indeterminate2
+
+# Plot the operating characteristics.
+plot(
+    delta_grid,
+    prob_go,
+    type = "l",
+    col = "green",
+    ylim = c(0, 1),
+    xlab = "Treatment Effect",
+    ylab = "Probability of Decision",
+    main = "Operating Characteristics"
+)
+lines(delta_grid, prob_stop, col = "red")
+lines(delta_grid, prob_indeterminate1, col = "blue")
+lines(delta_grid, prob_indeterminate2, col = "purple")
+lines(delta_grid, prob_indeterminate3, col = "orange")
+legend(
+    "topright",
+    legend = c("Go", "Stop", "Indeterminate (1)", "Indeterminate (2)", "Indeterminate (3)"),
+    col = c("green", "red", "blue", "purple", "orange"),
+    lty = 1
+)
+```
+
+We see that in this case the probability for indeterminate (1) is always zero. This is because the sample size is large enough such that when the median estimate is above 50, then the probability of being above 0 is always above 95%. 
+
+## Idea for `rpact` implementation of frequentist QTD1 fixed design
+
+The main summary of above is that the original QTD1 algorithm uses:
+
+-   Closed form calculations based on the normal distribution of the treatment difference for the continuous endpoint.
+-   Enumeration of all possible trial outcomes for the binary endpoint.
+
+For `rpact` we would like to integrate the new functionality as seamlessly as possible into the existing framework. One initial idea is:
+
+-   We propose a single constructor `getDesignDecisionRule()`
+    -   This consolidates all necessary inputs which are not endpoint-specific
+        - e.g. for now we would always have `kMax = 1`, i.e. a fixed design, but it could be easily extended to GSD later
+        -   Target Value (TV)
+        -   Lower Reference Value (LRV)
+        -   Upper Percentile
+        -   Lower Percentile
+-   As an alternative to specifying the last 3 of these values, the user can also choose to instead specify:
+    -   Significance level
+        - We want to the trial to be statistically significant
+        - This means that the lower bound of the confidence interval with level $(1 - \alpha)$ must be larger than the null hypothesis value
+        - So the lower percentile is set to $\alpha/2$.
+    -   So the LRV is automatically set to 0
+    -   Target Value (TV)
+        - We want to observe at least a certain value as the treatment effect estimate
+        - Here we use a 50% one-sided CI
+    -   See also this overview slide translating the QTD1 to and from the QTD3 decision rules:
+        ![Translation between QTD1 and QTD3 rules](images/2025-07-24-17-31-08.png)
+    -   We implement this with a flag option in the constructor function, e.g. `useSignificanceAndTarget = TRUE/FALSE`
+-   In a second step, an endpoint‑specific function can then be used: `getOperatingCharacteristicsMeans()` or `getOperatingCharacteristicsRates()` to compute the actual endpoint-specific operating characteristics.
+    - Here we input the different sample sizes and expected treatment differences or response rates
+    - This is where the actual calculations need to happen, similar to `OC.ct.GO()` in the original code, but ideally already using existing `rpact` functions as much and as general as possible:
+        -   For the continuous endpoint, can we use `getGroupSequentialProbabilities()`?
+        -   Is there an enumeration of all binary outcomes in `rpact` so far? Only for single arm binary outcome. So we can code this ourselves.
+            -   Note that in production, we will do this in C++ for better performance.
+-   Methods for the `DecisionOperatingCharacteristics` class could include:
+    -   `plot()`: to plot the operating characteristics
+    -   `summary()`: to create the summary table of results
+    -   `as.data.frame()`: to create the `data.frame` with all results
+-   Need to make sure that `getObjectRCode()` works for the new objects, check if we need to add methods to make it work
+
+A key advantage of this approach is that these functions can be implemented one‑to‑one in the "RPACT Cloud" GUI, ensuring consistency between the `rpact` package and the GUI (see the screenshots below).
+
+## Prototype of frequentist fixed design in `rpact`
+
+### Setup
+
+We follow here patterns close to the existing `rpact` code, but it will be fully integrated and aligned later when adding this to the `rpact` package.
+
+```{r}
+library(rpact)
+library(R6)
+```
+
+### `getDesignDecisionRule()`
+
+This constructor creates a decision rule object based on the design specification and decision criteria.
+
+First we define the `DesignDecisionRule` class:
+
+```{r}
+DesignDecisionRule <- R6::R6Class(
+    "DesignDecisionRule",
+    inherit = rpact:::ParameterSet,
+    public = list(
+        target_value = NULL,
+        lower_reference_value = NULL,
+        upper_percentile = NULL,
+        lower_percentile = NULL,
+        alpha = NULL,
+        useSignificanceAndTarget = NULL,
+        initialize = function(target_value,
+                              lower_reference_value,
+                              upper_percentile,
+                              lower_percentile,
+                              useSignificanceAndTarget,
+                              alpha) {
+            self$target_value <- target_value
+            self$lower_reference_value <- lower_reference_value
+            self$upper_percentile <- upper_percentile
+            self$lower_percentile <- lower_percentile
+            self$useSignificanceAndTarget <- useSignificanceAndTarget
+            self$alpha <- alpha
+        },
+        show = function() {
+            self$.show()
+        },
+        .show = function(consoleOutputEnabled = FALSE) {
+            cat("Design Decision Rule:\n")
+            if (self$useSignificanceAndTarget) {
+                cat("Using Significance Level and Target Value for Decision Rule\n")
+                cat("Significance Level:", self$alpha, "\n")
+            } else {
+                cat("Using Lower Reference Value and Percentiles for Decision Rule\n")
+                cat("Lower Reference Value:", self$lower_reference_value, "\n")
+                cat("Upper Percentile:", self$upper_percentile, "\n")
+                cat("Lower Percentile:", self$lower_percentile, "\n")
+            }
+            cat("Target Value:", self$target_value, "\n")
+        },
+        toString = function() {
+            if (self$useSignificanceAndTarget) {
+                paste0(
+                    "Significance Level=", self$alpha,
+                    ", TV=", self$target_value
+                )
+            } else {
+                paste0(
+                    "LRV=", self$lower_reference_value,
+                    ", TV=", self$target_value, "\n",
+                    "LB=", round(self$lower_percentile * 100), "%, ",
+                    "UB=", round(self$upper_percentile * 100), "%"
+                )
+            }
+        }
+    )
+)
+```
+
+Now we define the constructor function `getDesignDecisionRule()`:
+
+```{r}
+getDesignDecisionRule <- function(
+    target_value,
+    lower_reference_value = 0,
+    upper_percentile = 0.9,
+    lower_percentile = 0.2,
+    useSignificanceAndTarget = FALSE,
+    alpha = 0.05) {
+    # Validate inputs
+    rpact:::.assertIsSingleNumber(target_value, "target_value")
+    rpact:::.assertIsSingleNumber(
+        lower_reference_value,
+        "lower_reference_value"
+    )
+    rpact:::.assertIsSingleNumber(upper_percentile, "upper_percentile")
+    rpact:::.assertIsSingleNumber(lower_percentile, "lower_percentile")
+    rpact:::.assertIsInOpenInterval(upper_percentile, "upper_percentile", lower = 0, upper = 1)
+    rpact:::.assertIsInOpenInterval(
+        lower_percentile,
+        "lower_percentile",
+        lower = 0,
+        upper = upper_percentile
+    )
+    rpact:::.assertIsSingleLogical(
+        useSignificanceAndTarget,
+        "useSignificanceAndTarget"
+    )
+    rpact:::.assertIsValidAlpha(alpha)
+
+    DesignDecisionRule$new(
+        target_value = target_value,
+        lower_reference_value = lower_reference_value,
+        upper_percentile = upper_percentile,
+        lower_percentile = lower_percentile,
+        useSignificanceAndTarget = useSignificanceAndTarget,
+        alpha = alpha
+    )
+}
+```
+
+Let's try it out:
+
+```{r}
+design_decision_rule <- getDesignDecisionRule(
+    target_value = 100,
+    lower_reference_value = 0,
+    upper_percentile = 0.9,
+    lower_percentile = 0.2
+)
+design_decision_rule
+```
+
+And for the QTD3 formulation we can use:
+
+```{r}
+qtd3_decision_rule <- getDesignDecisionRule(
+    target_value = 100,
+    useSignificanceAndTarget = TRUE,
+    alpha = 0.05
+)
+qtd3_decision_rule
+```
+
+### QTD3 decision rule formulas
+
+Now we need to define a few more formulas for the case that we want to use the QTD3 decision rule formulation with significance level and target value. This works similarly as in the above QTD1 derivation, so it will look familiar:
+
+#### *Go* decision
+
+The Go decision is made when the median estimate is larger than the target value, and the $\alpha$ percentile is larger than 0. We can write the probability of this event as follows:
+
+$$
+\begin{align*}
+p_{\text{Go}}
+&= \mathbb{P}(\hat{\theta}_{0.5} > t_{T} \wedge \hat{\theta}_{\alpha} > 0) \\
+&= \mathbb{P}(\hat{\theta} + q_{0.5}s > t_{T} \wedge \hat{\theta} + q_{\alpha}s > 0) \\
+&= \mathbb{P}(\hat{\theta} > t_{T} - q_{0.5}s \wedge \hat{\theta} > - q_{\alpha}s) \\
+&= \mathbb{P}(\hat{\theta} > \max(t_{T} - q_{0.5}s, - q_{\alpha}s)) \\
+&= \mathbb{P}(\hat{\theta} > t_{M}) \\
+&= 1 - \mathbb{P}(\hat{\theta} < t_{M}) \\
+&= 1 - \Phi(t_{M} \vert \theta, s)
+\end{align*}
+$$
+
+where $t_{M} = \max(t_{T} - q_{0.5}s, - q_{\alpha}s) = \max(t_{T}, - q_{\alpha}s)$ because $q_{0.5} = 0$.
+
+#### *Stop* decision
+
+The Stop decision is made when the median estimate is less than 0, and the $(1 - \alpha)$ percentile is less than the target value. We can write the probability of this event as follows:
+
+$$
+\begin{align*}
+p_{\text{Stop}}
+&= \mathbb{P}(\hat{\theta}_{0.5} < 0 \wedge \hat{\theta}_{1 - \alpha} < t_{T}) \\
+&= \mathbb{P}(\hat{\theta} + q_{0.5}s < 0 \wedge \hat{\theta} + q_{1 - \alpha}s < t_{T}) \\
+&= \mathbb{P}(\hat{\theta} < - q_{0.5}s \wedge \hat{\theta} < t_{T} - q_{1 - \alpha}s) \\
+&= \mathbb{P}(\hat{\theta} < \min(- q_{0.5}s, t_{T} - q_{1 - \alpha}s)) \\
+&= \mathbb{P}(\hat{\theta} < t_{m}) \\
+&= \Phi(t_{m} \vert \theta, s)
+\end{align*}
+$$
+
+where $t_{m} = \min(- q_{0.5}s, t_{T} - q_{1 - \alpha}s) = \min(0, t_{T} - q_{1 - \alpha}s)$ because $q_{0.5} = 0$.
+
+#### *Indeterminate* decision
+
+Here we want to differentiate between two indeterminate cases:
+
+- Indeterminate (1): The median estimate is less than 0, and the $(1 - \alpha)$ percentile is greater than the target value
+- Indeterminate (2): Any other case: The median estimate is greater than 0, and the $(1 - \alpha)$ percentile is less than the target value
+
+The probabilities of these events can be written as follows.
+
+For the first indeterminate case:
+
+$$
+\begin{align*}
+p_{\text{Ind(1)}}
+&= \mathbb{P}(\hat{\theta}_{0.5} < 0 \wedge \hat{\theta}_{1 - \alpha} > t_{T}) \\
+&= \mathbb{P}(\hat{\theta} + q_{0.5}s < 0 \wedge \hat{\theta} + q_{1 - \alpha}s > t_{T}) \\
+&= \mathbb{P}(\hat{\theta} < - q_{0.5}s \wedge \hat{\theta} > t_{T} - q_{1 - \alpha}s) \\
+&= \mathbb{P}(t_{m} < \hat{\theta} < 0) \\
+&= \Phi(0 \vert \theta, s) - \Phi(t_{m} \vert \theta, s)
+\end{align*}
+$$
+
+where $t_{m} = \min(- q_{0.5}s, t_{T} - q_{1 - \alpha}s) = \min(0, t_{T} - q_{1 - \alpha}s)$ because $q_{0.5} = 0$.
+
+For the second indeterminate case:
+
+$$
+\begin{align*}
+p_{\text{Ind(2)}} = \Phi(t_{M} \vert \theta, s) - \Phi(0 \vert \theta, s)
+\end{align*}
+$$
+
+where again $t_{M} = \max(t_{T}, - q_{\alpha}s)$, because then the probabilities sum to 1.
+
+### `getOperatingCharacteristicsMeans()`
+
+This function calculates the operating characteristics based on the design decision rule, for the continuous endpoint.
+
+First we define the `OperatingCharacteristicsMeans` class. It is based on the more general `OperatingCharacteristics` class, which will also be the superclass of `OperatingCharacteristicsRates` for the binary endpoint later.
+
+```{r}
+OperatingCharacteristics <- R6::R6Class(
+    "OperatingCharacteristics",
+    inherit = rpact:::FieldSet,
+    public = list(
+        designDecisionRule = NULL,
+        numberOfSubjects = NULL,
+        probabilities = NULL,
+        initialize = function(designDecisionRule,
+                              numberOfSubjects,
+                              probabilities) {
+            self$designDecisionRule <- designDecisionRule
+            self$numberOfSubjects <- numberOfSubjects
+            self$probabilities <- probabilities
+        }
+    )
+)
+
+OperatingCharacteristicsMeans <- R6::R6Class(
+    "OperatingCharacteristicsMeans",
+    inherit = OperatingCharacteristics,
+    public = list(
+        normalApproximation = NULL,
+        alternative = NULL,
+        stDev = NULL,
+        controlMean = NULL,
+        initialize = function(..., normalApproximation, alternative, stDev, controlMean = NULL) {
+            super$initialize(...)
+            self$normalApproximation <- normalApproximation
+            self$alternative <- alternative
+            self$stDev <- stDev
+            self$controlMean <- controlMean
+        },
+        show = function() {
+            self$.show()
+        },
+        .show = function(consoleOutputEnabled = FALSE) {
+            cat("Operating Characteristics for Means Decision:\n")
+            cat("Design: Fixed Design\n")
+            print(self$designDecisionRule)
+            cat("Number of Subjects:\n")
+            print(self$numberOfSubjects)
+            # etc. (to be completed later)
+        },
+        .catMarkdownText = function() {
+            self$.show()
+        }
+    )
+)
+```
+
+Now we can define the function `getOperatingCharacteristicsMeans()`. We enforce certain features of the inputs here:
+
+-   For now we just support `normalApproximation = TRUE`, but we can extend this later to also support the Student t-distribution based calculations.
+-   We only support `groups = 2` for now, i.e. a two-arm design. But this could be later extended to single-arm designs relatively easily.
+
+We also allow for different standard deviations in the groups. Similarly as for `getSampleSizeMeans()`, the user can give a vector with two values, one per group, or a single value which is then used for both groups. If two values are given, then the first one is for the control group and the second one for the treatment group.
+
+The question here is how we define the different sample sizes:
+
+-   In the current `rpact` functions such as `getPowerMeans()`, the `maxNumberOfSubjects` argument can only be a single number, and the same for the `allocationRatioPlanned`.
+-   However, in the QTD1 app we have multiple scenarios with different sample sizes per group.
+-   So here we use a new argument `numberOfSubjects` which is the matrix of sample sizes per group.
+
+```{r}
+getOperatingCharacteristicsMeans <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    normalApproximation = TRUE,
+    groups = 2,
+    alternative = seq(0, 1, 0.2),
+    stDev = 1) {
+    # Validate inputs
+    stopifnot(is(designDecisionRule, "DesignDecisionRule"))
+    stopifnot(
+        is.matrix(numberOfSubjects) &&
+            ncol(numberOfSubjects) == groups &&
+            nrow(numberOfSubjects) > 0 &&
+            all(numberOfSubjects > 0)
+    )
+    stopifnot(isTRUE(normalApproximation)) # see assumption above
+    stopifnot(groups == 2) # see assumption above
+    stopifnot(is.numeric(alternative) && length(alternative) > 0)
+    rpact:::.assertIsValidStandardDeviation(stDev, groups = groups)
+
+    meanOCresults <- .calcOperatingCharacteristicsMeans(
+        designDecisionRule = designDecisionRule,
+        numberOfSubjects = numberOfSubjects,
+        alternative = alternative,
+        stDev = stDev
+    )
+    OperatingCharacteristicsMeans$new(
+        designDecisionRule = designDecisionRule,
+        numberOfSubjects = numberOfSubjects,
+        normalApproximation = normalApproximation,
+        alternative = alternative,
+        stDev = stDev,
+        probabilities = meanOCresults
+    )
+}
+```
+
+Now we are going to implement the actual calculations, either following the QTD1 or the QTD3 decision rule formulations depending on the `designDecisionRule` input:
+
+```{r}
+# This is basically the equivalent of the OC.ct.GO() function in the original code
+.calcOperatingCharacteristicsMeansSingleN <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    alternative,
+    stDev) {
+    stopifnot(is.numeric(numberOfSubjects) && length(numberOfSubjects) == 2)
+
+    s <- if (length(stDev) == 1) {
+        # Here we can slightly simplify the calculation.
+        stDev * sqrt(sum(1 / numberOfSubjects))
+    } else {
+        # Here we have group specific standard deviations.
+        sqrt(sum(stDev^2 / numberOfSubjects))
+    }
+
+    if (designDecisionRule$useSignificanceAndTarget) {
+        qAlpha <- qnorm(designDecisionRule$alpha)
+        qOneMinusAlpha <- 1 - qAlpha
+
+        p_go <- pnorm(
+            max(
+                designDecisionRule$target_value,
+                -qAlpha * s
+            ),
+            mean = alternative,
+            sd = s,
+            lower.tail = FALSE
+        )
+        p_stop <- pnorm(
+            min(
+                0,
+                designDecisionRule$target_value - qOneMinusAlpha * s
+            ),
+            mean = alternative,
+            sd = s
+        )
+        p_ind1 <- pnorm(
+            0,
+            mean = alternative, sd = s
+        ) - pnorm(
+            min(
+                0,
+                designDecisionRule$target_value - qOneMinusAlpha * s
+            ),
+            mean = alternative,
+            sd = s
+        )
+        p_ind2 <- pnorm(
+            max(
+                designDecisionRule$target_value,
+                -qAlpha * s
+            ),
+            mean = alternative,
+            sd = s
+        ) - pnorm(0, mean = alternative, sd = s)
+
+        categories <- c(
+            "Go",
+            "Indeterminate 1",
+            "Indeterminate 2",
+            "Stop"
+        )
+        category <- rep(categories, each = length(alternative))
+        probability <- c(p_go, p_ind1, p_ind2, p_stop)
+    } else {
+        qL <- qnorm(designDecisionRule$lower_percentile)
+        qU <- qnorm(designDecisionRule$upper_percentile)
+
+        tvMinusQLs <- designDecisionRule$target_value - qL * s
+        tvMinusQUs <- designDecisionRule$target_value - qU * s
+        lrvMinusQLs <- designDecisionRule$lower_reference_value - qL * s
+        lrvMinusQUs <- designDecisionRule$lower_reference_value - qU * s
+
+        p1 <- pnorm(tvMinusQLs, mean = alternative, sd = s, lower.tail = FALSE)
+
+        tM <- max(lrvMinusQLs, tvMinusQUs)
+        p2 <- pnorm(tvMinusQLs, mean = alternative, sd = s) -
+            pnorm(tM, mean = alternative, sd = s)
+
+        tm <- min(lrvMinusQLs, tvMinusQUs)
+        p3 <- pnorm(lrvMinusQLs, mean = alternative, sd = s) -
+            pnorm(tm, mean = alternative, sd = s)
+
+        p4 <- pnorm(tvMinusQUs, mean = alternative, sd = s) -
+            pnorm(tm, mean = alternative, sd = s)
+
+        p5 <- pnorm(tm, mean = alternative, sd = s) -
+            pnorm(lrvMinusQUs, mean = alternative, sd = s)
+
+        p6 <- pnorm(lrvMinusQUs, mean = alternative, sd = s)
+
+        categories <- c(
+            "Go (Fixed)",
+            "Go",
+            "Indeterminate 1",
+            "Indeterminate 2",
+            "Stop",
+            "Stop (Fixed)"
+        )
+        category <- rep(categories, each = length(alternative))
+        probability <- c(p1, p2, p3, p4, p5, p6)
+    }
+
+    df <- data.frame(
+        category = category,
+        probability = probability,
+        nControl = numberOfSubjects[1],
+        nTreatment = numberOfSubjects[2],
+        alternative = alternative
+    )
+    if (length(stDev) == 1) {
+        df$stDevControl <- stDev
+        df$stDevTreatment <- stDev
+    } else {
+        df$stDevControl <- stDev[1]
+        df$stDevTreatment <- stDev[2]
+    }
+    df
+}
+
+# This is just going through all numberOfSubjects scenarios
+.calcOperatingCharacteristicsMeans <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    alternative,
+    stDev) {
+    res <- apply(numberOfSubjects, 1, function(singleRow) {
+        .calcOperatingCharacteristicsMeansSingleN(
+            designDecisionRule = designDecisionRule,
+            numberOfSubjects = singleRow,
+            alternative = alternative,
+            stDev = stDev
+        )
+    })
+    do.call(rbind, res)
+}
+```
+
+Let's check these first:
+
+```{r}
+test <- .calcOperatingCharacteristicsMeansSingleN(
+    designDecisionRule = design_decision_rule,
+    numberOfSubjects = c(50, 60),
+    alternative = c(0, 100, 200),
+    stDev = 200
+)
+library(dplyr)
+test |>
+    group_by(alternative) |>
+    summarize(total_p = sum(probability))
+```
+
+That looks good, the probabilities sum to 1 for each alternative.
+
+Now let's check for the QTD3 decision rule:
+
+```{r}
+test_qtd3 <- .calcOperatingCharacteristicsMeansSingleN(
+    designDecisionRule = qtd3_decision_rule,
+    numberOfSubjects = c(50, 60),
+    alternative = c(0, 100, 200),
+    stDev = 200
+)
+test_qtd3 |>
+    group_by(alternative) |>
+    summarize(total_p = sum(probability))
+```
+
+Now try out the user function:
+
+```{r}
+characteristics <- getOperatingCharacteristicsMeans(
+    designDecisionRule = design_decision_rule,
+    numberOfSubjects = matrix(
+        c(50, 60, 60, 70),
+        nrow = 2,
+        ncol = 2,
+        byrow = TRUE
+    ),
+    alternative = seq(0, 200, length = 100),
+    stDev = 200
+)
+characteristics
+```
+
+We can also try with different standard deviations per group:
+
+```{r}
+characteristics2 <- getOperatingCharacteristicsMeans(
+    designDecisionRule = design_decision_rule,
+    numberOfSubjects = matrix(c(50, 60, 60, 70),
+        nrow = 2, ncol = 2, byrow = TRUE
+    ),
+    alternative = seq(0, 200, length = 100),
+    stDev = c(100, 200)
+)
+characteristics2
+head(characteristics2$probabilities)
+```
+
+### `getOperatingCharacteristicsRates()`
+
+Now we prototype the binary endpoint functionality. The structure is very similar to the continuous endpoint above.
+First we define the `OperatingCharacteristicsRates` class:
+
+```{r}
+OperatingCharacteristicsRates <- R6::R6Class(
+    "OperatingCharacteristicsRates",
+    inherit = OperatingCharacteristics,
+    public = list(
+        pi1 = NULL,
+        pi2 = NULL,
+        directionUpper = NULL,
+        initialize = function(..., pi1, pi2, directionUpper) {
+            super$initialize(...)
+            self$pi1 <- pi1
+            self$pi2 <- pi2
+            self$directionUpper <- directionUpper
+        },
+        show = function() {
+            self$.show()
+        },
+        .show = function(consoleOutputEnabled = FALSE) {
+            cat("Operating Characteristics for Rates Decision:\n")
+            cat("Design: Fixed Design\n")
+            print(self$designDecisionRule)
+            cat("Number of Subjects:\n")
+            print(self$numberOfSubjects)
+            # etc.
+        },
+        .catMarkdownText = function() {
+            self$.show()
+        }
+    )
+)
+```
+
+Now we can define the function `getOperatingCharacteristicsRates()`:
+
+```{r}
+getOperatingCharacteristicsRates <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    pi1,
+    pi2,
+    directionUpper = TRUE,
+    groups = 2) {
+    # Validate inputs
+    stopifnot(is(designDecisionRule, "DesignDecisionRule"))
+    stopifnot(
+        is.matrix(numberOfSubjects) &&
+            ncol(numberOfSubjects) == groups &&
+            nrow(numberOfSubjects) > 0 &&
+            all(numberOfSubjects > 0)
+    )
+    stopifnot(is.numeric(pi1) && length(pi1) > 0)
+    stopifnot(is.numeric(pi2) && length(pi2) > 0)
+    stopifnot(is.logical(directionUpper) && length(directionUpper) == 1)
+    stopifnot(groups == 2)
+
+    rateOCresults <- .calcOperatingCharacteristicsRates(
+        designDecisionRule = designDecisionRule,
+        numberOfSubjects = numberOfSubjects,
+        pi1 = pi1,
+        pi2 = pi2,
+        directionUpper = directionUpper
+    )
+    OperatingCharacteristicsRates$new(
+        designDecisionRule = designDecisionRule,
+        numberOfSubjects = numberOfSubjects,
+        pi1 = pi1,
+        pi2 = pi2,
+        directionUpper = directionUpper,
+        probabilities = rateOCresults
+    )
+}
+```
+
+The actual computations happen here:
+
+```{r}
+# This is basically the equivalent of the OC.bin.tab() and OC.bin.GO() functions in the original code
+.calcOperatingCharacteristicsRatesSingleN <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    pi1,
+    pi2,
+    directionUpper) {
+    stopifnot(is.numeric(numberOfSubjects) && length(numberOfSubjects) == 2)
+    stopifnot(is.numeric(pi1) && all(pi1 >= 0) && all(pi1 <= 1))
+    stopifnot(is.numeric(pi2) && length(pi2) == 1 && (pi2 >= 0) && (pi2 <= 1))
+    stopifnot(is.logical(directionUpper) && length(directionUpper) == 1)
+
+    n.con <- numberOfSubjects[1]
+    n.trt <- numberOfSubjects[2]
+
+    all_outcomes <- data.frame(expand.grid(0:n.con, 0:n.trt))
+    names(all_outcomes) <- c("y.con", "y.trt")
+
+    # Risk (response proportion) differences: control - treatment
+    all_outcomes$risk_diffs <- all_outcomes$y.con / n.con - all_outcomes$y.trt / n.trt
+    if (directionUpper) {
+        all_outcomes$risk_diffs <- -1 * all_outcomes$risk_diffs
+    }
+
+    if (designDecisionRule$useSignificanceAndTarget) {
+        # Calculate the standard deviations for the risk difference estimates
+        sdMedian <- .calcRiskDiffSD(
+            all_outcomes,
+            n.con,
+            n.trt,
+            0.5,
+            directionUpper
+        )
+        sdLower <- .calcRiskDiffSD(
+            all_outcomes,
+            n.con,
+            n.trt,
+            designDecisionRule$alpha,
+            directionUpper
+        )
+        sdUpper <- .calcRiskDiffSD(
+            all_outcomes,
+            n.con,
+            n.trt,
+            1 - designDecisionRule$alpha,
+            directionUpper
+        )
+
+        # Calculate the lower and upper percentiles for the risk difference
+        all_outcomes$median <- all_outcomes$risk_diffs +
+            qnorm(designDecisionRule$lower_percentile) * sdMedian
+        all_outcomes$lower <- all_outcomes$risk_diffs +
+            qnorm(designDecisionRule$alpha) * sdLower
+        all_outcomes$upper <- all_outcomes$risk_diffs +
+            qnorm(1 - designDecisionRule$alpha) * sdUpper
+
+        all_outcomes$ind1 <- all_outcomes$median >=
+            designDecisionRule$target_value &
+            all_outcomes$lower > 0
+        all_outcomes$ind2 <- all_outcomes$median < 0 &
+            all_outcomes$upper > designDecisionRule$target_value
+        all_outcomes$ind4 <- all_outcomes$median < 0 &
+            all_outcomes$upper <= designDecisionRule$target_value
+        all_outcomes$ind3 <- !(all_outcomes$ind1 |
+            all_outcomes$ind2 |
+            all_outcomes$ind4)
+
+        categories <- c(
+            "Go",
+            "Indeterminate 1",
+            "Indeterminate 2",
+            "Stop"
+        )
+        probs <- .sumBinomProbs(
+            all_outcomes,
+            n.con,
+            n.trt,
+            pi1,
+            pi2
+        )
+        category <- rep(categories, each = length(pi1))
+        probability <- with(probs, c(p1, p2, p3, p4))
+    } else {
+        # Calculate the standard deviations for the risk difference estimates
+        sdMAD <- .calcRiskDiffSD(
+            all_outcomes,
+            n.con,
+            n.trt,
+            designDecisionRule$lower_percentile,
+            directionUpper
+        )
+        sdTD <- .calcRiskDiffSD(
+            all_outcomes,
+            n.con,
+            n.trt,
+            designDecisionRule$upper_percentile,
+            directionUpper
+        )
+
+        # Calculate the lower and upper percentiles for the risk difference
+        all_outcomes$lower <- all_outcomes$risk_diffs +
+            qnorm(designDecisionRule$lower_percentile) * sdMAD
+        all_outcomes$upper <- all_outcomes$risk_diffs +
+            qnorm(designDecisionRule$upper_percentile) * sdTD
+
+        all_outcomes$ind1 <- all_outcomes$lower >=
+            designDecisionRule$target_value
+        all_outcomes$ind2 <- (all_outcomes$lower >=
+            designDecisionRule$lower_reference_value) &
+            (all_outcomes$lower < designDecisionRule$target_value) &
+            (all_outcomes$upper >= designDecisionRule$target_value)
+        all_outcomes$ind3 <- (all_outcomes$lower <
+            designDecisionRule$lower_reference_value) &
+            (all_outcomes$upper >= designDecisionRule$target_value)
+        all_outcomes$ind4 <- (all_outcomes$lower >=
+            designDecisionRule$lower_reference_value) &
+            (all_outcomes$upper < designDecisionRule$target_value)
+        all_outcomes$ind5 <- (all_outcomes$lower <
+            designDecisionRule$lower_reference_value) &
+            (all_outcomes$upper >= designDecisionRule$lower_reference_value) &
+            (all_outcomes$upper < designDecisionRule$target_value)
+        all_outcomes$ind6 <- all_outcomes$upper <
+            designDecisionRule$lower_reference_value
+
+        categories <- c(
+            "Go (Fixed)",
+            "Go",
+            "Indeterminate 1",
+            "Indeterminate 2",
+            "Stop",
+            "Stop (Fixed)"
+        )
+        probs <- .sumBinomProbs(
+            all_outcomes,
+            n.con,
+            n.trt,
+            pi1,
+            pi2
+        )
+        category <- rep(categories, each = length(pi1))
+        probability <- with(probs, c(p1, p2, p3, p4, p5, p6))
+    }
+
+    data.frame(
+        category = category,
+        probability = probability,
+        nControl = numberOfSubjects[1],
+        nTreatment = numberOfSubjects[2],
+        pi1 = pi1,
+        pi2 = pi2,
+        directionUpper = directionUpper
+    )
+}
+
+# Helper function to sum up the right binomial probabilities
+.sumBinomProbs <- function(all_outcomes, n.con, n.trt, pi1, pi2) {
+    dbin.con <- dbinom(all_outcomes$y.con, size = n.con, prob = pi2)
+
+    # Key point here is that for the treatment arm we expect multiple pi1 values.
+    dbin.trt <- sapply(pi1, function(this_pi1) {
+        dbinom(all_outcomes$y.trt, size = n.trt, prob = this_pi1)
+    })
+
+    # We multiply column wise here: each column corresponds to one pi1 value scenario.
+    dbin.con.trt <- dbin.con * dbin.trt
+
+    agg_fun <- function(inds) {
+        colSums(dbin.con.trt[inds, , drop = FALSE])
+    }
+    ind_res <- grepl("ind", names(all_outcomes))
+    probs <- lapply(
+        all_outcomes[ind_res],
+        agg_fun
+    )
+    names(probs) <- gsub("ind", "p", names(all_outcomes[ind_res]))
+    probs
+}
+
+# Helper function which calculates the risk difference standard deviation
+.calcRiskDiffSD <- function(all_outcomes, n.con, n.trt, percentile, directionUpper) {
+    # Calculate score CI for control arm
+    all_outcomes[, c("con.lower", "con.upper")] <- .calcScoreCI(
+        all_outcomes$y.con,
+        n = n.con,
+        conf_level = 1 - (percentile * 2)
+    )
+    # Calculate score CI for treatment arm
+    all_outcomes[, c("trt.lower", "trt.upper")] <- .calcScoreCI(
+        all_outcomes$y.trt,
+        n = n.trt,
+        conf_level = 1 - (percentile * 2)
+    )
+    # Calculate the standard deviation of the risk difference estimate
+    if (directionUpper) {
+        lower_bound <- all_outcomes$trt.lower * (1 - all_outcomes$trt.lower)
+        upper_bound <- all_outcomes$con.upper * (1 - all_outcomes$con.upper)
+        sqrt(lower_bound / n.trt + upper_bound / n.con)
+    } else {
+        lower_bound <- all_outcomes$con.lower * (1 - all_outcomes$con.lower)
+        upper_bound <- all_outcomes$trt.upper * (1 - all_outcomes$trt.upper)
+        sqrt(lower_bound / n.con + upper_bound / n.trt)
+    }
+}
+
+# Helper function which calculates the score confidence interval for a proportion
+.calcScoreCI <- function(x, n, conf_level) {
+    zalpha <- abs(qnorm((1 - conf_level) / 2))
+    phat <- x / n
+    bound <- zalpha *
+        sqrt((phat * (1 - phat) + zalpha^2 / (4 * n)) / n) /
+        (1 + zalpha^2 / n)
+    midpnt <- (phat + zalpha^2 / (2 * n)) / (1 + (zalpha^2) / n)
+    uplim <- round(midpnt + bound, digits = 4)
+    lowlim <- round(midpnt - bound, digits = 4)
+    results <- data.frame(lowlim, uplim)
+    results
+}
+
+# This is just going through all numberOfSubjects scenarios
+.calcOperatingCharacteristicsRates <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    pi1,
+    pi2,
+    directionUpper) {
+    res <- apply(numberOfSubjects, 1, function(singleRow) {
+        .calcOperatingCharacteristicsRatesSingleN(
+            designDecisionRule = designDecisionRule,
+            numberOfSubjects = singleRow,
+            pi1 = pi1,
+            pi2 = pi2,
+            directionUpper = directionUpper
+        )
+    })
+    do.call(rbind, res)
+}
+```
+
+Let's try it out:
+
+```{r}
+binary_decision_rule <- getDesignDecisionRule(
+    target_value = 0.2,
+    lower_reference_value = 0,
+    upper_percentile = 0.9,
+    lower_percentile = 0.2
+)
+
+binary_characteristics <- getOperatingCharacteristicsRates(
+    designDecisionRule = binary_decision_rule,
+    numberOfSubjects = matrix(
+        c(50, 60, 60, 70),
+        nrow = 2,
+        ncol = 2,
+        byrow = TRUE
+    ),
+    pi1 = seq(0, 1, 0.1), # treatment group response rates
+    pi2 = 0.3, # control group response rate
+    directionUpper = TRUE
+)
+binary_characteristics
+```
+
+And with the QTD3 decision rule:
+
+```{r}
+binary_qtd3_decision_rule <- getDesignDecisionRule(
+    target_value = 0.2,
+    useSignificanceAndTarget = TRUE,
+    alpha = 0.05
+)
+
+binary_qtd3_characteristics <- getOperatingCharacteristicsRates(
+    designDecisionRule = binary_qtd3_decision_rule,
+    numberOfSubjects = matrix(
+        c(50, 60, 60, 70),
+        nrow = 2,
+        ncol = 2,
+        byrow = TRUE
+    ),
+    pi1 = seq(0, 1, 0.1), # treatment group response rates
+    pi2 = 0.3, # control group response rate
+    directionUpper = TRUE
+)
+binary_qtd3_characteristics
+```
+
+### `plot()`
+
+Now the plotting method, which can be based on the `OperatingCharacteristics` class.
+
+Note that here is the point where the user can choose between 3 and 6 categories for the decision outcomes. So the object underneath will always contain the probabilities for all 6 categories, but the plot will only show the selected categories.
+
+```{r}
+library(ggplot2)
+
+.plotOperatingCharacteristics <- function(
+    x,
+    x_axis_var,
+    plotCat = c(3, 4, 6),
+    main = "Operating Characteristics") {
+    plotCat <- match.arg(as.character(plotCat), c("3", "4", "6"))
+
+    # Prepare data for plotting.
+    df <- x$probabilities
+    df$category <- factor(df$category, levels = unique(df$category))
+
+    # Merge categories if needed.
+    if (plotCat == "3") {
+        df$category <- factor(
+            ifelse(
+                df$category %in% c("Go (Fixed)", "Go"),
+                "Go",
+                ifelse(
+                    df$category %in%
+                        c(
+                            "Indeterminate 1",
+                            "Indeterminate 2",
+                            "Indeterminate"
+                        ),
+                    "Indeterminate",
+                    ifelse(
+                        df$category %in% c("Stop", "Stop (Fixed)"),
+                        "Stop",
+                        as.character(df$category)
+                    )
+                )
+            ),
+            levels = c("Go", "Indeterminate", "Stop")
+        )
+    } else if (plotCat == "4") {
+        stopifnot(length(unique(df$category)) >= 4)
+        df$category <- factor(
+            ifelse(
+                df$category %in% c("Go (Fixed)", "Go"),
+                "Go",
+                ifelse(
+                    df$category %in% c("Stop", "Stop (Fixed)"),
+                    "Stop",
+                    as.character(df$category)
+                )
+            ),
+            levels = c("Go", "Indeterminate 1", "Indeterminate 2", "Stop")
+        )
+    } else {
+        stopifnot(length(unique(df$category)) == 6)
+    }
+    if (plotCat %in% c("3", "4")) {
+        # Aggregate probabilities for the 3 categories.
+        df <- aggregate(
+            as.formula(paste("probability ~ category + nTreatment + nControl + ", x_axis_var)),
+            data = df,
+            FUN = sum
+        )
+    }
+    df$percentage <- df$probability * 100
+
+    x_label <- x$designDecisionRule$toString() # we leave this to the decision rule.
+
+    # Merge together the treatment and control sample sizes for plotting.
+    df$sampleSize <- paste0("T: ", df$nTreatment, " / C: ", df$nControl)
+
+    p <- ggplot(
+        df,
+        aes(
+            x = !!sym(x_axis_var),
+            y = percentage,
+            color = sampleSize,
+            group = sampleSize
+        )
+    ) +
+        geom_line() +
+        facet_wrap(~category, ncol = 2) +
+        ylim(c(0, 100)) +
+        labs(
+            title = main,
+            y = "Probability of Decision (%)"
+        )
+    structure(p, x_label = x_label)
+}
+```
+
+Then we define the methods accordingly, where we can add specific plot features on top:
+
+```{r}
+plot.OperatingCharacteristicsMeans <- function(x, plotCat = 3, main = "Operating Characteristics Means") {
+    p <- .plotOperatingCharacteristics(
+        x = x,
+        x_axis_var = "alternative",
+        plotCat = plotCat,
+        main = main
+    )
+    x_label <- paste0(
+        "Treatment Effect ",
+        "(sd=", base::toString(x$stDev),
+        ifelse(
+            !is.null(x$controlMean),
+            paste0(", control mean=", x$controlMean),
+            ""
+        ),
+        ")\n",
+        attr(p, "x_label")
+    )
+    
+    # Todo: in production we can only trigger these lines when using the corresponding 
+    # decision rule.
+    p +
+        geom_vline(
+            xintercept = x$designDecisionRule$target_value,
+            linetype = "dotted",
+            linewidth = 1,
+            show.legend = TRUE
+        ) +
+        geom_vline(
+            xintercept = x$designDecisionRule$lower_reference_value,
+            linetype = "dashed",
+            linewidth = 1,
+            show.legend = TRUE
+        ) +
+        xlab(x_label)
+}
+
+plot.OperatingCharacteristicsRates <- function(x, plotCat = 3, main = "Operating Characteristics Rates") {
+    p <- .plotOperatingCharacteristics(
+        x = x,
+        x_axis_var = "pi1",
+        plotCat = plotCat,
+        main = main
+    )
+    x_label <- paste0(
+        "Treatment response rate (pi1) (Control response rate ",
+        "pi2=",
+        x$pi2,
+        ")\n",
+        attr(p, "x_label")
+    )
+    p +
+        xlab(x_label)
+}
+```
+
+Let's try it out:
+
+```{r}
+plot(
+    characteristics,
+    plotCat = 6,
+    main = "Operating Characteristics for QTD1 Continuous Endpoint"
+)
+```
+
+It can later still be improved regarding the legend etc, but at least it looks like we get the same results as in the original QTD1 app.
+
+Let's also plot the second characteristics object with different standard deviations per group:
+
+```{r}
+plot(characteristics2, plotCat = 6, main = "Operating Characteristics for QTD1 Continuous Endpoint (Different SDs)")
+```
+
+So this also works (note the footnote which mentions the two standard deviations).
+
+We can also aggregate this into 3 categories only:
+
+```{r}
+plot(
+    characteristics2,
+    plotCat = 3,
+    main = "Operating Characteristics for QTD1 Continuous Endpoint (3 Categories)"
+)
+```
+
+And similarly it works now for the binary endpoint:
+
+```{r}
+plot(
+    binary_characteristics,
+    plotCat = 6,
+    main = "Operating Characteristics for QTD1 Binary Endpoint"
+)
+
+plot(
+    binary_qtd3_characteristics,
+    plotCat = 4,
+    main = "Operating Characteristics for QTD3 Binary Endpoint (4 Categories)"
+)
+```
+
+### `summary()`
+
+Here we can think about a most reasonable summary of the object. It will be quite straightforward, so we omit it here for now.
+
+### `as.data.frame()`
+
+We can just extract the probabilities and other relevant information into a `data.frame`:
+
+```{r}
+as.data.frame.OperatingCharacteristics <- function(x) {
+    df <- x$probabilities
+    df$category <- factor(df$category, levels = unique(df$category))
+    df$percentage <- df$probability * 100
+    df
+}
+
+as.data.frame.OperatingCharacteristicsMeans <- function(x) {
+    df <- as.data.frame.OperatingCharacteristics(x)
+    ret <- df[, c(
+        "category",
+        "nControl",
+        "nTreatment",
+        "alternative",
+        "stDevControl",
+        "stDevTreatment",
+        "percentage"
+    )]
+    if (!is.null(df$controlMean)) {
+        ret$controlMean <- df$controlMean
+    }
+    ret
+}
+
+as.data.frame.OperatingCharacteristicsRates <- function(x) {
+    df <- as.data.frame.OperatingCharacteristics(x)
+    df[, c(
+        "category",
+        "nControl",
+        "nTreatment",
+        "pi1",
+        "pi2",
+        "directionUpper",
+        "percentage"
+    )]
+}
+```
+
+Let's try it out:
+
+```{r}
+df <- as.data.frame(characteristics)
+head(df)
+```
+
+That works, and for the binary endpoint as well:
+
+```{r}
+df_binary <- as.data.frame(binary_characteristics)
+head(df_binary)
+```
+
+### Showing the R code
+
+We will need to adapt some of the existing `rpact` functions to make sure that the `getObjectRCode()` works for the new classes. So we don't show that yet here.
+
+## RPACT Cloud Integration
+
+We are showing here how to extend RPACT Cloud at the code level to make QTD integration a tangible possibility.
+Specifically, we can introduce and adapt all necessary UI elements - these now appear both in the "Quick Start" menu and within the Design UI, where they coexist with our step-by-step GO/STOP criteria.
+
+Behind the scenes, the codebase is refactored to accommodate QTD's data flows and interaction patterns without disrupting existing functionality. All new components inherit our established styling and adhere to our component-library guidelines, ensuring consistency in look and feel.
+
+From a user's perspective, adding QTD is as straightforward as selecting the relevant option in Quick Start or toggling it on within the Design interface.
+
+We think the integration can feel like a native extension rather than an afterthought. In short, these enhancements slot seamlessly into our overall user concept and UI framework, making QTD a first-class citizen of the RPACT Cloud experience.
+
+![RPACT Cloud integration example screenshot 1.](images/rpact-cloud_qtd_001.png){style="width: 100%;" fig-align="left"}
+
+![RPACT Cloud integration example screenshot 2.](images/rpact-cloud_qtd_002.png){style="width: 300px;" fig-align="left"}
+
+![RPACT Cloud integration example screenshot 3.](images/rpact-cloud_qtd_003.png){style="width: 100%;" fig-align="left"}
+
+![RPACT Cloud integration example screenshot 4.](images/rpact-cloud_qtd_004.png){style="width: 300px;" fig-align="left"}
+
+![RPACT Cloud integration example screenshot 5.](images/rpact-cloud_qtd_005.png){style="width: 100%;" fig-align="left"}
+
+![RPACT Cloud integration example screenshot 6.](images/rpact-cloud_qtd_006.png){style="width: 100%;" fig-align="left"}
+
+![RPACT Cloud integration example screenshot 7.](images/rpact-cloud_qtd_007.png){style="width: 100%;" fig-align="left"}
+
+## Idea for QTD3 implementation
+
+- The computations are done by [`RBesT`](https://cran.r-project.org/package=RBesT)
+- Here we define wrapper functions that use the `RBesT` functions to calculate the operating characteristics
+
+## Prototype of QTD3 implementation (fixed design)
+
+Maybe it is still easiest then to still include the wrapper functions into `rpact`.
+The plan is to put `RBesT` as a suggested package dependency for `rpact`, so that users need to install it separately if they want to use the QTD3 functionality. The functions which require the use of `RBesT` functions will then check if `RBesT` is installed and give an error message if not, via the use of `requireNamespace("RBesT")`. `rpact` already does this similarly for other packages such as `ggplot2`.
+
+Meanwhile (as we have seen above already) we can also distinguish different "indeterminate" scenario probabilities, because the corresponding `RBesT` feature [https://github.com/Novartis/RBesT/issues/27](here) is available in the latest CRAN release 1.9-0. We have therefore extended the code below accordingly and relatively straightforward so.
+
+### Decision rule specification
+
+We want to achieve two objectives with the decision rule specification:
+
+1. Replicate the existing QTD3 decision rules as closely as possible.
+2. Provide a new, consistent way to use the QTD1 decision rules.
+
+To do so, we will:
+
+- Define a new class `BayesDesignDecisionRule` that is separate from the above `DesignDecisionRule` class. This will be a more general class, basically mapping the `RBesT` decision rule specifications.
+- Provide a way to coerce a `DesignDecisionRule` object into a `BayesDesignDecisionRule` object. This then also clearly defines our interpretation of the QTD1 decision rules in a Bayesian context.
+
+So let's first define the `BayesDesignDecisionRule` class.
+We start with one atomic thresholds definition. 
+
+```{r}
+DecisionThresholds <- R6::R6Class(
+    "DecisionThresholds",
+    public = list(
+        quantiles = "numeric",
+        probabilities = "numeric",
+        lower_tail = "logical",
+        initialize = function(quantiles, probabilities, lower_tail) {
+            self$quantiles <- quantiles
+            self$probabilities <- probabilities
+            self$lower_tail <- lower_tail
+        },
+        show = function() {
+            self$.show()
+        },
+        .show = function(consoleOutputEnabled = FALSE) {
+            string <- self$toString()
+            cat(string, "\n")
+        },
+        toString = function() {
+            separate <- paste0(
+                "P(theta ",
+                ifelse(self$lower_tail, "<", ">"),
+                " ", self$quantiles, ") > ",
+                self$probabilities
+            )
+            paste(separate, collapse = " and \n")
+        }
+    )
+)
+goThres <- DecisionThresholds$new(
+    quantiles = c(0, 100),
+    probabilities = c(0.95, 0.5),
+    lower_tail = c(FALSE, FALSE)
+)
+goThres$show()
+
+indThresh <- DecisionThresholds$new(
+    quantiles = c(0, 100),
+    probabilities = c(0.5, 0.8),
+    lower_tail = c(FALSE, TRUE)
+)
+indThresh$show()
+```
+
+Next we can go to our main `BayesDesignDecisionRule` class, which contains the Go, Stop and Indeterminate 1 decision thresholds.
+
+```{r}
+BayesDesignDecisionRule <- R6::R6Class(
+    "BayesDesignDecisionRule",
+    inherit = rpact:::ParameterSet,
+    public = list(
+        go = "DecisionThresholds",
+        stop = "DecisionThresholds",
+        indeterminate1 = "DecisionThresholds",
+        initialize = function(go, stop, indeterminate1) {
+            self$go <- go
+            self$stop <- stop
+            self$indeterminate1 <- indeterminate1
+        },
+        show = function() {
+            self$.show()
+        },
+        .show = function(consoleOutputEnabled = FALSE) {
+            cat("Bayesian Decision Rule:\n")
+            cat("Go Criteria:\n")
+            self$go$show()
+            cat("Stop Criteria:\n")
+            self$stop$show()
+            cat("Indeterminate 1 Criteria:\n")
+            self$indeterminate1$show()
+        },
+        toString = function() {
+            paste0(
+                "Go: ", self$go$toString(), "\n",
+                "Stop: ", self$stop$toString(), "\n",
+                "Indeterminate 1: ", self$indeterminate1$toString()
+            )
+        }
+    )
+)
+bayes_design_decision_rule <- BayesDesignDecisionRule$new(
+    go = goThres,
+    stop = DecisionThresholds$new(
+        quantiles = c(0, 20),
+        probabilities = c(0.5, 0.8),
+        lower_tail = c(TRUE, TRUE)
+    ),
+    indeterminate1 = indThresh
+)
+bayes_design_decision_rule
+```
+
+In production we can then add a dedicated constructor function for the user, e.g. `getBayesDesignDecisionRule()`, similar to `getDesignDecisionRule()` above; however, for this prototype we omit this for now.
+
+Now we define the coercion from `DesignDecisionRule` to `BayesDesignDecisionRule`:
+
+```{r}
+toBayesDesignDecisionRule <- function(from, directionUpper = TRUE) {
+    if (from$useSignificanceAndTarget) {
+        # Create Go thresholds based on QTD3 DesignDecisionRule
+        go_thresholds <- DecisionThresholds$new(
+            quantiles = ifelse(directionUpper, +1, -1) * c(from$lower_reference_value, from$target_value),
+            probabilities = c(1 - from$alpha, 0.5),
+            lower_tail = !directionUpper
+        )
+        # Create Stop thresholds based on QTD3 DesignDecisionRule
+        stop_thresholds <- DecisionThresholds$new(
+            quantiles = ifelse(directionUpper, +1, -1) * c(from$lower_reference_value, from$target_value),
+            probabilities = c(0.5, 1 - from$alpha),
+            lower_tail = directionUpper
+        )
+        # Create Indeterminate 1 thresholds based on QTD3 DesignDecisionRule
+        indeterminate1_thresholds <- DecisionThresholds$new(
+            quantiles = ifelse(directionUpper, +1, -1) * c(from$lower_reference_value, from$target_value),
+            probabilities = c(1 - from$alpha, 0.5),
+            lower_tail = c(!directionUpper, directionUpper)
+        )
+    } else {
+        # Create Go thresholds based on DesignDecisionRule
+        go_thresholds <- DecisionThresholds$new(
+            quantiles = ifelse(directionUpper, +1, -1) * c(from$lower_reference_value, from$target_value),
+            probabilities = c(from$upper_percentile, from$lower_percentile),
+            lower_tail = !directionUpper
+        )
+        # Create Stop thresholds based on DecisionRule
+        stop_thresholds <- DecisionThresholds$new(
+            quantiles = ifelse(directionUpper, +1, -1) * c(from$target_value, from$lower_reference_value),
+            probabilities = c(from$lower_percentile, from$upper_percentile),
+            lower_tail = directionUpper
+        )
+        # Create Indeterminate 1 thresholds based on DesignDecisionRule
+        indeterminate1_thresholds <- DecisionThresholds$new(
+            quantiles = ifelse(directionUpper, +1, -1) * c(from$lower_reference_value, from$target_value),
+            probabilities = c(from$lower_percentile, from$upper_percentile),
+            lower_tail = c(directionUpper, !directionUpper)
+        )
+    }
+    BayesDesignDecisionRule$new(
+        go = go_thresholds,
+        stop = stop_thresholds,
+        indeterminate1 = indeterminate1_thresholds
+    )
+}
+```
+
+Let's try this:
+
+```{r}
+bayes_decision_rule_from_qtd1 <- toBayesDesignDecisionRule(design_decision_rule)
+bayes_decision_rule_from_qtd1
+
+bayes_qtd3_decision_rule <- toBayesDesignDecisionRule(qtd3_decision_rule)
+bayes_qtd3_decision_rule
+```
+
+### Calculation of continuous outcome operating characteristics
+
+Notes:
+
+- As a prototype we have a separate function here, depending on the user concept this could later also be merged with the other function `getOperatingCharacteristicsMeans()`.
+- Here we don't have the `normalApproximation` argument, because we don't use the frequentist test statistic distribution
+
+The argument `priorDist` allows either:
+
+-  A single or mixture of normal prior distributions for the treatment effect, e.g. `RBesT::mixnorm(c(1, 0, 100))`
+-  A list with two elements, where the first element is the prior for the control group mean, and the second element is the prior for the treatment group mean, e.g. `list(RBesT::mixnorm(c(1, 0, 100)), RBesT::mixnorm(c(1, 50, 100)))`
+
+With this interface, the user can thus either define a prior directly on the treatment effect, or define separate priors on the group means.
+
+The `alternative` argument defines the assumed true treatment effect values. In case separate priors for the group means are given in `priorDist`, the user also needs to define an assumed value for the control group mean, via the argument `controlMean`.
+
+```{r}
+getOperatingCharacteristicsMeansBayes <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    groups = 2,
+    alternative = seq(0, 1, 0.2),
+    controlMean = NULL,
+    stDev = 1,
+    priorDist = RBesT::mixnorm(c(1, 0, 100))) {
+    # Validate inputs
+    # similar as in the other function, so omitted here for now.
+
+    meanOCresults <- .calcOperatingCharacteristicsMeansBayes(
+        designDecisionRule = designDecisionRule,
+        numberOfSubjects = numberOfSubjects,
+        alternative = alternative,
+        priorDist = priorDist,
+        stDev = stDev,
+        controlMean = controlMean
+    )
+    OperatingCharacteristicsMeans$new(
+        designDecisionRule = designDecisionRule,
+        numberOfSubjects = numberOfSubjects,
+        normalApproximation = FALSE,
+        alternative = alternative,
+        stDev = stDev,
+        probabilities = meanOCresults,
+        controlMean = controlMean
+    )
+}
+```
+
+Now the main work here is to define the actual calculation function, based on the `RBesT` functions which we reviewed above.
+
+If the user specifies a prior on the treatment effect, then we can directly use `oc1S()` from `RBesT`.
+In the same way as above for the frequentist operating characteristics function, we are going to use the fact that the variance of the treatment effect estimate $\hat{\delta} = \overline{Y}_T - \overline{Y}_C$ is given by:
+
+$$
+\Var(\hat{\delta}) = \frac{\sigma_C^2}{n_C} + \frac{\sigma_T^2}{n_T}
+$$
+
+So the standard deviation is:
+
+$$
+\sigma_{\hat{\delta}} = \sqrt{\frac{\sigma_C^2}{n_C} + \frac{\sigma_T^2}{n_T}}
+$$
+
+If the standard deviations are the same in both groups, i.e. $\sigma_C = \sigma_T = \sigma$, then this simplifies to:
+
+$$
+\sigma_{\hat{\delta}} = \sigma \sqrt{\frac{1}{n_C} + \frac{1}{n_T}}
+$$  
+
+We then can use this as the `sigma` and set sample size $n = 1$ for using `oc1S`.
+
+Otherwise we are going to use `oc2S()` from `RBesT`, which allows to specify separate priors for the two group means.
+
+```{r}
+.calcOperatingCharacteristicsMeansBayesSingleN <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    alternative,
+    priorDist,
+    stDev,
+    controlMean) {
+    # Validate inputs
+    stopifnot(is.numeric(numberOfSubjects) && length(numberOfSubjects) == 2)
+
+    # Check prior distribution and control group mean input.
+    if (is.list(priorDist)) {
+        stopifnot(length(priorDist) == 2)
+        stopifnot(all(sapply(priorDist, function(x) is(x, "normMix"))))
+        stopifnot(!is.null(controlMean) && is.numeric(controlMean) && length(controlMean) == 1)
+    } else {
+        stopifnot(is(priorDist, "normMix"))
+        stopifnot(is.null(controlMean))
+    }
+    use_oc1s <- is(priorDist, "normMix")
+    # Check and if needed coerce the decision rule to Bayesian decision rule:
+    if (!is(designDecisionRule, "BayesDesignDecisionRule")) {
+        designDecisionRule <- toBayesDesignDecisionRule(designDecisionRule)
+    }
+    # Depending on the prior distribution, use oc1S or oc2S:
+    if (use_oc1s) {
+        # Calculate standard deviation based on stDev and sample sizes.
+        s <- if (length(stDev) == 1) {
+            stDev * sqrt(sum(1 / numberOfSubjects))
+        } else {
+            sqrt(sum(stDev^2 / numberOfSubjects))
+        }
+        # Create the decision rules accordingly.
+        go_rule <- decision1S(
+            pc = designDecisionRule$go$probabilities,
+            qc = designDecisionRule$go$quantiles,
+            lower.tail = designDecisionRule$go$lower_tail
+        )
+        stop_rule <- decision1S(
+            pc = designDecisionRule$stop$probabilities,
+            qc = designDecisionRule$stop$quantiles,
+            lower.tail = designDecisionRule$stop$lower_tail
+        )
+        indeterminate1_rule <- decision1S(
+            pc = designDecisionRule$indeterminate1$probabilities,
+            qc = designDecisionRule$indeterminate1$quantiles,
+            lower.tail = designDecisionRule$indeterminate1$lower_tail
+        )
+
+        # Calculate the Go, Stop and Indeterminate probabilities.
+        oc_go <- oc1S(
+            prior = priorDist,
+            n = 1,
+            decision = go_rule,
+            sigma = s
+        )
+        oc_stop <- oc1S(
+            prior = priorDist,
+            n = 1,
+            decision = stop_rule,
+            sigma = s
+        )
+        oc_indeterminate1 <- oc1S(
+            prior = priorDist,
+            n = 1,
+            decision = indeterminate1_rule,
+            sigma = s
+        )
+        prob_go <- oc_go(alternative) # probabilities for the Go decision rule
+        prob_stop <- oc_stop(alternative) # probabilities for the Stop decision rule
+        prob_indeterminate1 <- oc_indeterminate1(alternative) # probabilities for the Indeterminate 1 decision rule
+    } else {
+        # Create the decision rules accordingly.
+        go_rule <- decision2S(
+            pc = designDecisionRule$go$probabilities,
+            qc = designDecisionRule$go$quantiles,
+            lower.tail = designDecisionRule$go$lower_tail
+        )
+        stop_rule <- decision2S(
+            pc = designDecisionRule$stop$probabilities,
+            qc = designDecisionRule$stop$quantiles,
+            lower.tail = designDecisionRule$stop$lower_tail
+        )
+        indeterminate1_rule <- decision2S(
+            pc = designDecisionRule$indeterminate1$probabilities,
+            qc = designDecisionRule$indeterminate1$quantiles,
+            lower.tail = designDecisionRule$indeterminate1$lower_tail
+        )
+        # Calculate the Go, Stop and Indeterminate probabilities.
+        # Careful here: RBesT assumes that index 1 is for treatment, and index 2 for control.
+        oc_go <- oc2S(
+            prior1 = priorDist[[2]],
+            prior2 = priorDist[[1]],
+            n1 = numberOfSubjects[2],
+            n2 = numberOfSubjects[1],
+            decision = go_rule,
+            sigma1 = if (length(stDev) == 1) stDev else stDev[2],
+            sigma2 = if (length(stDev) == 1) stDev else stDev[1]
+        )
+        oc_stop <- oc2S(
+            prior1 = priorDist[[2]],
+            prior2 = priorDist[[1]],
+            n1 = numberOfSubjects[2],
+            n2 = numberOfSubjects[1],
+            decision = stop_rule,
+            sigma1 = if (length(stDev) == 1) stDev else stDev[2],
+            sigma2 = if (length(stDev) == 1) stDev else stDev[1]
+        )
+        oc_indeterminate1 <- oc2S(
+            prior1 = priorDist[[2]],
+            prior2 = priorDist[[1]],
+            n1 = numberOfSubjects[2],
+            n2 = numberOfSubjects[1],
+            decision = indeterminate1_rule,
+            sigma1 = if (length(stDev) == 1) stDev else stDev[2],
+            sigma2 = if (length(stDev) == 1) stDev else stDev[1]
+        )
+        prob_go <- oc_go(controlMean + alternative, controlMean) # probabilities for the Go decision rule
+        prob_stop <- oc_stop(controlMean + alternative, controlMean) # probabilities for the Stop decision rule
+        prob_indeterminate1 <- oc_indeterminate1(controlMean + alternative, controlMean) # probabilities for the Indeterminate 1 decision rule
+    }
+    prob_indeterminate2 <- 1 - prob_go - prob_stop - prob_indeterminate1
+    stopifnot(all(prob_indeterminate2 >= 0) && all(prob_indeterminate2 <= 1))
+
+    # Prepare the results in a data frame
+    categories <- c("Go", "Indeterminate 1", "Indeterminate 2", "Stop")
+    df <- data.frame(
+        category = rep(categories, each = length(alternative)),
+        probability = c(prob_go, prob_indeterminate1, prob_indeterminate2, prob_stop),
+        nControl = numberOfSubjects[1],
+        nTreatment = numberOfSubjects[2],
+        alternative = alternative
+    )
+    if (length(stDev) == 1) {
+        df$stDevControl <- stDev
+        df$stDevTreatment <- stDev
+    } else {
+        df$stDevControl <- stDev[1]
+        df$stDevTreatment <- stDev[2]
+    }
+    if (!use_oc1s) {
+        df$controlMean <- controlMean
+    }
+    df
+}
+
+# This is just going through all numberOfSubjects scenarios
+.calcOperatingCharacteristicsMeansBayes <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    alternative,
+    priorDist,
+    stDev,
+    controlMean) {
+    res <- apply(numberOfSubjects, 1, function(singleRow) {
+        .calcOperatingCharacteristicsMeansBayesSingleN(
+            designDecisionRule = designDecisionRule,
+            numberOfSubjects = singleRow,
+            alternative = alternative,
+            priorDist = priorDist,
+            stDev = stDev,
+            controlMean = controlMean
+        )
+    })
+    do.call(rbind, res)
+}
+```
+
+Let's try out this one:
+
+```{r}
+test <- getOperatingCharacteristicsMeansBayes(
+    designDecisionRule = qtd3_decision_rule,
+    numberOfSubjects = matrix(
+        c(50, 60, 60, 70),
+        nrow = 2,
+        ncol = 2,
+        byrow = TRUE
+    ),
+    alternative = seq(0, 200, length = 100),
+    priorDist = RBesT::mixnorm(c(1, 0, 100)),
+    stDev = 200
+)
+```
+
+Now that we have the object, we can then use the same plotting and summary methods as for the frequentist version:
+
+```{r}
+library(dplyr)
+test |>
+    as.data.frame() |>
+    group_by(alternative, nControl, nTreatment, stDevControl, stDevTreatment) |>
+    summarize(total_p = sum(percentage))
+```
+
+That looks good, the probabilities sum to 100% for each alternative and sample size combination.
+
+```{r}
+plot(test, plotCat = 4)
+```
+
+And now it also works with the QTD1 decision rule:
+
+```{r}
+test_qtd1 <- getOperatingCharacteristicsMeansBayes(
+    designDecisionRule = design_decision_rule,
+    numberOfSubjects = matrix(
+        c(50, 60, 60, 70),
+        nrow = 2,
+        ncol = 2,
+        byrow = TRUE
+    ),
+    alternative = seq(0, 200, length = 100),
+    priorDist = RBesT::mixnorm(c(1, 0, 100)),
+    stDev = 200
+)
+plot(test_qtd1, plotCat = 4)
+```
+
+We can also try with different priors and standard deviations per group:
+
+```{r}
+test2 <- getOperatingCharacteristicsMeansBayes(
+    designDecisionRule = design_decision_rule,
+    numberOfSubjects = matrix(c(50, 60, 60, 70),
+        nrow = 2, ncol = 2, byrow = TRUE
+    ),
+    alternative = seq(0, 200, length = 100),
+    priorDist = list(
+        RBesT::mixnorm(c(1, 10, 20)), # control
+        RBesT::mixnorm(c(1, 20, 100)) # treatment
+    ),
+    stDev = c(100, 200),
+    controlMean = 10
+)
+plot(test2, plotCat = 4)
+```
+
+Note that we can also replicate the original QTD3 decision rules by defining the `BayesDecisionRule` object directly, and this can also involve only one criterion (it does not have to be a double criterion):
+
+```{r}
+qtd3_bayes_decision_rule <- BayesDesignDecisionRule$new(
+    go = DecisionThresholds$new(
+        quantiles = 0,
+        probabilities = 0.95,
+        lower_tail = FALSE
+    ),
+    stop = DecisionThresholds$new(
+        quantiles = 0,
+        probabilities = 0.5,
+        lower_tail = TRUE
+    ),
+    indeterminate1 = DecisionThresholds$new(
+        quantiles = c(0, 0),
+        probabilities = c(0.05, 0.5),
+        lower_tail = c(TRUE, FALSE)
+    )
+)
+qtd3_test <- getOperatingCharacteristicsMeansBayes(
+    designDecisionRule = qtd3_bayes_decision_rule,
+    numberOfSubjects = matrix(c(50, 60, 60, 70), nrow = 2, ncol = 2, byrow = TRUE),
+    alternative = seq(0, 200, length = 100),
+    priorDist = RBesT::mixnorm(c(1, 0, 100)),
+    stDev = 200
+)
+plot(qtd3_test, plotCat = 4)
+```
+
+### Reproducing results from the QTD3 app
+
+Now let's try to reproduce some of the results from the QTD3 app with the prototype code from above:
+
+![Inputs in QTD3 example](images/2026-01-13-14-13-24.png)
+
+Here we deliberately only give one possible value for the control group mean (40) because that is what we have so far in our prototype. If it is important to have a range of control group means, we can extend the prototype later. But it seems for simplicity it could be better to do it like for the standard deviations, where just a single choice is made.
+
+Using these inputs, we get this plot:
+
+![Result plot in QTD3 example](images/test_cumulative.png)
+
+Now let's try to reproduce this with our prototype code. We need to specify:
+
+- Standard deviations
+  - Control: 60
+  - Treatment: 80
+- Prior distributions
+  - Control: Mean 49, prior total sample size 20, that implies standard deviation $\sigma_C = \sqrt{(60^2) / 20} = 13.416$
+  - Treatment: Mean 49, prior total sample size 0.001, that implies standard deviation $\sigma_T = \sqrt{(80^2) / 0.001} = 2539.84$
+- Alternative (treatment difference) ranging from 0 to 70
+- Control mean: 40
+- Number of patients
+  - Control: 10
+  - Treatment: 20
+- Go criterion:
+  - $P(\delta > 0) > 0.95$ and
+  - $P(\delta > 50) > 0.5$
+- Stop criterion:
+  $P(\delta < 40) > 0.9$
+
+We translate this into the following code:
+
+```{r}
+design_decision_rule_qtd3 <- BayesDesignDecisionRule$new(
+    go = DecisionThresholds$new(
+        quantiles = c(0, 50),
+        probabilities = c(0.95, 0.5),
+        lower_tail = c(FALSE, FALSE)
+    ),
+    stop = DecisionThresholds$new(
+        quantiles = 40,
+        probabilities = 0.9,
+        lower_tail = TRUE
+    ),
+    indeterminate1 = DecisionThresholds$new(
+        quantiles = c(0, 50),
+        probabilities = c(0.95, 0.5),
+        lower_tail = c(FALSE, TRUE)
+    )
+)
+characteristics_qtd3 <- getOperatingCharacteristicsMeansBayes(
+    designDecisionRule = design_decision_rule_qtd3,
+    numberOfSubjects = matrix(c(10, 20), nrow = 1, ncol = 2, byrow = TRUE),
+    alternative = seq(0, 70, length = 100),
+    priorDist = list(
+        RBesT::mixnorm(c(1, 49, 20), sigma = 60, param = "mn"), # control
+        RBesT::mixnorm(c(1, 49, 0.001), sigma = 80, param = "mn") # treatment
+    ),
+    stDev = c(60, 80),
+    controlMean = 40
+)
+plot(characteristics_qtd3, main = "Reproduced QTD3 Example Operating Characteristics")
+```
+
+So this looks a bit different from the layout, but the numbers seem to match well.
+
+Of course if we wanted we could further distinguish the two indeterminate scenarios:
+
+```{r}
+plot(characteristics_qtd3, plotCat = 4)
+```
+
+Note that `RBesT::mixnorm` allows to specify the prior standard deviation via the number of prior observations and the data standard deviation, which is what we used here.
+
+### Calculation of binary outcome operating characteristics
+
+Notes:
+
+- As a prototype we have a separate function here, depending on the user concept this could later also be merged with the other function `getOperatingCharacteristicsRates()`.
+- Here we have separate prior distributions for the response rates `pi1` in the treatment group and `pi2` in the control group, specified via `priorDist1` and `priorDist2`.
+
+```{r}
+getOperatingCharacteristicsRatesBayes <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    pi1,
+    pi2,
+    directionUpper = TRUE,
+    groups = 2,
+    priorDist1 = RBesT::mixbeta(c(1, 1 / 3, 1 / 3)),
+    priorDist2 = RBesT::mixbeta(c(1, 1 / 3, 1 / 3))) {
+    # Validate inputs
+    # similar as in the other function, so omitted here for now.
+
+    stopifnot(is(priorDist1, "betaMix"))
+    stopifnot(is(priorDist2, "betaMix"))
+
+    rateOCresults <- .calcOperatingCharacteristicsRatesBayes(
+        designDecisionRule = designDecisionRule,
+        numberOfSubjects = numberOfSubjects,
+        pi1 = pi1,
+        pi2 = pi2,
+        directionUpper = directionUpper,
+        priorDist1 = priorDist1,
+        priorDist2 = priorDist2
+    )
+    OperatingCharacteristicsRates$new(
+        designDecisionRule = designDecisionRule,
+        numberOfSubjects = numberOfSubjects,
+        pi1 = pi1,
+        pi2 = pi2,
+        directionUpper = directionUpper,
+        probabilities = rateOCresults
+    )
+}
+```
+
+The actual computations happen here:
+
+```{r}
+.calcOperatingCharacteristicsRatesBayesSingleN <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    pi1,
+    pi2,
+    directionUpper,
+    priorDist1,
+    priorDist2) {
+    stopifnot(is.numeric(numberOfSubjects) && length(numberOfSubjects) == 2)
+    stopifnot(is.numeric(pi1) && all(pi1 >= 0) && all(pi1 <= 1))
+    stopifnot(is.numeric(pi2) && length(pi2) == 1 && (pi2 >= 0) && (pi2 <= 1))
+    stopifnot(is.logical(directionUpper) && length(directionUpper) == 1)
+
+    n.con <- numberOfSubjects[1]
+    n.trt <- numberOfSubjects[2]
+
+    # Check and if needed coerce the decision rule to Bayesian decision rule:
+    if (!is(designDecisionRule, "BayesDesignDecisionRule")) {
+        designDecisionRule <- toBayesDesignDecisionRule(designDecisionRule, directionUpper = directionUpper)
+    }
+
+    # Create the decision rules accordingly.
+    go_rule <- decision2S(
+        pc = designDecisionRule$go$probabilities,
+        qc = designDecisionRule$go$quantiles,
+        lower.tail = designDecisionRule$go$lower_tail
+    )
+    stop_rule <- decision2S(
+        pc = designDecisionRule$stop$probabilities,
+        qc = designDecisionRule$stop$quantiles,
+        lower.tail = designDecisionRule$stop$lower_tail
+    )
+    indeterminate1_rule <- decision2S(
+        pc = designDecisionRule$indeterminate1$probabilities,
+        qc = designDecisionRule$indeterminate1$quantiles,
+        lower.tail = designDecisionRule$indeterminate1$lower_tail
+    )
+
+    # Calculate the Go, Stop and Indeterminate probabilities.
+    oc_go <- oc2S(
+        prior1 = priorDist1,
+        prior2 = priorDist2,
+        n1 = n.trt,
+        n2 = n.con,
+        decision = go_rule,
+        eps = 1e-6
+    )
+    oc_stop <- oc2S(
+        prior1 = priorDist1,
+        prior2 = priorDist2,
+        n1 = n.trt,
+        n2 = n.con,
+        decision = stop_rule,
+        eps = 1e-6
+    )
+    oc_indeterminate1 <- oc2S(
+        prior1 = priorDist1,
+        prior2 = priorDist2,
+        n1 = n.trt,
+        n2 = n.con,
+        decision = indeterminate1_rule,
+        eps = 1e-6
+    )
+
+    prob_go <- oc_go(pi1, pi2) # probabilities for the Go decision rule
+    prob_stop <- oc_stop(pi1, pi2) # probabilities for the Stop decision rule
+    prob_indeterminate1 <- oc_indeterminate1(pi1, pi2) # probabilities for the Indeterminate 1 decision rule
+    prob_indeterminate2 <- 1 - prob_go - prob_stop - prob_indeterminate1 # probabilities for the Indeterminate 2 decision rule
+    stopifnot(all(prob_indeterminate2 >= 0) && all(prob_indeterminate2 <= 1))
+
+    # Prepare the results in a data frame
+    categories <- c("Go", "Indeterminate 1", "Indeterminate 2", "Stop")
+    data.frame(
+        category = rep(categories, each = length(pi1)),
+        probability = c(prob_go, prob_indeterminate1, prob_indeterminate2, prob_stop),
+        nControl = n.con,
+        nTreatment = n.trt,
+        pi1 = pi1,
+        pi2 = pi2,
+        directionUpper = directionUpper
+    )
+}
+
+# This is just going through all numberOfSubjects scenarios
+.calcOperatingCharacteristicsRatesBayes <- function(
+    designDecisionRule,
+    numberOfSubjects,
+    pi1,
+    pi2,
+    directionUpper,
+    priorDist1,
+    priorDist2) {
+    res <- apply(numberOfSubjects, 1, function(singleRow) {
+        .calcOperatingCharacteristicsRatesBayesSingleN(
+            designDecisionRule = designDecisionRule,
+            numberOfSubjects = singleRow,
+            pi1 = pi1,
+            pi2 = pi2,
+            directionUpper = directionUpper,
+            priorDist1 = priorDist1,
+            priorDist2 = priorDist2
+        )
+    })
+    do.call(rbind, res)
+}
+```
+
+Let's try out this one:
+
+```{r}
+qtd3_binary_decision_rule <- getDesignDecisionRule(
+    target_value = 0.2,
+    useSignificanceAndTarget = TRUE
+)
+
+binary_characteristics_bayes <- getOperatingCharacteristicsRatesBayes(
+    designDecisionRule = qtd3_binary_decision_rule,
+    numberOfSubjects = matrix(
+        c(50, 60, 60, 70),
+        nrow = 2,
+        ncol = 2,
+        byrow = TRUE
+    ),
+    pi1 = seq(0, 1, 0.1), # treatment group response rates
+    pi2 = 0.3, # control group response rate
+    directionUpper = TRUE,
+    priorDist1 = RBesT::mixbeta(c(1, 1 / 3, 1 / 3)),
+    priorDist2 = RBesT::mixbeta(c(1, 1 / 3, 1 / 3))
+)
+```
+
+Let's check that the probabilities sum to 100% for each scenario:
+
+```{r}
+binary_characteristics_bayes |>
+    as.data.frame() |>
+    group_by(pi1, nControl, nTreatment) |>
+    summarize(total_p = sum(percentage))
+```
+
+OK that looks good, and the plot:
+
+```{r}
+plot(binary_characteristics_bayes, plotCat = 4)
+```
+
+Also nice!
+
+And now it also works with the QTD1 decision rule:
+
+```{r}
+binary_characteristics_bayes_qtd1 <- getOperatingCharacteristicsRatesBayes(
+    designDecisionRule = binary_decision_rule,
+    numberOfSubjects = matrix(
+        c(50, 60, 60, 70),
+        nrow = 2,
+        ncol = 2,
+        byrow = TRUE
+    ),
+    pi1 = seq(0, 1, 0.1), # treatment group response rates
+    pi2 = 0.3, # control group response rate
+    directionUpper = TRUE,
+    priorDist1 = RBesT::mixbeta(c(1, 1 / 3, 1 / 3)),
+    priorDist2 = RBesT::mixbeta(c(1, 1 / 3, 1 / 3))
+)
+
+plot(binary_characteristics_bayes_qtd1, plotCat = 4)
+```

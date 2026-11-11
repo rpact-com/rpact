@@ -83,6 +83,7 @@ Imports:
 	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
 Suggests:
+    RBesT (>= 1.9-0),
     callr,
     parallelly,
     quarto (>= 1.4.0),
@@ -177,9 +178,11 @@ Collate:
     'f_piecewise_survival_time.R'
     'f_piecewise_survival_time_multiarm.R'
     'f_plot_qtd.R'
+    'f_plot_qtd_bayes.R'
     'f_plot_qtd_utilities.R'
     'f_qtd_binary_intervals.R'
     'f_qtd_utilities.R'
+    'f_qtd_bayes.R'
     'f_quality_assurance.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'

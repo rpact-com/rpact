@@ -10,8 +10,6 @@
 #' Stores exact binomial decision-category probabilities for two independent
 #' groups. Obtain instances with [getOperatingCharacteristicsRates()].
 #'
-#' @template field_numberOfSubjects_qtd
-#' @template field_probabilities_qtd_rates
 #' @template field_groups_qtd
 #' @template field_pi1_qtd_rates
 #' @template field_pi2
@@ -19,10 +17,22 @@
 #' @template field_intervalMethod_qtd
 #' @template field_alternative_qtd_rates
 #'
+#' @eval local({
+#'     templates <- c("numberOfSubjects_qtd", "probabilities_qtd", "priorDist_qtd", "priorDist1_qtd", "priorDist2_qtd", "controlMean_qtd")
+#'     entries <- vapply(templates, function(template) {
+#'         lines <- readLines(file.path("man-roxygen", paste0("field_", template, ".R")), warn = FALSE)
+#'         field <- sub("^#' @field ", "", grep("^#' @field ", lines, value = TRUE))
+#'         name <- sub(" .*", "", field)
+#'         description <- substring(field, nchar(name) + 2L)
+#'         return(paste0("\\item{\\code{", name, "}}{", description, "}"))
+#'     }, character(1))
+#'     paste0("@section Inherited fields:\n\\describe{", paste(entries, collapse = "\n"), "}")
+#' })
+#'
 #' @details
 #' Inherits the sample-size matrix and probability table from
 #' `OperatingCharcteristics`. The originating quantitative decision rule is
-#' stored internally. Each sample-size scenario contains all six categories
+#' stored internally. Each sample-size scenario contains six frequentist or four Bayesian categories
 #' and the supplied treatment rates in their original order, including repeats.
 #' Console and Markdown printing use the standard ParameterSet mechanism.
 #' Use [summary()] for decision-rule assumptions and probability tables, and
@@ -169,9 +179,21 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
 #' @param intervalMethod One of `"qtd1"` (default), `"farringtonManning"`,
 #'   `"miettinenNurminen"`, or `"newcombe"`, as described in
 #'   [plot.TrialDesignPlanQuantitative()].
+#' @param priorDist1,priorDist2 Bayesian RBesT betaMix priors for treatment and
+#'   control, respectively. NULL selects mixbeta(c(1, 1/3, 1/3)) for each arm.
 #' @param ... Additional arguments are checked for unknown names.
 #'
 #' @details
+#' Bayesian rules use RBesT postmix and decision2S on the complete binomial
+#' count grid, followed by exact binomial probability summation. This avoids
+#' truncation by eps and mixed-tail boundary sentinel edge cases observed with
+#' oc2S in RBesT 1.12.0. Strict posterior comparisons follow RBesT. The four
+#' Bayesian categories are Go, Indeterminate 1, Indeterminate 2 and Stop;
+#' exact probability-threshold ties belong to Indeterminate 2. Omit intervalMethod
+#' for Bayesian rules. Priors are stored for reproducible output and recalculation.
+#' Only identity-link beta mixtures are supported. The count-grid limit applies
+#' to Bayesian rules as well; evaluation of large grids can be expensive.
+#'
 #' Decision boundaries use the same interval calculations and equality rules
 #' as the binary decision map. The QTD1 method reproduces the original program,
 #' including Wilson limits rounded to four decimal places in its variance
@@ -209,7 +231,7 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
 #' @export
 #'
 getOperatingCharacteristicsRates <- function(design, ..., numberOfSubjects, pi1, pi2,
-        directionUpper = TRUE, intervalMethod = "qtd1") {
+        directionUpper = TRUE, intervalMethod = "qtd1", priorDist1 = NULL, priorDist2 = NULL) {
     functionName <- "getOperatingCharacteristicsRates"
     .warnInCaseOfUnknownArguments(functionName = functionName, ...)
     missingInputs <- c(design = missing(design), numberOfSubjects = missing(numberOfSubjects),
@@ -219,6 +241,20 @@ getOperatingCharacteristicsRates <- function(design, ..., numberOfSubjects, pi1,
             functionName = functionName, parameter = names(missingInputs)[missingInputs],
             constraint = "design, numberOfSubjects, pi1 and pi2 are required",
             diagnosticId = "qtd.rates.missing_argument")
+    }
+    if (inherits(design, "TrialDesignPlanQuantitativeBayes")) {
+        if (!missing(intervalMethod)) {
+            stopIllegalArgument("'intervalMethod' is not a Bayesian calculation option",
+                functionName = functionName, parameter = "intervalMethod", value = intervalMethod,
+                constraint = "omit for Bayesian rules", diagnosticId = "qtd.bayes.frequentist_option")
+        }
+        return(.getQtdBayesRates(design, numberOfSubjects, pi1, pi2, directionUpper, priorDist1, priorDist2))
+    }
+    if (!is.null(priorDist1) || !is.null(priorDist2)) {
+        stopConflictingArguments("Priors require a Bayesian design",
+            functionName = functionName, parameter = c("priorDist1", "priorDist2"),
+            value = list(priorDist1, priorDist2), relatedParameter = "design", relatedValue = design,
+            constraint = "Bayesian design required", diagnosticId = "qtd.bayes.prior_without_bayes_design")
     }
     if (!inherits(design, "TrialDesignPlanQuantitative")) {
         stopIllegalArgument("'design' must be a quantitative decision rule",

@@ -18,31 +18,26 @@
 #' @name OperatingCharcteristics
 #'
 #' @title
-#' Operating Characteristics for Quantitative Trial Decisions
+#' Operating Characteristics for Quantitative Decisions
 #'
 #' @description
-#' A lightweight container for operating-characteristics results produced by the
-#' QTD helpers. Instances store the originating design, tested sample-size
-#' scenarios and the resulting category probabilities used for plotting and
-#' reporting.
+#' Internal ParameterSet container shared by means and rates results.
+#' Obtain concrete instances through the endpoint-specific OC functions.
 #'
 #' @template field_numberOfSubjects_qtd
 #' @template field_probabilities_qtd
+#' @template field_priorDist_qtd
+#' @template field_priorDist1_qtd
+#' @template field_priorDist2_qtd
+#' @template field_controlMean_qtd
 #'
 #' @details
-#' This internal base class supplies inherited fields for
-#' `OperatingCharcteristicsMeans` and `OperatingCharcteristicsRates`.
-#' Obtain result objects through [getOperatingCharacteristicsMeans()] or
-#' [getOperatingCharacteristicsRates()]. The originating design is stored internally.
+#' The originating rule is stored in the internal .design field. Priors and the
+#' control mean are NULL when not applicable. Bayesian results store four exclusive
+#' categories; frequentist results store six. Sampling probabilities are conditional
+#' on the supplied true effect or response rates; they are not predictive assurance.
 #'
 #' @seealso [getOperatingCharacteristicsMeans()], [getOperatingCharacteristicsRates()]
-#'
-#' @return An R6 object of class \code{OperatingCharcteristics}.
-#'
-#' @examples
-#' rule <- getDesignQuantitative(targetValue = 1, lowerReferenceValue = 0)
-#' nMatrix <- matrix(c(50, 100), ncol = 2, byrow = TRUE)
-#' # oc <- getOperatingCharacteristicsMeans(design = rule, numberOfSubjects = nMatrix)
 #'
 #' @keywords internal
 #'
@@ -53,6 +48,10 @@ OperatingCharcteristics <- R6::R6Class(
         .design = NULL,
         numberOfSubjects = NULL,
         probabilities = NULL,
+        priorDist = NULL,
+        priorDist1 = NULL,
+        priorDist2 = NULL,
+        controlMean = NULL,
         #'
         #' @description
         #' Initializes the shared quantitative operating-characteristics fields.
@@ -75,29 +74,43 @@ OperatingCharcteristics <- R6::R6Class(
     )
 )
 
-#' 
-#' OperatingCharcteristicsMeans R6 class
 #'
-#' Specialised operating-characteristics container for comparing means
-#' (two-group designs). Inherits from \code{OperatingCharcteristics} and adds
-#' fields relevant for mean comparisons and plotting.
+#' @name OperatingCharcteristicsMeans
 #'
-#' @field normalApproximation Logical. Indicates the use of a normal
-#'   approximation for the sampling distribution.
-#' @field alternative Numeric vector. Grid of true mean differences used when
-#'   computing probabilities.
-#' @field stDev Numeric scalar. Assumed common standard deviation used for the
-#'   normal approximation.
+#' @title
+#' Operating Characteristics for Comparing Means
 #'
-#' @return An R6 object of class \code{OperatingCharcteristicsMeans}.
+#' @description
+#' Stores fixed-design quantitative decision probabilities for means. Obtain
+#' instances through [getOperatingCharacteristicsMeans()].
 #'
-#' @examples
-#' # See getOperatingCharacteristicsMeans for an end-to-end example.
+#' @template field_normalApproximation_qtd
+#' @template field_groups_qtd
+#' @template field_alternative_qtd_means
+#' @template field_stDev_qtd
+#'
+#' @eval local({
+#'     templates <- c("numberOfSubjects_qtd", "probabilities_qtd", "priorDist_qtd", "priorDist1_qtd", "priorDist2_qtd", "controlMean_qtd")
+#'     entries <- vapply(templates, function(template) {
+#'         lines <- readLines(file.path("man-roxygen", paste0("field_", template, ".R")), warn = FALSE)
+#'         field <- sub("^#' @field ", "", grep("^#' @field ", lines, value = TRUE))
+#'         name <- sub(" .*", "", field)
+#'         description <- substring(field, nchar(name) + 2L)
+#'         return(paste0("\\item{\\code{", name, "}}{", description, "}"))
+#'     }, character(1))
+#'     paste0("@section Inherited fields:\n\\describe{", paste(entries, collapse = "\n"), "}")
+#' })
+#'
+#' @details
+#' Inherits sample sizes, probabilities, priors and controlMean from
+#' OperatingCharcteristics. The rates priors priorDist1 and priorDist2 remain NULL.
+#'
+#' @seealso [getDesignQuantitative()], [getOperatingCharacteristicsMeans()]
+#'
+#' @keywords internal
 #'
 #' @export
-#' 
-#' @keywords internal
-#' 
+#'
 OperatingCharcteristicsMeans <- R6::R6Class(
     "OperatingCharcteristicsMeans",
     inherit = OperatingCharcteristics,
@@ -106,6 +119,17 @@ OperatingCharcteristicsMeans <- R6::R6Class(
         groups = NULL,
         alternative = NULL,
         stDev = NULL,
+        #'
+        #' @description Initializes means OC assumptions and probability output.
+        #' @param ... Reserved for ParameterSet compatibility.
+        #' @param design Originating quantitative rule.
+        #' @param numberOfSubjects Control and treatment sample sizes.
+        #' @param normalApproximation Normal sampling model flag.
+        #' @param groups Number of groups.
+        #' @param alternative True effect vector.
+        #' @param stDev Known standard deviations.
+        #' @param probabilities Category-block probability table.
+        #'
         initialize = function(
                 ...,
                 design,
@@ -126,14 +150,29 @@ OperatingCharcteristicsMeans <- R6::R6Class(
             .setValueAndParameterType(self, "alternative", alternative, seq(0, 1, 0.2))
             .setValueAndParameterType(self, "stDev", stDev, 1)
         },
+        #'
+        #' @description Prints the result.
+        #' @param showType Output mode.
+        #' @param digits Display precision.
+        #'
         show = function(showType = 1, digits = NA_integer_) {
             self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
+        #'
+        #' @description Renders the result.
+        #' @param showType Output mode.
+        #' @param digits Display precision.
+        #' @param consoleOutputEnabled Print or collect output.
+        #'
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             if (!.showQtdOperatingCharacteristics(self, showType, digits, consoleOutputEnabled)) {
                 super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             }
         },
+        #'
+        #' @description Returns the result description.
+        #' @param startWithUpperCase Capitalize the description.
+        #'
         .toString = function(startWithUpperCase = FALSE) {
             s <- "operating-characteristics for comparing means"
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))

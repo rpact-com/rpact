@@ -15,6 +15,18 @@
 ## |
 
 C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
+    go = "Go criteria",
+    stop = "Stop criteria",
+    indeterminate1 = "Indeterminate 1 criteria",
+    percentileMapping = "Percentile mapping",
+    priorDist = "Prior distribution",
+    priorDist1 = "Treatment prior distribution",
+    priorDist2 = "Control prior distribution",
+    controlMean = "Control mean",
+    stDevControl = "Standard deviation (control)",
+    stDevTreatment = "Standard deviation (treatment)",
+    quantiles = "Effect thresholds",
+    lowerTail = "Lower tail",
     targetValue = "Target value",
     lowerReferenceValue = "Lower reference value",
     upperPercentile = "Upper percentile",

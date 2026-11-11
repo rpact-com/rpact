@@ -22,6 +22,13 @@
             constraint = "OperatingCharcteristicsMeans or OperatingCharcteristicsRates",
             diagnosticId = "qtd.plot.unsupported_endpoint")
     }
+    if (inherits(object$.design, "TrialDesignPlanQuantitativeBayes")) {
+        if (settings$endpoint == "means") {
+            settings$assumptions <- c("groups", "stDev", "priorDist", "controlMean")
+        } else {
+            settings$assumptions <- c("groups", "pi2", "directionUpper", "priorDist1", "priorDist2")
+        }
+    }
     if (is.null(xAxis)) {
         xAxis <- settings$defaultAxis
     }
@@ -66,4 +73,43 @@
         consoleOutputEnabled = consoleOutputEnabled)
     object$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
     return(invisible(TRUE))
+}
+
+#'
+#' @title
+#' Extract Quantitative Decision Probability Tables
+#'
+#' @description
+#' Returns the stored probability table of frequentist or Bayesian quantitative OCs.
+#'
+#' @param x An OperatingCharcteristicsMeans or OperatingCharcteristicsRates object.
+#' @param row.names Optional row names for the resulting data frame.
+#' @param optional Reserved for compatibility with as.data.frame.
+#' @param ... Additional arguments are checked for unknown names.
+#' @param niceColumnNamesEnabled Replace column identifiers with available captions.
+#'
+#' @return A data frame of sampling probabilities on the scale zero to one.
+#'   Assumptions, including priors, remain on the originating result object.
+#'
+#' @export
+#'
+as.data.frame.OperatingCharcteristics <- function(x, row.names = NULL, optional = FALSE,
+        ..., niceColumnNamesEnabled = FALSE) {
+    .warnInCaseOfUnknownArguments(functionName = "as.data.frame.OperatingCharcteristics", ...)
+    .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
+    result <- x$probabilities
+    if (!is.null(row.names)) {
+        rownames(result) <- row.names
+    }
+    if (niceColumnNamesEnabled) {
+        captions <- vapply(names(result), function(name) {
+            caption <- .getParameterCaption(name, x)
+            if (length(caption) == 0L || is.na(caption) || !nzchar(caption)) {
+                return(name)
+            }
+            return(caption)
+        }, character(1))
+        names(result) <- captions
+    }
+    return(result)
 }
