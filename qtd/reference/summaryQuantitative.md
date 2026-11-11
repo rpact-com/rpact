@@ -4,9 +4,9 @@ The standard [`summary()`](https://rdrr.io/r/base/summary.html) method
 supports quantitative decision rules from
 [`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md)
 and results from
-[`getOperatingCharcteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsMeans.md)
+[`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md)
 and
-[`getOperatingCharcteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsRates.md).
+[`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md).
 
 ## Value
 
@@ -46,7 +46,7 @@ column names.
 
 ``` r
 rule <- getDesignQuantitative(targetValue = 0, lowerReferenceValue = -0.05)
-rates <- getOperatingCharcteristicsRates(rule,
+rates <- getOperatingCharacteristicsRates(rule,
     numberOfSubjects = matrix(c(75, 75, 75, 150), ncol = 2, byrow = TRUE),
     pi1 = c(0.1, 0.15, 0.175, 0.2, 0.25), pi2 = 0.15, directionUpper = FALSE)
 summary(rates)

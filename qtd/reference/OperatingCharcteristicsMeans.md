@@ -28,5 +28,5 @@ An R6 object of class `OperatingCharcteristicsMeans`.
 ## Examples
 
 ``` r
-# See getOperatingCharcteristicsMeans for an end-to-end example.
+# See getOperatingCharacteristicsMeans for an end-to-end example.
 ```

@@ -39,9 +39,9 @@ plot(
 - x:
 
   Operating characteristics from
-  [`getOperatingCharcteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsMeans.md)
+  [`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md)
   or
-  [`getOperatingCharcteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsRates.md).
+  [`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md).
 
 - plotCat:
 
@@ -187,7 +187,7 @@ for means it retains the `effect` column.
 
 ``` r
 rule <- getDesignQuantitative(targetValue = 1, lowerReferenceValue = 0)
-oc <- getOperatingCharcteristicsMeans(rule,
+oc <- getOperatingCharacteristicsMeans(rule,
     numberOfSubjects = matrix(c(50, 50, 50, 100, 100, 100), ncol = 2, byrow = TRUE),
     alternative = seq(0, 1.5, by = 0.1))
 plot(oc)
@@ -210,7 +210,7 @@ plot(oc, type = 6, alternatives = c(0, 1, 1.5),
     weights = c(0.3, 0.3, 0.4), desiredDecisions = c("Stop", "Go", "Go"))
 
 binaryRule <- getDesignQuantitative(targetValue = 0, lowerReferenceValue = -0.05)
-rates <- getOperatingCharcteristicsRates(binaryRule,
+rates <- getOperatingCharacteristicsRates(binaryRule,
     numberOfSubjects = matrix(c(25, 25, 50, 50, 75, 75), ncol = 2, byrow = TRUE),
     pi1 = seq(0.1, 0.25, by = 0.025), pi2 = 0.15, directionUpper = FALSE)
 plot(rates)

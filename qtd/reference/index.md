@@ -93,9 +93,9 @@
   Get Objects from a Collection
 - [`getObservedInformationRates()`](https://docs.rpact.org/qtd/reference/getObservedInformationRates.md)
   : Get Observed Information Rates
-- [`getOperatingCharcteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsMeans.md)
+- [`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md)
   : Compute operating characteristics for a fixed quantitative design
-- [`getOperatingCharcteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsRates.md)
+- [`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md)
   : Operating Characteristics for Quantitative Decisions Comparing Rates
 - [`getOutputFormat()`](https://docs.rpact.org/qtd/reference/getOutputFormat.md)
   : Get Output Format

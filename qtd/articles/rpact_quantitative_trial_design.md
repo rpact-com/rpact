@@ -26,9 +26,9 @@ examples are provided below.
 The examples require the [QTD development version of
 rpact](https://github.com/rpact-com/rpact/tree/dev/qtd) providing
 [`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md),
-[`getOperatingCharcteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsMeans.md),
+[`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md),
 and
-[`getOperatingCharcteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsRates.md),
+[`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md),
 together with their QTD print, summary, and plot methods. The spelling
 `Charcteristics` follows the current function names.
 
@@ -179,7 +179,7 @@ demoSizes <- matrix(
     byrow = TRUE,
     dimnames = list(NULL, c("control", "treatment"))
 )
-ratesOC <- getOperatingCharcteristicsRates(
+ratesOC <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = demoSizes,
     pi1 = seq(0.10, 0.25, by = 0.001),
@@ -229,7 +229,7 @@ knitr::kable(data.frame(
 
 ``` r
 
-ratesScenarios <- getOperatingCharcteristicsRates(
+ratesScenarios <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = demoSizes,
     pi1 = scenarioRates,
@@ -505,7 +505,7 @@ planningSizes <- matrix(
     byrow = TRUE,
     dimnames = list(NULL, c("control", "treatment"))
 )
-meansOC <- getOperatingCharcteristicsMeans(
+meansOC <- getOperatingCharacteristicsMeans(
     design = meansRule,
     numberOfSubjects = planningSizes,
     normalApproximation = TRUE,
@@ -640,7 +640,7 @@ treatment probability and beneficial risk difference.
 
 ``` r
 
-meansScenarios <- getOperatingCharcteristicsMeans(
+meansScenarios <- getOperatingCharacteristicsMeans(
     design = meansRule,
     numberOfSubjects = demoSizes,
     alternative = c(0, 2.9, 4, 6),
@@ -939,7 +939,7 @@ analysis, specify it in the constructor:
 
 ``` r
 
-scoreRates <- getOperatingCharcteristicsRates(
+scoreRates <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = matrix(c(25, 25), ncol = 2),
     pi1 = c(0.10, 0.15, 0.20),
@@ -976,7 +976,7 @@ summary(scoreRates)
 
 ``` r
 
-higherIsBetter <- getOperatingCharcteristicsRates(
+higherIsBetter <- getOperatingCharacteristicsRates(
     design = getDesignQuantitative(targetValue = 0.10, lowerReferenceValue = 0),
     numberOfSubjects = matrix(c(25, 25), ncol = 2),
     pi1 = c(0.15, 0.25, 0.35),
@@ -1147,7 +1147,7 @@ additional `planningSizes` grid.
 
 ``` r
 
-ratesPlanning <- getOperatingCharcteristicsRates(
+ratesPlanning <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = planningSizes,
     pi1 = seq(0.10, 0.25, by = 0.005),
@@ -1274,13 +1274,13 @@ both arms independently.
 ``` r
 
 allocationSizes <- as.matrix(expand.grid(control = c(25, 75), treatment = c(25, 75)))
-meansAllocation <- getOperatingCharcteristicsMeans(
+meansAllocation <- getOperatingCharacteristicsMeans(
     design = meansRule,
     numberOfSubjects = allocationSizes,
     alternative = 4,
     stDev = 6
 )
-ratesAllocation <- getOperatingCharcteristicsRates(
+ratesAllocation <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = allocationSizes,
     pi1 = 0.15,

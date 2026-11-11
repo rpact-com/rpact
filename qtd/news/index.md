@@ -9,9 +9,9 @@
   [`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md)
   defines decision rules through a target value, a lower reference
   value, and two percentiles. The new functions
-  [`getOperatingCharcteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsMeans.md)
+  [`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md)
   and
-  [`getOperatingCharcteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharcteristicsRates.md)
+  [`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md)
   calculate probabilities for six Go, Indeterminate, and Stop categories
   across sample-size and effect scenarios, using a normal approximation
   for means and exact binomial summation for rates. Binary calculations

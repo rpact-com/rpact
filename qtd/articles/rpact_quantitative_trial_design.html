@@ -62,7 +62,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Quantitative Trial Decisions for Means and Rates with rpact</h1>
 
       <p class="author"><span class="author-row"><a href="#"></a></span> <span class="author-row"><a href="https://www.linkedin.com/in/pahlke" class="external-link author-linkedin" title="Visit Friedrich Pahlke's LinkedIn Profile">Friedrich Pahlke</a> <a href="https://orcid.org/0000-0003-2105-2582" class="external-link author-orcid" title="Visit Friedrich Pahlke's ORCID Profile"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewbox="0 0 512 512"><path fill="#a6ce39" d="M294.8 188.2h-45.9V342h47.5c67.6 0 83.1-51.3 83.1-76.9 0-41.6-26.5-76.9-84.7-76.9zM256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm-80.8 360.8h-29.8v-207.5h29.8zm-14.9-231.1a19.6 19.6 0 1 1 19.6-19.6 19.6 19.6 0 0 1 -19.6 19.6zM300 369h-81V161.3h80.6c76.7 0 110.4 54.8 110.4 103.9C410 318.4 368.4 369 300 369z"></path></svg></a></span> <span class="author-row"><a href="https://www.linkedin.com/in/danielsabanesbove/" class="external-link author-linkedin" title="Visit Daniel Sabanés Bové's LinkedIn Profile">Daniel Sabanés Bové</a> <a href="https://orcid.org/0000-0002-0176-9239" class="external-link author-orcid" title="Visit Daniel Sabanés Bové's ORCID Profile"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewbox="0 0 512 512"><path fill="#a6ce39" d="M294.8 188.2h-45.9V342h47.5c67.6 0 83.1-51.3 83.1-76.9 0-41.6-26.5-76.9-84.7-76.9zM256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm-80.8 360.8h-29.8v-207.5h29.8zm-14.9-231.1a19.6 19.6 0 1 1 19.6-19.6 19.6 19.6 0 0 1 -19.6 19.6zM300 369h-81V161.3h80.6c76.7 0 110.4 54.8 110.4 103.9C410 318.4 368.4 369 300 369z"></path></svg></a></span></p>
-      <p class="date">2026-11-06</p>
+      <p class="date">2026-11-11</p>
 
       <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/dev/qtd/vignettes/rpact_quantitative_trial_design.qmd" class="external-link"><code>vignettes/rpact_quantitative_trial_design.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
@@ -78,7 +78,7 @@
 <p>A development decision often depends on two questions: is the treatment effect sufficiently promising relative to a minimum acceptable difference, and could it reach a target difference? Quantitative trial design (QTD) makes these requirements explicit and calculates the probabilities of the resulting decisions under specified trial assumptions.</p>
 <p>This vignette demonstrates the QTD functions in <a href="https://www.rpact.org" class="external-link">rpact</a> for two independent groups with <strong>continuous endpoints (Means)</strong> and <strong>binary endpoints (Rates)</strong>. Rates here are event probabilities, rather than event counts per unit of exposure. We define a decision rule, inspect its output, calculate operating characteristics, and illustrate every QTD plot type, including sensitivity and weighted decision-performance displays.</p>
 <p>The examples in this vignette were inspired by a presentation by Björn Bornkamp and David Ohlssen on quantitative trial design. The worked example uses the fictional project name <strong>Kestrel</strong>. All decision rules, planning assumptions, and numerical results needed to follow the examples are provided below.</p>
-<p>The examples require the <a href="https://github.com/rpact-com/rpact/tree/dev/qtd" class="external-link">QTD development version of rpact</a> providing <code><a href="../reference/getDesignQuantitative.html">getDesignQuantitative()</a></code>, <code><a href="../reference/getOperatingCharcteristicsMeans.html">getOperatingCharcteristicsMeans()</a></code>, and <code><a href="../reference/getOperatingCharcteristicsRates.html">getOperatingCharcteristicsRates()</a></code>, together with their QTD print, summary, and plot methods. The spelling <code>Charcteristics</code> follows the current function names.</p>
+<p>The examples require the <a href="https://github.com/rpact-com/rpact/tree/dev/qtd" class="external-link">QTD development version of rpact</a> providing <code><a href="../reference/getDesignQuantitative.html">getDesignQuantitative()</a></code>, <code><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans()</a></code>, and <code><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates()</a></code>, together with their QTD print, summary, and plot methods. The spelling <code>Charcteristics</code> follows the current function names.</p>
 <section class="level2"><h3 id="how-to-install-the-qtd-development-version">How to install the QTD development version<a class="anchor" aria-label="anchor" href="#how-to-install-the-qtd-development-version"></a>
 </h3>
 <div class="cell">
@@ -303,7 +303,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 <span>    byrow <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"control"</span>, <span class="st">"treatment"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">ratesOC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsRates.html">getOperatingCharcteristicsRates</a></span><span class="op">(</span></span>
+<span><span class="va">ratesOC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">binaryRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="va">demoSizes</span>,</span>
 <span>    pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.10</span>, <span class="fl">0.25</span>, by <span class="op">=</span> <span class="fl">0.001</span><span class="op">)</span>,</span>
@@ -369,7 +369,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </table>
 </div>
 <div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ratesScenarios</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsRates.html">getOperatingCharcteristicsRates</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">ratesScenarios</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">binaryRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="va">demoSizes</span>,</span>
 <span>    pi1 <span class="op">=</span> <span class="va">scenarioRates</span>,</span>
@@ -1289,7 +1289,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 <span>    byrow <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"control"</span>, <span class="st">"treatment"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">meansOC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsMeans.html">getOperatingCharcteristicsMeans</a></span><span class="op">(</span></span>
+<span><span class="va">meansOC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">meansRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="va">planningSizes</span>,</span>
 <span>    normalApproximation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -1964,7 +1964,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 <p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> gives the rule and assumptions, followed by one table per sample-size scenario, with one row per input effect and six probability columns. Rates tables include treatment probability and beneficial risk difference.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">meansScenarios</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsMeans.html">getOperatingCharcteristicsMeans</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">meansScenarios</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">meansRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="va">demoSizes</span>,</span>
 <span>    alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2.9</span>, <span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span>,</span>
@@ -2520,7 +2520,7 @@ $`3`
 <p>Maps contain at most one million cells, including zero-event rows and columns. Interval methods can classify boundary count pairs differently and change the OC probabilities. To use another method throughout an OC analysis, specify it in the constructor:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">scoreRates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsRates.html">getOperatingCharcteristicsRates</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">scoreRates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">binaryRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
 <span>    pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span><span class="op">)</span>,</span>
@@ -2615,7 +2615,7 @@ $`3`
 </table>
 </div>
 <div class="sourceCode cell-code" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">higherIsBetter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsRates.html">getOperatingCharcteristicsRates</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">higherIsBetter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span>targetValue <span class="op">=</span> <span class="fl">0.10</span>, lowerReferenceValue <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
 <span>    pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="fl">0.35</span><span class="op">)</span>,</span>
@@ -2861,7 +2861,7 @@ $`6`
 <p>This plot needs multiple total sample sizes. Allocation ratios are separated so that different treatment-to-control allocations are not joined into one curve. The Kestrel binary example has only one total N for each allocation ratio. For meaningful sample-size curves we use the additional <code>planningSizes</code> grid.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ratesPlanning</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsRates.html">getOperatingCharcteristicsRates</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">ratesPlanning</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">binaryRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="va">planningSizes</span>,</span>
 <span>    pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.10</span>, <span class="fl">0.25</span>, by <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span>,</span>
@@ -2964,13 +2964,13 @@ $`6`
 <div class="cell">
 <div class="sourceCode cell-code" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allocationSizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">75</span><span class="op">)</span>, treatment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">75</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">meansAllocation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsMeans.html">getOperatingCharcteristicsMeans</a></span><span class="op">(</span></span>
+<span><span class="va">meansAllocation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">meansRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="va">allocationSizes</span>,</span>
 <span>    alternative <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>    stDev <span class="op">=</span> <span class="fl">6</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">ratesAllocation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharcteristicsRates.html">getOperatingCharcteristicsRates</a></span><span class="op">(</span></span>
+<span><span class="va">ratesAllocation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">binaryRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="va">allocationSizes</span>,</span>
 <span>    pi1 <span class="op">=</span> <span class="fl">0.15</span>,</span>

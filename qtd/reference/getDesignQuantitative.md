@@ -48,7 +48,7 @@ The function performs basic input validation and returns an object of
 class `TrialDesignPlanQuantitative`. This object is used by helper
 functions that compute operating characteristics and make decisions for
 fixed designs with normally approximated endpoints (see
-`getOperatingCharcteristicsMeans`).
+`getOperatingCharacteristicsMeans`).
 
 ## Examples
 
