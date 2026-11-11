@@ -2,6 +2,14 @@
 
 ## New features
 
+* Mixed comparisons with interim analyses harmonize fixed plans' sample sizes (`nFixed`, `nFixed1`, `nFixed2`) to `numberOfSubjects`, `numberOfSubjects1`, and `numberOfSubjects2`, using an extensible internal column mapping. The same columns are used in summaries, tables, and plots; original objects and sequential fixed-design reference values are preserved.
+
+* Comparison summaries treat constant numeric vector cells as their scalar value, so standard deviations shown as `1` and `1, 1` are shared across fixed and sequential plans. Nonconstant profiles and missing values remain distinct; stored data are unchanged.
+
+* The `%vs%` operator combines trial planning objects, comparisons, and their summaries through `getComparison()` and returns a comparison summary. It supports chaining and plotting with explicit axis selections. `compare(x)` can now create a comparison from a single object.
+
+* Comparison plots and `getComparisonPlotParameters()` use `xAxis`, `yAxis`, `category`, and `group` for column selections.
+
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
 * `getSimulationMultiArmSurvival()` and `getSimulationEnrichmentSurvival()` now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument `simulationType` can be used to choose between the new C++ implementation (`"patientWise"`), the previous test-statistic-based approach (`"testStatisticBased"`), and a basic R reference implementation (`"patientWiseBasic"`) intended for validation and testing. The default `"auto"` setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.
 Survival planning reports derived `expectedDropoutProportion1` and `expectedDropoutProportion2` at each scenario's final planned analysis time, accounting for competing events and deterministic planned accrual. Patient-wise two-arm, multi-arm, and enrichment survival simulations report `observedDropoutProportion1` and `observedDropoutProportion2`, averaged from replication-specific proportions at each arm or population's finishing analysis, including discontinued groups. The accompanying `dropoutObservationTime1` and `dropoutObservationTime2` are mean finishing horizons over the same eligible replications. These outputs differ from the input dropout probabilities, have no stage dimension, and are unavailable for test-statistic-based simulations. Existing event, power, sample-size and analysis-time calculations are unchanged.
@@ -25,8 +33,12 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 * For survival endpoints, the default value of `directionUpper` has changed from `TRUE` to `FALSE`. Accordingly, the default event rates have been adjusted to provide meaningful examples for an alternative in the lower direction: `pi2` (and `piControl`) now defaults to `0.5`, while the sample size default for `pi1` is now `c(0.1, 0.2, 0.3)`; the power and simulation default for `pi1` remains `seq(0.2, 0.5, 0.1)`. One-sided power calculations and simulations issue a warning if `directionUpper` is not specified explicitly, making users aware of the changed default. No warning is issued for sample size calculations because the `directionUpper` argument has only been added to these functions in this version. For sample size calculations, the direction is always derived from the specified alternative; the argument is provided solely to validate that this derived direction is consistent with a `directionUpper` value that may already have been set in the design.
 * `testPackage()` now supports parallel test execution on Windows, Linux, and macOS while retaining its HTML and PDF reports. The new `workers` argument defaults to automatic selection (available CPUs minus two, between one and 16); use `workers = 1` for serial execution. Local test scheduling priorities are respected, and the result includes the worker count and separate timings for unit tests, R basic package tests, and HTML/PDF rendering.
 * Added `getComparison()` and the R6 `TrialComparison` class for comparing designs, design characteristics, sample size and power calculations, and simulations. Named or unnamed objects, nested lists, and existing comparisons can be combined, extended with `add()`, and edited with `delete()`; `getObjects()`, `fetch()`, `$`, and `[[` provide access to the contained objects. Duplicate names are rejected. Compact print and summary output presents shared and differing parameter profiles using descriptive object labels, context-specific captions, and titles, with display limits for large comparisons. Full data-frame conversion, Markdown output, and R-code reconstruction are supported, including stage coordinates for fixed designs and robust numeric type inference. The `plot()` of a `TrialComparison` result supports multiple category columns and y parameters, with automatic or explicit left/right axis assignment through `yAxisSide`. `getComparisonPlotParameters()` previews selections, axis transformations, and diagnostic messages. Comparison axes use context-specific parameter captions for both single and multiple y parameters. Comparison legends use object-aware titles and adaptive category/parameter layouts, with measured wrapping, independent positions, and font reductions limited to ten percent. Automatic legend placement (`legendPosition = "auto"`) is the default across all rpact plots with legends, while manual positions and legacy `NA` behaviour remain available. Comparison operations and package testing provide structured errors through the central error helpers, preserving worker failure details.
+`compare()` starts a trial comparison from supported planning objects and extends an existing `TrialComparison` by reference, supporting pipelines such as `design |> compare(plan1) |> compare(plan2)`.
+Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
 
 ## Improvements, issues, and changes
+
+* Comparison plots now connect single-point objects along a common numeric input when only that input varies and the object scope is shared. Explicit categories and groups, additional varying inputs, and objects containing multiple points retain separate curves.
 
 * Parameter listings now align their colon column using applicable parameter captions without a fixed four-character padding allowance. Technical summaries account separately for parameter type prefixes. Caption padding remains capped at 40 characters, and longer captions are retained in full.
 * Repeated p-values are now unavailable (`NA` with a warning) for sequential designs with user-defined beta spending (`typeBetaSpending = "bsUser"`), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.
@@ -52,6 +64,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 # rpact 4.4.0
 
 ## New features
+
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
 
 * Extended `testPackage()` with additional options for report customization
   and metadata handling. A new argument `reportFileBaseName` allows explicit
@@ -92,6 +106,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 
 ## New features
 
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
+
 * The new function `getFutilityBounds()` converts futility bounds between different 
   scales such as z-value, p-value, conditional power, predictive power, reverse conditional
   power, and effect estimate.
@@ -113,6 +129,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 
 ## New features
 
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
+
 * `efficacyStops` and `futilityStops` parameter added  (issue [#88](https://github.com/rpact-com/rpact/issues/88))
 * parameter `stdErrorEstimate` (`"pooled"` or `"unpooled"`) added for calculation of final confidence intervals in two-sample situation for rates
 * `testPackage()` returns an `InstallationQualificationResult` object
@@ -128,6 +146,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 # rpact 4.2.0
 
 ## New features
+
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
 
 * For the functions `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()` it is now possible to specify a parameter `doseLevels` to define the dose levels for a `linear` or `sigmoidEmax` dose-response relationship (see feature request [#63](https://github.com/rpact-com/rpact/issues/63))
 * Added support for unequal variances between two groups in `getSampleSizeMeans()`, `getPowerMeans()`, and `getSimulationMeans()` functions, see enhancement [#70](https://github.com/rpact-com/rpact/issues/70)
@@ -163,6 +183,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 
 ## New features
 
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
+
 * The new function `getSimulationCounts()` can be used to perform power simulations for clinical trials with negative binomial distributed count data. The function returns the simulated power, stopping probabilities, conditional power, and expected sample size for testing mean rates for negative binomial distributed event numbers in the two treatment groups testing situation
 * The functions `getDesignGroupSequential()`, `getDesignInverseNormal()`, and `getDesignFisher()` now support the argument `directionUpper` to specify the direction of the alternative for one-sided testing early at the design phase, see enhancement [#26](https://github.com/rpact-com/rpact/issues/26)
 * `getSampleSizeCounts()` and `getPowerCounts()` output boundary values also on the treatment effect scale, see enhancement [#40](https://github.com/rpact-com/rpact/issues/40)
@@ -183,6 +205,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 # rpact 4.0.0
 
 ## New features
+
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
 
 * All reference classes in the package have been replaced by [R6](https://cran.r-project.org/package=R6) classes. This change brings significant advantages, including improved performance, more flexible and cleaner object-oriented programming, and enhanced encapsulation of methods and properties. The transition to R6 classes allows for more efficient memory management and faster execution, making the package more robust and scalable. Additionally, R6 classes provide a more intuitive and user-friendly interface for developers, facilitating the creation and maintenance of complex data structures and workflows
 * Extension of the function `getPerformanceScore()` for sample size recalculation rules to the setting of binary endpoints according to [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4)
@@ -221,6 +245,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 
 ## New features
 
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
+
 * The new functions `getSampleSizeCounts()` and `getPowerCounts()` can be used to perform sample size calculations and the assessment of test characteristics for clinical trials with negative binomial distributed count data. This is possible for fixed sample size and group sequential designs. For the latter, the methodology described in Muetze et al. (2019) is implemented. These functions can also be used to perform blinded sample size reassessments according to Friede and Schmidli (2010).
 
 ## Improvements, issues, and changes
@@ -236,6 +262,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 # rpact 3.4.0
 
 ## New features
+
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
 
 * The new function `getPerformanceScore()` calculates the conditional performance score, its sub-scores and components according to [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) for a given simulation result from a two-stage design
 * `allocationRatioPlanned` for simulating multi-arm and enrichment designs can be a vector of length kMax, the number of stages 
@@ -300,6 +328,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 
 ## New features
 
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
+
 * Two-sided beta-spending approach with binding and non-binding futility bounds
 * Delayed response utility added in design specification
 
@@ -336,6 +366,8 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 
 ## New features
 
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
+
 * Simulation tools for enrichment design testing means, rates, and hazard ratios: function `getSimulationEnrichmentMeans()`, `getSimulationEnrichmentRates()`, `getSimulationEnrichmentSurvival()` available for simulation of enrichment designs; 
 note that this is a novel implementation, hence experimental
 * `getDesignGroupSequential()` / `getDesignInverseNormal()`: new typeOfDesign = "noEarlyEfficacy" added
@@ -370,6 +402,8 @@ note that this is a novel implementation, hence experimental
 # rpact 3.1.0
 
 ## New features
+
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
 
 * Analysis tools for enrichment design testing means, rates, and hazard ratios: function `getAnalysisResults()` generalized for enrichment designs; function `getDataset()` generalized for entering stratified data; manual extended for enrichment designs
 * Automatic boundary recalculations during the trial for analysis with alpha spending approach, 
@@ -443,6 +477,8 @@ note that this is a novel implementation, hence experimental
 # rpact 3.0.0
 
 ## New features
+
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
 
 * Simulation tools for multi-arm design testing means, rates, and hazard ratios
 * Analysis tools for multi-arm design testing means, rates, and hazard ratios
@@ -520,6 +556,8 @@ note that this is a novel implementation, hence experimental
 
 ## New features
 
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
+
 * Plot function for Fisher design implemented
 * Generic function `summary()` implemented for `getDesign[...]()`, `getSampleSize[...]()`, `getPower[...]()`, and `getSimulation[...]()` results: a simple boundary summary will be displayed
 
@@ -562,6 +600,8 @@ note that this is a novel implementation, hence experimental
 # rpact 2.0.0
 
 ## New features
+
+* Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVariableParameters` for numeric formatting and shared profiles. The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.
 
 * Power calculation at given or adapted sample size for means, rates and survival data
 * Sample size and power calculation for survival trials with piecewise accrual time and intensity

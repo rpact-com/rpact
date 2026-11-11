@@ -169,6 +169,7 @@ Collate:
     'f_comparison_parameters.R'
     'f_comparison_plot.R'
     'f_comparison_r_code.R'
+    'f_comparison_table.R'
     'f_core_output_formats.R'
     'f_design_fisher_combination_test.R'
     'f_design_fixed.R'

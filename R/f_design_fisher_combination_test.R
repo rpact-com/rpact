@@ -64,7 +64,7 @@ NULL
 #' Fisher's combination test as described in Bauer (1989), Bauer and Koehne (1994),
 #' Bauer and Roehmel (1995), and Wassmer (1999) for equally and unequally sized stages.
 #'
-#' @seealso \code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare.
+#' @seealso [getComparison()] to compare different design situations.
 #'
 #' @template return_object_trial_design
 #' @template how_to_get_help_for_generics

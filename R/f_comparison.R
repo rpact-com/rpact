@@ -17,6 +17,46 @@
 ## |  Contact: info@rpact.com
 ## |
 
+.getComparisonColumnMapping <- function(object, hasInterimAnalyses = FALSE) {
+    mapping <- c(sampleSizes = "numberOfSubjects")
+    design <- if (.isComparisonObject(object)) {
+        .getTrialDesign(object)
+    } else {
+        NULL
+    }
+    if (hasInterimAnalyses && inherits(object, "TrialDesignPlan") &&
+            !is.null(design) && design$kMax == 1L) {
+        # Extend this named mapping for further equivalent fixed-plan columns.
+        mapping <- c(mapping, nFixed = "numberOfSubjects",
+            nFixed1 = "numberOfSubjects1", nFixed2 = "numberOfSubjects2")
+    }
+    return(mapping)
+}
+
+.harmonizeComparisonColumns <- function(data, mapping) {
+    for (source in intersect(names(mapping), names(data))) {
+        target <- mapping[[source]]
+        if (identical(source, target)) {
+            next
+        }
+        if (!target %in% names(data)) {
+            names(data)[names(data) == source] <- target
+        } else {
+            sourceValues <- data[[source]]
+            targetValues <- data[[target]]
+            shared <- !is.na(sourceValues) & !is.na(targetValues)
+            if (!any(shared) || identical(sourceValues[shared], targetValues[shared])) {
+                missing <- is.na(targetValues)
+                targetValues[missing] <- sourceValues[missing]
+                data[[target]] <- targetValues
+                data[[source]] <- NULL
+            }
+        }
+        # Conflicting non-missing targets retain both columns without overwriting values.
+    }
+    return(data)
+}
+
 .isComparisonObject <- function(object) {
     return(inherits(object, c("TrialDesign", "TrialDesignCharacteristics", "TrialDesignPlan", "SimulationResults")))
 }
@@ -45,8 +85,10 @@
 #' and results based on them, `kMax` and `stages` identify the single stage as 1, even when omitted by the
 #' individual data-frame methods. The situation column numbers rows within each
 #' stage. Columns are matched by technical names; missing
-#' values are filled with `NA`. `sampleSizes` is harmonized to `numberOfSubjects`
-#' when this does not overwrite another column. Conflicting non-numeric column
+#' values are filled with `NA`. `sampleSizes` is harmonized to `numberOfSubjects`.
+#' In comparisons containing interim analyses, fixed plans' `nFixed`, `nFixed1`,
+#' and `nFixed2` use `numberOfSubjects`, `numberOfSubjects1`, and `numberOfSubjects2`.
+#' Existing distinct target columns are preserved. Conflicting non-numeric column
 #' types are represented as character values. No master design or automatic
 #' parameter variation is implied. Original objects are not stored in the result.
 #'
@@ -79,6 +121,18 @@
             diagnosticId = "comparison.objects_invalid"
         )
     }
+    hasInterimAnalyses <- any(vapply(objects, function(object) {
+        if (!.isComparisonObject(object)) {
+            return(FALSE)
+        }
+        design <- .getTrialDesign(object)
+        return(!is.null(design) && design$kMax > 1L)
+    }, logical(1)))
+    mappings <- lapply(objects, .getComparisonColumnMapping, hasInterimAnalyses = hasInterimAnalyses)
+    fixedMappings <- lapply(mappings, function(mapping) {
+        return(mapping[setdiff(names(mapping), "sampleSizes")])
+    })
+    requiredColumns <- unique(unlist(lapply(fixedMappings, unname), use.names = FALSE))
     frames <- lapply(seq_along(objects), function(i) {
         obj <- objects[[i]]
         if (!.isComparisonObject(obj)) {
@@ -93,6 +147,13 @@
             niceColumnNamesEnabled = FALSE,
             includeAllParameters = includeAllParameters
         )
+        df <- .harmonizeComparisonColumns(df, mappings[[i]])
+        missingColumns <- setdiff(intersect(requiredColumns, names(obj)), names(df))
+        if (length(missingColumns)) {
+            fullData <- as.data.frame(obj, niceColumnNamesEnabled = FALSE, includeAllParameters = TRUE)
+            missingColumns <- intersect(missingColumns, names(fullData))
+            df[missingColumns] <- fullData[missingColumns]
+        }
         design <- if (inherits(obj, "TrialDesign")) {
             obj
         } else {
@@ -132,9 +193,6 @@
                 )
             }
             df[missing] <- designData[indices, missing, drop = FALSE]
-        }
-        if ("sampleSizes" %in% names(df) && !"numberOfSubjects" %in% names(df)) {
-            names(df)[names(df) == "sampleSizes"] <- "numberOfSubjects"
         }
         className <- class(obj)[1L]
         isDesign <- inherits(obj, c("TrialDesign", "TrialDesignCharacteristics"))
@@ -222,5 +280,5 @@
         }, character(1))
         names(result) <- make.unique(names(result))
     }
-    result
+    return(result)
 }

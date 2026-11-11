@@ -1425,7 +1425,7 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
                 )
             }
         }
-        designSet <- getDesignSet(designs = c(x, y), variedParameters = variedParameters)
+        designSet <- TrialDesignSet$new(designs = c(x, y), variedParameters = variedParameters)
     } else {
         designSet <- TrialDesignSet$new(design = x, singleDesign = TRUE)
         if (!is.null(plotSettings)) {

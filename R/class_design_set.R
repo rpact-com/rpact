@@ -88,10 +88,13 @@ NULL
 #' )
 #' if (require(ggplot2)) plot(designSet, type = 8, nMax = 20)
 #' }
+#' 
+#' @deprecated Use [getComparison()] instead.
 #'
 #' @export
 #'
 getDesignSet <- function(...) {
+    .Deprecated("getComparison")
     return(TrialDesignSet$new(...))
 }
 
