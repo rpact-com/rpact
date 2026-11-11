@@ -15,7 +15,9 @@ This vignette demonstrates the QTD functions in
 here are event probabilities, rather than event counts per unit of
 exposure. We define a decision rule, inspect its output, calculate
 operating characteristics, and illustrate every QTD plot type, including
-sensitivity and weighted decision-performance displays.
+sensitivity and weighted decision-performance displays. A dedicated
+Bayesian section adds normal and beta priors, custom posterior criteria,
+and both interpretations of the percentile inputs.
 
 The examples in this vignette were inspired by a presentation by Björn
 Bornkamp and David Ohlssen on quantitative trial design. The worked
@@ -27,10 +29,11 @@ The examples require the [QTD development version of
 rpact](https://github.com/rpact-com/rpact/tree/dev/qtd) providing
 [`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md),
 [`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md),
-and
 [`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md),
-together with their QTD print, summary, and plot methods. The spelling
-`Charcteristics` follows the current function names.
+and
+[`getQuantitativeDecisionThresholds()`](https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.md),
+together with Bayesian class dispatch and their QTD print, summary, and
+plot methods.
 
 ### How to install the QTD development version
 
@@ -46,7 +49,7 @@ pak::pkg_install("rpact-com/rpact@dev/qtd", upgrade = TRUE)
 | Argument | Interpretation | Default |
 |:---|:---|:---|
 | `targetValue` | Target value (TV), also called target difference (TD) | Required |
-| `lowerReferenceValue` | Lower reference value (LRV), also called minimum acceptable difference (MAD) | Required |
+| `lowerReferenceValue` | Lower reference value (LRV), also called minimum acceptable difference (MAD) | `0` |
 | `lowerPercentile` | Percentile defining the lower interval limit | `0.2` |
 | `upperPercentile` | Percentile defining the upper interval limit | `0.9` |
 
@@ -73,21 +76,18 @@ binaryRule <- getDesignQuantitative(
     lowerPercentile = 0.2,
     upperPercentile = 0.9
 )
-print(binaryRule)
+print(binaryRule, markdown = FALSE)
 ```
 
-**Design parameters and output of quantitative trial design (decision
-rule)**
+    Design parameters and output of quantitative trial design (decision rule):
 
-**User defined parameters**
+    User defined parameters:
+      Target value          : 0
+      Lower reference value : -0.05
 
-- *Target value*: 0
-- *Lower reference value*: -0.05
-
-**Default parameters**
-
-- *Upper percentile*: 0.9000
-- *Lower percentile*: 0.2000
+    Default parameters:
+      Upper percentile      : 0.9000
+      Lower percentile      : 0.2000 
 
 ``` r
 
@@ -122,7 +122,7 @@ an indeterminate decision.
 | Go | $`\mathrm{LRV} \leq L < \mathrm{TV}`$ and $`U \geq \mathrm{TV}`$ | Go |
 | Indeterminate 1 | $`L < \mathrm{LRV}`$ and $`U \geq \mathrm{TV}`$ | Indeterminate |
 | Indeterminate 2 | $`L \geq \mathrm{LRV}`$ and $`U < \mathrm{TV}`$ | Indeterminate |
-|  | Stop | $`L < \mathrm{LRV}`$ and $`\mathrm{LRV} \leq U < \mathrm{TV}`$ |
+| Stop | $`L < \mathrm{LRV}`$ and $`\mathrm{LRV} \leq U < \mathrm{TV}`$ | Stop |
 | Stop (Fixed) | $`U < \mathrm{LRV}`$ | Stop |
 
 The implementation includes equality at the corresponding reference
@@ -287,22 +287,23 @@ scenarios. Triplets are ordered Go / Indeterminate / Stop.
 | Poor | −5% | 0.20 / 0.48 / 0.32 | 0.20 / 0.45 / 0.35 |
 | Very poor | −10% | 0.05 / 0.34 / 0.60 | 0.04 / 0.28 / 0.68 |
 
-The compact overview uses limited precision and is not renormalized;
-some triplets sum to 0.99. Use the calculated table below for numerical
-comparisons: it reports the QTD1 probabilities to six decimal places
-under the same assumptions.
+The compact overview retains the displayed precision of the original
+demonstration and is not renormalized; some triplets sum to 0.99.
+Displayed values can differ from conventional rounding. Use the
+calculated table below for numerical comparisons: it reports the QTD1
+probabilities to six decimal places under the same assumptions.
 
 ``` r
 
 scenarioPlot <- plot(ratesScenarios, type = 4, plotCat = 3)
 scenarioTable <- reshape(
-    scenarioPlot$data[c("scenario", "nControl", "nTreatment", 
+    scenarioPlot$data[c("scenario", "nControl", "nTreatment",
         "pi1", "alternative", "category", "probability")],
     idvar = c("scenario", "nControl", "nTreatment", "pi1", "alternative"),
     timevar = "category",
     direction = "wide"
 )
-scenarioTable <- scenarioTable[order(scenarioTable$scenario, 
+scenarioTable <- scenarioTable[order(scenarioTable$scenario,
     match(scenarioTable$pi1, scenarioRates)), ]
 scenarioTable$Scenario <- scenarioNames[match(scenarioTable$pi1, scenarioRates)]
 knitr::kable(
@@ -376,11 +377,11 @@ visibleTable <- reshape(
     direction = "wide"
 )
 visibleTable <- visibleTable[order(visibleTable$pi1), ]
-visibleTable$Go <- visibleTable[["probability.Go (Fixed)"]] + 
+visibleTable$Go <- visibleTable[["probability.Go (Fixed)"]] +
     visibleTable$probability.Go
 visibleTable$Indeterminate <- visibleTable[["probability.Indeterminate 1"]] +
     visibleTable[["probability.Indeterminate 2"]]
-visibleTable$Stop <- visibleTable$probability.Stop + 
+visibleTable$Stop <- visibleTable$probability.Stop +
     visibleTable[["probability.Stop (Fixed)"]]
 knitr::kable(visibleTable, digits = 6, row.names = FALSE)
 ```
@@ -515,18 +516,15 @@ meansOC <- getOperatingCharacteristicsMeans(
 )
 ```
 
-Argument \| Meaning and supported options \| \|:–\|:–\| \| `design` \|
-Quantitative
-
-decision rule \| \| `numberOfSubjects` \| Positive integer matrix, one
-scenario per row, columns control then treatment \| \|
-`normalApproximation` \| Must be `TRUE` in the current implementation \|
-\| `groups` \| Must be `2` in the current implementation \| \|
-`alternative` \| Vector of true mean differences, treatment minus
-control; default `seq(0, 1, 0.2)` \| \| `stDev` \| Positive common
-within-group standard deviation; default `1` \| \| `...` \| Reserved
-additional arguments; no further QTD calculation options are used here
-\|
+| Argument | Meaning and supported options |
+|:---|:---|
+| `design` | Quantitative decision rule |
+| `numberOfSubjects` | Positive integer matrix, one scenario per row, columns control then treatment |
+| `normalApproximation` | Must be `TRUE` in the current implementation |
+| `groups` | Must be `2` in the current implementation |
+| `alternative` | Vector of true mean differences, treatment minus control; default `seq(0, 1, 0.2)` |
+| `stDev` | Positive common within-group standard deviation; default `1` |
+| `...` | Reserved additional arguments; no further QTD calculation options are used here |
 
 The sampling standard error is $`s = \sigma\sqrt{1/n_C + 1/n_T}`$. The
 normal sampling distribution of the estimated difference gives the six
@@ -535,6 +533,512 @@ common standard deviation rather than a t-distribution. Means has no
 `directionUpper` argument: formulate the endpoint so that larger
 differences represent greater benefit. At the lower percentile 0.5,
 $`\Phi^{-1}(0.5)=0`$ and $`L=\widehat\theta`$.
+
+## Bayesian Quantitative Decisions
+
+The same constructors also support Bayesian decisions. Set
+`bayesian = TRUE` in
+[`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md),
+or supply explicit posterior probability criteria. The result has class
+`TrialDesignPlanQuantitativeBayes`.
+[`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md)
+and
+[`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md)
+select the Bayesian calculation from this class; separate OC function
+names are not needed.
+
+These examples additionally require RBesT. Install it once if necessary:
+
+``` r
+
+install.packages("RBesT")
+```
+
+Bayesian calculations retain four exclusive categories: **Go**,
+**Indeterminate 1**, **Indeterminate 2**, and **Stop**. Use
+`plotCat = 4` to display them separately or `plotCat = 3` to combine the
+two intermediate categories. There are no separate Go (Fixed) and Stop
+(Fixed) categories in these results.
+
+The rule uses posterior probabilities after observing trial data. Its
+operating characteristics are the sampling probabilities of the
+decisions at the supplied true effects or event rates. They are not
+prior-predictive probabilities of success. The following assumptions are
+illustrative and are separate from the Kestrel and AFQ056 examples
+above.
+
+### Two interpretations of the percentiles
+
+The `percentileMapping` argument makes the interpretation explicit. For
+the same inputs `lowerPercentile = 0.2` and `upperPercentile = 0.9`, the
+two definitions of Go are:
+
+| Mapping | Criterion at LRV | Criterion at TV |
+|:---|:---|:---|
+| `"quantile"` (default) | $`P(\theta > \mathrm{LRV} \mid y) > 0.8`$ | $`P(\theta > \mathrm{TV} \mid y) > 0.1`$ |
+| `"posteriorProbability"` | $`P(\theta > \mathrm{LRV} \mid y) > 0.9`$ | $`P(\theta > \mathrm{TV} \mid y) > 0.2`$ |
+
+The default interprets the inputs as posterior quantile levels. A
+posterior 20th percentile above LRV is equivalent to more than 80%
+posterior probability above LRV; a posterior 90th percentile above TV
+corresponds to more than 10% probability above TV. The alternative
+mapping interprets `upperPercentile` as the beneficial-tail probability
+threshold at LRV and `lowerPercentile` as the threshold at TV. These are
+different decision rules, even with identical numerical inputs.
+
+For each mapping, Stop requires both complementary criteria in the
+opposite direction. Indeterminate 1 fails the LRV criterion and passes
+TV. Indeterminate 2 contains the remaining outcomes. Probability
+comparisons are strict; an exact probability-threshold tie belongs to
+the residual category. This can matter for discrete event counts.
+
+### Means with a prior on the treatment effect
+
+We compare true mean differences from 0 to 6, with a known common SD of
+6. The prior `mixnorm(c(1, 0, 6))` has one normal component with weight
+1, mean 0, and SD 6 on the treatment-minus-control effect. This prior SD
+describes uncertainty about the effect; `stDev` describes individual
+observations.
+
+``` r
+
+bayesMeanRules <- list(
+    quantile = getDesignQuantitative(
+        targetValue = 4,
+        lowerReferenceValue = 0,
+        lowerPercentile = 0.2,
+        upperPercentile = 0.9,
+        bayesian = TRUE,
+        percentileMapping = "quantile"
+    ),
+    posteriorProbability = getDesignQuantitative(
+        targetValue = 4,
+        lowerReferenceValue = 0,
+        lowerPercentile = 0.2,
+        upperPercentile = 0.9,
+        bayesian = TRUE,
+        percentileMapping = "posteriorProbability"
+    )
+)
+bayesMeanSizes <- matrix(c(25, 25, 50, 50), ncol = 2, byrow = TRUE)
+effectPrior <- RBesT::mixnorm(c(1, 0, 6))
+bayesMeanOC <- lapply(bayesMeanRules, function(design) {
+    return(getOperatingCharacteristicsMeans(
+        design = design,
+        numberOfSubjects = bayesMeanSizes,
+        alternative = seq(0, 6, by = 0.25),
+        stDev = 6,
+        priorDist = effectPrior
+    ))
+})
+summary(bayesMeanRules$quantile)
+```
+
+**Bayesian quantitative trial design (decision rule)**
+
+Fixed quantitative trial decision rule.
+
+- *Go criteria*: P(effect \> 0) \> 0.8, P(effect \> 4) \> 0.1
+- *Stop criteria*: P(effect \<= 0) \> 0.2, P(effect \<= 4) \> 0.9
+- *Indeterminate 1 criteria*: P(effect \<= 0) \> 0.2, P(effect \> 4) \>
+  0.1
+- *Percentile mapping*: quantile
+
+``` r
+
+summary(bayesMeanRules$posteriorProbability)
+```
+
+**Bayesian quantitative trial design (decision rule)**
+
+Fixed quantitative trial decision rule.
+
+- *Go criteria*: P(effect \> 0) \> 0.9, P(effect \> 4) \> 0.2
+- *Stop criteria*: P(effect \<= 0) \> 0.1, P(effect \<= 4) \> 0.8
+- *Indeterminate 1 criteria*: P(effect \<= 0) \> 0.1, P(effect \> 4) \>
+  0.2
+- *Percentile mapping*: posteriorProbability
+
+Omit `normalApproximation` for Bayesian rules. The means model uses
+known standard deviations. With an effect prior, the sampling variance
+of the estimated difference is $`\sigma_C^2/n_C + \sigma_T^2/n_T`$.
+
+The next table compares Go probabilities at three true effects, keeping
+the prior and sample sizes fixed.
+
+``` r
+
+bayesMeanComparison <- do.call(rbind, lapply(names(bayesMeanOC), function(mapping) {
+    data <- subset(as.data.frame(bayesMeanOC[[mapping]]),
+        category == "Go" & alternative %in% c(0, 4, 6))
+    data$mapping <- mapping
+    return(data[c("mapping", "nControl", "nTreatment", "alternative", "probability")])
+}))
+knitr::kable(bayesMeanComparison, digits = 4, row.names = FALSE)
+```
+
+| mapping              | nControl | nTreatment | alternative | probability |
+|:---------------------|---------:|-----------:|------------:|------------:|
+| quantile             |       25 |         25 |           0 |      0.1124 |
+| quantile             |       25 |         25 |           4 |      0.8735 |
+| quantile             |       25 |         25 |           6 |      0.9899 |
+| quantile             |       50 |         50 |           0 |      0.0154 |
+| quantile             |       50 |         50 |           4 |      0.8797 |
+| quantile             |       50 |         50 |           6 |      0.9977 |
+| posteriorProbability |       25 |         25 |           0 |      0.0474 |
+| posteriorProbability |       25 |         25 |           4 |      0.7537 |
+| posteriorProbability |       25 |         25 |           6 |      0.9689 |
+| posteriorProbability |       50 |         50 |           0 |      0.0045 |
+| posteriorProbability |       50 |         50 |           4 |      0.7658 |
+| posteriorProbability |       50 |         50 |           6 |      0.9916 |
+
+``` r
+
+plot(bayesMeanOC$quantile, plotCat = 4,
+    main = "Bayesian means: quantile interpretation")
+```
+
+![](rpact_quantitative_trial_design_files/figure-html/bayes-means-plots-1.png)
+
+Four-category mean OCs under the two percentile interpretations, with
+identical priors and sampling assumptions.
+
+``` r
+
+plot(bayesMeanOC$posteriorProbability, plotCat = 4,
+    main = "Bayesian means: posterior probability interpretation")
+```
+
+![](rpact_quantitative_trial_design_files/figure-html/bayes-means-plots-2.png)
+
+Four-category mean OCs under the two percentile interpretations, with
+identical priors and sampling assumptions.
+
+### Means with separate group priors
+
+Alternatively, `priorDist` can be a two-element list ordered **control,
+treatment**. The true control mean must then be supplied through
+`controlMean`; the true treatment mean is `controlMean + alternative`. A
+two-element `stDev` vector follows the same arm order. Priors on the
+group means define a different model from a prior directly on their
+difference.
+
+``` r
+
+bayesGroupOC <- getOperatingCharacteristicsMeans(
+    design = bayesMeanRules$quantile,
+    numberOfSubjects = matrix(c(25, 40), ncol = 2),
+    alternative = c(0, 2, 4, 6),
+    stDev = c(6, 8),
+    controlMean = 40,
+    priorDist = list(
+        RBesT::mixnorm(c(1, 40, 3)),
+        RBesT::mixnorm(c(1, 43, 6))
+    )
+)
+summary(bayesGroupOC, digits = 4)
+```
+
+**Operating-characteristics for comparing means**
+
+**Decision rule**
+
+- *Go criteria*: P(effect \> 0) \> 0.8, P(effect \> 4) \> 0.1
+- *Stop criteria*: P(effect \<= 0) \> 0.2, P(effect \<= 4) \> 0.9
+- *Indeterminate 1 criteria*: P(effect \<= 0) \> 0.2, P(effect \> 4) \>
+  0.1
+- *Percentile mapping*: quantile
+
+**Assumptions**
+
+- *Treatment groups*: 2
+- *Standard deviation*: 6.0000, 8.0000
+- Prior distribution: normMix: 1, 40, 3 / normMix: 1, 43, 6
+- *Control mean*: 40.0000
+
+**Number of subjects (control = 25, treatment = 40)**
+
+|     | Alternatives | Go      | Indeterminate 1 | Indeterminate 2 | Stop    |
+|-----|--------------|---------|-----------------|-----------------|---------|
+| 1   | 0            | 0.13757 | 0               | 0.07433         | 0.78809 |
+| 2   | 2.0000       | 0.54418 | 0               | 0.11214         | 0.34368 |
+| 3   | 4.0000       | 0.90545 | 0               | 0.04027         | 0.05428 |
+| 4   | 6.0000       | 0.99406 | 0               | 0.00344         | 0.00250 |
+
+These single-component normal priors permit analytic conjugate
+calculations. Normal mixture priors with several components are also
+supported; those OCs use numerical RBesT boundary searches and
+integration.
+
+### Rates with beta priors
+
+For rates, `priorDist1` is the treatment prior and `priorDist2` the
+control prior, consistent with `pi1` and `pi2`. This differs from the
+column order of `numberOfSubjects`, which remains **control,
+treatment**.
+
+We use a harmful event with control probability 0.3, so the beneficial
+effect is $`\theta = p_C - p_T`$ and `directionUpper = FALSE`. Both
+reference values and custom criteria below use this beneficial-effect
+scale. A target value of 0.15 means a reduction of 15 percentage points.
+The priors are Beta(2, 8) for treatment and Beta(3, 7) for control, with
+prior means 0.2 and 0.3, respectively.
+
+``` r
+
+bayesRateRules <- lapply(c("quantile", "posteriorProbability"), function(mapping) {
+    return(getDesignQuantitative(
+        targetValue = 0.15,
+        lowerReferenceValue = 0,
+        lowerPercentile = 0.2,
+        upperPercentile = 0.9,
+        bayesian = TRUE,
+        percentileMapping = mapping
+    ))
+})
+names(bayesRateRules) <- c("quantile", "posteriorProbability")
+bayesRateSizes <- matrix(c(12, 16, 18, 24), ncol = 2, byrow = TRUE)
+treatmentPrior <- RBesT::mixbeta(c(1, 2, 8))
+controlPrior <- RBesT::mixbeta(c(1, 3, 7))
+bayesRateOC <- lapply(bayesRateRules, function(design) {
+    return(getOperatingCharacteristicsRates(
+        design = design,
+        numberOfSubjects = bayesRateSizes,
+        pi1 = seq(0.05, 0.45, by = 0.05),
+        pi2 = 0.3,
+        directionUpper = FALSE,
+        priorDist1 = treatmentPrior,
+        priorDist2 = controlPrior
+    ))
+})
+```
+
+Omit `intervalMethod`: Bayesian rules evaluate posterior criteria rather
+than frequentist confidence intervals. The calculation evaluates the
+posterior decisions for all possible pairs of binomial event counts and
+sums their sampling probabilities. The deliberately small sample sizes
+keep the examples quick to execute; larger count grids can be expensive.
+
+``` r
+
+bayesRateComparison <- do.call(rbind, lapply(names(bayesRateOC), function(mapping) {
+    data <- subset(as.data.frame(bayesRateOC[[mapping]]),
+        category == "Go" & nControl == 12)
+    data$mapping <- mapping
+    return(data[c("mapping", "nControl", "nTreatment", "pi1", "pi2", "alternative", "probability")])
+}))
+knitr::kable(bayesRateComparison, digits = 4, row.names = FALSE)
+```
+
+| mapping              | nControl | nTreatment |  pi1 | pi2 | alternative | probability |
+|:---------------------|---------:|-----------:|-----:|----:|------------:|------------:|
+| quantile             |       12 |         16 | 0.05 | 0.3 |        0.25 |      0.9025 |
+| quantile             |       12 |         16 | 0.10 | 0.3 |        0.20 |      0.7774 |
+| quantile             |       12 |         16 | 0.15 | 0.3 |        0.15 |      0.6318 |
+| quantile             |       12 |         16 | 0.20 | 0.3 |        0.10 |      0.4853 |
+| quantile             |       12 |         16 | 0.25 | 0.3 |        0.05 |      0.3524 |
+| quantile             |       12 |         16 | 0.30 | 0.3 |        0.00 |      0.2418 |
+| quantile             |       12 |         16 | 0.35 | 0.3 |       -0.05 |      0.1564 |
+| quantile             |       12 |         16 | 0.40 | 0.3 |       -0.10 |      0.0950 |
+| quantile             |       12 |         16 | 0.45 | 0.3 |       -0.15 |      0.0540 |
+| posteriorProbability |       12 |         16 | 0.05 | 0.3 |        0.25 |      0.7646 |
+| posteriorProbability |       12 |         16 | 0.10 | 0.3 |        0.20 |      0.6010 |
+| posteriorProbability |       12 |         16 | 0.15 | 0.3 |        0.15 |      0.4463 |
+| posteriorProbability |       12 |         16 | 0.20 | 0.3 |        0.10 |      0.3138 |
+| posteriorProbability |       12 |         16 | 0.25 | 0.3 |        0.05 |      0.2090 |
+| posteriorProbability |       12 |         16 | 0.30 | 0.3 |        0.00 |      0.1316 |
+| posteriorProbability |       12 |         16 | 0.35 | 0.3 |       -0.05 |      0.0781 |
+| posteriorProbability |       12 |         16 | 0.40 | 0.3 |       -0.10 |      0.0435 |
+| posteriorProbability |       12 |         16 | 0.45 | 0.3 |       -0.15 |      0.0226 |
+
+``` r
+
+plot(bayesRateOC$quantile, plotCat = 3,
+    main = "Bayesian rates: quantile interpretation")
+```
+
+![](rpact_quantitative_trial_design_files/figure-html/bayes-rates-plots-1.png)
+
+Three-category binary OCs under both percentile interpretations; lower
+treatment event rates are beneficial.
+
+``` r
+
+plot(bayesRateOC$posteriorProbability, plotCat = 3,
+    main = "Bayesian rates: posterior probability interpretation")
+```
+
+![](rpact_quantitative_trial_design_files/figure-html/bayes-rates-plots-2.png)
+
+Three-category binary OCs under both percentile interpretations; lower
+treatment event rates are beneficial.
+
+### Custom posterior decision criteria
+
+[`getQuantitativeDecisionThresholds()`](https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.md)
+combines one or more posterior criteria with logical **AND**.
+`lowerTail = FALSE` specifies $`P(\theta > q \mid y) > p`$; `TRUE`
+specifies $`P(\theta \leq q \mid y) > p`$. A scalar direction is
+repeated for all criteria.
+
+The following means rule requires both a promising effect and evidence
+of clinical relevance for Go. Its Stop threshold is specified
+separately. Indeterminate 1 passes the first Go criterion and fails the
+second, while explicitly excluding Stop through the third condition.
+
+``` r
+
+customMeanRule <- getDesignQuantitative(
+    go = getQuantitativeDecisionThresholds(
+        quantiles = c(0, 4), probabilities = c(0.95, 0.5), lowerTail = FALSE
+    ),
+    stop = getQuantitativeDecisionThresholds(
+        quantiles = 3, probabilities = 0.9, lowerTail = TRUE
+    ),
+    indeterminate1 = getQuantitativeDecisionThresholds(
+        quantiles = c(0, 4, 3),
+        probabilities = c(0.95, 0.5, 0.1),
+        lowerTail = c(FALSE, TRUE, FALSE)
+    )
+)
+customMeanOC <- getOperatingCharacteristicsMeans(
+    design = customMeanRule,
+    numberOfSubjects = bayesMeanSizes,
+    alternative = seq(0, 6, by = 0.25),
+    stDev = 6,
+    priorDist = effectPrior
+)
+summary(customMeanRule)
+```
+
+**Bayesian quantitative trial design (decision rule)**
+
+Fixed quantitative trial decision rule.
+
+- *Go criteria*: P(effect \> 0) \> 0.95, P(effect \> 4) \> 0.5
+- *Stop criteria*: P(effect \<= 3) \> 0.9
+- *Indeterminate 1 criteria*: P(effect \> 0) \> 0.95, P(effect \<= 4) \>
+  0.5, P(effect \> 3) \> 0.1
+- *Percentile mapping*: quantile
+
+``` r
+
+plot(customMeanOC, plotCat = 4, main = "Bayesian means: custom posterior criteria")
+```
+
+![](rpact_quantitative_trial_design_files/figure-html/bayes-custom-means-1.png)
+
+Explicit criteria imply a Bayesian rule, so `bayesian = TRUE` is
+optional in this call. Supply all three criteria objects without
+reference-value or percentile arguments. The constructor requires a
+proof of pairwise exclusion using monotonicity of the posterior CDF.
+Rules that cannot be certified are rejected, even if a particular prior
+might make them disjoint. The labels for custom intermediate criteria
+reflect the supplied definitions; they need not have the same
+interpretation as Indeterminate 1 in a reference-value rule.
+
+The same interface works for rates. Here Go requires evidence of any
+reduction and a clinically relevant reduction of 15 percentage points.
+Stop requires more than 90% posterior probability that the reduction is
+at most 10 percentage points. The intermediate rule again excludes Stop.
+
+``` r
+
+customRateRule <- getDesignQuantitative(
+    go = getQuantitativeDecisionThresholds(
+        quantiles = c(0, 0.15), probabilities = c(0.95, 0.5), lowerTail = FALSE
+    ),
+    stop = getQuantitativeDecisionThresholds(
+        quantiles = 0.10, probabilities = 0.9, lowerTail = TRUE
+    ),
+    indeterminate1 = getQuantitativeDecisionThresholds(
+        quantiles = c(0, 0.15, 0.10),
+        probabilities = c(0.95, 0.5, 0.1),
+        lowerTail = c(FALSE, TRUE, FALSE)
+    )
+)
+customRateOC <- getOperatingCharacteristicsRates(
+    design = customRateRule,
+    numberOfSubjects = bayesRateSizes,
+    pi1 = seq(0.05, 0.45, by = 0.05),
+    pi2 = 0.3,
+    directionUpper = FALSE,
+    priorDist1 = treatmentPrior,
+    priorDist2 = controlPrior
+)
+summary(customRateRule)
+```
+
+**Bayesian quantitative trial design (decision rule)**
+
+Fixed quantitative trial decision rule.
+
+- *Go criteria*: P(effect \> 0) \> 0.95, P(effect \> 0.15) \> 0.5
+- *Stop criteria*: P(effect \<= 0.1) \> 0.9
+- *Indeterminate 1 criteria*: P(effect \> 0) \> 0.95, P(effect \<= 0.15)
+  \> 0.5, P(effect \> 0.1) \> 0.1
+- *Percentile mapping*: quantile
+
+``` r
+
+plot(customRateOC, plotCat = 4, main = "Bayesian rates: custom posterior criteria")
+```
+
+![](rpact_quantitative_trial_design_files/figure-html/bayes-custom-rates-1.png)
+
+For each custom rule, Indeterminate 2 is the complement of the three
+explicit categories, including exact probability-threshold ties. The
+stored probabilities therefore sum to one for each sample-size and
+effect scenario. We can inspect the range of these totals without
+rounding the category probabilities:
+
+``` r
+
+vapply(list(means = customMeanOC, rates = customRateOC), function(result) {
+    totals <- aggregate(probability ~ nControl + nTreatment + alternative,
+        data = as.data.frame(result), FUN = sum)
+    return(range(totals$probability))
+}, numeric(2))
+```
+
+         means rates
+    [1,]     1     1
+    [2,]     1     1
+
+### A significance-and-target shortcut
+
+For the standard dual rule, `useSignificanceAndTarget = TRUE` constructs
+Go criteria with posterior probabilities `1 - alpha` at LRV and 0.5 at
+TV. This Bayesian shortcut uses `alpha` as a posterior tail probability.
+The frequentist shortcut uses `alpha / 2` for a two-sided significance
+convention; the two shortcuts do not define identical thresholds.
+
+``` r
+
+bayesDualRule <- getDesignQuantitative(
+    targetValue = 4,
+    lowerReferenceValue = 0,
+    bayesian = TRUE,
+    useSignificanceAndTarget = TRUE,
+    alpha = 0.05
+)
+summary(bayesDualRule)
+```
+
+**Bayesian quantitative trial design (decision rule)**
+
+Fixed quantitative trial decision rule.
+
+- *Go criteria*: P(effect \> 0) \> 0.95, P(effect \> 4) \> 0.5
+- *Stop criteria*: P(effect \<= 0) \> 0.05, P(effect \<= 4) \> 0.5
+- *Indeterminate 1 criteria*: P(effect \<= 0) \> 0.05, P(effect \> 4) \>
+  0.5
+- *Percentile mapping*: quantile
+
+The following sections return to the frequentist `meansOC` and `ratesOC`
+objects. Their print, summary, and OC plot interfaces are also available
+for the Bayesian results above, with four detailed categories instead of
+six.
 
 ## Printing, Summarizing, and Accessing Results
 
@@ -545,93 +1049,89 @@ this output manageable.
 
 ``` r
 
-print(ratesScenarios)
+print(ratesScenarios, markdown = FALSE)
 ```
 
-**Parameters and output of operating-characteristics for comparing
-rates**
+    Parameters and output of operating-characteristics for comparing rates:
 
-**User defined parameters**
+    User defined parameters:
+      Number of subjects [1]       : 75, 75
+      Number of subjects [2]       : 75, 150
+      Assumed treatment rate       : 0.100, 0.150, 0.175, 0.200, 0.250
+      Assumed control rate         : 0.150
+      Direction upper              : FALSE
 
-- *Number of subjects \[1\]*: 75, 75
-- *Number of subjects \[2\]*: 75, 150
-- *Assumed treatment rate*: 0.100, 0.150, 0.175, 0.200, 0.250
-- *Assumed control rate*: 0.150
-- *Direction upper*: FALSE
+    Derived from user defined parameters:
+      Alternatives                 : 0.050, 0.000, -0.025, -0.050, -0.100
 
-**Derived from user defined parameters**
+    Default parameters:
+      Treatment groups             : 2
+      Interval method              : qtd1
 
-- *Alternatives*: 0.050, 0.000, -0.025, -0.050, -0.100
-
-**Default parameters**
-
-- *Treatment groups*: 2
-- *Interval method*: qtd1
-
-**Output**
-
-|  | Category | Probability | Number of subjects (control) | Number of subjects (treatment) | Alternatives | Assumed treatment rate | Assumed control rate |
-|----|----|----|----|----|----|----|----|
-| 1 | Go (Fixed) | 5.352327e-01 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 2 | Go (Fixed) | 2.037757e-01 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 3 | Go (Fixed) | 1.067077e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 4 | Go (Fixed) | 5.023338e-02 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 5 | Go (Fixed) | 8.310520e-03 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 6 | Go | 3.132233e-01 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 7 | Go | 3.043533e-01 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 8 | Go | 2.267809e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 9 | Go | 1.469166e-01 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 10 | Go | 4.383561e-02 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 11 | Indeterminate 1 | 1.383506e-01 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 12 | Indeterminate 1 | 3.913004e-01 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 13 | Indeterminate 1 | 4.711368e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 14 | Indeterminate 1 | 4.822145e-01 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 15 | Indeterminate 1 | 3.433772e-01 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 16 | Indeterminate 2 | 6.447415e-08 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 17 | Indeterminate 2 | 2.235870e-09 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 18 | Indeterminate 2 | 3.442681e-10 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 19 | Indeterminate 2 | 4.756762e-11 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 20 | Indeterminate 2 | 6.683973e-13 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 21 | Stop | 1.232006e-02 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 22 | Stop | 8.432942e-02 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 23 | Stop | 1.509382e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 24 | Stop | 2.224109e-01 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 25 | Stop | 3.065523e-01 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 26 | Stop (Fixed) | 8.733303e-04 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 27 | Stop (Fixed) | 1.624114e-02 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 28 | Stop (Fixed) | 4.443645e-02 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 29 | Stop (Fixed) | 9.822453e-02 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 30 | Stop (Fixed) | 2.979244e-01 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 31 | Go (Fixed) | 5.947519e-01 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 32 | Go (Fixed) | 1.987206e-01 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 33 | Go (Fixed) | 9.205907e-02 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 34 | Go (Fixed) | 3.674273e-02 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 35 | Go (Fixed) | 3.869971e-03 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 36 | Go | 3.201810e-01 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 37 | Go | 3.720240e-01 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 38 | Go | 2.716497e-01 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 39 | Go | 1.625763e-01 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 40 | Go | 3.558971e-02 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 41 | Indeterminate 1 | 7.488036e-02 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 42 | Indeterminate 1 | 3.309465e-01 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 43 | Indeterminate 1 | 4.311718e-01 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 44 | Indeterminate 1 | 4.466464e-01 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 45 | Indeterminate 1 | 2.770091e-01 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 46 | Indeterminate 2 | 9.126242e-09 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 47 | Indeterminate 2 | 1.591020e-11 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 48 | Indeterminate 2 | 4.410220e-13 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 49 | Indeterminate 2 | 9.714064e-15 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 50 | Indeterminate 2 | 2.480298e-18 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 51 | Stop | 9.867110e-03 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 52 | Stop | 8.685674e-02 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 53 | Stop | 1.672263e-01 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 54 | Stop | 2.579502e-01 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 55 | Stop | 3.414298e-01 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 56 | Stop (Fixed) | 3.196266e-04 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 57 | Stop (Fixed) | 1.145223e-02 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 58 | Stop (Fixed) | 3.789310e-02 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 59 | Stop (Fixed) | 9.608442e-02 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 60 | Stop (Fixed) | 3.421014e-01 | 75 | 150 | -0.100 | 0.250 | 0.15 |
+    Output:
+              Category  Probability Number of   Number of Alternatives   Assumed      Assumed
+                                     subjects    subjects              treatment control rate
+                                    (control) (treatment)                   rate
+     1      Go (Fixed) 5.352327e-01        75          75        0.050     0.100         0.15
+     2      Go (Fixed) 2.037757e-01        75          75        0.000     0.150         0.15
+     3      Go (Fixed) 1.067077e-01        75          75       -0.025     0.175         0.15
+     4      Go (Fixed) 5.023338e-02        75          75       -0.050     0.200         0.15
+     5      Go (Fixed) 8.310520e-03        75          75       -0.100     0.250         0.15
+     6              Go 3.132233e-01        75          75        0.050     0.100         0.15
+     7              Go 3.043533e-01        75          75        0.000     0.150         0.15
+     8              Go 2.267809e-01        75          75       -0.025     0.175         0.15
+     9              Go 1.469166e-01        75          75       -0.050     0.200         0.15
+    10              Go 4.383561e-02        75          75       -0.100     0.250         0.15
+    11 Indeterminate 1 1.383506e-01        75          75        0.050     0.100         0.15
+    12 Indeterminate 1 3.913004e-01        75          75        0.000     0.150         0.15
+    13 Indeterminate 1 4.711368e-01        75          75       -0.025     0.175         0.15
+    14 Indeterminate 1 4.822145e-01        75          75       -0.050     0.200         0.15
+    15 Indeterminate 1 3.433772e-01        75          75       -0.100     0.250         0.15
+    16 Indeterminate 2 6.447415e-08        75          75        0.050     0.100         0.15
+    17 Indeterminate 2 2.235870e-09        75          75        0.000     0.150         0.15
+    18 Indeterminate 2 3.442681e-10        75          75       -0.025     0.175         0.15
+    19 Indeterminate 2 4.756762e-11        75          75       -0.050     0.200         0.15
+    20 Indeterminate 2 6.683973e-13        75          75       -0.100     0.250         0.15
+    21            Stop 1.232006e-02        75          75        0.050     0.100         0.15
+    22            Stop 8.432942e-02        75          75        0.000     0.150         0.15
+    23            Stop 1.509382e-01        75          75       -0.025     0.175         0.15
+    24            Stop 2.224109e-01        75          75       -0.050     0.200         0.15
+    25            Stop 3.065523e-01        75          75       -0.100     0.250         0.15
+    26    Stop (Fixed) 8.733303e-04        75          75        0.050     0.100         0.15
+    27    Stop (Fixed) 1.624114e-02        75          75        0.000     0.150         0.15
+    28    Stop (Fixed) 4.443645e-02        75          75       -0.025     0.175         0.15
+    29    Stop (Fixed) 9.822453e-02        75          75       -0.050     0.200         0.15
+    30    Stop (Fixed) 2.979244e-01        75          75       -0.100     0.250         0.15
+    31      Go (Fixed) 5.947519e-01        75         150        0.050     0.100         0.15
+    32      Go (Fixed) 1.987206e-01        75         150        0.000     0.150         0.15
+    33      Go (Fixed) 9.205907e-02        75         150       -0.025     0.175         0.15
+    34      Go (Fixed) 3.674273e-02        75         150       -0.050     0.200         0.15
+    35      Go (Fixed) 3.869971e-03        75         150       -0.100     0.250         0.15
+    36              Go 3.201810e-01        75         150        0.050     0.100         0.15
+    37              Go 3.720240e-01        75         150        0.000     0.150         0.15
+    38              Go 2.716497e-01        75         150       -0.025     0.175         0.15
+    39              Go 1.625763e-01        75         150       -0.050     0.200         0.15
+    40              Go 3.558971e-02        75         150       -0.100     0.250         0.15
+    41 Indeterminate 1 7.488036e-02        75         150        0.050     0.100         0.15
+    42 Indeterminate 1 3.309465e-01        75         150        0.000     0.150         0.15
+    43 Indeterminate 1 4.311718e-01        75         150       -0.025     0.175         0.15
+    44 Indeterminate 1 4.466464e-01        75         150       -0.050     0.200         0.15
+    45 Indeterminate 1 2.770091e-01        75         150       -0.100     0.250         0.15
+    46 Indeterminate 2 9.126242e-09        75         150        0.050     0.100         0.15
+    47 Indeterminate 2 1.591020e-11        75         150        0.000     0.150         0.15
+    48 Indeterminate 2 4.410220e-13        75         150       -0.025     0.175         0.15
+    49 Indeterminate 2 9.714064e-15        75         150       -0.050     0.200         0.15
+    50 Indeterminate 2 2.480298e-18        75         150       -0.100     0.250         0.15
+    51            Stop 9.867110e-03        75         150        0.050     0.100         0.15
+    52            Stop 8.685674e-02        75         150        0.000     0.150         0.15
+    53            Stop 1.672263e-01        75         150       -0.025     0.175         0.15
+    54            Stop 2.579502e-01        75         150       -0.050     0.200         0.15
+    55            Stop 3.414298e-01        75         150       -0.100     0.250         0.15
+    56    Stop (Fixed) 3.196266e-04        75         150        0.050     0.100         0.15
+    57    Stop (Fixed) 1.145223e-02        75         150        0.000     0.150         0.15
+    58    Stop (Fixed) 3.789310e-02        75         150       -0.025     0.175         0.15
+    59    Stop (Fixed) 9.608442e-02        75         150       -0.050     0.200         0.15
+    60    Stop (Fixed) 3.421014e-01        75         150       -0.100     0.250         0.15
 
 [`summary()`](https://rdrr.io/r/base/summary.html) gives the rule and
 assumptions, followed by one table per sample-size scenario, with one
@@ -731,13 +1231,102 @@ document.
 
 ``` r
 
-print(ratesScenarios)
+print(ratesScenarios, markdown = TRUE)
 ```
 
 ``` r
 
-summary(ratesScenarios, digits = 4)
+markdownSummary <- summary(ratesScenarios, digits = 4)
+markdownText <- print(markdownSummary, markdown = TRUE)
+cat(as.character(markdownText), sep = "\n")
 ```
+
+**Parameters and output of operating-characteristics for comparing
+rates**
+
+**User defined parameters**
+
+- *Number of subjects \[1\]*: 75, 75
+- *Number of subjects \[2\]*: 75, 150
+- *Assumed treatment rate*: 0.100, 0.150, 0.175, 0.200, 0.250
+- *Assumed control rate*: 0.150
+- *Direction upper*: FALSE
+
+**Derived from user defined parameters**
+
+- *Alternatives*: 0.050, 0.000, -0.025, -0.050, -0.100
+
+**Default parameters**
+
+- *Treatment groups*: 2
+- *Interval method*: qtd1
+
+**Output**
+
+|  | Category | Probability | Number of subjects (control) | Number of subjects (treatment) | Alternatives | Assumed treatment rate | Assumed control rate |
+|----|----|----|----|----|----|----|----|
+| 1 | Go (Fixed) | 5.352327e-01 | 75 | 75 | 0.050 | 0.100 | 0.15 |
+| 2 | Go (Fixed) | 2.037757e-01 | 75 | 75 | 0.000 | 0.150 | 0.15 |
+| 3 | Go (Fixed) | 1.067077e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
+| 4 | Go (Fixed) | 5.023338e-02 | 75 | 75 | -0.050 | 0.200 | 0.15 |
+| 5 | Go (Fixed) | 8.310520e-03 | 75 | 75 | -0.100 | 0.250 | 0.15 |
+| 6 | Go | 3.132233e-01 | 75 | 75 | 0.050 | 0.100 | 0.15 |
+| 7 | Go | 3.043533e-01 | 75 | 75 | 0.000 | 0.150 | 0.15 |
+| 8 | Go | 2.267809e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
+| 9 | Go | 1.469166e-01 | 75 | 75 | -0.050 | 0.200 | 0.15 |
+| 10 | Go | 4.383561e-02 | 75 | 75 | -0.100 | 0.250 | 0.15 |
+| 11 | Indeterminate 1 | 1.383506e-01 | 75 | 75 | 0.050 | 0.100 | 0.15 |
+| 12 | Indeterminate 1 | 3.913004e-01 | 75 | 75 | 0.000 | 0.150 | 0.15 |
+| 13 | Indeterminate 1 | 4.711368e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
+| 14 | Indeterminate 1 | 4.822145e-01 | 75 | 75 | -0.050 | 0.200 | 0.15 |
+| 15 | Indeterminate 1 | 3.433772e-01 | 75 | 75 | -0.100 | 0.250 | 0.15 |
+| 16 | Indeterminate 2 | 6.447415e-08 | 75 | 75 | 0.050 | 0.100 | 0.15 |
+| 17 | Indeterminate 2 | 2.235870e-09 | 75 | 75 | 0.000 | 0.150 | 0.15 |
+| 18 | Indeterminate 2 | 3.442681e-10 | 75 | 75 | -0.025 | 0.175 | 0.15 |
+| 19 | Indeterminate 2 | 4.756762e-11 | 75 | 75 | -0.050 | 0.200 | 0.15 |
+| 20 | Indeterminate 2 | 6.683973e-13 | 75 | 75 | -0.100 | 0.250 | 0.15 |
+| 21 | Stop | 1.232006e-02 | 75 | 75 | 0.050 | 0.100 | 0.15 |
+| 22 | Stop | 8.432942e-02 | 75 | 75 | 0.000 | 0.150 | 0.15 |
+| 23 | Stop | 1.509382e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
+| 24 | Stop | 2.224109e-01 | 75 | 75 | -0.050 | 0.200 | 0.15 |
+| 25 | Stop | 3.065523e-01 | 75 | 75 | -0.100 | 0.250 | 0.15 |
+| 26 | Stop (Fixed) | 8.733303e-04 | 75 | 75 | 0.050 | 0.100 | 0.15 |
+| 27 | Stop (Fixed) | 1.624114e-02 | 75 | 75 | 0.000 | 0.150 | 0.15 |
+| 28 | Stop (Fixed) | 4.443645e-02 | 75 | 75 | -0.025 | 0.175 | 0.15 |
+| 29 | Stop (Fixed) | 9.822453e-02 | 75 | 75 | -0.050 | 0.200 | 0.15 |
+| 30 | Stop (Fixed) | 2.979244e-01 | 75 | 75 | -0.100 | 0.250 | 0.15 |
+| 31 | Go (Fixed) | 5.947519e-01 | 75 | 150 | 0.050 | 0.100 | 0.15 |
+| 32 | Go (Fixed) | 1.987206e-01 | 75 | 150 | 0.000 | 0.150 | 0.15 |
+| 33 | Go (Fixed) | 9.205907e-02 | 75 | 150 | -0.025 | 0.175 | 0.15 |
+| 34 | Go (Fixed) | 3.674273e-02 | 75 | 150 | -0.050 | 0.200 | 0.15 |
+| 35 | Go (Fixed) | 3.869971e-03 | 75 | 150 | -0.100 | 0.250 | 0.15 |
+| 36 | Go | 3.201810e-01 | 75 | 150 | 0.050 | 0.100 | 0.15 |
+| 37 | Go | 3.720240e-01 | 75 | 150 | 0.000 | 0.150 | 0.15 |
+| 38 | Go | 2.716497e-01 | 75 | 150 | -0.025 | 0.175 | 0.15 |
+| 39 | Go | 1.625763e-01 | 75 | 150 | -0.050 | 0.200 | 0.15 |
+| 40 | Go | 3.558971e-02 | 75 | 150 | -0.100 | 0.250 | 0.15 |
+| 41 | Indeterminate 1 | 7.488036e-02 | 75 | 150 | 0.050 | 0.100 | 0.15 |
+| 42 | Indeterminate 1 | 3.309465e-01 | 75 | 150 | 0.000 | 0.150 | 0.15 |
+| 43 | Indeterminate 1 | 4.311718e-01 | 75 | 150 | -0.025 | 0.175 | 0.15 |
+| 44 | Indeterminate 1 | 4.466464e-01 | 75 | 150 | -0.050 | 0.200 | 0.15 |
+| 45 | Indeterminate 1 | 2.770091e-01 | 75 | 150 | -0.100 | 0.250 | 0.15 |
+| 46 | Indeterminate 2 | 9.126242e-09 | 75 | 150 | 0.050 | 0.100 | 0.15 |
+| 47 | Indeterminate 2 | 1.591020e-11 | 75 | 150 | 0.000 | 0.150 | 0.15 |
+| 48 | Indeterminate 2 | 4.410220e-13 | 75 | 150 | -0.025 | 0.175 | 0.15 |
+| 49 | Indeterminate 2 | 9.714064e-15 | 75 | 150 | -0.050 | 0.200 | 0.15 |
+| 50 | Indeterminate 2 | 2.480298e-18 | 75 | 150 | -0.100 | 0.250 | 0.15 |
+| 51 | Stop | 9.867110e-03 | 75 | 150 | 0.050 | 0.100 | 0.15 |
+| 52 | Stop | 8.685674e-02 | 75 | 150 | 0.000 | 0.150 | 0.15 |
+| 53 | Stop | 1.672263e-01 | 75 | 150 | -0.025 | 0.175 | 0.15 |
+| 54 | Stop | 2.579502e-01 | 75 | 150 | -0.050 | 0.200 | 0.15 |
+| 55 | Stop | 3.414298e-01 | 75 | 150 | -0.100 | 0.250 | 0.15 |
+| 56 | Stop (Fixed) | 3.196266e-04 | 75 | 150 | 0.050 | 0.100 | 0.15 |
+| 57 | Stop (Fixed) | 1.145223e-02 | 75 | 150 | 0.000 | 0.150 | 0.15 |
+| 58 | Stop (Fixed) | 3.789310e-02 | 75 | 150 | -0.025 | 0.175 | 0.15 |
+| 59 | Stop (Fixed) | 9.608442e-02 | 75 | 150 | -0.050 | 0.200 | 0.15 |
+| 60 | Stop (Fixed) | 3.421014e-01 | 75 | 150 | -0.100 | 0.250 | 0.15 |
+
+------------------------------------------------------------------------
 
 **Operating-characteristics for comparing rates**
 
@@ -1519,10 +2108,12 @@ head(sourcePlot$data)
     5 2: C: 75 / T: 150           225               2         0.1
     6 2: C: 75 / T: 150           225               2         0.1
 
-Plots can be saved as PNG files, and full probability data and compact
-summary tables can be exported as CSV files. The following code
-illustrates this workflow with explicit filenames and table contents.
-This optional export code is not executed when rendering the vignette.
+The original QTD interface offered PNG plots, a full-data CSV, and a
+compact summary CSV. In R, plots can be saved as PNG files, and full
+probability data and compact summary tables can be exported as CSV
+files. The following code illustrates this workflow with explicit
+filenames and table contents. This optional export code is not executed
+when rendering the vignette.
 
 ``` r
 
@@ -1550,9 +2141,9 @@ writeLines(as.character(print(summary(ratesScenarios), markdown = TRUE)), "kestr
   *Journal of Clinical Epidemiology*, 42, 293–299.
 - Spiegelhalter, D. J., Abrams, K. R., and Myles, J. P. (2004).
   *Bayesian Approaches to Clinical Trials and Health-Care Evaluation*.
-  Wiley, Section 6.3. Background reading on Bayesian decision making;
-  the implemented calculations above use frequentist interval
-  constructions.
+  Wiley, Section 6.3. Background reading on Bayesian decision making.
+  The Bayesian examples above use posterior probability criteria
+  implemented with RBesT.
 
 [^1]: AEB071 is the publicly documented code for sotrastaurin. The
     [NCT01064791 study

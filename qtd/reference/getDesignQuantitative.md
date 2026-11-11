@@ -1,19 +1,23 @@
-# Create a quantitative fixed-design decision rule
+# Create a Frequentist or Bayesian Quantitative Decision Rule
 
-getDesignQuantitative constructs a decision-rule object for a fixed
-(non-adaptive) trial with a quantitative endpoint. The returned object
-contains the target value (TV), a lower reference value (LRV) and two
-percentiles that define the decision boundaries used by the graphicalQTD
-methods.
+Constructs a fixed-design quantitative decision rule. Its class selects
+the calculation in the common operating-characteristics functions.
 
 ## Usage
 
 ``` r
 getDesignQuantitative(
   targetValue,
-  lowerReferenceValue,
+  lowerReferenceValue = 0,
   upperPercentile = 0.9,
-  lowerPercentile = 0.2
+  lowerPercentile = 0.2,
+  bayesian = FALSE,
+  useSignificanceAndTarget = FALSE,
+  alpha = 0.05,
+  go = NULL,
+  stop = NULL,
+  indeterminate1 = NULL,
+  percentileMapping = "quantile"
 )
 ```
 
@@ -21,71 +25,96 @@ getDesignQuantitative(
 
 - targetValue:
 
-  Numeric scalar. The target value (TV) for the endpoint.
+  Single target effect on the beneficial-effect scale.
 
 - lowerReferenceValue:
 
-  Numeric scalar. The lower reference value (LRV).
+  Single lower reference effect; default zero.
 
 - upperPercentile:
 
-  Numeric scalar in (0, 1). The upper percentile used to define the
-  upper decision boundary. Default is 0.9.
+  Upper percentile in (0, 1); default 0.9.
 
 - lowerPercentile:
 
-  Numeric scalar in (0, upperPercentile). The lower percentile used to
-  define the lower decision boundary. Default is 0.2.
+  Lower percentile in (0, upperPercentile); default 0.2.
+
+- bayesian:
+
+  Whether to construct a Bayesian rule. Explicit criteria imply TRUE
+  when this argument is omitted.
+
+- useSignificanceAndTarget:
+
+  Construct a dual significance/target rule.
+
+- alpha:
+
+  Two-sided frequentist significance level or Bayesian posterior tail
+  probability in (0, 0.5); default 0.05. These are different
+  conventions.
+
+- go, stop, indeterminate1:
+
+  Criteria from
+  [`getQuantitativeDecisionThresholds()`](https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.md).
+  Supply all three without reference values, percentiles or shortcut
+  options.
+
+- percentileMapping:
+
+  Bayesian interpretation: "quantile" (default) or
+  "posteriorProbability". Stored in the design for reproducibility.
 
 ## Value
 
-An object of class `TrialDesignPlanQuantitative` containing the supplied
-design parameters.
+A TrialDesignPlanQuantitative or TrialDesignPlanQuantitativeBayes,
+inheriting from TrialDesignPlanQuantitativeBase and ParameterSet.
 
 ## Details
 
-The function performs basic input validation and returns an object of
-class `TrialDesignPlanQuantitative`. This object is used by helper
-functions that compute operating characteristics and make decisions for
-fixed designs with normally approximated endpoints (see
-`getOperatingCharacteristicsMeans`).
+For mapping "quantile", Go requires P(effect \> LRV) \>
+1-lowerPercentile and P(effect \> TV) \> 1-upperPercentile. Stop
+requires P(effect \<= LRV) \> lowerPercentile and P(effect \<= TV) \>
+upperPercentile. This follows by comparing posterior quantiles with the
+references, and agrees with normal CI decisions in the diffuse-prior
+limit. It differs from the exploratory prototype mapping.
+
+Mapping "posteriorProbability" is a different rule: the beneficial-tail
+Go thresholds are upperPercentile at LRV and lowerPercentile at TV, and
+Stop uses their complements. For both mappings, Indeterminate 1 fails
+the LRV criterion and passes TV. Indeterminate 2 is the complement of
+Go, Stop and Indeterminate 1, including exact probability-threshold
+ties. Comparisons are strict, following RBesT; ties can have positive
+sampling probability for rates.
+
+The significance/target shortcut uses lowerPercentile = alpha/2 and
+upperPercentile = 0.5 for frequentist rules. Bayesian rules require
+posterior probabilities 1-alpha at LRV and 0.5 at TV, independently of
+percentileMapping. The shortcut stores the canonical quantile mapping
+for reproducibility. The two shortcuts are not claimed to be equivalent:
+for example 95 percent two-sided confidence corresponds to a 97.5
+percent one-sided tail probability.
+
+All explicit categories must be provably pairwise incompatible by
+monotonicity of a continuous posterior CDF. Potential overlaps are
+rejected; a particular prior might permit additional disjoint rules that
+this conservative validation cannot certify. No category precedence is
+introduced. When defining custom intermediate criteria, explicitly
+exclude futility, as in the RBesT examples. Reference effects always use
+the beneficial direction, also for decreasing rates.
+
+## See also
+
+[`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md),
+[`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md),
+<https://opensource.nibr.com/RBesT/reference/decision2S.html>
 
 ## Examples
 
 ``` r
-# Basic usage with default percentiles
-decisionRule <- getDesignQuantitative(
-    targetValue = 100,
-    lowerReferenceValue = 0
-)
-decisionRule
-#> Design parameters and output of quantitative trial design (decision rule):
-#> 
-#> User defined parameters:
-#>   Target value          : 100 
-#>   Lower reference value : 0 
-#> 
-#> Default parameters:
-#>   Upper percentile      : 0.9000 
-#>   Lower percentile      : 0.2000 
-#> 
-
-# Custom percentiles
-decisionRule2 <- getDesignQuantitative(
-    targetValue = 5.5,
-    lowerReferenceValue = 0,
-    upperPercentile = 0.95,
-    lowerPercentile = 0.1
-)
-decisionRule2
-#> Design parameters and output of quantitative trial design (decision rule):
-#> 
-#> User defined parameters:
-#>   Target value          : 5.5 
-#>   Lower reference value : 0 
-#>   Upper percentile      : 0.9500 
-#>   Lower percentile      : 0.1000 
-#> 
-#> Default parameters: not available
-#> 
+rule <- getDesignQuantitative(targetValue = 1)
+bayes <- getDesignQuantitative(targetValue = 1, bayesian = TRUE)
+dual <- getDesignQuantitative(targetValue = 1, bayesian = TRUE,
+    useSignificanceAndTarget = TRUE)
 ```

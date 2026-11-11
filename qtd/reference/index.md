@@ -6,6 +6,8 @@
   : Trial Comparison
 - [`add()`](https://docs.rpact.org/qtd/reference/add.md) : Add Objects
   to a Collection
+- [`as.data.frame(`*`<OperatingCharcteristics>`*`)`](https://docs.rpact.org/qtd/reference/as.data.frame.OperatingCharcteristics.md)
+  : Extract Quantitative Decision Probability Tables
 - [`as.data.frame(`*`<PiecewiseSurvivalTimeMultiGroup>`*`)`](https://docs.rpact.org/qtd/reference/as.data.frame.PiecewiseSurvivalTimeMultiGroup.md)
   : Coerce a Multi-Group Piecewise Survival Specification to a Data
   Frame
@@ -69,7 +71,7 @@
 - [`getDesignInverseNormal()`](https://docs.rpact.org/qtd/reference/getDesignInverseNormal.md)
   : Get Design Inverse Normal
 - [`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md)
-  : Create a quantitative fixed-design decision rule
+  : Create a Frequentist or Bayesian Quantitative Decision Rule
 - [`getDesignSet()`](https://docs.rpact.org/qtd/reference/getDesignSet.md)
   : Get Design Set
 - [`getEventProbabilities()`](https://docs.rpact.org/qtd/reference/getEventProbabilities.md)
@@ -94,7 +96,7 @@
 - [`getObservedInformationRates()`](https://docs.rpact.org/qtd/reference/getObservedInformationRates.md)
   : Get Observed Information Rates
 - [`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md)
-  : Compute operating characteristics for a fixed quantitative design
+  : Operating Characteristics for Quantitative Decisions Comparing Means
 - [`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md)
   : Operating Characteristics for Quantitative Decisions Comparing Rates
 - [`getOutputFormat()`](https://docs.rpact.org/qtd/reference/getOutputFormat.md)
@@ -119,6 +121,8 @@
   : Get Power Rates
 - [`getPowerSurvival()`](https://docs.rpact.org/qtd/reference/getPowerSurvival.md)
   : Get Power Survival
+- [`getQuantitativeDecisionThresholds()`](https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.md)
+  : Specify Posterior Probability Criteria
 - [`getRawData()`](https://docs.rpact.org/qtd/reference/getRawData.md) :
   Get Simulation Raw Data for Survival
 - [`getRepeatedConfidenceIntervals()`](https://docs.rpact.org/qtd/reference/getRepeatedConfidenceIntervals.md)
@@ -191,6 +195,8 @@
   : Trial Design Plan Plotting
 - [`plot(`*`<TrialDesignPlanQuantitative>`*`)`](https://docs.rpact.org/qtd/reference/plot.TrialDesignPlanQuantitative.md)
   : Plot a Quantitative Trial Decision Rule
+- [`plot(`*`<TrialDesignPlanQuantitativeBayes>`*`)`](https://docs.rpact.org/qtd/reference/plot.TrialDesignPlanQuantitativeBayes.md)
+  : Plot Bayesian Quantitative Decision Regions
 - [`plot(`*`<TrialDesignSet>`*`)`](https://docs.rpact.org/qtd/reference/plot.TrialDesignSet.md)
   : Trial Design Set Plotting
 - [`plot(`*`<TrialDesignSummaries>`*`)`](https://docs.rpact.org/qtd/reference/plot.TrialDesignSummaries.md)

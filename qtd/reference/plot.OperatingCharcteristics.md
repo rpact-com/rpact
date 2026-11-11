@@ -45,7 +45,9 @@ plot(
 
 - plotCat:
 
-  Number of decision categories, either 3 (default) or 6.
+  Number of decision categories: 3 (default), 6 for frequentist results
+  or 4 for Bayesian results. Bayesian sensitivity recalculations retain
+  the original priors and use the Bayesian calculation.
 
 - main:
 

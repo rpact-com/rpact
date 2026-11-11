@@ -13,7 +13,9 @@ getOperatingCharacteristicsRates(
   pi1,
   pi2,
   directionUpper = TRUE,
-  intervalMethod = "qtd1"
+  intervalMethod = "qtd1",
+  priorDist1 = NULL,
+  priorDist2 = NULL
 )
 ```
 
@@ -55,6 +57,11 @@ getOperatingCharacteristicsRates(
   `"miettinenNurminen"`, or `"newcombe"`, as described in
   [`plot.TrialDesignPlanQuantitative()`](https://docs.rpact.org/qtd/reference/plot.TrialDesignPlanQuantitative.md).
 
+- priorDist1, priorDist2:
+
+  Bayesian RBesT betaMix priors for treatment and control, respectively.
+  NULL selects mixbeta(c(1, 1/3, 1/3)) for each arm.
+
 ## Value
 
 An `OperatingCharcteristicsRates` object supporting console and Markdown
@@ -64,6 +71,17 @@ frame contains `category`, `probability`, `nControl`, `nTreatment`,
 difference in the beneficial direction.
 
 ## Details
+
+Bayesian rules use RBesT postmix and decision2S on the complete binomial
+count grid, followed by exact binomial probability summation. This
+avoids truncation by eps and mixed-tail boundary sentinel edge cases
+observed with oc2S in RBesT 1.12.0. Strict posterior comparisons follow
+RBesT. The four Bayesian categories are Go, Indeterminate 1,
+Indeterminate 2 and Stop; exact probability-threshold ties belong to
+Indeterminate 2. Omit intervalMethod for Bayesian rules. Priors are
+stored for reproducible output and recalculation. Only identity-link
+beta mixtures are supported. The count-grid limit applies to Bayesian
+rules as well; evaluation of large grids can be expensive.
 
 Decision boundaries use the same interval calculations and equality
 rules as the binary decision map. The QTD1 method reproduces the
@@ -104,18 +122,18 @@ print(oc)
 #> Parameters and output of operating-characteristics for comparing rates:
 #> 
 #> User defined parameters:
-#>   Number of subjects [1] : 75, 75 
-#>   Number of subjects [2] : 75, 150 
-#>   Assumed treatment rate : 0.100, 0.150, 0.175, 0.200, 0.250 
-#>   Assumed control rate   : 0.150 
-#>   Direction upper        : FALSE 
+#>   Number of subjects [1]       : 75, 75 
+#>   Number of subjects [2]       : 75, 150 
+#>   Assumed treatment rate       : 0.100, 0.150, 0.175, 0.200, 0.250 
+#>   Assumed control rate         : 0.150 
+#>   Direction upper              : FALSE 
 #> 
 #> Derived from user defined parameters:
-#>   Alternatives           : 0.050, 0.000, -0.025, -0.050, -0.100 
+#>   Alternatives                 : 0.050, 0.000, -0.025, -0.050, -0.100 
 #> 
 #> Default parameters:
-#>   Treatment groups       : 2 
-#>   Interval method        : qtd1 
+#>   Treatment groups             : 2 
+#>   Interval method              : qtd1 
 #> 
 #> Output:
 #>           Category  Probability Number of   Number of Alternatives   Assumed

@@ -4,6 +4,17 @@
 
 ### New features
 
+- Quantitative trial design now supports Bayesian decision rules through
+  `getDesignQuantitative(bayesian = TRUE)` and custom criteria from
+  [`getQuantitativeDecisionThresholds()`](https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.md).
+  The common means and rates OC functions dispatch by design class and
+  support RBesT normal or beta mixture priors. Bayesian results include
+  four exclusive decision categories, posterior decision maps,
+  summaries, sensitivity plots and reproducible R code. Percentile
+  interpretation is explicit through `percentileMapping`; the default
+  preserves the quantile interpretation. RBesT is an optional suggested
+  dependency.
+
 - Introduced quantitative trial design (QTD) for fixed two-group trials
   with continuous or binary endpoints. The new function
   [`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md)

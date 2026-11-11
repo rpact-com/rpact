@@ -76,9 +76,9 @@
     <section class="section level2"><h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>A development decision often depends on two questions: is the treatment effect sufficiently promising relative to a minimum acceptable difference, and could it reach a target difference? Quantitative trial design (QTD) makes these requirements explicit and calculates the probabilities of the resulting decisions under specified trial assumptions.</p>
-<p>This vignette demonstrates the QTD functions in <a href="https://www.rpact.org" class="external-link">rpact</a> for two independent groups with <strong>continuous endpoints (Means)</strong> and <strong>binary endpoints (Rates)</strong>. Rates here are event probabilities, rather than event counts per unit of exposure. We define a decision rule, inspect its output, calculate operating characteristics, and illustrate every QTD plot type, including sensitivity and weighted decision-performance displays.</p>
+<p>This vignette demonstrates the QTD functions in <a href="https://www.rpact.org" class="external-link">rpact</a> for two independent groups with <strong>continuous endpoints (Means)</strong> and <strong>binary endpoints (Rates)</strong>. Rates here are event probabilities, rather than event counts per unit of exposure. We define a decision rule, inspect its output, calculate operating characteristics, and illustrate every QTD plot type, including sensitivity and weighted decision-performance displays. A dedicated Bayesian section adds normal and beta priors, custom posterior criteria, and both interpretations of the percentile inputs.</p>
 <p>The examples in this vignette were inspired by a presentation by Björn Bornkamp and David Ohlssen on quantitative trial design. The worked example uses the fictional project name <strong>Kestrel</strong>. All decision rules, planning assumptions, and numerical results needed to follow the examples are provided below.</p>
-<p>The examples require the <a href="https://github.com/rpact-com/rpact/tree/dev/qtd" class="external-link">QTD development version of rpact</a> providing <code><a href="../reference/getDesignQuantitative.html">getDesignQuantitative()</a></code>, <code><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans()</a></code>, and <code><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates()</a></code>, together with their QTD print, summary, and plot methods. The spelling <code>Charcteristics</code> follows the current function names.</p>
+<p>The examples require the <a href="https://github.com/rpact-com/rpact/tree/dev/qtd" class="external-link">QTD development version of rpact</a> providing <code><a href="../reference/getDesignQuantitative.html">getDesignQuantitative()</a></code>, <code><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans()</a></code>, <code><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates()</a></code>, and <code><a href="../reference/getQuantitativeDecisionThresholds.html">getQuantitativeDecisionThresholds()</a></code>, together with Bayesian class dispatch and their QTD print, summary, and plot methods.</p>
 <section class="level2"><h3 id="how-to-install-the-qtd-development-version">How to install the QTD development version<a class="anchor" aria-label="anchor" href="#how-to-install-the-qtd-development-version"></a>
 </h3>
 <div class="cell">
@@ -109,7 +109,7 @@
 <tr class="even">
 <td style="text-align: left;"><code>lowerReferenceValue</code></td>
 <td style="text-align: left;">Lower reference value (LRV), also called minimum acceptable difference (MAD)</td>
-<td style="text-align: left;">Required</td>
+<td style="text-align: left;"><code>0</code></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><code>lowerPercentile</code></td>
@@ -138,25 +138,19 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 <span>    lowerPercentile <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>    upperPercentile <span class="op">=</span> <span class="fl">0.9</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">binaryRule</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
-<p><strong>Design parameters and output of quantitative trial design (decision rule)</strong></p>
-<p><strong>User defined parameters</strong></p>
-<ul>
-<li>
-<em>Target value</em>: 0</li>
-<li>
-<em>Lower reference value</em>: -0.05</li>
-</ul>
-<p><strong>Default parameters</strong></p>
-<ul>
-<li>
-<em>Upper percentile</em>: 0.9000</li>
-<li>
-<em>Lower percentile</em>: 0.2000</li>
-</ul>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">binaryRule</span>, markdown <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Design parameters and output of quantitative trial design (decision rule):
+
+User defined parameters:
+  Target value          : 0
+  Lower reference value : -0.05
+
+Default parameters:
+  Upper percentile      : 0.9000
+  Lower percentile      : 0.2000 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">binaryRule</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <p><strong>Quantitative trial design (decision rule)</strong></p>
@@ -216,11 +210,11 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 <td style="text-align: left;">Indeterminate</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"></td>
 <td style="text-align: left;">Stop</td>
 <td style="text-align: left;">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>&lt;</mo><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">R</mi><mi mathvariant="normal">V</mi></mrow></mrow><annotation encoding="application/x-tex">L &lt; \mathrm{LRV}</annotation></semantics></math> and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">R</mi><mi mathvariant="normal">V</mi></mrow><mo>≤</mo><mi>U</mi><mo>&lt;</mo><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">V</mi></mrow></mrow><annotation encoding="application/x-tex">\mathrm{LRV} \leq U &lt; \mathrm{TV}</annotation></semantics></math>
 </td>
+<td style="text-align: left;">Stop</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Stop (Fixed)</td>
@@ -296,7 +290,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </table>
 <p>We evaluate treatment event probabilities from 0.10 to 0.25 in steps of 0.001 for both sample-size scenarios. Rates and reference differences are entered as proportions, so five percentage points are entered as <code>0.05</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">demoSizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">75</span>, <span class="fl">75</span>, <span class="fl">75</span>, <span class="fl">150</span><span class="op">)</span>,</span>
 <span>    ncol <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -317,7 +311,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </section><section class="level2"><h3 id="the-five-named-scenarios">The five named scenarios<a class="anchor" aria-label="anchor" href="#the-five-named-scenarios"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scenarioNames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Very good"</span>, <span class="st">"Good"</span>, <span class="st">"Indifferent"</span>, <span class="st">"Poor"</span>, <span class="st">"Very poor"</span><span class="op">)</span></span>
 <span><span class="va">improvements</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">0.025</span>, <span class="op">-</span><span class="fl">0.05</span>, <span class="op">-</span><span class="fl">0.10</span><span class="op">)</span></span>
 <span><span class="va">scenarioRates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.175</span>, <span class="fl">0.20</span>, <span class="fl">0.25</span><span class="op">)</span></span>
@@ -368,7 +362,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ratesScenarios</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">binaryRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="va">demoSizes</span>,</span>
@@ -615,18 +609,18 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </tr>
 </tbody>
 </table>
-<p>The compact overview uses limited precision and is not renormalized; some triplets sum to 0.99. Use the calculated table below for numerical comparisons: it reports the QTD1 probabilities to six decimal places under the same assumptions.</p>
+<p>The compact overview retains the displayed precision of the original demonstration and is not renormalized; some triplets sum to 0.99. Displayed values can differ from conventional rounding. Use the calculated table below for numerical comparisons: it reports the QTD1 probabilities to six decimal places under the same assumptions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scenarioPlot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, type <span class="op">=</span> <span class="fl">4</span>, plotCat <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">scenarioTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">reshape</a></span><span class="op">(</span></span>
-<span>    <span class="va">scenarioPlot</span><span class="op">$</span><span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scenario"</span>, <span class="st">"nControl"</span>, <span class="st">"nTreatment"</span>, </span>
+<span>    <span class="va">scenarioPlot</span><span class="op">$</span><span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scenario"</span>, <span class="st">"nControl"</span>, <span class="st">"nTreatment"</span>,</span>
 <span>        <span class="st">"pi1"</span>, <span class="st">"alternative"</span>, <span class="st">"category"</span>, <span class="st">"probability"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>    idvar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scenario"</span>, <span class="st">"nControl"</span>, <span class="st">"nTreatment"</span>, <span class="st">"pi1"</span>, <span class="st">"alternative"</span><span class="op">)</span>,</span>
 <span>    timevar <span class="op">=</span> <span class="st">"category"</span>,</span>
 <span>    direction <span class="op">=</span> <span class="st">"wide"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">scenarioTable</span> <span class="op">&lt;-</span> <span class="va">scenarioTable</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">scenarioTable</span><span class="op">$</span><span class="va">scenario</span>, </span>
+<span><span class="va">scenarioTable</span> <span class="op">&lt;-</span> <span class="va">scenarioTable</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">scenarioTable</span><span class="op">$</span><span class="va">scenario</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">scenarioTable</span><span class="op">$</span><span class="va">pi1</span>, <span class="va">scenarioRates</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="va">scenarioTable</span><span class="op">$</span><span class="va">Scenario</span> <span class="op">&lt;-</span> <span class="va">scenarioNames</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">scenarioTable</span><span class="op">$</span><span class="va">pi1</span>, <span class="va">scenarioRates</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
@@ -934,7 +928,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </table>
 <p>The full probability grid begins at <code>pi1 = 0.100</code> with step <code>0.001</code>. For 75 patients per group at <code>pi1 = 0.100</code>, the six-category probabilities are approximately 0.535233, 0.313223, 0.138351, 0, 0.01232, and 0.000873, with aggregate probabilities 0.848456, 0.138351, and 0.013193. Small displayed zeros can represent rounded positive probabilities. The following calculation shows the first grid points and their three-category sums from unrounded results.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">visibleRows</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">ratesOC</span><span class="op">$</span><span class="va">probabilities</span>,</span>
 <span>    <span class="va">nTreatment</span> <span class="op">==</span> <span class="fl">75</span> <span class="op">&amp;</span> <span class="va">pi1</span> <span class="op">&gt;=</span> <span class="fl">0.100</span> <span class="op">&amp;</span> <span class="va">pi1</span> <span class="op">&lt;=</span> <span class="fl">0.112</span><span class="op">)</span></span>
 <span><span class="va">visibleTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">reshape</a></span><span class="op">(</span></span>
@@ -944,11 +938,11 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 <span>    direction <span class="op">=</span> <span class="st">"wide"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">visibleTable</span> <span class="op">&lt;-</span> <span class="va">visibleTable</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">visibleTable</span><span class="op">$</span><span class="va">pi1</span><span class="op">)</span>, <span class="op">]</span></span>
-<span><span class="va">visibleTable</span><span class="op">$</span><span class="va">Go</span> <span class="op">&lt;-</span> <span class="va">visibleTable</span><span class="op">[[</span><span class="st">"probability.Go (Fixed)"</span><span class="op">]</span><span class="op">]</span> <span class="op">+</span> </span>
+<span><span class="va">visibleTable</span><span class="op">$</span><span class="va">Go</span> <span class="op">&lt;-</span> <span class="va">visibleTable</span><span class="op">[[</span><span class="st">"probability.Go (Fixed)"</span><span class="op">]</span><span class="op">]</span> <span class="op">+</span></span>
 <span>    <span class="va">visibleTable</span><span class="op">$</span><span class="va">probability.Go</span></span>
 <span><span class="va">visibleTable</span><span class="op">$</span><span class="va">Indeterminate</span> <span class="op">&lt;-</span> <span class="va">visibleTable</span><span class="op">[[</span><span class="st">"probability.Indeterminate 1"</span><span class="op">]</span><span class="op">]</span> <span class="op">+</span></span>
 <span>    <span class="va">visibleTable</span><span class="op">[[</span><span class="st">"probability.Indeterminate 2"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="va">visibleTable</span><span class="op">$</span><span class="va">Stop</span> <span class="op">&lt;-</span> <span class="va">visibleTable</span><span class="op">$</span><span class="va">probability.Stop</span> <span class="op">+</span> </span>
+<span><span class="va">visibleTable</span><span class="op">$</span><span class="va">Stop</span> <span class="op">&lt;-</span> <span class="va">visibleTable</span><span class="op">$</span><span class="va">probability.Stop</span> <span class="op">+</span></span>
 <span>    <span class="va">visibleTable</span><span class="op">[[</span><span class="st">"probability.Stop (Fixed)"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">visibleTable</span>, digits <span class="op">=</span> <span class="fl">6</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -1187,7 +1181,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </h3>
 <p>Suppose we observe <strong>16 events among 75 control patients</strong>. With 75 treatment patients, the rule gives Go for <strong>0–15</strong> events, Indeterminate for <strong>16–22</strong>, and Stop for <strong>23–75</strong>. The QTD1 event-count map shows these decision regions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">eventMap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>    <span class="va">binaryRule</span>,</span>
 <span>    type <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -1209,7 +1203,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </div>
 <p>Here <code>numberOfSubjects</code> is a vector of length two, unlike the OC constructors’ matrix. <code>observedControl</code> adds the vertical line. Supplying <code>controlRate</code> and <code>treatmentRate</code> together adds joint binomial cell probabilities to the plot data without changing the decisions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">controlSlice</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">eventMap</span><span class="op">$</span><span class="va">data</span>, <span class="va">eventsControl</span> <span class="op">==</span> <span class="fl">16</span><span class="op">)</span></span>
 <span><span class="va">observedRanges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">eventsTreatment</span> <span class="op">~</span> <span class="va">category</span>, <span class="va">controlSlice</span>, <span class="va">range</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -1243,7 +1237,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">cellProbability</span> <span class="op">~</span> <span class="va">category</span>, <span class="va">eventMap</span><span class="op">$</span><span class="va">data</span>, <span class="va">sum</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       category cellProbability
@@ -1257,7 +1251,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </h2>
 <p>The continuous-endpoint example concerns AFQ056<a class="footnote-ref" role="doc-noteref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;AFQ056 is the publicly documented code for mavoglurant, an mGluR5 antagonist; see &lt;a href=&quot;https://pubmed.ncbi.nlm.nih.gov/25316499/&quot; class=&quot;external-link&quot;&gt;the 2014 pharmacological characterization indexed in PubMed&lt;/a&gt;. The numbers 2.9, 4, 0.5, and 0.8 are illustrative decision-rule settings, not published efficacy results.&lt;/p&gt;"><sup>2</sup></a> and specifies <strong>MAD = 2.9</strong>, <strong>TD = 4</strong>, a <strong>50th-percentile lower bound</strong>, and an <strong>80th-percentile upper bound</strong>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">meansRule</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span></span>
 <span>    targetValue <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>    lowerReferenceValue <span class="op">=</span> <span class="fl">2.9</span>,</span>
@@ -1282,7 +1276,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </div>
 <p>For the following calculations, we assume a common <strong>standard deviation of 6</strong>, mean differences from <strong>0 to 6 in steps of 0.1</strong>, and sample-size pairs <strong>(25, 25), (50, 50), (75, 75), (25, 50), (50, 100), (75, 150)</strong>. These assumptions are illustrative.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">planningSizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span>, <span class="fl">50</span>, <span class="fl">50</span>, <span class="fl">75</span>, <span class="fl">75</span>, <span class="fl">25</span>, <span class="fl">50</span>, <span class="fl">50</span>, <span class="fl">100</span>, <span class="fl">75</span>, <span class="fl">150</span><span class="op">)</span>,</span>
 <span>    ncol <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -1298,16 +1292,1074 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 <span>    stDev <span class="op">=</span> <span class="fl">6</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="line-block">Argument | Meaning and supported options | |:–|:–| | <code>design</code> | Quantitative</div>
-<p>decision rule | | <code>numberOfSubjects</code> | Positive integer matrix, one scenario per row, columns control then treatment | | <code>normalApproximation</code> | Must be <code>TRUE</code> in the current implementation | | <code>groups</code> | Must be <code>2</code> in the current implementation | | <code>alternative</code> | Vector of true mean differences, treatment minus control; default <code>seq(0, 1, 0.2)</code> | | <code>stDev</code> | Positive common within-group standard deviation; default <code>1</code> | | <code>...</code> | Reserved additional arguments; no further QTD calculation options are used here |</p>
+<table class="table caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead><tr class="header">
+<th style="text-align: left;">Argument</th>
+<th style="text-align: left;">Meaning and supported options</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>design</code></td>
+<td style="text-align: left;">Quantitative decision rule</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>numberOfSubjects</code></td>
+<td style="text-align: left;">Positive integer matrix, one scenario per row, columns control then treatment</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>normalApproximation</code></td>
+<td style="text-align: left;">Must be <code>TRUE</code> in the current implementation</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>groups</code></td>
+<td style="text-align: left;">Must be <code>2</code> in the current implementation</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>alternative</code></td>
+<td style="text-align: left;">Vector of true mean differences, treatment minus control; default <code>seq(0, 1, 0.2)</code>
+</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>stDev</code></td>
+<td style="text-align: left;">Positive common within-group standard deviation; default <code>1</code>
+</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>...</code></td>
+<td style="text-align: left;">Reserved additional arguments; no further QTD calculation options are used here</td>
+</tr>
+</tbody>
+</table>
 <p>The sampling standard error is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>=</mo><mi>σ</mi><msqrt><mrow><mn>1</mn><mi>/</mi><msub><mi>n</mi><mi>C</mi></msub><mo>+</mo><mn>1</mn><mi>/</mi><msub><mi>n</mi><mi>T</mi></msub></mrow></msqrt></mrow><annotation encoding="application/x-tex">s = \sigma\sqrt{1/n_C + 1/n_T}</annotation></semantics></math>. The normal sampling distribution of the estimated difference gives the six decision probabilities analytically. This calculation uses a specified common standard deviation rather than a t-distribution. Means has no <code>directionUpper</code> argument: formulate the endpoint so that larger differences represent greater benefit. At the lower percentile 0.5, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi mathvariant="normal">Φ</mi><mrow><mi>−</mi><mn>1</mn></mrow></msup><mo stretchy="false" form="prefix">(</mo><mn>0.5</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\Phi^{-1}(0.5)=0</annotation></semantics></math> and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mover><mi>θ</mi><mo accent="true">̂</mo></mover></mrow><annotation encoding="application/x-tex">L=\widehat\theta</annotation></semantics></math>.</p>
-</section><section class="section level2"><h2 id="printing-summarizing-and-accessing-results">Printing, Summarizing, and Accessing Results<a class="anchor" aria-label="anchor" href="#printing-summarizing-and-accessing-results"></a>
+</section><section class="section level2"><h2 id="bayesian-quantitative-decisions">Bayesian Quantitative Decisions<a class="anchor" aria-label="anchor" href="#bayesian-quantitative-decisions"></a>
+</h2>
+<p>The same constructors also support Bayesian decisions. Set <code>bayesian = TRUE</code> in <code><a href="../reference/getDesignQuantitative.html">getDesignQuantitative()</a></code>, or supply explicit posterior probability criteria. The result has class <code>TrialDesignPlanQuantitativeBayes</code>. <code><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans()</a></code> and <code><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates()</a></code> select the Bayesian calculation from this class; separate OC function names are not needed.</p>
+<p>These examples additionally require RBesT. Install it once if necessary:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"RBesT"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>Bayesian calculations retain four exclusive categories: <strong>Go</strong>, <strong>Indeterminate 1</strong>, <strong>Indeterminate 2</strong>, and <strong>Stop</strong>. Use <code>plotCat = 4</code> to display them separately or <code>plotCat = 3</code> to combine the two intermediate categories. There are no separate Go (Fixed) and Stop (Fixed) categories in these results.</p>
+<p>The rule uses posterior probabilities after observing trial data. Its operating characteristics are the sampling probabilities of the decisions at the supplied true effects or event rates. They are not prior-predictive probabilities of success. The following assumptions are illustrative and are separate from the Kestrel and AFQ056 examples above.</p>
+<section class="level2"><h3 id="two-interpretations-of-the-percentiles">Two interpretations of the percentiles<a class="anchor" aria-label="anchor" href="#two-interpretations-of-the-percentiles"></a>
+</h3>
+<p>The <code>percentileMapping</code> argument makes the interpretation explicit. For the same inputs <code>lowerPercentile = 0.2</code> and <code>upperPercentile = 0.9</code>, the two definitions of Go are:</p>
+<table class="table caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead><tr class="header">
+<th style="text-align: left;">Mapping</th>
+<th style="text-align: left;">Criterion at LRV</th>
+<th style="text-align: left;">Criterion at TV</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">
+<code>"quantile"</code> (default)</td>
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mi>θ</mi><mo>&gt;</mo><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">R</mi><mi mathvariant="normal">V</mi></mrow><mo>∣</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>&gt;</mo><mn>0.8</mn></mrow><annotation encoding="application/x-tex">P(\theta &gt; \mathrm{LRV} \mid y) &gt; 0.8</annotation></semantics></math></td>
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mi>θ</mi><mo>&gt;</mo><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">V</mi></mrow><mo>∣</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>&gt;</mo><mn>0.1</mn></mrow><annotation encoding="application/x-tex">P(\theta &gt; \mathrm{TV} \mid y) &gt; 0.1</annotation></semantics></math></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>"posteriorProbability"</code></td>
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mi>θ</mi><mo>&gt;</mo><mrow><mi mathvariant="normal">L</mi><mi mathvariant="normal">R</mi><mi mathvariant="normal">V</mi></mrow><mo>∣</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>&gt;</mo><mn>0.9</mn></mrow><annotation encoding="application/x-tex">P(\theta &gt; \mathrm{LRV} \mid y) &gt; 0.9</annotation></semantics></math></td>
+<td style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mi>θ</mi><mo>&gt;</mo><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">V</mi></mrow><mo>∣</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>&gt;</mo><mn>0.2</mn></mrow><annotation encoding="application/x-tex">P(\theta &gt; \mathrm{TV} \mid y) &gt; 0.2</annotation></semantics></math></td>
+</tr>
+</tbody>
+</table>
+<p>The default interprets the inputs as posterior quantile levels. A posterior 20th percentile above LRV is equivalent to more than 80% posterior probability above LRV; a posterior 90th percentile above TV corresponds to more than 10% probability above TV. The alternative mapping interprets <code>upperPercentile</code> as the beneficial-tail probability threshold at LRV and <code>lowerPercentile</code> as the threshold at TV. These are different decision rules, even with identical numerical inputs.</p>
+<p>For each mapping, Stop requires both complementary criteria in the opposite direction. Indeterminate 1 fails the LRV criterion and passes TV. Indeterminate 2 contains the remaining outcomes. Probability comparisons are strict; an exact probability-threshold tie belongs to the residual category. This can matter for discrete event counts.</p>
+</section><section class="level2"><h3 id="means-with-a-prior-on-the-treatment-effect">Means with a prior on the treatment effect<a class="anchor" aria-label="anchor" href="#means-with-a-prior-on-the-treatment-effect"></a>
+</h3>
+<p>We compare true mean differences from 0 to 6, with a known common SD of 6. The prior <code>mixnorm(c(1, 0, 6))</code> has one normal component with weight 1, mean 0, and SD 6 on the treatment-minus-control effect. This prior SD describes uncertainty about the effect; <code>stDev</code> describes individual observations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bayesMeanRules</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    quantile <span class="op">=</span> <span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span></span>
+<span>        targetValue <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>        lowerReferenceValue <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>        lowerPercentile <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>        upperPercentile <span class="op">=</span> <span class="fl">0.9</span>,</span>
+<span>        bayesian <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        percentileMapping <span class="op">=</span> <span class="st">"quantile"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    posteriorProbability <span class="op">=</span> <span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span></span>
+<span>        targetValue <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>        lowerReferenceValue <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>        lowerPercentile <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>        upperPercentile <span class="op">=</span> <span class="fl">0.9</span>,</span>
+<span>        bayesian <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        percentileMapping <span class="op">=</span> <span class="st">"posteriorProbability"</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">bayesMeanSizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span>, <span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">effectPrior</span> <span class="op">&lt;-</span> <span class="fu">RBesT</span><span class="fu">::</span><span class="fu"><a href="https://opensource.nibr.com/RBesT/reference/mixnorm.html" class="external-link">mixnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">bayesMeanOC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">bayesMeanRules</span>, <span class="kw">function</span><span class="op">(</span><span class="va">design</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans</a></span><span class="op">(</span></span>
+<span>        design <span class="op">=</span> <span class="va">design</span>,</span>
+<span>        numberOfSubjects <span class="op">=</span> <span class="va">bayesMeanSizes</span>,</span>
+<span>        alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, by <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>        stDev <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>        priorDist <span class="op">=</span> <span class="va">effectPrior</span></span>
+<span>    <span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bayesMeanRules</span><span class="op">$</span><span class="va">quantile</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<p><strong>Bayesian quantitative trial design (decision rule)</strong></p>
+<p>Fixed quantitative trial decision rule.</p>
+<ul>
+<li>
+<em>Go criteria</em>: P(effect &gt; 0) &gt; 0.8, P(effect &gt; 4) &gt; 0.1</li>
+<li>
+<em>Stop criteria</em>: P(effect &lt;= 0) &gt; 0.2, P(effect &lt;= 4) &gt; 0.9</li>
+<li>
+<em>Indeterminate 1 criteria</em>: P(effect &lt;= 0) &gt; 0.2, P(effect &gt; 4) &gt; 0.1</li>
+<li>
+<em>Percentile mapping</em>: quantile</li>
+</ul>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bayesMeanRules</span><span class="op">$</span><span class="va">posteriorProbability</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<p><strong>Bayesian quantitative trial design (decision rule)</strong></p>
+<p>Fixed quantitative trial decision rule.</p>
+<ul>
+<li>
+<em>Go criteria</em>: P(effect &gt; 0) &gt; 0.9, P(effect &gt; 4) &gt; 0.2</li>
+<li>
+<em>Stop criteria</em>: P(effect &lt;= 0) &gt; 0.1, P(effect &lt;= 4) &gt; 0.8</li>
+<li>
+<em>Indeterminate 1 criteria</em>: P(effect &lt;= 0) &gt; 0.1, P(effect &gt; 4) &gt; 0.2</li>
+<li>
+<em>Percentile mapping</em>: posteriorProbability</li>
+</ul>
+</div>
+</div>
+<p>Omit <code>normalApproximation</code> for Bayesian rules. The means model uses known standard deviations. With an effect prior, the sampling variance of the estimated difference is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>C</mi><mn>2</mn></msubsup><mi>/</mi><msub><mi>n</mi><mi>C</mi></msub><mo>+</mo><msubsup><mi>σ</mi><mi>T</mi><mn>2</mn></msubsup><mi>/</mi><msub><mi>n</mi><mi>T</mi></msub></mrow><annotation encoding="application/x-tex">\sigma_C^2/n_C + \sigma_T^2/n_T</annotation></semantics></math>.</p>
+<p>The next table compares Go probabilities at three true effects, keeping the prior and sample sizes fixed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bayesMeanComparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bayesMeanOC</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">mapping</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">bayesMeanOC</span><span class="op">[[</span><span class="va">mapping</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        <span class="va">category</span> <span class="op">==</span> <span class="st">"Go"</span> <span class="op">&amp;</span> <span class="va">alternative</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">data</span><span class="op">$</span><span class="va">mapping</span> <span class="op">&lt;-</span> <span class="va">mapping</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mapping"</span>, <span class="st">"nControl"</span>, <span class="st">"nTreatment"</span>, <span class="st">"alternative"</span>, <span class="st">"probability"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">bayesMeanComparison</span>, digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<table class="table caption-top">
+<thead><tr class="header">
+<th style="text-align: left;">mapping</th>
+<th style="text-align: right;">nControl</th>
+<th style="text-align: right;">nTreatment</th>
+<th style="text-align: right;">alternative</th>
+<th style="text-align: right;">probability</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.1124</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.8735</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.9899</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0154</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.8797</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.9977</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0474</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.7537</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.9689</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0045</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.7658</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0.9916</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bayesMeanOC</span><span class="op">$</span><span class="va">quantile</span>, plotCat <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    main <span class="op">=</span> <span class="st">"Bayesian means: quantile interpretation"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure><p><img src="rpact_quantitative_trial_design_files/figure-html/bayes-means-plots-1.png" width="960"></p>
+<figcaption>Four-category mean OCs under the two percentile interpretations, with identical priors and sampling assumptions.</figcaption></figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bayesMeanOC</span><span class="op">$</span><span class="va">posteriorProbability</span>, plotCat <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    main <span class="op">=</span> <span class="st">"Bayesian means: posterior probability interpretation"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure><p><img src="rpact_quantitative_trial_design_files/figure-html/bayes-means-plots-2.png" width="960"></p>
+<figcaption>Four-category mean OCs under the two percentile interpretations, with identical priors and sampling assumptions.</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section class="level2"><h3 id="means-with-separate-group-priors">Means with separate group priors<a class="anchor" aria-label="anchor" href="#means-with-separate-group-priors"></a>
+</h3>
+<p>Alternatively, <code>priorDist</code> can be a two-element list ordered <strong>control, treatment</strong>. The true control mean must then be supplied through <code>controlMean</code>; the true treatment mean is <code>controlMean + alternative</code>. A two-element <code>stDev</code> vector follows the same arm order. Priors on the group means define a different model from a prior directly on their difference.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bayesGroupOC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans</a></span><span class="op">(</span></span>
+<span>    design <span class="op">=</span> <span class="va">bayesMeanRules</span><span class="op">$</span><span class="va">quantile</span>,</span>
+<span>    numberOfSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">40</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>    alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span>,</span>
+<span>    stDev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">8</span><span class="op">)</span>,</span>
+<span>    controlMean <span class="op">=</span> <span class="fl">40</span>,</span>
+<span>    priorDist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>        <span class="fu">RBesT</span><span class="fu">::</span><span class="fu"><a href="https://opensource.nibr.com/RBesT/reference/mixnorm.html" class="external-link">mixnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">40</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        <span class="fu">RBesT</span><span class="fu">::</span><span class="fu"><a href="https://opensource.nibr.com/RBesT/reference/mixnorm.html" class="external-link">mixnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">43</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bayesGroupOC</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<p><strong>Operating-characteristics for comparing means</strong></p>
+<p><strong>Decision rule</strong></p>
+<ul>
+<li>
+<em>Go criteria</em>: P(effect &gt; 0) &gt; 0.8, P(effect &gt; 4) &gt; 0.1</li>
+<li>
+<em>Stop criteria</em>: P(effect &lt;= 0) &gt; 0.2, P(effect &lt;= 4) &gt; 0.9</li>
+<li>
+<em>Indeterminate 1 criteria</em>: P(effect &lt;= 0) &gt; 0.2, P(effect &gt; 4) &gt; 0.1</li>
+<li>
+<em>Percentile mapping</em>: quantile</li>
+</ul>
+<p><strong>Assumptions</strong></p>
+<ul>
+<li>
+<em>Treatment groups</em>: 2</li>
+<li>
+<em>Standard deviation</em>: 6.0000, 8.0000</li>
+<li>Prior distribution: normMix: 1, 40, 3 / normMix: 1, 43, 6</li>
+<li>
+<em>Control mean</em>: 40.0000</li>
+</ul>
+<p><strong>Number of subjects (control = 25, treatment = 40)</strong></p>
+<table class="table caption-top">
+<thead><tr class="header">
+<th></th>
+<th>Alternatives</th>
+<th>Go</th>
+<th>Indeterminate 1</th>
+<th>Indeterminate 2</th>
+<th>Stop</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>0.13757</td>
+<td>0</td>
+<td>0.07433</td>
+<td>0.78809</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2.0000</td>
+<td>0.54418</td>
+<td>0</td>
+<td>0.11214</td>
+<td>0.34368</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>4.0000</td>
+<td>0.90545</td>
+<td>0</td>
+<td>0.04027</td>
+<td>0.05428</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>6.0000</td>
+<td>0.99406</td>
+<td>0</td>
+<td>0.00344</td>
+<td>0.00250</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>These single-component normal priors permit analytic conjugate calculations. Normal mixture priors with several components are also supported; those OCs use numerical RBesT boundary searches and integration.</p>
+</section><section class="level2"><h3 id="rates-with-beta-priors">Rates with beta priors<a class="anchor" aria-label="anchor" href="#rates-with-beta-priors"></a>
+</h3>
+<p>For rates, <code>priorDist1</code> is the treatment prior and <code>priorDist2</code> the control prior, consistent with <code>pi1</code> and <code>pi2</code>. This differs from the column order of <code>numberOfSubjects</code>, which remains <strong>control, treatment</strong>.</p>
+<p>We use a harmful event with control probability 0.3, so the beneficial effect is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>=</mo><msub><mi>p</mi><mi>C</mi></msub><mo>−</mo><msub><mi>p</mi><mi>T</mi></msub></mrow><annotation encoding="application/x-tex">\theta = p_C - p_T</annotation></semantics></math> and <code>directionUpper = FALSE</code>. Both reference values and custom criteria below use this beneficial-effect scale. A target value of 0.15 means a reduction of 15 percentage points. The priors are Beta(2, 8) for treatment and Beta(3, 7) for control, with prior means 0.2 and 0.3, respectively.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bayesRateRules</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"quantile"</span>, <span class="st">"posteriorProbability"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">mapping</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span></span>
+<span>        targetValue <span class="op">=</span> <span class="fl">0.15</span>,</span>
+<span>        lowerReferenceValue <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>        lowerPercentile <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>        upperPercentile <span class="op">=</span> <span class="fl">0.9</span>,</span>
+<span>        bayesian <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        percentileMapping <span class="op">=</span> <span class="va">mapping</span></span>
+<span>    <span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bayesRateRules</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"quantile"</span>, <span class="st">"posteriorProbability"</span><span class="op">)</span></span>
+<span><span class="va">bayesRateSizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>, <span class="fl">16</span>, <span class="fl">18</span>, <span class="fl">24</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">treatmentPrior</span> <span class="op">&lt;-</span> <span class="fu">RBesT</span><span class="fu">::</span><span class="fu"><a href="https://opensource.nibr.com/RBesT/reference/mixbeta.html" class="external-link">mixbeta</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">controlPrior</span> <span class="op">&lt;-</span> <span class="fu">RBesT</span><span class="fu">::</span><span class="fu"><a href="https://opensource.nibr.com/RBesT/reference/mixbeta.html" class="external-link">mixbeta</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">bayesRateOC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">bayesRateRules</span>, <span class="kw">function</span><span class="op">(</span><span class="va">design</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
+<span>        design <span class="op">=</span> <span class="va">design</span>,</span>
+<span>        numberOfSubjects <span class="op">=</span> <span class="va">bayesRateSizes</span>,</span>
+<span>        pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.45</span>, by <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>,</span>
+<span>        pi2 <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>        directionUpper <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>        priorDist1 <span class="op">=</span> <span class="va">treatmentPrior</span>,</span>
+<span>        priorDist2 <span class="op">=</span> <span class="va">controlPrior</span></span>
+<span>    <span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>Omit <code>intervalMethod</code>: Bayesian rules evaluate posterior criteria rather than frequentist confidence intervals. The calculation evaluates the posterior decisions for all possible pairs of binomial event counts and sums their sampling probabilities. The deliberately small sample sizes keep the examples quick to execute; larger count grids can be expensive.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bayesRateComparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bayesRateOC</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">mapping</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">bayesRateOC</span><span class="op">[[</span><span class="va">mapping</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        <span class="va">category</span> <span class="op">==</span> <span class="st">"Go"</span> <span class="op">&amp;</span> <span class="va">nControl</span> <span class="op">==</span> <span class="fl">12</span><span class="op">)</span></span>
+<span>    <span class="va">data</span><span class="op">$</span><span class="va">mapping</span> <span class="op">&lt;-</span> <span class="va">mapping</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mapping"</span>, <span class="st">"nControl"</span>, <span class="st">"nTreatment"</span>, <span class="st">"pi1"</span>, <span class="st">"pi2"</span>, <span class="st">"alternative"</span>, <span class="st">"probability"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">bayesRateComparison</span>, digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<table class="table caption-top">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 12%">
+<col style="width: 14%">
+<col style="width: 6%">
+<col style="width: 5%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead><tr class="header">
+<th style="text-align: left;">mapping</th>
+<th style="text-align: right;">nControl</th>
+<th style="text-align: right;">nTreatment</th>
+<th style="text-align: right;">pi1</th>
+<th style="text-align: right;">pi2</th>
+<th style="text-align: right;">alternative</th>
+<th style="text-align: right;">probability</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">0.9025</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: right;">0.7774</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.6318</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.4853</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.3524</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.2418</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">0.1564</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.40</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">-0.10</td>
+<td style="text-align: right;">0.0950</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">quantile</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">-0.15</td>
+<td style="text-align: right;">0.0540</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">0.7646</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: right;">0.6010</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.15</td>
+<td style="text-align: right;">0.4463</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.3138</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.2090</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.1316</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">-0.05</td>
+<td style="text-align: right;">0.0781</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.40</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">-0.10</td>
+<td style="text-align: right;">0.0435</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">posteriorProbability</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">-0.15</td>
+<td style="text-align: right;">0.0226</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bayesRateOC</span><span class="op">$</span><span class="va">quantile</span>, plotCat <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>    main <span class="op">=</span> <span class="st">"Bayesian rates: quantile interpretation"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure><p><img src="rpact_quantitative_trial_design_files/figure-html/bayes-rates-plots-1.png" width="960"></p>
+<figcaption>Three-category binary OCs under both percentile interpretations; lower treatment event rates are beneficial.</figcaption></figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bayesRateOC</span><span class="op">$</span><span class="va">posteriorProbability</span>, plotCat <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>    main <span class="op">=</span> <span class="st">"Bayesian rates: posterior probability interpretation"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure><p><img src="rpact_quantitative_trial_design_files/figure-html/bayes-rates-plots-2.png" width="960"></p>
+<figcaption>Three-category binary OCs under both percentile interpretations; lower treatment event rates are beneficial.</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section class="level2"><h3 id="custom-posterior-decision-criteria">Custom posterior decision criteria<a class="anchor" aria-label="anchor" href="#custom-posterior-decision-criteria"></a>
+</h3>
+<p><code><a href="../reference/getQuantitativeDecisionThresholds.html">getQuantitativeDecisionThresholds()</a></code> combines one or more posterior criteria with logical <strong>AND</strong>. <code>lowerTail = FALSE</code> specifies <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mi>θ</mi><mo>&gt;</mo><mi>q</mi><mo>∣</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>&gt;</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">P(\theta &gt; q \mid y) &gt; p</annotation></semantics></math>; <code>TRUE</code> specifies <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mi>θ</mi><mo>≤</mo><mi>q</mi><mo>∣</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>&gt;</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">P(\theta \leq q \mid y) &gt; p</annotation></semantics></math>. A scalar direction is repeated for all criteria.</p>
+<p>The following means rule requires both a promising effect and evidence of clinical relevance for Go. Its Stop threshold is specified separately. Indeterminate 1 passes the first Go criterion and fails the second, while explicitly excluding Stop through the third condition.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">customMeanRule</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span></span>
+<span>    go <span class="op">=</span> <span class="fu"><a href="../reference/getQuantitativeDecisionThresholds.html">getQuantitativeDecisionThresholds</a></span><span class="op">(</span></span>
+<span>        quantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span>, probabilities <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.5</span><span class="op">)</span>, lowerTail <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    stop <span class="op">=</span> <span class="fu"><a href="../reference/getQuantitativeDecisionThresholds.html">getQuantitativeDecisionThresholds</a></span><span class="op">(</span></span>
+<span>        quantiles <span class="op">=</span> <span class="fl">3</span>, probabilities <span class="op">=</span> <span class="fl">0.9</span>, lowerTail <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    indeterminate1 <span class="op">=</span> <span class="fu"><a href="../reference/getQuantitativeDecisionThresholds.html">getQuantitativeDecisionThresholds</a></span><span class="op">(</span></span>
+<span>        quantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>        probabilities <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.5</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
+<span>        lowerTail <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">customMeanOC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans</a></span><span class="op">(</span></span>
+<span>    design <span class="op">=</span> <span class="va">customMeanRule</span>,</span>
+<span>    numberOfSubjects <span class="op">=</span> <span class="va">bayesMeanSizes</span>,</span>
+<span>    alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, by <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
+<span>    stDev <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>    priorDist <span class="op">=</span> <span class="va">effectPrior</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">customMeanRule</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<p><strong>Bayesian quantitative trial design (decision rule)</strong></p>
+<p>Fixed quantitative trial decision rule.</p>
+<ul>
+<li>
+<em>Go criteria</em>: P(effect &gt; 0) &gt; 0.95, P(effect &gt; 4) &gt; 0.5</li>
+<li>
+<em>Stop criteria</em>: P(effect &lt;= 3) &gt; 0.9</li>
+<li>
+<em>Indeterminate 1 criteria</em>: P(effect &gt; 0) &gt; 0.95, P(effect &lt;= 4) &gt; 0.5, P(effect &gt; 3) &gt; 0.1</li>
+<li>
+<em>Percentile mapping</em>: quantile</li>
+</ul>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">customMeanOC</span>, plotCat <span class="op">=</span> <span class="fl">4</span>, main <span class="op">=</span> <span class="st">"Bayesian means: custom posterior criteria"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="rpact_quantitative_trial_design_files/figure-html/bayes-custom-means-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Explicit criteria imply a Bayesian rule, so <code>bayesian = TRUE</code> is optional in this call. Supply all three criteria objects without reference-value or percentile arguments. The constructor requires a proof of pairwise exclusion using monotonicity of the posterior CDF. Rules that cannot be certified are rejected, even if a particular prior might make them disjoint. The labels for custom intermediate criteria reflect the supplied definitions; they need not have the same interpretation as Indeterminate 1 in a reference-value rule.</p>
+<p>The same interface works for rates. Here Go requires evidence of any reduction and a clinically relevant reduction of 15 percentage points. Stop requires more than 90% posterior probability that the reduction is at most 10 percentage points. The intermediate rule again excludes Stop.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">customRateRule</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span></span>
+<span>    go <span class="op">=</span> <span class="fu"><a href="../reference/getQuantitativeDecisionThresholds.html">getQuantitativeDecisionThresholds</a></span><span class="op">(</span></span>
+<span>        quantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.15</span><span class="op">)</span>, probabilities <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.5</span><span class="op">)</span>, lowerTail <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    stop <span class="op">=</span> <span class="fu"><a href="../reference/getQuantitativeDecisionThresholds.html">getQuantitativeDecisionThresholds</a></span><span class="op">(</span></span>
+<span>        quantiles <span class="op">=</span> <span class="fl">0.10</span>, probabilities <span class="op">=</span> <span class="fl">0.9</span>, lowerTail <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    indeterminate1 <span class="op">=</span> <span class="fu"><a href="../reference/getQuantitativeDecisionThresholds.html">getQuantitativeDecisionThresholds</a></span><span class="op">(</span></span>
+<span>        quantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.15</span>, <span class="fl">0.10</span><span class="op">)</span>,</span>
+<span>        probabilities <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.5</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
+<span>        lowerTail <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">customRateOC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
+<span>    design <span class="op">=</span> <span class="va">customRateRule</span>,</span>
+<span>    numberOfSubjects <span class="op">=</span> <span class="va">bayesRateSizes</span>,</span>
+<span>    pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.45</span>, by <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>,</span>
+<span>    pi2 <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>    directionUpper <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    priorDist1 <span class="op">=</span> <span class="va">treatmentPrior</span>,</span>
+<span>    priorDist2 <span class="op">=</span> <span class="va">controlPrior</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">customRateRule</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<p><strong>Bayesian quantitative trial design (decision rule)</strong></p>
+<p>Fixed quantitative trial decision rule.</p>
+<ul>
+<li>
+<em>Go criteria</em>: P(effect &gt; 0) &gt; 0.95, P(effect &gt; 0.15) &gt; 0.5</li>
+<li>
+<em>Stop criteria</em>: P(effect &lt;= 0.1) &gt; 0.9</li>
+<li>
+<em>Indeterminate 1 criteria</em>: P(effect &gt; 0) &gt; 0.95, P(effect &lt;= 0.15) &gt; 0.5, P(effect &gt; 0.1) &gt; 0.1</li>
+<li>
+<em>Percentile mapping</em>: quantile</li>
+</ul>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">customRateOC</span>, plotCat <span class="op">=</span> <span class="fl">4</span>, main <span class="op">=</span> <span class="st">"Bayesian rates: custom posterior criteria"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="rpact_quantitative_trial_design_files/figure-html/bayes-custom-rates-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For each custom rule, Indeterminate 2 is the complement of the three explicit categories, including exact probability-threshold ties. The stored probabilities therefore sum to one for each sample-size and effect scenario. We can inspect the range of these totals without rounding the category probabilities:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>means <span class="op">=</span> <span class="va">customMeanOC</span>, rates <span class="op">=</span> <span class="va">customRateOC</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">totals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">probability</span> <span class="op">~</span> <span class="va">nControl</span> <span class="op">+</span> <span class="va">nTreatment</span> <span class="op">+</span> <span class="va">alternative</span>,</span>
+<span>        data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>, FUN <span class="op">=</span> <span class="va">sum</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">totals</span><span class="op">$</span><span class="va">probability</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     means rates
+[1,]     1     1
+[2,]     1     1</code></pre>
+</div>
+</div>
+</section><section class="level2"><h3 id="a-significance-and-target-shortcut">A significance-and-target shortcut<a class="anchor" aria-label="anchor" href="#a-significance-and-target-shortcut"></a>
+</h3>
+<p>For the standard dual rule, <code>useSignificanceAndTarget = TRUE</code> constructs Go criteria with posterior probabilities <code>1 - alpha</code> at LRV and 0.5 at TV. This Bayesian shortcut uses <code>alpha</code> as a posterior tail probability. The frequentist shortcut uses <code>alpha / 2</code> for a two-sided significance convention; the two shortcuts do not define identical thresholds.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bayesDualRule</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span></span>
+<span>    targetValue <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    lowerReferenceValue <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>    bayesian <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    useSignificanceAndTarget <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.05</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">bayesDualRule</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<p><strong>Bayesian quantitative trial design (decision rule)</strong></p>
+<p>Fixed quantitative trial decision rule.</p>
+<ul>
+<li>
+<em>Go criteria</em>: P(effect &gt; 0) &gt; 0.95, P(effect &gt; 4) &gt; 0.5</li>
+<li>
+<em>Stop criteria</em>: P(effect &lt;= 0) &gt; 0.05, P(effect &lt;= 4) &gt; 0.5</li>
+<li>
+<em>Indeterminate 1 criteria</em>: P(effect &lt;= 0) &gt; 0.05, P(effect &gt; 4) &gt; 0.5</li>
+<li>
+<em>Percentile mapping</em>: quantile</li>
+</ul>
+</div>
+</div>
+<p>The following sections return to the frequentist <code>meansOC</code> and <code>ratesOC</code> objects. Their print, summary, and OC plot interfaces are also available for the Bayesian results above, with four detailed categories instead of six.</p>
+</section></section><section class="section level2"><h2 id="printing-summarizing-and-accessing-results">Printing, Summarizing, and Accessing Results<a class="anchor" aria-label="anchor" href="#printing-summarizing-and-accessing-results"></a>
 </h2>
 <p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> distinguishes user-defined, derived, and default parameters and displays the long-format probability table. The compact five-scenario object makes this output manageable.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ratesScenarios</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, markdown <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Parameters and output of operating-characteristics for comparing rates:
+
+User defined parameters:
+  Number of subjects [1]       : 75, 75
+  Number of subjects [2]       : 75, 150
+  Assumed treatment rate       : 0.100, 0.150, 0.175, 0.200, 0.250
+  Assumed control rate         : 0.150
+  Direction upper              : FALSE
+
+Derived from user defined parameters:
+  Alternatives                 : 0.050, 0.000, -0.025, -0.050, -0.100
+
+Default parameters:
+  Treatment groups             : 2
+  Interval method              : qtd1
+
+Output:
+          Category  Probability Number of   Number of Alternatives   Assumed      Assumed
+                                 subjects    subjects              treatment control rate
+                                (control) (treatment)                   rate
+ 1      Go (Fixed) 5.352327e-01        75          75        0.050     0.100         0.15
+ 2      Go (Fixed) 2.037757e-01        75          75        0.000     0.150         0.15
+ 3      Go (Fixed) 1.067077e-01        75          75       -0.025     0.175         0.15
+ 4      Go (Fixed) 5.023338e-02        75          75       -0.050     0.200         0.15
+ 5      Go (Fixed) 8.310520e-03        75          75       -0.100     0.250         0.15
+ 6              Go 3.132233e-01        75          75        0.050     0.100         0.15
+ 7              Go 3.043533e-01        75          75        0.000     0.150         0.15
+ 8              Go 2.267809e-01        75          75       -0.025     0.175         0.15
+ 9              Go 1.469166e-01        75          75       -0.050     0.200         0.15
+10              Go 4.383561e-02        75          75       -0.100     0.250         0.15
+11 Indeterminate 1 1.383506e-01        75          75        0.050     0.100         0.15
+12 Indeterminate 1 3.913004e-01        75          75        0.000     0.150         0.15
+13 Indeterminate 1 4.711368e-01        75          75       -0.025     0.175         0.15
+14 Indeterminate 1 4.822145e-01        75          75       -0.050     0.200         0.15
+15 Indeterminate 1 3.433772e-01        75          75       -0.100     0.250         0.15
+16 Indeterminate 2 6.447415e-08        75          75        0.050     0.100         0.15
+17 Indeterminate 2 2.235870e-09        75          75        0.000     0.150         0.15
+18 Indeterminate 2 3.442681e-10        75          75       -0.025     0.175         0.15
+19 Indeterminate 2 4.756762e-11        75          75       -0.050     0.200         0.15
+20 Indeterminate 2 6.683973e-13        75          75       -0.100     0.250         0.15
+21            Stop 1.232006e-02        75          75        0.050     0.100         0.15
+22            Stop 8.432942e-02        75          75        0.000     0.150         0.15
+23            Stop 1.509382e-01        75          75       -0.025     0.175         0.15
+24            Stop 2.224109e-01        75          75       -0.050     0.200         0.15
+25            Stop 3.065523e-01        75          75       -0.100     0.250         0.15
+26    Stop (Fixed) 8.733303e-04        75          75        0.050     0.100         0.15
+27    Stop (Fixed) 1.624114e-02        75          75        0.000     0.150         0.15
+28    Stop (Fixed) 4.443645e-02        75          75       -0.025     0.175         0.15
+29    Stop (Fixed) 9.822453e-02        75          75       -0.050     0.200         0.15
+30    Stop (Fixed) 2.979244e-01        75          75       -0.100     0.250         0.15
+31      Go (Fixed) 5.947519e-01        75         150        0.050     0.100         0.15
+32      Go (Fixed) 1.987206e-01        75         150        0.000     0.150         0.15
+33      Go (Fixed) 9.205907e-02        75         150       -0.025     0.175         0.15
+34      Go (Fixed) 3.674273e-02        75         150       -0.050     0.200         0.15
+35      Go (Fixed) 3.869971e-03        75         150       -0.100     0.250         0.15
+36              Go 3.201810e-01        75         150        0.050     0.100         0.15
+37              Go 3.720240e-01        75         150        0.000     0.150         0.15
+38              Go 2.716497e-01        75         150       -0.025     0.175         0.15
+39              Go 1.625763e-01        75         150       -0.050     0.200         0.15
+40              Go 3.558971e-02        75         150       -0.100     0.250         0.15
+41 Indeterminate 1 7.488036e-02        75         150        0.050     0.100         0.15
+42 Indeterminate 1 3.309465e-01        75         150        0.000     0.150         0.15
+43 Indeterminate 1 4.311718e-01        75         150       -0.025     0.175         0.15
+44 Indeterminate 1 4.466464e-01        75         150       -0.050     0.200         0.15
+45 Indeterminate 1 2.770091e-01        75         150       -0.100     0.250         0.15
+46 Indeterminate 2 9.126242e-09        75         150        0.050     0.100         0.15
+47 Indeterminate 2 1.591020e-11        75         150        0.000     0.150         0.15
+48 Indeterminate 2 4.410220e-13        75         150       -0.025     0.175         0.15
+49 Indeterminate 2 9.714064e-15        75         150       -0.050     0.200         0.15
+50 Indeterminate 2 2.480298e-18        75         150       -0.100     0.250         0.15
+51            Stop 9.867110e-03        75         150        0.050     0.100         0.15
+52            Stop 8.685674e-02        75         150        0.000     0.150         0.15
+53            Stop 1.672263e-01        75         150       -0.025     0.175         0.15
+54            Stop 2.579502e-01        75         150       -0.050     0.200         0.15
+55            Stop 3.414298e-01        75         150       -0.100     0.250         0.15
+56    Stop (Fixed) 3.196266e-04        75         150        0.050     0.100         0.15
+57    Stop (Fixed) 1.145223e-02        75         150        0.000     0.150         0.15
+58    Stop (Fixed) 3.789310e-02        75         150       -0.025     0.175         0.15
+59    Stop (Fixed) 9.608442e-02        75         150       -0.050     0.200         0.15
+60    Stop (Fixed) 3.421014e-01        75         150       -0.100     0.250         0.15</code></pre>
+</div>
+</div>
+<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> gives the rule and assumptions, followed by one table per sample-size scenario, with one row per input effect and six probability columns. Rates tables include treatment probability and beneficial risk difference.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">meansScenarios</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans</a></span><span class="op">(</span></span>
+<span>    design <span class="op">=</span> <span class="va">meansRule</span>,</span>
+<span>    numberOfSubjects <span class="op">=</span> <span class="va">demoSizes</span>,</span>
+<span>    alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2.9</span>, <span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span>,</span>
+<span>    stDev <span class="op">=</span> <span class="fl">6</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">meansScenarios</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
+<p><strong>Operating-characteristics for comparing means</strong></p>
+<p><strong>Decision rule</strong></p>
+<ul>
+<li>
+<em>Target value</em>: 4.0000</li>
+<li>
+<em>Lower reference value</em>: 2.9000</li>
+<li>
+<em>Upper percentile</em>: 0.80000</li>
+<li>
+<em>Lower percentile</em>: 0.50000</li>
+</ul>
+<p><strong>Assumptions</strong></p>
+<ul>
+<li>
+<em>Normal approximation</em>: TRUE</li>
+<li>
+<em>Treatment groups</em>: 2</li>
+<li>
+<em>Standard deviation</em>: 6.0000</li>
+</ul>
+<p><strong>Number of subjects (control = 75, treatment = 75)</strong></p>
+<table class="table caption-top">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead><tr class="header">
+<th></th>
+<th>Alternatives</th>
+<th>Go (Fixed)</th>
+<th>Go</th>
+<th>Indeterminate 1</th>
+<th>Indeterminate 2</th>
+<th>Stop</th>
+<th>Stop (Fixed)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>0.00002</td>
+<td>0.00057</td>
+<td>0</td>
+<td>0.00094</td>
+<td>0.01554</td>
+<td>0.98292</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2.9000</td>
+<td>0.13079</td>
+<td>0.25855</td>
+<td>0</td>
+<td>0.11067</td>
+<td>0.30000</td>
+<td>0.20000</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>4.0000</td>
+<td>0.50000</td>
+<td>0.30000</td>
+<td>0</td>
+<td>0.06921</td>
+<td>0.10604</td>
+<td>0.02475</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>6.0000</td>
+<td>0.97939</td>
+<td>0.01864</td>
+<td>0</td>
+<td>0.00119</td>
+<td>0.00075</td>
+<td>0.00003</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Number of subjects (control = 75, treatment = 150)</strong></p>
+<table class="table caption-top">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead><tr class="header">
+<th></th>
+<th>Alternatives</th>
+<th>Go (Fixed)</th>
+<th>Go</th>
+<th>Indeterminate 1</th>
+<th>Indeterminate 2</th>
+<th>Stop</th>
+<th>Stop (Fixed)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>&lt;0.00001</td>
+<td>0.00005</td>
+<td>0</td>
+<td>0.00026</td>
+<td>0.00468</td>
+<td>0.99500</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2.9000</td>
+<td>0.09743</td>
+<td>0.22722</td>
+<td>0</td>
+<td>0.17535</td>
+<td>0.30000</td>
+<td>0.20000</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>4.0000</td>
+<td>0.50000</td>
+<td>0.30000</td>
+<td>0</td>
+<td>0.10257</td>
+<td>0.08117</td>
+<td>0.01626</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>6.0000</td>
+<td>0.99079</td>
+<td>0.00852</td>
+<td>0</td>
+<td>0.00056</td>
+<td>0.00013</td>
+<td>&lt;0.00001</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><code>output</code> selects <code>"all"</code> (default), <code>"title"</code>, <code>"overview"</code>, or <code>"body"</code>. The OC overview contains the rule and assumptions; its body contains the tables. For a decision rule, the body contains its four parameters. <code>digits</code> controls display precision, following the summary settings <code>rpact.summary.digits</code> and <code>rpact.summary.digits.probs</code>, without changing stored probabilities.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, output <span class="op">=</span> <span class="st">"title"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<p><strong>Operating-characteristics for comparing rates</strong></p>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, output <span class="op">=</span> <span class="st">"overview"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<p><strong>Decision rule</strong></p>
+<ul>
+<li>
+<em>Target value</em>: 0</li>
+<li>
+<em>Lower reference value</em>: -0.050</li>
+<li>
+<em>Upper percentile</em>: 0.9000</li>
+<li>
+<em>Lower percentile</em>: 0.2000</li>
+</ul>
+<p><strong>Assumptions</strong></p>
+<ul>
+<li>
+<em>Treatment groups</em>: 2</li>
+<li>
+<em>Assumed control rate</em>: 0.1500</li>
+<li>
+<em>Direction upper</em>: FALSE</li>
+<li>
+<em>Interval method</em>: qtd1</li>
+</ul>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">binaryRule</span>, output <span class="op">=</span> <span class="st">"body"</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<ul>
+<li>
+<em>Target value</em>: 0</li>
+<li>
+<em>Lower reference value</em>: -0.0500</li>
+<li>
+<em>Upper percentile</em>: 0.90000</li>
+<li>
+<em>Lower percentile</em>: 0.20000</li>
+</ul>
+</div>
+</div>
+<p>Both the original object and its summary support Markdown for reports. The second expression embeds the summary tables directly into the document.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, markdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">markdownSummary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">markdownText</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">markdownSummary</span>, markdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">markdownText</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Parameters and output of operating-characteristics for comparing rates</strong></p>
 <p><strong>User defined parameters</strong></p>
 <ul>
@@ -1959,229 +3011,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> gives the rule and assumptions, followed by one table per sample-size scenario, with one row per input effect and six probability columns. Rates tables include treatment probability and beneficial risk difference.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">meansScenarios</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans</a></span><span class="op">(</span></span>
-<span>    design <span class="op">=</span> <span class="va">meansRule</span>,</span>
-<span>    numberOfSubjects <span class="op">=</span> <span class="va">demoSizes</span>,</span>
-<span>    alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2.9</span>, <span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span>,</span>
-<span>    stDev <span class="op">=</span> <span class="fl">6</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">meansScenarios</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
-<p><strong>Operating-characteristics for comparing means</strong></p>
-<p><strong>Decision rule</strong></p>
-<ul>
-<li>
-<em>Target value</em>: 4.0000</li>
-<li>
-<em>Lower reference value</em>: 2.9000</li>
-<li>
-<em>Upper percentile</em>: 0.80000</li>
-<li>
-<em>Lower percentile</em>: 0.50000</li>
-</ul>
-<p><strong>Assumptions</strong></p>
-<ul>
-<li>
-<em>Normal approximation</em>: TRUE</li>
-<li>
-<em>Treatment groups</em>: 2</li>
-<li>
-<em>Standard deviation</em>: 6.0000</li>
-</ul>
-<p><strong>Number of subjects (control = 75, treatment = 75)</strong></p>
-<table class="table caption-top">
-<colgroup>
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-</colgroup>
-<thead><tr class="header">
-<th></th>
-<th>Alternatives</th>
-<th>Go (Fixed)</th>
-<th>Go</th>
-<th>Indeterminate 1</th>
-<th>Indeterminate 2</th>
-<th>Stop</th>
-<th>Stop (Fixed)</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td>0</td>
-<td>0.00002</td>
-<td>0.00057</td>
-<td>0</td>
-<td>0.00094</td>
-<td>0.01554</td>
-<td>0.98292</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2.9000</td>
-<td>0.13079</td>
-<td>0.25855</td>
-<td>0</td>
-<td>0.11067</td>
-<td>0.30000</td>
-<td>0.20000</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td>4.0000</td>
-<td>0.50000</td>
-<td>0.30000</td>
-<td>0</td>
-<td>0.06921</td>
-<td>0.10604</td>
-<td>0.02475</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>6.0000</td>
-<td>0.97939</td>
-<td>0.01864</td>
-<td>0</td>
-<td>0.00119</td>
-<td>0.00075</td>
-<td>0.00003</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Number of subjects (control = 75, treatment = 150)</strong></p>
-<table class="table caption-top">
-<colgroup>
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-</colgroup>
-<thead><tr class="header">
-<th></th>
-<th>Alternatives</th>
-<th>Go (Fixed)</th>
-<th>Go</th>
-<th>Indeterminate 1</th>
-<th>Indeterminate 2</th>
-<th>Stop</th>
-<th>Stop (Fixed)</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td>0</td>
-<td>&lt;0.00001</td>
-<td>0.00005</td>
-<td>0</td>
-<td>0.00026</td>
-<td>0.00468</td>
-<td>0.99500</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2.9000</td>
-<td>0.09743</td>
-<td>0.22722</td>
-<td>0</td>
-<td>0.17535</td>
-<td>0.30000</td>
-<td>0.20000</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td>4.0000</td>
-<td>0.50000</td>
-<td>0.30000</td>
-<td>0</td>
-<td>0.10257</td>
-<td>0.08117</td>
-<td>0.01626</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>6.0000</td>
-<td>0.99079</td>
-<td>0.00852</td>
-<td>0</td>
-<td>0.00056</td>
-<td>0.00013</td>
-<td>&lt;0.00001</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p><code>output</code> selects <code>"all"</code> (default), <code>"title"</code>, <code>"overview"</code>, or <code>"body"</code>. The OC overview contains the rule and assumptions; its body contains the tables. For a decision rule, the body contains its four parameters. <code>digits</code> controls display precision, following the summary settings <code>rpact.summary.digits</code> and <code>rpact.summary.digits.probs</code>, without changing stored probabilities.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, output <span class="op">=</span> <span class="st">"title"</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
-<p><strong>Operating-characteristics for comparing rates</strong></p>
-</div>
-<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, output <span class="op">=</span> <span class="st">"overview"</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
-<p><strong>Decision rule</strong></p>
-<ul>
-<li>
-<em>Target value</em>: 0</li>
-<li>
-<em>Lower reference value</em>: -0.050</li>
-<li>
-<em>Upper percentile</em>: 0.9000</li>
-<li>
-<em>Lower percentile</em>: 0.2000</li>
-</ul>
-<p><strong>Assumptions</strong></p>
-<ul>
-<li>
-<em>Treatment groups</em>: 2</li>
-<li>
-<em>Assumed control rate</em>: 0.1500</li>
-<li>
-<em>Direction upper</em>: FALSE</li>
-<li>
-<em>Interval method</em>: qtd1</li>
-</ul>
-</div>
-<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">binaryRule</span>, output <span class="op">=</span> <span class="st">"body"</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
-<ul>
-<li>
-<em>Target value</em>: 0</li>
-<li>
-<em>Lower reference value</em>: -0.0500</li>
-<li>
-<em>Upper percentile</em>: 0.90000</li>
-<li>
-<em>Lower percentile</em>: 0.20000</li>
-</ul>
-</div>
-</div>
-<p>Both the original object and its summary support Markdown for reports. The second expression embeds the summary tables directly into the document.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ratesScenarios</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
+<hr>
 <p><strong>Operating-characteristics for comparing rates</strong></p>
 <p><strong>Decision rule</strong></p>
 <ul>
@@ -2369,11 +3199,9 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </tr>
 </tbody>
 </table>
-</div>
-</div>
 <p>The <code>probabilities</code> field is a data frame of unrounded values. Columns include <code>category</code>, <code>probability</code>, <code>nControl</code>, <code>nTreatment</code>, and <code>alternative</code>, plus <code>stDev</code> for Means or <code>pi1</code> and <code>pi2</code> for Rates. Each scenario contains six category blocks, with effects retained in input order within each block. Repeated rates and sample-size scenarios are retained; use all relevant identifiers when filtering. A summary stores a deep copy, so later changes to the original object do not change an existing summary.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ratesScenarios</span><span class="op">$</span><span class="va">probabilities</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    category probability nControl nTreatment alternative   pi1  pi2
@@ -2384,7 +3212,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 5 Go (Fixed)  0.00831052       75         75      -0.100 0.250 0.15
 6         Go  0.31322328       75         75       0.050 0.100 0.15</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">meansScenarios</span><span class="op">$</span><span class="va">numberOfSubjects</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     control treatment
@@ -2396,7 +3224,7 @@ U = \widehat\theta + \Phi^{-1}(p_U)s.
 </h2>
 <p>There are three rule plot types. <code><a href="../reference/getAvailablePlotTypes.html">getAvailablePlotTypes()</a></code> supplies numbers or captions. A matching caption can replace the numeric <code>type</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getAvailablePlotTypes.html">getAvailablePlotTypes</a></span><span class="op">(</span><span class="va">binaryRule</span>, output <span class="op">=</span> <span class="st">"numcap"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$`1`
@@ -2413,7 +3241,7 @@ $`3`
 </h3>
 <p>Without supplied data, type 1 creates illustrative intervals with varying standard errors to show all six categories. They are interval configurations rather than six observed results or a common-sample-size calculation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">binaryRule</span>, type <span class="op">=</span> <span class="fl">1</span>, plotCat <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2424,7 +3252,7 @@ $`3`
 </div>
 <p>Supply <code>estimates</code> and <code>standardErrors</code> together to classify normally approximated intervals. <code>labels</code> supplies one character label per estimate. This example uses the continuous-endpoint rule’s reference values and percentiles.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>    <span class="va">meansRule</span>,</span>
 <span>    type <span class="op">=</span> <span class="st">"Decision rule intervals"</span>,</span>
@@ -2444,7 +3272,7 @@ $`3`
 </h3>
 <p>This plot shows decisions against the <strong>observed effect estimate</strong> and <strong>standard error</strong>, rather than the true effects used in OC plots. <code>effectRange</code> and <code>standardErrorRange</code> are increasing pairs. <code>gridSize</code> is the number of evaluated values on each axis (2 to 1000, default 200). Optional estimates and standard errors overlay points.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>    <span class="va">meansRule</span>,</span>
 <span>    type <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -2497,7 +3325,7 @@ $`3`
 <p>QTD1 requires <code>lowerPercentile &lt;= 0.5 &lt;= upperPercentile</code>. The other methods allow ordered percentiles anywhere in <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math>, including both on the same side of 0.5. They use the lower-tail construction below 0.5, the upper-tail construction above 0.5, and the observed difference at 0.5. See the methodological references below.</p>
 <p>This comparison uses additional illustrative sample sizes of 25 per group to keep calculation of all four maps economical.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">intervalMethods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"qtd1"</span>, <span class="st">"farringtonManning"</span>, <span class="st">"miettinenNurminen"</span>, <span class="st">"newcombe"</span><span class="op">)</span></span>
 <span><span class="va">methodPlots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">intervalMethods</span>, <span class="kw">function</span><span class="op">(</span><span class="va">method</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">binaryRule</span>, type <span class="op">=</span> <span class="fl">3</span>, numberOfSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>,</span>
@@ -2519,7 +3347,7 @@ $`3`
 </div>
 <p>Maps contain at most one million cells, including zero-event rows and columns. Interval methods can classify boundary count pairs differently and change the OC probabilities. To use another method throughout an OC analysis, specify it in the constructor:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scoreRates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">binaryRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
@@ -2614,7 +3442,7 @@ $`3`
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">higherIsBetter</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="fu"><a href="../reference/getDesignQuantitative.html">getDesignQuantitative</a></span><span class="op">(</span>targetValue <span class="op">=</span> <span class="fl">0.10</span>, lowerReferenceValue <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
@@ -2715,7 +3543,7 @@ $`3`
 </h2>
 <p>All six OC plot types support both endpoints. Their numbers refer to the OC object rather than the decision-rule object.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getAvailablePlotTypes.html">getAvailablePlotTypes</a></span><span class="op">(</span><span class="va">meansOC</span>, output <span class="op">=</span> <span class="st">"numcap"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$`1`
@@ -2736,7 +3564,7 @@ $`5`
 $`6`
 [1] "Desired and observed decisions"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getAvailablePlotTypes.html">getAvailablePlotTypes</a></span><span class="op">(</span><span class="va">ratesOC</span>, output <span class="op">=</span> <span class="st">"caption"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Operating characteristics"             "Stacked decision probabilities"
@@ -2802,7 +3630,7 @@ $`6`
 </h3>
 <p>The binary plot compares the two sample-size scenarios, with treatment-rate range 0.10–0.25 and reference rates 0.15 and 0.20 corresponding to TV and LRV.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesOC</span>, type <span class="op">=</span> <span class="fl">1</span>, plotCat <span class="op">=</span> <span class="fl">3</span>, plotPointsEnabled <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    main <span class="op">=</span> <span class="st">"Kestrel: binary operating characteristics"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -2814,7 +3642,7 @@ $`6`
 </div>
 <p>Rates defaults to <code>xAxis = "treatmentRate"</code>; <code>"effect"</code> shows beneficial risk difference. Reference lines are transformed separately for each control-rate panel. Unattainable reference rates outside <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math> are omitted.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesOC</span>, type <span class="op">=</span> <span class="fl">1</span>, xAxis <span class="op">=</span> <span class="st">"effect"</span>, plotCat <span class="op">=</span> <span class="fl">6</span>,</span>
 <span>    plotPointsEnabled <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -2826,7 +3654,7 @@ $`6`
 </div>
 <p>Means uses the true mean difference. By default <code>plotPointsEnabled = NA</code> adds points for grids of at most ten distinct effects. <code>TRUE</code> and <code>FALSE</code> override this behavior for OC curves.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">meansOC</span>, type <span class="op">=</span> <span class="fl">1</span>, alternatives <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2.9</span>, <span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span>, plotPointsEnabled <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2839,7 +3667,7 @@ $`6`
 </h3>
 <p>Stacked plots show the composition of probabilities for each sample-size scenario. Areas interpolate linearly between supplied grid points without calculating additional effects; use a sufficiently dense grid for a smooth display.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">meansOC</span>, type <span class="op">=</span> <span class="fl">2</span>, plotCat <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2847,7 +3675,7 @@ $`6`
 <figcaption>Stacked probabilities for continuous and binary endpoints.</figcaption></figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesOC</span>, type <span class="op">=</span> <span class="st">"Stacked decision probabilities"</span>, plotCat <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2860,7 +3688,7 @@ $`6`
 </h3>
 <p>This plot needs multiple total sample sizes. Allocation ratios are separated so that different treatment-to-control allocations are not joined into one curve. The Kestrel binary example has only one total N for each allocation ratio. For meaningful sample-size curves we use the additional <code>planningSizes</code> grid.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ratesPlanning</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsRates.html">getOperatingCharacteristicsRates</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">binaryRule</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="va">planningSizes</span>,</span>
@@ -2875,7 +3703,7 @@ $`6`
 <figcaption>Decision probabilities by sample size with separate allocation ratios.</figcaption></figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesPlanning</span>, type <span class="op">=</span> <span class="fl">3</span>, pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2888,7 +3716,7 @@ $`6`
 </h3>
 <p>This plot compares actual grid points as discrete scenarios without interpolation. Types 3 and 4 always show points, independently of <code>plotPointsEnabled</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">meansOC</span>, type <span class="op">=</span> <span class="fl">4</span>, alternatives <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2.9</span>, <span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2896,7 +3724,7 @@ $`6`
 <figcaption>Selected mean differences and the five Kestrel treatment-rate scenarios.</figcaption></figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, type <span class="op">=</span> <span class="fl">4</span>, pi1 <span class="op">=</span> <span class="va">scenarioRates</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2912,7 +3740,7 @@ $`6`
 </h4>
 <p><code>sensitivity = "sampleSize"</code> is the default. It varies effect or treatment rate and total sample size, separately by allocation ratio and endpoint assumption. <code>contourLevels</code> optionally supplies probabilities in <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math> for contours.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">meansOC</span>, type <span class="op">=</span> <span class="fl">5</span>, sensitivity <span class="op">=</span> <span class="st">"sampleSize"</span>, category <span class="op">=</span> <span class="st">"Go"</span>,</span>
 <span>    contourLevels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -2921,7 +3749,7 @@ $`6`
 <figcaption>Sensitivity to effect and total sample size, using added planning scenarios.</figcaption></figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesPlanning</span>, type <span class="op">=</span> <span class="fl">5</span>, sensitivity <span class="op">=</span> <span class="st">"sampleSize"</span>, category <span class="op">=</span> <span class="st">"Indeterminate"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2934,7 +3762,7 @@ $`6`
 </h4>
 <p>A positive <code>stDev</code> vector recalculates OC probabilities using the normal calculation. <code>sensitivity = "stDev"</code> places these values on the vertical axis. <code>stDev</code> can also create assumption panels for the other OC types. Recalculation for plotting does not replace the stored probabilities.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">meansOC</span>, type <span class="op">=</span> <span class="fl">5</span>, sensitivity <span class="op">=</span> <span class="st">"stDev"</span>, stDev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">8</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>    category <span class="op">=</span> <span class="st">"Go"</span>, contourLevels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -2948,7 +3776,7 @@ $`6`
 </h4>
 <p><code>sensitivity = "pi2"</code> and a <code>pi2</code> vector recalculate probabilities for different true control rates using the stored interval method and direction. This map always uses treatment and control rates as axes. Treatment rates stay fixed. <code>stDev</code> applies only to Means and <code>pi2</code> only to Rates.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesOC</span>, type <span class="op">=</span> <span class="fl">5</span>, sensitivity <span class="op">=</span> <span class="st">"pi2"</span>, pi2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.10</span>, <span class="fl">0.20</span>, by <span class="op">=</span> <span class="fl">0.025</span><span class="op">)</span>,</span>
 <span>    category <span class="op">=</span> <span class="st">"Go"</span>, contourLevels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -2962,7 +3790,7 @@ $`6`
 </h4>
 <p>Allocation maps require one selected effect and a complete grid of control and treatment sample sizes. The additional grid below varies both arms independently.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">allocationSizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">75</span><span class="op">)</span>, treatment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">75</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">meansAllocation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getOperatingCharacteristicsMeans.html">getOperatingCharacteristicsMeans</a></span><span class="op">(</span></span>
 <span>    design <span class="op">=</span> <span class="va">meansRule</span>,</span>
@@ -2984,7 +3812,7 @@ $`6`
 <figcaption>Allocation sensitivity at mean difference 4 and equal binary event rates 0.15.</figcaption></figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesAllocation</span>, type <span class="op">=</span> <span class="fl">5</span>, sensitivity <span class="op">=</span> <span class="st">"allocation"</span>, category <span class="op">=</span> <span class="st">"Stop"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2998,7 +3826,7 @@ $`6`
 <p>This display needs an explicit distribution over selected true-effect scenarios. Supply one nonnegative entry per effect through <code>weights</code>, summing to one, and one desired decision (<code>"Go"</code>, <code>"Indeterminate"</code>, or <code>"Stop"</code>) through <code>desiredDecisions</code>. Both follow selection order. These are additional decision-analysis assumptions, not estimates supplied by the trial.</p>
 <p>Each cell is a joint probability: conditional decision probabilities multiplied by scenario weights and summed over scenarios. Matching desired and observed decisions count as correct under this definition. Indeterminate remains separate and is not treated as Stop. These are neither conventional type-I/type-II error rates nor posterior probabilities. Each panel reports its probability of a correct decision under the supplied definition.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">meansPerformance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>    <span class="va">meansOC</span>,</span>
 <span>    type <span class="op">=</span> <span class="fl">6</span>,</span>
@@ -3013,7 +3841,7 @@ $`6`
 <figcaption>Desired and observed decisions under explicitly chosen effect distributions.</figcaption></figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ratesPerformance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>    <span class="va">ratesScenarios</span>,</span>
 <span>    type <span class="op">=</span> <span class="fl">6</span>,</span>
@@ -3031,7 +3859,7 @@ $`6`
 </div>
 <p>The data include <code>desiredDecision</code>, <code>observedDecision</code>, and <code>correct</code>. The <code>qtdEffectDistribution</code> attribute records the exact effect distribution and desired decisions. For Rates it identifies scenarios by <code>pi1</code>. If several <code>pi2</code> values are supplied, the same distribution over treatment rates and desired decisions applies separately to each control-rate panel.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">ratesPerformance</span>, <span class="st">"qtdEffectDistribution"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    pi1 weight desiredDecision
@@ -3041,7 +3869,7 @@ $`6`
 4 0.200    0.2            Stop
 5 0.250    0.2            Stop</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ratesPerformance</span><span class="op">$</span><span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"desiredDecision"</span>, <span class="st">"observedDecision"</span>, <span class="st">"probability"</span>, <span class="st">"correct"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  desiredDecision observedDecision probability correct
@@ -3057,7 +3885,7 @@ $`6`
 </h2>
 <p>All QTD plots accept <code>main</code>, <code>xlab</code>, <code>ylab</code>, <code>palette</code>, <code>legendPosition</code>, <code>plotSettings</code>, and <code>showSource</code>. With <code>palette = NULL</code>, decision categories use semantic colors and sample-size curves use the rpact hue palette. Sensitivity and performance use a continuous probability scale. The default legend position is <code>"auto"</code>; standard positions such as <code>"bottom"</code> and <code>"none"</code> are also supported.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb79"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">kestrelPlot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>    <span class="va">ratesOC</span>,</span>
 <span>    type <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -3086,7 +3914,7 @@ $`6`
 </div>
 <p>Results are ggplot objects supporting additional ggplot2 layers and themes. <code>data</code> contains the unrounded plot data. <code>showSource = TRUE</code> also prints them; a compact scenario object keeps this output manageable.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sourcePlot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, type <span class="op">=</span> <span class="fl">4</span>, showSource <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Source data of the QTD plot:
@@ -3153,7 +3981,7 @@ $`6`
 29 2: C: 75 / T: 150           225               2        0.25
 30 2: C: 75 / T: 150           225               2        0.25</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb82"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sourcePlot</span><span class="op">$</span><span class="va">data</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       category scenario effectIndex nControl nTreatment alternative  pi2 pi1 probability     sampleSize
@@ -3172,9 +4000,9 @@ $`6`
 6 2: C: 75 / T: 150           225               2         0.1</code></pre>
 </div>
 </div>
-<p>Plots can be saved as PNG files, and full probability data and compact summary tables can be exported as CSV files. The following code illustrates this workflow with explicit filenames and table contents. This optional export code is not executed when rendering the vignette.</p>
+<p>The original QTD interface offered PNG plots, a full-data CSV, and a compact summary CSV. In R, plots can be saved as PNG files, and full probability data and compact summary tables can be exported as CSV files. The following code illustrates this workflow with explicit filenames and table contents. This optional export code is not executed when rendering the vignette.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb84"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"kestrel_plot.png"</span>, <span class="va">kestrelPlot</span>, width <span class="op">=</span> <span class="fl">10</span>, height <span class="op">=</span> <span class="fl">6</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">ratesOC</span><span class="op">$</span><span class="va">probabilities</span>, <span class="st">"kestrel_data.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">scenarioTable</span>, <span class="st">"kestrel_table.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -3187,7 +4015,7 @@ $`6`
 <li>Miettinen, O. and Nurminen, M. (1985). Comparative analysis of two rates. <em>Statistics in Medicine</em>, 4, 213–226. <a href="https://doi.org/10.1002/sim.4780040211" class="external-link">doi:10.1002/sim.4780040211</a>.</li>
 <li>Newcombe, R. G. (1998). Interval estimation for the difference between independent proportions: comparison of eleven methods. <em>Statistics in Medicine</em>, 17, 873–890. <a href="https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8%3C873::AID-SIM779%3E3.0.CO;2-I" class="external-link">Publication link</a>.</li>
 <li>Armitage, P. (1989). Inference and decision in clinical trials. <em>Journal of Clinical Epidemiology</em>, 42, 293–299.</li>
-<li>Spiegelhalter, D. J., Abrams, K. R., and Myles, J. P. (2004). <em>Bayesian Approaches to Clinical Trials and Health-Care Evaluation</em>. Wiley, Section 6.3. Background reading on Bayesian decision making; the implemented calculations above use frequentist interval constructions.</li>
+<li>Spiegelhalter, D. J., Abrams, K. R., and Myles, J. P. (2004). <em>Bayesian Approaches to Clinical Trials and Health-Care Evaluation</em>. Wiley, Section 6.3. Background reading on Bayesian decision making. The Bayesian examples above use posterior probability criteria implemented with RBesT.</li>
 </ul></section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);

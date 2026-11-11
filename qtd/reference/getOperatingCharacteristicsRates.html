@@ -53,7 +53,9 @@ exact summation over two independent binomial event counts.</p>
 <span>  <span class="va">pi1</span>,</span>
 <span>  <span class="va">pi2</span>,</span>
 <span>  directionUpper <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  intervalMethod <span class="op">=</span> <span class="st">"qtd1"</span></span>
+<span>  intervalMethod <span class="op">=</span> <span class="st">"qtd1"</span>,</span>
+<span>  priorDist1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  priorDist2 <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -94,6 +96,11 @@ If TRUE (default), the effect is <code>pi1 - pi2</code>; if FALSE, it is <code>p
 <code>"miettinenNurminen"</code>, or <code>"newcombe"</code>, as described in
 <code><a href="plot.TrialDesignPlanQuantitative.html">plot.TrialDesignPlanQuantitative()</a></code>.</p></dd>
 
+
+<dt id="arg-priordist-priordist-">priorDist1, priorDist2<a class="anchor" aria-label="anchor" href="#arg-priordist-priordist-"></a></dt>
+<dd><p>Bayesian RBesT betaMix priors for treatment and
+control, respectively. NULL selects mixbeta(c(1, 1/3, 1/3)) for each arm.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -104,7 +111,16 @@ Markdown printing, summaries and the QTD plot families. Its <code>probabilities<
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Decision boundaries use the same interval calculations and equality rules
+    <p>Bayesian rules use RBesT postmix and decision2S on the complete binomial
+count grid, followed by exact binomial probability summation. This avoids
+truncation by eps and mixed-tail boundary sentinel edge cases observed with
+oc2S in RBesT 1.12.0. Strict posterior comparisons follow RBesT. The four
+Bayesian categories are Go, Indeterminate 1, Indeterminate 2 and Stop;
+exact probability-threshold ties belong to Indeterminate 2. Omit intervalMethod
+for Bayesian rules. Priors are stored for reproducible output and recalculation.
+Only identity-link beta mixtures are supported. The count-grid limit applies
+to Bayesian rules as well; evaluation of large grids can be expensive.</p>
+<p>Decision boundaries use the same interval calculations and equality rules
 as the binary decision map. The QTD1 method reproduces the original program,
 including Wilson limits rounded to four decimal places in its variance
 construction, and requires <code>lowerPercentile &lt;= 0.5 &lt;= upperPercentile</code>.
@@ -137,18 +153,18 @@ Counts and probabilities are computed without requiring ggplot2 or Java.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters and output of operating-characteristics for comparing rates:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Number of subjects [1] : 75, 75 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Number of subjects [2] : 75, 150 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed treatment rate : 0.100, 0.150, 0.175, 0.200, 0.250 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed control rate   : 0.150 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Direction upper        : FALSE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Number of subjects [1]       : 75, 75 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Number of subjects [2]       : 75, 150 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed treatment rate       : 0.100, 0.150, 0.175, 0.200, 0.250 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed control rate         : 0.150 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Direction upper              : FALSE </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Derived from user defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Alternatives           : 0.050, 0.000, -0.025, -0.050, -0.100 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Alternatives                 : 0.050, 0.000, -0.025, -0.050, -0.100 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Treatment groups       : 2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Interval method        : qtd1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Treatment groups             : 2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Interval method              : qtd1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Output:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Category  Probability Number of   Number of Alternatives   Assumed</span>

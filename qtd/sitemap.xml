@@ -51,6 +51,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/PiecewiseSurvivalTimeMultiGroup.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/PlotSettings.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/PowerAndAverageSampleNumberResult.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/QuantitativeDecisionThresholds.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/SimulationResults.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/SimulationResultsCountData.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/SimulationResultsEnrichmentMeans.html</loc></url>
@@ -86,11 +87,14 @@
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesignPlanCountData.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesignPlanMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesignPlanQuantitative.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/TrialDesignPlanQuantitativeBase.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/TrialDesignPlanQuantitativeBayes.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesignPlanRates.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesignPlanSurvival.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesignSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/add.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.AnalysisResults.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.OperatingCharcteristics.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.ParameterSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.PiecewiseSurvivalTimeMultiGroup.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.PowerAndAverageSampleNumberResult.html</loc></url>
@@ -173,6 +177,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/getPowerMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/getPowerRates.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/getPowerSurvival.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/getRawData.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/getRepeatedConfidenceIntervals.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/getRepeatedPValues.html</loc></url>
@@ -374,6 +379,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/plot.TrialDesign.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/plot.TrialDesignPlan.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/plot.TrialDesignPlanQuantitative.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/plot.TrialDesignPlanQuantitativeBayes.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/plot.TrialDesignSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/plot.TrialDesignSummaries.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/print.Dataset.html</loc></url>
