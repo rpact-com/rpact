@@ -234,8 +234,8 @@ plot.TrialDesignPlanQuantitative <- function(x, ..., type = 1L, estimates = NULL
 #' Plots decision probabilities, sample-size comparisons, sensitivity surfaces
 #' and explicitly weighted decision-performance metrics for quantitative trials.
 #'
-#' @param x Operating characteristics from [getOperatingCharcteristicsMeans()]
-#'   or [getOperatingCharcteristicsRates()].
+#' @param x Operating characteristics from [getOperatingCharacteristicsMeans()]
+#'   or [getOperatingCharacteristicsRates()].
 #' @param plotCat Number of decision categories, either 3 (default) or 6.
 #' @param main Optional title. The original positional `plotCat` and `main`
 #'   arguments are retained for compatibility.
@@ -312,7 +312,7 @@ plot.TrialDesignPlanQuantitative <- function(x, ..., type = 1L, estimates = NULL
 #'
 #' @examples
 #' rule <- getDesignQuantitative(targetValue = 1, lowerReferenceValue = 0)
-#' oc <- getOperatingCharcteristicsMeans(rule,
+#' oc <- getOperatingCharacteristicsMeans(rule,
 #'     numberOfSubjects = matrix(c(50, 50, 50, 100, 100, 100), ncol = 2, byrow = TRUE),
 #'     alternative = seq(0, 1.5, by = 0.1))
 #' plot(oc)
@@ -323,7 +323,7 @@ plot.TrialDesignPlanQuantitative <- function(x, ..., type = 1L, estimates = NULL
 #' plot(oc, type = 6, alternatives = c(0, 1, 1.5),
 #'     weights = c(0.3, 0.3, 0.4), desiredDecisions = c("Stop", "Go", "Go"))
 #' binaryRule <- getDesignQuantitative(targetValue = 0, lowerReferenceValue = -0.05)
-#' rates <- getOperatingCharcteristicsRates(binaryRule,
+#' rates <- getOperatingCharacteristicsRates(binaryRule,
 #'     numberOfSubjects = matrix(c(25, 25, 50, 50, 75, 75), ncol = 2, byrow = TRUE),
 #'     pi1 = seq(0.1, 0.25, by = 0.025), pi2 = 0.15, directionUpper = FALSE)
 #' plot(rates)

@@ -94,7 +94,7 @@
 #' 
 #' Compute operating characteristics for a fixed quantitative design
 #'
-#' getOperatingCharcteristicsMeans computes the operating characteristics
+#' getOperatingCharacteristicsMeans computes the operating characteristics
 #' (probabilities of the decision categories) for a fixed (non-adaptive)
 #' two-group design with a quantitative endpoint using a normal
 #' approximation. The decision boundaries are defined by a
@@ -142,7 +142,7 @@
 #'
 #' # Evaluate operating characteristics for two sample-size scenarios
 #' nMatrix <- matrix(c(50, 100, 75, 150), ncol = 2, byrow = TRUE)
-#' oc <- getOperatingCharcteristicsMeans(
+#' oc <- getOperatingCharacteristicsMeans(
 #'     design = decisionRule,
 #'     numberOfSubjects = nMatrix,
 #'     alternative = seq(0, 2, 0.5),
@@ -152,7 +152,7 @@
 #'
 #' @export
 #' 
-getOperatingCharcteristicsMeans <- function(
+getOperatingCharacteristicsMeans <- function(
         design,
         ...,
         numberOfSubjects,

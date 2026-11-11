@@ -8,8 +8,8 @@ A \code{SummaryFactory} object supporting console and Markdown output.
 }
 \description{
 The standard \code{\link[=summary]{summary()}} method supports quantitative decision rules from
-\code{\link[=getDesignQuantitative]{getDesignQuantitative()}} and results from \code{\link[=getOperatingCharcteristicsMeans]{getOperatingCharcteristicsMeans()}}
-and \code{\link[=getOperatingCharcteristicsRates]{getOperatingCharcteristicsRates()}}.
+\code{\link[=getDesignQuantitative]{getDesignQuantitative()}} and results from \code{\link[=getOperatingCharacteristicsMeans]{getOperatingCharacteristicsMeans()}}
+and \code{\link[=getOperatingCharacteristicsRates]{getOperatingCharacteristicsRates()}}.
 }
 \details{
 Use \code{summary(rule)} for the target value, lower reference value and decision
@@ -34,7 +34,7 @@ with probability tables. Console tables use wrapped, readable column names.
 }
 \examples{
 rule <- getDesignQuantitative(targetValue = 0, lowerReferenceValue = -0.05)
-rates <- getOperatingCharcteristicsRates(rule,
+rates <- getOperatingCharacteristicsRates(rule,
     numberOfSubjects = matrix(c(75, 75, 75, 150), ncol = 2, byrow = TRUE),
     pi1 = c(0.1, 0.15, 0.175, 0.2, 0.25), pi2 = 0.15, directionUpper = FALSE)
 summary(rates)

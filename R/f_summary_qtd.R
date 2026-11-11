@@ -28,8 +28,8 @@ NULL
 #'
 #' @description
 #' The standard [summary()] method supports quantitative decision rules from
-#' [getDesignQuantitative()] and results from [getOperatingCharcteristicsMeans()]
-#' and [getOperatingCharcteristicsRates()].
+#' [getDesignQuantitative()] and results from [getOperatingCharacteristicsMeans()]
+#' and [getOperatingCharacteristicsRates()].
 #'
 #' @details
 #' Use `summary(rule)` for the target value, lower reference value and decision
@@ -58,7 +58,7 @@ NULL
 #'
 #' @examples
 #' rule <- getDesignQuantitative(targetValue = 0, lowerReferenceValue = -0.05)
-#' rates <- getOperatingCharcteristicsRates(rule,
+#' rates <- getOperatingCharacteristicsRates(rule,
 #'     numberOfSubjects = matrix(c(75, 75, 75, 150), ncol = 2, byrow = TRUE),
 #'     pi1 = c(0.1, 0.15, 0.175, 0.2, 0.25), pi2 = 0.15, directionUpper = FALSE)
 #' summary(rates)

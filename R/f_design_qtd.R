@@ -33,7 +33,7 @@
 #' The function performs basic input validation and returns an object of class
 #' \code{TrialDesignPlanQuantitative}. This object is used by helper functions
 #' that compute operating characteristics and make decisions for fixed designs
-#' with normally approximated endpoints (see \code{getOperatingCharcteristicsMeans}).
+#' with normally approximated endpoints (see \code{getOperatingCharacteristicsMeans}).
 #'
 #' @return An object of class \code{TrialDesignPlanQuantitative} containing the
 #'   supplied design parameters.

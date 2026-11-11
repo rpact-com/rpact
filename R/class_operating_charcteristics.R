@@ -32,17 +32,17 @@
 #' @details
 #' This internal base class supplies inherited fields for
 #' `OperatingCharcteristicsMeans` and `OperatingCharcteristicsRates`.
-#' Obtain result objects through [getOperatingCharcteristicsMeans()] or
-#' [getOperatingCharcteristicsRates()]. The originating design is stored internally.
+#' Obtain result objects through [getOperatingCharacteristicsMeans()] or
+#' [getOperatingCharacteristicsRates()]. The originating design is stored internally.
 #'
-#' @seealso [getOperatingCharcteristicsMeans()], [getOperatingCharcteristicsRates()]
+#' @seealso [getOperatingCharacteristicsMeans()], [getOperatingCharacteristicsRates()]
 #'
 #' @return An R6 object of class \code{OperatingCharcteristics}.
 #'
 #' @examples
 #' rule <- getDesignQuantitative(targetValue = 1, lowerReferenceValue = 0)
 #' nMatrix <- matrix(c(50, 100), ncol = 2, byrow = TRUE)
-#' # oc <- getOperatingCharcteristicsMeans(design = rule, numberOfSubjects = nMatrix)
+#' # oc <- getOperatingCharacteristicsMeans(design = rule, numberOfSubjects = nMatrix)
 #'
 #' @keywords internal
 #'
@@ -92,7 +92,7 @@ OperatingCharcteristics <- R6::R6Class(
 #' @return An R6 object of class \code{OperatingCharcteristicsMeans}.
 #'
 #' @examples
-#' # See getOperatingCharcteristicsMeans for an end-to-end example.
+#' # See getOperatingCharacteristicsMeans for an end-to-end example.
 #'
 #' @export
 #' 

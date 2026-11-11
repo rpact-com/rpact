@@ -8,7 +8,7 @@
 #'
 #' @description
 #' Stores exact binomial decision-category probabilities for two independent
-#' groups. Obtain instances with [getOperatingCharcteristicsRates()].
+#' groups. Obtain instances with [getOperatingCharacteristicsRates()].
 #'
 #' @template field_numberOfSubjects_qtd
 #' @template field_probabilities_qtd_rates
@@ -28,7 +28,7 @@
 #' Use [summary()] for decision-rule assumptions and probability tables, and
 #' [plot.OperatingCharcteristics()] for the shared QTD plot families.
 #'
-#' @seealso [getOperatingCharcteristicsRates()], [getDesignQuantitative()]
+#' @seealso [getOperatingCharacteristicsRates()], [getDesignQuantitative()]
 #'
 #' @keywords internal
 #'
@@ -43,7 +43,7 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
         alternative = NULL,
         #'
         #' @description
-        #' Initializes a rates result. Use getOperatingCharcteristicsRates() to
+        #' Initializes a rates result. Use getOperatingCharacteristicsRates() to
         #' validate inputs and calculate probabilities.
         #'
         #' @param design The originating quantitative decision rule.
@@ -127,7 +127,7 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
         key <- paste(sizes, collapse = "/")
         if (!exists(key, envir = decisionMaps, inherits = FALSE)) {
             decisionMaps[[key]] <- .getQtdBinaryDecisionData(design, sizes, directionUpper,
-                intervalMethod = intervalMethod, functionName = "getOperatingCharcteristicsRates")$category
+                intervalMethod = intervalMethod, functionName = "getOperatingCharacteristicsRates")$category
         }
         decisions <- decisionMaps[[key]]
         controlProbabilities <- stats::dbinom(0:sizes[1], sizes[1], pi2)
@@ -196,21 +196,21 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
 #' @examples
 #' # Binary example from the original QTD1 demonstration:
 #' rule <- getDesignQuantitative(targetValue = 0, lowerReferenceValue = -0.05)
-#' oc <- getOperatingCharcteristicsRates(rule,
+#' oc <- getOperatingCharacteristicsRates(rule,
 #'     numberOfSubjects = matrix(c(75, 75, 75, 150), ncol = 2, byrow = TRUE),
 #'     pi1 = c(0.1, 0.15, 0.175, 0.2, 0.25), pi2 = 0.15,
 #'     directionUpper = FALSE)
 #' print(oc)
 #' cat(print(oc, markdown = TRUE)[1], "\n")
 #'
-#' @seealso [getDesignQuantitative()], [getOperatingCharcteristicsMeans()],
+#' @seealso [getDesignQuantitative()], [getOperatingCharacteristicsMeans()],
 #'   [OperatingCharcteristicsRates], [summaryQuantitative], [plot.OperatingCharcteristics()]
 #'
 #' @export
 #'
-getOperatingCharcteristicsRates <- function(design, ..., numberOfSubjects, pi1, pi2,
+getOperatingCharacteristicsRates <- function(design, ..., numberOfSubjects, pi1, pi2,
         directionUpper = TRUE, intervalMethod = "qtd1") {
-    functionName <- "getOperatingCharcteristicsRates"
+    functionName <- "getOperatingCharacteristicsRates"
     .warnInCaseOfUnknownArguments(functionName = functionName, ...)
     missingInputs <- c(design = missing(design), numberOfSubjects = missing(numberOfSubjects),
         pi1 = missing(pi1), pi2 = missing(pi2))

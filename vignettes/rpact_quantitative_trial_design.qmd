@@ -77,8 +77,8 @@ and numerical results needed to follow the examples are provided below.
 
 The examples require the [QTD development version of
 rpact](https://github.com/rpact-com/rpact/tree/dev/qtd) providing
-`getDesignQuantitative()`, `getOperatingCharcteristicsMeans()`, and
-`getOperatingCharcteristicsRates()`, together with their QTD print, summary, and
+`getDesignQuantitative()`, `getOperatingCharacteristicsMeans()`, and
+`getOperatingCharacteristicsRates()`, together with their QTD print, summary, and
 plot methods. The spelling `Charcteristics` follows the current function names.
 
 ## How to install the QTD development version
@@ -197,7 +197,7 @@ demoSizes <- matrix(
     byrow = TRUE,
     dimnames = list(NULL, c("control", "treatment"))
 )
-ratesOC <- getOperatingCharcteristicsRates(
+ratesOC <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = demoSizes,
     pi1 = seq(0.10, 0.25, by = 0.001),
@@ -234,7 +234,7 @@ knitr::kable(data.frame(
     `Treatment event probability` = scenarioRates,
     check.names = FALSE
 ))
-ratesScenarios <- getOperatingCharcteristicsRates(
+ratesScenarios <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = demoSizes,
     pi1 = scenarioRates,
@@ -413,7 +413,7 @@ planningSizes <- matrix(
     byrow = TRUE,
     dimnames = list(NULL, c("control", "treatment"))
 )
-meansOC <- getOperatingCharcteristicsMeans(
+meansOC <- getOperatingCharacteristicsMeans(
     design = meansRule,
     numberOfSubjects = planningSizes,
     normalApproximation = TRUE,
@@ -456,7 +456,7 @@ Rates tables include treatment probability and beneficial risk difference.
 
 ```{r}
 #| label: summary-means
-meansScenarios <- getOperatingCharcteristicsMeans(
+meansScenarios <- getOperatingCharacteristicsMeans(
     design = meansRule,
     numberOfSubjects = demoSizes,
     alternative = c(0, 2.9, 4, 6),
@@ -614,7 +614,7 @@ the constructor:
 
 ```{r}
 #| label: alternative-method-direction
-scoreRates <- getOperatingCharcteristicsRates(
+scoreRates <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = matrix(c(25, 25), ncol = 2),
     pi1 = c(0.10, 0.15, 0.20),
@@ -623,7 +623,7 @@ scoreRates <- getOperatingCharcteristicsRates(
     intervalMethod = "miettinenNurminen"
 )
 summary(scoreRates)
-higherIsBetter <- getOperatingCharcteristicsRates(
+higherIsBetter <- getOperatingCharacteristicsRates(
     design = getDesignQuantitative(targetValue = 0.10, lowerReferenceValue = 0),
     numberOfSubjects = matrix(c(25, 25), ncol = 2),
     pi1 = c(0.15, 0.25, 0.35),
@@ -724,7 +724,7 @@ meaningful sample-size curves we use the additional `planningSizes` grid.
 #| label: sample-size-curves
 #| fig-height: 8
 #| fig-cap: "Decision probabilities by sample size with separate allocation ratios."
-ratesPlanning <- getOperatingCharcteristicsRates(
+ratesPlanning <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = planningSizes,
     pi1 = seq(0.10, 0.25, by = 0.005),
@@ -809,13 +809,13 @@ independently.
 #| label: allocation-sensitivity
 #| fig-cap: "Allocation sensitivity at mean difference 4 and equal binary event rates 0.15."
 allocationSizes <- as.matrix(expand.grid(control = c(25, 75), treatment = c(25, 75)))
-meansAllocation <- getOperatingCharcteristicsMeans(
+meansAllocation <- getOperatingCharacteristicsMeans(
     design = meansRule,
     numberOfSubjects = allocationSizes,
     alternative = 4,
     stDev = 6
 )
-ratesAllocation <- getOperatingCharcteristicsRates(
+ratesAllocation <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = allocationSizes,
     pi1 = 0.15,

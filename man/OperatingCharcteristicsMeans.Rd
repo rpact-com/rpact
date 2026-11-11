@@ -25,7 +25,7 @@ normal approximation.}
 }}
 
 \examples{
-# See getOperatingCharcteristicsMeans for an end-to-end example.
+# See getOperatingCharacteristicsMeans for an end-to-end example.
 
 }
 \keyword{internal}
