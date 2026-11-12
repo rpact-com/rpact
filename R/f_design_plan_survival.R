@@ -128,12 +128,18 @@ NULL
 #' Averages competing-risk dropout incidence over entry times, dividing by
 #' accrued enrollment rather than total planned enrollment. Constant allocation
 #' cancels within each group. Follow-up intervals are split at event-hazard
-#' changes and integrated analytically. On an interval of width d starting at a,
-#' with total hazard h and joint survival J(a), the mean incidence is
-#' F_D(a) + phi * J(a) / h * (1 - (1 - exp(-h * d)) / (h * d)).
-#' A Taylor expansion evaluates the final factor for small h * d.
+#' changes and integrated analytically. On an interval from v to w,
+#' let h be the total hazard and J(v) the joint survival at its start.
+#' With z = h * (w - v), the mean incidence is
+#' F_D(v) + phi * J(v) / h * B(z).
+#' The factor B(z) equals G_1(z) - G_2(z) / z,
+#' where G_k is the gamma CDF with shape k and rate one. The second term is
+#' evaluated using its log probability to avoid underflow before division.
+#' The factor is zero at z = 0 by continuity.
 #' This implements the validation specification's expected dropout proportion
 #' and analytic dropout accrual integral formulas without numerical quadrature.
+#' The survival dropout integration appendix derives these formulas and maps
+#' their mathematical quantities to the implementation variables.
 #'
 #' @keywords internal
 #'
@@ -192,11 +198,14 @@ NULL
                 }
                 totalHazard <- eventHazard + phi[g]
                 scaledWidth <- totalHazard * intervalWidth
-                if (scaledWidth < 1e-3) {
-                    meanIncrement <- scaledWidth * (1 / 2 + scaledWidth * (-1 / 6 +
-                        scaledWidth * (1 / 24 + scaledWidth * (-1 / 120 + scaledWidth / 720))))
+                if (scaledWidth == 0) {
+                    meanIncrement <- 0
                 } else {
-                    meanIncrement <- 1 + expm1(-scaledWidth) / scaledWidth
+                    # FS formula fs:survival:dropoutGammaFactor. Use log(G_2(z)) - log(z)
+                    # so G_2(z) does not underflow before division by z.
+                    meanIncrement <- stats::pgamma(scaledWidth, shape = 1, rate = 1) -
+                        exp(stats::pgamma(scaledWidth, shape = 2, rate = 1, log.p = TRUE) -
+                            log(scaledWidth))
                 }
                 jointSurvival <- exp(-phi[g] * intervalStart - cumulativeEventHazard)
                 incidence <- .getDropoutIncidence(intervalStart, lambdas[[g]],
