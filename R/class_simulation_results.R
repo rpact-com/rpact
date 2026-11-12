@@ -1125,9 +1125,10 @@ SimulationResultsMultiArmRates <- R6::R6Class(
 #' @template field_dropoutObservationTime2
 #'
 #' @details
-#' Patient-wise dropout summaries use each arm or population's last contributing
-#' analysis, including discontinued groups. Replication proportions and finishing
-#' horizons are averaged over the same nonempty enrolled-subject denominators.
+#' Patient-wise dropout summaries use each stage's analysis time. Replication
+#' proportions are averaged over nonempty enrolled-subject denominators at that
+#' stage. Stopped trials and discontinued groups do not contribute to later stages.
+#' Observation times remain available in the object but are omitted from displays.
 #' Test-statistic-based simulations leave these fields unavailable.
 #'
 #' @seealso [SimulationResultsSurvival], [SimulationResultsMultiArmSurvival],

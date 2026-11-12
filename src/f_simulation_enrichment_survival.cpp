@@ -367,7 +367,7 @@ List getSurvDropoutTimes(int numberOfSubjects,
 	Rcpp::RNGScope scope; 
 
 	NumericVector survivalTime(numberOfSubjects);
-	NumericVector dropoutTime(numberOfSubjects);
+	NumericVector dropoutTime(numberOfSubjects, NA_REAL);
 	
 	for (int i = 0; i < numberOfSubjects; i++) {
 		// Find which subgroup this subject belongs to
@@ -1197,7 +1197,7 @@ List performSimulationEnrichmentSurvivalLoop(
 	NumericMatrix iterations(kMax, cols);
 	IntegerMatrix rawDataPerStage(cols, kMax);
 	List rawDataSets;
-    NumericMatrix dropoutRecords(cols * maxNumberOfIterations * gMax * 2, 7);
+    NumericMatrix dropoutRecords(cols * maxNumberOfIterations * gMax * 2 * kMax, 8);
     std::fill(dropoutRecords.begin(), dropoutRecords.end(), NA_REAL);
 	
 	// Initialize all these with zeros
@@ -1346,7 +1346,7 @@ List performSimulationEnrichmentSurvivalLoop(
 			NumericMatrix separatePValuesTest = closedTest["separatePValues"];
 
             finishDropoutRecords(dropoutRecords,
-                (i * maxNumberOfIterations + j) * gMax * 2, i + 1, j + 1,
+                (i * maxNumberOfIterations + j) * gMax * 2 * kMax, i + 1, j + 1,
                 as<NumericMatrix>(stageResults["dropoutEnrolled"]),
                 as<NumericMatrix>(stageResults["dropoutDropped"]), analysisTime,
                 selectedPopulationsTest, eventsNotAchieved, successStop, futilityStop,

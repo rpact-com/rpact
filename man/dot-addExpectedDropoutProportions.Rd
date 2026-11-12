@@ -12,16 +12,16 @@ reference. Its survival and accrual inputs must already be normalized.}
 }
 \value{
 Invisibly returns the assigned derived parameter type; the design
-  plan is updated by reference.
+plan is updated by reference.
 }
 \description{
-Populates derived group-specific dropout proportions at each scenario's
-final planned analysis time, including analyses before recruitment ends.
+Populates derived group-specific dropout proportions at each stage's
+planned analysis time in each scenario, including analyses before recruitment ends.
 }
 \details{
 Converts input dropout probabilities to exponential hazards and averages
-competing-risk dropout incidence over accrued subjects. Stores one value per
-alternative scenario without a stage dimension. Values remain missing when
+competing-risk dropout incidence over accrued subjects. Stores matrices with
+stage rows and alternative-scenario columns. Values remain missing when
 observation times are not accounted for or the horizon is unavailable.
 }
 \keyword{internal}

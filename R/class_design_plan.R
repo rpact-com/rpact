@@ -752,8 +752,8 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
 #' This object cannot be created directly;
 #' use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 #' or [getPowerSurvival()] with suitable arguments to create a survival design plan.
-#' Expected dropout proportions use the final planned analysis horizon for each
-#' alternative scenario, with no stage dimension. See the constructor help for
+#' Expected dropout proportions use each stage's planned analysis horizon for each
+#' alternative scenario, with stage rows and scenario columns. See the constructor help for
 #' the deterministic planned-accrual denominator and competing-event assumptions.
 #'
 #' @include class_core_parameter_set.R

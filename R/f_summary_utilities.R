@@ -828,6 +828,8 @@ print.SummaryFactory <- function(
                         "conditionalPowerAchieved",
                         "plannedCalendarTime",
                         "analysisTime",
+                        "observedDropoutProportion1",
+                        "observedDropoutProportion2",
                         "studyDuration"
                     )) {
                 transposed <- TRUE

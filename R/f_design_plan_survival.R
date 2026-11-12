@@ -226,8 +226,8 @@ NULL
 #' Add Expected Dropout Proportions to a Survival Design Plan
 #'
 #' @description
-#' Populates derived group-specific dropout proportions at each scenario's
-#' final planned analysis time, including analyses before recruitment ends.
+#' Populates derived group-specific dropout proportions at each stage's
+#' planned analysis time in each scenario, including analyses before recruitment ends.
 #'
 #' @param designPlan Survival sample-size or power design plan, modified by
 #'   reference. Its survival and accrual inputs must already be normalized.
@@ -237,20 +237,19 @@ NULL
 #'
 #' @details
 #' Converts input dropout probabilities to exponential hazards and averages
-#' competing-risk dropout incidence over accrued subjects. Stores one value per
-#' alternative scenario without a stage dimension. Values remain missing when
+#' competing-risk dropout incidence over accrued subjects. Stores matrices with
+#' stage rows and alternative-scenario columns. Values remain missing when
 #' observation times are not accounted for or the horizon is unavailable.
 #'
 #' @keywords internal
 #'
 .addExpectedDropoutProportions <- function(designPlan) {
     numberOfResults <- length(designPlan$hazardRatio)
-    result <- matrix(NA_real_, nrow = 2, ncol = numberOfResults)
+    kMax <- designPlan$.design$kMax
+    result <- array(NA_real_, dim = c(kMax, numberOfResults, 2))
     if (isTRUE(designPlan$accountForObservationTimes) && length(designPlan$analysisTime) > 0) {
-        horizons <- designPlan$analysisTime[designPlan$.design$kMax, ]
-        if (length(horizons) == 1L) {
-            horizons <- rep(horizons, numberOfResults)
-        }
+        horizons <- matrix(rep(designPlan$analysisTime, length.out = kMax * numberOfResults),
+            nrow = kMax)
         phi <- -log1p(-c(designPlan$dropoutRate1, designPlan$dropoutRate2)) / designPlan$dropoutTime
         for (i in seq_len(numberOfResults)) {
             lambda1 <- designPlan$lambda1[i]
@@ -259,17 +258,19 @@ NULL
             }
             lambda1 <- .getLambda(groupNumber = 1, lambda1 = lambda1,
                 lambda2 = designPlan$lambda2, hazardRatio = designPlan$hazardRatio[i], kappa = designPlan$kappa)
-            result[, i] <- .getDropoutProportionsGroupwise(
-                time = horizons[i], accrualTimeVector = designPlan$accrualTime,
-                accrualIntensity = designPlan$accrualIntensity,
-                lambda1 = lambda1, lambda2 = designPlan$lambda2,
-                piecewiseSurvivalTime = designPlan$piecewiseSurvivalTime, phi = phi,
-                allocationRatioPlanned = rep(designPlan$allocationRatioPlanned, length.out = numberOfResults)[i]
-            )
+            for (k in seq_len(kMax)) {
+                result[k, i, ] <- .getDropoutProportionsGroupwise(
+                    time = horizons[k, i], accrualTimeVector = designPlan$accrualTime,
+                    accrualIntensity = designPlan$accrualIntensity,
+                    lambda1 = lambda1, lambda2 = designPlan$lambda2,
+                    piecewiseSurvivalTime = designPlan$piecewiseSurvivalTime, phi = phi,
+                    allocationRatioPlanned = rep(designPlan$allocationRatioPlanned, length.out = numberOfResults)[i]
+                )
+            }
         }
     }
-    designPlan$expectedDropoutProportion1 <- result[1, ]
-    designPlan$expectedDropoutProportion2 <- result[2, ]
+    designPlan$expectedDropoutProportion1 <- matrix(result[, , 1], nrow = kMax)
+    designPlan$expectedDropoutProportion2 <- matrix(result[, , 2], nrow = kMax)
     designPlan$.setParameterType("expectedDropoutProportion1", C_PARAM_DERIVED)
     designPlan$.setParameterType("expectedDropoutProportion2", C_PARAM_DERIVED)
 }

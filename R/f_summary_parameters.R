@@ -343,6 +343,11 @@ NULL
     treatments <- ifelse(grepl("Survival", .getClassName(designPlan)), 1, 2)
     treatmentCaption <- ifelse(numberOfGroups > treatments, paste0("Treatment arm ", groupNumber), "Treatment arm")
 
+    if (inherits(designPlan, "SimulationResultsMultiArmSurvival") &&
+            parameterName == "observedDropoutProportion1") {
+        return(paste0(listItemPrefix, treatmentCaption))
+    }
+
     if (!grepl("Survival", .getClassName(designPlan)) ||
             (inherits(designPlan, "SimulationResultsMultiArmSurvival") &&
                 parameterName == "singleEventsPerArmAndStage")) {

@@ -43,36 +43,35 @@ inline void captureDropoutCounts(const NumericVector& accrual, const NumericVect
     }
 }
 
-// One row per replication, population and arm. No averaging of pooled counts.
+// One row per replication, population, arm and stage. Do not pool counts.
 inline void finishDropoutRecords(NumericMatrix& records, int offset, int scenario, int iteration,
         const NumericMatrix& enrolled, const NumericMatrix& dropped, const NumericVector& times,
         const LogicalMatrix& selected, const LogicalVector& eventsNotAchieved,
         const LogicalVector& success, const LogicalVector& futility, int groups, int arms,
         bool sharedControl = false) {
+    int kMax = times.size();
     for (int g = 0; g < groups; ++g) {
-        int last = -1;
-        for (int k = 0; k < times.size(); ++k) {
-            if (eventsNotAchieved[k] == TRUE || !R_finite(times[k])) {
-                break;
+        bool stopped = false;
+        for (int k = 0; k < kMax; ++k) {
+            bool available = !stopped && eventsNotAchieved[k] != TRUE && R_finite(times[k]);
+            bool contributes = available &&
+                ((sharedControl && g == groups - 1) || selected(g, k) == TRUE);
+            for (int a = 0; a < arms; ++a) {
+                int groupRow = g * arms + a;
+                int row = offset + groupRow * kMax + k;
+                records(row, 0) = scenario;
+                records(row, 1) = iteration;
+                records(row, 2) = g + 1;
+                records(row, 3) = a + 1;
+                records(row, 4) = k + 1;
+                if (contributes) {
+                    records(row, 5) = times[k];
+                    records(row, 6) = enrolled(groupRow, k);
+                    records(row, 7) = dropped(groupRow, k);
+                }
             }
-            if ((sharedControl && g == groups - 1) || selected(g, k) == TRUE) {
-                last = k;
-            }
-            if (success[k] == TRUE || (k < futility.size() && futility[k] == TRUE)) {
-                break;
-            }
-        }
-        for (int a = 0; a < arms; ++a) {
-            int groupRow = g * arms + a;
-            int row = offset + groupRow;
-            records(row, 0) = scenario;
-            records(row, 1) = iteration;
-            records(row, 2) = g + 1;
-            records(row, 3) = a + 1;
-            if (last >= 0) {
-                records(row, 4) = times[last];
-                records(row, 5) = enrolled(groupRow, last);
-                records(row, 6) = dropped(groupRow, last);
+            if (!available || success[k] == TRUE || (k < futility.size() && futility[k] == TRUE)) {
+                stopped = true;
             }
         }
     }
