@@ -271,10 +271,9 @@
                 ", stage = ", .comparisonValueRCode(object$stage),
                 ", situations = ", .comparisonValueRCode(object$situations), ")")
         } else {
-            planCode <- getObjectRCode(plan, includeDefaultParameters = includeDefaultParameters,
-                stringWrapParagraphWidth = NULL, pipeOperator = "none", output = "internal", tolerance = tolerance)
-            code <- paste0("getFisherInformation(local({\n", paste(planCode, collapse = "\n"),
-                "\n}), stage = ", .comparisonValueRCode(object$stage),
+            planCode <- .getComparisonObjectRCode(plan, includeDefaultParameters, tolerance, pipeOperator)
+            code <- paste0("getFisherInformation(", paste(planCode, collapse = "\n"),
+                ", stage = ", .comparisonValueRCode(object$stage),
                 ", type = ", .comparisonValueRCode(object$type), ")")
         }
     } else {

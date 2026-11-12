@@ -35,6 +35,8 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 
 ## Improvements, issues, and changes
 
+* `getObjectRCode()` reconstructs trial comparisons with direct object arguments and inline prerequisites, without `local()` wrappers. Comparison summaries respect the selected pipe operator and omit default summary settings unless requested.
+
 * Ambiguous comparison plot axes now produce compact, structured error messages with parameter names and captions, console-aware wrapping, bounded candidate lists, and one role-aware example. Full selection diagnostics and existing error classes are retained; no new dependency is required.
 
 * Comparison plots now connect single-point objects along a common numeric input when only that input varies and the object scope is shared. Explicit categories and groups, additional varying inputs, and objects containing multiple points retain separate curves.

@@ -462,7 +462,7 @@ rcmd <- function(
 #' Returns the R source command of a result object.
 #'
 #' @param obj The result object, including a `TrialComparison` or its summary.
-#'   Comparison reconstruction isolates each object's preconditions. Argument
+#'   Comparison reconstruction inlines each object's preconditions. Argument
 #'   overrides are unsupported for comparisons, and their code is not word-wrapped
 #'   so object names and callback bodies remain intact.
 #' @param leadingArguments A character vector with arguments that shall be inserted at the beginning of the function command,
@@ -616,17 +616,31 @@ getObjectRCode <- function(
     if (inherits(obj, "TrialComparisonSummary")) {
         summaryArguments <- c(list(digits = obj$.digits), obj$.limits,
             list(output = obj$output, harmonizeColumnNames = .getComparisonSummaryHarmonization(obj)))
+        if (!includeDefaultParameters) {
+            defaults <- formals(summary.TrialComparison)
+            defaults$output <- "all"
+            summaryArguments <- summaryArguments[!vapply(names(summaryArguments), function(name) {
+                return(isTRUE(all.equal(summaryArguments[[name]], defaults[[name]])))
+            }, TRUE)]
+        }
         arguments <- paste(vapply(names(summaryArguments), function(name) {
-            paste0(name, " = ", paste(deparse(summaryArguments[[name]]), collapse = ""))
+            return(paste0(name, " = ", paste(deparse(summaryArguments[[name]]), collapse = "")))
         }, ""), collapse = ", ")
-        code <- getObjectRCode(obj$object, includeDefaultParameters = includeDefaultParameters,
+        if (pipeOperator == "none") {
+            prefix <- paste0(prefix, "summary(")
+            if (nzchar(arguments)) {
+                postfix <- c(paste0(", ", arguments, ")"), postfix)
+            } else {
+                postfix <- c(")", postfix)
+            }
+        } else {
+            postfix <- c(pipeOperatorPostfix, paste0("summary(", arguments, ")"), postfix)
+        }
+        return(getObjectRCode(obj$object, includeDefaultParameters = includeDefaultParameters,
             leadingArguments = leadingArguments, newArgumentValues = newArgumentValues,
             stringWrapParagraphWidth = NULL, pipeOperator = pipeOperator, tolerance = tolerance,
-            output = "internal")
-        return(.formatRCode(paste0(prefix, "summary(", paste(code, collapse = "\n"), ", ", arguments, ")"),
-            precondition = character(), stringWrapParagraphWidth = NULL, postfix = postfix,
-            stringWrapPrefix = stringWrapPrefix, pipeOperator = pipeOperator,
-            pipeOperatorPostfix = pipeOperatorPostfix, output = output, explicitPrint = explicitPrint))
+            prefix = prefix, postfix = postfix, stringWrapPrefix = stringWrapPrefix,
+            output = output, explicitPrint = explicitPrint))
     }
     if (!is.list(newArgumentValues)) {
         stopIllegalArgument("'newArgumentValues' must be a named list ",
@@ -1228,7 +1242,7 @@ getObjectRCode <- function(
         explicitPrint) {
     if (any(postfix != "")) {
         if (length(postfix) > 1 && grepl("(\\|>)|(%>%)", postfix[1])) {
-            if (!grepl("(\\|>)|(%>%) *$", rCode[length(rCode)])) {
+            if (!grepl("(\\|>|%>%) *$", rCode[length(rCode)])) {
                 rCode <- paste0(rCode, postfix[1])
             }
             if (length(postfix) > 1) {
