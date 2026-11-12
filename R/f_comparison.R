@@ -319,8 +319,10 @@
     })
     for (name in columnNames) {
         columns <- lapply(frames, `[[`, name)
-        numericCompatible <- all(vapply(columns, function(x) is.numeric(x) || is.logical(x), logical(1)))
-        sameType <- length(unique(vapply(columns, function(x) paste(class(x), collapse = "/"), character(1)))) == 1L
+        numericCompatible <- all(vapply(columns, 
+            function(x) is.numeric(x) || is.logical(x), logical(1)))
+        sameType <- length(unique(vapply(columns, 
+            function(x) paste(class(x), collapse = "/"), character(1)))) == 1L
         if (!numericCompatible && !sameType) {
             frames <- lapply(frames, function(df) {
                 df[[name]] <- as.character(df[[name]])

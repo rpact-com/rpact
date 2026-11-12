@@ -150,7 +150,8 @@ NULL
 #'
 #' @examples
 #' asn <- getPowerAndAverageSampleNumber(getDesignGroupSequential(kMax = 2),
-#'     theta = c(0, 0.2), nMax = 100)
+#'     theta = c(0, 0.2), nMax = 100
+#' )
 #' getComparison(asn, asn)
 #'
 #' comparison <- getComparison(list(
@@ -1162,7 +1163,9 @@ as.data.frame.TrialComparison <- function(
     if (parameter %in% .comparisonScope) {
         return("Object types and scope")
     }
-    if (grepl("^observed", parameter) || parameter %in% c("time", "treatmentArm", "populations", "situations", "type", "nPlanned")) {
+    if (grepl("^observed", parameter) || parameter %in% c(
+            "time", "treatmentArm", "populations", "situations", "type", "nPlanned"
+        )) {
         return("Inputs and design settings")
     }
     sourceParameter <- sub("^(optimal_|design_|simulation_)", "", parameter)
@@ -1426,7 +1429,13 @@ as.data.frame.TrialComparison <- function(
 #'
 #' @export
 #'
-print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, maxTypes = 5L, maxMetrics = 6L) {
+print.TrialComparison <- function(
+        x,
+        ...,
+        markdown = NA,
+        digits = NA_integer_,
+        maxTypes = 5L,
+        maxMetrics = 6L) {
     .warnInCaseOfUnknownArguments(functionName = "print.TrialComparison", ...)
     .assertIsSingleLogical(markdown, "markdown", naAllowed = TRUE)
     if (is.na(markdown)) {
@@ -1441,7 +1450,12 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
             digits = digits, maxTypes = maxTypes, maxMetrics = maxMetrics
         )), collapse = "\n")))
     }
-    x$.show(digits = digits, maxTypes = maxTypes, maxMetrics = maxMetrics, consoleOutputEnabled = TRUE)
+    x$.show(
+        digits = digits, 
+        maxTypes = maxTypes, 
+        maxMetrics = maxMetrics, 
+        consoleOutputEnabled = TRUE
+    )
     invisible(x)
 }
 
@@ -1514,7 +1528,8 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
             values <- range(values)
         }
         emit(
-            indent, sprintf("%-*s : %s", metricWidth, metricCaptions[[parameter]], .comparisonPreview(values, digits = digits)),
+            indent, sprintf("%-*s : %s", metricWidth, metricCaptions[[parameter]], 
+                .comparisonPreview(values, digits = digits)),
             if (row$hasMissingValues) {
                 " (missing values present)"
             } else {
@@ -1528,8 +1543,14 @@ print.TrialComparison <- function(x, ..., markdown = NA, digits = NA_integer_, m
 
     emit("\n")
     object$.cat("Available operations:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-    operations <- c("summary(x)", "as.data.frame(x)", "plot(x, xAxis = ..., yAxis = ...)", "getObjects(x)")
-    descriptions <- c("Compare differences", "Access all data", "Plot selected parameters", "Access contained objects")
+    operations <- c(
+        "summary(x)", "as.data.frame(x)", 
+        "plot(x, xAxis = ..., yAxis = ...)", 
+        "getObjects(x)")
+    descriptions <- c(
+        "Compare differences", 
+        "Access all data", "Plot selected parameters", 
+        "Access contained objects")
     operationWidth <- max(nchar(operations))
     for (i in seq_along(operations)) {
         emit(indent, sprintf("%-*s : %s", operationWidth, operations[i], descriptions[i]), "\n")
@@ -1606,11 +1627,16 @@ summary.TrialComparison <- function(
         harmonizeColumnNames = TRUE) {
     .warnInCaseOfUnknownArguments(functionName = "summary.TrialComparison", ...)
     .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
-    limits <- list(maxParameters = maxParameters, maxProfiles = maxProfiles, maxObjects = maxObjects, maxValues = maxValues)
+    limits <- list(
+        maxParameters = maxParameters, 
+        maxProfiles = maxProfiles, 
+        maxObjects = maxObjects, 
+        maxValues = maxValues)
     for (parameter in names(limits)) {
         .assertComparisonLimit(limits[[parameter]], parameter, "summary.TrialComparison")
     }
-    data <- .getTrialComparisonData(object$getObjects(), harmonizeColumnNames = harmonizeColumnNames)
+    data <- .getTrialComparisonData(object$getObjects(), 
+        harmonizeColumnNames = harmonizeColumnNames)
     info <- .getTrialComparisonInfo(object, data)
     attr(info, "harmonizeColumnNames") <- harmonizeColumnNames
     getComparisonParameterDescriptions(info[FALSE, ], digits = digits)
@@ -1759,7 +1785,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         emit(paste(strwrap(paste0(overview, "."), width = 100L), collapse = "\n"), "\n")
         if (length(common)) {
             emit(
-                "Shared (examples): ", .comparisonText(paste(head(info$paramCaption[common], 6L), collapse = ", "), 130L),
+                "Shared (examples): ", .comparisonText(
+                    paste(head(info$paramCaption[common], 6L), collapse = ", "), 130L),
                 if (length(common) > 6L) {
                     ", ..."
                 } else {
@@ -1971,9 +1998,11 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 #' comparison <- getSampleSizeMeans(alternative = 0.22, stDev = 0.5) |>
 #'     compare(getSampleSizeMeans(alternative = 0.44, stDev = 1)) |>
 #'     compare(getSampleSizeMeans(alternative = 0.59, stDev = 1))
-#' plot(comparison, xAxis = "Alternative",
+#' plot(comparison,
+#'     xAxis = "Alternative",
 #'     yAxis = c("Number of subjects", "Critical values (treatment effect scale)"),
-#'     category = "Standard deviation")
+#'     category = "Standard deviation"
+#' )
 #' plot(comparison, xAxis = alternative, yAxis = numberOfSubjects, group = stDev)
 #'
 #' @export

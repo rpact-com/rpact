@@ -87,11 +87,13 @@
             .comparisonRole(objects, xAxis) != "Inputs and design settings") {
         return(FALSE)
     }
+    
     # Each object must contribute exactly one point at a distinct finite x.
     if (anyNA(data$objectNumber) || anyDuplicated(data$objectNumber) ||
             any(!is.finite(data[[xAxis]])) || anyDuplicated(data[[xAxis]])) {
         return(FALSE)
     }
+    
     varying <- getComparisonParameterNames(data,
         exclude = c("objectNumber", "objectName", "designNumber", xAxis)
     )
@@ -114,6 +116,7 @@
     if (!length(issues)) {
         return(NULL)
     }
+    
     width <- max(40L, min(100L, getOption("width", 80L)))
     axisIssues <- vapply(issues, function(issue) {
         return(identical(issue$diagnosticId, "comparison.plot_axis_ambiguous"))
@@ -173,6 +176,7 @@
         }
         return(paste(lines, collapse = "\n"))
     }
+    
     # Leave room for the central error prefix and the default R error buffer.
     message <- buildMessage(5L)
     for (limit in 4:1) {
