@@ -764,7 +764,7 @@ getPowerMeans <- function(
         }
         if (designPlan$normalApproximation) {
             powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
-                design, theta, maxNumberOfSubjects
+                design, theta = theta, nMax = maxNumberOfSubjects
             )
         } else {
             thetaAdj <- (sign(theta) * .getOneMinusQNorm(design$alpha / design$sided) -
@@ -777,7 +777,7 @@ getPowerMeans <- function(
                     theta * sqrt(maxNumberOfSubjects)
                 ))) / sqrt(maxNumberOfSubjects)
             powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
-                design, thetaAdj, maxNumberOfSubjects
+                design, theta = thetaAdj, nMax = maxNumberOfSubjects
             )
         }
     } else {
@@ -799,7 +799,7 @@ getPowerMeans <- function(
         }
         if (designPlan$normalApproximation) {
             powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
-                design, theta, maxNumberOfSubjects
+                design, theta = theta, nMax = maxNumberOfSubjects
             )
         } else {
             if (designPlan$stDev[1] == designPlan$stDev[2]) {
@@ -820,7 +820,7 @@ getPowerMeans <- function(
                     theta * sqrt(maxNumberOfSubjects)
                 ))) / sqrt(maxNumberOfSubjects)
             powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
-                design, thetaAdj, maxNumberOfSubjects
+                design, theta = thetaAdj, nMax = maxNumberOfSubjects
             )
         }
     }

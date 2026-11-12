@@ -2919,8 +2919,23 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 #'
 #' @export
 #'
-getPowerAndAverageSampleNumber <- function(design, theta = seq(-1, 1, 0.02), nMax = 100) {
-    .assertIsTrialDesign(design)
+getPowerAndAverageSampleNumber <- function(design = NULL, ..., theta = seq(-1, 1, 0.02), nMax = 100) {
+    if (is.null(design)) {
+        design <- .getDefaultDesign(type = "power", ...)
+        .warnInCaseOfUnknownArguments(
+            functionName = "getPowerAndAverageSampleNumber",
+            ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+                design,
+                powerCalculationEnabled = FALSE
+            ), ...
+        )
+    } else {
+        .assertIsTrialDesign(design)
+        .warnInCaseOfUnknownArguments(functionName = "getPowerAndAverageSampleNumber", ...)
+        .warnInCaseOfTwoSidedPowerArgument(...)
+        design <- .resetPipeOperatorQueue(design)
+    }
+    
     .assertIsSingleNumber(nMax, "nMax")
     .assertIsInClosedInterval(nMax, "nMax", lower = 1, upper = NULL)
     return(PowerAndAverageSampleNumberResult$new(design = design, theta = theta, nMax = nMax))
