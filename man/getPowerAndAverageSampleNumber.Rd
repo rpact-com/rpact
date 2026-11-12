@@ -4,7 +4,12 @@
 \alias{getPowerAndAverageSampleNumber}
 \title{Get Power And Average Sample Number}
 \usage{
-getPowerAndAverageSampleNumber(design, theta = seq(-1, 1, 0.02), nMax = 100)
+getPowerAndAverageSampleNumber(
+  design = NULL,
+  ...,
+  theta = seq(-1, 1, 0.02),
+  nMax = 100
+)
 }
 \arguments{
 \item{design}{The trial design.}

@@ -144,7 +144,8 @@ executing generated simulation code reruns the corresponding simulations.
 }
 \examples{
 asn <- getPowerAndAverageSampleNumber(getDesignGroupSequential(kMax = 2),
-    theta = c(0, 0.2), nMax = 100)
+    theta = c(0, 0.2), nMax = 100
+)
 getComparison(asn, asn)
 
 comparison <- getComparison(list(

@@ -86,9 +86,11 @@ select \code{nFixed}. Unknown names, ambiguous captions and duplicate selections
 comparison <- getSampleSizeMeans(alternative = 0.22, stDev = 0.5) |>
     compare(getSampleSizeMeans(alternative = 0.44, stDev = 1)) |>
     compare(getSampleSizeMeans(alternative = 0.59, stDev = 1))
-plot(comparison, xAxis = "Alternative",
+plot(comparison,
+    xAxis = "Alternative",
     yAxis = c("Number of subjects", "Critical values (treatment effect scale)"),
-    category = "Standard deviation")
+    category = "Standard deviation"
+)
 plot(comparison, xAxis = alternative, yAxis = numberOfSubjects, group = stDev)
 
 }
