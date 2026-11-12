@@ -15,6 +15,8 @@
   Algorithm AS 251: Normal Distribution
 - [`as251StudentT()`](https://docs.rpact.org/reference/as251StudentT.md)
   : Algorithm AS 251: Student T Distribution
+- [`compare()`](https://docs.rpact.org/reference/compare.md) : Start or
+  Extend a Trial Comparison
 - [`delete()`](https://docs.rpact.org/reference/delete.md) : Delete an
   Object from a Collection
 - [`` `[[`( ``*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/extract.TrialComparison.md)
@@ -153,6 +155,8 @@
   : Get Test Actions
 - [`knit_print(`*`<SummaryFactory>`*`)`](https://docs.rpact.org/reference/knit_print.SummaryFactory.md)
   : Print Summary Factory in Markdown Code Chunks
+- [`knit_print(`*`<TrialComparisonTable>`*`)`](https://docs.rpact.org/reference/knit_print.TrialComparisonTable.md)
+  : Render a Trial Comparison Table in knitr
 - [`mvnprd()`](https://docs.rpact.org/reference/mvnprd.md) : Original
   Algorithm AS 251: Normal Distribution
 - [`mvstud()`](https://docs.rpact.org/reference/mvstud.md) : Original
@@ -202,6 +206,8 @@
   Confirmatory Adaptive Clinical Trial Design and Analysis
 - [`setOutputFormat()`](https://docs.rpact.org/reference/setOutputFormat.md)
   : Set Output Format
+- [`` `[`( ``*`<TrialComparisonTable>`*`)`](https://docs.rpact.org/reference/sub-.TrialComparisonTable.md)
+  : Subset a Trial Comparison Table
 - [`summary(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/summary.TrialComparison.md)
   : Summarize Differences Between Trial Planning Objects
 - [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) :
@@ -213,6 +219,8 @@
   [`getPiecewiseExponentialRandomNumbers()`](https://docs.rpact.org/reference/utilitiesForPiecewiseExponentialDistribution.md)
   [`rpwexp()`](https://docs.rpact.org/reference/utilitiesForPiecewiseExponentialDistribution.md)
   : The Piecewise Exponential Distribution
+- [`` `%vs%` ``](https://docs.rpact.org/reference/versus.md) : Compare
+  and Summarize Trial Planning Objects
 - [`writeDataset()`](https://docs.rpact.org/reference/writeDataset.md) :
   Write Dataset
 - [`writeDatasets()`](https://docs.rpact.org/reference/writeDatasets.md)

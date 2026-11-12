@@ -147,6 +147,21 @@
   and legacy `NA` behaviour remain available. Comparison operations and
   package testing provide structured errors through the central error
   helpers, preserving worker failure details.
+  [`compare()`](https://docs.rpact.org/reference/compare.md) starts a
+  trial comparison from supported planning objects and extends an
+  existing `TrialComparison` by reference, supporting pipelines such as
+  `design |> compare(plan1) |> compare(plan2)`. Trial comparison data
+  frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+- The `%vs%` operator combines trial planning objects, comparisons, and
+  their summaries through
+  [`getComparison()`](https://docs.rpact.org/reference/getComparison.md)
+  and returns a comparison summary. It supports chaining and plotting
+  with explicit axis selections. `compare(x)` can now create a
+  comparison from a single object.
 
 ### Improvements, issues, and changes
 
@@ -236,11 +251,18 @@ CRAN release: 2026-03-04
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - Extended
   [`testPackage()`](https://docs.rpact.org/reference/testPackage.md)
   with additional options for report customization and metadata
   handling. A new argument `reportFileBaseName` allows explicit control
   over the base name of all generated report files.
+
 - [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
   supports structured metadata via the new arguments `metaData` and
   `metaDataFile`. Users can either pass a named list of key–value pairs
@@ -248,6 +270,7 @@ CRAN release: 2026-03-04
   metadata is included in the generated test reports and supports
   reproducible, auditable installation qualification and validation
   workflows.
+
 - Added two internal utility functions,
   [`writeKeyValueFile()`](https://docs.rpact.org/reference/writeKeyValueFile.md)
   and
@@ -256,6 +279,7 @@ CRAN release: 2026-03-04
   (`KEY=VALUE`, INI/.env-like format). These functions are implemented
   using base R only, support UTF-8 encoding, comments, and robust
   parsing, and are intended for use in regulated environments.
+
 - The new key–value file utilities are used internally by
   [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) to
   support structured metadata handling via the `metaData` and
@@ -287,17 +311,25 @@ CRAN release: 2025-12-16
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - The new function
   [`getFutilityBounds()`](https://docs.rpact.org/reference/getFutilityBounds.md)
   converts futility bounds between different scales such as z-value,
   p-value, conditional power, predictive power, reverse conditional
   power, and effect estimate.
+
 - The new argument `futilityBoundsScale` in
   [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md)
   and
   [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md)
   allows specifying futility bounds directly on alternative scales
   (e.g. p-value), which are internally converted as needed.
+
 - The new argument `alpha0Scale` in
   [`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md)
   allows specifying alpha0 bounds directly on alternative scales, which
@@ -320,11 +352,19 @@ CRAN release: 2025-07-24
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - `efficacyStops` and `futilityStops` parameter added (issue
   [\#88](https://github.com/rpact-com/rpact/issues/88))
+
 - parameter `stdErrorEstimate` (`"pooled"` or `"unpooled"`) added for
   calculation of final confidence intervals in two-sample situation for
   rates
+
 - [`testPackage()`](https://docs.rpact.org/reference/testPackage.md)
   returns an `InstallationQualificationResult` object
 
@@ -345,6 +385,12 @@ CRAN release: 2025-03-24
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - For the functions
   [`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md),
   [`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md),
@@ -354,6 +400,7 @@ CRAN release: 2025-03-24
   dose levels for a `linear` or `sigmoidEmax` dose-response relationship
   (see feature request
   [\#63](https://github.com/rpact-com/rpact/issues/63))
+
 - Added support for unequal variances between two groups in
   [`getSampleSizeMeans()`](https://docs.rpact.org/reference/getSampleSizeMeans.md),
   [`getPowerMeans()`](https://docs.rpact.org/reference/getPowerMeans.md),
@@ -361,26 +408,33 @@ CRAN release: 2025-03-24
   [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md)
   functions, see enhancement
   [\#70](https://github.com/rpact-com/rpact/issues/70)
+
 - [`testPackage()`](https://docs.rpact.org/reference/testPackage.md)
   produces a comprehensive installation qualification report in html and
   pdf format (see new vignette [Installation Qualification of
   rpact](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/))
+
 - [`setupPackageTests()`](https://docs.rpact.org/reference/setupPackageTests.md)
   sets up the package tests by downloading the test files and copying
   them to the rpact installation directory
+
 - [`saveOptions()`](https://docs.rpact.org/reference/saveOptions.md)
   saves the current `rpact` options to a configuration file
+
 - [`resetOptions()`](https://docs.rpact.org/reference/resetOptions.md)
   resets the `rpact` options to their default values
+
 - Argument `conservative` added to
   [`getSampleSizeRates()`](https://docs.rpact.org/reference/getSampleSizeRates.md)
   function, see enhancement
   [\#39](https://github.com/rpact-com/rpact/issues/39)
+
 - Enable futility boundaries in *Boundaries p Values Scale plot* plot
   (type = 3) using
   `options("rpact.plot.show.futility.on.pvalue.scale" = TRUE)` or
   argument `showFutilityBounds = TRUE`, see enhancement
   [\#79](https://github.com/rpact-com/rpact/issues/79)
+
 - Enable beta-spending in *Error Spending* plot (type = 4) using
   `options("rpact.plot.show.beta.spent" = TRUE)` or argument
   `showBetaSpent = TRUE`, see enhancement
@@ -388,6 +442,7 @@ CRAN release: 2025-03-24
   `options("rpact.plot.show.alpha.spent" = FALSE)` or argument
   `showAlphaSpent = FALSE` can be used to show only beta-spending in the
   plot
+
 - [`getSampleSizeMeans()`](https://docs.rpact.org/reference/getSampleSizeMeans.md),
   [`getPowerMeans()`](https://docs.rpact.org/reference/getPowerMeans.md),
   [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md):
@@ -431,6 +486,12 @@ CRAN release: 2024-09-27
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - The new function
   [`getSimulationCounts()`](https://docs.rpact.org/reference/getSimulationCounts.md)
   can be used to perform power simulations for clinical trials with
@@ -439,6 +500,7 @@ CRAN release: 2024-09-27
   expected sample size for testing mean rates for negative binomial
   distributed event numbers in the two treatment groups testing
   situation
+
 - The functions
   [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md),
   [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md),
@@ -447,11 +509,13 @@ CRAN release: 2024-09-27
   now support the argument `directionUpper` to specify the direction of
   the alternative for one-sided testing early at the design phase, see
   enhancement [\#26](https://github.com/rpact-com/rpact/issues/26)
+
 - [`getSampleSizeCounts()`](https://docs.rpact.org/reference/getSampleSizeCounts.md)
   and
   [`getPowerCounts()`](https://docs.rpact.org/reference/getPowerCounts.md)
   output boundary values also on the treatment effect scale, see
   enhancement [\#40](https://github.com/rpact-com/rpact/issues/40)
+
 - The
   [`fetch()`](https://docs.rpact.org/reference/fetch.ParameterSet.md)
   and
@@ -486,6 +550,12 @@ CRAN release: 2024-05-31
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - All reference classes in the package have been replaced by
   [R6](https://cran.r-project.org/package=R6) classes. This change
   brings significant advantages, including improved performance, more
@@ -496,11 +566,13 @@ CRAN release: 2024-05-31
   provide a more intuitive and user-friendly interface for developers,
   facilitating the creation and maintenance of complex data structures
   and workflows
+
 - Extension of the function
   [`getPerformanceScore()`](https://docs.rpact.org/reference/getPerformanceScore.md)
   for sample size recalculation rules to the setting of binary endpoints
   according to [Bokelmann et
   al. (2024)](https://doi.org/10.1186/s12874-024-02150-4)
+
 - The
   [`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md),
   [`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md),
@@ -516,6 +588,7 @@ CRAN release: 2024-05-31
   means), `overallEffects`, and for rates additionally:
   `piTreatmentsH1`, `piControlH1`, `overallRates`, and
   `overallRatesControl`
+
 - Same as above for
   [`getSimulationEnrichmentMeans()`](https://docs.rpact.org/reference/getSimulationEnrichmentMeans.md),
   [`getSimulationEnrichmentRates()`](https://docs.rpact.org/reference/getSimulationEnrichmentRates.md),
@@ -525,6 +598,7 @@ CRAN release: 2024-05-31
   `selectPopulationsFunction` argument based on predictive/posterior
   probabilities added (see
   [\#32](https://github.com/rpact-com/rpact/issues/32))
+
 - The
   [`fetch()`](https://docs.rpact.org/reference/fetch.ParameterSet.md)
   and
@@ -582,6 +656,12 @@ CRAN release: 2024-01-25
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - The new functions
   [`getSampleSizeCounts()`](https://docs.rpact.org/reference/getSampleSizeCounts.md)
   and
@@ -612,20 +692,29 @@ CRAN release: 2023-07-03
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - The new function
   [`getPerformanceScore()`](https://docs.rpact.org/reference/getPerformanceScore.md)
   calculates the conditional performance score, its sub-scores and
   components according to [Herrmann et
   al. (2020)](https://doi.org/10.1002/sim.8534) for a given simulation
   result from a two-stage design
+
 - `allocationRatioPlanned` for simulating multi-arm and enrichment
   designs can be a vector of length kMax, the number of stages
+
 - [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md)
   (short:
   [`rcmd()`](https://docs.rpact.org/reference/getObjectRCode.md)): with
   the new arguments `pipeOperator` and `output` many new output variants
   can be specified, e.g., the native R pipe operator or the magrittr
   pipe operator can be used
+
 - Generic function
   [`knitr::knit_print`](https://rdrr.io/pkg/knitr/man/knit_print.html)
   for all result objects implemented and automatic code chunk option
@@ -729,8 +818,15 @@ CRAN release: 2022-06-15
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - Two-sided beta-spending approach with binding and non-binding futility
   bounds
+
 - Delayed response utility added in design specification
 
 ### Improvements, issues, and changes
@@ -791,6 +887,12 @@ CRAN release: 2021-12-16
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - Simulation tools for enrichment design testing means, rates, and
   hazard ratios: function
   [`getSimulationEnrichmentMeans()`](https://docs.rpact.org/reference/getSimulationEnrichmentMeans.md),
@@ -798,6 +900,7 @@ CRAN release: 2021-12-16
   [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.md)
   available for simulation of enrichment designs; note that this is a
   novel implementation, hence experimental
+
 - [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md)
   /
   [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md):
@@ -858,6 +961,12 @@ CRAN release: 2021-06-10
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - Analysis tools for enrichment design testing means, rates, and hazard
   ratios: function
   [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)
@@ -865,25 +974,30 @@ CRAN release: 2021-06-10
   [`getDataset()`](https://docs.rpact.org/reference/getDataset.md)
   generalized for entering stratified data; manual extended for
   enrichment designs
+
 - Automatic boundary recalculations during the trial for analysis with
   alpha spending approach, including under- and over-running: setup via
   the optional parameters ‘maxInformation’ and ‘informationEpsilon’ in
   function
   [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)
+
 - The new function
   [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md)
   (short:
   [`rcmd()`](https://docs.rpact.org/reference/getObjectRCode.md))
   returns the original R command which produced any rpact result object,
   including all dependencies
+
 - [`getWideFormat()`](https://docs.rpact.org/reference/getWideFormat.md)
   and
   [`getLongFormat()`](https://docs.rpact.org/reference/getLongFormat.md)
   return a dataset object in wide format (unstacked) or long format
   (narrow, stacked)
+
 - Generic function
   [`kable()`](https://docs.rpact.org/reference/kableParameterSet.md)
   returns the output of an rpact result object formatted in Markdown.
+
 - Generic function [`t()`](https://rdrr.io/r/base/t.html) returns the
   transpose of an rpact result object
 
@@ -1005,41 +1119,65 @@ CRAN release: 2020-09-07
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - Simulation tools for multi-arm design testing means, rates, and hazard
   ratios
+
 - Analysis tools for multi-arm design testing means, rates, and hazard
   ratios
+
 - [`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md):
   exact versions for testing a rate (one-sample case) and equality of
   rates (two-sample case)
+
 - getDataset: multi-arm datasets for means, rates, and survival data
+
 - Analysis of fixed designs
+
 - Summary for analysis and simulation result objects newly implemented
+
 - Summary for most rpact result objects substantially improved and
   enhanced
+
 - [`getEventProbabilities()`](https://docs.rpact.org/reference/getEventProbabilities.md):
   plot of result object
+
 - [`getNumberOfSubjects()`](https://docs.rpact.org/reference/getNumberOfSubjects.md):
   plot of result object
+
 - Visual comparison of two designs: `plot(design1, design2)`
+
 - Functions setOutputFormat and getOutputFormat implemented: definition
   of user defined output formats
+
 - [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md):
   thetaH1 and stDevH1 can be specified for assessment of sample size
   recalculation (replaces thetaStandardized)
+
 - [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md):
   separate p-values added to the aggregated simulation data for Fisher
   designs
+
 - [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md),
   [`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md):
   Cumulated number of subjects integrated in getData object
+
 - `getSimulation[MultiArm][Means/Rates/Survival]()`: new logical
   argument ‘showStatistics’ added
+
 - Example datasets (csv files) added to the package
+
 - plot type “all”: plot all available plots of an object in one step
   using `plot(x, type = "all")`
+
 - plot type improved: ‘type’ now can be a vector, e.g.,
   `plot(x, type = c(1, 3))`
+
 - `plot(x, grid = 1)`: new plot argument ‘grid’ enables the plotting of
   2 or more plots in one graphic
 
@@ -1155,7 +1293,14 @@ CRAN release: 2019-09-20
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - Plot function for Fisher design implemented
+
 - Generic function [`summary()`](https://rdrr.io/r/base/summary.html)
   implemented for `getDesign[...]()`, `getSampleSize[...]()`,
   `getPower[...]()`, and `getSimulation[...]()` results: a simple
@@ -1232,21 +1377,33 @@ CRAN release: 2019-05-28
 
 ### New features
 
+- Trial comparison data frames support `digits`, `ceilingEnabled`, and
+  `removeVariableParameters` for numeric formatting and shared profiles.
+  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
+  and render scrollable HTML or split LaTeX longtables automatically
+  through knitr, without embedded report helpers.
+
 - Power calculation at given or adapted sample size for means, rates and
   survival data
+
 - Sample size and power calculation for survival trials with piecewise
   accrual time and intensity
+
 - Sample size and power calculation for survival trials with exponential
   survival time, piecewise exponential survival time and survival times
   that follow a Weibull distribution
+
 - Simulation tool for survival trials; our simulator is very fast
   because it was implemented with C++. Adaptive event number
   recalculations based on conditional power can be assessed
+
 - Simulation tool for designs with continuous and binary endpoints.
   Adaptive sample size recalculations based on conditional power can be
   assessed
+
 - Comprehensive and unified tool for performing sample size calculation
   for fixed sample size design
+
 - Enhanced plot functionalities
 
 ### Improvements, issues, and changes

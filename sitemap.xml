@@ -100,6 +100,7 @@
 <url><loc>https://docs.rpact.org/reference/as251Normal.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/as251StudentT.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/checkInstallationQualificationStatus.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/compare.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/dataEnrichmentMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/dataEnrichmentMeansStratified.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/dataEnrichmentRates.html</loc></url>
@@ -193,6 +194,7 @@
 <url><loc>https://docs.rpact.org/reference/knit_print.FieldSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/knit_print.ParameterSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/knit_print.SummaryFactory.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/knit_print.TrialComparisonTable.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/length.TrialDesignSet.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/mvnprd.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/mvstud.html</loc></url>
@@ -388,6 +390,7 @@
 <url><loc>https://docs.rpact.org/reference/setLogLevel.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/setOutputFormat.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/setupPackageTests.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/sub-.TrialComparisonTable.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/summary.AnalysisResults.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/summary.Dataset.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/summary.FutilityBounds.html</loc></url>
@@ -398,6 +401,7 @@
 <url><loc>https://docs.rpact.org/reference/test_plan_section.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/utilitiesForPiecewiseExponentialDistribution.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/utilitiesForSurvivalTrials.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/versus.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/writeDataset.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/writeDatasets.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/writeKeyValueFile.html</loc></url>

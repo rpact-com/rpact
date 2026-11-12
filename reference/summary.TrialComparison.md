@@ -15,7 +15,8 @@ summary(
   maxProfiles = 3L,
   maxObjects = 6L,
   maxValues = 4L,
-  output = c("all", "title", "overview", "body")
+  output = c("all", "title", "overview", "body"),
+  harmonizeColumnNames = TRUE
 )
 ```
 
@@ -54,34 +55,51 @@ summary(
 
   One of "all", "title", "overview", or "body".
 
+- harmonizeColumnNames:
+
+  If `TRUE` (default), compare the harmonized columns described in
+  [`getComparison()`](https://docs.rpact.org/reference/getComparison.md).
+  If `FALSE`, compare the original parameter names, as in
+  `as.data.frame(object, harmonizeColumnNames = FALSE)`.
+
 ## Value
 
 A `TrialComparisonSummary` inheriting from `SummaryFactory`. Its
 `parameterInfo` contains metadata, full exact profiles and object group
 IDs. The displayed summary is a snapshot; call
 [`summary()`](https://rdrr.io/r/base/summary.html) again after changing
-an underlying object. Input roles take precedence when roles differ
-across the compared object types.
+an underlying object. The `harmonizeColumnNames` attribute of
+`parameterInfo` records the selected naming mode for plotting and R-code
+reconstruction. Input roles take precedence when roles differ across the
+compared object types.
 
 ## Details
 
+Constant numeric vector cells compare equal to their scalar value
+regardless of vector length. Nonconstant vectors, missing values, and
+their positions remain part of the exact comparison. The stored
+comparison data are unchanged. This value normalization also applies
+when column-name harmonization is disabled. Plotting a summary retains
+its selected column-name mode unless custom data are supplied.
+
 Parameter captions are resolved separately for each original object,
 including its design when a parameter comes from that design.
-`parameterInfo$paramName` retains the original column names;
-`paramCaption` contains the display label and `paramCaptions` contains
-captions in object order (NA for absent parameters). These captions are
-captured with the summary. Distinct object-specific captions are shown
-together and identified alongside the corresponding object labels; they
-do not change exact value-profile grouping. Unnamed entries are labelled
-by their calculation or design type and collection position. The
-overview and these type labels are captured with the summary. The legend
-explains exact profile comparison and mentions NA only when displayed
-profiles contain missing values. Titles distinguish designs, sample size
-calculations, power calculations, and power simulations. Mixed
-comparisons use a design plan comparison title; empty comparisons retain
-the general trial comparison title. Markdown output presents each
-differing parameter as a table with one row per displayed profile and
-columns labelled by stage and situation. Scalar profiles use a Value
-column. Blank cells indicate coordinates absent from a profile; explicit
-missing values are shown as NA. The display limits also apply to these
-tables, with omitted values and profiles indicated explicitly.
+`parameterInfo$paramName` retains the column names selected by
+`harmonizeColumnNames`; `paramCaption` contains the display label and
+`paramCaptions` contains captions in object order (NA for absent
+parameters). These captions are captured with the summary. Distinct
+object-specific captions are shown together and identified alongside the
+corresponding object labels; they do not change exact value-profile
+grouping. Unnamed entries are labelled by their calculation or design
+type and collection position. The overview and these type labels are
+captured with the summary. The legend explains exact profile comparison
+and mentions NA only when displayed profiles contain missing values.
+Titles distinguish designs, sample size calculations, power
+calculations, and power simulations. Mixed comparisons use a design plan
+comparison title; empty comparisons retain the general trial comparison
+title. Markdown output presents each differing parameter as a table with
+one row per displayed profile and columns labelled by stage and
+situation. Scalar profiles use a Value column. Blank cells indicate
+coordinates absent from a profile; explicit missing values are shown as
+NA. The display limits also apply to these tables, with omitted values
+and profiles indicated explicitly.

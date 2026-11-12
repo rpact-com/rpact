@@ -111,7 +111,10 @@ testPackage(
 - metaDataFile:
 
   An optional path to a text file containing metadata: one entry per
-  line in the form `KEY=VALUE`. For more information, see
+  line in the form `KEY=VALUE`. Ignored with a warning when a non-empty
+  `metaData` list is supplied. Supplied metadata is saved as
+  `meta_data.txt` in the test target directory. For more information,
+  see
   [`writeKeyValueFile`](https://docs.rpact.org/reference/writeKeyValueFile.md)
   and
   [`readKeyValueFile`](https://docs.rpact.org/reference/readKeyValueFile.md).

@@ -51,7 +51,8 @@
 <li>For survival endpoints, the default value of <code>directionUpper</code> has changed from <code>TRUE</code> to <code>FALSE</code>. Accordingly, the default event rates have been adjusted to provide meaningful examples for an alternative in the lower direction: <code>pi2</code> (and <code>piControl</code>) now defaults to <code>0.5</code>, while the sample size default for <code>pi1</code> is now <code>c(0.1, 0.2, 0.3)</code>; the power and simulation default for <code>pi1</code> remains <code>seq(0.2, 0.5, 0.1)</code>. One-sided power calculations and simulations issue a warning if <code>directionUpper</code> is not specified explicitly, making users aware of the changed default. No warning is issued for sample size calculations because the <code>directionUpper</code> argument has only been added to these functions in this version. For sample size calculations, the direction is always derived from the specified alternative; the argument is provided solely to validate that this derived direction is consistent with a <code>directionUpper</code> value that may already have been set in the design.</li>
 <li>
 <code><a href="../reference/testPackage.html">testPackage()</a></code> now supports parallel test execution on Windows, Linux, and macOS while retaining its HTML and PDF reports. The new <code>workers</code> argument defaults to automatic selection (available CPUs minus two, between one and 16); use <code>workers = 1</code> for serial execution. Local test scheduling priorities are respected, and the result includes the worker count and separate timings for unit tests, R basic package tests, and HTML/PDF rendering.</li>
-<li>Added <code><a href="../reference/getComparison.html">getComparison()</a></code> and the R6 <code>TrialComparison</code> class for comparing designs, design characteristics, sample size and power calculations, and simulations. Named or unnamed objects, nested lists, and existing comparisons can be combined, extended with <code><a href="../reference/add.html">add()</a></code>, and edited with <code><a href="../reference/delete.html">delete()</a></code>; <code><a href="../reference/getObjects.html">getObjects()</a></code>, <code><a href="../reference/fetch.ParameterSet.html">fetch()</a></code>, <code>$</code>, and <code>[[</code> provide access to the contained objects. Duplicate names are rejected. Compact print and summary output presents shared and differing parameter profiles using descriptive object labels, context-specific captions, and titles, with display limits for large comparisons. Full data-frame conversion, Markdown output, and R-code reconstruction are supported, including stage coordinates for fixed designs and robust numeric type inference. The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> of a <code>TrialComparison</code> result supports multiple category columns and y parameters, with automatic or explicit left/right axis assignment through <code>yAxisSide</code>. <code><a href="../reference/getComparisonPlotParameters.html">getComparisonPlotParameters()</a></code> previews selections, axis transformations, and diagnostic messages. Comparison axes use context-specific parameter captions for both single and multiple y parameters. Comparison legends use object-aware titles and adaptive category/parameter layouts, with measured wrapping, independent positions, and font reductions limited to ten percent. Automatic legend placement (<code>legendPosition = "auto"</code>) is the default across all rpact plots with legends, while manual positions and legacy <code>NA</code> behaviour remain available. Comparison operations and package testing provide structured errors through the central error helpers, preserving worker failure details.</li>
+<li>Added <code><a href="../reference/getComparison.html">getComparison()</a></code> and the R6 <code>TrialComparison</code> class for comparing designs, design characteristics, sample size and power calculations, and simulations. Named or unnamed objects, nested lists, and existing comparisons can be combined, extended with <code><a href="../reference/add.html">add()</a></code>, and edited with <code><a href="../reference/delete.html">delete()</a></code>; <code><a href="../reference/getObjects.html">getObjects()</a></code>, <code><a href="../reference/fetch.ParameterSet.html">fetch()</a></code>, <code>$</code>, and <code>[[</code> provide access to the contained objects. Duplicate names are rejected. Compact print and summary output presents shared and differing parameter profiles using descriptive object labels, context-specific captions, and titles, with display limits for large comparisons. Full data-frame conversion, Markdown output, and R-code reconstruction are supported, including stage coordinates for fixed designs and robust numeric type inference. The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> of a <code>TrialComparison</code> result supports multiple category columns and y parameters, with automatic or explicit left/right axis assignment through <code>yAxisSide</code>. <code><a href="../reference/getComparisonPlotParameters.html">getComparisonPlotParameters()</a></code> previews selections, axis transformations, and diagnostic messages. Comparison axes use context-specific parameter captions for both single and multiple y parameters. Comparison legends use object-aware titles and adaptive category/parameter layouts, with measured wrapping, independent positions, and font reductions limited to ten percent. Automatic legend placement (<code>legendPosition = "auto"</code>) is the default across all rpact plots with legends, while manual positions and legacy <code>NA</code> behaviour remain available. Comparison operations and package testing provide structured errors through the central error helpers, preserving worker failure details. <code><a href="../reference/compare.html">compare()</a></code> starts a trial comparison from supported planning objects and extends an existing <code>TrialComparison</code> by reference, supporting pipelines such as <code>design |&gt; compare(plan1) |&gt; compare(plan2)</code>. Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</li>
+<li>The <code>%vs%</code> operator combines trial planning objects, comparisons, and their summaries through <code><a href="../reference/getComparison.html">getComparison()</a></code> and returns a comparison summary. It supports chaining and plotting with explicit axis selections. <code>compare(x)</code> can now create a comparison from a single object.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-5-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-5-0"></a></h3>
@@ -85,11 +86,11 @@
 <h2 class="pkg-version" data-toc-text="4.4.0" id="rpact-440">rpact 4.4.0<a class="anchor" aria-label="anchor" href="#rpact-440"></a></h2><p class="text-muted">CRAN release: 2026-03-04</p>
 <div class="section level3">
 <h3 id="new-features-4-4-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-4-0"></a></h3>
-<ul><li>Extended <code><a href="../reference/testPackage.html">testPackage()</a></code> with additional options for report customization and metadata handling. A new argument <code>reportFileBaseName</code> allows explicit control over the base name of all generated report files.</li>
-<li>
-<code><a href="../reference/testPackage.html">testPackage()</a></code> now supports structured metadata via the new arguments <code>metaData</code> and <code>metaDataFile</code>. Users can either pass a named list of key–value pairs directly or provide an external text file in <code>KEY=VALUE</code> format. This metadata is included in the generated test reports and supports reproducible, auditable installation qualification and validation workflows.</li>
-<li>Added two internal utility functions, <code><a href="../reference/writeKeyValueFile.html">writeKeyValueFile()</a></code> and <code><a href="../reference/readKeyValueFile.html">readKeyValueFile()</a></code>, for writing and reading human-editable key–value metadata files (<code>KEY=VALUE</code>, INI/.env-like format). These functions are implemented using base R only, support UTF-8 encoding, comments, and robust parsing, and are intended for use in regulated environments.</li>
-<li>The new key–value file utilities are used internally by <code><a href="../reference/testPackage.html">testPackage()</a></code> to support structured metadata handling via the <code>metaData</code> and <code>metaDataFile</code> arguments, enabling reproducible and auditable inclusion of environment- and system-specific information in installation qualification and validation reports.</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>Extended <code><a href="../reference/testPackage.html">testPackage()</a></code> with additional options for report customization and metadata handling. A new argument <code>reportFileBaseName</code> allows explicit control over the base name of all generated report files.</p></li>
+<li><p><code><a href="../reference/testPackage.html">testPackage()</a></code> now supports structured metadata via the new arguments <code>metaData</code> and <code>metaDataFile</code>. Users can either pass a named list of key–value pairs directly or provide an external text file in <code>KEY=VALUE</code> format. This metadata is included in the generated test reports and supports reproducible, auditable installation qualification and validation workflows.</p></li>
+<li><p>Added two internal utility functions, <code><a href="../reference/writeKeyValueFile.html">writeKeyValueFile()</a></code> and <code><a href="../reference/readKeyValueFile.html">readKeyValueFile()</a></code>, for writing and reading human-editable key–value metadata files (<code>KEY=VALUE</code>, INI/.env-like format). These functions are implemented using base R only, support UTF-8 encoding, comments, and robust parsing, and are intended for use in regulated environments.</p></li>
+<li><p>The new key–value file utilities are used internally by <code><a href="../reference/testPackage.html">testPackage()</a></code> to support structured metadata handling via the <code>metaData</code> and <code>metaDataFile</code> arguments, enabling reproducible and auditable inclusion of environment- and system-specific information in installation qualification and validation reports.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-4-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-4-0"></a></h3>
@@ -106,9 +107,10 @@
 <h2 class="pkg-version" data-toc-text="4.3.0" id="rpact-430">rpact 4.3.0<a class="anchor" aria-label="anchor" href="#rpact-430"></a></h2><p class="text-muted">CRAN release: 2025-12-16</p>
 <div class="section level3">
 <h3 id="new-features-4-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-3-0"></a></h3>
-<ul><li>The new function <code><a href="../reference/getFutilityBounds.html">getFutilityBounds()</a></code> converts futility bounds between different scales such as z-value, p-value, conditional power, predictive power, reverse conditional power, and effect estimate.</li>
-<li>The new argument <code>futilityBoundsScale</code> in <code><a href="../reference/getDesignInverseNormal.html">getDesignInverseNormal()</a></code> and <code><a href="../reference/getDesignGroupSequential.html">getDesignGroupSequential()</a></code> allows specifying futility bounds directly on alternative scales (e.g. p-value), which are internally converted as needed.</li>
-<li>The new argument <code>alpha0Scale</code> in <code><a href="../reference/getDesignFisher.html">getDesignFisher()</a></code> allows specifying alpha0 bounds directly on alternative scales, which are internally converted as needed.</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>The new function <code><a href="../reference/getFutilityBounds.html">getFutilityBounds()</a></code> converts futility bounds between different scales such as z-value, p-value, conditional power, predictive power, reverse conditional power, and effect estimate.</p></li>
+<li><p>The new argument <code>futilityBoundsScale</code> in <code><a href="../reference/getDesignInverseNormal.html">getDesignInverseNormal()</a></code> and <code><a href="../reference/getDesignGroupSequential.html">getDesignGroupSequential()</a></code> allows specifying futility bounds directly on alternative scales (e.g. p-value), which are internally converted as needed.</p></li>
+<li><p>The new argument <code>alpha0Scale</code> in <code><a href="../reference/getDesignFisher.html">getDesignFisher()</a></code> allows specifying alpha0 bounds directly on alternative scales, which are internally converted as needed.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-3-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-3-0"></a></h3>
@@ -123,11 +125,10 @@
 <h2 class="pkg-version" data-toc-text="4.2.1" id="rpact-421">rpact 4.2.1<a class="anchor" aria-label="anchor" href="#rpact-421"></a></h2><p class="text-muted">CRAN release: 2025-07-24</p>
 <div class="section level3">
 <h3 id="new-features-4-2-1">New features<a class="anchor" aria-label="anchor" href="#new-features-4-2-1"></a></h3>
-<ul><li>
-<code>efficacyStops</code> and <code>futilityStops</code> parameter added (issue <a href="https://github.com/rpact-com/rpact/issues/88" class="external-link">#88</a>)</li>
-<li>parameter <code>stdErrorEstimate</code> (<code>"pooled"</code> or <code>"unpooled"</code>) added for calculation of final confidence intervals in two-sample situation for rates</li>
-<li>
-<code><a href="../reference/testPackage.html">testPackage()</a></code> returns an <code>InstallationQualificationResult</code> object</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p><code>efficacyStops</code> and <code>futilityStops</code> parameter added (issue <a href="https://github.com/rpact-com/rpact/issues/88" class="external-link">#88</a>)</p></li>
+<li><p>parameter <code>stdErrorEstimate</code> (<code>"pooled"</code> or <code>"unpooled"</code>) added for calculation of final confidence intervals in two-sample situation for rates</p></li>
+<li><p><code><a href="../reference/testPackage.html">testPackage()</a></code> returns an <code>InstallationQualificationResult</code> object</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-2-1">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-2-1"></a></h3>
@@ -141,24 +142,17 @@
 <h2 class="pkg-version" data-toc-text="4.2.0" id="rpact-420">rpact 4.2.0<a class="anchor" aria-label="anchor" href="#rpact-420"></a></h2><p class="text-muted">CRAN release: 2025-03-24</p>
 <div class="section level3">
 <h3 id="new-features-4-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-2-0"></a></h3>
-<ul><li>For the functions <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> it is now possible to specify a parameter <code>doseLevels</code> to define the dose levels for a <code>linear</code> or <code>sigmoidEmax</code> dose-response relationship (see feature request <a href="https://github.com/rpact-com/rpact/issues/63" class="external-link">#63</a>)</li>
-<li>Added support for unequal variances between two groups in <code><a href="../reference/getSampleSizeMeans.html">getSampleSizeMeans()</a></code>, <code><a href="../reference/getPowerMeans.html">getPowerMeans()</a></code>, and <code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code> functions, see enhancement <a href="https://github.com/rpact-com/rpact/issues/70" class="external-link">#70</a>
-</li>
-<li>
-<code><a href="../reference/testPackage.html">testPackage()</a></code> produces a comprehensive installation qualification report in html and pdf format (see new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/" class="external-link">Installation Qualification of rpact</a>)</li>
-<li>
-<code><a href="../reference/setupPackageTests.html">setupPackageTests()</a></code> sets up the package tests by downloading the test files and copying them to the rpact installation directory</li>
-<li>
-<code><a href="../reference/saveOptions.html">saveOptions()</a></code> saves the current <code>rpact</code> options to a configuration file</li>
-<li>
-<code><a href="../reference/resetOptions.html">resetOptions()</a></code> resets the <code>rpact</code> options to their default values</li>
-<li>Argument <code>conservative</code> added to <code><a href="../reference/getSampleSizeRates.html">getSampleSizeRates()</a></code> function, see enhancement <a href="https://github.com/rpact-com/rpact/issues/39" class="external-link">#39</a>
-</li>
-<li>Enable futility boundaries in <em>Boundaries p Values Scale plot</em> plot (type = 3) using <code>options("rpact.plot.show.futility.on.pvalue.scale" = TRUE)</code> or argument <code>showFutilityBounds = TRUE</code>, see enhancement <a href="https://github.com/rpact-com/rpact/issues/79" class="external-link">#79</a>
-</li>
-<li>Enable beta-spending in <em>Error Spending</em> plot (type = 4) using <code>options("rpact.plot.show.beta.spent" = TRUE)</code> or argument <code>showBetaSpent = TRUE</code>, see enhancement <a href="https://github.com/rpact-com/rpact/issues/80" class="external-link">#80</a>. Furthermore, <code>options("rpact.plot.show.alpha.spent" = FALSE)</code> or argument <code>showAlphaSpent = FALSE</code> can be used to show only beta-spending in the plot</li>
-<li>
-<code><a href="../reference/getSampleSizeMeans.html">getSampleSizeMeans()</a></code>, <code><a href="../reference/getPowerMeans.html">getPowerMeans()</a></code>, <code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code>: For two-armed trials, it is allowed to specify the standard deviations (<code>stDev</code>) separately, i.e., as vector with two elements.</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>For the functions <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> it is now possible to specify a parameter <code>doseLevels</code> to define the dose levels for a <code>linear</code> or <code>sigmoidEmax</code> dose-response relationship (see feature request <a href="https://github.com/rpact-com/rpact/issues/63" class="external-link">#63</a>)</p></li>
+<li><p>Added support for unequal variances between two groups in <code><a href="../reference/getSampleSizeMeans.html">getSampleSizeMeans()</a></code>, <code><a href="../reference/getPowerMeans.html">getPowerMeans()</a></code>, and <code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code> functions, see enhancement <a href="https://github.com/rpact-com/rpact/issues/70" class="external-link">#70</a></p></li>
+<li><p><code><a href="../reference/testPackage.html">testPackage()</a></code> produces a comprehensive installation qualification report in html and pdf format (see new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/" class="external-link">Installation Qualification of rpact</a>)</p></li>
+<li><p><code><a href="../reference/setupPackageTests.html">setupPackageTests()</a></code> sets up the package tests by downloading the test files and copying them to the rpact installation directory</p></li>
+<li><p><code><a href="../reference/saveOptions.html">saveOptions()</a></code> saves the current <code>rpact</code> options to a configuration file</p></li>
+<li><p><code><a href="../reference/resetOptions.html">resetOptions()</a></code> resets the <code>rpact</code> options to their default values</p></li>
+<li><p>Argument <code>conservative</code> added to <code><a href="../reference/getSampleSizeRates.html">getSampleSizeRates()</a></code> function, see enhancement <a href="https://github.com/rpact-com/rpact/issues/39" class="external-link">#39</a></p></li>
+<li><p>Enable futility boundaries in <em>Boundaries p Values Scale plot</em> plot (type = 3) using <code>options("rpact.plot.show.futility.on.pvalue.scale" = TRUE)</code> or argument <code>showFutilityBounds = TRUE</code>, see enhancement <a href="https://github.com/rpact-com/rpact/issues/79" class="external-link">#79</a></p></li>
+<li><p>Enable beta-spending in <em>Error Spending</em> plot (type = 4) using <code>options("rpact.plot.show.beta.spent" = TRUE)</code> or argument <code>showBetaSpent = TRUE</code>, see enhancement <a href="https://github.com/rpact-com/rpact/issues/80" class="external-link">#80</a>. Furthermore, <code>options("rpact.plot.show.alpha.spent" = FALSE)</code> or argument <code>showAlphaSpent = FALSE</code> can be used to show only beta-spending in the plot</p></li>
+<li><p><code><a href="../reference/getSampleSizeMeans.html">getSampleSizeMeans()</a></code>, <code><a href="../reference/getPowerMeans.html">getPowerMeans()</a></code>, <code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code>: For two-armed trials, it is allowed to specify the standard deviations (<code>stDev</code>) separately, i.e., as vector with two elements.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-2-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-2-0"></a></h3>
@@ -182,13 +176,11 @@
 <h2 class="pkg-version" data-toc-text="4.1.0" id="rpact-410">rpact 4.1.0<a class="anchor" aria-label="anchor" href="#rpact-410"></a></h2><p class="text-muted">CRAN release: 2024-09-27</p>
 <div class="section level3">
 <h3 id="new-features-4-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-1-0"></a></h3>
-<ul><li>The new function <code><a href="../reference/getSimulationCounts.html">getSimulationCounts()</a></code> can be used to perform power simulations for clinical trials with negative binomial distributed count data. The function returns the simulated power, stopping probabilities, conditional power, and expected sample size for testing mean rates for negative binomial distributed event numbers in the two treatment groups testing situation</li>
-<li>The functions <code><a href="../reference/getDesignGroupSequential.html">getDesignGroupSequential()</a></code>, <code><a href="../reference/getDesignInverseNormal.html">getDesignInverseNormal()</a></code>, and <code><a href="../reference/getDesignFisher.html">getDesignFisher()</a></code> now support the argument <code>directionUpper</code> to specify the direction of the alternative for one-sided testing early at the design phase, see enhancement <a href="https://github.com/rpact-com/rpact/issues/26" class="external-link">#26</a>
-</li>
-<li>
-<code><a href="../reference/getSampleSizeCounts.html">getSampleSizeCounts()</a></code> and <code><a href="../reference/getPowerCounts.html">getPowerCounts()</a></code> output boundary values also on the treatment effect scale, see enhancement <a href="https://github.com/rpact-com/rpact/issues/40" class="external-link">#40</a>
-</li>
-<li>The <code><a href="../reference/fetch.ParameterSet.html">fetch()</a></code> and <code><a href="../reference/fetch.ParameterSet.html">obtain()</a></code> functions can be used to extract multiple parameters from an rpact result object and support various output formats</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>The new function <code><a href="../reference/getSimulationCounts.html">getSimulationCounts()</a></code> can be used to perform power simulations for clinical trials with negative binomial distributed count data. The function returns the simulated power, stopping probabilities, conditional power, and expected sample size for testing mean rates for negative binomial distributed event numbers in the two treatment groups testing situation</p></li>
+<li><p>The functions <code><a href="../reference/getDesignGroupSequential.html">getDesignGroupSequential()</a></code>, <code><a href="../reference/getDesignInverseNormal.html">getDesignInverseNormal()</a></code>, and <code><a href="../reference/getDesignFisher.html">getDesignFisher()</a></code> now support the argument <code>directionUpper</code> to specify the direction of the alternative for one-sided testing early at the design phase, see enhancement <a href="https://github.com/rpact-com/rpact/issues/26" class="external-link">#26</a></p></li>
+<li><p><code><a href="../reference/getSampleSizeCounts.html">getSampleSizeCounts()</a></code> and <code><a href="../reference/getPowerCounts.html">getPowerCounts()</a></code> output boundary values also on the treatment effect scale, see enhancement <a href="https://github.com/rpact-com/rpact/issues/40" class="external-link">#40</a></p></li>
+<li><p>The <code><a href="../reference/fetch.ParameterSet.html">fetch()</a></code> and <code><a href="../reference/fetch.ParameterSet.html">obtain()</a></code> functions can be used to extract multiple parameters from an rpact result object and support various output formats</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-1-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-1-0"></a></h3>
@@ -206,13 +198,12 @@
 <h2 class="pkg-version" data-toc-text="4.0.0" id="rpact-400">rpact 4.0.0<a class="anchor" aria-label="anchor" href="#rpact-400"></a></h2><p class="text-muted">CRAN release: 2024-05-31</p>
 <div class="section level3">
 <h3 id="new-features-4-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-0-0"></a></h3>
-<ul><li>All reference classes in the package have been replaced by <a href="https://cran.r-project.org/package=R6" class="external-link">R6</a> classes. This change brings significant advantages, including improved performance, more flexible and cleaner object-oriented programming, and enhanced encapsulation of methods and properties. The transition to R6 classes allows for more efficient memory management and faster execution, making the package more robust and scalable. Additionally, R6 classes provide a more intuitive and user-friendly interface for developers, facilitating the creation and maintenance of complex data structures and workflows</li>
-<li>Extension of the function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> for sample size recalculation rules to the setting of binary endpoints according to <a href="https://doi.org/10.1186/s12874-024-02150-4" class="external-link">Bokelmann et al. (2024)</a>
-</li>
-<li>The <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> functions now support an enhanced <code>selectArmsFunction</code> argument. Previously, only <code>effectVector</code> and <code>stage</code> were allowed as arguments. Now, users can optionally utilize additional arguments for more powerful custom function implementations, including <code>conditionalPower</code>, <code>conditionalCriticalValue</code>, <code>plannedSubjects/plannedEvents</code>, <code>allocationRatioPlanned</code>, <code>selectedArms</code>, <code>thetaH1</code> (for means and survival), <code>stDevH1</code> (for means), <code>overallEffects</code>, and for rates additionally: <code>piTreatmentsH1</code>, <code>piControlH1</code>, <code>overallRates</code>, and <code>overallRatesControl</code>
-</li>
-<li>Same as above for <code><a href="../reference/getSimulationEnrichmentMeans.html">getSimulationEnrichmentMeans()</a></code>, <code><a href="../reference/getSimulationEnrichmentRates.html">getSimulationEnrichmentRates()</a></code>, and <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code>. Specifically, support for population selection with <code>selectPopulationsFunction</code> argument based on predictive/posterior probabilities added (see <a href="https://github.com/rpact-com/rpact/issues/32" class="external-link">#32</a>)</li>
-<li>The <code><a href="../reference/fetch.ParameterSet.html">fetch()</a></code> and <code><a href="../reference/fetch.ParameterSet.html">obtain()</a></code> functions can be used to extract a single parameter from an rpact result object, which is useful for writing pipe-operator linked commands</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>All reference classes in the package have been replaced by <a href="https://cran.r-project.org/package=R6" class="external-link">R6</a> classes. This change brings significant advantages, including improved performance, more flexible and cleaner object-oriented programming, and enhanced encapsulation of methods and properties. The transition to R6 classes allows for more efficient memory management and faster execution, making the package more robust and scalable. Additionally, R6 classes provide a more intuitive and user-friendly interface for developers, facilitating the creation and maintenance of complex data structures and workflows</p></li>
+<li><p>Extension of the function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> for sample size recalculation rules to the setting of binary endpoints according to <a href="https://doi.org/10.1186/s12874-024-02150-4" class="external-link">Bokelmann et al. (2024)</a></p></li>
+<li><p>The <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> functions now support an enhanced <code>selectArmsFunction</code> argument. Previously, only <code>effectVector</code> and <code>stage</code> were allowed as arguments. Now, users can optionally utilize additional arguments for more powerful custom function implementations, including <code>conditionalPower</code>, <code>conditionalCriticalValue</code>, <code>plannedSubjects/plannedEvents</code>, <code>allocationRatioPlanned</code>, <code>selectedArms</code>, <code>thetaH1</code> (for means and survival), <code>stDevH1</code> (for means), <code>overallEffects</code>, and for rates additionally: <code>piTreatmentsH1</code>, <code>piControlH1</code>, <code>overallRates</code>, and <code>overallRatesControl</code></p></li>
+<li><p>Same as above for <code><a href="../reference/getSimulationEnrichmentMeans.html">getSimulationEnrichmentMeans()</a></code>, <code><a href="../reference/getSimulationEnrichmentRates.html">getSimulationEnrichmentRates()</a></code>, and <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code>. Specifically, support for population selection with <code>selectPopulationsFunction</code> argument based on predictive/posterior probabilities added (see <a href="https://github.com/rpact-com/rpact/issues/32" class="external-link">#32</a>)</p></li>
+<li><p>The <code><a href="../reference/fetch.ParameterSet.html">fetch()</a></code> and <code><a href="../reference/fetch.ParameterSet.html">obtain()</a></code> functions can be used to extract a single parameter from an rpact result object, which is useful for writing pipe-operator linked commands</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-0-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-0-0"></a></h3>
@@ -260,7 +251,8 @@
 <h2 class="pkg-version" data-toc-text="3.5.0" id="rpact-350">rpact 3.5.0<a class="anchor" aria-label="anchor" href="#rpact-350"></a></h2><p class="text-muted">CRAN release: 2024-01-25</p>
 <div class="section level3">
 <h3 id="new-features-3-5-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-5-0"></a></h3>
-<ul><li>The new functions <code><a href="../reference/getSampleSizeCounts.html">getSampleSizeCounts()</a></code> and <code><a href="../reference/getPowerCounts.html">getPowerCounts()</a></code> can be used to perform sample size calculations and the assessment of test characteristics for clinical trials with negative binomial distributed count data. This is possible for fixed sample size and group sequential designs. For the latter, the methodology described in Muetze et al. (2019) is implemented. These functions can also be used to perform blinded sample size reassessments according to Friede and Schmidli (2010).</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>The new functions <code><a href="../reference/getSampleSizeCounts.html">getSampleSizeCounts()</a></code> and <code><a href="../reference/getPowerCounts.html">getPowerCounts()</a></code> can be used to perform sample size calculations and the assessment of test characteristics for clinical trials with negative binomial distributed count data. This is possible for fixed sample size and group sequential designs. For the latter, the methodology described in Muetze et al. (2019) is implemented. These functions can also be used to perform blinded sample size reassessments according to Friede and Schmidli (2010).</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-3-5-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-3-5-0"></a></h3>
@@ -278,12 +270,11 @@
 <h2 class="pkg-version" data-toc-text="3.4.0" id="rpact-340">rpact 3.4.0<a class="anchor" aria-label="anchor" href="#rpact-340"></a></h2><p class="text-muted">CRAN release: 2023-07-03</p>
 <div class="section level3">
 <h3 id="new-features-3-4-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-4-0"></a></h3>
-<ul><li>The new function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> calculates the conditional performance score, its sub-scores and components according to <a href="https://doi.org/10.1002/sim.8534" class="external-link">Herrmann et al. (2020)</a> for a given simulation result from a two-stage design</li>
-<li>
-<code>allocationRatioPlanned</code> for simulating multi-arm and enrichment designs can be a vector of length kMax, the number of stages</li>
-<li>
-<code><a href="../reference/getObjectRCode.html">getObjectRCode()</a></code> (short: <code><a href="../reference/getObjectRCode.html">rcmd()</a></code>): with the new arguments <code>pipeOperator</code> and <code>output</code> many new output variants can be specified, e.g., the native R pipe operator or the magrittr pipe operator can be used</li>
-<li>Generic function <code><a href="https://rdrr.io/pkg/knitr/man/knit_print.html" class="external-link">knitr::knit_print</a></code> for all result objects implemented and automatic code chunk option <code>results = 'asis'</code> activated</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>The new function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> calculates the conditional performance score, its sub-scores and components according to <a href="https://doi.org/10.1002/sim.8534" class="external-link">Herrmann et al. (2020)</a> for a given simulation result from a two-stage design</p></li>
+<li><p><code>allocationRatioPlanned</code> for simulating multi-arm and enrichment designs can be a vector of length kMax, the number of stages</p></li>
+<li><p><code><a href="../reference/getObjectRCode.html">getObjectRCode()</a></code> (short: <code><a href="../reference/getObjectRCode.html">rcmd()</a></code>): with the new arguments <code>pipeOperator</code> and <code>output</code> many new output variants can be specified, e.g., the native R pipe operator or the magrittr pipe operator can be used</p></li>
+<li><p>Generic function <code><a href="https://rdrr.io/pkg/knitr/man/knit_print.html" class="external-link">knitr::knit_print</a></code> for all result objects implemented and automatic code chunk option <code>results = 'asis'</code> activated</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-3-4-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-3-4-0"></a></h3>
@@ -355,8 +346,9 @@
 <h2 class="pkg-version" data-toc-text="3.3.0" id="rpact-330">rpact 3.3.0<a class="anchor" aria-label="anchor" href="#rpact-330"></a></h2><p class="text-muted">CRAN release: 2022-06-15</p>
 <div class="section level3">
 <h3 id="new-features-3-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-3-0"></a></h3>
-<ul><li>Two-sided beta-spending approach with binding and non-binding futility bounds</li>
-<li>Delayed response utility added in design specification</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>Two-sided beta-spending approach with binding and non-binding futility bounds</p></li>
+<li><p>Delayed response utility added in design specification</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-3-3-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-3-3-0"></a></h3>
@@ -398,9 +390,9 @@
 <h2 class="pkg-version" data-toc-text="3.2.0" id="rpact-320">rpact 3.2.0<a class="anchor" aria-label="anchor" href="#rpact-320"></a></h2><p class="text-muted">CRAN release: 2021-12-16</p>
 <div class="section level3">
 <h3 id="new-features-3-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-2-0"></a></h3>
-<ul><li>Simulation tools for enrichment design testing means, rates, and hazard ratios: function <code><a href="../reference/getSimulationEnrichmentMeans.html">getSimulationEnrichmentMeans()</a></code>, <code><a href="../reference/getSimulationEnrichmentRates.html">getSimulationEnrichmentRates()</a></code>, <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code> available for simulation of enrichment designs; note that this is a novel implementation, hence experimental</li>
-<li>
-<code><a href="../reference/getDesignGroupSequential.html">getDesignGroupSequential()</a></code> / <code><a href="../reference/getDesignInverseNormal.html">getDesignInverseNormal()</a></code>: new typeOfDesign = “noEarlyEfficacy” added</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>Simulation tools for enrichment design testing means, rates, and hazard ratios: function <code><a href="../reference/getSimulationEnrichmentMeans.html">getSimulationEnrichmentMeans()</a></code>, <code><a href="../reference/getSimulationEnrichmentRates.html">getSimulationEnrichmentRates()</a></code>, <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code> available for simulation of enrichment designs; note that this is a novel implementation, hence experimental</p></li>
+<li><p><code><a href="../reference/getDesignGroupSequential.html">getDesignGroupSequential()</a></code> / <code><a href="../reference/getDesignInverseNormal.html">getDesignInverseNormal()</a></code>: new typeOfDesign = “noEarlyEfficacy” added</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-3-2-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-3-2-0"></a></h3>
@@ -437,14 +429,13 @@
 <h2 class="pkg-version" data-toc-text="3.1.0" id="rpact-310">rpact 3.1.0<a class="anchor" aria-label="anchor" href="#rpact-310"></a></h2><p class="text-muted">CRAN release: 2021-06-10</p>
 <div class="section level3">
 <h3 id="new-features-3-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-1-0"></a></h3>
-<ul><li>Analysis tools for enrichment design testing means, rates, and hazard ratios: function <code><a href="../reference/getAnalysisResults.html">getAnalysisResults()</a></code> generalized for enrichment designs; function <code><a href="../reference/getDataset.html">getDataset()</a></code> generalized for entering stratified data; manual extended for enrichment designs</li>
-<li>Automatic boundary recalculations during the trial for analysis with alpha spending approach, including under- and over-running: setup via the optional parameters ‘maxInformation’ and ‘informationEpsilon’ in function <code><a href="../reference/getAnalysisResults.html">getAnalysisResults()</a></code>
-</li>
-<li>The new function <code><a href="../reference/getObjectRCode.html">getObjectRCode()</a></code> (short: <code><a href="../reference/getObjectRCode.html">rcmd()</a></code>) returns the original R command which produced any rpact result object, including all dependencies</li>
-<li>
-<code><a href="../reference/getWideFormat.html">getWideFormat()</a></code> and <code><a href="../reference/getLongFormat.html">getLongFormat()</a></code> return a dataset object in wide format (unstacked) or long format (narrow, stacked)</li>
-<li>Generic function <code><a href="../reference/kableParameterSet.html">kable()</a></code> returns the output of an rpact result object formatted in Markdown.</li>
-<li>Generic function <code><a href="https://rdrr.io/r/base/t.html" class="external-link">t()</a></code> returns the transpose of an rpact result object</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>Analysis tools for enrichment design testing means, rates, and hazard ratios: function <code><a href="../reference/getAnalysisResults.html">getAnalysisResults()</a></code> generalized for enrichment designs; function <code><a href="../reference/getDataset.html">getDataset()</a></code> generalized for entering stratified data; manual extended for enrichment designs</p></li>
+<li><p>Automatic boundary recalculations during the trial for analysis with alpha spending approach, including under- and over-running: setup via the optional parameters ‘maxInformation’ and ‘informationEpsilon’ in function <code><a href="../reference/getAnalysisResults.html">getAnalysisResults()</a></code></p></li>
+<li><p>The new function <code><a href="../reference/getObjectRCode.html">getObjectRCode()</a></code> (short: <code><a href="../reference/getObjectRCode.html">rcmd()</a></code>) returns the original R command which produced any rpact result object, including all dependencies</p></li>
+<li><p><code><a href="../reference/getWideFormat.html">getWideFormat()</a></code> and <code><a href="../reference/getLongFormat.html">getLongFormat()</a></code> return a dataset object in wide format (unstacked) or long format (narrow, stacked)</p></li>
+<li><p>Generic function <code><a href="../reference/kableParameterSet.html">kable()</a></code> returns the output of an rpact result object formatted in Markdown.</p></li>
+<li><p>Generic function <code><a href="https://rdrr.io/r/base/t.html" class="external-link">t()</a></code> returns the transpose of an rpact result object</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-3-1-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-3-1-0"></a></h3>
@@ -522,36 +513,26 @@
 <h2 class="pkg-version" data-toc-text="3.0.0" id="rpact-300">rpact 3.0.0<a class="anchor" aria-label="anchor" href="#rpact-300"></a></h2><p class="text-muted">CRAN release: 2020-09-07</p>
 <div class="section level3">
 <h3 id="new-features-3-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-0-0"></a></h3>
-<ul><li>Simulation tools for multi-arm design testing means, rates, and hazard ratios</li>
-<li>Analysis tools for multi-arm design testing means, rates, and hazard ratios</li>
-<li>
-<code><a href="../reference/getSimulationRates.html">getSimulationRates()</a></code>: exact versions for testing a rate (one-sample case) and equality of rates (two-sample case)</li>
-<li>getDataset: multi-arm datasets for means, rates, and survival data</li>
-<li>Analysis of fixed designs</li>
-<li>Summary for analysis and simulation result objects newly implemented</li>
-<li>Summary for most rpact result objects substantially improved and enhanced</li>
-<li>
-<code><a href="../reference/getEventProbabilities.html">getEventProbabilities()</a></code>: plot of result object</li>
-<li>
-<code><a href="../reference/getNumberOfSubjects.html">getNumberOfSubjects()</a></code>: plot of result object</li>
-<li>Visual comparison of two designs: <code>plot(design1, design2)</code>
-</li>
-<li>Functions setOutputFormat and getOutputFormat implemented: definition of user defined output formats</li>
-<li>
-<code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code>: thetaH1 and stDevH1 can be specified for assessment of sample size recalculation (replaces thetaStandardized)</li>
-<li>
-<code><a href="../reference/getSimulationSurvival.html">getSimulationSurvival()</a></code>: separate p-values added to the aggregated simulation data for Fisher designs</li>
-<li>
-<code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code>, <code><a href="../reference/getSimulationRates.html">getSimulationRates()</a></code>: Cumulated number of subjects integrated in getData object</li>
-<li>
-<code>getSimulation[MultiArm][Means/Rates/Survival]()</code>: new logical argument ‘showStatistics’ added</li>
-<li>Example datasets (csv files) added to the package</li>
-<li>plot type “all”: plot all available plots of an object in one step using <code>plot(x, type = "all")</code>
-</li>
-<li>plot type improved: ‘type’ now can be a vector, e.g., <code>plot(x, type = c(1, 3))</code>
-</li>
-<li>
-<code>plot(x, grid = 1)</code>: new plot argument ‘grid’ enables the plotting of 2 or more plots in one graphic</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>Simulation tools for multi-arm design testing means, rates, and hazard ratios</p></li>
+<li><p>Analysis tools for multi-arm design testing means, rates, and hazard ratios</p></li>
+<li><p><code><a href="../reference/getSimulationRates.html">getSimulationRates()</a></code>: exact versions for testing a rate (one-sample case) and equality of rates (two-sample case)</p></li>
+<li><p>getDataset: multi-arm datasets for means, rates, and survival data</p></li>
+<li><p>Analysis of fixed designs</p></li>
+<li><p>Summary for analysis and simulation result objects newly implemented</p></li>
+<li><p>Summary for most rpact result objects substantially improved and enhanced</p></li>
+<li><p><code><a href="../reference/getEventProbabilities.html">getEventProbabilities()</a></code>: plot of result object</p></li>
+<li><p><code><a href="../reference/getNumberOfSubjects.html">getNumberOfSubjects()</a></code>: plot of result object</p></li>
+<li><p>Visual comparison of two designs: <code>plot(design1, design2)</code></p></li>
+<li><p>Functions setOutputFormat and getOutputFormat implemented: definition of user defined output formats</p></li>
+<li><p><code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code>: thetaH1 and stDevH1 can be specified for assessment of sample size recalculation (replaces thetaStandardized)</p></li>
+<li><p><code><a href="../reference/getSimulationSurvival.html">getSimulationSurvival()</a></code>: separate p-values added to the aggregated simulation data for Fisher designs</p></li>
+<li><p><code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code>, <code><a href="../reference/getSimulationRates.html">getSimulationRates()</a></code>: Cumulated number of subjects integrated in getData object</p></li>
+<li><p><code>getSimulation[MultiArm][Means/Rates/Survival]()</code>: new logical argument ‘showStatistics’ added</p></li>
+<li><p>Example datasets (csv files) added to the package</p></li>
+<li><p>plot type “all”: plot all available plots of an object in one step using <code>plot(x, type = "all")</code></p></li>
+<li><p>plot type improved: ‘type’ now can be a vector, e.g., <code>plot(x, type = c(1, 3))</code></p></li>
+<li><p><code>plot(x, grid = 1)</code>: new plot argument ‘grid’ enables the plotting of 2 or more plots in one graphic</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-3-0-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-3-0-0"></a></h3>
@@ -627,8 +608,9 @@
 <h2 class="pkg-version" data-toc-text="2.0.3" id="rpact-203">rpact 2.0.3<a class="anchor" aria-label="anchor" href="#rpact-203"></a></h2><p class="text-muted">CRAN release: 2019-09-20</p>
 <div class="section level3">
 <h3 id="new-features-2-0-3">New features<a class="anchor" aria-label="anchor" href="#new-features-2-0-3"></a></h3>
-<ul><li>Plot function for Fisher design implemented</li>
-<li>Generic function <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> implemented for <code>getDesign[...]()</code>, <code>getSampleSize[...]()</code>, <code>getPower[...]()</code>, and <code>getSimulation[...]()</code> results: a simple boundary summary will be displayed</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>Plot function for Fisher design implemented</p></li>
+<li><p>Generic function <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> implemented for <code>getDesign[...]()</code>, <code>getSampleSize[...]()</code>, <code>getPower[...]()</code>, and <code>getSimulation[...]()</code> results: a simple boundary summary will be displayed</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-2-0-3">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-2-0-3"></a></h3>
@@ -671,13 +653,14 @@
 <h2 class="pkg-version" data-toc-text="2.0.0" id="rpact-200">rpact 2.0.0<a class="anchor" aria-label="anchor" href="#rpact-200"></a></h2><p class="text-muted">CRAN release: 2019-05-28</p>
 <div class="section level3">
 <h3 id="new-features-2-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-2-0-0"></a></h3>
-<ul><li>Power calculation at given or adapted sample size for means, rates and survival data</li>
-<li>Sample size and power calculation for survival trials with piecewise accrual time and intensity</li>
-<li>Sample size and power calculation for survival trials with exponential survival time, piecewise exponential survival time and survival times that follow a Weibull distribution</li>
-<li>Simulation tool for survival trials; our simulator is very fast because it was implemented with C++. Adaptive event number recalculations based on conditional power can be assessed</li>
-<li>Simulation tool for designs with continuous and binary endpoints. Adaptive sample size recalculations based on conditional power can be assessed</li>
-<li>Comprehensive and unified tool for performing sample size calculation for fixed sample size design</li>
-<li>Enhanced plot functionalities</li>
+<ul><li><p>Trial comparison data frames support <code>digits</code>, <code>ceilingEnabled</code>, and <code>removeVariableParameters</code> for numeric formatting and shared profiles. The <code>output</code> modes <code>"auto"</code>, <code>"html"</code>, and <code>"pdf"</code> retain data frames and render scrollable HTML or split LaTeX longtables automatically through knitr, without embedded report helpers.</p></li>
+<li><p>Power calculation at given or adapted sample size for means, rates and survival data</p></li>
+<li><p>Sample size and power calculation for survival trials with piecewise accrual time and intensity</p></li>
+<li><p>Sample size and power calculation for survival trials with exponential survival time, piecewise exponential survival time and survival times that follow a Weibull distribution</p></li>
+<li><p>Simulation tool for survival trials; our simulator is very fast because it was implemented with C++. Adaptive event number recalculations based on conditional power can be assessed</p></li>
+<li><p>Simulation tool for designs with continuous and binary endpoints. Adaptive sample size recalculations based on conditional power can be assessed</p></li>
+<li><p>Comprehensive and unified tool for performing sample size calculation for fixed sample size design</p></li>
+<li><p>Enhanced plot functionalities</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-2-0-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-2-0-0"></a></h3>

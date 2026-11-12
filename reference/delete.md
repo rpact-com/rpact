@@ -30,7 +30,7 @@ delete(x, ...)
 
 ## Value
 
-The modified comparison invisibly for `TrialComparison`.
+The modified comparison for `TrialComparison`.
 
 ## See also
 
@@ -40,9 +40,48 @@ The modified comparison invisibly for `TrialComparison`.
 ## Examples
 
 ``` r
-comparison <- getComparison(fixed = getDesignFixed(),
-    sequential = getDesignGroupSequential(kMax = 2))
+comparison <- getComparison(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
 comparison |> delete("fixed")
+#> Design comparison
+#> 
+#> 1 objects; 2 comparison rows; 19 columns.
+#> 
+#> Object types:
+#>     Group sequential design : 1
+#> 
+#> Observed metrics (across objects, stages and situations):
+#>     Maximum number of stages : 2
+#>     Significance level       : 0.025
+#>     Type II error rate       : 0.2
+#> 
+#> Available operations:
+#>     summary(x)                        : Compare differences
+#>     as.data.frame(x)                  : Access all data
+#>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters
+#>     getObjects(x)                     : Access contained objects
 comparison |> delete(index = 1)
-comparison |> add(getDesignFixed()) |> delete(1)
+#> Trial comparison
+#> 
+#> 0 objects; 0 comparison rows; 0 columns.
+#> 
+#> Available operations:
+#>     summary(x)                        : Compare differences
+#>     as.data.frame(x)                  : Access all data
+#>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters
+#>     getObjects(x)                     : Access contained objects
+comparison |>
+    add(getDesignFixed()) |>
+    delete(1)
+#> Trial comparison
+#> 
+#> 0 objects; 0 comparison rows; 0 columns.
+#> 
+#> Available operations:
+#>     summary(x)                        : Compare differences
+#>     as.data.frame(x)                  : Access all data
+#>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters
+#>     getObjects(x)                     : Access contained objects
 ```

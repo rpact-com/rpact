@@ -56,6 +56,12 @@ this result object:
 Specify a master design and one or more design parameters or a list of
 designs.
 
+## Deprecated
+
+Use
+[`getComparison()`](https://docs.rpact.org/reference/getComparison.md)
+instead.
+
 ## How to get help for generic functions
 
 Click on the link of a generic in the list above to go directly to the

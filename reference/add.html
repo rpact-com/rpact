@@ -70,7 +70,7 @@ after the other arguments, with the same rules as <code><a href="getComparison.h
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The modified comparison invisibly for <code>TrialComparison</code>.</p>
+    <p>The modified comparison for <code>TrialComparison</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -81,7 +81,43 @@ after the other arguments, with the same rules as <code><a href="getComparison.h
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="getComparison.html">getComparison</a></span><span class="op">(</span>fixed <span class="op">=</span> <span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">comparison</span> <span class="op">|&gt;</span> <span class="fu">add</span><span class="op">(</span>sequential <span class="op">=</span> <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Design comparison</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 objects; 3 comparison rows; 19 columns.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object types:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Fixed sample size design : 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Group sequential design  : 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observed metrics (across objects, stages and situations):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Maximum number of stages : 1, 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Significance level       : 0.025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Type II error rate       : 0.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Available operations:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     summary(x)                        : Compare differences</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     as.data.frame(x)                  : Access all data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     getObjects(x)                     : Access contained objects</span>
 <span class="r-in"><span><span class="va">comparison</span> <span class="op">|&gt;</span> <span class="fu">add</span><span class="op">(</span>objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>other <span class="op">=</span> <span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Design comparison</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 objects; 4 comparison rows; 19 columns.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object types:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Fixed sample size design : 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Group sequential design  : 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observed metrics (across objects, stages and situations):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Maximum number of stages : 1, 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Significance level       : 0.025, 0.050</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Type II error rate       : 0.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Available operations:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     summary(x)                        : Compare differences</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     as.data.frame(x)                  : Access all data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     getObjects(x)                     : Access contained objects</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

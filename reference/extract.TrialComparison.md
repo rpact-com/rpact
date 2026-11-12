@@ -57,8 +57,10 @@ or `$add()` to build or extend the collection.
 ## Examples
 
 ``` r
-comparison <- getComparison(fixed = getDesignFixed(),
-    sequential = getDesignGroupSequential(kMax = 2))
+comparison <- getComparison(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
 identical(comparison$fixed, comparison[["fixed"]])
 #> [1] TRUE
 identical(comparison[[1]], comparison$fixed)

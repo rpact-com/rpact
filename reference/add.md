@@ -29,7 +29,7 @@ add(x, ...)
 
 ## Value
 
-The modified comparison invisibly for `TrialComparison`.
+The modified comparison for `TrialComparison`.
 
 ## See also
 
@@ -41,5 +41,41 @@ The modified comparison invisibly for `TrialComparison`.
 ``` r
 comparison <- getComparison(fixed = getDesignFixed())
 comparison |> add(sequential = getDesignGroupSequential(kMax = 2))
+#> Design comparison
+#> 
+#> 2 objects; 3 comparison rows; 19 columns.
+#> 
+#> Object types:
+#>     Fixed sample size design : 1
+#>     Group sequential design  : 1
+#> 
+#> Observed metrics (across objects, stages and situations):
+#>     Maximum number of stages : 1, 2
+#>     Significance level       : 0.025
+#>     Type II error rate       : 0.2
+#> 
+#> Available operations:
+#>     summary(x)                        : Compare differences
+#>     as.data.frame(x)                  : Access all data
+#>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters
+#>     getObjects(x)                     : Access contained objects
 comparison |> add(objects = list(other = getDesignFixed(alpha = 0.05)))
+#> Design comparison
+#> 
+#> 3 objects; 4 comparison rows; 19 columns.
+#> 
+#> Object types:
+#>     Fixed sample size design : 2
+#>     Group sequential design  : 1
+#> 
+#> Observed metrics (across objects, stages and situations):
+#>     Maximum number of stages : 1, 2
+#>     Significance level       : 0.025, 0.050
+#>     Type II error rate       : 0.2
+#> 
+#> Available operations:
+#>     summary(x)                        : Compare differences
+#>     as.data.frame(x)                  : Access all data
+#>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters
+#>     getObjects(x)                     : Access contained objects
 ```
