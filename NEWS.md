@@ -31,6 +31,7 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 
 ## Improvements, issues, and changes
 
+* Comparison summaries wrap complete Console text by default and offer `textMode`, `width`, and `showAll` controls. All display limits and these controls can also be set through `RPACT_COMPARISON_SUMMARY_*` environment variables or `rpact.comparison.summary.*` options. Omitted content has actionable display hints; Markdown tables retain full text.
 * Parameter listings now align their colon column using applicable parameter captions without a fixed four-character padding allowance. Technical summaries account separately for parameter type prefixes. Caption padding remains capped at 40 characters, and longer captions are retained in full.
 * Repeated p-values are now unavailable (`NA` with a warning) for sequential designs with user-defined beta spending (`typeBetaSpending = "bsUser"`), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.
 * Replaced direct errors in comparison extraction, comparison plotting, and package testing with the central error helpers, providing specific error categories and structured diagnostic context while preserving worker failure details.

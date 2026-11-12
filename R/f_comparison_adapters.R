@@ -331,6 +331,37 @@
             next
         }
         result[[parameter]] <- NA_real_
+        expectedRows <- if (endsWith(parameter, "2")) {
+            1L
+        } else {
+            arms
+        }
+        # Current simulations retain stages; older result objects stored only
+        # the finishing horizon per arm and situation.
+        stageWise <- length(dim(values)) == 3L ||
+            (expectedRows == 1L && is.matrix(values) && nrow(values) == object$.design$kMax)
+        if (stageWise) {
+            if (is.matrix(values)) {
+                values <- array(values, dim = c(dim(values), 1L))
+            }
+            expected <- c(object$.design$kMax, max(data$situation), expectedRows)
+            if (!all(dim(values) == expected)) {
+                stopIllegalDataInput("Unexpected dimensions for comparison drop-out parameter '", parameter, "'",
+                    functionName = ".expandComparisonSurvivalCategories", parameter = parameter, value = object[[parameter]],
+                    constraint = "stage by situation by arm array", diagnosticId = "comparison.dropout_dimensions_invalid",
+                    context = list(expectedDimensions = expected, actualDimensions = dim(values)))
+            }
+            for (g in seq_len(expectedRows)) {
+                category <- if (endsWith(parameter, "2")) {
+                    "Control"
+                } else {
+                    paste("Treatment", g)
+                }
+                rows <- result$categoryType == "arm" & result$category == category
+                result[[parameter]][rows] <- values[cbind(result$stages[rows], result$situation[rows], g)]
+            }
+            next
+        }
         if (is.null(dim(values))) {
             values <- matrix(values, nrow = 1L)
         }

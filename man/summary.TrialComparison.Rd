@@ -8,12 +8,15 @@
   object,
   ...,
   digits = NA_integer_,
-  maxParameters = 12L,
-  maxProfiles = 3L,
-  maxObjects = 6L,
-  maxValues = 4L,
+  maxParameters = NULL,
+  maxProfiles = NULL,
+  maxObjects = NULL,
+  maxValues = NULL,
   output = c("all", "title", "overview", "body"),
-  harmonizeColumnNames = TRUE
+  harmonizeColumnNames = TRUE,
+  textMode = NULL,
+  width = NULL,
+  showAll = NULL
 )
 }
 \arguments{
@@ -37,6 +40,17 @@ sections. Increase this to inspect further differences.}
 \item{harmonizeColumnNames}{If \code{TRUE} (default), compare the harmonized
 columns described in \code{\link[=getComparison]{getComparison()}}. If \code{FALSE}, compare the original
 parameter names, as in \code{as.data.frame(object, harmonizeColumnNames = FALSE)}.}
+
+\item{textMode}{Console text handling: \code{"wrap"} (default) wraps complete text,
+\code{"truncate"} shows compact previews with an explicit shortening notice,
+and \code{"full"} writes complete text without automatic wrapping. Markdown
+always retains complete text in its profile tables.}
+
+\item{width}{Console line width, at least 20 characters. Defaults to
+\code{getOption("width", 80L)}. Long unbroken words can exceed this width.}
+
+\item{showAll}{If \code{TRUE}, lift all four \verb{max*} limits and disable text truncation.
+Wrapping remains active when \code{textMode = "wrap"}. Defaults to \code{FALSE}.}
 }
 \value{
 A \code{TrialComparisonSummary} inheriting from \code{SummaryFactory}. Its
@@ -76,4 +90,17 @@ displayed profile and columns labelled by stage and situation. Scalar profiles
 use a Value column. Blank cells indicate coordinates absent from a profile;
 explicit missing values are shown as NA. The display limits also apply to
 these tables, with omitted values and profiles indicated explicitly.
+
+A \code{NULL} display argument reads its setting through \code{.getEnvironmentVariable()}.
+Explicit arguments take precedence over environment variables, which take
+precedence over R options and defaults. The four default limits are 12
+parameters, 3 profiles, 6 objects and 4 values. R options use the prefix
+\code{rpact.comparison.summary.} followed by the argument name: \code{maxParameters},
+\code{maxProfiles}, \code{maxObjects}, \code{maxValues}, \code{textMode}, \code{width} or \code{showAll}.
+The corresponding environment variables are \code{RPACT_COMPARISON_SUMMARY_MAX_PARAMETERS},
+\code{RPACT_COMPARISON_SUMMARY_MAX_PROFILES}, \code{RPACT_COMPARISON_SUMMARY_MAX_OBJECTS},
+\code{RPACT_COMPARISON_SUMMARY_MAX_VALUES}, \code{RPACT_COMPARISON_SUMMARY_TEXT_MODE},
+\code{RPACT_COMPARISON_SUMMARY_WIDTH} and \code{RPACT_COMPARISON_SUMMARY_SHOW_ALL}.
+Settings are captured when the summary is created. For a complete display use
+\code{summary(x, showAll = TRUE)}; for a compact display use \code{textMode = "truncate"}.
 }
