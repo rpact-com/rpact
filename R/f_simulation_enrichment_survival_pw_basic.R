@@ -1127,6 +1127,8 @@ updateSubGroupVector <- function(
         )
     }
 
+    .addStudyDurationToDesignPlan(simulationResults)
+
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
