@@ -906,7 +906,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					expPvals[i] = pow(adjustedPValues[i], weights[i]);
 				}				
 				// prod(expPvals)
-				double denominator = std::accumulate(expPvals.begin(), expPvals.end(), 1, std::multiplies<double>());
+				double denominator = std::accumulate(expPvals.begin(), expPvals.end(), 1.0, std::multiplies<double>());
 				double term = pow(numerator / denominator, 1.0 / weights[k + 1]);
 				conditionalCriticalValue[k] = getOneMinusQNorm(std::min(term, 1.0 - 1e-07));
 			} else {
