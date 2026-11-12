@@ -939,8 +939,10 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #'   Readable labels remain controlled by `niceColumnNamesEnabled`.
 #' @param removeConstantParameters If `TRUE`, retain identifiers and only parameters
 #'   with different object profiles, using the same rules as `summary()`.
-#' @param transposed If `TRUE`, return parameters as rows and comparison situations
-#'   as columns. Mixed column types are converted to a common type by transposition.
+#' @param transposed If `TRUE`, return parameters as rows and comparison records
+#'   as columns, labelled by object and available stage/situation coordinates.
+#'   Shared scalar profiles use `Value`; duplicate labels receive unique suffixes.
+#'   Mixed column types are converted to a common type by transposition.
 #' @param removeVariableParameters If `TRUE`, return shared parameter profiles once,
 #'   with stage and situation coordinates where needed, without object identifiers.
 #'   Cannot be combined with `removeConstantParameters = TRUE`.
@@ -1030,6 +1032,7 @@ as.data.frame.TrialComparison <- function(
         harmonizeColumnNames = harmonizeColumnNames
     )
     objectNumbers <- data$objectNumber
+    columnNameData <- data
     allNames <- names(data)
     if (removeConstantParameters) {
         info <- .getTrialComparisonInfo(x, data)
@@ -1054,6 +1057,7 @@ as.data.frame.TrialComparison <- function(
         }
         objectNumbers <- rep(1L, nrow(data))
         rownames(data) <- NULL
+        columnNameData <- data
     }
     countParameters <- c(
         .getOutputFormatParameterNames("rpact.output.format.sample.size"),
@@ -1088,14 +1092,7 @@ as.data.frame.TrialComparison <- function(
         identifiers <- labels[match(identifiers, allNames)]
     }
     if (transposed) {
-        situationNames <- vapply(seq_along(objectNumbers), function(i) {
-            number <- objectNumbers[i]
-            suffix <- ""
-            if (sum(objectNumbers == number) > 1L) {
-                suffix <- paste0(".", sum(objectNumbers[seq_len(i)] == number))
-            }
-            return(paste0("Situation ", number, suffix))
-        }, character(1))
+        situationNames <- .getComparisonTransposedColumnNames(columnNameData)
         values <- as.data.frame(t(as.matrix(data)), stringsAsFactors = FALSE)
         names(values) <- situationNames
         data <- cbind(data.frame(Parameter = names(data), stringsAsFactors = FALSE), values)
@@ -1120,6 +1117,40 @@ as.data.frame.TrialComparison <- function(
 
 .comparisonIdentifiers <- c("objectNumber", "objectName", "stages", "stage", "situation")
 .comparisonScope <- c("objectType", "endpoint", "calculationTarget")
+
+.getComparisonTransposedColumnNames <- function(data) {
+    coordinates <- unique(c(.getComparisonCoordinateNames(data), intersect("situation", names(data))))
+    # The generated situation index is redundant for a single situation with
+    # semantic coordinates, but distinguishes multiple scenarios at each stage.
+    if (length(setdiff(coordinates, "situation")) &&
+            "situation" %in% coordinates && length(unique(data$situation)) <= 1L) {
+        coordinates <- setdiff(coordinates, "situation")
+    }
+    captions <- c(stages = "Stage", stage = "Stage", time = "Time",
+        treatmentArm = "Treatment arm", populations = "Population",
+        situations = "Situation", situation = "Situation")
+    labels <- vapply(seq_len(nrow(data)), function(i) {
+        parts <- character()
+        if ("objectNumber" %in% names(data)) {
+            label <- data$objectName[i]
+            if (is.null(label) || is.na(label) || !nzchar(trimws(label))) {
+                label <- paste("Object", data$objectNumber[i])
+            }
+            parts <- label
+        }
+        for (coordinate in coordinates) {
+            value <- data[[coordinate]][i]
+            if (!is.na(value) && nzchar(trimws(as.character(value)))) {
+                parts <- c(parts, paste(captions[[coordinate]], value))
+            }
+        }
+        if (!length(parts)) {
+            return("Value")
+        }
+        return(paste(unique(parts), collapse = " / "))
+    }, character(1))
+    return(make.unique(labels))
+}
 
 .assertComparisonLimit <- function(value, parameter, functionName) {
     if (!is.numeric(value) || is.complex(value) || length(value) != 1L || is.na(value) ||
