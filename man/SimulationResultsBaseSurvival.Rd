@@ -12,7 +12,13 @@ Base class for survival simulation results. Obtain specialized instances with
 Patient-wise dropout summaries use each stage's analysis time. Replication
 proportions are averaged over nonempty enrolled-subject denominators at that
 stage. Stopped trials and discontinued groups do not contribute to later stages.
-Observation times remain available in the object but are omitted from displays.
+The fields \code{dropoutObservationTime1} and \code{dropoutObservationTime2}
+remain available for direct access but are omitted from print and summary
+output. They average analysis times over exactly the replications contributing
+to the corresponding dropout proportion. They can therefore differ from the
+trial-level \code{analysisTime} after arm or population selection, or when an
+enrolled-subject denominator is empty. Contributing arms and populations share
+the same analysis time within each replication and stage.
 Test-statistic-based simulations leave these fields unavailable.
 }
 \section{Fields}{

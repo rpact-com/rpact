@@ -386,7 +386,12 @@ SimulationResults <- R6::R6Class(
                     } else if (enrichmentEnabled) {
                         matrixName <- .getSimulationEnrichmentEffectMatrixName(self)
                         if (nrow(self$effectList[[matrixName]]) > 1) {
-                            self$.cat("  (i): results of situation i\n", consoleOutputEnabled = consoleOutputEnabled)
+                            self$.cat("  (j): results of situation j\n", consoleOutputEnabled = consoleOutputEnabled)
+                        }
+                        dropoutLegend <- .getDropoutLegendEntries(self)
+                        for (label in names(dropoutLegend)) {
+                            self$.cat("  ", label, ": ", dropoutLegend[[label]], "\n",
+                                consoleOutputEnabled = consoleOutputEnabled)
                         }
                     } else if (twoGroupsEnabled) {
                         self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
@@ -1128,7 +1133,13 @@ SimulationResultsMultiArmRates <- R6::R6Class(
 #' Patient-wise dropout summaries use each stage's analysis time. Replication
 #' proportions are averaged over nonempty enrolled-subject denominators at that
 #' stage. Stopped trials and discontinued groups do not contribute to later stages.
-#' Observation times remain available in the object but are omitted from displays.
+#' The fields \code{dropoutObservationTime1} and \code{dropoutObservationTime2}
+#' remain available for direct access but are omitted from print and summary
+#' output. They average analysis times over exactly the replications contributing
+#' to the corresponding dropout proportion. They can therefore differ from the
+#' trial-level \code{analysisTime} after arm or population selection, or when an
+#' enrolled-subject denominator is empty. Contributing arms and populations share
+#' the same analysis time within each replication and stage.
 #' Test-statistic-based simulations leave these fields unavailable.
 #'
 #' @seealso [SimulationResultsSurvival], [SimulationResultsMultiArmSurvival],

@@ -122,8 +122,13 @@
 }
 
 .addDropoutSummaryItems <- function(result, summaryFactory) {
+    if (inherits(result, "SimulationResultsMultiArmSurvival")) {
+        .addMultiArmDropoutSummaryItems(result, summaryFactory)
+        return(invisible(NULL))
+    }
     fields <- c("expectedDropoutProportion1", "expectedDropoutProportion2",
         "observedDropoutProportion1", "observedDropoutProportion2")
+    legendEntry <- .getDropoutLegendEntries(result)
     for (field in fields) {
         values <- result[[field]]
         if (is.null(values) || result$isNotApplicableParameter(field) || .isDropoutOutputHidden(result, field)) {
@@ -132,12 +137,62 @@
         caption <- .getParameterCaption(field, result)
         if (length(dim(values)) == 3L) {
             .addSimulationArrayToSummary(result, field, caption, summaryFactory,
-                digitsSampleSize = 0)
+                digitsSampleSize = 0, legendEntry = legendEntry)
         } else {
             summaryFactory$addParameter(result, parameterName = field,
                 parameterCaption = caption, roundDigits = 0, showNA = TRUE,
+                legendEntry = legendEntry,
                 transpose = inherits(result, "SimulationResultsMultiArmSurvival") ||
                     inherits(result, "SimulationResultsEnrichmentSurvival"))
         }
+    }
+}
+
+.getDropoutLegendEntries <- function(result) {
+    if (!inherits(result, c("SimulationResultsSurvival", "SimulationResultsEnrichmentSurvival"))) {
+        return(list())
+    }
+    for (field in c("observedDropoutProportion1", "observedDropoutProportion2")) {
+        if (!is.null(result[[field]]) && !result$isNotApplicableParameter(field) &&
+                !.isDropoutOutputHidden(result, field)) {
+            return(.addLegendEntry("treatmentArmValues"))
+        }
+    }
+    return(list())
+}
+
+.addMultiArmDropoutSummaryItems <- function(result, summaryFactory) {
+    treatment <- result$observedDropoutProportion1
+    control <- result$observedDropoutProportion2
+    if (is.null(treatment) || is.null(control) ||
+            result$isNotApplicableParameter("observedDropoutProportion1") ||
+            result$isNotApplicableParameter("observedDropoutProportion2") ||
+            .isDropoutOutputHidden(result, "observedDropoutProportion1")) {
+        return(invisible(NULL))
+    }
+    numberOfArms <- 1L
+    if (length(dim(treatment)) == 3L) {
+        numberOfArms <- dim(treatment)[3]
+    }
+    treatment <- array(treatment, dim = c(nrow(control), ncol(control), numberOfArms))
+    listItemPrefix <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_LIST_ITEM_PREFIX", "rpact.summary.list.item.prefix",
+        default = C_SUMMARY_LIST_ITEM_PREFIX_DEFAULT, type = "character"
+    )
+    for (i in seq_len(ncol(control))) {
+        group <- .getSummaryGroup("Observed drop-out proportion", ncol(control), i, result)
+        summaryFactory$addItem(group$groupCaption, "", legendEntry = group$legendEntry)
+        for (g in seq_len(numberOfArms)) {
+            summaryFactory$addParameter(result,
+                parameterName = "observedDropoutProportion1", values = treatment[, i, g],
+                parameterCaption = paste0(listItemPrefix, "Treatment arm ", g),
+                roundDigits = 0, enforceFirstCase = TRUE
+            )
+        }
+        summaryFactory$addParameter(result,
+            parameterName = "observedDropoutProportion2", values = control[, i],
+            parameterCaption = paste0(listItemPrefix, "Control"),
+            roundDigits = 0, enforceFirstCase = TRUE
+        )
     }
 }

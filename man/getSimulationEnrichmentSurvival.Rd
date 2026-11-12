@@ -334,9 +334,23 @@ The function has to contain the three-dots argument '...' (see examples).
 The corresponding \code{dropoutObservationTime1} and
 \code{dropoutObservationTime2} fields retain the mean stage analysis time over
 exactly the same contributing replications, with the same dimensions as the
-proportions, but are omitted from displays. When both input dropout rates are
-zero, the proportions are also omitted from print and summary output while
-remaining in the result object.
+proportions. They are omitted from print and summary output but can be accessed
+directly as \code{result$dropoutObservationTime1} and
+\code{result$dropoutObservationTime2}. In multi-arm trials, the first field
+refers to the active treatment arms and the second to shared control. In
+enrichment trials, both fields contain population-specific results for their
+respective treatment arms. See \link{SimulationResultsSurvival},
+\link{SimulationResultsMultiArmSurvival}, and \link{SimulationResultsEnrichmentSurvival}
+for the result fields and their dimensions.
+
+These averages can differ from the trial-level \code{analysisTime}, because
+arm or population selection and the requirement for a nonempty enrolled-subject
+denominator can change which replications contribute. Within a replication,
+all arms or populations contributing at a given stage share its analysis time;
+differences between the reported averages arise from the contributing sets of
+replications, rather than different analysis schedules within that replication.
+When both input dropout rates are zero, the proportions are also omitted from
+print and summary output while remaining in the result object.
 
 These outputs require patient histories and are unavailable for
 \code{simulationType = "testStatisticBased"}. Existing recruitment and

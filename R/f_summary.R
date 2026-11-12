@@ -796,10 +796,7 @@ NULL
             parameterCaption = "Reject at least one",
             roundDigits = digitSettings$digitsProbabilities,
             smoothedZeroFormat = TRUE, transpose = TRUE,
-            lastStage = design$kMax,
-            legendEntry = {
-                if (multiArmEnabled) list("(i)" = "treatment arm i") else list()
-            }
+            lastStage = design$kMax
         )
 
         if (outputSize == "large" && multiArmEnabled) {
