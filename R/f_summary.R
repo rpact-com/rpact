@@ -964,7 +964,7 @@ NULL
                     if (!is.null(designPlan$populationEventsPerStage) &&
                             length(dim(designPlan$populationEventsPerStage)) > 2 &&
                             dim(designPlan$populationEventsPerStage)[3] > 1) {
-                        parameterName <- "populationEventsPerStage" # TODO check: singleEventsPerSubsetAndStage instead?
+                        parameterName <- "populationEventsPerStage" 
                         parameterCaption <- "Number of events per population"
                     }
                 } else {

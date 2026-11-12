@@ -39,8 +39,10 @@ nonzero integers within the collection bounds. Selecting the last object of
 an empty comparison raises an index error.
 }
 \examples{
-comparison <- getComparison(fixed = getDesignFixed(),
-    sequential = getDesignGroupSequential(kMax = 2))
+comparison <- getComparison(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
 identical(comparison |> fetch("fixed"), comparison[["fixed"]])
 identical(comparison |> fetch(fixed), comparison$fixed)
 identical(comparison |> fetch(1), comparison[[1]])

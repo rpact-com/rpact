@@ -13,20 +13,30 @@ getComparison(..., objects = NULL)
 \method{names}{TrialComparison}(x)
 }
 \arguments{
-\item{...}{Designs, design characteristics, plans, simulations, lists thereof, or \code{TrialComparison}
-objects. Entries from \code{...} precede entries from \code{objects}.}
+\item{...}{Designs, design characteristics, plans, simulations,
+\code{PowerAndAverageSampleNumberResult}, \code{EventProbabilities}, \code{NumberOfSubjects},
+\code{ConditionalPowerResults} (including subclasses), \code{PerformanceScore},
+\code{FisherInformation}, or \code{TrialDesignOptimalConditionalErrorCharacteristics}
+objects, lists thereof,
+\code{TrialComparison} objects, or \code{TrialComparisonSummary} objects. Entries
+from \code{...} precede entries from \code{objects}.}
 
-\item{objects}{Optional objects, lists of objects or \code{TrialComparison} objects.
+\item{objects}{Optional objects, lists of objects, \code{TrialComparison} objects,
+or \code{TrialComparisonSummary} objects.
 NULL is treated as an empty list.}
 
 \item{x}{A \code{TrialComparison}.}
 }
 \value{
-An R6 \code{TrialComparison} inheriting from \code{ParameterSet}.
+An R6 \code{TrialComparison} inheriting from \code{ParameterSet}. For a single
+\code{TrialComparisonSummary}, its underlying comparison is returned by reference;
+otherwise a new collection is created.
 }
 \description{
 Creates a comparison of existing designs, design characteristics, sample size
-or power plans, and simulation results without recalculating them.
+or power plans, simulation results, and power/ASN results without recalculating
+them. A single
+comparison summary returns its underlying comparison.
 
 \code{length()} returns the number of objects in the comparison.
 
@@ -44,6 +54,13 @@ an object whose name coincides with a member such as \code{add}. Unknown names
 return NULL. The \code{\link[=fetch.TrialComparison]{fetch.TrialComparison()}}
 method provides the same object access through \code{fetch(comparison, name)} or
 \code{fetch(comparison, position)}.
+A single summary can be unwrapped with \code{summaryObject |> getComparison()},
+returning exactly \code{summaryObject$object}. Changes to the returned collection
+therefore affect that underlying comparison. In combinations or nested lists,
+summaries contribute their underlying comparisons' current objects; a new
+collection is created without changing the source collections. Summary display
+settings are not transferred to the comparison.
+
 Lists and comparisons are recursively expanded in their original order.
 Names on individual objects are retained; container names are discarded.
 Supplied non-empty names must be unique across the expanded collection;
@@ -72,10 +89,52 @@ Shallow cloning shares the contained objects. \code{clone(deep = TRUE)} is unsup
 \code{print()} describes the collection and selected observed ranges. \code{summary()}
 groups differences by object scope, inputs/design settings and results, with
 equal profiles grouped by object number. Constants are compared independently
-of the number of rows. Nonconstant profiles retain stage/situation positions;
+of the number of rows. Constant numeric vector cells, such as \verb{1, 1},
+compare equal to the corresponding scalar. Nonconstant profiles retain stage/situation positions;
 repeated values across the other dimension are collapsed. Missing values and
 their positions participate in exact comparisons. No rounding or numerical
 tolerance is used to decide whether profiles differ.
+
+For comparisons containing interim analyses, fixed plans' \code{nFixed}, \code{nFixed1},
+and \code{nFixed2} are harmonized to \code{numberOfSubjects}, \code{numberOfSubjects1}, and
+\code{numberOfSubjects2}. The corresponding stored group sizes are included for
+sequential plans. Comparisons of fixed plans alone retain the fixed names.
+With \code{includeAllParameters = TRUE}, sequential plans' \code{nFixed} reference values
+remain separate from their stage-wise sample sizes. Fixed survival plans also
+use \code{cumulativeEventsPerStage} for \code{eventsFixed} when interim analyses occur
+in the comparison; sequential plans retain their fixed-design event reference.
+
+Available sample-size expectations \code{expectedNumberOfSubjectsH1} and
+\code{expectedEventsH1} use \code{expectedNumberOfSubjects} and \code{expectedNumberOfEvents}.
+These expectations refer to each scenario's supplied alternative. Harmonization
+does not change alternatives or stopping rules, combine H0/H0-H1 expectations,
+or reinterpret simulation assumptions used for conditional power.
+Conflicting non-missing target values remain in separate columns.
+Power/ASN results from \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}} retain their generic
+\code{theta}, \code{nMax}, and \code{averageSampleNumber} scales. Individual \code{theta} scenarios
+retain their stage coordinates even in full exports. The comparison includes \code{nMax}
+even when the compact source data frame omits it; no endpoint or conversion to
+subjects or events is inferred. With column harmonization enabled, their
+stage-wise \code{earlyStop} becomes \code{earlyStopPerStage}, \code{overallEarlyStop} becomes
+\code{earlyStop}, and \code{overallFutility} becomes \code{futilityStop}. \code{calculatedPower}
+merges into \code{overallReject} when the values agree. Original names remain
+available with \code{harmonizeColumnNames = FALSE} in data frames and summaries.
+Original objects are unchanged.
+
+Event probabilities and recruitment results retain their time coordinates and
+assumptions. Conditional-power results retain planned stages, treatment arms
+or populations, and observed stage and data context; no analysis is rerun.
+Performance scores retain scenario alternatives, simulation inputs and design
+settings. Fisher information retains selected stages, situations, the source
+plan when available, and its cumulative or stage-wise type; these scales are
+not harmonized. Profiles and plot groups respect time, arm, population and
+situation coordinates.
+
+Optimal conditional-error characteristics are supported internally, including
+their theta-by-stage results and atomic design settings. Their constructor and
+characteristic functions remain unexported. Function-valued settings are not
+compared as scalar parameters. Deprecated \code{TrialDesignSet} objects and standalone
+optimal conditional-error designs are not supported.
 
 Console and Markdown output are bounded. Limits and display rounding do not
 change the underlying data. \code{\link[=as.data.frame.TrialComparison]{as.data.frame.TrialComparison()}} returns the full
@@ -84,15 +143,22 @@ comparison table. \code{\link[=plot.TrialComparison]{plot.TrialComparison()}} se
 executing generated simulation code reruns the corresponding simulations.
 }
 \examples{
+asn <- getPowerAndAverageSampleNumber(getDesignGroupSequential(kMax = 2),
+    theta = c(0, 0.2), nMax = 100
+)
+getComparison(asn, asn)
+
 comparison <- getComparison(list(
     fixed = getDesignFixed(), sequential = getDesignGroupSequential(kMax = 2)
 ))
 print(comparison)
-summary(comparison)
+comparisonSummary <- summary(comparison)
+identical(comparisonSummary |> getComparison(), comparison)
 head(as.data.frame(comparison))
 withCharacteristics <- getComparison(
     getDesignGroupSequential(kMax = 2),
-    getDesignCharacteristics(getDesignGroupSequential(kMax = 3)))
+    getDesignCharacteristics(getDesignGroupSequential(kMax = 3))
+)
 combined <- getComparison(comparison, other = getDesignFixed(alpha = 0.05))
 combined$add(list(getDesignFixed(alpha = 0.01)))
 empty <- getComparison()
@@ -100,10 +166,11 @@ empty$add(getDesignFixed())
 combined$delete(1)
 combined$delete("sequential")
 \dontrun{
-plot(comparison, 
-    xParamName = "objectNumber", 
-    yParamName = "criticalValues", 
-    plotLineEnabled = FALSE)
+plot(comparison,
+    xAxis = "objectNumber",
+    yAxis = "criticalValues",
+    plotLineEnabled = FALSE
+)
 }
 
 }

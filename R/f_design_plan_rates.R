@@ -753,8 +753,8 @@ getPowerRates <- function(
 
     powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
         design,
-        theta,
-        maxNumberOfSubjects
+        theta = theta,
+        nMax = maxNumberOfSubjects
     )
 
     designPlan$expectedNumberOfSubjects <- powerAndAverageSampleNumber$averageSampleNumber

@@ -17,6 +17,59 @@
 ## |  Contact: info@rpact.com
 ## |
 
+.getComparisonObjectRCode <- function(object, includeDefaultParameters, tolerance, pipeOperator) {
+    code <- getObjectRCode(object, includeDefaultParameters = includeDefaultParameters,
+        stringWrapParagraphWidth = NULL, pipeOperator = "none", output = "internal", tolerance = tolerance)
+    # Reuse standard reconstruction, then inline its prerequisite assignments.
+    # Each object remains a single expression without shared temporary variables.
+    expressions <- as.list(parse(text = code))
+    bindings <- list()
+    inlineExpression <- function(expression) {
+        if (is.call(expression) && identical(expression[[1L]], as.name("function"))) {
+            return(expression)
+        }
+        firstArgument <- NULL
+        if (is.call(expression) && length(expression) > 1L && is.symbol(expression[[2L]])) {
+            firstArgument <- as.character(expression[[2L]])
+        }
+        if (identical(firstArgument, "design") && !includeDefaultParameters &&
+                identical(bindings$design, quote(getDesignFixed()))) {
+            expression[[2L]] <- NULL
+            firstArgument <- NULL
+        }
+        if (!is.null(firstArgument) && firstArgument %in% names(bindings) &&
+                pipeOperator != "none" &&
+                firstArgument %in% c("design", "data", "stageResults", "simulationResults", "futilityBounds", "alpha0Vec")) {
+            expression[[2L]] <- NULL
+            expression <- do.call(substitute, list(expression, bindings))
+            operator <- if (pipeOperator == "R") {
+                "%rpactReconstructionPipe%"
+            } else {
+                "%>%"
+            }
+            return(as.call(list(as.name(operator), bindings[[firstArgument]], expression)))
+        }
+        return(do.call(substitute, list(expression, bindings)))
+    }
+    for (expression in head(expressions, -1L)) {
+        bindings[[as.character(expression[[2L]])]] <- inlineExpression(expression[[3L]])
+    }
+    code <- deparse(inlineExpression(expressions[[length(expressions)]]), width.cutoff = 100L)
+    if (pipeOperator == "R") {
+        # Deparsing native pipe calls uses function-call syntax. Render a temporary
+        # infix token instead, preserving operators and strings in callback bodies.
+        parseData <- utils::getParseData(parse(text = code, keep.source = TRUE))
+        pipes <- parseData[parseData$terminal & parseData$token == "SPECIAL" & parseData$text == "%rpactReconstructionPipe%", ]
+        pipes <- pipes[order(pipes$line1, pipes$col1, decreasing = TRUE), ]
+        for (i in seq_len(nrow(pipes))) {
+            line <- pipes$line1[i]
+            code[line] <- paste0(substr(code[line], 1L, pipes$col1[i] - 1L), "|>",
+                substring(code[line], pipes$col2[i] + 1L))
+        }
+    }
+    return(code)
+}
+
 .getTrialComparisonRCode <- function(object, leadingArguments, includeDefaultParameters,
         prefix, postfix, stringWrapPrefix, newArgumentValues, tolerance,
         pipeOperator, pipeOperatorPostfix, output, explicitPrint) {
@@ -29,15 +82,22 @@
     }
     objects <- object$getObjects()
     expressions <- vapply(objects, function(item) {
-        # Reconstructed designs, datasets and callbacks need independent scopes.
-        code <- getObjectRCode(item, includeDefaultParameters = includeDefaultParameters,
-            stringWrapParagraphWidth = NULL, pipeOperator = "none", output = "internal", tolerance = tolerance)
-        paste0("local({\n", paste0("    ", code, collapse = "\n"), "\n})")
+        return(paste(.getComparisonObjectRCode(item, includeDefaultParameters, tolerance, pipeOperator), collapse = "\n"))
     }, "")
-    objectsCode <- paste0("list(\n", paste(expressions, collapse = ",\n"), "\n)")
-    if (!is.null(names(objects))) {
-        objectsCode <- paste0("structure(", objectsCode, ", names = ",
-            paste(deparse(names(objects), width.cutoff = 500L), collapse = "\n"), ")")
+    objectNames <- names(objects)
+    # A list preserves names that would otherwise match getComparison's formals.
+    useList <- any(objectNames %in% c("objects", ""))
+    if (!is.null(objectNames) && !useList) {
+        expressions <- paste0(vapply(objectNames, function(name) {
+            return(paste(deparse(name), collapse = "\n"))
+        }, ""), " = ", expressions)
+    }
+    objectsCode <- paste0("\n    ", gsub("\n", "\n    ", paste(expressions, collapse = ",\n")), "\n")
+    if (!length(objects)) {
+        objectsCode <- ""
+    } else if (useList) {
+        objectsCode <- paste0("structure(list(", objectsCode, "), names = ",
+            paste(deparse(objectNames, width.cutoff = 500L), collapse = "\n"), ")")
     }
     # The generic word wrapper is not syntax-aware; preserve embedded newlines
     # and user-supplied names and callback code instead of reflowing them.
@@ -48,6 +108,9 @@
     if (output %in% c("vector", "internal")) {
         return(unlist(strsplit(result, "\n", fixed = TRUE), use.names = FALSE))
     }
-    result
+    if (output == "markdown") {
+        return(result)
+    }
+    return(invisible(result))
 }
 

@@ -39,7 +39,7 @@ getObjectRCode(
 }
 \arguments{
 \item{obj}{The result object, including a \code{TrialComparison} or its summary.
-Comparison reconstruction isolates each object's preconditions. Argument
+Comparison reconstruction inlines each object's preconditions. Argument
 overrides are unsupported for comparisons, and their code is not word-wrapped
 so object names and callback bodies remain intact.}
 

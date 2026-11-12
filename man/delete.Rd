@@ -18,7 +18,7 @@ Invalid selections leave the comparison
 unchanged. Removing the last object leaves an empty comparison.}
 }
 \value{
-The modified comparison invisibly for \code{TrialComparison}.
+The modified comparison for \code{TrialComparison}.
 }
 \description{
 S3 generic for removing objects. The \code{TrialComparison} method
@@ -27,11 +27,15 @@ delegates to \verb{$delete()} and modifies the existing comparison by reference.
 The \code{TrialComparison} method deletes one contained object by position or name.
 }
 \examples{
-comparison <- getComparison(fixed = getDesignFixed(),
-    sequential = getDesignGroupSequential(kMax = 2))
+comparison <- getComparison(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
 comparison |> delete("fixed")
 comparison |> delete(index = 1)
-comparison |> add(getDesignFixed()) |> delete(1)
+comparison |>
+    add(getDesignFixed()) |>
+    delete(1)
 
 }
 \seealso{
