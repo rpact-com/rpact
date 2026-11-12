@@ -2,10 +2,6 @@
 
 ## New features
 
-* Comparison plot selectors `xAxis`, `yAxis`, `category`, and `group` accept parameter captions and unquoted names, as well as character variables and technical column names. Resolution respects available harmonized columns, reports ambiguous labels, and is shared with `getComparisonPlotParameters()`.
-
-* Trial comparisons additionally accept event probabilities, recruitment results (`NumberOfSubjects`), conditional-power results (including multiarm and enrichment), performance scores, and Fisher information. Time, stage, scenario and group coordinates and relevant input context are preserved. Optimal conditional-error characteristics are supported internally without exporting their constructors. Deprecated `TrialDesignSet` objects remain excluded.
-
 * The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
 * `getSimulationMultiArmSurvival()` and `getSimulationEnrichmentSurvival()` now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument `simulationType` can be used to choose between the new C++ implementation (`"patientWise"`), the previous test-statistic-based approach (`"testStatisticBased"`), and a basic R reference implementation (`"patientWiseBasic"`) intended for validation and testing. The default `"auto"` setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.
 Survival planning reports derived `expectedDropoutProportion1` and `expectedDropoutProportion2` at each scenario's final planned analysis time, accounting for competing events and deterministic planned accrual. Patient-wise two-arm, multi-arm, and enrichment survival simulations report `observedDropoutProportion1` and `observedDropoutProportion2`, averaged from replication-specific proportions at each arm or population's finishing analysis, including discontinued groups. The accompanying `dropoutObservationTime1` and `dropoutObservationTime2` are mean finishing horizons over the same eligible replications. These outputs differ from the input dropout probabilities, have no stage dimension, and are unavailable for test-statistic-based simulations. Existing event, power, sample-size and analysis-time calculations are unchanged.
@@ -34,12 +30,6 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 * The `%vs%` operator combines trial planning objects, comparisons, and their summaries through `getComparison()` and returns a comparison summary. It supports chaining and plotting with explicit axis selections. `compare(x)` can now create a comparison from a single object.
 
 ## Improvements, issues, and changes
-
-* `getObjectRCode()` reconstructs trial comparisons with direct object arguments and inline prerequisites, without `local()` wrappers. Comparison summaries respect the selected pipe operator and omit default summary settings unless requested.
-
-* Ambiguous comparison plot axes now produce compact, structured error messages with parameter names and captions, console-aware wrapping, bounded candidate lists, and one role-aware example. Full selection diagnostics and existing error classes are retained; no new dependency is required.
-
-* Comparison plots now connect single-point objects along a common numeric input when only that input varies and the object scope is shared. Explicit categories and groups, additional varying inputs, and objects containing multiple points retain separate curves.
 
 * Parameter listings now align their colon column using applicable parameter captions without a fixed four-character padding allowance. Technical summaries account separately for parameter type prefixes. Caption padding remains capped at 40 characters, and longer captions are retained in full.
 * Repeated p-values are now unavailable (`NA` with a warning) for sequential designs with user-defined beta spending (`typeBetaSpending = "bsUser"`), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.
