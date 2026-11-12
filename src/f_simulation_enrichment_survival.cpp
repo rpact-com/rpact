@@ -1498,7 +1498,7 @@ List performSimulationEnrichmentSurvivalLoop(
 			for (int k = 0; k < kMax; k++) {
 				if (iterations(k, i) > 0) {
 					simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] = 
-						round(simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] / iterations(k, i) * 10.0) / 10.0;
+                        R::fround(simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] / iterations(k, i), 1.0);
 				}
 			}
 		}

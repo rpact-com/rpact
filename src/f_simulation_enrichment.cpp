@@ -91,7 +91,13 @@ LogicalVector selectPopulations(NumericVector effectVector,
     } else {
         stop("Invalid typeOfSelection. Must be 'all', 'best', 'rBest', or 'epsilon'");
     }
-    LogicalVector effectBelowThreshold = is_na(effectVector) | (effectVector <= threshold);
+    LogicalVector effectBelowThreshold = effectVector <= threshold;
+    if (typeOfSelectionLower == "all") {
+        // Retain undefined effects under "all", matching the R selector.
+        effectBelowThreshold[is_na(effectVector)] = false;
+    } else {
+        effectBelowThreshold = is_na(effectVector) | effectBelowThreshold;
+    }
     selectedPopulations[effectBelowThreshold] = false; // Exclude populations below threshold
 
     return selectedPopulations;
