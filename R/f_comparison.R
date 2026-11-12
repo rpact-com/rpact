@@ -308,7 +308,7 @@
         } else {
             seq_len(nrow(df))
         }
-        cbind(info, df, row.names = NULL)
+        return(.expandComparisonSurvivalCategories(obj, cbind(info, df, row.names = NULL), includeAllParameters))
     })
     columnNames <- unique(unlist(lapply(frames, names), use.names = FALSE))
     frames <- lapply(frames, function(df) {
@@ -334,9 +334,17 @@
     rownames(result) <- NULL
     if (niceColumnNamesEnabled) {
         labels <- as.list(C_TABLE_COLUMN_NAMES)
-        labels[c("objectNumber", "objectName", "objectType", "endpoint", "calculationTarget")] <-
-            c("Object number", "Object name", "Object type", "Endpoint", "Calculation target")
+        labels[c("objectNumber", "objectName", "objectType", "endpoint", "calculationTarget", "categoryType", "category")] <-
+            c("Object number", "Object name", "Object type", "Endpoint", "Calculation target", "Category type", "Category")
         names(result) <- vapply(names(result), function(name) {
+            if (grepl("^(observedDropoutProportion|dropoutObservationTime)[12](\\.|$)", name) ||
+                    (name %in% c("singleEventsPerStage", "cumulativeEventsPerStage", "singleEventsPerArmAndStage") &&
+                        any(vapply(objects, inherits, logical(1), "SimulationResultsMultiArmSurvival")))) {
+                captions <- vapply(objects, function(object) {
+                    return(.comparisonCaption(name, object, tableOutputEnabled = TRUE))
+                }, character(1))
+                return(.comparisonCaptionLabel(name, captions, tableOutputEnabled = TRUE))
+            }
             label <- labels[[name]]
             if (is.null(label)) {
                 name

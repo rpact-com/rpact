@@ -31,6 +31,8 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 
 ## Improvements, issues, and changes
 
+* Multi-arm survival comparisons now retain event arrays and arm-specific results in numeric columns with `categoryType` and `category` coordinates. Treatment-versus-control, individual-arm and overall results occupy separate rows; summaries, parameter filters and transposed tables retain these distinctions. Drop-out summaries identify treatment arms and control explicitly.
+* Transposed comparison columns identify situation axes by the matching input parameter (for example, `Alternative 1`) when input metadata and unrounded values establish an unambiguous mapping. Ambiguous axes retain `Situation`.
 * Parameter listings now align their colon column using applicable parameter captions without a fixed four-character padding allowance. Technical summaries account separately for parameter type prefixes. Caption padding remains capped at 40 characters, and longer captions are retained in full.
 * Repeated p-values are now unavailable (`NA` with a warning) for sequential designs with user-defined beta spending (`typeBetaSpending = "bsUser"`), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.
 * Replaced direct errors in comparison extraction, comparison plotting, and package testing with the central error helpers, providing specific error categories and structured diagnostic context while preserving worker failure details.
@@ -51,6 +53,8 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 * In all simulation raw data, the `armNumber` column was renamed to `activeArm`
 * For consistency with other result objects, the `direction` field in `getStageResults()` result objects was renamed to `directionUpper`.
 * Error and warning context now identifies diagnostic situations with stable IDs and factual metadata. Authored explanations and corrective instructions are maintained separately by consuming applications; ordinary condition messages remain unchanged.
+* RPACT Cloud link changed to https://demo.rpact.cloud
+
 
 # rpact 4.4.0
 
@@ -93,6 +97,7 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 * Corrected calculation of `finalPValues` for two-sided group-sequential
   designs in specific edge cases (see issue [#114](https://github.com/rpact-com/rpact/issues/114)).
 
+
 # rpact 4.3.0
 
 ## New features
@@ -115,6 +120,7 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 * Issue [#99](https://github.com/rpact-com/rpact/issues/99) fixed
 * Testing improved, e.g., new helper function `getTestLabel()` introduced
 * Several minor improvements
+
 
 # rpact 4.2.1
 
@@ -246,7 +252,7 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 * R package `mnormt` dependency has been removed 
 * Argument `theta` can be used for plotting of sample size and power results
 * Pipe operator usage improved
-* Shiny app link changed to https://rpact-cloud.share.connect.posit.cloud
+* Shiny app link changed to https://demo.rpact.cloud
 * Several minor improvements
 
 

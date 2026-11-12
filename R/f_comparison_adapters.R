@@ -238,7 +238,11 @@
 }
 
 .getComparisonCoordinateNames <- function(data) {
-    coordinates <- intersect(c("stages", "stage", "time", "treatmentArm", "populations", "situations"), names(data))
+    coordinates <- intersect(c("stages", "stage", "time", "treatmentArm", "populations", "situations",
+        "categoryType", "category"), names(data))
+    if ("categoryType" %in% coordinates) {
+        coordinates <- unique(c(coordinates, intersect("situation", names(data))))
+    }
     coordinates <- coordinates[vapply(data[coordinates], function(values) {
         return(any(!is.na(values)))
     }, logical(1))]
@@ -297,4 +301,104 @@
         stringWrapParagraphWidth = NULL, postfix = postfix, stringWrapPrefix = stringWrapPrefix,
         pipeOperator = pipeOperator, pipeOperatorPostfix = pipeOperatorPostfix,
         output = output, explicitPrint = explicitPrint))
+}
+
+.expandComparisonSurvivalCategories <- function(object, data, includeAllParameters = FALSE) {
+    if (!inherits(object, "SimulationResultsMultiArmSurvival")) {
+        return(data)
+    }
+    arms <- object$activeArms
+    types <- c("overall", rep("comparison", arms), rep("arm", arms + 1L))
+    categories <- c("All arms", paste("Treatment", seq_len(arms), "vs. Control"),
+        paste("Treatment", seq_len(arms)), "Control")
+    rowIndices <- rep(seq_len(nrow(data)), each = length(types))
+    result <- data[rowIndices, , drop = FALSE]
+    result$categoryType <- rep(types, nrow(data))
+    result$category <- rep(categories, nrow(data))
+    overall <- result$categoryType == "overall"
+    # Inputs and design settings remain available for grouping on every row.
+    # Scalar and stage-wise simulation results belong only to the overall rows.
+    inputs <- c(object$.getUserDefinedParameters(), object$.getDefaultParameters(),
+        names(.getComparisonDesign(object)), .comparisonIdentifiers, .comparisonScope)
+    for (parameter in setdiff(intersect(names(result), names(object)), inputs)) {
+        result[[parameter]][!overall] <- NA
+    }
+    groupFields <- grep("^(observedDropoutProportion|dropoutObservationTime)[12]$", names(object), value = TRUE)
+    for (parameter in groupFields) {
+        result[grep(paste0("^", parameter, "\\."), names(result), value = TRUE)] <- NULL
+        values <- object[[parameter]]
+        if (is.null(values) || (!includeAllParameters && object$isNotApplicableParameter(parameter))) {
+            next
+        }
+        result[[parameter]] <- NA_real_
+        if (is.null(dim(values))) {
+            values <- matrix(values, nrow = 1L)
+        }
+        expectedRows <- if (endsWith(parameter, "2")) {
+            1L
+        } else {
+            arms
+        }
+        if (!is.matrix(values) || nrow(values) != expectedRows || ncol(values) != max(data$situation)) {
+            stopIllegalDataInput("Unexpected dimensions for comparison drop-out parameter '", parameter, "'",
+                functionName = ".expandComparisonSurvivalCategories", parameter = parameter, value = object[[parameter]],
+                constraint = "arm by situation matrix, or a single-arm situation vector",
+                diagnosticId = "comparison.dropout_dimensions_invalid",
+                context = list(expectedDimensions = c(expectedRows, max(data$situation)), actualDimensions = dim(values)))
+        }
+        for (g in seq_len(nrow(values))) {
+            category <- if (endsWith(parameter, "2")) {
+                "Control"
+            } else {
+                paste("Treatment", g)
+            }
+            rows <- result$categoryType == "arm" & result$category == category
+            result[[parameter]][rows] <- values[g, result$situation[rows]]
+        }
+    }
+    arrayFields <- c("singleEventsPerStage", "cumulativeEventsPerStage",
+        "singleEventsPerArmAndStage", "selectedArms", "rejectedArmsPerStage")
+    for (parameter in arrayFields) {
+        values <- object[[parameter]]
+        if (is.null(values) || (!includeAllParameters && object$isNotApplicableParameter(parameter))) {
+            next
+        }
+        comparison <- parameter %in% c("singleEventsPerStage", "cumulativeEventsPerStage")
+        groups <- if (parameter == "singleEventsPerArmAndStage") {
+            arms + 1L
+        } else {
+            arms
+        }
+        expected <- c(object$.design$kMax, max(data$situation), groups)
+        if (length(dim(values)) != 3L || !all(dim(values) == expected)) {
+            stopIllegalDataInput("Unexpected dimensions for comparison array '", parameter, "'",
+                functionName = ".expandComparisonSurvivalCategories", parameter = parameter, value = values,
+                constraint = "stage by situation by category array", diagnosticId = "comparison.array_dimensions_invalid",
+                context = list(expectedDimensions = expected, actualDimensions = dim(values)))
+        }
+        result[[parameter]] <- NA_real_
+        for (g in seq_len(groups)) {
+            category <- if (comparison) {
+                paste("Treatment", g, "vs. Control")
+            } else if (g > arms) {
+                "Control"
+            } else {
+                paste("Treatment", g)
+            }
+            rows <- result$category == category
+            result[[parameter]][rows] <- values[cbind(result$stages[rows], result$situation[rows], g)]
+        }
+    }
+    for (parameter in intersect(c("lambdaTreatment", "medianTreatment", "effectMatrix"), names(result))) {
+        values <- object[[parameter]]
+        if (is.matrix(values) && nrow(values) == arms && ncol(values) == max(data$situation)) {
+            result[[parameter]] <- NA_real_
+            for (g in seq_len(arms)) {
+                rows <- result$categoryType == "arm" & result$category == paste("Treatment", g)
+                result[[parameter]][rows] <- values[g, result$situation[rows]]
+            }
+        }
+    }
+    rownames(result) <- NULL
+    return(result)
 }

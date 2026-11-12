@@ -63,7 +63,7 @@ URL: https://www.rpact.org,
     https://www.rpact.com,
     https://docs.rpact.org,
     https://github.com/rpact-com/rpact,
-    https://rpact-cloud.share.connect.posit.cloud
+    https://demo.rpact.cloud
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US
 Depends:

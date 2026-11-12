@@ -942,6 +942,9 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #' @param transposed If `TRUE`, return parameters as rows and comparison records
 #'   as columns, labelled by object and available stage/situation coordinates.
 #'   Shared scalar profiles use `Value`; duplicate labels receive unique suffixes.
+#'   If exactly one supplied or default input vector matches all situations across
+#'   stages, its caption replaces `Situation` (for example, `Alternative 1`).
+#'   Ambiguous axes retain `Situation`; shared profiles require agreement across objects.
 #'   Mixed column types are converted to a common type by transposition.
 #' @param removeVariableParameters If `TRUE`, return shared parameter profiles once,
 #'   with stage and situation coordinates where needed, without object identifiers.
@@ -977,6 +980,16 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #' LaTeX output requires the suggested rmarkdown package and registers the longtable
 #' dependency through knitr metadata. Other knitting targets use ordinary data-frame
 #' output. Reporting does not modify the comparison or its contained objects.
+#'
+#' Multi-arm survival simulations use `categoryType` and `category` coordinates.
+#' `comparison` rows (for example, `Treatment 1 vs. Control`) contain stage-wise
+#' and cumulative event counts for treatment plus control. `arm` rows contain
+#' individual-arm events, selections, rejections and drop-out summaries, including
+#' a separate `Control` category. Arm-independent simulation results occur on
+#' `overall` / `All arms` rows. Input and design settings remain available for
+#' grouping. Result cells outside their applicable category are `NA`.
+#' Categories and situations are retained in profile comparisons and transposed
+#' headings. Shared scalar-only output can omit these coordinates.
 #'
 #' @export
 #'
@@ -1033,6 +1046,17 @@ as.data.frame.TrialComparison <- function(
     )
     objectNumbers <- data$objectNumber
     columnNameData <- data
+    situationCaptions <- if (transposed) {
+        vapply(seq_along(objects), function(i) {
+            parameter <- .getComparisonSituationParameter(objects[[i]], data[data$objectNumber == i, , drop = FALSE])
+            if (is.null(parameter)) {
+                return("Situation")
+            }
+            return(.comparisonCaption(parameter, objects[[i]], tableOutputEnabled = TRUE))
+        }, character(1))
+    } else {
+        character()
+    }
     allNames <- names(data)
     if (removeConstantParameters) {
         info <- .getTrialComparisonInfo(x, data)
@@ -1092,7 +1116,16 @@ as.data.frame.TrialComparison <- function(
         identifiers <- labels[match(identifiers, allNames)]
     }
     if (transposed) {
-        situationNames <- .getComparisonTransposedColumnNames(columnNameData)
+        rowCaptions <- if (removeVariableParameters) {
+            if (length(unique(situationCaptions)) == 1L) {
+                rep(situationCaptions[1L], nrow(columnNameData))
+            } else {
+                rep("Situation", nrow(columnNameData))
+            }
+        } else {
+            situationCaptions[columnNameData$objectNumber]
+        }
+        situationNames <- .getComparisonTransposedColumnNames(columnNameData, rowCaptions)
         values <- as.data.frame(t(as.matrix(data)), stringsAsFactors = FALSE)
         names(values) <- situationNames
         data <- cbind(data.frame(Parameter = names(data), stringsAsFactors = FALSE), values)
@@ -1115,10 +1148,42 @@ as.data.frame.TrialComparison <- function(
     return(data)
 }
 
-.comparisonIdentifiers <- c("objectNumber", "objectName", "stages", "stage", "situation")
+.comparisonIdentifiers <- c("objectNumber", "objectName", "stages", "stage", "situation", "categoryType", "category")
 .comparisonScope <- c("objectType", "endpoint", "calculationTarget")
 
-.getComparisonTransposedColumnNames <- function(data) {
+.getComparisonSituationParameter <- function(object, data) {
+    if (!inherits(object, "ParameterSet") || !"situation" %in% names(data)) {
+        return(NULL)
+    }
+    situations <- data$situation
+    if (!length(situations) || anyNA(situations)) {
+        return(NULL)
+    }
+    nSituations <- max(situations)
+    if (nSituations <= 1L || !setequal(situations, seq_len(nSituations))) {
+        return(NULL)
+    }
+    # Only supplied/default inputs can explain a scenario axis. Derived results
+    # and vectors indexed by stage, arm or population must not name that axis.
+    candidates <- intersect(c(object$.getUserDefinedParameters(), object$.getDefaultParameters()), names(data))
+    candidates <- setdiff(candidates, c(.comparisonIdentifiers, .getComparisonCoordinateNames(data)))
+    candidates <- candidates[vapply(candidates, function(parameter) {
+        values <- object[[parameter]]
+        if (!is.atomic(values) || !is.null(dim(values)) || length(values) != nSituations ||
+                anyNA(values) || length(unique(values)) <= 1L) {
+            return(FALSE)
+        }
+        # Check the unrounded values at every stage, not merely vector lengths.
+        return(isTRUE(all.equal(unname(data[[parameter]]), unname(values[situations]),
+            check.attributes = FALSE, tolerance = 0)))
+    }, logical(1))]
+    if (length(candidates) != 1L) {
+        return(NULL)
+    }
+    return(candidates[[1L]])
+}
+
+.getComparisonTransposedColumnNames <- function(data, situationCaptions = rep("Situation", nrow(data))) {
     coordinates <- unique(c(.getComparisonCoordinateNames(data), intersect("situation", names(data))))
     # The generated situation index is redundant for a single situation with
     # semantic coordinates, but distinguishes multiple scenarios at each stage.
@@ -1128,7 +1193,7 @@ as.data.frame.TrialComparison <- function(
     }
     captions <- c(stages = "Stage", stage = "Stage", time = "Time",
         treatmentArm = "Treatment arm", populations = "Population",
-        situations = "Situation", situation = "Situation")
+        situations = "Situation", situation = "Situation", categoryType = "Category type", category = "Category")
     labels <- vapply(seq_len(nrow(data)), function(i) {
         parts <- character()
         if ("objectNumber" %in% names(data)) {
@@ -1141,7 +1206,12 @@ as.data.frame.TrialComparison <- function(
         for (coordinate in coordinates) {
             value <- data[[coordinate]][i]
             if (!is.na(value) && nzchar(trimws(as.character(value)))) {
-                parts <- c(parts, paste(captions[[coordinate]], value))
+                caption <- if (coordinate == "situation") {
+                    situationCaptions[i]
+                } else {
+                    captions[[coordinate]]
+                }
+                parts <- c(parts, paste(caption, value))
             }
         }
         if (!length(parts)) {
@@ -1318,9 +1388,46 @@ as.data.frame.TrialComparison <- function(
             return(parameter %in% names(source))
         }, logical(1))
         if (!any(matching)) {
+            baseParameter <- sub("\\.[^.]+$", "", parameter)
+            if (grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", baseParameter)) {
+                for (source in sources) {
+                    values <- source[[baseParameter]]
+                    if (!is.matrix(values)) {
+                        next
+                    }
+                    for (g in seq_len(nrow(values))) {
+                        group <- if (inherits(source, "SimulationResultsEnrichmentSurvival")) {
+                            .getCategoryCaptionEnrichment(source, baseParameter, g)
+                        } else {
+                            paste0("arm", g)
+                        }
+                        if (identical(parameter, paste0(baseParameter, ".", group))) {
+                            caption <- .getParameterCaption(baseParameter, source,
+                                tableOutputEnabled = tableOutputEnabled)
+                            if (is.null(caption) || !nzchar(caption)) {
+                                caption <- .getParameterCaption(baseParameter, source)
+                            }
+                            return(.getParameterSetParameterCaptionPerRow(source, baseParameter, caption, g))
+                        }
+                    }
+                }
+            }
             return(NA_character_)
         }
         object <- sources[[which(matching)[1L]]]
+    }
+    if (inherits(object, "SimulationResultsMultiArmSurvival") &&
+            grepl("^(observedDropoutProportion|dropoutObservationTime)1$", parameter)) {
+        return(paste0(sub(" \\(1\\)$", "", .getParameterCaption(parameter, object)), " (treatment arm)"))
+    }
+    if (inherits(object, "SimulationResultsMultiArmSurvival") &&
+            parameter %in% c("singleEventsPerStage", "cumulativeEventsPerStage", "singleEventsPerArmAndStage")) {
+        scope <- if (parameter == "singleEventsPerArmAndStage") {
+            "individual arm"
+        } else {
+            "treatment plus control"
+        }
+        return(paste0(.getParameterCaption(parameter, object), " (", scope, ")"))
     }
     caption <- .getParameterCaption(parameter, obj = object, tableOutputEnabled = tableOutputEnabled)
     if (is.null(caption) || length(caption) != 1L || is.na(caption) || !nzchar(caption)) {
@@ -1371,7 +1478,27 @@ as.data.frame.TrialComparison <- function(
     return(value)
 }
 
-.comparisonProfile <- function(data, parameter) {
+.comparisonProfile <- function(data, parameter, object = NULL) {
+    if (inherits(object, "SimulationResultsMultiArmSurvival") && "categoryType" %in% names(data)) {
+        inputs <- c(object$.getUserDefinedParameters(), object$.getDefaultParameters(),
+            names(.getComparisonDesign(object)), .comparisonIdentifiers, .comparisonScope)
+        if (parameter %in% names(object) && !parameter %in% inputs) {
+            categoryType <- if (parameter %in% c("singleEventsPerStage", "cumulativeEventsPerStage")) {
+                "comparison"
+            } else if (parameter %in% c("singleEventsPerArmAndStage", "selectedArms", "rejectedArmsPerStage",
+                    "lambdaTreatment", "medianTreatment", "effectMatrix") ||
+                    grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", parameter)) {
+                "arm"
+            } else {
+                "overall"
+            }
+            data <- data[data$categoryType == categoryType, , drop = FALSE]
+            if (grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", parameter)) {
+                control <- endsWith(parameter, "2")
+                data <- data[(data$category == "Control") == control, , drop = FALSE]
+            }
+        }
+    }
     values <- data[[parameter]]
     if (is.character(values)) {
         values <- vapply(values, .comparisonConstantCell, character(1), USE.NAMES = FALSE)
@@ -1418,7 +1545,11 @@ as.data.frame.TrialComparison <- function(
     info <- info[match(candidates, info$paramName), , drop = FALSE]
     objects <- object$getObjects()
     frames <- split(data, factor(data$objectNumber, levels = seq_along(objects)))
-    profiles <- lapply(info$paramName, function(parameter) lapply(frames, .comparisonProfile, parameter = parameter))
+    profiles <- lapply(info$paramName, function(parameter) {
+        return(lapply(seq_along(frames), function(i) {
+            return(.comparisonProfile(frames[[i]], parameter, objects[[i]]))
+        }))
+    })
     # Exact serialized keys avoid display rounding and quadratic pairwise comparisons.
     groups <- lapply(profiles, function(items) {
         keys <- vapply(items, function(item) paste(as.character(serialize(item, NULL, version = 2)), collapse = ""), "")

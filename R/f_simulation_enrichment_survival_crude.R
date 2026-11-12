@@ -425,9 +425,14 @@ NULL
         }
     }
 
+    # Match patient-wise reporting: dropped populations do not contribute to
+    # population summaries, even when their subsets remain in a selected population.
+    eventsByPopulationForSummary <- populationEventsPerStage
+    eventsByPopulationForSummary[!selectedPopulations] <- NA_real_
+
     return(list(
         cumulativeEventsPerStage = cumulativeEventsPerStage,
-        eventsByPopulationForSummary = populationEventsPerStage,
+        eventsByPopulationForSummary = eventsByPopulationForSummary,
         plannedEvents = plannedEvents,
         allocationRatioPlanned = allocationRatioPlanned,
         overallEffects = overallEffects,

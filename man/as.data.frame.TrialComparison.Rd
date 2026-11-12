@@ -44,8 +44,13 @@ Readable labels remain controlled by \code{niceColumnNamesEnabled}.}
 \item{removeConstantParameters}{If \code{TRUE}, retain identifiers and only parameters
 with different object profiles, using the same rules as \code{summary()}.}
 
-\item{transposed}{If \code{TRUE}, return parameters as rows and comparison situations
-as columns. Mixed column types are converted to a common type by transposition.}
+\item{transposed}{If \code{TRUE}, return parameters as rows and comparison records
+as columns, labelled by object and available stage/situation coordinates.
+Shared scalar profiles use \code{Value}; duplicate labels receive unique suffixes.
+If exactly one supplied or default input vector matches all situations across
+stages, its caption replaces \code{Situation} (for example, \verb{Alternative 1}).
+Ambiguous axes retain \code{Situation}; shared profiles require agreement across objects.
+Mixed column types are converted to a common type by transposition.}
 
 \item{removeVariableParameters}{If \code{TRUE}, return shared parameter profiles once,
 with stage and situation coordinates where needed, without object identifiers.
@@ -88,4 +93,14 @@ or LaTeX longtables split into column blocks with repeated identifier columns.
 LaTeX output requires the suggested rmarkdown package and registers the longtable
 dependency through knitr metadata. Other knitting targets use ordinary data-frame
 output. Reporting does not modify the comparison or its contained objects.
+
+Multi-arm survival simulations use \code{categoryType} and \code{category} coordinates.
+\code{comparison} rows (for example, \verb{Treatment 1 vs. Control}) contain stage-wise
+and cumulative event counts for treatment plus control. \code{arm} rows contain
+individual-arm events, selections, rejections and drop-out summaries, including
+a separate \code{Control} category. Arm-independent simulation results occur on
+\code{overall} / \verb{All arms} rows. Input and design settings remain available for
+grouping. Result cells outside their applicable category are \code{NA}.
+Categories and situations are retained in profile comparisons and transposed
+headings. Shared scalar-only output can omit these coordinates.
 }

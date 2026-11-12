@@ -260,7 +260,10 @@ NULL
             return(paste0(paramCaption, ", population ", population))
         }
         if (inherits(parameterSet, "SimulationResultsMultiArmSurvival")) {
-            label <- substr(paramCaption, 1, nchar(paramCaption) - 4L)
+            if (endsWith(paramName, "2")) {
+                return(paramCaption)
+            }
+            label <- sub(" \\([12]\\)$", "", paramCaption)
             return(paste0(label, " (arm ", matrixRow, ")"))
         }
     }
