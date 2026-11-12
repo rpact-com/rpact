@@ -2892,6 +2892,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 #' @inheritParams param_design
 #' @inheritParams param_theta
 #' @inheritParams param_nMax
+#' @inheritParams param_three_dots
 #'
 #' @details
 #' This function returns the power and average sample number (ASN) of the specified
