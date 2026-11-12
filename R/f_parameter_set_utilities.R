@@ -92,8 +92,7 @@ NULL
 }
 
 .getParameterValueFormatted <- function(obj, parameterName) {
-    if (inherits(obj, "SimulationResultsEnrichmentSurvival") &&
-            identical(parameterName, "dropoutObservationTime2")) {
+    if (.isDropoutOutputHidden(obj, parameterName)) {
         return(NULL)
     }
     tryCatch(
@@ -222,7 +221,10 @@ NULL
 }
 
 .getParameterSetParameterCaptionPerCategory <- function(parameterSet, paramName, paramCaption, category, matrixRow, numberOfCategories) {
-    if (.isMultiArmSimulationResults(parameterSet) &&
+    if (inherits(parameterSet, "SimulationResultsMultiArmSurvival") &&
+            paramName == "observedDropoutProportion1") {
+        paramCaption <- paste0(sub(" \\(1\\)$", "", paramCaption), " (arm ", category, ")")
+    } else if (.isMultiArmSimulationResults(parameterSet) &&
             paramName %in% c("singleEventsPerArmAndStage")) {
         if (!inherits(parameterSet, "SimulationResultsEnrichmentSurvival") &&
                 !is.na(numberOfCategories) && 
@@ -254,20 +256,6 @@ NULL
 }
 
 .getParameterSetParameterCaptionPerRow <- function(parameterSet, paramName, paramCaption, matrixRow) {
-    if (grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", paramName)) {
-        if (inherits(parameterSet, "SimulationResultsEnrichmentSurvival")) {
-            population <- .getCategoryCaptionEnrichment(parameterSet, paramName, matrixRow)
-            return(paste0(paramCaption, ", population ", population))
-        }
-        if (inherits(parameterSet, "SimulationResultsMultiArmSurvival")) {
-            if (endsWith(paramName, "2")) {
-                return(paramCaption)
-            }
-            label <- sub(" \\([12]\\)$", "", paramCaption)
-            return(paste0(label, " (arm ", matrixRow, ")"))
-        }
-    }
-
     if (.isMultiArmAnalysisResults(parameterSet)) {
         return(paste0(paramCaption, " (", matrixRow, ")"))
     }

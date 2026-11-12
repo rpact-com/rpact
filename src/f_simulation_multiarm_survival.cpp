@@ -989,7 +989,7 @@ List performSimulationMultiArmSurvivalLoop(
 	NumericMatrix iterations(kMax, cols);
 	IntegerMatrix rawDataPerStage(cols, kMax);
 	List rawDataSets;
-    NumericMatrix dropoutRecords(cols * maxNumberOfIterations * (gMax + 1), 7);
+    NumericMatrix dropoutRecords(cols * maxNumberOfIterations * (gMax + 1) * kMax, 8);
     std::fill(dropoutRecords.begin(), dropoutRecords.end(), NA_REAL);
 	
 	// Initialize all these with zeros
@@ -1129,7 +1129,7 @@ List performSimulationMultiArmSurvivalLoop(
 			NumericMatrix separatePValuesTest = closedTest["separatePValues"];
 
             finishDropoutRecords(dropoutRecords,
-                (i * maxNumberOfIterations + j) * (gMax + 1), i + 1, j + 1,
+                (i * maxNumberOfIterations + j) * (gMax + 1) * kMax, i + 1, j + 1,
                 as<NumericMatrix>(stageResults["dropoutEnrolled"]),
                 as<NumericMatrix>(stageResults["dropoutDropped"]), analysisTime,
                 selectedArmsTest, eventsNotAchieved, successStop, futilityStop,

@@ -729,7 +729,7 @@ NULL
     iterations <- matrix(0, nrow = kMax, ncol = cols)
     rawDataPerStage <- matrix(0L, nrow = cols, ncol = kMax)
     rawDataSets <- list()
-    dropoutRecords <- matrix(NA_real_, nrow = cols * maxNumberOfIterations * (gMax + 1), ncol = 7)
+    dropoutRecords <- matrix(NA_real_, nrow = cols * maxNumberOfIterations * (gMax + 1) * kMax, ncol = 8)
 
     len <- maxNumberOfIterations * kMax * gMax * cols
 
@@ -821,7 +821,7 @@ NULL
                 )
             }
 
-            recordRows <- ((i - 1L) * maxNumberOfIterations + j - 1L) * (gMax + 1) + seq_len(gMax + 1)
+            recordRows <- ((i - 1L) * maxNumberOfIterations + j - 1L) * (gMax + 1) * kMax + seq_len((gMax + 1) * kMax)
             dropoutRecords[recordRows, ] <- .finishDropoutRecords(stageResults, closedTest, i, j,
                 groups = gMax + 1L, arms = 1, sharedControl = TRUE)
 

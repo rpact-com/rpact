@@ -10,8 +10,8 @@ Trial design plan for survival data.
 This object cannot be created directly;
 use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 or \code{\link[=getPowerSurvival]{getPowerSurvival()}} with suitable arguments to create a survival design plan.
-Expected dropout proportions use the final planned analysis horizon for each
-alternative scenario, with no stage dimension. See the constructor help for
+Expected dropout proportions use each stage's planned analysis horizon for each
+alternative scenario, with stage rows and scenario columns. See the constructor help for
 the deterministic planned-accrual denominator and competing-event assumptions.
 }
 \section{Fields}{
@@ -73,9 +73,9 @@ the deterministic planned-accrual denominator and competing-event assumptions.
 
 \item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.}
 
-\item{\code{expectedDropoutProportion1}}{Expected observed dropout proportion in arm 1 at the final planned analysis time, allowing for competing events and deterministic planned accrual. One probability per alternative scenario without a stage dimension; NA when the final horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by the horizon, with fractional planning counts retained. Is a numeric vector.}
+\item{\code{expectedDropoutProportion1}}{Expected observed dropout proportion in arm 1 at each stage's planned analysis time, allowing for competing events and deterministic planned accrual. Stage rows and alternative-scenario columns, including for a single stage or scenario. NA when that stage's horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by that horizon, retaining fractional planning counts. Zero dropout is retained in the object; both proportions are hidden in print and summary output when both input dropout rates are zero. Is a numeric matrix.}
 
-\item{\code{expectedDropoutProportion2}}{Expected observed dropout proportion in arm 2 at the final planned analysis time, allowing for competing events and deterministic planned accrual. One probability per alternative scenario without a stage dimension; NA when the final horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by the horizon, with fractional planning counts retained. Is a numeric vector.}
+\item{\code{expectedDropoutProportion2}}{Expected observed dropout proportion in arm 2 at each stage's planned analysis time, allowing for competing events and deterministic planned accrual. Stage rows and alternative-scenario columns, including for a single stage or scenario. NA when that stage's horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by that horizon, retaining fractional planning counts. Zero dropout is retained in the object; both proportions are hidden in print and summary output when both input dropout rates are zero. Is a numeric matrix.}
 
 \item{\code{chi}}{The calculated event probability at end of trial. Is a numeric vector.}
 

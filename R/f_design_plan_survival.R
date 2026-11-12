@@ -48,6 +48,30 @@ NULL
     return(lambda1)
 }
 
+#'
+#' @title
+#' Calculate Competing-Risk Dropout Incidence
+#'
+#' @description
+#' Calculates the probability of dropout before an event by a follow-up time,
+#' for exponential dropout and exponential or piecewise exponential event times.
+#'
+#' @param time Vector of follow-up times since enrollment. Negative times give
+#'   zero incidence; missing times remain missing.
+#' @param piecewiseLambda Normalized nonnegative event hazards, one per interval.
+#' @param piecewiseSurvivalTime Normalized interval start times, starting at zero.
+#'   Ignored when there is a single event hazard.
+#' @param phi Nonnegative exponential dropout hazard.
+#'
+#' @return A numeric vector of dropout incidences, with one entry per time.
+#'
+#' @details
+#' Integrates the dropout hazard times joint event-free and dropout-free
+#' survival analytically over the event-hazard intervals. Inputs are normalized
+#' by the survival model before this internal helper is called.
+#'
+#' @keywords internal
+#'
 .getDropoutIncidence <- function(time, piecewiseLambda, piecewiseSurvivalTime, phi) {
     # Inputs are normalized by PiecewiseSurvivalTime; times are follow-up times.
     result <- rep(NA_real_, length(time))
@@ -79,6 +103,46 @@ NULL
     return(result)
 }
 
+#'
+#' @title
+#' Average Dropout Incidence over Accrued Subjects
+#'
+#' @description
+#' Calculates group-specific expected dropout proportions among subjects
+#' enrolled by a calendar-time horizon, using piecewise constant accrual.
+#'
+#' @param time Single finite calendar time since recruitment began.
+#' @param accrualTimeVector Accrual interval boundaries; a leading zero is
+#'   inserted if absent.
+#' @param accrualIntensity Accrual rates, recycled across accrual intervals.
+#' @param lambda1,lambda2 Normalized event hazards for the two groups.
+#' @param piecewiseSurvivalTime Normalized event-hazard interval start times.
+#'   Ignored for a group with a single event hazard.
+#' @param phi Vector of exponential dropout hazards for the two groups.
+#' @param allocationRatioPlanned Constant planned treatment-to-control ratio.
+#'
+#' @return A numeric vector of length two. Unavailable horizons, empty accrued
+#'   denominators, and groups without allocation yield missing proportions.
+#'
+#' @details
+#' Averages competing-risk dropout incidence over entry times, dividing by
+#' accrued enrollment rather than total planned enrollment. Constant allocation
+#' cancels within each group. Follow-up intervals are split at event-hazard
+#' changes and integrated analytically. On an interval from v to w,
+#' let h be the total hazard and J(v) the joint survival at its start.
+#' With z = h * (w - v), the mean incidence is
+#' F_D(v) + phi * J(v) / h * B(z).
+#' The factor B(z) equals G_1(z) - G_2(z) / z,
+#' where G_k is the gamma CDF with shape k and rate one. The second term is
+#' evaluated using its log probability to avoid underflow before division.
+#' The factor is zero at z = 0 by continuity.
+#' This implements the validation specification's expected dropout proportion
+#' and analytic dropout accrual integral formulas without numerical quadrature.
+#' The survival dropout integration appendix derives these formulas and maps
+#' their mathematical quantities to the implementation variables.
+#'
+#' @keywords internal
+#'
 .getDropoutProportionsGroupwise <- function(time, accrualTimeVector, accrualIntensity,
         lambda1, lambda2, piecewiseSurvivalTime, phi, allocationRatioPlanned = 1) {
     result <- rep(NA_real_, 2)
@@ -110,40 +174,82 @@ NULL
         for (j in which(counts > 0)) {
             lower <- time - ends[j]
             upper <- time - starts[j]
+            # Use the limiting incidence if subtraction rounds away the interval.
+            if (lower == upper) {
+                result[g] <- result[g] + weights[j] *
+                    .getDropoutIncidence(lower, lambdas[[g]], piecewiseSurvivalTime, phi[g])
+                next
+            }
             breaks <- sort(unique(c(lower, upper,
                 piecewiseSurvivalTime[piecewiseSurvivalTime > lower & piecewiseSurvivalTime < upper])))
             integral <- 0
             for (m in seq_len(length(breaks) - 1L)) {
-                part <- tryCatch(
-                    stats::integrate(function(u) {
-                        return(.getDropoutIncidence(u, lambdas[[g]], piecewiseSurvivalTime, phi[g]))
-                    }, breaks[m], breaks[m + 1L], rel.tol = 1e-9, abs.tol = 1e-11),
-                    error = function(e) {
-                        stopRuntimeIssue("Dropout accrual integration failed: ", conditionMessage(e),
-                            functionName = ".getDropoutProportionsGroupwise",
-                            constraint = "convergent one-dimensional dropout incidence integration",
-                            diagnosticId = "survival.dropout_accrual_integration_failed",
-                            context = list(arm = g, accrualInterval = j, horizon = time,
-                                lower = breaks[m], upper = breaks[m + 1L], operation = "integrate")
-                        )
-                    }
-                )
-                integral <- integral + part$value
+                intervalStart <- breaks[m]
+                intervalWidth <- breaks[m + 1L] - intervalStart
+                if (length(lambdas[[g]]) == 1L) {
+                    eventHazard <- lambdas[[g]]
+                    cumulativeEventHazard <- eventHazard * intervalStart
+                } else {
+                    interval <- findInterval(intervalStart, piecewiseSurvivalTime)
+                    eventHazard <- lambdas[[g]][interval]
+                    durations <- pmax(0, pmin(intervalStart,
+                        c(piecewiseSurvivalTime[-1], Inf)) - piecewiseSurvivalTime)
+                    cumulativeEventHazard <- sum(lambdas[[g]] * durations)
+                }
+                totalHazard <- eventHazard + phi[g]
+                scaledWidth <- totalHazard * intervalWidth
+                if (scaledWidth == 0) {
+                    meanIncrement <- 0
+                } else {
+                    # FS formula fs:survival:dropoutGammaFactor. Use log(G_2(z)) - log(z)
+                    # so G_2(z) does not underflow before division by z.
+                    meanIncrement <- stats::pgamma(scaledWidth, shape = 1, rate = 1) -
+                        exp(stats::pgamma(scaledWidth, shape = 2, rate = 1, log.p = TRUE) -
+                            log(scaledWidth))
+                }
+                jointSurvival <- exp(-phi[g] * intervalStart - cumulativeEventHazard)
+                incidence <- .getDropoutIncidence(intervalStart, lambdas[[g]],
+                    piecewiseSurvivalTime, phi[g])
+                integral <- integral + intervalWidth *
+                    (incidence + phi[g] / totalHazard * jointSurvival * meanIncrement)
             }
-            result[g] <- result[g] + weights[j] * integral / widths[j]
+            # Normalize on the same follow-up scale to avoid cancellation when
+            # a short accrual interval is subtracted from a large horizon.
+            result[g] <- result[g] + weights[j] * integral / (upper - lower)
         }
     }
     return(result)
 }
 
+#'
+#' @title
+#' Add Expected Dropout Proportions to a Survival Design Plan
+#'
+#' @description
+#' Populates derived group-specific dropout proportions at each stage's
+#' planned analysis time in each scenario, including analyses before recruitment ends.
+#'
+#' @param designPlan Survival sample-size or power design plan, modified by
+#'   reference. Its survival and accrual inputs must already be normalized.
+#'
+#' @return Invisibly returns the assigned derived parameter type; the design
+#'   plan is updated by reference.
+#'
+#' @details
+#' Converts input dropout probabilities to exponential hazards and averages
+#' competing-risk dropout incidence over accrued subjects. Stores matrices with
+#' stage rows and alternative-scenario columns. Values remain missing when
+#' observation times are not accounted for or the horizon is unavailable.
+#'
+#' @keywords internal
+#'
 .addExpectedDropoutProportions <- function(designPlan) {
     numberOfResults <- length(designPlan$hazardRatio)
-    result <- matrix(NA_real_, nrow = 2, ncol = numberOfResults)
+    kMax <- designPlan$.design$kMax
+    result <- array(NA_real_, dim = c(kMax, numberOfResults, 2))
     if (isTRUE(designPlan$accountForObservationTimes) && length(designPlan$analysisTime) > 0) {
-        horizons <- designPlan$analysisTime[designPlan$.design$kMax, ]
-        if (length(horizons) == 1L) {
-            horizons <- rep(horizons, numberOfResults)
-        }
+        horizons <- matrix(rep(designPlan$analysisTime, length.out = kMax * numberOfResults),
+            nrow = kMax)
         phi <- -log1p(-c(designPlan$dropoutRate1, designPlan$dropoutRate2)) / designPlan$dropoutTime
         for (i in seq_len(numberOfResults)) {
             lambda1 <- designPlan$lambda1[i]
@@ -152,17 +258,19 @@ NULL
             }
             lambda1 <- .getLambda(groupNumber = 1, lambda1 = lambda1,
                 lambda2 = designPlan$lambda2, hazardRatio = designPlan$hazardRatio[i], kappa = designPlan$kappa)
-            result[, i] <- .getDropoutProportionsGroupwise(
-                time = horizons[i], accrualTimeVector = designPlan$accrualTime,
-                accrualIntensity = designPlan$accrualIntensity,
-                lambda1 = lambda1, lambda2 = designPlan$lambda2,
-                piecewiseSurvivalTime = designPlan$piecewiseSurvivalTime, phi = phi,
-                allocationRatioPlanned = rep(designPlan$allocationRatioPlanned, length.out = numberOfResults)[i]
-            )
+            for (k in seq_len(kMax)) {
+                result[k, i, ] <- .getDropoutProportionsGroupwise(
+                    time = horizons[k, i], accrualTimeVector = designPlan$accrualTime,
+                    accrualIntensity = designPlan$accrualIntensity,
+                    lambda1 = lambda1, lambda2 = designPlan$lambda2,
+                    piecewiseSurvivalTime = designPlan$piecewiseSurvivalTime, phi = phi,
+                    allocationRatioPlanned = rep(designPlan$allocationRatioPlanned, length.out = numberOfResults)[i]
+                )
+            }
         }
     }
-    designPlan$expectedDropoutProportion1 <- result[1, ]
-    designPlan$expectedDropoutProportion2 <- result[2, ]
+    designPlan$expectedDropoutProportion1 <- matrix(result[, , 1], nrow = kMax)
+    designPlan$expectedDropoutProportion2 <- matrix(result[, , 2], nrow = kMax)
     designPlan$.setParameterType("expectedDropoutProportion1", C_PARAM_DERIVED)
     designPlan$.setParameterType("expectedDropoutProportion2", C_PARAM_DERIVED)
 }
@@ -615,15 +723,7 @@ NULL
     designPlan$maxNumberOfEvents <- designPlan$cumulativeEventsPerStage[designPlan$.design$kMax, ]
     designPlan$.setParameterType("maxNumberOfEvents", C_PARAM_GENERATED)
 
-    if (!anyNA(designPlan$followUpTime)) {
-        if (any(designPlan$followUpTime < -1e-02)) {
-            warnInvalidInput("Accrual duration longer than maximum study ",
-                "duration (time to maximum number of events); followUpTime = ",
-                .arrayToString(designPlan$followUpTime),
-                diagnosticId = "survival.accrual_duration_inconsistent"
-            )
-        }
-    } else {
+    if (anyNA(designPlan$followUpTime)) {
         warnNumericalIssue("Follow-up time could not be calculated for hazardRatio = ",
             .arrayToString(designPlan$hazardRatio),
             diagnosticId = "survival.event_target_calculation_failed"

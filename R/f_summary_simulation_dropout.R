@@ -36,28 +36,25 @@
     if (is.null(selected)) {
         selected <- closedTest$selectedPopulations
     }
-    result <- matrix(NA_real_, nrow = groups * arms, ncol = 7)
+    kMax <- length(stageResults$analysisTime)
+    result <- matrix(NA_real_, nrow = groups * arms * kMax, ncol = 8)
     for (g in seq_len(groups)) {
-        last <- NA_integer_
-        for (k in seq_along(stageResults$analysisTime)) {
-            if (isTRUE(stageResults$eventsNotAchieved[k]) || !is.finite(stageResults$analysisTime[k])) {
-                break
+        stopped <- FALSE
+        for (k in seq_len(kMax)) {
+            available <- !stopped && !isTRUE(stageResults$eventsNotAchieved[k]) &&
+                is.finite(stageResults$analysisTime[k])
+            contributes <- available && ((sharedControl && g == groups) || isTRUE(selected[g, k]))
+            for (a in seq_len(arms)) {
+                groupRow <- (g - 1L) * arms + a
+                row <- (groupRow - 1L) * kMax + k
+                result[row, 1:5] <- c(scenario, iteration, g, a, k)
+                if (contributes) {
+                    result[row, 6:8] <- c(stageResults$analysisTime[k],
+                        stageResults$dropoutEnrolled[groupRow, k], stageResults$dropoutDropped[groupRow, k])
+                }
             }
-            if ((sharedControl && g == groups) || isTRUE(selected[g, k])) {
-                last <- k
-            }
-            if (isTRUE(closedTest$successStop[k]) || isTRUE(closedTest$futilityStop[k])) {
-                break
-            }
-        }
-        for (a in seq_len(arms)) {
-            row <- (g - 1L) * arms + a
-            result[row, 1:4] <- c(scenario, iteration, g, a)
-            if (!is.na(last)) {
-                result[row, 5:7] <- c(
-                    stageResults$analysisTime[last],
-                    stageResults$dropoutEnrolled[row, last], stageResults$dropoutDropped[row, last]
-                )
+            if (!available || isTRUE(closedTest$successStop[k]) || isTRUE(closedTest$futilityStop[k])) {
+                stopped <- TRUE
             }
         }
     }
@@ -66,16 +63,17 @@
 
 .addObservedDropoutProportions <- function(result, records, scenarios, groups = 1, multiArm = FALSE) {
     records <- as.data.frame(records)
-    names(records) <- c("scenario", "iteration", "group", "arm", "horizon", "enrolled", "dropouts")
+    names(records) <- c("scenario", "iteration", "group", "arm", "stage", "horizon", "enrolled", "dropouts")
     result$.dropoutRecords <- records
+    kMax <- result$.design$kMax
     for (a in 1:2) {
-        columns <- groups
+        numberOfGroups <- groups
         if (multiArm && a == 2) {
-            columns <- 1L
+            numberOfGroups <- 1L
         }
-        proportions <- horizons <- matrix(NA_real_, nrow = columns, ncol = scenarios)
-        contributors <- matrix(0L, nrow = columns, ncol = scenarios)
-        for (g in seq_len(columns)) {
+        proportions <- horizons <- array(NA_real_, dim = c(kMax, scenarios, numberOfGroups))
+        contributors <- array(0L, dim = c(kMax, scenarios, numberOfGroups))
+        for (g in seq_len(numberOfGroups)) {
             for (i in seq_len(scenarios)) {
                 selectedGroup <- g
                 selectedArm <- a
@@ -85,21 +83,24 @@
                         selectedGroup <- groups + 1L
                     }
                 }
-                rows <- records$scenario == i & records$group == selectedGroup &
-                    records$arm == selectedArm & is.finite(records$horizon) & records$enrolled > 0
-                rows[is.na(rows)] <- FALSE
-                contributors[g, i] <- sum(rows)
-                if (any(rows)) {
-                    proportions[g, i] <- mean(records$dropouts[rows] / records$enrolled[rows])
-                    horizons[g, i] <- mean(records$horizon[rows])
+                for (k in seq_len(kMax)) {
+                    rows <- records$scenario == i & records$group == selectedGroup &
+                        records$arm == selectedArm & records$stage == k &
+                        is.finite(records$horizon) & records$enrolled > 0
+                    rows[is.na(rows)] <- FALSE
+                    contributors[k, i, g] <- sum(rows)
+                    if (any(rows)) {
+                        proportions[k, i, g] <- mean(records$dropouts[rows] / records$enrolled[rows])
+                        horizons[k, i, g] <- mean(records$horizon[rows])
+                    }
                 }
             }
         }
-        # Group/population rows and scenario columns, with no stage dimension.
-        if (columns == 1L) {
-            proportions <- as.numeric(proportions)
-            horizons <- as.numeric(horizons)
-            contributors <- as.integer(contributors)
+        # Keep stage and scenario dimensions, even for a single stage or scenario.
+        if (numberOfGroups == 1L) {
+            proportions <- matrix(proportions, nrow = kMax)
+            horizons <- matrix(horizons, nrow = kMax)
+            contributors <- matrix(contributors, nrow = kMax)
         }
         result[[paste0("observedDropoutProportion", a)]] <- proportions
         result[[paste0("dropoutObservationTime", a)]] <- horizons
@@ -109,116 +110,89 @@
     }
 }
 
-.addDropoutSummaryItems <- function(result, summaryFactory) {
-    if (inherits(result, "SimulationResultsEnrichmentSurvival")) {
-        .addEnrichmentDropoutSummaryItems(result, summaryFactory)
-        return(invisible(NULL))
+.isDropoutOutputHidden <- function(result, field) {
+    if (grepl("^dropoutObservationTime[12]$", field)) {
+        return(TRUE)
     }
+    if (!grepl("^(expected|observed)DropoutProportion[12]$", field)) {
+        return(FALSE)
+    }
+    rates <- c(result[["dropoutRate1"]], result[["dropoutRate2"]])
+    return(length(rates) > 0 && all(!is.na(rates) & rates == 0))
+}
+
+.addDropoutSummaryItems <- function(result, summaryFactory) {
     if (inherits(result, "SimulationResultsMultiArmSurvival")) {
         .addMultiArmDropoutSummaryItems(result, summaryFactory)
         return(invisible(NULL))
     }
-    fields <- c(
-        "expectedDropoutProportion1", "expectedDropoutProportion2",
-        "observedDropoutProportion1", "observedDropoutProportion2",
-        "dropoutObservationTime1", "dropoutObservationTime2"
-    )
+    fields <- c("expectedDropoutProportion1", "expectedDropoutProportion2",
+        "observedDropoutProportion1", "observedDropoutProportion2")
+    legendEntry <- .getDropoutLegendEntries(result)
     for (field in fields) {
         values <- result[[field]]
-        if (is.null(values) || result$isNotApplicableParameter(field)) {
+        if (is.null(values) || result$isNotApplicableParameter(field) || .isDropoutOutputHidden(result, field)) {
             next
         }
-        if (is.null(dim(values))) {
-            values <- matrix(values, nrow = 1)
-        }
-        for (g in seq_len(nrow(values))) {
-            caption <- .getParameterCaption(field, result)
-            if (nrow(values) > 1) {
-                caption <- .getParameterSetParameterCaptionPerRow(result, field, caption, g)
-            }
-            for (i in seq_len(ncol(values))) {
-                title <- caption
-                if (ncol(values) > 1) {
-                    title <- paste0(title, ", scenario ", i)
-                }
-                formatted <- .formatRates(values[g, i])
-                if (startsWith(field, "dropoutObservationTime")) {
-                    formatted <- .formatDropoutObservationTime(values[g, i])
-                }
-                summaryFactory$addItem(title, formatted)
-            }
+        caption <- .getParameterCaption(field, result)
+        if (length(dim(values)) == 3L) {
+            .addSimulationArrayToSummary(result, field, caption, summaryFactory,
+                digitsSampleSize = 0, legendEntry = legendEntry)
+        } else {
+            summaryFactory$addParameter(result, parameterName = field,
+                parameterCaption = caption, roundDigits = 0, showNA = TRUE,
+                legendEntry = legendEntry,
+                transpose = inherits(result, "SimulationResultsMultiArmSurvival") ||
+                    inherits(result, "SimulationResultsEnrichmentSurvival"))
         }
     }
 }
 
+.getDropoutLegendEntries <- function(result) {
+    if (!inherits(result, c("SimulationResultsSurvival", "SimulationResultsEnrichmentSurvival"))) {
+        return(list())
+    }
+    for (field in c("observedDropoutProportion1", "observedDropoutProportion2")) {
+        if (!is.null(result[[field]]) && !result$isNotApplicableParameter(field) &&
+                !.isDropoutOutputHidden(result, field)) {
+            return(.addLegendEntry("treatmentArmValues"))
+        }
+    }
+    return(list())
+}
+
 .addMultiArmDropoutSummaryItems <- function(result, summaryFactory) {
-    fields <- c(
-        "observedDropoutProportion1", "observedDropoutProportion2",
-        "dropoutObservationTime1", "dropoutObservationTime2"
-    )
-    values <- lapply(fields, function(field) {
-        value <- result[[field]]
-        if (is.null(value) || result$isNotApplicableParameter(field)) {
-            return(NULL)
-        }
-        if (is.null(dim(value))) {
-            value <- matrix(value, nrow = 1)
-        }
-        return(value)
-    })
-    if (any(vapply(values, is.null, logical(1)))) {
+    treatment <- result$observedDropoutProportion1
+    control <- result$observedDropoutProportion2
+    if (is.null(treatment) || is.null(control) ||
+            result$isNotApplicableParameter("observedDropoutProportion1") ||
+            result$isNotApplicableParameter("observedDropoutProportion2") ||
+            .isDropoutOutputHidden(result, "observedDropoutProportion1")) {
         return(invisible(NULL))
     }
-
-    proportions <- rbind(values[[1]], values[[2]])
-    times <- rbind(values[[3]], values[[4]])
-    armCaptions <- c(paste0("Treatment arm ", seq_len(nrow(values[[1]]))), "Control")
+    numberOfArms <- 1L
+    if (length(dim(treatment)) == 3L) {
+        numberOfArms <- dim(treatment)[3]
+    }
+    treatment <- array(treatment, dim = c(nrow(control), ncol(control), numberOfArms))
     listItemPrefix <- .getEnvironmentVariable(
         "RPACT_SUMMARY_LIST_ITEM_PREFIX", "rpact.summary.list.item.prefix",
         default = C_SUMMARY_LIST_ITEM_PREFIX_DEFAULT, type = "character"
     )
-    for (i in seq_len(ncol(proportions))) {
-        caption <- "Observed drop-out by arm"
-        if (ncol(proportions) > 1) {
-            caption <- paste0(caption, ", scenario ", i)
+    for (i in seq_len(ncol(control))) {
+        group <- .getSummaryGroup("Observed drop-out proportion", ncol(control), i, result)
+        summaryFactory$addItem(group$groupCaption, "", legendEntry = group$legendEntry)
+        for (g in seq_len(numberOfArms)) {
+            summaryFactory$addParameter(result,
+                parameterName = "observedDropoutProportion1", values = treatment[, i, g],
+                parameterCaption = paste0(listItemPrefix, "Treatment arm ", g),
+                roundDigits = 0, enforceFirstCase = TRUE
+            )
         }
-        summaryFactory$addItem(caption, "")
-        for (g in seq_len(nrow(proportions))) {
-            summaryFactory$addItem(paste0(listItemPrefix, armCaptions[g]), "")
-            summaryFactory$addItem("    Proportion", .formatRates(proportions[g, i]))
-            summaryFactory$addItem("    Time", .formatDropoutObservationTime(times[g, i]))
-        }
-    }
-}
-
-.addEnrichmentDropoutSummaryItems <- function(result, summaryFactory) {
-    fields <- c("observedDropoutProportion1", "observedDropoutProportion2", "dropoutObservationTime1")
-    values <- lapply(fields, function(field) {
-        value <- result[[field]]
-        if (is.null(value) || result$isNotApplicableParameter(field)) {
-            return(NULL)
-        }
-        if (is.null(dim(value))) {
-            value <- matrix(value, nrow = 1)
-        }
-        return(value)
-    })
-    if (any(vapply(values, is.null, logical(1)))) {
-        return(invisible(NULL))
-    }
-
-    for (i in seq_len(ncol(values[[1]]))) {
-        caption <- "Observed drop-out by population"
-        if (ncol(values[[1]]) > 1) {
-            caption <- paste0(caption, ", scenario ", i)
-        }
-        summaryFactory$addItem(caption, "")
-        for (g in seq_len(nrow(values[[1]]))) {
-            populationCaption <- .getSummaryGroupCaption(result, fields[1], nrow(values[[1]]), g)
-            summaryFactory$addItem(populationCaption, "")
-            summaryFactory$addItem("    Proportion (1)", .formatRates(values[[1]][g, i]))
-            summaryFactory$addItem("    Proportion (2)", .formatRates(values[[2]][g, i]))
-            summaryFactory$addItem("    Time", .formatDropoutObservationTime(values[[3]][g, i]))
-        }
+        summaryFactory$addParameter(result,
+            parameterName = "observedDropoutProportion2", values = control[, i],
+            parameterCaption = paste0(listItemPrefix, "Control"),
+            roundDigits = 0, enforceFirstCase = TRUE
+        )
     }
 }
