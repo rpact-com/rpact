@@ -28,6 +28,7 @@ Survival planning reports derived `expectedDropoutProportion1` and `expectedDrop
 
 ## Improvements, issues, and changes
 
+* Corrected `populationEventsPerStage` in test-statistic-based enrichment survival simulations to exclude dropped populations, matching the patient-wise approaches. Events in subsets belonging to retained populations remain available in `singleEventsPerSubsetAndStage`.
 * Parameter listings now align their colon column using applicable parameter captions without a fixed four-character padding allowance. Technical summaries account separately for parameter type prefixes. Caption padding remains capped at 40 characters, and longer captions are retained in full.
 * Repeated p-values are now unavailable (`NA` with a warning) for sequential designs with user-defined beta spending (`typeBetaSpending = "bsUser"`), for both binding and nonbinding futility. This avoids unreliable inversion results and C++ bounds warnings. The restriction also applies to multi-arm and enrichment analyses; other analysis results remain available.
 * Replaced direct errors in comparison extraction, comparison plotting, and package testing with the central error helpers, providing specific error categories and structured diagnostic context while preserving worker failure details.
