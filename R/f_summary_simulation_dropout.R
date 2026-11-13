@@ -66,47 +66,47 @@
     names(records) <- c("scenario", "iteration", "group", "arm", "stage", "horizon", "enrolled", "dropouts")
     result$.dropoutRecords <- records
     kMax <- result$.design$kMax
-    for (a in 1:2) {
+    for (groupNumber in 1:2) {
         numberOfGroups <- groups
-        if (multiArm && a == 2) {
+        if (multiArm && groupNumber == 2) {
             numberOfGroups <- 1L
         }
         proportions <- horizons <- array(NA_real_, dim = c(kMax, scenarios, numberOfGroups))
         contributors <- array(0L, dim = c(kMax, scenarios, numberOfGroups))
-        for (g in seq_len(numberOfGroups)) {
-            for (i in seq_len(scenarios)) {
-                selectedGroup <- g
-                selectedArm <- a
+        for (selectedGroupNumber in seq_len(numberOfGroups)) {
+            for (scenarioNumber in seq_len(scenarios)) {
+                selectedGroup <- selectedGroupNumber
+                selectedArm <- groupNumber
                 if (multiArm) {
                     selectedArm <- 1L
-                    if (a == 2) {
+                    if (groupNumber == 2) {
                         selectedGroup <- groups + 1L
                     }
                 }
-                for (k in seq_len(kMax)) {
-                    rows <- records$scenario == i & records$group == selectedGroup &
-                        records$arm == selectedArm & records$stage == k &
+                for (stage in seq_len(kMax)) {
+                    rows <- records$scenario == scenarioNumber & records$group == selectedGroup &
+                        records$arm == selectedArm & records$stage == stage &
                         is.finite(records$horizon) & records$enrolled > 0
                     rows[is.na(rows)] <- FALSE
-                    contributors[k, i, g] <- sum(rows)
+                    contributors[stage, scenarioNumber, selectedGroupNumber] <- sum(rows)
                     if (any(rows)) {
-                        proportions[k, i, g] <- mean(records$dropouts[rows] / records$enrolled[rows])
-                        horizons[k, i, g] <- mean(records$horizon[rows])
+                        proportions[stage, scenarioNumber, selectedGroupNumber] <- mean(records$dropouts[rows] / records$enrolled[rows])
+                        horizons[stage, scenarioNumber, selectedGroupNumber] <- mean(records$horizon[rows])
                     }
                 }
             }
         }
-        # Keep stage and scenario dimensions, even for a single stage or scenario.
+        # Keep stage and scenario dimensions, even for groupNumber single stage or scenario.
         if (numberOfGroups == 1L) {
             proportions <- matrix(proportions, nrow = kMax)
             horizons <- matrix(horizons, nrow = kMax)
             contributors <- matrix(contributors, nrow = kMax)
         }
-        result[[paste0("observedDropoutProportion", a)]] <- proportions
-        result[[paste0("dropoutObservationTime", a)]] <- horizons
-        result[[paste0(".dropoutContributors", a)]] <- contributors
-        result$.setParameterType(paste0("observedDropoutProportion", a), C_PARAM_GENERATED)
-        result$.setParameterType(paste0("dropoutObservationTime", a), C_PARAM_GENERATED)
+        result[[paste0("observedDropoutProportion", groupNumber)]] <- proportions
+        result[[paste0("dropoutObservationTime", groupNumber)]] <- horizons
+        result[[paste0(".dropoutContributors", groupNumber)]] <- contributors
+        result$.setParameterType(paste0("observedDropoutProportion", groupNumber), C_PARAM_GENERATED)
+        result$.setParameterType(paste0("dropoutObservationTime", groupNumber), C_PARAM_GENERATED)
     }
 }
 
@@ -126,14 +126,18 @@
         .addMultiArmDropoutSummaryItems(result, summaryFactory)
         return(invisible(NULL))
     }
-    fields <- c("expectedDropoutProportion1", "expectedDropoutProportion2",
-        "observedDropoutProportion1", "observedDropoutProportion2")
+    fields <- c(
+        "expectedDropoutProportion1", 
+        "expectedDropoutProportion2",
+        "observedDropoutProportion1", 
+        "observedDropoutProportion2")
     legendEntry <- .getDropoutLegendEntries(result)
     for (field in fields) {
         values <- result[[field]]
         if (is.null(values) || result$isNotApplicableParameter(field) || .isDropoutOutputHidden(result, field)) {
             next
         }
+        
         caption <- .getParameterCaption(field, result)
         if (length(dim(values)) == 3L) {
             .addSimulationArrayToSummary(result, field, caption, summaryFactory,
@@ -170,6 +174,7 @@
             .isDropoutOutputHidden(result, "observedDropoutProportion1")) {
         return(invisible(NULL))
     }
+    
     numberOfArms <- 1L
     if (length(dim(treatment)) == 3L) {
         numberOfArms <- dim(treatment)[3]

@@ -1185,8 +1185,11 @@ SimulationResultsBaseSurvival <- R6::R6Class(
             for (generatedParam in generatedParams) {
                 self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
-            for (field in c("observedDropoutProportion1", "observedDropoutProportion2",
-                    "dropoutObservationTime1", "dropoutObservationTime2")) {
+            for (field in c(
+                    "observedDropoutProportion1", 
+                    "observedDropoutProportion2",
+                    "dropoutObservationTime1", 
+                    "dropoutObservationTime2")) {
                 self$.setParameterType(field, C_PARAM_NOT_APPLICABLE)
             }
             self$.setParameterType("maxStudyDuration", C_PARAM_NOT_APPLICABLE)

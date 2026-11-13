@@ -1083,6 +1083,9 @@ as.data.frame.TrialComparison <- function(
         rownames(data) <- NULL
         columnNameData <- data
     }
+    identifiers <- intersect(.comparisonIdentifiers, names(data))
+    parameters <- .getComparisonParameterOrder(objects, setdiff(names(data), identifiers))
+    data <- data[c(identifiers, parameters)]
     countParameters <- c(
         .getOutputFormatParameterNames("rpact.output.format.sample.size"),
         .getOutputFormatParameterNames("rpact.output.format.event")
@@ -1266,21 +1269,32 @@ as.data.frame.TrialComparison <- function(
     if (parameter %in% .comparisonScope) {
         return("Object types and scope")
     }
+    sourceParameter <- sub("^(optimal_|design_|simulation_)", "", parameter)
+    roles <- unlist(lapply(objects, function(object) {
+        return(unlist(lapply(.getComparisonMetadataSources(object), function(source) {
+            if (sourceParameter %in% source$.getInputParameters()) {
+                return("input")
+            }
+            if (sourceParameter %in% c(source$.getGeneratedParameters(), source$.getDerivedParameters())) {
+                return("result")
+            }
+            return(character())
+        }), use.names = FALSE))
+    }), use.names = FALSE)
+    # Retain input precedence when compared objects assign different roles.
+    if ("input" %in% roles) {
+        return("Inputs and design settings")
+    }
+    if ("result" %in% roles) {
+        return("Results and derived parameters")
+    }
+    # Adapter coordinates without ParameterSet metadata retain their input role.
     if (grepl("^observed", parameter) || parameter %in% c(
             "time", "treatmentArm", "populations", "situations", "type", "nPlanned"
         )) {
         return("Inputs and design settings")
     }
-    sourceParameter <- sub("^(optimal_|design_|simulation_)", "", parameter)
-    types <- unlist(lapply(objects, function(object) {
-        return(unlist(lapply(.getComparisonMetadataSources(object), function(source) {
-            return(source$.parameterTypes[[sourceParameter]])
-        }), use.names = FALSE))
-    }), use.names = FALSE)
-    if (any(types %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))) {
-        return("Inputs and design settings")
-    }
-    "Results and derived parameters"
+    return("Results and derived parameters")
 }
 
 .getTrialComparisonTitle <- function(objects, summaryEnabled = FALSE) {
@@ -1536,13 +1550,50 @@ as.data.frame.TrialComparison <- function(
     return(profile)
 }
 
+.getComparisonParameterOrder <- function(objects, candidates) {
+    sourceNames <- sub("^(optimal_|design_|simulation_)", "", candidates)
+    ordered <- character()
+    for (method in c(".getUserDefinedParameters", ".getDefaultParameters",
+            ".getGeneratedParameters", ".getDerivedParameters")) {
+        group <- character()
+        for (object in objects) {
+            for (source in .getComparisonMetadataSources(object)) {
+                parameters <- source[[method]]()
+                parameters <- parameters[parameters %in% sourceNames]
+                # Insert additional parameters before their next known neighbour.
+                # Conflicting orders retain the earlier object's precedence.
+                for (i in seq_along(parameters)) {
+                    parameter <- parameters[[i]]
+                    if (parameter %in% group) {
+                        next
+                    }
+                    following <- parameters[seq.int(i, length(parameters))]
+                    following <- following[following %in% group]
+                    position <- if (length(following)) {
+                        match(following[[1L]], group) - 1L
+                    } else {
+                        length(group)
+                    }
+                    group <- append(group, parameter, after = position)
+                }
+            }
+        }
+        ordered <- c(ordered, unlist(lapply(group, function(parameter) {
+            return(candidates[sourceNames == parameter])
+        }), use.names = FALSE))
+    }
+    # Keep scope columns first and untyped adapter columns in their original order.
+    return(unique(c(intersect(.comparisonScope, candidates), ordered, candidates)))
+}
+
 .getTrialComparisonInfo <- function(object, data = .getTrialComparisonData(object$getObjects())) {
     info <- .getComparisonParameterInfo(data)
     # Use the common metadata API for the full ordered candidate set; row-wise
     # variation alone cannot identify equal stage profiles of different objects.
     candidates <- getComparisonParameterNames(data, varyingOnly = FALSE, exclude = .comparisonIdentifiers)
-    info <- info[match(candidates, info$paramName), , drop = FALSE]
     objects <- object$getObjects()
+    candidates <- .getComparisonParameterOrder(objects, candidates)
+    info <- info[match(candidates, info$paramName), , drop = FALSE]
     frames <- split(data, factor(data$objectNumber, levels = seq_along(objects)))
     profiles <- lapply(info$paramName, function(parameter) {
         return(lapply(seq_along(frames), function(i) {
@@ -2148,7 +2199,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         different[info$role[different] == role]
     }), use.names = FALSE)
     # Share the display budget across sections so a long input list cannot hide
-    # every result difference. Within each section preserve source-column order.
+    # every result difference. Within each section preserve ParameterSet order.
     sections <- lapply(roles, function(role) {
         different[info$role[different] == role]
     })
