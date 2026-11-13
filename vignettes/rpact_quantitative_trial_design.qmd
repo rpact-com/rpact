@@ -222,19 +222,28 @@ Exact binomial summation over all possible event-count
 pairs produces the category probabilities which are in the result of `getOperatingCharacteristicsRates`. The confidence interval construction itself
 remains approximate, based on the normal assumption described above.
 
-## The five named scenarios
+## Named scenarios
+
+We can also assign names to scenarios for easier reference. For example, let's define five scenarios ranging from "very good" to "very poor" efficacy:
 
 ```{r}
 #| label: kestrel-scenarios
 scenarioNames <- c("Very good", "Good", "Indifferent", "Poor", "Very poor")
-improvements <- c(0.05, 0, -0.025, -0.05, -0.10)
+controlRate <- 0.15
 scenarioRates <- c(0.10, 0.15, 0.175, 0.20, 0.25)
+improvements <- controlRate - scenarioRates
 knitr::kable(data.frame(
     Scenario = scenarioNames,
     `True improvement (percentage points)` = 100 * improvements,
     `Treatment event probability` = scenarioRates,
     check.names = FALSE
 ))
+```
+
+Then we compute the operating characteristics for these named scenarios using the previously defined `demoSizes` and `scenarioRates`:
+
+```{r}
+#| label: kestrel-rates-scenarios
 ratesScenarios <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = demoSizes,
@@ -245,6 +254,10 @@ ratesScenarios <- getOperatingCharacteristicsRates(
 )
 summary(ratesScenarios, digits = 4)
 ```
+
+For both sample size configurations, we can thus see the probabilities for each decision under the assumed treatment rate.
+
+TODO: Either remove this table or use R code to produce it
 
 The next table gives a compact probability overview for the five scenarios.
 Triplets are ordered Go / Indeterminate / Stop.
@@ -267,16 +280,17 @@ assumptions.
 ```{r}
 #| label: kestrel-calculated-table
 scenarioPlot <- plot(ratesScenarios, type = 4, plotCat = 3)
-scenarioTable <- reshape(
-    scenarioPlot$data[c("scenario", "nControl", "nTreatment",
-        "pi1", "alternative", "category", "probability")],
-    idvar = c("scenario", "nControl", "nTreatment", "pi1", "alternative"),
-    timevar = "category",
-    direction = "wide"
-)
-scenarioTable <- scenarioTable[order(scenarioTable$scenario,
-    match(scenarioTable$pi1, scenarioRates)), ]
-scenarioTable$Scenario <- scenarioNames[match(scenarioTable$pi1, scenarioRates)]
+
+scenarioTable <- scenarioPlot$data |>
+    dplyr::select(scenario, nControl, nTreatment, pi1, alternative,
+        category, probability) |>
+    tidyr::pivot_wider(
+        names_from = category,
+        values_from = probability,
+        names_prefix = "probability."
+    ) |>
+    dplyr::arrange(scenario, match(pi1, scenarioRates)) |>
+    dplyr::mutate(Scenario = scenarioNames[match(pi1, scenarioRates)])
 knitr::kable(
     scenarioTable[c("Scenario", "nControl", "nTreatment", "pi1", "alternative",
         "probability.Go", "probability.Indeterminate", "probability.Stop")],
@@ -286,15 +300,16 @@ knitr::kable(
 ```
 
 For a five-percentage-point improvement, the Go probability is approximately
-0.848456 with 75 patients per group and 0.914933 with 75 control and 150
+`r round(scenarioTable$probability.Go[scenarioTable$nControl == 75 & scenarioTable$nTreatment == 75 & scenarioTable$pi1 == 0.1],3)` with 75 patients per group and `r round(scenarioTable$probability.Go[scenarioTable$nControl == 75 & scenarioTable$nTreatment == 150 & scenarioTable$pi1 == 0.1],3)` with 75 control and 150
 treatment patients. At equal event rates, these probabilities are approximately
-0.508129 and 0.570745. Go under this rule therefore does not imply rejection of
-a conventional superiority null hypothesis.
+`r round(scenarioTable$probability.Go[scenarioTable$nControl == 75 & scenarioTable$nTreatment == 75 & scenarioTable$pi1 == 0.15],3)` and `r round(scenarioTable$probability.Go[scenarioTable$nControl == 75 & scenarioTable$nTreatment == 150 & scenarioTable$pi1 == 0.15],3)`. This is just one illustration that we are not using Phase 3 style strict type I error control here with quantitative trial decisions. That said, we might want to change the decision thresholds used in order to obtain satisfactory operating characteristics.
 
 ## Detailed probability tables
 
 The following table summarizes the three-category probabilities for treatment
 event probabilities from 0.10 to 0.24 in steps of 0.02.
+
+TODO remove or use R code
 
 | Control N | Treatment N | Control rate | Treatment rate | Go | Indeterminate | Stop |
 |--:|--:|--:|--:|--:|--:|--:|
@@ -315,30 +330,27 @@ event probabilities from 0.10 to 0.24 in steps of 0.02.
 | 75 | 150 | 0.15 | 0.22 | 0.1112 | 0.3996 | 0.4892 |
 | 75 | 150 | 0.15 | 0.24 | 0.057  | 0.3209 | 0.6222 |
 
-The full probability grid begins at `pi1 = 0.100` with step `0.001`. For 75
-patients per group at `pi1 = 0.100`, the six-category probabilities are
-approximately 0.535233, 0.313223, 0.138351, 0, 0.01232, and 0.000873, with
-aggregate probabilities 0.848456, 0.138351, and 0.013193. Small displayed zeros
-can represent rounded positive probabilities. The following calculation shows
-the first grid points and their three-category sums from unrounded results.
+The full probability grid begins at `pi1 = 0.100` with step `0.01`. 
+The following calculation shows the first grid points and their three-category sums from unrounded results.
 
 ```{r}
 #| label: kestrel-full-data
-visibleRows <- subset(ratesOC$probabilities,
-    nTreatment == 75 & pi1 >= 0.100 & pi1 <= 0.112)
-visibleTable <- reshape(
-    visibleRows[c("pi1", "pi2", "nControl", "nTreatment", "category", "probability")],
-    idvar = c("pi1", "pi2", "nControl", "nTreatment"),
-    timevar = "category",
-    direction = "wide"
-)
-visibleTable <- visibleTable[order(visibleTable$pi1), ]
-visibleTable$Go <- visibleTable[["probability.Go (Fixed)"]] +
-    visibleTable$probability.Go
-visibleTable$Indeterminate <- visibleTable[["probability.Indeterminate 1"]] +
-    visibleTable[["probability.Indeterminate 2"]]
-visibleTable$Stop <- visibleTable$probability.Stop +
-    visibleTable[["probability.Stop (Fixed)"]]
+visibleTable <- ratesOC$probabilities |>
+    dplyr::filter(nTreatment == 75, pi1 >= 0.100, pi1 <= 0.112) |>
+    dplyr::group_by(pi1, pi2, nControl, nTreatment) |>
+    dplyr::summarise(
+        `probability.Go (Fixed)` = sum(probability[category == "Go (Fixed)"]),
+        probability.Go = sum(probability[category == "Go"]),
+        `probability.Indeterminate 1` = sum(probability[category == "Indeterminate 1"]),
+        `probability.Indeterminate 2` = sum(probability[category == "Indeterminate 2"]),
+        probability.Stop = sum(probability[category == "Stop"]),
+        `probability.Stop (Fixed)` = sum(probability[category == "Stop (Fixed)"]),
+        Go = `probability.Go (Fixed)` + probability.Go,
+        Indeterminate = `probability.Indeterminate 1` + `probability.Indeterminate 2`,
+        Stop = probability.Stop + `probability.Stop (Fixed)`,
+        .groups = "drop"
+    ) |>
+    dplyr::arrange(pi1)
 knitr::kable(visibleTable, digits = 6, row.names = FALSE)
 ```
 
@@ -346,11 +358,11 @@ knitr::kable(visibleTable, digits = 6, row.names = FALSE)
 
 Suppose we observe **16 events among 75 control patients**. With 75 treatment
 patients, the rule gives Go for **0–15** events, Indeterminate for **16–22**,
-and Stop for **23–75**. The QTD1 event-count map shows these decision regions.
+and Stop for **23–75**. The event-count map shows these decision regions.
 
 ```{r}
 #| label: binary-event-map
-#| fig-cap: "QTD1 decisions for 75 patients per group. The vertical line marks 16 control events."
+#| fig-cap: "Quantitative trial decisions for 75 patients per group. The vertical line marks 16 control events."
 eventMap <- plot(
     binaryRule,
     type = 3,
@@ -365,32 +377,34 @@ eventMap <- plot(
 eventMap
 ```
 
-Here `numberOfSubjects` is a vector of length two, unlike the OC constructors'
-matrix. `observedControl` adds the vertical line. Supplying `controlRate` and
-`treatmentRate` together adds joint binomial cell probabilities to the plot data
-without changing the decisions.
+Here `numberOfSubjects` is a vector of length two, unlike the matrix given to `getOperatingCharacteristicsBinary` previously. `observedControl` adds the vertical line. Supplying `controlRate` and `treatmentRate` together adds joint binomial cell probabilities to the plot data without changing the decisions.
+
+For example, if we observe 16 control events, the following code extracts the corresponding treatment event ranges and aggregated cell probabilities:
 
 ```{r}
 #| label: observed-event-ranges
-controlSlice <- subset(eventMap$data, eventsControl == 16)
-observedRanges <- aggregate(eventsTreatment ~ category, controlSlice, range)
-knitr::kable(data.frame(
-    Decision = observedRanges$category,
-    Minimum = observedRanges$eventsTreatment[, 1],
-    Maximum = observedRanges$eventsTreatment[, 2]
-))
-aggregate(cellProbability ~ category, eventMap$data, sum)
+observedRanges <- eventMap$data |>
+    dplyr::filter(eventsControl == 16) |>
+    dplyr::group_by(category) |>
+    dplyr::summarise(
+        Minimum = min(eventsTreatment),
+        Maximum = max(eventsTreatment),
+        .groups = "drop"
+    )
+knitr::kable(dplyr::rename(observedRanges, Decision = category))
+eventMap$data |>
+    dplyr::group_by(category) |>
+    dplyr::summarise(cellProbability = sum(cellProbability), .groups = "drop")
 ```
 
-Aggregated cell probabilities are unconditional OC probabilities at the supplied
-true rates. The count ranges condition on the observed control count and should
-not be interpreted as those unconditional probabilities.
 
 # Continuous Endpoints: Means
 
-The continuous-endpoint example concerns AFQ056[^afq056] and specifies
-**MAD = 2.9**, **TD = 4**, a **50th-percentile lower bound**, and an
-**80th-percentile upper bound**.
+Similarly, we can work with continuous endpoints, i.e. means.
+
+The continuous-endpoint example concerns a specific continuous biomarker and uses
+**LRV = 2.9**, **TD = 4**, a **50th-percentile lower bound**, and an
+**80th-percentile upper bound** for the quantitative trial decisions:
 
 ```{r}
 #| label: means-rule
@@ -403,10 +417,10 @@ meansRule <- getDesignQuantitative(
 summary(meansRule)
 ```
 
-For the following calculations, we assume a common **standard deviation of 6**,
-mean differences from **0 to 6 in steps of 0.1**,
-and sample-size pairs **(25, 25), (50, 50), (75, 75), (25, 50), (50, 100), (75,
-150)**. These assumptions are illustrative.
+For the following calculations, we assume a common standard deviation of 6,
+mean differences from 0 to 6,
+and sample-size pairs (25, 25), (50, 50), (75, 75), (25, 50), (50, 100), (75,
+150):
 
 ```{r}
 #| label: means-operating-characteristics
@@ -426,6 +440,8 @@ meansOC <- getOperatingCharacteristicsMeans(
 )
 ```
 
+Here is a quick overview of what the arguments for `getOperatingCharacteristicsMeans` mean:
+
 | Argument | Meaning and supported options |
 |:--|:--|
 | `design` | Quantitative decision rule |
@@ -434,14 +450,12 @@ meansOC <- getOperatingCharacteristicsMeans(
 | `groups` | Must be `2` in the current implementation |
 | `alternative` | Vector of true mean differences, treatment minus control; default `seq(0, 1, 0.2)` |
 | `stDev` | Positive common within-group standard deviation; default `1` |
-| `...` | Reserved additional arguments; no further QTD calculation options are used here |
 
-The sampling standard error is $s = \sigma\sqrt{1/n_C + 1/n_T}$. The normal
+The sampling standard error is $s = \sigma\sqrt{1/n_C + 1/n_T}$ when $\sigma$ is the common standard deviation and $n_C$, $n_T$ are the sample sizes in the control and treatment groups, respectively. The normal
 sampling distribution of the estimated difference gives the six decision
 probabilities analytically. This calculation uses a specified common standard
 deviation rather than a t-distribution. Means has no `directionUpper` argument:
-formulate the endpoint so that larger differences represent greater benefit. At
-the lower percentile 0.5, $\Phi^{-1}(0.5)=0$ and $L=\widehat\theta$.
+formulate the endpoint so that larger differences represent greater benefit. 
 
 # Bayesian Quantitative Decisions
 
@@ -449,10 +463,9 @@ The same constructors also support Bayesian decisions. Set `bayesian = TRUE`
 in `getDesignQuantitative()`, or supply explicit posterior probability criteria.
 The result has class `TrialDesignPlanQuantitativeBayes`.
 `getOperatingCharacteristicsMeans()` and `getOperatingCharacteristicsRates()`
-select the Bayesian calculation from this class; separate OC function names
-are not needed.
+select the Bayesian calculation from this class.
 
-These examples additionally require RBesT. Install it once if necessary:
+These calculations additionally require the `RBesT` package. Install it once if you haven't yet:
 
 ```{r}
 #| label: install-rbest
@@ -460,22 +473,18 @@ These examples additionally require RBesT. Install it once if necessary:
 install.packages("RBesT")
 ```
 
-Bayesian calculations retain four exclusive categories: **Go**, **Indeterminate
+Bayesian calculations have four exclusive decision outcomes: **Go**, **Indeterminate
 1**, **Indeterminate 2**, and **Stop**. Use `plotCat = 4` to display them
-separately or `plotCat = 3` to combine the two intermediate categories. There
-are no separate Go (Fixed) and Stop (Fixed) categories in these results.
+separately or `plotCat = 3` to combine the two intermediate categories. Note that there
+are no separate Go (Fixed) and Stop (Fixed) decisions in these results.
 
 The rule uses posterior probabilities after observing trial data. Its operating
 characteristics are the sampling probabilities of the decisions at the supplied
-true effects or event rates. They are not prior-predictive probabilities of
-success. The following assumptions are illustrative and are separate from the
-Kestrel and AFQ056 examples above.
+true effects or event rates.
 
 ## Two interpretations of the percentiles
 
-The `percentileMapping` argument makes the interpretation explicit. For the
-same inputs `lowerPercentile = 0.2` and `upperPercentile = 0.9`, the two
-definitions of Go are:
+The `percentileMapping` defines how the percentiles are used for the decision rules. For the same inputs `lowerPercentile = 0.2` and `upperPercentile = 0.9`, the two definitions of Go are:
 
 | Mapping | Criterion at LRV | Criterion at TV |
 |:--|:--|:--|
@@ -485,14 +494,16 @@ definitions of Go are:
 The default interprets the inputs as posterior quantile levels. A posterior
 20th percentile above LRV is equivalent to more than 80% posterior probability
 above LRV; a posterior 90th percentile above TV corresponds to more than 10%
-probability above TV. The alternative mapping interprets `upperPercentile` as
+probability above TV. 
+
+The alternative mapping interprets `upperPercentile` as
 the beneficial-tail probability threshold at LRV and `lowerPercentile` as the
 threshold at TV. These are different decision rules, even with identical
 numerical inputs.
 
 For each mapping, Stop requires both complementary criteria in the opposite
 direction. Indeterminate 1 fails the LRV criterion and passes TV. Indeterminate
-2 contains the remaining outcomes. Probability comparisons are strict;
+2 contains any other remaining outcomes. Probability comparisons are strict;
 an exact probability-threshold tie belongs to the residual category. This can
 matter for discrete event counts.
 
