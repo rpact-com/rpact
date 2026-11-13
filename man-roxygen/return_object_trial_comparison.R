@@ -4,7 +4,7 @@
 #'   \item \code{\link[=add.TrialComparison]{add()}} to obtain the field names,
 #'   \item \code{\link[=delete.TrialComparison]{delete()}} to obtain the field names,
 #'   \item \code{\link[=fetch.TrialComparison]{fetch()}} to obtain the field names,
-#'   \item \code{\link[=compare.TrialComparison]{compare()}} to obtain the field names,
+#'   \item \code{\link[=compare]{compare()}} to obtain the field names,
 #'   \item \code{\link[=names.TrialComparison]{names()}} to obtain the field names,
 #'   \item \code{\link[=length.TrialComparison]{length()}} to obtain the field names,
 #'   \item \code{\link[=print.TrialComparison]{print()}} to print the object,
