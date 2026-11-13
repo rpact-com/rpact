@@ -1,0 +1,3 @@
+#' Field description: expected dropout proportion 1
+#' @field expectedDropoutProportion1 Expected observed dropout proportion in arm 1 at each stage's planned analysis time, allowing for competing events and deterministic planned accrual. Stage rows and alternative-scenario columns, including for a single stage or scenario. NA when that stage's horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by that horizon, retaining fractional planning counts. Zero dropout is retained in the object; both proportions are hidden in print and summary output when both input dropout rates are zero. Is a numeric matrix.
+#' @keywords internal

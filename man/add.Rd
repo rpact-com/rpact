@@ -17,7 +17,7 @@ comparisons to append. The optional named argument \code{objects} is appended
 after the other arguments, with the same rules as \code{\link[=getComparison]{getComparison()}}.}
 }
 \value{
-The modified comparison invisibly for \code{TrialComparison}.
+The modified comparison for \code{TrialComparison}.
 }
 \description{
 S3 generic for adding objects. The \code{TrialComparison} method

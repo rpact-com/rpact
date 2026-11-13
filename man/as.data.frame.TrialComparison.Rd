@@ -11,7 +11,13 @@
   ...,
   niceColumnNamesEnabled = FALSE,
   includeAllParameters = FALSE,
-  removeConstantParameters = FALSE
+  harmonizeColumnNames = TRUE,
+  removeConstantParameters = FALSE,
+  transposed = FALSE,
+  removeVariableParameters = FALSE,
+  digits = NA_integer_,
+  ceilingEnabled = FALSE,
+  output = "data.frame"
 )
 }
 \arguments{
@@ -30,12 +36,71 @@ names will be used; syntactic names (variable names) otherwise
 \item{includeAllParameters}{If \code{TRUE}, include all parameters supported by
 the existing data-frame methods of the individual objects.}
 
+\item{harmonizeColumnNames}{If \code{TRUE} (default), apply the class-specific
+mappings described below. If \code{FALSE}, retain original parameter names and
+omit extra fields that are included only to support these mappings.
+Readable labels remain controlled by \code{niceColumnNamesEnabled}.}
+
 \item{removeConstantParameters}{If \code{TRUE}, retain identifiers and only parameters
 with different object profiles, using the same rules as \code{summary()}.}
+
+\item{transposed}{If \code{TRUE}, return parameters as rows and comparison records
+as columns, labelled by object and available stage/situation coordinates.
+Shared scalar profiles use \code{Value}; duplicate labels receive unique suffixes.
+If exactly one supplied or default input vector matches all situations across
+stages, its caption replaces \code{Situation} (for example, \verb{Alternative 1}).
+Ambiguous axes retain \code{Situation}; shared profiles require agreement across objects.
+Mixed column types are converted to a common type by transposition.}
+
+\item{removeVariableParameters}{If \code{TRUE}, return shared parameter profiles once,
+with stage and situation coordinates where needed, without object identifiers.
+Cannot be combined with \code{removeConstantParameters = TRUE}.}
+
+\item{digits}{Integer number of decimal places for numeric parameters, or \code{NA}
+to retain full precision. Parameter profiles are compared before rounding.}
+
+\item{ceilingEnabled}{If \code{TRUE}, round sample-size and event-count parameters
+upwards to integers, using rpact parameter metadata. Variances are excluded.}
+
+\item{output}{Output mode: \code{"data.frame"} (default), \code{"auto"}, \code{"html"}, or \code{"pdf"}.
+Reporting modes add class \code{TrialComparisonTable} and rendering attributes;
+they still return a data frame. \code{"auto"} selects HTML or LaTeX during knitting.
+\code{"pdf"} produces LaTeX tables for a PDF document, not a PDF file.}
 }
 \value{
-An unrounded data.frame. All columns are returned by default.
+A data.frame, unrounded and with all columns by default. Reporting modes
+additionally inherit from \code{TrialComparisonTable} for automatic knitr output.
 }
 \description{
-Converts a trial comparison to an unrounded data frame.
+Converts a trial comparison to a data frame, optionally prepared for reporting.
+}
+\details{
+With \code{harmonizeColumnNames = TRUE}, fixed-plan sample size columns are harmonized when the comparison includes
+interim analyses: \code{nFixed}, \code{nFixed1}, and \code{nFixed2} become \code{numberOfSubjects},
+\code{numberOfSubjects1}, and \code{numberOfSubjects2}. Fixed survival events use
+\code{cumulativeEventsPerStage} in mixed comparisons with interim analyses.
+Available sample-size H1 expectations use \code{expectedNumberOfSubjects} and
+\code{expectedNumberOfEvents}, referring to each scenario's supplied alternative.
+See \code{\link[=getComparison]{getComparison()}} for the class-specific rules and reference values.
+
+Shared profiles use the same exact comparison as \code{\link[=summary.TrialComparison]{summary.TrialComparison()}},
+applied to the selected harmonized or original columns. The summary's
+\code{harmonizeColumnNames} argument can be set independently of this data-frame option.
+Filtering precedes rounding, readable labels and transposition. Common scalar
+parameters are returned once; common stage or situation profiles retain their
+coordinates. Reporting modes render HTML in a horizontally scrollable container
+or LaTeX longtables split into column blocks with repeated identifier columns.
+LaTeX output requires the suggested rmarkdown package and registers the longtable
+dependency through knitr metadata. Other knitting targets use ordinary data-frame
+output. Reporting does not modify the comparison or its contained objects.
+
+Multi-arm survival simulations use \code{categoryType} and \code{category} coordinates.
+\code{comparison} rows (for example, \verb{Treatment 1 vs. Control}) contain stage-wise
+and cumulative event counts for treatment plus control. \code{arm} rows contain
+individual-arm events, selections, rejections and drop-out summaries, including
+a separate \code{Control} category. Arm-independent simulation results occur on
+\code{overall} / \verb{All arms} rows. Input and design settings remain available for
+grouping. Result cells outside their applicable category are \code{NA}.
+Categories and situations are retained in profile comparisons and transposed
+headings. Shared scalar-only output can omit these coordinates.
 }

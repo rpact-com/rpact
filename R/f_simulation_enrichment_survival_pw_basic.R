@@ -1,21 +1,20 @@
 ## |
-## |  *Simulation of enrichment design with time to event data*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
-## |
-## |  File version: $Revision: 8349 $
-## |  Last changed: $Date: 2024-11-01 14:50:21 +0100 (Fr, 01 Nov 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_simulation_enrichment.R
@@ -138,6 +137,7 @@ updateSubGroupVector <- function(
     analysisTime <- rep(NA_real_, kMax)
     numberOfSubjects <- rep(NA_real_, kMax)
     eventsNotAchieved <- rep(FALSE, kMax)
+    dropoutEnrolled <- dropoutDropped <- matrix(NA_real_, nrow = gMax * 2, ncol = kMax)
 
     ##  Create data set for first stage  ##
     treatmentsAndSubGroups <- .getTreatmentsSubgroups(maxNumberOfSubjects, allocationFraction, subGroups, prevalences)
@@ -173,6 +173,7 @@ updateSubGroupVector <- function(
             survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
                 lambdaControl[subGroupIndex]
         }
+        survivalDataSet$dropoutTime[i] <- NA_real_
         if (any(phi > 0)) {
             if (phi[1] > 0) {
                 if (survivalDataSet$treatmentArm[i] == 1) {
@@ -278,6 +279,7 @@ updateSubGroupVector <- function(
                             survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
                                 lambdaControl[subGroupIndex]
                         }
+                        survivalDataSet$dropoutTime[i] <- NA_real_
                         if (any(phi > 0)) {
                             if (phi[1] > 0) {
                                 if (survivalDataSet$treatmentArm[i] == 1) {
@@ -368,6 +370,17 @@ updateSubGroupVector <- function(
             testStatistics[!selectedPopulations[, k], k] <- NA_real_
             overallEffects[!selectedPopulations[, k], k] <- NA_real_
             overallTestStatistics[!selectedPopulations[, k], k] <- NA_real_
+        }
+
+        for (g in seq_len(gMax)) {
+            inPopulation <- survivalDataSet$subGroup %in% .createSubGroupsFromPopulationCpp(gMax, g)
+            for (a in 1:2) {
+                row <- (g - 1L) * 2L + a
+                counts <- .captureDropoutCounts(survivalDataSet, analysisTime[k],
+                    inPopulation & survivalDataSet$treatmentArm == a)
+                dropoutEnrolled[row, k] <- counts[1]
+                dropoutDropped[row, k] <- counts[2]
+            }
         }
 
         separatePValues[, k] <- 1 - stats::pnorm(testStatistics[, k])
@@ -529,6 +542,8 @@ updateSubGroupVector <- function(
     }
 
     result <- list(
+        dropoutEnrolled = dropoutEnrolled,
+        dropoutDropped = dropoutDropped,
         eventsNotAchieved = eventsNotAchieved,
         populationEventsPerStage = populationEventsPerStage,
         subsetEventsPerStage = subsetEventsPerStage,
@@ -732,6 +747,7 @@ updateSubGroupVector <- function(
     iterations <- matrix(0, nrow = kMax, ncol = cols)
     rawDataPerStage <- matrix(0L, nrow = cols, ncol = kMax)
     rawDataSets <- list()
+    dropoutRecords <- matrix(NA_real_, nrow = cols * maxNumberOfIterations * (gMax * 2) * kMax, ncol = 8)
 
     len <- maxNumberOfIterations * kMax * gMax * cols
 
@@ -820,7 +836,7 @@ updateSubGroupVector <- function(
             matrix(
                 allPiecewiseActiveHazards[, , i, drop = FALSE],
                 nrow = length(effectList$subGroups),
-                dimnames = dimnames(piecewiseSurvivalTime$hazardRatios)[1:2]
+                dimnames = dimnames(piecewiseSurvivalTime$hazardRatio)[1:2]
             )
         } else {
             NULL
@@ -869,6 +885,10 @@ updateSubGroupVector <- function(
                 intersectionTest = intersectionTest,
                 successCriterion = successCriterion
             )
+
+            recordRows <- ((i - 1L) * maxNumberOfIterations + j - 1L) * (gMax * 2) * kMax + seq_len((gMax * 2) * kMax)
+            dropoutRecords[recordRows, ] <- .finishDropoutRecords(stageResults, closedTest, i, j,
+                groups = gMax, arms = 2, sharedControl = FALSE)
 
             stopStage <- NA_integer_
             for (k in seq_len(kMax)) {
@@ -1109,6 +1129,8 @@ updateSubGroupVector <- function(
         )
     }
 
+    .addStudyDurationToDesignPlan(simulationResults)
+
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
@@ -1134,6 +1156,8 @@ updateSubGroupVector <- function(
         rawDataSets,
         enrichment = TRUE
     )
+
+    .addObservedDropoutProportions(simulationResults, dropoutRecords, cols, gMax)
 
     return(simulationResults)
 }

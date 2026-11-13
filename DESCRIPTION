@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.5.0.9326
-Date: 2026-11-02
+Version: 4.5.0
+Date: 2026-11-13
 Authors@R: c(
 	person(
 		given = "Gernot",
@@ -63,7 +63,7 @@ URL: https://www.rpact.org,
     https://www.rpact.com,
     https://docs.rpact.org,
     https://github.com/rpact-com/rpact,
-    https://rpact-cloud.share.connect.posit.cloud
+    https://demo.rpact.cloud
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US
 Depends:
@@ -95,7 +95,25 @@ VignetteBuilder: knitr, rmarkdown, quarto
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
-Config/testthat/start-first: *analysis*
+Config/testthat/start-first: f_analysis_multiarm_means_inverse_normal,
+    f_analysis_multiarm_means_fisher,
+    f_analysis_multiarm_means_inverse_normal_direction_lower,
+    f_analysis_multiarm_means_fisher_direction_lower,
+    f_design_optimal_user,
+    class_analysis_dataset,
+    f_analysis_enrichment_means,
+    f_analysis_base_rates,
+    f_design_plan_survival,
+    f_analysis_multiarm_rates,
+    f_design_optimal_background,
+    f_simulation_multiarm_rates,
+    f_analysis_base_means,
+    f_simulation_multiarm_means,
+    f_simulation_multiarm_survival_patient_wise_compare_basic,
+    f_analysis_multiarm_means_kmax1,
+    f_analysis_multiarm_means_fixed,
+    f_simulation_plot,
+    f_simulation_multiarm_survival
 Collate:
     'RcppExports.R'
     'f_logger.R'
@@ -152,9 +170,11 @@ Collate:
     'f_analysis_multiarm_survival.R'
     'f_as251.R'
     'f_comparison.R'
+    'f_comparison_adapters.R'
     'f_comparison_parameters.R'
     'f_comparison_plot.R'
     'f_comparison_r_code.R'
+    'f_comparison_table.R'
     'f_core_output_formats.R'
     'f_design_fisher_combination_test.R'
     'f_design_fixed.R'
@@ -180,9 +200,9 @@ Collate:
     'f_plot_qtd.R'
     'f_plot_qtd_bayes.R'
     'f_plot_qtd_utilities.R'
+    'f_qtd_bayes.R'
     'f_qtd_binary_intervals.R'
     'f_qtd_utilities.R'
-    'f_qtd_bayes.R'
     'f_quality_assurance.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'
@@ -208,6 +228,7 @@ Collate:
     'f_summary_header.R'
     'f_summary_parameters.R'
     'f_summary_qtd.R'
+    'f_summary_simulation_dropout.R'
     'f_summary_title.R'
     'f_summary_utilities.R'
     'f_test_execution.R'

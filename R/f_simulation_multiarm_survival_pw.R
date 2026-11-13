@@ -1,21 +1,20 @@
 ## |
-## |  *Simulation of multi-arm design with time to event data*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
-## |
-## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Di, 10 Dez 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_simulation_multiarm.R
@@ -100,6 +99,10 @@ NULL
 #' legacy test-statistic-based approach for backward compatibility if no patient-wise-specific
 #' arguments are provided.
 #'
+#' The summary groups observed drop-out proportions and observation times by
+#' active treatment arm, followed by the shared control arm. Each arm uses its
+#' own finishing analysis, including active arms discontinued at an interim.
+#'
 #' For piecewise exponential event times, create \code{piecewiseSurvivalTime}
 #' with \code{getPiecewiseSurvivalTimeMultiArm()}. Hazard ratios are represented
 #' as an active-arm-by-interval-by-situation array; equivalently, they can be
@@ -130,6 +133,8 @@ NULL
 #'
 #' @template details_type_of_selection
 #' @template details_survival_conditional_power
+#'
+#' @template details_observed_survival_dropout
 #'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
@@ -432,6 +437,8 @@ getSimulationMultiArmSurvival <- function(
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
 #' @template details_type_of_selection
+#' @template details_observed_survival_dropout
+#'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'
@@ -910,6 +917,8 @@ getSimulationMultiArmSurvival <- function(
 
     simulationResults$.data <- loopResult$data
     simulationResults$.rawData <- .createSimulationSurvivalRawData(loopResult$rawData)
+
+    .addObservedDropoutProportions(simulationResults, loopResult$dropoutRecords, cols, gMax, multiArm = TRUE)
 
     return(simulationResults)
 }

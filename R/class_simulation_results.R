@@ -1,17 +1,20 @@
 ## |
-## |  *Simulation result classes*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_core_utilities.R
@@ -383,7 +386,12 @@ SimulationResults <- R6::R6Class(
                     } else if (enrichmentEnabled) {
                         matrixName <- .getSimulationEnrichmentEffectMatrixName(self)
                         if (nrow(self$effectList[[matrixName]]) > 1) {
-                            self$.cat("  (i): results of situation i\n", consoleOutputEnabled = consoleOutputEnabled)
+                            self$.cat("  (j): results of situation j\n", consoleOutputEnabled = consoleOutputEnabled)
+                        }
+                        dropoutLegend <- .getDropoutLegendEntries(self)
+                        for (label in names(dropoutLegend)) {
+                            self$.cat("  ", label, ": ", dropoutLegend[[label]], "\n",
+                                consoleOutputEnabled = consoleOutputEnabled)
                         }
                     } else if (twoGroupsEnabled) {
                         self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
@@ -393,7 +401,7 @@ SimulationResults <- R6::R6Class(
                     }
                     if (inherits(self[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
                         self$.cat("  Situations: ",
-                            paste(dimnames(self$piecewiseSurvivalTime$hazardRatios)[[3]], collapse = ", "),
+                            paste(dimnames(self$piecewiseSurvivalTime$hazardRatio)[[3]], collapse = ", "),
                             " (in this order)\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
 
@@ -1087,10 +1095,69 @@ SimulationResultsMultiArmRates <- R6::R6Class(
     )
 )
 
+
+#'
+#' @name SimulationResultsBaseSurvival
+#'
+#' @title
+#' Common Survival Simulation Results
+#'
+#' @description
+#' Base class for survival simulation results. Obtain specialized instances with
+#' [getSimulationSurvival()], [getSimulationMultiArmSurvival()], or
+#' [getSimulationEnrichmentSurvival()].
+#'
+#' @template field_maxNumberOfIterations
+#' @template field_seed
+#' @template field_allocationRatioPlanned
+#' @template field_conditionalPower
+#' @template field_iterations
+#' @template field_futilityPerStage
+#' @template field_futilityStop
+#' @template field_calcEventsFunction
+#' @template field_directionUpper
+#' @template field_expectedNumberOfEvents
+#' @template field_maxNumberOfEventsPerStage
+#' @template field_minNumberOfEventsPerStage
+#' @template field_plannedEvents
+#' @template field_thetaH0
+#' @template field_thetaH1_survival
+#' @template field_studyDuration
+#' @template field_maxStudyDuration
+#' @template field_observedDropoutProportion1
+#' @template field_observedDropoutProportion2
+#' @template field_dropoutObservationTime1
+#' @template field_dropoutObservationTime2
+#'
+#' @details
+#' Patient-wise dropout summaries use each stage's analysis time. Replication
+#' proportions are averaged over nonempty enrolled-subject denominators at that
+#' stage. Stopped trials and discontinued groups do not contribute to later stages.
+#' The fields \code{dropoutObservationTime1} and \code{dropoutObservationTime2}
+#' remain available for direct access but are omitted from print and summary
+#' output. They average analysis times over exactly the replications contributing
+#' to the corresponding dropout proportion. They can therefore differ from the
+#' trial-level \code{analysisTime} after arm or population selection, or when an
+#' enrolled-subject denominator is empty. Contributing arms and populations share
+#' the same analysis time within each replication and stage.
+#' Test-statistic-based simulations leave these fields unavailable.
+#'
+#' @seealso [SimulationResultsSurvival], [SimulationResultsMultiArmSurvival],
+#' [SimulationResultsEnrichmentSurvival]
+#'
+#' @keywords internal
+#'
 SimulationResultsBaseSurvival <- R6::R6Class(
     "SimulationResultsBaseSurvival",
     inherit = SimulationResults,
     public = list(
+        .dropoutRecords = NULL,
+        .dropoutContributors1 = NULL,
+        .dropoutContributors2 = NULL,
+        observedDropoutProportion1 = NULL,
+        observedDropoutProportion2 = NULL,
+        dropoutObservationTime1 = NULL,
+        dropoutObservationTime2 = NULL,
         calcEventsFunction = NULL,
         directionUpper = NULL,
         expectedNumberOfEvents = NULL,
@@ -1117,6 +1184,13 @@ SimulationResultsBaseSurvival <- R6::R6Class(
             }
             for (generatedParam in generatedParams) {
                 self$.setParameterType(generatedParam, C_PARAM_GENERATED)
+            }
+            for (field in c(
+                    "observedDropoutProportion1", 
+                    "observedDropoutProportion2",
+                    "dropoutObservationTime1", 
+                    "dropoutObservationTime2")) {
+                self$.setParameterType(field, C_PARAM_NOT_APPLICABLE)
             }
             self$.setParameterType("maxStudyDuration", C_PARAM_NOT_APPLICABLE)
         }
@@ -1145,6 +1219,10 @@ SimulationResultsBaseSurvival <- R6::R6Class(
 #' @template field_dropoutRate1
 #' @template field_dropoutRate2
 #' @template field_dropoutTime
+#' @template field_observedDropoutProportion1
+#' @template field_observedDropoutProportion2
+#' @template field_dropoutObservationTime1
+#' @template field_dropoutObservationTime2
 #' @template field_earlyStop
 #' @template field_eventsNotAchieved
 #' @template field_eventTime
@@ -1177,6 +1255,11 @@ SimulationResultsBaseSurvival <- R6::R6Class(
 #' @template field_studyDuration
 #' @template field_thetaH0
 #' @template field_thetaH1
+#'
+#' @template field_analysisTime
+#' @template field_eventsPerStage
+#' @template field_overallEventsPerStage
+#' @template field_maxStudyDuration
 #'
 #' @details
 #' Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
@@ -1314,6 +1397,10 @@ SimulationResultsSurvival <- R6::R6Class(
 #' @template field_dropoutRate1
 #' @template field_dropoutRate2
 #' @template field_dropoutTime
+#' @template field_observedDropoutProportion1
+#' @template field_observedDropoutProportion2
+#' @template field_dropoutObservationTime1
+#' @template field_dropoutObservationTime2
 #' @template field_earlyStop
 #' @template field_effectMatrix
 #' @template field_epsilonValue
@@ -1354,6 +1441,21 @@ SimulationResultsSurvival <- R6::R6Class(
 #' @template field_lambdaControl
 #' @template field_medianTreatment
 #' @template field_medianControl
+#'
+#' @template field_analysisTime
+#' @template field_effectMeasure
+#' @template field_eventsNotAchieved
+#' @template field_numberOfSubjects
+#' @template field_piControl
+#' @template field_piecewiseSurvivalTime
+#' @template field_successCriterion
+#' @template field_typeOfSelection
+#' @template field_calcEventsFunction
+#' @template field_thetaH1_survival
+#' @template field_maxStudyDuration
+#'
+#' @template field_doseLevels
+#' @template field_numberOfActiveArms
 #'
 #' @details
 #' Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}
@@ -1670,6 +1772,10 @@ SimulationResultsEnrichmentRates <- R6::R6Class(
 #' @template field_dropoutRate1
 #' @template field_dropoutRate2
 #' @template field_dropoutTime
+#' @template field_observedDropoutProportion1
+#' @template field_observedDropoutProportion2
+#' @template field_dropoutObservationTime1
+#' @template field_dropoutObservationTime2
 #' @template field_earlyStop
 #' @template field_effectList
 #' @template field_effectMeasure
@@ -1709,6 +1815,15 @@ SimulationResultsEnrichmentRates <- R6::R6Class(
 #' @template field_thetaH1_survival
 #' @template field_threshold
 #' @template field_typeOfSelection
+#'
+#' @template field_analysisTime
+#' @template field_eventsNotAchieved
+#' @template field_numberOfSubjects
+#' @template field_piecewiseSurvivalTime
+#' @template field_maxNumberOfEventsPerStage
+#' @template field_minNumberOfEventsPerStage
+#' @template field_plannedEvents
+#' @template field_maxStudyDuration
 #'
 #' @details
 #' Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurvival()}}

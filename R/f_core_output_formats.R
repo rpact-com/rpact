@@ -1,17 +1,20 @@
 ## |
-## |  *Output formats*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_core_constants.R
@@ -44,6 +47,7 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
     "rpact.output.format.mean" = "digits = 4",
     "rpact.output.format.ratio" = "digits = 3",
     "rpact.output.format.st.dev" = "digits = 4",
+    "rpact.output.format.dropout.observation.time" = "digits = 2, nsmall = 2",
     "rpact.output.format.duration" = "digits = 2, nsmall = 2",
     "rpact.output.format.time" = "digits = 2, nsmall = 2"
 )
@@ -753,6 +757,17 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
     return(.getFormattedValue(value, digits = 2, nsmall = 2))
 }
 
+# Formats mean drop-out observation times independently of general time values.
+.formatDropoutObservationTime <- function(value) {
+    x <- .getOptionBasedFormattedValue("rpact.output.format.dropout.observation.time",
+        value = value, digits = 2, nsmall = 2
+    )
+    if (!is.null(x)) {
+        return(x)
+    }
+    return(.getFormattedValue(value, digits = 2, nsmall = 2))
+}
+
 #
 # @title
 # Format Time
@@ -872,6 +887,11 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 #' Output formats can be written to a text file (see \code{\link[=getOutputFormat]{getOutputFormat()}}).
 #' To load your personal output formats read a formerly saved file at the beginning of your
 #' work with \code{rpact}, e.g. execute \code{setOutputFormat(file = "my_rpact_output_formats.txt")}.
+#'
+#' Drop-out observation times use a separate output format with the same default
+#' precision as study duration. For example, use
+#' \code{setOutputFormat("dropoutObservationTime1", digits = 4, nsmall = 4)}
+#' to change it for both arms without changing other time formats.
 #'
 #' Note that the \code{parameterName} must not match exactly, e.g., for p-values the
 #' following parameter names will be recognized amongst others:
@@ -1316,6 +1336,9 @@ getOutputFormat <- function(
     }
     if (key == "rpact.output.format.st.dev") {
         return(".formatStDevs")
+    }
+    if (key == "rpact.output.format.dropout.observation.time") {
+        return(".formatDropoutObservationTime")
     }
     if (key == "rpact.output.format.duration") {
         return(".formatDurations")

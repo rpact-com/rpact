@@ -1,17 +1,20 @@
 ## |
-## |  *Time classes for piecewise exponential survival multi-group simulations*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include class_time.R
@@ -29,7 +32,7 @@ NULL
 #'
 #' @template field_piecewiseSurvivalTime
 #' @template field_lambdaControls
-#' @template field_hazardRatios
+#' @template field_hazardRatio_piecewise
 #' @template field_medianTreatments
 #' @template field_groupType
 #'
@@ -42,14 +45,19 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
     public = list(
         piecewiseSurvivalTime = NULL,
         lambdaControls = NULL,
-        hazardRatios = NULL,
+        hazardRatio = NULL,
         medianTreatments = NULL,
         groupType = NULL,
-        initialize = function(piecewiseSurvivalTime = NULL, lambdaControls = NULL,
-                hazardRatios = NULL, groupType = NULL) {
+        initialize = function(
+                piecewiseSurvivalTime = NULL,
+                lambdaControls = NULL,
+                hazardRatio = NULL,
+                groupType = NULL) {
             super$initialize()
-            inputs <- .validatePiecewiseSurvivalInputs(piecewiseSurvivalTime, lambdaControls,
-                hazardRatios, groupType, .getClassName(self))
+            inputs <- .validatePiecewiseSurvivalInputs(
+                piecewiseSurvivalTime, lambdaControls,
+                hazardRatio, groupType, .getClassName(self)
+            )
             for (parameter in names(inputs)) {
                 self[[parameter]] <- inputs[[parameter]]
                 self$.setParameterType(parameter, C_PARAM_USER_DEFINED)
@@ -59,15 +67,17 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
         },
         .initMedianParameters = function(medianTreatments) {
             if (!is.null(medianTreatments)) {
-                dimnames(medianTreatments) <- dimnames(self$hazardRatios)
+                dimnames(medianTreatments) <- dimnames(self$hazardRatio)
                 self$medianTreatments <- medianTreatments
                 self$.setParameterType("medianTreatments", C_PARAM_USER_DEFINED)
-                self$.setParameterType("hazardRatios", C_PARAM_DERIVED)
+                self$.setParameterType("hazardRatio", C_PARAM_DERIVED)
             }
         },
         .validate = function(functionName = .getClassName(self)) {
-            inputs <- .validatePiecewiseSurvivalInputs(self$piecewiseSurvivalTime, self$lambdaControls,
-                self$hazardRatios, self$groupType, functionName)
+            inputs <- .validatePiecewiseSurvivalInputs(
+                self$piecewiseSurvivalTime, self$lambdaControls,
+                self$hazardRatio, self$groupType, functionName
+            )
             expectedType <- if (inherits(self, "PiecewiseSurvivalTimeMultiArm")) {
                 "multi-arm"
             } else if (inherits(self, "PiecewiseSurvivalTimeEnrichment")) {
@@ -80,16 +90,18 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                     functionName = functionName, parameter = "groupType", value = self$groupType,
                     constraint = "group type matches the statistical role of the class",
                     relatedParameter = "class", relatedValue = class(self),
-                    diagnosticId = "survival.piecewise_class_role")
+                    diagnosticId = "survival.piecewise_class_role"
+                )
             }
             if (inherits(self, "PiecewiseSurvivalTimeMultiArm")) {
-                .assertPiecewiseNumeric(self$lambdaControl, "lambdaControl", functionName)
+                .assertPiecewiseNumeric(self$lambdaControl, "lambdaControl", functionName, allowZero = TRUE)
                 if (!identical(as.numeric(self$lambdaControl), as.numeric(self$lambdaControls[1, ]))) {
                     stopConflictingArguments("'lambdaControl' must agree with the common control hazards",
                         functionName = functionName, parameter = "lambdaControl", value = self$lambdaControl,
                         constraint = "one common control hazard per interval",
                         relatedParameter = "lambdaControls", relatedValue = self$lambdaControls,
-                        diagnosticId = "survival.piecewise_common_control")
+                        diagnosticId = "survival.piecewise_common_control"
+                    )
                 }
             }
             controlMedianName <- if (self$groupType == "multi-arm") {
@@ -114,18 +126,20 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                         functionName = functionName, parameter = controlMedianName, value = controlMedians,
                         constraint = "control hazards derived from the supplied interval medians",
                         relatedParameter = "lambdaControls", relatedValue = self$lambdaControls,
-                        diagnosticId = "survival.piecewise_median_hazard_consistency")
+                        diagnosticId = "survival.piecewise_median_hazard_consistency"
+                    )
                 }
             }
             if (!is.null(self$medianTreatments)) {
                 expectedRatios <- .getPiecewiseMedianRatios(self$medianTreatments, self$lambdaControls, functionName)
-                if (!identical(dimnames(expectedRatios), dimnames(self$hazardRatios)) ||
-                        !isTRUE(all.equal(expectedRatios, self$hazardRatios, tolerance = 1e-12))) {
+                if (!identical(dimnames(expectedRatios), dimnames(self$hazardRatio)) ||
+                        !isTRUE(all.equal(expectedRatios, self$hazardRatio, tolerance = 1e-12))) {
                     stopConflictingArguments("treatment medians must agree with their derived hazard ratios; recreate the specification",
                         functionName = functionName, parameter = "medianTreatments", value = self$medianTreatments,
                         constraint = "hazard ratios derived from treatment medians and control hazards",
-                        relatedParameter = "hazardRatios", relatedValue = self$hazardRatios,
-                        diagnosticId = "survival.piecewise_median_hazard_consistency")
+                        relatedParameter = "hazardRatio", relatedValue = self$hazardRatio,
+                        diagnosticId = "survival.piecewise_median_hazard_consistency"
+                    )
                 }
             }
             # Normalized objects are passed to C++ without further dimensional checks.
@@ -135,33 +149,36 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                     stopIllegalArgument("'", parameter, "' no longer has its validated representation; recreate the specification",
                         functionName = functionName, parameter = parameter, value = self[[parameter]],
                         constraint = "canonical validated piecewise survival representation",
-                        diagnosticId = "survival.piecewise_modified_specification")
+                        diagnosticId = "survival.piecewise_modified_specification"
+                    )
                 }
             }
             return(invisible(self))
         },
         getActiveHazards = function() {
             self$.validate()
-            return(sweep(self$hazardRatios, c(1, 2), self$lambdaControls, `*`))
+            return(sweep(self$hazardRatio, c(1, 2), self$lambdaControls, `*`))
         },
         getNumberOfSituations = function() {
-            return(dim(self$hazardRatios)[3])
+            return(dim(self$hazardRatio)[3])
         },
         getNumberOfGroups = function() {
-            return(dim(self$hazardRatios)[1])
+            return(dim(self$hazardRatio)[1])
         },
         asDataFrame = function() {
             self$.validate()
-            dimensions <- dim(self$hazardRatios)
-            dimensionNames <- dimnames(self$hazardRatios)
+            dimensions <- dim(self$hazardRatio)
+            dimensionNames <- dimnames(self$hazardRatio)
             result <- expand.grid(
                 group = dimensionNames[[1]], interval = dimensionNames[[2]], situation = dimensionNames[[3]],
-                KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
+                KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE
+            )
             result$startTime <- rep(self$piecewiseSurvivalTime, each = dimensions[1], times = dimensions[3])
             result$endTime <- rep(c(self$piecewiseSurvivalTime[-1], Inf),
-                each = dimensions[1], times = dimensions[3])
+                each = dimensions[1], times = dimensions[3]
+            )
             result$lambdaControl <- rep(as.vector(self$lambdaControls), dimensions[3])
-            result$hazardRatio <- as.vector(self$hazardRatios)
+            result$hazardRatio <- as.vector(self$hazardRatio)
             result$lambdaActive <- result$lambdaControl * result$hazardRatio
             return(result)
         },
@@ -177,12 +194,14 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                 return(invisible(self))
             }
             self$.cat("Piecewise exponential ", self$groupType, " survival time\n\n",
-                heading = 1, consoleOutputEnabled = consoleOutputEnabled)
+                heading = 1, consoleOutputEnabled = consoleOutputEnabled
+            )
 
             controls <- self$lambdaControls
             if (self$groupType == "multi-arm") {
                 self$.cat("Control hazards (common to all comparisons):\n",
-                    heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    heading = 2, consoleOutputEnabled = consoleOutputEnabled
+                )
                 controls <- controls[1, , drop = FALSE]
                 rownames(controls) <- "Control"
                 controlParameter <- "lambdaControl"
@@ -193,12 +212,18 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
             self$.showMatrix(controls, controlParameter, digits, consoleOutputEnabled)
             self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
             self$.cat("Details:\n\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
-            self$.showPiecewiseParameterGroup(self$.getUserDefinedParameters(),
-                "User defined parameters", digits, consoleOutputEnabled)
-            self$.showPiecewiseParameterGroup(self$.getDefaultParameters(),
-                "Default parameters", digits, consoleOutputEnabled)
-            self$.showPiecewiseParameterGroup(self$.getDerivedParameters(),
-                "Generated parameters", digits, consoleOutputEnabled)
+            self$.showPiecewiseParameterGroup(
+                self$.getUserDefinedParameters(),
+                "User defined parameters", digits, consoleOutputEnabled
+            )
+            self$.showPiecewiseParameterGroup(
+                self$.getDefaultParameters(),
+                "Default parameters", digits, consoleOutputEnabled
+            )
+            self$.showPiecewiseParameterGroup(
+                self$.getDerivedParameters(),
+                "Generated parameters", digits, consoleOutputEnabled
+            )
             self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
 
             return(invisible(self))
@@ -210,8 +235,10 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
             # Only parameter lines determine the colon column, never table headings
             # or captions of inactive fields. Long captions remain complete.
             parameters <- self$.getVisibleFieldNames()
-            parameters <- setdiff(parameters, c("lambdaControls", "medianControls",
-                "hazardRatios", "medianTreatments"))
+            parameters <- setdiff(parameters, c(
+                "lambdaControls", "medianControls",
+                "hazardRatio", "medianTreatments"
+            ))
             captions <- character()
             for (parameter in parameters) {
                 if (self$isApplicableParameter(parameter)) {
@@ -228,17 +255,20 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
             }
             if (length(parameters) == 0) {
                 self$.showParametersOfOneGroup(parameters, title,
-                    consoleOutputEnabled = consoleOutputEnabled)
+                    consoleOutputEnabled = consoleOutputEnabled
+                )
                 return(invisible(NULL))
             }
-            parameterOrder <- c("piecewiseSurvivalTime", "lambdaControl", "lambdaControls",
-                "medianControl", "medianControls", "medianTreatments", "hazardRatios", "groupType")
+            parameterOrder <- c(
+                "piecewiseSurvivalTime", "lambdaControl", "lambdaControls",
+                "medianControl", "medianControls", "medianTreatments", "hazardRatio", "groupType"
+            )
             parameters <- c(intersect(parameterOrder, parameters), setdiff(parameters, parameterOrder))
             self$.cat(title, ":\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
             for (parameter in parameters) {
                 values <- self[[parameter]]
-                if (parameter %in% c("hazardRatios", "medianTreatments")) {
-                    caption <- if (parameter == "hazardRatios") {
+                if (parameter %in% c("hazardRatio", "medianTreatments")) {
+                    caption <- if (parameter == "hazardRatio") {
                         "Hazard ratios"
                     } else {
                         "Treatment medians"
@@ -251,9 +281,12 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                         }
                         self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
                         self$.cat(caption, " - ", dimnames(values)[[3]][i], suffix, ":\n",
-                            heading = 3, consoleOutputEnabled = consoleOutputEnabled)
-                        self$.showMatrix(matrix(values[, , i], nrow = self$getNumberOfGroups(),
-                            dimnames = dimnames(values)[1:2]), parameter, digits, consoleOutputEnabled)
+                            heading = 3, consoleOutputEnabled = consoleOutputEnabled
+                        )
+                        self$.showMatrix(matrix(values[, , i],
+                            nrow = self$getNumberOfGroups(),
+                            dimnames = dimnames(values)[1:2]
+                        ), parameter, digits, consoleOutputEnabled)
                     }
                 } else if (parameter %in% c("lambdaControls", "medianControls")) {
                     caption <- if (parameter == "lambdaControls") {
@@ -262,8 +295,10 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                         "Control medians (exponential per interval)"
                     }
                     self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
-                    self$.cat(caption, ":\n", heading = 3,
-                        consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(caption, ":\n",
+                        heading = 3,
+                        consoleOutputEnabled = consoleOutputEnabled
+                    )
                     self$.showMatrix(values, parameter, digits, consoleOutputEnabled)
                 } else {
                     self$.showParameter(parameter, consoleOutputEnabled = consoleOutputEnabled)
@@ -275,7 +310,8 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
         .showMatrix = function(values, parameterName, digits, consoleOutputEnabled) {
             formatFunction <- .getParameterFormatFunction(parameterName, self)
             formattedValues <- .getParameterValueFormattedByFormatFunctionName(
-                formatFunction, as.vector(values), self)
+                formatFunction, as.vector(values), self
+            )
             # Only transpose the formatted view; the simulation representation stays unchanged.
             formattedValues <- t(matrix(formattedValues, nrow = nrow(values), dimnames = dimnames(values)))
             names(dimnames(formattedValues)) <- c("Interval", "Group")
@@ -284,13 +320,18 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
                     self$.cat(line, "\n", consoleOutputEnabled = TRUE)
                 }
             } else {
-                .showMatrix(self, formattedValues, digits, consoleOutputEnabled = FALSE,
-                    rowLabel = "Interval", escapeMarkdown = TRUE)
+                .showMatrix(self, formattedValues, digits,
+                    consoleOutputEnabled = FALSE,
+                    rowLabel = "Interval", escapeMarkdown = TRUE
+                )
             }
             return(invisible(NULL))
         },
-        .printAsDataFrame = function(parameterNames = NULL, niceColumnNamesEnabled = FALSE,
-                includeAllParameters = FALSE, handleParameterNamesAsToBeExcluded = FALSE,
+        .printAsDataFrame = function(
+                parameterNames = NULL,
+                niceColumnNamesEnabled = FALSE,
+                includeAllParameters = FALSE,
+                handleParameterNamesAsToBeExcluded = FALSE,
                 lineBreakEnabled = FALSE) {
             for (line in capture.output(print(self$asDataFrame(), row.names = FALSE))) {
                 self$.cat(line, "\n")
@@ -312,7 +353,7 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
 #' @template field_piecewiseSurvivalTime
 #' @template field_lambdaControl_piecewise
 #' @template field_lambdaControls
-#' @template field_hazardRatios
+#' @template field_hazardRatio_piecewise
 #' @template field_medianControl_piecewise
 #' @template field_medianTreatments
 #' @template field_groupType
@@ -321,7 +362,7 @@ PiecewiseSurvivalTimeMultiGroup <- R6::R6Class("PiecewiseSurvivalTimeMultiGroup"
 #' Create objects with [getPiecewiseSurvivalTimeMultiArm()]. The class inherits
 #' from \code{PiecewiseSurvivalTimeMultiGroup} and \code{TimeDefinition}.
 #' Rows of \code{lambdaControls} repeat the common control hazards for each
-#' active arm. The dimensions of \code{hazardRatios} and \code{medianTreatments}
+#' active arm. The dimensions of \code{hazardRatio} and \code{medianTreatments}
 #' are active arm, interval, and situation, in that order.
 #' Interval starts begin at zero and the last interval is open-ended.
 #' Supplied interval medians parameterize exponential hazards through
@@ -338,27 +379,36 @@ PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
     public = list(
         lambdaControl = NULL,
         medianControl = NULL,
-        initialize = function(piecewiseSurvivalTime = NULL, lambdaControl = NULL, hazardRatios = NULL,
-                medianControl = NULL, medianTreatments = NULL) {
+        initialize = function(
+                piecewiseSurvivalTime = NULL,
+                lambdaControl = NULL,
+                hazardRatio = NULL,
+                medianControl = NULL,
+                medianTreatments = NULL) {
             functionName <- "getPiecewiseSurvivalTimeMultiArm"
             times <- .validatePiecewiseStartTimes(piecewiseSurvivalTime, functionName)
-            lambdaControl <- .getPiecewiseControlInput(times, lambdaControl, medianControl,
-                "lambdaControl", "medianControl", functionName)
-            .assertPiecewiseNumeric(lambdaControl, "lambdaControl", functionName)
+            lambdaControl <- .getPiecewiseControlInput(
+                times, lambdaControl, medianControl,
+                "lambdaControl", "medianControl", functionName
+            )
+            .assertPiecewiseNumeric(lambdaControl, "lambdaControl", functionName, allowZero = TRUE)
             if (length(lambdaControl) != length(times)) {
                 stopArgumentLengthOutOfBounds("'lambdaControl' must contain one numeric value per interval",
                     functionName = functionName, parameter = "lambdaControl", value = lambdaControl,
                     constraint = "one numeric value per interval", relatedParameter = "piecewiseSurvivalTime",
                     relatedValue = times, expectedLength = length(times), actualLength = length(lambdaControl),
-                    diagnosticId = "survival.piecewise_control_length")
+                    diagnosticId = "survival.piecewise_control_length"
+                )
             }
-            ratios <- .getPiecewiseEffectInput(hazardRatios, medianTreatments, functionName)
+            ratios <- .getPiecewiseEffectInput(hazardRatio, medianTreatments, functionName)
             medians <- NULL
             if (!is.null(medianTreatments)) {
                 medians <- ratios
             }
-            controls <- matrix(rep(lambdaControl, each = dim(ratios)[1]), nrow = dim(ratios)[1],
-                dimnames = list(dimnames(ratios)[[1]], NULL))
+            controls <- matrix(rep(lambdaControl, each = dim(ratios)[1]),
+                nrow = dim(ratios)[1],
+                dimnames = list(dimnames(ratios)[[1]], NULL)
+            )
             if (!is.null(medians)) {
                 ratios <- .getPiecewiseMedianRatios(medians, controls, functionName)
             }
@@ -390,7 +440,7 @@ PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
 #'
 #' @template field_piecewiseSurvivalTime
 #' @template field_lambdaControls
-#' @template field_hazardRatios
+#' @template field_hazardRatio_piecewise
 #' @template field_medianControls
 #' @template field_medianTreatments
 #' @template field_groupType
@@ -399,7 +449,7 @@ PiecewiseSurvivalTimeMultiArm <- R6::R6Class("PiecewiseSurvivalTimeMultiArm",
 #' Create objects with [getPiecewiseSurvivalTimeEnrichment()]. The class inherits
 #' from \code{PiecewiseSurvivalTimeMultiGroup} and \code{TimeDefinition}.
 #' Rows of \code{lambdaControls} and \code{medianControls} correspond to disjoint
-#' population subsets. The dimensions of \code{hazardRatios} and
+#' population subsets. The dimensions of \code{hazardRatio} and
 #' \code{medianTreatments} are subset, interval, and situation, in that order.
 #' Interval starts begin at zero and the last interval is open-ended.
 #' Supplied interval medians parameterize exponential hazards through
@@ -415,15 +465,22 @@ PiecewiseSurvivalTimeEnrichment <- R6::R6Class("PiecewiseSurvivalTimeEnrichment"
     inherit = PiecewiseSurvivalTimeMultiGroup,
     public = list(
         medianControls = NULL,
-        initialize = function(piecewiseSurvivalTime = NULL, lambdaControls = NULL, hazardRatios = NULL,
-                medianControls = NULL, medianTreatments = NULL) {
+        initialize = function(
+                piecewiseSurvivalTime = NULL,
+                lambdaControls = NULL,
+                hazardRatio = NULL,
+                medianControls = NULL,
+                medianTreatments = NULL) {
             functionName <- "getPiecewiseSurvivalTimeEnrichment"
             times <- .validatePiecewiseStartTimes(piecewiseSurvivalTime, functionName)
             lambdaControls <- .getPiecewiseControlInput(times, lambdaControls, medianControls,
-                "lambdaControls", "medianControls", functionName, dimension = 2)
-            .assertPiecewiseNumeric(lambdaControls, "lambdaControls", functionName, dimension = 2)
-            ratios <- .getPiecewiseEffectInput(hazardRatios, medianTreatments, functionName,
-                groupNames = rownames(lambdaControls))
+                "lambdaControls", "medianControls", functionName,
+                dimension = 2
+            )
+            .assertPiecewiseNumeric(lambdaControls, "lambdaControls", functionName, dimension = 2, allowZero = TRUE)
+            ratios <- .getPiecewiseEffectInput(hazardRatio, medianTreatments, functionName,
+                groupNames = rownames(lambdaControls)
+            )
             medians <- NULL
             if (!is.null(medianTreatments)) {
                 medians <- ratios
@@ -461,13 +518,20 @@ PiecewiseSurvivalTimeEnrichment <- R6::R6Class("PiecewiseSurvivalTimeEnrichment"
 #'
 #' @export
 #'
-as.data.frame.PiecewiseSurvivalTimeMultiGroup <- function(x, row.names = NULL, optional = FALSE,
-        ..., niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE) {
+as.data.frame.PiecewiseSurvivalTimeMultiGroup <- function(
+        x,
+        row.names = NULL,
+        optional = FALSE,
+        ...,
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame", ...)
     result <- x$asDataFrame()
     if (niceColumnNamesEnabled) {
-        names(result) <- c("Group", "Interval", "Situation", "Start time", "End time",
-            "Control hazard", "Hazard ratio", "Active hazard")
+        names(result) <- c(
+            "Group", "Interval", "Situation", "Start time", "End time",
+            "Control hazard", "Hazard ratio", "Active hazard"
+        )
     }
     if (!is.null(row.names)) {
         rownames(result) <- row.names

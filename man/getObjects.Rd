@@ -31,8 +31,10 @@ entries in the returned list does not change the comparison's membership;
 use \code{\link[=add]{add()}} and \code{\link[=delete]{delete()}} to modify the collection.
 }
 \examples{
-comparison <- getComparison(fixed = getDesignFixed(),
-    sequential = getDesignGroupSequential(kMax = 2))
+comparison <- getComparison(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
 objects <- comparison |> getObjects()
 names(objects)
 identical(objects$fixed, comparison$fixed)

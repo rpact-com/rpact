@@ -1,24 +1,27 @@
 ## |
-## |  *Time utilities for piecewise exponential survival multi-group simulations*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_core_assertions.R
 #' @include f_error_handling.R
 NULL
 
-.assertPiecewiseNumeric <- function(value, parameter, functionName, dimension = NULL) {
+.assertPiecewiseNumeric <- function(value, parameter, functionName, dimension = NULL, allowZero = FALSE) {
     if (is.null(value) || length(value) == 0) {
         stopMissingArgument("'", parameter, "' must contain numeric values",
             functionName = functionName, parameter = parameter, value = value,
@@ -39,7 +42,15 @@ NULL
             context = list(expectedDimensions = dimension, actualDimensions = dim(value))
         )
     }
-    if (any(!is.finite(value)) || any(value <= 0)) {
+    if (allowZero) {
+        if (any(!is.finite(value)) || any(value < 0)) {
+            stopArgumentOutOfRange("all ", parameter, " must be finite and greater than or equal to 0",
+                functionName = functionName, parameter = parameter, value = value,
+                constraint = "finite values in [0, Inf)", lowerBound = 0,
+                diagnosticId = "survival.piecewise_nonnegative_hazards"
+            )
+        }
+    } else if (any(!is.finite(value)) || any(value <= 0)) {
         stopArgumentOutOfRange("all ", parameter, " must be finite and greater than 0",
             functionName = functionName, parameter = parameter, value = value,
             constraint = "finite values in (0, Inf)", lowerBound = 0,
@@ -163,6 +174,7 @@ NULL
     if (is.null(medians)) {
         return(hazards)
     }
+    
     converted <- .getPiecewiseMedianHazards(medians, medianParameter, functionName, dimension)
     actualLength <- if (is.null(dimension)) {
         length(medians)
@@ -180,14 +192,15 @@ NULL
     return(converted)
 }
 
-.getPiecewiseEffectInput <- function(hazardRatios, medianTreatments, functionName, groupNames = NULL) {
+.getPiecewiseEffectInput <- function(
+        hazardRatio, medianTreatments, functionName, groupNames = NULL, parameter = "hazardRatio") {
     .assertPiecewiseAlternativeInputs(
-        hazardRatios, medianTreatments,
-        "hazardRatios", "medianTreatments", functionName
+        hazardRatio, medianTreatments,
+        parameter, "medianTreatments", functionName
     )
     if (is.null(medianTreatments)) {
-        return(.normalizePiecewiseHazardRatios(hazardRatios,
-            groupNames = groupNames, functionName = functionName
+        return(.normalizePiecewiseHazardRatios(hazardRatio,
+            groupNames = groupNames, functionName = functionName, parameter = parameter
         ))
     }
     return(.normalizePiecewiseHazardRatios(medianTreatments,
@@ -212,28 +225,28 @@ NULL
 }
 
 .normalizePiecewiseHazardRatios <- function(
-        hazardRatios,
+        hazardRatio,
         groupNames = NULL,
         intervalNames = NULL,
         functionName,
-        parameter = "hazardRatios") {
+        parameter = "hazardRatio") {
     matrixType <- if (parameter == "medianTreatments") {
         "treatment-median"
     } else {
         "hazard-ratio"
     }
-    if (is.array(hazardRatios) && length(dim(hazardRatios)) == 3) {
-        .assertPiecewiseNumeric(hazardRatios, parameter, functionName, dimension = 3)
-        result <- hazardRatios
+    if (is.array(hazardRatio) && length(dim(hazardRatio)) == 3) {
+        .assertPiecewiseNumeric(hazardRatio, parameter, functionName, dimension = 3)
+        result <- hazardRatio
     } else {
-        situations <- if (is.list(hazardRatios) && !is.data.frame(hazardRatios)) {
-            hazardRatios
+        situations <- if (is.list(hazardRatio) && !is.data.frame(hazardRatio)) {
+            hazardRatio
         } else {
-            list(hazardRatios)
+            list(hazardRatio)
         }
         if (length(situations) == 0) {
             stopMissingArgument("at least one ", matrixType, " matrix must be specified",
-                functionName = functionName, parameter = parameter, value = hazardRatios,
+                functionName = functionName, parameter = parameter, value = hazardRatio,
                 constraint = "at least one group-by-interval matrix",
                 diagnosticId = "survival.piecewise_input_required"
             )
@@ -246,7 +259,7 @@ NULL
                 return(!identical(dim(situation), referenceDim))
             }, logical(1)))) {
             stopIllegalArgument("all ", matrixType, " matrices must have identical non-zero dimensions",
-                functionName = functionName, parameter = parameter, value = hazardRatios,
+                functionName = functionName, parameter = parameter, value = hazardRatio,
                 constraint = "identical non-zero group-by-interval dimensions",
                 diagnosticId = "survival.piecewise_situation_dimensions",
                 context = list(dimensions = lapply(situations, dim))
@@ -302,7 +315,7 @@ NULL
 .validatePiecewiseSurvivalInputs <- function(
         piecewiseSurvivalTime,
         lambdaControls,
-        hazardRatios,
+        hazardRatio,
         groupType,
         functionName) {
     times <- .validatePiecewiseStartTimes(piecewiseSurvivalTime, functionName)
@@ -314,11 +327,11 @@ NULL
             context = list(allowedValues = c("multi-arm", "enrichment"))
         )
     }
-    .assertPiecewiseNumeric(lambdaControls, "lambdaControls", functionName, dimension = 2)
+    .assertPiecewiseNumeric(lambdaControls, "lambdaControls", functionName, dimension = 2, allowZero = TRUE)
     .assertPiecewiseNames(rownames(lambdaControls), nrow(lambdaControls), "groupNames", functionName)
     .assertPiecewiseNames(colnames(lambdaControls), ncol(lambdaControls), "intervalNames", functionName)
-    ratios <- .normalizePiecewiseHazardRatios(hazardRatios,
-        groupNames = rownames(lambdaControls), functionName = functionName
+    ratios <- .normalizePiecewiseHazardRatios(hazardRatio,
+        groupNames = rownames(lambdaControls), functionName = functionName, parameter = "hazardRatio"
     )
     if (ncol(lambdaControls) != length(times) || dim(ratios)[2] != length(times) ||
             nrow(lambdaControls) != dim(ratios)[1]) {
@@ -327,8 +340,8 @@ NULL
             parameter = "lambdaControls", 
             value = lambdaControls,
             constraint = "matching groups and one column per interval",
-            relatedParameter = "hazardRatios", 
-            relatedValue = hazardRatios,
+            relatedParameter = "hazardRatio",
+            relatedValue = hazardRatio,
             diagnosticId = "survival.piecewise_hazard_dimensions",
             context = list(
                 intervalStarts = times, controlDimensions = dim(lambdaControls),
@@ -353,10 +366,10 @@ NULL
     dimnames(ratios)[[2]] <- intervalNames
     storage.mode(lambdaControls) <- "double"
     activeHazards <- sweep(ratios, c(1, 2), lambdaControls, `*`)
-    .assertPiecewiseNumeric(activeHazards, "activeHazards", functionName, dimension = 3)
+    .assertPiecewiseNumeric(activeHazards, "activeHazards", functionName, dimension = 3, allowZero = TRUE)
     return(list(
         piecewiseSurvivalTime = times, lambdaControls = lambdaControls,
-        hazardRatios = ratios, groupType = groupType
+        hazardRatio = ratios, groupType = groupType
     ))
 }
 
@@ -420,14 +433,14 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
     if (!is.null(object$medianTreatments)) {
         arguments$medianTreatments <- object$medianTreatments
     } else {
-        arguments$hazardRatios <- object$hazardRatios
+        arguments$hazardRatio <- object$hazardRatio
     }
     controlArguments <- if (object$groupType == "multi-arm") {
         c("lambdaControl", "medianControl")
     } else {
         c("lambdaControls", "medianControls")
     }
-    allowedArguments <- c("piecewiseSurvivalTime", controlArguments, "hazardRatios", "medianTreatments")
+    allowedArguments <- c("piecewiseSurvivalTime", controlArguments, "hazardRatio", "medianTreatments")
     if (!is.list(newArgumentValues) || (length(newArgumentValues) > 0 &&
             (is.null(names(newArgumentValues)) || any(!names(newArgumentValues) %in% allowedArguments)))) {
         stopIllegalArgument("piecewise survival argument overrides must be a named list of constructor arguments",
@@ -437,7 +450,7 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
             context = list(allowedArguments = allowedArguments)
         )
     }
-    for (alternatives in list(controlArguments, c("hazardRatios", "medianTreatments"))) {
+    for (alternatives in list(controlArguments, c("hazardRatio", "medianTreatments"))) {
         overridden <- intersect(alternatives, names(newArgumentValues))
         if (length(overridden) == 1) {
             arguments[setdiff(alternatives, overridden)] <- NULL
@@ -447,15 +460,25 @@ getPiecewiseHazardRatioArray <- function(..., groupNames = NULL, intervalNames =
         arguments[argumentName] <- newArgumentValues[argumentName]
     }
     expressions <- vapply(names(arguments), function(argumentName) {
+        argumentValue <- arguments[[argumentName]]
+        controls <- c("keepNA", "keepInteger", "niceNames", "showAttributes", "digits17")
+        expression <- deparse(argumentValue, width.cutoff = 500L, control = controls)
+        if (is.numeric(argumentValue)) {
+            # Some decimal literals can parse to an adjacent double, even with 17 digits.
+            reconstructed <- tryCatch(
+                eval(parse(text = expression), envir = baseenv()),
+                error = function(e) {
+                    return(NULL)
+                }
+            )
+            if (!identical(reconstructed, argumentValue)) {
+                expression <- deparse(argumentValue, width.cutoff = 500L,
+                    control = c(setdiff(controls, "digits17"), "hexNumeric"))
+            }
+        }
         return(paste0(
             argumentName, " = ",
-            paste(
-                deparse(arguments[[argumentName]],
-                    width.cutoff = 500L,
-                    control = c("keepNA", "keepInteger", "niceNames", "showAttributes", "digits17")
-                ),
-                collapse = "\n"
-            )
+            paste(expression, collapse = "\n")
         ))
     }, character(1))
     code <- paste0(prefix, functionName, "(", paste(c(leadingArguments, expressions), collapse = ", "), ")")

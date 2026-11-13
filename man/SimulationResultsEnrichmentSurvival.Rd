@@ -37,6 +37,14 @@ to create an object of this type.
 
 \item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.}
 
+\item{\code{observedDropoutProportion1}}{Mean replication-specific cumulative observed dropout proportion in arm 1 at each stage, counting dropout before the event and by that stage's analysis time. Only replications contributing at that stage with a finite analysis time and positive enrolled-subject denominator contribute; NA if none contribute. Stopped trials and discontinued groups do not contribute to later stages; overlapping populations include their shared subjects. Numeric matrices with stage rows and scenario columns for two-arm trials. In multi-arm trials, arm 1 has dimensions stage, scenario, and active arm; arm 2 is a stage-by-scenario matrix for shared control. In enrichment trials, both arms have dimensions stage, scenario, and population (subpopulations followed by the full population). A single active arm or population uses a stage-by-scenario matrix. Stage and scenario dimensions are always retained. NULL for test-statistic-based simulation. Both proportions are hidden in print and summary output when both input dropout rates are zero, but remain in the object.}
+
+\item{\code{observedDropoutProportion2}}{Mean replication-specific cumulative observed dropout proportion in arm 2 at each stage, counting dropout before the event and by that stage's analysis time. Only replications contributing at that stage with a finite analysis time and positive enrolled-subject denominator contribute; NA if none contribute. Stopped trials and discontinued groups do not contribute to later stages; overlapping populations include their shared subjects. Numeric matrices with stage rows and scenario columns for two-arm trials. In multi-arm trials, arm 1 has dimensions stage, scenario, and active arm; arm 2 is a stage-by-scenario matrix for shared control. In enrichment trials, both arms have dimensions stage, scenario, and population (subpopulations followed by the full population). A single active arm or population uses a stage-by-scenario matrix. Stage and scenario dimensions are always retained. NULL for test-statistic-based simulation. Both proportions are hidden in print and summary output when both input dropout rates are zero, but remain in the object.}
+
+\item{\code{dropoutObservationTime1}}{Mean stage analysis time in arm 1 over exactly the replications contributing to the corresponding stage's observed dropout proportion, in the same units as accrual and survival times. NA if no replication contributes. Numeric matrices with stage rows and scenario columns for two-arm trials. In multi-arm trials, arm 1 has dimensions stage, scenario, and active arm; arm 2 is a stage-by-scenario matrix for shared control. In enrichment trials, both arms have dimensions stage, scenario, and population (subpopulations followed by the full population). A single active arm or population uses a stage-by-scenario matrix. Stage and scenario dimensions are always retained. NULL for test-statistic-based simulation. Retained in the object but omitted from print and summary output.}
+
+\item{\code{dropoutObservationTime2}}{Mean stage analysis time in arm 2 over exactly the replications contributing to the corresponding stage's observed dropout proportion, in the same units as accrual and survival times. NA if no replication contributes. Numeric matrices with stage rows and scenario columns for two-arm trials. In multi-arm trials, arm 1 has dimensions stage, scenario, and active arm; arm 2 is a stage-by-scenario matrix for shared control. In enrichment trials, both arms have dimensions stage, scenario, and population (subpopulations followed by the full population). A single active arm or population uses a stage-by-scenario matrix. Stage and scenario dimensions are always retained. NULL for test-statistic-based simulation. Retained in the object but omitted from print and summary output.}
+
 \item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
 \item{\code{effectList}}{The list of subsets, prevalences and effect sizes with columns and number of rows reflecting the different situations to be considered.}
@@ -118,6 +126,22 @@ and subgroup.}
 \item{\code{threshold}}{The selection criterion: treatment arm/population is only selected if \code{effectMeasure} exceeds \code{threshold}. Either a single numeric value or a numeric vector of length \code{activeArms} referring to a separate threshold condition for each treatment arm.}
 
 \item{\code{typeOfSelection}}{The way the treatment arms or populations are selected at interim. Is a single character value.}
+
+\item{\code{analysisTime}}{The estimated time of analysis. Is a numeric matrix.}
+
+\item{\code{eventsNotAchieved}}{The simulated number of cases how often the number of events was not reached. Is a numeric matrix.}
+
+\item{\code{numberOfSubjects}}{In simulation results data set: The number of subjects under consideration when the interim analysis takes place.}
+
+\item{\code{piecewiseSurvivalTime}}{The time intervals for the piecewise definition of the exponential survival time cumulative distribution function. Is a numeric vector.}
+
+\item{\code{maxNumberOfEventsPerStage}}{Determines the maximum number of events per stage for data-driven sample size recalculation. Is a numeric vector of length \code{kMax} containing whole numbers.}
+
+\item{\code{minNumberOfEventsPerStage}}{Determines the minimum number of events per stage for data-driven sample size recalculation. Is a numeric vector of length \code{kMax} containing whole numbers.}
+
+\item{\code{plannedEvents}}{Determines the number of cumulated (overall) events in survival designs when the interim stages are planned. For two treatment arms, is the number of events for both treatment arms. For multi-arm designs, refers to the overall number of events for the selected arms plus control. Is a numeric vector of length \code{kMax} containing whole numbers.}
+
+\item{\code{maxStudyDuration}}{The maximum study duration in survival designs. Is a numeric vector.}
 }}
 
 \keyword{internal}

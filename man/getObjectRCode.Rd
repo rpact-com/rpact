@@ -18,7 +18,8 @@ rcmd(
   tolerance = 1e-07,
   pipeOperator = c("auto", "none", "magrittr", "R"),
   output = c("vector", "cat", "test", "markdown", "internal"),
-  explicitPrint = FALSE
+  explicitPrint = FALSE,
+  showVersus = FALSE
 )
 
 getObjectRCode(
@@ -34,12 +35,13 @@ getObjectRCode(
   tolerance = 1e-07,
   pipeOperator = c("auto", "none", "magrittr", "R"),
   output = c("vector", "cat", "test", "markdown", "internal"),
-  explicitPrint = FALSE
+  explicitPrint = FALSE,
+  showVersus = FALSE
 )
 }
 \arguments{
 \item{obj}{The result object, including a \code{TrialComparison} or its summary.
-Comparison reconstruction isolates each object's preconditions. Argument
+Comparison reconstruction inlines each object's preconditions. Argument
 overrides are unsupported for comparisons, and their code is not word-wrapped
 so object names and callback bodies remain intact.}
 
@@ -71,6 +73,14 @@ set to \code{NULL} to insert no line breaks.}
 \item{output}{The output format, default is a character "vector".}
 
 \item{explicitPrint}{Show an explicit \code{print} command, default is \code{FALSE}.}
+
+\item{showVersus}{If \code{TRUE}, reconstruct a \code{TrialComparisonSummary} as a
+chain using \verb{\%vs\%}. Default is \code{FALSE}. A \code{summary()} call is appended only
+for non-default display settings or when \code{includeDefaultParameters = TRUE}.
+If omitted, use option \code{rpact.r.code.show.versus} or environment variable
+\code{RPACT_R_CODE_SHOW_VERSUS} (the environment variable takes precedence).
+Explicit arguments override both settings. Other object classes are unaffected.
+\code{includeDefaultParameters} also controls the contained objects.}
 }
 \value{
 A \code{\link[base]{character}} value or vector will be returned.

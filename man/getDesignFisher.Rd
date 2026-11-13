@@ -114,7 +114,7 @@ getDesignFisher(kMax = 2, method = "fullAlpha", alpha = 0.05, alpha0Vec = 0.50)
 
 }
 \seealso{
-\code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare.
+\code{\link[=getComparison]{getComparison()}} to compare different design situations.
 
 \code{\link[=getFutilityBounds]{getFutilityBounds()}} for the
 specification of futility bounds on scales other than the p-value scale.

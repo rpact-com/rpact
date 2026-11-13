@@ -1,17 +1,20 @@
 ## |
-## |  *Test Execution*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_quality_assurance.R
@@ -80,7 +83,10 @@ NULL
     on.exit(unlink(c(stdout, stderr)), add = TRUE)
     tryCatch(
         callr::r(function(scope, headingLevel) {
-            rpact:::.testInstalledBasicPackagesInProcess(scope = scope, headingLevel = headingLevel)
+            get(".testInstalledBasicPackagesInProcess",
+                envir = asNamespace("rpact"), inherits = FALSE)(
+                scope = scope, headingLevel = headingLevel
+            )
         }, args = list(scope = scope, headingLevel = headingLevel), libpath = .libPaths(),
         stdout = stdout, stderr = stderr, stdin = NULL, poll_connection = FALSE,
         user_profile = FALSE),
@@ -488,6 +494,71 @@ NULL
     invisible(results)
 }
 
+.getTestReportMetaData <- function(metaData, metaDataFile, testFileTargetDirectory) {
+    if (!is.null(metaData) && (!is.list(metaData) ||
+            (length(metaData) > 0 && (is.null(names(metaData)) ||
+                anyNA(names(metaData)) || any(!nzchar(names(metaData))))))) {
+        stopIllegalArgument("'metaData' must be a named list",
+            functionName = ".getTestReportMetaData",
+            parameter = "metaData",
+            value = metaData,
+            constraint = "a list with non-missing, non-empty names, or NULL",
+            diagnosticId = "qa.meta_data_invalid"
+        )
+    }
+
+    if (!is.null(metaData) && length(metaData) > 0 && !is.null(metaDataFile)) {
+        warnArgumentIgnored("'metaDataFile' will be ignored because 'metaData' is provided",
+            functionName = ".getTestReportMetaData",
+            parameter = "metaDataFile",
+            value = metaDataFile,
+            relatedParameter = "metaData",
+            relatedValue = metaData,
+            constraint = "when 'metaData' is provided, 'metaDataFile' is ignored",
+            diagnosticId = "qa.meta_data_ignored"
+        )
+        metaDataFile <- NULL
+    }
+
+    if (!is.null(metaDataFile)) {
+        .assertIsSingleCharacter(metaDataFile, "metaDataFile", naAllowed = FALSE)
+        if (!file.exists(metaDataFile)) {
+            stopIllegalArgument("The specified 'metaDataFile' (", metaDataFile, ") does not exist",
+                functionName = ".getTestReportMetaData",
+                parameter = "metaDataFile",
+                value = metaDataFile,
+                constraint = "the file must exist and be readable",
+                diagnosticId = "qa.meta_data_file_missing"
+            )
+        }
+        if (dir.exists(metaDataFile) || file.access(metaDataFile, mode = 4) != 0) {
+            stopIllegalArgument("The specified 'metaDataFile' (", metaDataFile, ") must be a readable file",
+                functionName = ".getTestReportMetaData",
+                parameter = "metaDataFile",
+                value = metaDataFile,
+                constraint = "the path must refer to a readable file, not a directory",
+                diagnosticId = "qa.meta_data_file_unreadable"
+            )
+        }
+    }
+
+    if (!is.null(metaData) && length(metaData) > 0) {
+        if (is.null(metaDataFile)) {
+            metaDataFile <- file.path(testFileTargetDirectory, "meta_data.txt")
+        }
+        writeKeyValueFile(
+            keyValueList = metaData,
+            filePath = metaDataFile,
+            safeKeyCheck = FALSE
+        )
+    } else if (!is.null(metaDataFile)) {
+        metaData <- readKeyValueFile(metaDataFile)
+    }
+
+    return(metaData)
+}
+
+#' 
 #' @title
 #' Test and Validate the rpact Package Installation
 #'
@@ -526,6 +597,8 @@ NULL
 #'    Default is an empty list.
 #'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
 #' @param metaDataFile An optional path to a text file containing metadata: one entry per line in the form \code{KEY=VALUE}.
+#'    Ignored with a warning when a non-empty \code{metaData} list is supplied.
+#'    Supplied metadata is saved as \code{meta_data.txt} in the test target directory.
 #'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
 #' @param workers Number of parallel R test processes. The default \code{NULL} uses
 #'     the available logical CPUs minus two, with a minimum of one and a maximum of
@@ -616,7 +689,7 @@ testPackage <- function(
     .assertIsSingleLogical(testInstalledBasicPackages, "testInstalledBasicPackages", naAllowed = FALSE)
     .assertIsSingleLogical(openHtmlReport, "openHtmlReport", naAllowed = FALSE)
     .assertIsSingleLogical(keepSourceFiles, "keepSourceFiles", naAllowed = FALSE)
-
+    
     token <- .getConnectionArgument(connection, "token")
     secret <- .getConnectionArgument(connection, "secret")
     credentialsAvailable <- (!is.null(token) && !is.null(secret) &&
@@ -630,21 +703,8 @@ testPackage <- function(
 
     pkgName <- "rpact"
     testFileTargetDirectory <- .getTestFileTargetDirectory(outDir, testFileDirectory, executionMode, pkgName)
-    if (!is.null(metaData) && length(metaData) > 0) {
-        if (is.null(metaDataFile)) {
-            metaDataFile <- file.path(testFileTargetDirectory, "meta_data.txt")
-        }
-        writeKeyValueFile(
-            keyValueList = metaData,
-            filePath = metaDataFile,
-            safeKeyCheck = FALSE
-        )
-    }
-
-    if (!is.null(metaDataFile)) {
-        metaData <- readKeyValueFile(metaDataFile)
-    }
-
+    metaData <- .getTestReportMetaData(metaData, metaDataFile, testFileTargetDirectory)
+    
     reportType <- match.arg(reportType)
     scope <- match.arg(scope)
 
@@ -856,7 +916,8 @@ testPackage <- function(
     commands <- c(
         deparse(substitute(.libPaths(paths), list(paths = .libPaths())), width.cutoff = 500L),
         deparse(
-            substitute(rpact:::.runPackageUnitTests(
+            substitute(get(".runPackageUnitTests",
+                envir = asNamespace("rpact"), inherits = FALSE)(
                 files = testFiles, workers = count, reporterArguments = arguments, resultFile = path
             ), list(testFiles = files, count = workers, arguments = reporterArguments, path = resultFile)),
             width.cutoff = 500L

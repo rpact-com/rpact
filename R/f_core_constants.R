@@ -1,17 +1,20 @@
 ## |
-## |  *Constants*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include class_dictionary.R
@@ -401,6 +404,7 @@ C_FISHER_METHOD_DEFAULT <- C_FISHER_METHOD_EQUAL_ALPHA
 
 C_SUMMARY_LEGEND_ENTRY_EFFECT_MATRIX <- list("[j]" = "effect shape situation j")
 C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARM <- list("(i)" = "results of treatment arm i vs. control arm")
+C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARM_VALUES <- list("(i)" = "values of treatment arm i")
 C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARMS <- list("(i, j, ...)" = "comparison of treatment arms 'i, j, ...' vs. control arm")
 C_SUMMARY_LEGEND_ENTRY_TREATMENT_EFFECT_SCALE <- list("(t)" = "treatment effect scale")
 

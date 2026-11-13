@@ -1,17 +1,20 @@
 ## |
-## |  *Structured warning conditions*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_error_handling.R
@@ -24,11 +27,12 @@ NULL
         call = NULL, call. = TRUE) {
     message <- .getErrorMessage(...)
     warningClass <- c(paste0("rpact_", tolower(code), "_warning"), "rpact_warning")
-    factory <- getOption(paste0("rpact.warning.factory.",
-        gsub("_", ".", tolower(code)), ".condition"))
+    optionId <- paste0("rpact.warning.factory.", gsub("_", ".", tolower(code)), ".condition")
+    factory <- getOption(optionId)
     if (!is.function(factory)) {
         factory <- getOption("rpact.warning.factory.condition")
     }
+    
     condition <- simpleWarning(message, call = if (isTRUE(call.)) call else NULL)
     class(condition) <- unique(c(warningClass, class(condition)))
     if (is.function(factory) || isTRUE(getOption("rpact.warning.context", FALSE))) {
@@ -58,8 +62,14 @@ NULL
             }
         }
     }
+    
+    if (isFALSE(as.logical(getOption(paste0(
+            "rpact.warning.", gsub("_", ".", tolower(code)), ".enabled"))))) {
+        return(invisible(NULL))
+    }
+    
     base::warning(condition)
-    invisible(NULL)
+    return(invisible(NULL))
 }
 
 #' @noRd

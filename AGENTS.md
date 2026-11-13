@@ -256,6 +256,23 @@ for (parameter in names(limits)) {
 Apply this rule to nested loops as well. Existing unbraced loops are not
 examples to follow.
 
+## Header for new R source files
+
+Every new `.R` file must begin with the complete header from
+[.github/templates/r-source-header.txt](.github/templates/r-source-header.txt).
+Copy the template verbatim, preserving the `## |` comment style, and leave a
+blank line between the header and the file's code or Roxygen documentation.
+Use this general header without adding a file-specific title or copyright years.
+Preserve any required third-party copyright and license notices in addition to
+the header; do not overwrite them or apply incompatible licensing to third-party
+code. For generated `.R` files, arrange for the generation workflow to include
+the header while preserving required generator notices.
+
+The template is a maintained development resource, not package R code. Keep it
+under `.github/templates/`, outside `R/` and `inst/`. The existing `.Rbuildignore`
+rules exclude `.github` and `AGENTS.md` from the source package; retain these
+exclusions so the template and agent instructions do not affect CRAN checks.
+
 ## R source formatting and syntax
 
 Follow the established style in files such as `R/class_core_parameter_set.R`,
@@ -430,7 +447,7 @@ and its fields.
    ```r
    #' @template field_piecewiseSurvivalTime
    #' @template field_lambdaControl_piecewise
-   #' @template field_hazardRatios
+   #' @template field_hazardRatio
    ```
 
    Use `field_<field_name_unique>` as the template name. Do not add Markdown

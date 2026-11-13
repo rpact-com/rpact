@@ -1,21 +1,93 @@
 ## |
-## |  *Result comparison*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
+.getComparisonColumnMapping <- function(object, hasInterimAnalyses = FALSE) {
+    mapping <- c(sampleSizes = "numberOfSubjects")
+    design <- if (.isComparisonObject(object)) {
+        .getComparisonDesign(object)
+    } else {
+        NULL
+    }
+    if (hasInterimAnalyses && inherits(object, "TrialDesignPlan") &&
+            !is.null(design) && design$kMax == 1L) {
+        # Extend this named mapping for further equivalent fixed-plan columns.
+        mapping <- c(mapping,
+            nFixed = "numberOfSubjects",
+            nFixed1 = "numberOfSubjects1",
+            nFixed2 = "numberOfSubjects2"
+        )
+        if (inherits(object, "TrialDesignPlanSurvival")) {
+            mapping <- c(mapping, eventsFixed = "cumulativeEventsPerStage")
+        }
+    }
+    if (inherits(object, "TrialDesignPlan") && object$.isSampleSizeObject()) {
+        # H1 is the alternative supplied for the current sample-size scenario.
+        expectationMapping <- c(expectedNumberOfSubjectsH1 = "expectedNumberOfSubjects")
+        if (inherits(object, "TrialDesignPlanSurvival")) {
+            expectationMapping <- c(expectationMapping, expectedEventsH1 = "expectedNumberOfEvents")
+        }
+        for (source in intersect(names(expectationMapping), names(object))) {
+            value <- object[[source]]
+            if (length(value) && !all(is.na(value))) {
+                mapping <- c(mapping, expectationMapping[source])
+            }
+        }
+    }
+    if (inherits(object, "PowerAndAverageSampleNumberResult")) {
+        # Preserve stage-wise stopping before mapping the overall probability.
+        mapping <- c(mapping,
+            earlyStop = "earlyStopPerStage",
+            overallEarlyStop = "earlyStop",
+            overallFutility = "futilityStop",
+            calculatedPower = "overallReject"
+        )
+    }
+    return(mapping)
+}
+
+.harmonizeComparisonColumns <- function(data, mapping) {
+    for (source in intersect(names(mapping), names(data))) {
+        target <- mapping[[source]]
+        if (identical(source, target)) {
+            next
+        }
+        if (!target %in% names(data)) {
+            names(data)[names(data) == source] <- target
+        } else {
+            sourceValues <- data[[source]]
+            targetValues <- data[[target]]
+            shared <- !is.na(sourceValues) & !is.na(targetValues)
+            if (!any(shared) || identical(sourceValues[shared], targetValues[shared])) {
+                missing <- is.na(targetValues)
+                targetValues[missing] <- sourceValues[missing]
+                data[[target]] <- targetValues
+                data[[source]] <- NULL
+            }
+        }
+        # Conflicting non-missing targets retain both columns without overwriting values.
+    }
+    return(data)
+}
+
 .isComparisonObject <- function(object) {
-    return(inherits(object, c("TrialDesign", "TrialDesignCharacteristics", "TrialDesignPlan", "SimulationResults")))
+    return(inherits(object, c("TrialDesign", "TrialDesignCharacteristics", "TrialDesignPlan",
+        "SimulationResults", "PowerAndAverageSampleNumberResult")) || !is.null(.getComparisonAdapter(object)))
 }
 
 #'
@@ -28,12 +100,18 @@
 #' the objects.
 #'
 #' @param objects A non-empty list of objects inheriting from `TrialDesign`,
-#'   `TrialDesignCharacteristics`, `TrialDesignPlan`, or `SimulationResults`.
+#'   `TrialDesignCharacteristics`, `TrialDesignPlan`, `SimulationResults`, or
+#'   `PowerAndAverageSampleNumberResult`, `EventProbabilities`, `NumberOfSubjects`,
+#'   `ConditionalPowerResults`, `PerformanceScore`, `FisherInformation`, or
+#'   `TrialDesignOptimalConditionalErrorCharacteristics`.
 #'   Optional names are retained in the column `objectName`.
 #' @param ... Further arguments. Currently unused.
 #' @param niceColumnNamesEnabled If `TRUE`, use descriptive column names.
 #' @param includeAllParameters If `TRUE`, include all parameters supported by
 #'   the existing data-frame methods of the individual objects.
+#'
+#' @param harmonizeColumnNames If `TRUE`, apply class-specific column mappings
+#'   and include available equivalent fields. If `FALSE`, retain original names.
 #'
 #' @details
 #' Each object receives an `objectNumber`, repeated for all its rows. Design
@@ -42,8 +120,13 @@
 #' and results based on them, `kMax` and `stages` identify the single stage as 1, even when omitted by the
 #' individual data-frame methods. The situation column numbers rows within each
 #' stage. Columns are matched by technical names; missing
-#' values are filled with `NA`. `sampleSizes` is harmonized to `numberOfSubjects`
-#' when this does not overwrite another column. Conflicting non-numeric column
+#' values are filled with `NA`. `sampleSizes` is harmonized to `numberOfSubjects`.
+#' In comparisons containing interim analyses, fixed plans' `nFixed`, `nFixed1`,
+#' and `nFixed2` use `numberOfSubjects`, `numberOfSubjects1`, and `numberOfSubjects2`.
+#' Fixed survival plans additionally use `cumulativeEventsPerStage` for `eventsFixed`.
+#' Available H1 expectations in sample size plans use `expectedNumberOfSubjects`
+#' and `expectedNumberOfEvents`; H0 and intermediate-hypothesis expectations remain separate.
+#' Existing distinct target columns are preserved. Conflicting non-numeric column
 #' types are represented as character values. No master design or automatic
 #' parameter variation is implied. Original objects are not stored in the result.
 #'
@@ -65,58 +148,98 @@
         objects,
         ...,
         niceColumnNamesEnabled = FALSE,
-        includeAllParameters = FALSE) {
+        includeAllParameters = FALSE,
+        harmonizeColumnNames = TRUE) {
     .warnInCaseOfUnknownArguments(functionName = ".getComparisonData", ...)
     .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
     .assertIsSingleLogical(includeAllParameters, "includeAllParameters")
+    .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
     if (!is.list(objects) || is.data.frame(objects) || length(objects) == 0) {
-        stopIllegalArgument("'objects' must be a non-empty list of rpact designs, design characteristics, plans, or simulation results",
+        stopIllegalArgument("'objects' must be a non-empty list of supported rpact comparison objects",
             functionName = ".getComparisonData", parameter = "objects", value = objects,
             constraint = "a non-empty list, excluding data.frames",
             diagnosticId = "comparison.objects_invalid"
         )
     }
+    hasInterimAnalyses <- harmonizeColumnNames && any(vapply(objects, function(object) {
+        if (!.isComparisonObject(object)) {
+            return(FALSE)
+        }
+        design <- .getComparisonDesign(object)
+        return(!is.null(design) && isTRUE(design$kMax > 1L))
+    }, logical(1)))
+    mappings <- lapply(objects, function(object) {
+        if (harmonizeColumnNames) {
+            return(.getComparisonColumnMapping(object, hasInterimAnalyses = hasInterimAnalyses))
+        }
+        return(character())
+    })
+    resultMappings <- lapply(mappings, function(mapping) {
+        return(mapping[setdiff(names(mapping), "sampleSizes")])
+    })
+    requiredColumns <- unique(unlist(lapply(resultMappings, unname), use.names = FALSE))
     frames <- lapply(seq_along(objects), function(i) {
         obj <- objects[[i]]
         if (!.isComparisonObject(obj)) {
             stopIllegalArgument("Unsupported object at position ", i, ": ", paste(class(obj), collapse = "/"),
                 functionName = ".getComparisonData", parameter = "objects", value = obj,
-                constraint = "each object must inherit from TrialDesign, TrialDesignCharacteristics, TrialDesignPlan, or SimulationResults",
+                constraint = "each object must be a supported comparison result or planning object",
                 diagnosticId = "comparison.object_class_unsupported",
                 context = list(objectPosition = i, objectClass = class(obj))
             )
         }
-        df <- as.data.frame(obj,
-            niceColumnNamesEnabled = FALSE,
-            includeAllParameters = includeAllParameters
-        )
-        design <- if (inherits(obj, "TrialDesign")) {
-            obj
-        } else {
-            obj$.design
+        .validateComparisonSurvivalDropoutDimensions(obj, includeAllParameters)
+        df <- .getComparisonAdapterData(obj, includeAllParameters = includeAllParameters)
+        if (is.null(df)) {
+            df <- as.data.frame(obj, niceColumnNamesEnabled = FALSE,
+                includeAllParameters = includeAllParameters)
         }
+        if (inherits(obj, "PowerAndAverageSampleNumberResult")) {
+            # nMax is an essential input even when the compact source export omits it.
+            df$nMax <- rep(obj$nMax, nrow(df))
+            # The full source export can collapse theta into vector-valued cells.
+            df$theta <- rep(obj$theta, times = obj$.design$kMax)
+        }
+        # Some equivalent fields are omitted by the object's compact export.
+        mappedColumns <- unique(c(requiredColumns, names(mappings[[i]])))
+        missingColumns <- setdiff(intersect(mappedColumns, names(obj)), names(df))
+        if (length(missingColumns) && is.null(.getComparisonAdapter(obj))) {
+            fullData <- as.data.frame(obj, niceColumnNamesEnabled = FALSE, includeAllParameters = TRUE)
+            missingColumns <- intersect(missingColumns, names(fullData))
+            df[missingColumns] <- fullData[missingColumns]
+        }
+        df <- .harmonizeComparisonColumns(df, mappings[[i]])
+        design <- .getComparisonDesign(obj)
         if (inherits(design, "TrialDesignFixed")) {
             # Fixed-design data-frame methods omit these known design coordinates.
             df$kMax <- rep(design$kMax, nrow(df))
-            df$stages <- rep(1L, nrow(df))
+            if ("stage" %in% names(df) && !"stages" %in% names(df)) {
+                df$stage <- rep(1L, nrow(df))
+            } else {
+                df$stages <- rep(1L, nrow(df))
+            }
         }
-        if (!inherits(obj, "TrialDesign")) {
-            designData <- as.data.frame(obj$.design,
+        if (!inherits(obj, c("TrialDesign", "PerformanceScore")) && inherits(design, "TrialDesign")) {
+            designData <- as.data.frame(design,
                 niceColumnNamesEnabled = FALSE,
                 includeAllParameters = includeAllParameters
             )
             missing <- setdiff(names(designData), names(df))
+            stageColumn <- intersect(c("stages", "stage"), names(df))
+            if ("stage" %in% stageColumn) {
+                missing <- setdiff(missing, "stages")
+            }
             if (nrow(designData) == 1L) {
                 indices <- rep(1L, nrow(df))
-            } else if ("stages" %in% names(df) && "stages" %in% names(designData)) {
-                indices <- match(df$stages, designData$stages)
+            } else if (length(stageColumn) && "stages" %in% names(designData)) {
+                indices <- match(df[[stageColumn[1L]]], designData$stages)
                 if (anyNA(indices)) {
                     stopIllegalDataInput("Cannot match analysis stages of object ", i,
-                        functionName = ".getComparisonData", parameter = "stages", value = df$stages,
+                        functionName = ".getComparisonData", parameter = stageColumn[1L], value = df[[stageColumn[1L]]],
                         relatedParameter = "design$stages", relatedValue = designData$stages,
                         constraint = "each result stage must match an associated design stage",
                         diagnosticId = "comparison.stages_unmatched",
-                        context = list(objectPosition = i, unmatchedStages = df$stages[is.na(indices)])
+                        context = list(objectPosition = i, unmatchedStages = df[[stageColumn[1L]]][is.na(indices)])
                     )
                 }
             } else {
@@ -129,9 +252,6 @@
                 )
             }
             df[missing] <- designData[indices, missing, drop = FALSE]
-        }
-        if ("sampleSizes" %in% names(df) && !"numberOfSubjects" %in% names(df)) {
-            names(df)[names(df) == "sampleSizes"] <- "numberOfSubjects"
         }
         className <- class(obj)[1L]
         isDesign <- inherits(obj, c("TrialDesign", "TrialDesignCharacteristics"))
@@ -150,7 +270,11 @@
                 "Undefined"
             }
         }
-        calculationTarget <- if (isDesign) {
+        adapterContext <- .getComparisonAdapterContext(obj)
+        calculationTarget <- if (!is.null(adapterContext)) {
+            endpoint <- adapterContext$endpoint
+            adapterContext$target
+        } else if (isDesign) {
             "Design"
         } else {
             if (inherits(obj, "SimulationResults")) {
@@ -159,6 +283,8 @@
                 } else {
                     "Power simulation"
                 }
+            } else if (inherits(obj, "PowerAndAverageSampleNumberResult")) {
+                "Power and ASN"
             } else if (obj$.isSampleSizeObject()) {
                 "Sample size"
             } else {
@@ -183,7 +309,7 @@
         } else {
             seq_len(nrow(df))
         }
-        cbind(info, df, row.names = NULL)
+        return(.expandComparisonSurvivalCategories(obj, cbind(info, df, row.names = NULL), includeAllParameters))
     })
     columnNames <- unique(unlist(lapply(frames, names), use.names = FALSE))
     frames <- lapply(frames, function(df) {
@@ -194,8 +320,10 @@
     })
     for (name in columnNames) {
         columns <- lapply(frames, `[[`, name)
-        numericCompatible <- all(vapply(columns, function(x) is.numeric(x) || is.logical(x), logical(1)))
-        sameType <- length(unique(vapply(columns, function(x) paste(class(x), collapse = "/"), character(1)))) == 1L
+        numericCompatible <- all(vapply(columns, 
+            function(x) is.numeric(x) || is.logical(x), logical(1)))
+        sameType <- length(unique(vapply(columns, 
+            function(x) paste(class(x), collapse = "/"), character(1)))) == 1L
         if (!numericCompatible && !sameType) {
             frames <- lapply(frames, function(df) {
                 df[[name]] <- as.character(df[[name]])
@@ -207,9 +335,17 @@
     rownames(result) <- NULL
     if (niceColumnNamesEnabled) {
         labels <- as.list(C_TABLE_COLUMN_NAMES)
-        labels[c("objectNumber", "objectName", "objectType", "endpoint", "calculationTarget")] <-
-            c("Object number", "Object name", "Object type", "Endpoint", "Calculation target")
+        labels[c("objectNumber", "objectName", "objectType", "endpoint", "calculationTarget", "categoryType", "category")] <-
+            c("Object number", "Object name", "Object type", "Endpoint", "Calculation target", "Category type", "Category")
         names(result) <- vapply(names(result), function(name) {
+            if (grepl("^(observedDropoutProportion|dropoutObservationTime)[12](\\.|$)", name) ||
+                    (name %in% c("singleEventsPerStage", "cumulativeEventsPerStage", "singleEventsPerArmAndStage") &&
+                        any(vapply(objects, inherits, logical(1), "SimulationResultsMultiArmSurvival")))) {
+                captions <- vapply(objects, function(object) {
+                    return(.comparisonCaption(name, object, tableOutputEnabled = TRUE))
+                }, character(1))
+                return(.comparisonCaptionLabel(name, captions, tableOutputEnabled = TRUE))
+            }
             label <- labels[[name]]
             if (is.null(label)) {
                 name
@@ -219,5 +355,5 @@
         }, character(1))
         names(result) <- make.unique(names(result))
     }
-    result
+    return(result)
 }

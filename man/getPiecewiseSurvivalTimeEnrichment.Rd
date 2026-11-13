@@ -7,7 +7,7 @@
 getPiecewiseSurvivalTimeEnrichment(
   piecewiseSurvivalTime = NULL,
   lambdaControls = NULL,
-  hazardRatios = NULL,
+  hazardRatio = NULL,
   medianControls = NULL,
   medianTreatments = NULL
 )
@@ -15,22 +15,22 @@ getPiecewiseSurvivalTimeEnrichment(
 \arguments{
 \item{piecewiseSurvivalTime}{Numeric interval start times beginning with 0.}
 
-\item{lambdaControls}{Positive subset-by-interval control-hazard matrix.
+\item{lambdaControls}{Non-negative, finite subset-by-interval control-hazard matrix.
 If both control hazards and hazard ratios have row names, their names and
 order must agree.
 Specify either \code{lambdaControls} or \code{medianControls}.}
 
-\item{hazardRatios}{One subset-by-interval matrix, a named list of such
+\item{hazardRatio}{One subset-by-interval matrix, a named list of such
 matrices (one per situation), or a subset-by-interval-by-situation array.
 In the array, situation is the slowest-changing dimension.
-Specify either \code{hazardRatios} or \code{medianTreatments}.}
+Specify either \code{hazardRatio} or \code{medianTreatments}.}
 
 \item{medianControls}{Positive, finite exponential control medians in a
 subset-by-interval matrix, as an alternative to \code{lambdaControls}. Names and
 dimensions follow the same rules as for \code{lambdaControls}.}
 
 \item{medianTreatments}{Positive, finite exponential treatment medians, in the
-same matrix, list, or array format as \code{hazardRatios}, as an alternative to it.}
+same matrix, list, or array format as \code{hazardRatio}, as an alternative to it.}
 }
 \value{
 A \code{PiecewiseSurvivalTimeEnrichment} object.
@@ -41,8 +41,9 @@ patient-wise population-enrichment simulation.
 }
 \details{
 At least two finite, strictly increasing interval starts are required. The last
-interval is open-ended. Hazards must be finite and strictly positive. Group and
-situation names must be unique and non-empty. Unnamed groups are positional;
+interval is open-ended. Hazards must be finite and non-negative; zero denotes
+an interval without events. Hazard ratios must be finite and strictly positive.
+Group and situation names must be unique and non-empty. Unnamed groups are positional;
 named groups must agree in order. Interval columns are positional and receive
 labels derived from the interval starts. Only piecewise exponential event times
 are supported; simulation requires \code{kappa = 1}.
@@ -60,13 +61,19 @@ is performed.
 \examples{
 piecewiseTime <- getPiecewiseSurvivalTimeEnrichment(
     piecewiseSurvivalTime = c(0, 6),
-    lambdaControls = rbind(markerPositive = c(0.08, 0.12),
-        markerNegative = c(0.05, 0.09)),
-    hazardRatios = list(
-        favorable = rbind(markerPositive = c(0.65, 0.55),
-            markerNegative = c(0.9, 0.8)),
-        conservative = rbind(markerPositive = c(0.8, 0.7),
-            markerNegative = c(1, 0.9))
+    lambdaControls = rbind(
+        markerPositive = c(0.08, 0.12),
+        markerNegative = c(0.05, 0.09)
+    ),
+    hazardRatio = list(
+        favorable = rbind(
+            markerPositive = c(0.65, 0.55),
+            markerNegative = c(0.9, 0.8)
+        ),
+        conservative = rbind(
+            markerPositive = c(0.8, 0.7),
+            markerNegative = c(1, 0.9)
+        )
     )
 )
 as.data.frame(piecewiseTime)

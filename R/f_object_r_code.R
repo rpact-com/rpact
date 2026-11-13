@@ -1,17 +1,20 @@
 ## |
-## |  *Object R Code*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_core_constants.R
@@ -253,7 +256,7 @@ NULL
     }
 
     if (inherits(obj, "PerformanceScore")) {
-        return("gePerformanceScore")
+        return("getPerformanceScore")
     }
 
     if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
@@ -281,7 +284,12 @@ rcmd <- function(
         tolerance = 1e-07,
         pipeOperator = c("auto", "none", "magrittr", "R"),
         output = c("vector", "cat", "test", "markdown", "internal"),
-        explicitPrint = FALSE) {
+        explicitPrint = FALSE,
+        showVersus = FALSE) {
+    if (missing(showVersus)) {
+        showVersus <- .getEnvironmentVariable("RPACT_R_CODE_SHOW_VERSUS",
+            "rpact.r.code.show.versus", default = FALSE, type = "logical")
+    }
     getObjectRCode(
         obj = obj,
         leadingArguments = leadingArguments,
@@ -294,7 +302,8 @@ rcmd <- function(
         tolerance = tolerance,
         pipeOperator = pipeOperator,
         output = output,
-        explicitPrint = explicitPrint
+        explicitPrint = explicitPrint,
+        showVersus = showVersus
     )
 }
 
@@ -439,7 +448,7 @@ rcmd <- function(
         }
         ends <- unique(c(getPipeEnds(roots$id[i]), end))
         ends <- ends[ends <= end]
-        starts <- c(start, head(ends, -1) + 1L)
+        starts <- c(start, utils::head(ends, -1) + 1L)
         return(Map(seq.int, starts, ends))
     }), recursive = FALSE)
     # Do not remove a line shared by multiple top-level expressions.
@@ -459,7 +468,7 @@ rcmd <- function(
 #' Returns the R source command of a result object.
 #'
 #' @param obj The result object, including a `TrialComparison` or its summary.
-#'   Comparison reconstruction isolates each object's preconditions. Argument
+#'   Comparison reconstruction inlines each object's preconditions. Argument
 #'   overrides are unsupported for comparisons, and their code is not word-wrapped
 #'   so object names and callback bodies remain intact.
 #' @param leadingArguments A character vector with arguments that shall be inserted at the beginning of the function command,
@@ -477,6 +486,13 @@ rcmd <- function(
 #' @param pipeOperator The pipe operator to use in the R code, default is "none".
 #' @param output The output format, default is a character "vector".
 #' @param explicitPrint Show an explicit \code{print} command, default is \code{FALSE}.
+#' @param showVersus If `TRUE`, reconstruct a `TrialComparisonSummary` as a
+#'   chain using `%vs%`. Default is `FALSE`. A `summary()` call is appended only
+#'   for non-default display settings or when `includeDefaultParameters = TRUE`.
+#'   If omitted, use option `rpact.r.code.show.versus` or environment variable
+#'   `RPACT_R_CODE_SHOW_VERSUS` (the environment variable takes precedence).
+#'   Explicit arguments override both settings. Other object classes are unaffected.
+#'   `includeDefaultParameters` also controls the contained objects.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -501,12 +517,19 @@ getObjectRCode <- function(
         tolerance = 1e-07,
         pipeOperator = c("auto", "none", "magrittr", "R"),
         output = c("vector", "cat", "test", "markdown", "internal"),
-        explicitPrint = FALSE) {
+        explicitPrint = FALSE,
+        showVersus = FALSE) {
     functionName <- deparse(substitute(obj))
     functionName <- sub("\\(.*\\)$", "", functionName)
 
     output <- match.arg(output)
 
+    if (missing(showVersus)) {
+        showVersus <- .getEnvironmentVariable("RPACT_R_CODE_SHOW_VERSUS",
+            "rpact.r.code.show.versus", default = FALSE, type = "logical")
+    }
+    
+    .assertIsSingleLogical(showVersus, "showVersus")
     .assertIsSingleLogical(includeDefaultParameters, "includeDefaultParameters")
     .assertIsSingleLogical(explicitPrint, "explicitPrint")
     if (!is.null(stringWrapParagraphWidth)) {
@@ -605,6 +628,11 @@ getObjectRCode <- function(
     if (inherits(obj[["piecewiseSurvivalTime"]], "PiecewiseSurvivalTimeMultiGroup")) {
         stringWrapParagraphWidth <- NULL
     }
+    if (inherits(obj, c("FisherInformation", "TrialDesignOptimalConditionalErrorCharacteristics"))) {
+        return(.getComparisonSpecialRCode(obj, leadingArguments, includeDefaultParameters,
+            prefix, postfix, stringWrapPrefix, newArgumentValues, tolerance,
+            pipeOperator, pipeOperatorPostfix, output, explicitPrint))
+    }
     if (inherits(obj, "TrialComparison")) {
         return(.getTrialComparisonRCode(obj,
             leadingArguments = leadingArguments, includeDefaultParameters = includeDefaultParameters,
@@ -614,18 +642,43 @@ getObjectRCode <- function(
     }
 
     if (inherits(obj, "TrialComparisonSummary")) {
-        summaryArguments <- c(list(digits = obj$.digits), obj$.limits, list(output = obj$output))
+        if (includeDefaultParameters) {
+            objNames <- obj$.getInputParameters()
+        } else {
+            objNames <- obj$.getUserDefinedParameters()
+        }
+        summaryArguments <- lapply(objNames, function(name) {
+            return(obj[[name]])
+        })
+        names(summaryArguments) <- objNames
         arguments <- paste(vapply(names(summaryArguments), function(name) {
-            paste0(name, " = ", paste(deparse(summaryArguments[[name]]), collapse = ""))
+            return(paste0(name, " = ", paste(deparse(summaryArguments[[name]]), collapse = "")))
         }, ""), collapse = ", ")
-        code <- getObjectRCode(obj$object, includeDefaultParameters = includeDefaultParameters,
+        if (!showVersus || length(summaryArguments)) {
+            if (pipeOperator == "none") {
+                prefix <- paste0(prefix, "summary(")
+                if (nzchar(arguments)) {
+                    postfix <- c(paste0(", ", arguments, ")"), postfix)
+                } else {
+                    postfix <- c(")", postfix)
+                }
+            } else {
+                postfix <- c(pipeOperatorPostfix, paste0("summary(", arguments, ")"), postfix)
+            }
+        }
+        if (showVersus) {
+            return(.getTrialComparisonRCode(obj$object,
+                leadingArguments = leadingArguments, includeDefaultParameters = includeDefaultParameters,
+                prefix = prefix, postfix = postfix, stringWrapPrefix = stringWrapPrefix,
+                newArgumentValues = newArgumentValues, tolerance = tolerance, pipeOperator = pipeOperator,
+                pipeOperatorPostfix = pipeOperatorPostfix, output = output,
+                explicitPrint = explicitPrint, showVersus = TRUE))
+        }
+        return(getObjectRCode(obj$object, includeDefaultParameters = includeDefaultParameters,
             leadingArguments = leadingArguments, newArgumentValues = newArgumentValues,
             stringWrapParagraphWidth = NULL, pipeOperator = pipeOperator, tolerance = tolerance,
-            output = "internal")
-        return(.formatRCode(paste0(prefix, "summary(", paste(code, collapse = "\n"), ", ", arguments, ")"),
-            precondition = character(), stringWrapParagraphWidth = NULL, postfix = postfix,
-            stringWrapPrefix = stringWrapPrefix, pipeOperator = pipeOperator,
-            pipeOperatorPostfix = pipeOperatorPostfix, output = output, explicitPrint = explicitPrint))
+            prefix = prefix, postfix = postfix, stringWrapPrefix = stringWrapPrefix,
+            output = output, explicitPrint = explicitPrint))
     }
     if (!is.list(newArgumentValues)) {
         stopIllegalArgument("'newArgumentValues' must be a named list ",
@@ -665,7 +718,7 @@ getObjectRCode <- function(
         )
         precondition <- c(precondition, preconditionSimulationResults)
         if (pipeOperator == "none") {
-            leadingArguments <- c(leadingArguments, "simulationResults = simulationResults")
+            leadingArguments <- c(leadingArguments, "simulationResult = simulationResults")
         }
     }
     if (!is.null(obj[[".dataInput"]]) && (is.null(leadingArguments) || !any(grepl("data", leadingArguments)))) {
@@ -1227,7 +1280,7 @@ getObjectRCode <- function(
         explicitPrint) {
     if (any(postfix != "")) {
         if (length(postfix) > 1 && grepl("(\\|>)|(%>%)", postfix[1])) {
-            if (!grepl("(\\|>)|(%>%) *$", rCode[length(rCode)])) {
+            if (!grepl("(\\|>|%>%) *$", rCode[length(rCode)])) {
                 rCode <- paste0(rCode, postfix[1])
             }
             if (length(postfix) > 1) {

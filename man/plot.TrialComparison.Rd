@@ -5,22 +5,59 @@
 \alias{plot.TrialComparisonSummary}
 \title{Plot a Trial Comparison}
 \usage{
-\method{plot}{TrialComparison}(x, xParamName = NULL, yParamName = NULL, ...)
+\method{plot}{TrialComparison}(
+  x,
+  xAxis = NULL,
+  yAxis = NULL,
+  ...,
+  data = NULL,
+  category = NULL,
+  group = NULL,
+  main = NULL,
+  xlab = NA_character_,
+  ylab = NA_character_
+)
 
-\method{plot}{TrialComparisonSummary}(x, xParamName = NULL, yParamName = NULL, ..., showSummary = FALSE)
+\method{plot}{TrialComparisonSummary}(
+  x,
+  xAxis = NULL,
+  yAxis = NULL,
+  ...,
+  showSummary = FALSE,
+  category = NULL,
+  group = NULL,
+  data = NULL
+)
 }
 \arguments{
 \item{x}{A \code{TrialComparison} or its summary.}
 
-\item{xParamName, yParamName}{Optional axis column names. Omitted axes are
+\item{xAxis, yAxis}{Optional axis column names or captions. Omitted axes are
 selected only when there is exactly one candidate: inputs/design settings
 are preferred for x, results for y, then other varying numeric columns.
-Identifier columns are excluded; stages remain eligible axes. \code{yParamName}
+Identifier columns are excluded; stages remain eligible axes. \code{yAxis}
 may also explicitly select multiple numeric parameters. Their axis sides
 can be controlled through \code{yAxisSide} passed to \code{\link[=plot.TrialComparison]{plot.TrialComparison()}}.}
 
 \item{...}{Arguments passed to \code{\link[=plot.TrialComparison]{plot.TrialComparison()}}, including categories,
 grouping, titles and line/point settings. Explicit axis selections prevail.}
+
+\item{data}{Optional comparison data frame with additional annotation columns.
+Rows must follow the order of \code{as.data.frame(x)}. Without custom data,
+summary plots retain the summary's column-name harmonization setting.}
+
+\item{category}{Optional column names defining categories. Multiple columns
+define joint categories. NULL selects automatically; NA_character_ or
+character(0) disables categories.}
+
+\item{group}{Optional column name defining an additional grouping.}
+
+\item{main}{Plot title. When omitted, generated from the original objects.
+NULL or NA hides the title.}
+
+\item{xlab, ylab}{Axis labels. NA uses automatic parameter captions; NULL hides
+the label. \code{ylab} overrides the primary y-axis label, including a single
+right-positioned axis. A secondary y axis retains its automatic caption.}
 
 \item{showSummary}{If TRUE, also print the summary before creating its plot.}
 }
@@ -32,4 +69,28 @@ descriptions and a concrete example.
 Plots selected variables from a trial comparison.
 
 The summary method plots the objects contained in the comparison.
+}
+\details{
+\code{xAxis}, \code{yAxis}, \code{category}, and \code{group} accept technical column names,
+captions from the parameter dictionary, and object-specific captions as in
+\code{\link[=fetch]{fetch()}}. For example, \code{"Alternative"} and \code{"Alternatives"} both select
+\code{alternative}. Names may also be unquoted, including inside \code{c(...)}.
+Defined variables and other expressions are evaluated in the calling environment.
+Exact column names take precedence over captions. Other names must resolve
+unambiguously to a column present in the comparison export; harmonized names
+are taken into account. With fixed plans alone, \code{"Number of subjects"} can
+select \code{nFixed}. Unknown names, ambiguous captions and duplicate selections
+(including two aliases for one column) raise selection errors.
+}
+\examples{
+comparison <- getSampleSizeMeans(alternative = 0.22, stDev = 0.5) |>
+    compare(getSampleSizeMeans(alternative = 0.44, stDev = 1)) |>
+    compare(getSampleSizeMeans(alternative = 0.59, stDev = 1))
+plot(comparison,
+    xAxis = "Alternative",
+    yAxis = c("Number of subjects", "Critical values (treatment effect scale)"),
+    category = "Standard deviation"
+)
+plot(comparison, xAxis = alternative, yAxis = numberOfSubjects, group = stDev)
+
 }

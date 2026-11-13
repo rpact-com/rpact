@@ -9,7 +9,10 @@ Trial design plan for survival data.
 \details{
 This object cannot be created directly;
 use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
-with suitable arguments to create a design plan for a dataset of survival data.
+or \code{\link[=getPowerSurvival]{getPowerSurvival()}} with suitable arguments to create a survival design plan.
+Expected dropout proportions use each stage's planned analysis horizon for each
+alternative scenario, with stage rows and scenario columns. See the constructor help for
+the deterministic planned-accrual denominator and competing-event assumptions.
 }
 \section{Fields}{
 
@@ -69,6 +72,10 @@ with suitable arguments to create a design plan for a dataset of survival data.
 \item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a single numeric value between 0 and 1.}
 
 \item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.}
+
+\item{\code{expectedDropoutProportion1}}{Expected observed dropout proportion in arm 1 at each stage's planned analysis time, allowing for competing events and deterministic planned accrual. Stage rows and alternative-scenario columns, including for a single stage or scenario. NA when that stage's horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by that horizon, retaining fractional planning counts. Zero dropout is retained in the object; both proportions are hidden in print and summary output when both input dropout rates are zero. Is a numeric matrix.}
+
+\item{\code{expectedDropoutProportion2}}{Expected observed dropout proportion in arm 2 at each stage's planned analysis time, allowing for competing events and deterministic planned accrual. Stage rows and alternative-scenario columns, including for a single stage or scenario. NA when that stage's horizon is unavailable or no subjects have accrued. The denominator includes only enrollment by that horizon, retaining fractional planning counts. Zero dropout is retained in the object; both proportions are hidden in print and summary output when both input dropout rates are zero. Is a numeric matrix.}
 
 \item{\code{chi}}{The calculated event probability at end of trial. Is a numeric vector.}
 

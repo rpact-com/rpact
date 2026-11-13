@@ -1,21 +1,20 @@
 ## |
-## |  *Simulation of multi-arm design with time to event data*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
-## |
-## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Di, 10 Dez 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_simulation_multiarm.R
@@ -312,6 +311,7 @@ NULL
     analysisTime <- rep(NA_real_, kMax)
     numberOfSubjects <- rep(NA_real_, kMax)
     eventsNotAchieved <- rep(FALSE, kMax)
+    dropoutEnrolled <- dropoutDropped <- matrix(NA_real_, nrow = gMax + 1, ncol = kMax)
 
     if (.isTrialDesignFisher(design)) {
         weights <- .getWeightsFisher(design)
@@ -489,6 +489,12 @@ NULL
             singleEventsPerStage[retainedArms, k] <- singleEventsPerStage[retainedArms, k] -
                 cumulativeEventsPerArmAndStage[retainedArms, k - 1]
         }
+        for (g in seq_len(gMax + 1L)) {
+            counts <- .captureDropoutCounts(survivalDataSet, analysisTime[k], survivalDataSet$treatmentArm == g)
+            dropoutEnrolled[g, k] <- counts[1]
+            dropoutDropped[g, k] <- counts[2]
+        }
+
         separatePValues[, k] <- 1 - stats::pnorm(testStatistics[, k])
         overallEffects[, k] <- thetaH0 * exp(
             (2 * directionUpper - 1) *
@@ -643,6 +649,8 @@ NULL
     }
 
     result <- list(
+        dropoutEnrolled = dropoutEnrolled,
+        dropoutDropped = dropoutDropped,
         eventsNotAchieved = eventsNotAchieved,
         singleEventsPerStage = singleEventsPerStage,
         cumulativeEventsPerStage = cumulativeEventsPerStage,
@@ -721,6 +729,7 @@ NULL
     iterations <- matrix(0, nrow = kMax, ncol = cols)
     rawDataPerStage <- matrix(0L, nrow = cols, ncol = kMax)
     rawDataSets <- list()
+    dropoutRecords <- matrix(NA_real_, nrow = cols * maxNumberOfIterations * (gMax + 1) * kMax, ncol = 8)
 
     len <- maxNumberOfIterations * kMax * gMax * cols
 
@@ -756,7 +765,7 @@ NULL
             matrix(
                 allPiecewiseActiveHazards[, , i, drop = FALSE],
                 nrow = gMax,
-                dimnames = dimnames(piecewiseSurvivalTime$hazardRatios)[1:2]
+                dimnames = dimnames(piecewiseSurvivalTime$hazardRatio)[1:2]
             )
         } else {
             NULL
@@ -811,6 +820,10 @@ NULL
                     successCriterion = successCriterion
                 )
             }
+
+            recordRows <- ((i - 1L) * maxNumberOfIterations + j - 1L) * (gMax + 1) * kMax + seq_len((gMax + 1) * kMax)
+            dropoutRecords[recordRows, ] <- .finishDropoutRecords(stageResults, closedTest, i, j,
+                groups = gMax + 1L, arms = 1, sharedControl = TRUE)
 
             stopStage <- NA_integer_
             for (k in seq_len(kMax)) {
@@ -1014,6 +1027,7 @@ NULL
         expectedStudyDuration = expectedStudyDuration,
         iterations = iterations,
         data = data,
+        dropoutRecords = dropoutRecords,
         rawData = rawDataSets
     )
 }

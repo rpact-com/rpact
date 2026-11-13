@@ -1,20 +1,23 @@
-/**
- *
- * -- Simulation enrichment survival --
- *
- * This file is part of the R package rpact:
- * Confirmatory Adaptive Clinical Trial Design and Analysis
- *
- * Author: Gernot Wassmer, PhD, Daniel Sabanes Bove, PhD, and Friedrich Pahlke, PhD
- * Licensed under "GNU Lesser General Public License" version 3
- * License text can be found here: https://www.r-project.org/Licenses/LGPL-3
- *
- * RPACT company website: https://www.rpact.com
- * rpact package website: https://www.rpact.org
- *
- * Contact us for information about our services: info@rpact.com
- *
- */
+// |
+// |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+// |  This file is part of the rpact R package.
+// |
+// |  RPACT — Statistical Tools for Drug Development
+// |
+// |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+// |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+// |  SPDX-License-Identifier: LGPL-3.0-only
+// |
+// |  Licensed under the GNU Lesser General Public License, version 3.
+// |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
+// |
+// |  Package documentation: https://www.rpact.org
+// |  Resources and customer portal: https://connect.rpact.app
+// |  Consulting and services: https://www.rpact.com
+// |  Contact: info@rpact.com
+// |
+
+// Original authors: Gernot Wassmer, PhD, Daniel Sabanes Bove, PhD, and Friedrich Pahlke, PhD
 
 #include <Rcpp.h>
 #include <cmath>
@@ -364,7 +367,7 @@ List getSurvDropoutTimes(int numberOfSubjects,
 	Rcpp::RNGScope scope; 
 
 	NumericVector survivalTime(numberOfSubjects);
-	NumericVector dropoutTime(numberOfSubjects);
+	NumericVector dropoutTime(numberOfSubjects, NA_REAL);
 	
 	for (int i = 0; i < numberOfSubjects; i++) {
 		// Find which subgroup this subject belongs to
@@ -578,6 +581,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	std::fill(conditionalCriticalValue.begin(), conditionalCriticalValue.end(), NA_REAL);
 	NumericVector conditionalPowerPerStage(kMax);
 	std::fill(conditionalPowerPerStage.begin(), conditionalPowerPerStage.end(), NA_REAL);
+    NumericMatrix dropoutEnrolled(gMax * 2, kMax), dropoutDropped(gMax * 2, kMax);
+    std::fill(dropoutEnrolled.begin(), dropoutEnrolled.end(), NA_REAL);
+    std::fill(dropoutDropped.begin(), dropoutDropped.end(), NA_REAL);
 	LogicalMatrix selectedPopulations(gMax, kMax);
 	selectedPopulations(_, 0) = rep(TRUE, gMax); // First stage all populations selected
 	LogicalMatrix selectedsubGroupsIndices(pMax, kMax);
@@ -849,6 +855,15 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			}
 		}
 
+        for (int g = 0; g < gMax; ++g) {
+            LogicalVector inPopulation = charInSet(subGroupVector, createSubGroupsFromPopulation(gMax, g + 1));
+            for (int a = 0; a < 2; ++a) {
+                LogicalVector member = inPopulation & (treatments == a + 1);
+                captureDropoutCounts(recruitmentTimes, survivalTime, dropoutTime, member,
+                    analysisTime[k], dropoutEnrolled, dropoutDropped, g * 2 + a, k);
+            }
+        }
+
 		// Calculate separate p-values
 		for (int g = 0; g < gMax; g++) {
 			if (!R_IsNA(testStatistics(g, k))) {
@@ -891,7 +906,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					expPvals[i] = pow(adjustedPValues[i], weights[i]);
 				}				
 				// prod(expPvals)
-				double denominator = std::accumulate(expPvals.begin(), expPvals.end(), 1, std::multiplies<double>());
+				double denominator = std::accumulate(expPvals.begin(), expPvals.end(), 1.0, std::multiplies<double>());
 				double term = pow(numerator / denominator, 1.0 / weights[k + 1]);
 				conditionalCriticalValue[k] = getOneMinusQNorm(std::min(term, 1.0 - 1e-07));
 			} else {
@@ -1058,7 +1073,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	}
 
 	List result = List::create(
-		_["eventsNotAchieved"] = eventsNotAchieved,
+		_["dropoutEnrolled"] = dropoutEnrolled,
+        _["dropoutDropped"] = dropoutDropped,
+        _["eventsNotAchieved"] = eventsNotAchieved,
 		_["populationEventsPerStage"] = populationEventsPerStage,
 		_["subsetEventsPerStage"] = subsetEventsPerStage,
 		_["plannedEvents"] = plannedEvents,
@@ -1180,6 +1197,8 @@ List performSimulationEnrichmentSurvivalLoop(
 	NumericMatrix iterations(kMax, cols);
 	IntegerMatrix rawDataPerStage(cols, kMax);
 	List rawDataSets;
+    NumericMatrix dropoutRecords(cols * maxNumberOfIterations * gMax * 2 * kMax, 8);
+    std::fill(dropoutRecords.begin(), dropoutRecords.end(), NA_REAL);
 	
 	// Initialize all these with zeros
 	std::fill(simulatedNumberEventsNotAchieved.begin(), simulatedNumberEventsNotAchieved.end(), 0);
@@ -1325,6 +1344,13 @@ List performSimulationEnrichmentSurvivalLoop(
 			LogicalVector successStop = closedTest["successStop"];
 			LogicalVector futilityStop = closedTest["futilityStop"];
 			NumericMatrix separatePValuesTest = closedTest["separatePValues"];
+
+            finishDropoutRecords(dropoutRecords,
+                (i * maxNumberOfIterations + j) * gMax * 2 * kMax, i + 1, j + 1,
+                as<NumericMatrix>(stageResults["dropoutEnrolled"]),
+                as<NumericMatrix>(stageResults["dropoutDropped"]), analysisTime,
+                selectedPopulationsTest, eventsNotAchieved, successStop, futilityStop,
+                gMax, 2, false);
 
 			int stopStage = -1;
 			for (int k = 0; k < kMax; k++) {
@@ -1472,7 +1498,7 @@ List performSimulationEnrichmentSurvivalLoop(
 			for (int k = 0; k < kMax; k++) {
 				if (iterations(k, i) > 0) {
 					simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] = 
-						round(simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] / iterations(k, i) * 10.0) / 10.0;
+                        R::fround(simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] / iterations(k, i), 1.0);
 				}
 			}
 		}
@@ -1570,6 +1596,7 @@ List performSimulationEnrichmentSurvivalLoop(
 		_["expectedStudyDuration"] = expectedStudyDuration,
 		_["iterations"] = iterations,
 		_["data"] = filteredData,
-		_["rawData"] = rawDataSets
+		_["dropoutRecords"] = dropoutRecords,
+        _["rawData"] = rawDataSets
 	);
 }

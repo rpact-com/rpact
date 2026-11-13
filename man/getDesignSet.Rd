@@ -35,6 +35,11 @@ Creates a trial design set object and returns it.
 \details{
 Specify a master design and one or more design parameters or a list of designs.
 }
+\section{Deprecated}{
+
+Use \code{\link[=getComparison]{getComparison()}} instead.
+}
+
 \section{How to get help for generic functions}{
 
 Click on the link of a generic in the list above to go directly to the help documentation of

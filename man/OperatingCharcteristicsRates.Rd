@@ -3,9 +3,41 @@
 \name{OperatingCharcteristicsRates}
 \alias{OperatingCharcteristicsRates}
 \title{Operating Characteristics for Quantitative Decisions Comparing Rates}
+\arguments{
+\item{design}{The originating quantitative decision rule.}
+
+\item{numberOfSubjects}{Matrix of control and treatment sample sizes.}
+
+\item{pi1}{Vector of treatment event probabilities.}
+
+\item{pi2}{Single control event probability.}
+
+\item{directionUpper}{Whether larger treatment event rates are beneficial.}
+
+\item{intervalMethod}{Risk-difference interval construction.}
+
+\item{probabilities}{Computed probability data frame.}
+
+\item{showType}{Output mode passed to ParameterSet.}
+
+\item{digits}{Optional display precision.}
+
+\item{consoleOutputEnabled}{Whether to print or collect the output.}
+
+\item{startWithUpperCase}{Whether to capitalize the first character.}
+}
 \description{
 Stores exact binomial decision-category probabilities for two independent
 groups. Obtain instances with \code{\link[=getOperatingCharacteristicsRates]{getOperatingCharacteristicsRates()}}.
+
+Initializes a rates result. Use getOperatingCharacteristicsRates() to
+validate inputs and calculate probabilities.
+
+Prints the result to the console.
+
+Internal rendering method used by standard console and Markdown output.
+
+Returns the result description used in output headings.
 }
 \details{
 Inherits the sample-size matrix and probability table from
@@ -16,6 +48,22 @@ Console and Markdown printing use the standard ParameterSet mechanism.
 Use \code{\link[=summary]{summary()}} for decision-rule assumptions and probability tables, and
 \code{\link[=plot.OperatingCharcteristics]{plot.OperatingCharcteristics()}} for the shared QTD plot families.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{groups}}{Number of independent treatment groups, fixed at 2 (control and treatment). Is a single numeric value representing a  whole number.}
+
+\item{\code{pi1}}{Supplied numeric vector of true treatment event probabilities between 0 and 1, inclusive. Its order and repeated entries are retained. Every rate is evaluated for every supplied sample-size scenario against the single control probability pi2.}
+
+\item{\code{pi2}}{The assumed probability in the reference group for two-group designs. Is a single numeric value between 0 and 1.}
+
+\item{\code{directionUpper}}{Whether larger treatment event probabilities are beneficial. TRUE (default) defines the effect as pi1 minus pi2; FALSE defines it as pi2 minus pi1. Reference values use the same beneficial-effect scale. Is a single logical value.}
+
+\item{\code{intervalMethod}}{Frequentist interval construction: qtd1, farringtonManning, miettinenNurminen or newcombe. NA for Bayesian rates, which evaluate posterior criteria instead of confidence intervals. Is a single character value.}
+
+\item{\code{alternative}}{Derived true risk differences in the beneficial direction, one per supplied treatment rate: pi1 minus pi2 when directionUpper is TRUE, otherwise pi2 minus pi1. Entries are between -1 and 1, inclusive, in the same order as pi1, and are not additional user-supplied assumptions. Is a numeric vector.}
+}}
+
 \section{Inherited fields}{
 
 \describe{\item{\code{numberOfSubjects}}{Supplied sample-size scenarios. Rows correspond to scenarios; the two columns contain the positive integer numbers of control and treatment subjects, in that order. Repeated scenarios are retained. Is a numeric matrix.}
@@ -30,205 +78,3 @@ Use \code{\link[=summary]{summary()}} for decision-rule assumptions and probabil
 \code{\link[=getOperatingCharacteristicsRates]{getOperatingCharacteristicsRates()}}, \code{\link[=getDesignQuantitative]{getDesignQuantitative()}}
 }
 \keyword{internal}
-\section{Super classes}{
-\code{\link[rpact:FieldSet]{FieldSet}} -> \code{\link[rpact:ParameterSet]{ParameterSet}} -> \code{\link[rpact:OperatingCharcteristics]{OperatingCharcteristics}} -> \code{OperatingCharcteristicsRates}
-}
-\section{Public fields}{
-  \if{html}{\out{<div class="r6-fields">}}
-  \describe{
-    \item{\code{groups}}{Number of independent treatment groups, fixed at 2 (control and treatment). Is a single numeric value representing a  whole number.}
-
-    \item{\code{pi1}}{Supplied numeric vector of true treatment event probabilities between 0 and 1, inclusive. Its order and repeated entries are retained. Every rate is evaluated for every supplied sample-size scenario against the single control probability pi2.}
-
-    \item{\code{pi2}}{The assumed probability in the reference group for two-group designs. Is a single numeric value between 0 and 1.}
-
-    \item{\code{directionUpper}}{Whether larger treatment event probabilities are beneficial. TRUE (default) defines the effect as pi1 minus pi2; FALSE defines it as pi2 minus pi1. Reference values use the same beneficial-effect scale. Is a single logical value.}
-
-    \item{\code{intervalMethod}}{Frequentist interval construction: qtd1, farringtonManning, miettinenNurminen or newcombe. NA for Bayesian rates, which evaluate posterior criteria instead of confidence intervals. Is a single character value.}
-
-    \item{\code{alternative}}{Derived true risk differences in the beneficial direction, one per supplied treatment rate: pi1 minus pi2 when directionUpper is TRUE, otherwise pi2 minus pi1. Entries are between -1 and 1, inclusive, in the same order as pi1, and are not additional user-supplied assumptions. Is a numeric vector.}
-  }
-  \if{html}{\out{</div>}}
-}
-\section{Methods}{
-\subsection{Public methods}{
-  \itemize{
-    \item \href{#method-OperatingCharcteristicsRates-initialize}{\code{OperatingCharcteristicsRates$new()}}
-    \item \href{#method-OperatingCharcteristicsRates-show}{\code{OperatingCharcteristicsRates$show()}}
-    \item \href{#method-OperatingCharcteristicsRates-.show}{\code{OperatingCharcteristicsRates$.show()}}
-    \item \href{#method-OperatingCharcteristicsRates-.toString}{\code{OperatingCharcteristicsRates$.toString()}}
-    \item \href{#method-OperatingCharcteristicsRates-clone}{\code{OperatingCharcteristicsRates$clone()}}
-  }
-}
-\if{html}{\out{<details><summary>Inherited methods</summary>
-<ul>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".cat"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.cat'><code>FieldSet$.cat()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".catMarkdownText"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.catMarkdownText'><code>FieldSet$.catMarkdownText()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".getFieldNames"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.getFieldNames'><code>FieldSet$.getFieldNames()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".getFields"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.getFields'><code>FieldSet$.getFields()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".getVisibleFieldNames"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.getVisibleFieldNames'><code>FieldSet$.getVisibleFieldNames()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="FieldSet" data-id=".resetCat"><a href='../../rpact/html/FieldSet.html#method-FieldSet-.resetCat'><code>FieldSet$.resetCat()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".containsMultidimensionalParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.containsMultidimensionalParameters'><code>ParameterSet$.containsMultidimensionalParameters()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".extractParameterNameAndValue"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.extractParameterNameAndValue'><code>ParameterSet$.extractParameterNameAndValue()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".formatDataFrameParametersAsCharacter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.formatDataFrameParametersAsCharacter'><code>ParameterSet$.formatDataFrameParametersAsCharacter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getDataFrameColumnCaption"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getDataFrameColumnCaption'><code>ParameterSet$.getDataFrameColumnCaption()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getDefaultParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getDefaultParameters'><code>ParameterSet$.getDefaultParameters()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getDerivedParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getDerivedParameters'><code>ParameterSet$.getDerivedParameters()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getGeneratedParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getGeneratedParameters'><code>ParameterSet$.getGeneratedParameters()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getInputParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getInputParameters'><code>ParameterSet$.getInputParameters()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getMultidimensionalNumberOfStages"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getMultidimensionalNumberOfStages'><code>ParameterSet$.getMultidimensionalNumberOfStages()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getNChar"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getNChar'><code>ParameterSet$.getNChar()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getNumberOfRows"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getNumberOfRows'><code>ParameterSet$.getNumberOfRows()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getParameterType"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getParameterType'><code>ParameterSet$.getParameterType()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getParameterValueIfUserDefinedOrDefault"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getParameterValueIfUserDefinedOrDefault'><code>ParameterSet$.getParameterValueIfUserDefinedOrDefault()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getParametersOfOneGroup"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getParametersOfOneGroup'><code>ParameterSet$.getParametersOfOneGroup()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getParametersToShow"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getParametersToShow'><code>ParameterSet$.getParametersToShow()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getSubListByNames"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getSubListByNames'><code>ParameterSet$.getSubListByNames()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getUndefinedParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getUndefinedParameters'><code>ParameterSet$.getUndefinedParameters()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getUnidimensionalNumberOfStages"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getUnidimensionalNumberOfStages'><code>ParameterSet$.getUnidimensionalNumberOfStages()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getUserDefinedParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getUserDefinedParameters'><code>ParameterSet$.getUserDefinedParameters()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getVariedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getVariedParameter'><code>ParameterSet$.getVariedParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".getVisibleFieldNamesOrdered"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.getVisibleFieldNamesOrdered'><code>ParameterSet$.getVisibleFieldNamesOrdered()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".initParameterTypes"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.initParameterTypes'><code>ParameterSet$.initParameterTypes()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".printAsDataFrame"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.printAsDataFrame'><code>ParameterSet$.printAsDataFrame()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".setParameterType"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.setParameterType'><code>ParameterSet$.setParameterType()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showAllParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showAllParameters'><code>ParameterSet$.showAllParameters()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameter'><code>ParameterSet$.showParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameterFormatted"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameterFormatted'><code>ParameterSet$.showParameterFormatted()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameterSingle"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameterSingle'><code>ParameterSet$.showParameterSingle()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameterType"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameterType'><code>ParameterSet$.showParameterType()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParameterTypeDescription"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParameterTypeDescription'><code>ParameterSet$.showParameterTypeDescription()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showParametersOfOneGroup"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showParametersOfOneGroup'><code>ParameterSet$.showParametersOfOneGroup()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id=".showUnknownParameters"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-.showUnknownParameters'><code>ParameterSet$.showUnknownParameters()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isApplicableParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isApplicableParameter'><code>ParameterSet$isApplicableParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isDefaultParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isDefaultParameter'><code>ParameterSet$isDefaultParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isDefinedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isDefinedParameter'><code>ParameterSet$isDefinedParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isDerivedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isDerivedParameter'><code>ParameterSet$isDerivedParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isGeneratedOrDerivedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isGeneratedOrDerivedParameter'><code>ParameterSet$isGeneratedOrDerivedParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isGeneratedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isGeneratedParameter'><code>ParameterSet$isGeneratedParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isNotApplicableParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isNotApplicableParameter'><code>ParameterSet$isNotApplicableParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isNotGeneratedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isNotGeneratedParameter'><code>ParameterSet$isNotGeneratedParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isNotUserDefinedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isNotUserDefinedParameter'><code>ParameterSet$isNotUserDefinedParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isUndefinedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isUndefinedParameter'><code>ParameterSet$isUndefinedParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isUserDefinedOrDerivedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isUserDefinedOrDerivedParameter'><code>ParameterSet$isUserDefinedOrDerivedParameter()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="rpact" data-topic="ParameterSet" data-id="isUserDefinedParameter"><a href='../../rpact/html/ParameterSet.html#method-ParameterSet-isUserDefinedParameter'><code>ParameterSet$isUserDefinedParameter()</code></a></span></li>
-</ul>
-</details>}}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-OperatingCharcteristicsRates-initialize"></a>}}
-\if{latex}{\out{\hypertarget{method-OperatingCharcteristicsRates-initialize}{}}}
-\subsection{\code{OperatingCharcteristicsRates$new()}}{
-  Initializes a rates result. Use getOperatingCharacteristicsRates() to
-validate inputs and calculate probabilities.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{OperatingCharcteristicsRates$new(
-  design,
-  numberOfSubjects,
-  pi1,
-  pi2,
-  directionUpper = TRUE,
-  intervalMethod = "qtd1",
-  probabilities = NA_real_
-)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{design}}{The originating quantitative decision rule.}
-      \item{\code{numberOfSubjects}}{Matrix of control and treatment sample sizes.}
-      \item{\code{pi1}}{Vector of treatment event probabilities.}
-      \item{\code{pi2}}{Single control event probability.}
-      \item{\code{directionUpper}}{Whether larger treatment event rates are beneficial.}
-      \item{\code{intervalMethod}}{Risk-difference interval construction.}
-      \item{\code{probabilities}}{Computed probability data frame.}
-    }
-    \if{html}{\out{</div>}}
-  }
-}
-
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-OperatingCharcteristicsRates-show"></a>}}
-\if{latex}{\out{\hypertarget{method-OperatingCharcteristicsRates-show}{}}}
-\subsection{\code{OperatingCharcteristicsRates$show()}}{
-  Prints the result to the console.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{OperatingCharcteristicsRates$show(showType = 1, digits = NA_integer_)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{showType}}{Output mode passed to ParameterSet.}
-      \item{\code{digits}}{Optional display precision.}
-    }
-    \if{html}{\out{</div>}}
-  }
-}
-
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-OperatingCharcteristicsRates-.show"></a>}}
-\if{latex}{\out{\hypertarget{method-OperatingCharcteristicsRates-.show}{}}}
-\subsection{\code{OperatingCharcteristicsRates$.show()}}{
-  Internal rendering method used by standard console and Markdown output.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{OperatingCharcteristicsRates$.show(
-  showType = 1,
-  digits = NA_integer_,
-  consoleOutputEnabled = TRUE
-)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{showType}}{Output mode passed to ParameterSet.}
-      \item{\code{digits}}{Optional display precision.}
-      \item{\code{consoleOutputEnabled}}{Whether to print or collect the output.}
-    }
-    \if{html}{\out{</div>}}
-  }
-}
-
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-OperatingCharcteristicsRates-.toString"></a>}}
-\if{latex}{\out{\hypertarget{method-OperatingCharcteristicsRates-.toString}{}}}
-\subsection{\code{OperatingCharcteristicsRates$.toString()}}{
-  Returns the result description used in output headings.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{OperatingCharcteristicsRates$.toString(startWithUpperCase = FALSE)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{startWithUpperCase}}{Whether to capitalize the first character.}
-    }
-    \if{html}{\out{</div>}}
-  }
-}
-
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-OperatingCharcteristicsRates-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-OperatingCharcteristicsRates-clone}{}}}
-\subsection{\code{OperatingCharcteristicsRates$clone()}}{
-  The objects of this class are cloneable with this method.
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{OperatingCharcteristicsRates$clone(deep = FALSE)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{deep}}{Whether to make a deep clone.}
-    }
-    \if{html}{\out{</div>}}
-  }
-}
-
-}

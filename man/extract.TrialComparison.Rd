@@ -39,8 +39,10 @@ These methods provide extraction; replacing collection entries is not supported.
 Use \code{\link[=getComparison]{getComparison()}} or \verb{$add()} to build or extend the collection.
 }
 \examples{
-comparison <- getComparison(fixed = getDesignFixed(),
-    sequential = getDesignGroupSequential(kMax = 2))
+comparison <- getComparison(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
 identical(comparison$fixed, comparison[["fixed"]])
 identical(comparison[[1]], comparison$fixed)
 

@@ -39,6 +39,14 @@ to create an object of this type.
 
 \item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a single numeric value.}
 
+\item{\code{observedDropoutProportion1}}{Mean replication-specific cumulative observed dropout proportion in arm 1 at each stage, counting dropout before the event and by that stage's analysis time. Only replications contributing at that stage with a finite analysis time and positive enrolled-subject denominator contribute; NA if none contribute. Stopped trials and discontinued groups do not contribute to later stages; overlapping populations include their shared subjects. Numeric matrices with stage rows and scenario columns for two-arm trials. In multi-arm trials, arm 1 has dimensions stage, scenario, and active arm; arm 2 is a stage-by-scenario matrix for shared control. In enrichment trials, both arms have dimensions stage, scenario, and population (subpopulations followed by the full population). A single active arm or population uses a stage-by-scenario matrix. Stage and scenario dimensions are always retained. NULL for test-statistic-based simulation. Both proportions are hidden in print and summary output when both input dropout rates are zero, but remain in the object.}
+
+\item{\code{observedDropoutProportion2}}{Mean replication-specific cumulative observed dropout proportion in arm 2 at each stage, counting dropout before the event and by that stage's analysis time. Only replications contributing at that stage with a finite analysis time and positive enrolled-subject denominator contribute; NA if none contribute. Stopped trials and discontinued groups do not contribute to later stages; overlapping populations include their shared subjects. Numeric matrices with stage rows and scenario columns for two-arm trials. In multi-arm trials, arm 1 has dimensions stage, scenario, and active arm; arm 2 is a stage-by-scenario matrix for shared control. In enrichment trials, both arms have dimensions stage, scenario, and population (subpopulations followed by the full population). A single active arm or population uses a stage-by-scenario matrix. Stage and scenario dimensions are always retained. NULL for test-statistic-based simulation. Both proportions are hidden in print and summary output when both input dropout rates are zero, but remain in the object.}
+
+\item{\code{dropoutObservationTime1}}{Mean stage analysis time in arm 1 over exactly the replications contributing to the corresponding stage's observed dropout proportion, in the same units as accrual and survival times. NA if no replication contributes. Numeric matrices with stage rows and scenario columns for two-arm trials. In multi-arm trials, arm 1 has dimensions stage, scenario, and active arm; arm 2 is a stage-by-scenario matrix for shared control. In enrichment trials, both arms have dimensions stage, scenario, and population (subpopulations followed by the full population). A single active arm or population uses a stage-by-scenario matrix. Stage and scenario dimensions are always retained. NULL for test-statistic-based simulation. Retained in the object but omitted from print and summary output.}
+
+\item{\code{dropoutObservationTime2}}{Mean stage analysis time in arm 2 over exactly the replications contributing to the corresponding stage's observed dropout proportion, in the same units as accrual and survival times. NA if no replication contributes. Numeric matrices with stage rows and scenario columns for two-arm trials. In multi-arm trials, arm 1 has dimensions stage, scenario, and active arm; arm 2 is a stage-by-scenario matrix for shared control. In enrichment trials, both arms have dimensions stage, scenario, and population (subpopulations followed by the full population). A single active arm or population uses a stage-by-scenario matrix. Stage and scenario dimensions are always retained. NULL for test-statistic-based simulation. Retained in the object but omitted from print and summary output.}
+
 \item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
 \item{\code{effectMatrix}}{The matrix of effect sizes with \code{activeArms} columns and number of rows reflecting the different situations to consider.}
@@ -119,6 +127,32 @@ to create an object of this type.
 \item{\code{medianTreatment}}{The assumed median survival time in the active arm. Is a numeric vector of length number of stages times number of groups.}
 
 \item{\code{medianControl}}{The assumed median survival time in the reference group. Is a single numeric value.}
+
+\item{\code{analysisTime}}{The estimated time of analysis. Is a numeric matrix.}
+
+\item{\code{effectMeasure}}{Criterion for treatment arm/population selection, either based on test statistic (\code{"testStatistic"}) or effect estimate (\code{"effectEstimate"}). Is a single character value.}
+
+\item{\code{eventsNotAchieved}}{The simulated number of cases how often the number of events was not reached. Is a numeric matrix.}
+
+\item{\code{numberOfSubjects}}{In simulation results data set: The number of subjects under consideration when the interim analysis takes place.}
+
+\item{\code{piControl}}{The assumed probability in the control arm for simulation and under which the sample size recalculation is performed. Is a single numeric value between 0 and 1.}
+
+\item{\code{piecewiseSurvivalTime}}{The time intervals for the piecewise definition of the exponential survival time cumulative distribution function. Is a numeric vector.}
+
+\item{\code{successCriterion}}{Defines when the study is stopped for efficacy at interim. \code{"all"} stops the trial if the efficacy criterion has been fulfilled for all selected treatment arms/populations, \code{"atLeastOne"} stops if at least one of the selected treatment arms/populations is shown to be superior to control at interim. Is a single character value.}
+
+\item{\code{typeOfSelection}}{The way the treatment arms or populations are selected at interim. Is a single character value.}
+
+\item{\code{calcEventsFunction}}{An optional function that can be entered to define how event size is recalculated. By default, recalculation is performed with conditional power with specified \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage}.}
+
+\item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio. Is a numeric vector.}
+
+\item{\code{maxStudyDuration}}{The maximum study duration in survival designs. Is a numeric vector.}
+
+\item{\code{doseLevels}}{Dose levels supplied for the dose-response relationship, one per active arm. Numeric vector, or NULL when a user-defined effect matrix is used.}
+
+\item{\code{numberOfActiveArms}}{Deprecated alias of numberOfSelectedArms. Numeric matrix with stage rows and scenario columns, giving the mean number of selected active arms at each analysis.}
 }}
 
 \keyword{internal}

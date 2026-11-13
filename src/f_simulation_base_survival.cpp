@@ -1,20 +1,21 @@
-/**
- *
- * -- Simulation of survival data with group sequential and combination test --
- *
- * This file is part of the R package rpact:
- * Confirmatory Adaptive Clinical Trial Design and Analysis
- *
- * Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
- * Licensed under "GNU Lesser General Public License" version 3
- * License text can be found here: https://www.r-project.org/Licenses/LGPL-3
- *
- * RPACT company website: https://www.rpact.com
- * rpact package website: https://www.rpact.org
- *
- * Contact us for information about our services: info@rpact.com
- *
- */
+// |
+// |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+// |  This file is part of the rpact R package.
+// |
+// |  RPACT — Statistical Tools for Drug Development
+// |
+// |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+// |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+// |  SPDX-License-Identifier: LGPL-3.0-only
+// |
+// |  Licensed under the GNU Lesser General Public License, version 3.
+// |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
+// |
+// |  Package documentation: https://www.rpact.org
+// |  Resources and customer portal: https://connect.rpact.app
+// |  Consulting and services: https://www.rpact.com
+// |  Contact: info@rpact.com
+// |
 
 #include <Rcpp.h>
 
@@ -674,6 +675,9 @@ List getSimulationSurvivalCpp(
 	NumericVector iterationsSum = NumericVector(sumVectorLength, 0.0);
 	NumericVector conditionalPowerAchievedSum = NumericVector(sumVectorLength, 0.0);
 
+    NumericMatrix dropoutRecords(n * maxNumberOfIterations * 2 * kMax, 8);
+    std::fill(dropoutRecords.begin(), dropoutRecords.end(), NA_REAL);
+
 	int simResultsVectorLength = sumVectorLength * maxNumberOfIterations;
 	IntegerVector iterationNumbers = IntegerVector(simResultsVectorLength, NA_INTEGER);
 	IntegerVector stageNumbers = IntegerVector(simResultsVectorLength, NA_INTEGER);
@@ -782,6 +786,27 @@ List getSimulationSurvivalCpp(
 				calcEventsFunctionType,
 				calcEventsFunctionR,
 				calcEventsFunctionCppXPtr);
+
+            for (int a = 0; a < 2; ++a) {
+                LogicalVector member = treatmentGroup == a + 1;
+                for (int k = 0; k < kMax; ++k) {
+                    int row = ((pi1Index * maxNumberOfIterations + iterationIndex) * 2 + a) * kMax + k;
+                    dropoutRecords(row, 0) = pi1Index + 1;
+                    dropoutRecords(row, 1) = iterationIndex + 1;
+                    dropoutRecords(row, 2) = 1;
+                    dropoutRecords(row, 3) = a + 1;
+                    dropoutRecords(row, 4) = k + 1;
+                    if (stepResults(k, 9) > 0 && R_finite(stepResults(k, 15))) {
+                        double horizon = stepResults(k, 15);
+                        NumericMatrix enrolled(1, 1), dropped(1, 1);
+                        captureDropoutCounts(accrualTime, survivalTime, dropoutTime, member,
+                            horizon, enrolled, dropped, 0, 0);
+                        dropoutRecords(row, 5) = horizon;
+                        dropoutRecords(row, 6) = enrolled(0, 0);
+                        dropoutRecords(row, 7) = dropped(0, 0);
+                    }
+                }
+            }
 
 			vectorSumC(pi1Index, 0, kMax, REAL(analysisTimeSum), stepResults);
 			vectorSumC(pi1Index, 1, kMax, REAL(subjectsSum), stepResults);
@@ -987,14 +1012,16 @@ List getSimulationSurvivalCpp(
 		);
 
 		return List::create(
-			_["overview"] = overview,
+			_["dropoutRecords"] = dropoutRecords,
+            _["overview"] = overview,
 			_["data"] = data,
 			_["rawData"] = rawData
 		);
 	}
 
 	return List::create(
-		_["overview"] = overview,
+		_["dropoutRecords"] = dropoutRecords,
+            _["overview"] = overview,
 		_["data"] = data
 	);
 }

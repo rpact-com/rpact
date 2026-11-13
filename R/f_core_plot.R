@@ -1,17 +1,20 @@
 ## |
-## |  *Plot functions*
+## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  This file is part of the rpact R package.
 ## |
-## |  This file is part of the R package rpact:
-## |  Confirmatory Adaptive Clinical Trial Design and Analysis
+## |  RPACT — Statistical Tools for Drug Development
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
-## |  Licensed under "GNU Lesser General Public License" version 3
-## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
+## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
+## |  SPDX-License-Identifier: LGPL-3.0-only
 ## |
-## |  RPACT company website: https://www.rpact.com
-## |  rpact package website: https://www.rpact.org
+## |  Licensed under the GNU Lesser General Public License, version 3.
+## |  License text: https://www.gnu.org/licenses/lgpl-3.0.html
 ## |
-## |  Contact us for information about our services: info@rpact.com
+## |  Package documentation: https://www.rpact.org
+## |  Resources and customer portal: https://connect.rpact.app
+## |  Consulting and services: https://www.rpact.com
+## |  Contact: info@rpact.com
 ## |
 
 #' @include f_core_utilities.R
@@ -533,11 +536,9 @@ getAvailablePlotTypes <- function(
             if (obj$.design$kMax > 1) {
                 types <- c(types, 5, 6)
             }
-            if (obj$.design$kMax > 1) {
-                paramName <- .getEndpointDependentEffectParameterName(obj)
-                if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
-                    types <- c(types, 7)
-                }
+            paramName <- .getEndpointDependentEffectParameterName(obj)
+            if (!is.null(paramName) && length(obj[[paramName]]) > 1) {
+                types <- c(types, 7)
             }
             if (obj$.design$kMax > 1) {
                 types <- c(types, 8)
@@ -1394,7 +1395,7 @@ getAvailablePlotTypes <- function(
     if (!is.null(piecewiseSpecification)) {
         p <- p + ggplot2::scale_x_continuous(
             breaks = seq_len(piecewiseSpecification$getNumberOfSituations()),
-            labels = dimnames(piecewiseSpecification$hazardRatios)[[3]])
+            labels = dimnames(piecewiseSpecification$hazardRatio)[[3]])
     } else if (xParameterName == "informationRates") {
         p <- .setXAxisScale(p, data, addZero = TRUE, digits = 3)
     }
@@ -2079,8 +2080,8 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         if (nrow(group) < 2L) {
             next
         }
-        x <- head(group$x, -1L)
-        y <- head(group$y, -1L)
+        x <- utils::head(group$x, -1L)
+        y <- utils::head(group$y, -1L)
         dx <- diff(group$x)
         dy <- diff(group$y)
         valid <- is.finite(x) & is.finite(y) & is.finite(dx) & is.finite(dy)
