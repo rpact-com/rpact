@@ -442,7 +442,7 @@ rcmd <- function(
         }
         ends <- unique(c(getPipeEnds(roots$id[i]), end))
         ends <- ends[ends <= end]
-        starts <- c(start, head(ends, -1) + 1L)
+        starts <- c(start, utils::head(ends, -1) + 1L)
         return(Map(seq.int, starts, ends))
     }), recursive = FALSE)
     # Do not remove a line shared by multiple top-level expressions.

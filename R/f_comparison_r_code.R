@@ -51,7 +51,7 @@
         }
         return(do.call(substitute, list(expression, bindings)))
     }
-    for (expression in head(expressions, -1L)) {
+    for (expression in utils::head(expressions, -1L)) {
         bindings[[as.character(expression[[2L]])]] <- inlineExpression(expression[[3L]])
     }
     code <- deparse(inlineExpression(expressions[[length(expressions)]]), width.cutoff = 100L)

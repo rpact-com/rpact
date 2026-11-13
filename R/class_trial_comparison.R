@@ -1238,7 +1238,7 @@ as.data.frame.TrialComparison <- function(
 }
 
 .comparisonPreview <- function(values, maxValues = 4L, digits = NA_integer_, reference = NULL, truncate = TRUE) {
-    shown <- head(values, maxValues)
+    shown <- utils::head(values, maxValues)
     text <- .formatComparisonParameterValues(shown, digits)
     if (is.na(digits) && !is.null(reference) && is.numeric(values)) {
         labels <- .formatComparisonParameterValues(reference)
@@ -1651,7 +1651,7 @@ print.TrialComparison <- function(
     types <- table(vapply(object$getObjects(), function(item) {
         .comparisonObjectType(item)
     }, ""))
-    typeLabels <- .comparisonText(head(names(types), maxTypes), 55L)
+    typeLabels <- .comparisonText(utils::head(names(types), maxTypes), 55L)
     typeWidth <- max(c(0L, nchar(typeLabels)))
     if (length(types)) {
         emit("\n")
@@ -1668,7 +1668,7 @@ print.TrialComparison <- function(
         "kMax", "alpha", "beta", "nMax", "averageSampleNumber", "maxNumberOfSubjects", "maxNumberOfEvents",
         "nFixed", "overallReject", "expectedNumberOfSubjects", "expectedNumberOfEvents", "studyDuration"
     ), info$paramName[!info$isEmpty])
-    shownMetrics <- head(metrics, maxMetrics)
+    shownMetrics <- utils::head(metrics, maxMetrics)
     metricCaptions <- vapply(shownMetrics, function(parameter) {
         captions <- vapply(object$getObjects(), function(item) {
             .comparisonCaption(parameter, item)
@@ -1934,7 +1934,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     )
     for (i in seq_along(profiles)) {
         profile <- profiles[[i]]
-        values[i, match(positions[[i]], columns)] <- vapply(head(profile$value, maxValues), function(value) {
+        values[i, match(positions[[i]], columns)] <- vapply(utils::head(profile$value, maxValues), function(value) {
             return(.comparisonPreview(value, digits = digits, reference = reference, truncate = FALSE))
         }, character(1))
         if (omitted[i] > 0L) {
@@ -2029,7 +2029,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         if (length(common)) {
             emit(
                 "Shared (examples): ", text(
-                    paste(head(info$paramCaption[common], if (limits$showAll) {
+                    paste(utils::head(info$paramCaption[common], if (limits$showAll) {
                         length(common)
                     } else {
                         6L
@@ -2065,7 +2065,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             indices[position][!is.na(indices[position])]
         }), use.names = FALSE)
     }), use.names = FALSE)
-    shown <- head(interleaved, limits$maxParameters)
+    shown <- utils::head(interleaved, limits$maxParameters)
     shownNA <- FALSE
     sectionStarted <- summary$output == "all"
     for (role in roles) {
@@ -2101,7 +2101,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             displayedProfiles <- list()
             for (group in seq_len(min(row$nProfiles, limits$maxProfiles))) {
                 members <- which(groups == group)
-                ids <- head(members, limits$maxObjects)
+                ids <- utils::head(members, limits$maxObjects)
                 labels <- paste(text(summary$.objectTypes[ids], 40L), ids)
                 named <- rep(FALSE, length(ids))
                 if (!is.null(summary$.objectNames)) {
@@ -2138,9 +2138,9 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                 }
                 profile <- row$profiles[[1L]][[members[1L]]]
                 keys <- setdiff(names(profile), "value")
-                shownNA <- shownNA || anyNA(head(profile$value, limits$maxValues)) ||
+                shownNA <- shownNA || anyNA(utils::head(profile$value, limits$maxValues)) ||
                     any(vapply(keys, function(key) {
-                        anyNA(head(profile[[key]], limits$maxValues))
+                        anyNA(utils::head(profile[[key]], limits$maxValues))
                     }, logical(1)))
                 if (!consoleOutputEnabled) {
                     profileLabels <- c(profileLabels, membersText)

@@ -152,7 +152,7 @@ NULL
     if (accrualTimeVector[1] != 0) {
         accrualTimeVector <- c(0, accrualTimeVector)
     }
-    starts <- head(accrualTimeVector, -1)
+    starts <- utils::head(accrualTimeVector, -1)
     ends <- pmin(time, tail(accrualTimeVector, -1))
     widths <- pmax(0, ends - starts)
     counts <- rep(accrualIntensity, length.out = length(widths)) * widths
