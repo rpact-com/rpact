@@ -57,5 +57,5 @@ getSampleSizeMeans(alternative = 0.22, stDev = 0.5) \%vs\%
 
 }
 \seealso{
-\code{\link[=getComparison]{getComparison()}}, \code{\link[=compare]{compare()}}, \code{\link[=summary.TrialComparison]{summary.TrialComparison()}}
+\code{\link[=getComparison]{getComparison()}}, \code{\link[=compare]{compare()}}
 }

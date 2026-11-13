@@ -45,5 +45,5 @@ length(comp)
 
 }
 \seealso{
-\code{\link[=getComparison]{getComparison()}}, \code{\link[=add]{add()}}
+\code{\link[=getComparison]{getComparison()}}, \code{\link[=add]{add()}}, \code{\link[=delete]{delete()}}, \code{\link[=fetch.TrialComparison]{fetch.TrialComparison()}}, \code{\link[=getObjects]{getObjects()}}
 }

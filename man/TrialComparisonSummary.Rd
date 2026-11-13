@@ -58,6 +58,6 @@ display labels are snapshots. Recompute the summary after changing objects.
 }}
 
 \seealso{
-\code{\link[=getComparison]{getComparison()}}, \code{\link[=summary.TrialComparison]{summary.TrialComparison()}}, \code{\link[=getObjectRCode]{getObjectRCode()}}
+\code{\link[=getComparison]{getComparison()}}, \code{\link[=compare]{compare()}}
 }
 \keyword{internal}

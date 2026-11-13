@@ -136,18 +136,18 @@ NULL
 #' not harmonized. Profiles and plot groups respect time, arm, population and
 #' situation coordinates.
 #'
-#' Optimal conditional-error characteristics are supported internally, including
-#' their theta-by-stage results and atomic design settings. Their constructor and
-#' characteristic functions remain unexported. Function-valued settings are not
-#' compared as scalar parameters. Deprecated `TrialDesignSet` objects and standalone
-#' optimal conditional-error designs are not supported.
-#'
 #' Console and Markdown output are bounded. Limits and display rounding do not
 #' change the underlying data. [as.data.frame.TrialComparison()] returns the full
 #' comparison table. [plot.TrialComparison()] selects axes only when unambiguous.
 #' [getObjectRCode()] reconstructs the comparison and its contained objects;
 #' executing generated simulation code reruns the corresponding simulations.
 #'
+#' @template return_object_trial_comparison
+#' @template how_to_get_help_for_generics
+#' 
+#' @seealso
+#' [compare()], [add()], [delete()], [fetch.TrialComparison()], [getObjects()]
+#' 
 #' @examples
 #' asn <- getPowerAndAverageSampleNumber(getDesignGroupSequential(kMax = 2),
 #'     theta = c(0, 0.2), nMax = 100
@@ -220,7 +220,7 @@ getComparison <- function(..., objects = NULL) {
 #' Objects are retained by reference without recalculating them.
 #'
 #' @seealso
-#' [getComparison()], [add()]
+#' [getComparison()], [add()], [delete()], [fetch.TrialComparison()], [getObjects()]
 #'
 #' @examples
 #' comp <- getDesignInverseNormal(kMax = 2) |>
@@ -287,7 +287,7 @@ compare.ParameterSet <- function(x, y) {
 #' summaries. Plot axes must still be specified when their selection is ambiguous.
 #'
 #' @seealso
-#' [getComparison()], [compare()], [summary.TrialComparison()]
+#' [getComparison()], [compare()]
 #'
 #' @examples
 #' comparison <- getSampleSizeMeans(alternative = 0.22, stDev = 0.5) %vs%
@@ -412,7 +412,7 @@ compare.ParameterSet <- function(x, y) {
 #' use [add()] and [delete()] to modify the collection.
 #'
 #' @seealso
-#' [getComparison()], [fetch.TrialComparison()]
+#' [getComparison()], [compare()]
 #'
 #' @examples
 #' comparison <- getComparison(
@@ -1980,7 +1980,7 @@ summary.TrialComparisonSummary <- function(object, ...) {
 #' The underlying comparison is retained by reference, whereas profiles and
 #' display labels are snapshots. Recompute the summary after changing objects.
 #'
-#' @seealso [getComparison()], [summary.TrialComparison()], [getObjectRCode()]
+#' @seealso [getComparison()], [compare()]
 #'
 #' @keywords internal
 #'
