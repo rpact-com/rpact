@@ -72,7 +72,7 @@
 
 .getTrialComparisonRCode <- function(object, leadingArguments, includeDefaultParameters,
         prefix, postfix, stringWrapPrefix, newArgumentValues, tolerance,
-        pipeOperator, pipeOperatorPostfix, output, explicitPrint) {
+        pipeOperator, pipeOperatorPostfix, output, explicitPrint, showVersus = FALSE) {
     if (length(leadingArguments) || !is.list(newArgumentValues) || length(newArgumentValues)) {
         stopIllegalArgument("TrialComparison reconstruction does not support argument overrides",
             functionName = "getObjectRCode", parameter = c("leadingArguments", "newArgumentValues"),
@@ -85,23 +85,45 @@
         return(paste(.getComparisonObjectRCode(item, includeDefaultParameters, tolerance, pipeOperator), collapse = "\n"))
     }, "")
     objectNames <- names(objects)
-    # A list preserves names that would otherwise match getComparison's formals.
-    useList <- any(objectNames %in% c("objects", ""))
-    if (!is.null(objectNames) && !useList) {
-        expressions <- paste0(vapply(objectNames, function(name) {
-            return(paste(deparse(name), collapse = "\n"))
-        }, ""), " = ", expressions)
-    }
-    objectsCode <- paste0("\n    ", gsub("\n", "\n    ", paste(expressions, collapse = ",\n")), "\n")
-    if (!length(objects)) {
-        objectsCode <- ""
-    } else if (useList) {
-        objectsCode <- paste0("structure(list(", objectsCode, "), names = ",
-            paste(deparse(objectNames, width.cutoff = 500L), collapse = "\n"), ")")
+    if (showVersus) {
+        for (i in seq_along(expressions)) {
+            if (!is.null(objectNames)) {
+                # Wrap named operands so collection names survive the infix chain,
+                # including names that coincide with getComparison's formals.
+                expressions[i] <- paste0("getComparison(objects = structure(list(", expressions[i],
+                    "), names = ", paste(deparse(objectNames[i]), collapse = "\n"), "))")
+            } else if (grepl("\\|>|%>%", expressions[i])) {
+                # Pipes inside an operand must not bind to neighboring operands.
+                expressions[i] <- paste0("(", expressions[i], ")")
+            }
+        }
+        if (length(expressions) < 2L) {
+            expressions <- c("getComparison()", expressions)
+            if (length(expressions) == 1L) {
+                expressions <- c(expressions, "getComparison()")
+            }
+        }
+        comparisonCode <- paste(expressions, collapse = " %vs%\n    ")
+    } else {
+        # A list preserves names that would otherwise match getComparison's formals.
+        useList <- any(objectNames %in% c("objects", ""))
+        if (!is.null(objectNames) && !useList) {
+            expressions <- paste0(vapply(objectNames, function(name) {
+                return(paste(deparse(name), collapse = "\n"))
+            }, ""), " = ", expressions)
+        }
+        objectsCode <- paste0("\n    ", gsub("\n", "\n    ", paste(expressions, collapse = ",\n")), "\n")
+        if (!length(objects)) {
+            objectsCode <- ""
+        } else if (useList) {
+            objectsCode <- paste0("structure(list(", objectsCode, "), names = ",
+                paste(deparse(objectNames, width.cutoff = 500L), collapse = "\n"), ")")
+        }
+        comparisonCode <- paste0("getComparison(", objectsCode, ")")
     }
     # The generic word wrapper is not syntax-aware; preserve embedded newlines
     # and user-supplied names and callback code instead of reflowing them.
-    result <- .formatRCode(paste0(prefix, "getComparison(", objectsCode, ")"),
+    result <- .formatRCode(paste0(prefix, comparisonCode),
         precondition = character(), stringWrapParagraphWidth = NULL, postfix = postfix,
         stringWrapPrefix = stringWrapPrefix, pipeOperator = pipeOperator,
         pipeOperatorPostfix = pipeOperatorPostfix, output = output, explicitPrint = explicitPrint)

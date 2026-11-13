@@ -1726,7 +1726,7 @@ print.TrialComparison <- function(
 #' @description
 #' Summarizes differences between the object profiles in a trial comparison.
 #'
-#' @param object A `TrialComparison`.
+#' @param object A `TrialComparison` or an existing `TrialComparisonSummary`.
 #' @param ... Further arguments. Currently unused.
 #' @param digits Display rounding only; exact values determine differences.
 #' @param maxParameters Maximum number of differing parameters shown, across all
@@ -1859,6 +1859,31 @@ summary.TrialComparison <- function(
         maxObjects = limits$maxObjects, maxValues = limits$maxValues,
         digits = digits, output = match.arg(output), harmonizeColumnNames = harmonizeColumnNames,
         textMode = textMode, width = width, showAll = showAll))
+}
+
+#'
+#' @title
+#' Update a Trial Comparison Summary
+#'
+#' @rdname summary.TrialComparison
+#'
+#' @description
+#' The `TrialComparisonSummary` method refreshes a summary from its underlying
+#' comparison, retaining stored display settings unless explicitly overridden.
+#' This also supports `%vs%` chains followed by `summary(...)`.
+#'
+#' @export
+#'
+summary.TrialComparisonSummary <- function(object, ...) {
+    parameterNames <- object$.getInputParameters()
+    arguments <- lapply(parameterNames, function(name) {
+        return(object[[name]])
+    })
+    names(arguments) <- parameterNames
+    overrides <- list(...)
+    arguments <- arguments[!names(arguments) %in% names(overrides)]
+    return(do.call(summary.TrialComparison,
+        c(list(object = object$object), arguments, overrides)))
 }
 
 .getComparisonSummaryHarmonization <- function(object) {

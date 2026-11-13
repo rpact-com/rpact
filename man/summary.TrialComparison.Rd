@@ -2,6 +2,7 @@
 % Please edit documentation in R/class_trial_comparison.R
 \name{summary.TrialComparison}
 \alias{summary.TrialComparison}
+\alias{summary.TrialComparisonSummary}
 \title{Summarize Differences Between Trial Planning Objects}
 \usage{
 \method{summary}{TrialComparison}(
@@ -18,9 +19,11 @@
   width = NA_integer_,
   showAll = NA
 )
+
+\method{summary}{TrialComparisonSummary}(object, ...)
 }
 \arguments{
-\item{object}{A \code{TrialComparison}.}
+\item{object}{A \code{TrialComparison} or an existing \code{TrialComparisonSummary}.}
 
 \item{...}{Further arguments. Currently unused.}
 
@@ -62,6 +65,10 @@ Input roles take precedence when roles differ across the compared object types.
 }
 \description{
 Summarizes differences between the object profiles in a trial comparison.
+
+The \code{TrialComparisonSummary} method refreshes a summary from its underlying
+comparison, retaining stored display settings unless explicitly overridden.
+This also supports \verb{\%vs\%} chains followed by \code{summary(...)}.
 }
 \details{
 Constant numeric vector cells compare equal to their scalar value regardless

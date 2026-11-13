@@ -284,7 +284,12 @@ rcmd <- function(
         tolerance = 1e-07,
         pipeOperator = c("auto", "none", "magrittr", "R"),
         output = c("vector", "cat", "test", "markdown", "internal"),
-        explicitPrint = FALSE) {
+        explicitPrint = FALSE,
+        showVersus = FALSE) {
+    if (missing(showVersus)) {
+        showVersus <- .getEnvironmentVariable("RPACT_R_CODE_SHOW_VERSUS",
+            "rpact.r.code.show.versus", default = FALSE, type = "logical")
+    }
     getObjectRCode(
         obj = obj,
         leadingArguments = leadingArguments,
@@ -297,7 +302,8 @@ rcmd <- function(
         tolerance = tolerance,
         pipeOperator = pipeOperator,
         output = output,
-        explicitPrint = explicitPrint
+        explicitPrint = explicitPrint,
+        showVersus = showVersus
     )
 }
 
@@ -480,6 +486,13 @@ rcmd <- function(
 #' @param pipeOperator The pipe operator to use in the R code, default is "none".
 #' @param output The output format, default is a character "vector".
 #' @param explicitPrint Show an explicit \code{print} command, default is \code{FALSE}.
+#' @param showVersus If `TRUE`, reconstruct a `TrialComparisonSummary` as a
+#'   chain using `%vs%`. Default is `FALSE`. A `summary()` call is appended only
+#'   for non-default display settings or when `includeDefaultParameters = TRUE`.
+#'   If omitted, use option `rpact.r.code.show.versus` or environment variable
+#'   `RPACT_R_CODE_SHOW_VERSUS` (the environment variable takes precedence).
+#'   Explicit arguments override both settings. Other object classes are unaffected.
+#'   `includeDefaultParameters` also controls the contained objects.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -504,12 +517,18 @@ getObjectRCode <- function(
         tolerance = 1e-07,
         pipeOperator = c("auto", "none", "magrittr", "R"),
         output = c("vector", "cat", "test", "markdown", "internal"),
-        explicitPrint = FALSE) {
+        explicitPrint = FALSE,
+        showVersus = FALSE) {
     functionName <- deparse(substitute(obj))
     functionName <- sub("\\(.*\\)$", "", functionName)
 
     output <- match.arg(output)
 
+    if (missing(showVersus)) {
+        showVersus <- .getEnvironmentVariable("RPACT_R_CODE_SHOW_VERSUS",
+            "rpact.r.code.show.versus", default = FALSE, type = "logical")
+    }
+    .assertIsSingleLogical(showVersus, "showVersus")
     .assertIsSingleLogical(includeDefaultParameters, "includeDefaultParameters")
     .assertIsSingleLogical(explicitPrint, "explicitPrint")
     if (!is.null(stringWrapParagraphWidth)) {
@@ -626,15 +645,25 @@ getObjectRCode <- function(
         arguments <- paste(vapply(names(summaryArguments), function(name) {
             return(paste0(name, " = ", paste(deparse(summaryArguments[[name]]), collapse = "")))
         }, ""), collapse = ", ")
-        if (pipeOperator == "none") {
-            prefix <- paste0(prefix, "summary(")
-            if (nzchar(arguments)) {
-                postfix <- c(paste0(", ", arguments, ")"), postfix)
+        if (!showVersus || length(summaryArguments)) {
+            if (pipeOperator == "none") {
+                prefix <- paste0(prefix, "summary(")
+                if (nzchar(arguments)) {
+                    postfix <- c(paste0(", ", arguments, ")"), postfix)
+                } else {
+                    postfix <- c(")", postfix)
+                }
             } else {
-                postfix <- c(")", postfix)
+                postfix <- c(pipeOperatorPostfix, paste0("summary(", arguments, ")"), postfix)
             }
-        } else {
-            postfix <- c(pipeOperatorPostfix, paste0("summary(", arguments, ")"), postfix)
+        }
+        if (showVersus) {
+            return(.getTrialComparisonRCode(obj$object,
+                leadingArguments = leadingArguments, includeDefaultParameters = includeDefaultParameters,
+                prefix = prefix, postfix = postfix, stringWrapPrefix = stringWrapPrefix,
+                newArgumentValues = newArgumentValues, tolerance = tolerance, pipeOperator = pipeOperator,
+                pipeOperatorPostfix = pipeOperatorPostfix, output = output,
+                explicitPrint = explicitPrint, showVersus = TRUE))
         }
         return(getObjectRCode(obj$object, includeDefaultParameters = includeDefaultParameters,
             leadingArguments = leadingArguments, newArgumentValues = newArgumentValues,
