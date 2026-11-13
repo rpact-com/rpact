@@ -614,15 +614,15 @@ getObjectRCode <- function(
     }
 
     if (inherits(obj, "TrialComparisonSummary")) {
-        summaryArguments <- c(list(digits = obj$.digits), obj$.limits,
-            list(output = obj$output, harmonizeColumnNames = .getComparisonSummaryHarmonization(obj)))
-        if (!includeDefaultParameters) {
-            defaults <- formals(summary.TrialComparison)
-            defaults$output <- "all"
-            summaryArguments <- summaryArguments[!vapply(names(summaryArguments), function(name) {
-                return(isTRUE(all.equal(summaryArguments[[name]], defaults[[name]])))
-            }, TRUE)]
+        if (includeDefaultParameters) {
+            objNames <- obj$.getInputParameters()
+        } else {
+            objNames <- obj$.getUserDefinedParameters()
         }
+        summaryArguments <- lapply(objNames, function(name) {
+            return(obj[[name]])
+        })
+        names(summaryArguments) <- objNames
         arguments <- paste(vapply(names(summaryArguments), function(name) {
             return(paste0(name, " = ", paste(deparse(summaryArguments[[name]]), collapse = "")))
         }, ""), collapse = ", ")

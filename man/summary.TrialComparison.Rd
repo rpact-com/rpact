@@ -8,15 +8,15 @@
   object,
   ...,
   digits = NA_integer_,
-  maxParameters = NULL,
-  maxProfiles = NULL,
-  maxObjects = NULL,
-  maxValues = NULL,
+  maxParameters = NA_integer_,
+  maxProfiles = NA_integer_,
+  maxObjects = NA_integer_,
+  maxValues = NA_integer_,
   output = c("all", "title", "overview", "body"),
   harmonizeColumnNames = TRUE,
-  textMode = NULL,
-  width = NULL,
-  showAll = NULL
+  textMode = c("wrap", "truncate", "full"),
+  width = NA_integer_,
+  showAll = NA
 )
 }
 \arguments{

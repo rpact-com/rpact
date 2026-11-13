@@ -1801,32 +1801,35 @@ summary.TrialComparison <- function(
         object,
         ...,
         digits = NA_integer_,
-        maxParameters = NULL,
-        maxProfiles = NULL,
-        maxObjects = NULL,
-        maxValues = NULL,
+        maxParameters = NA_integer_,
+        maxProfiles = NA_integer_,
+        maxObjects = NA_integer_,
+        maxValues = NA_integer_,
         output = c("all", "title", "overview", "body"),
         harmonizeColumnNames = TRUE,
-        textMode = NULL,
-        width = NULL,
-        showAll = NULL) {
+        textMode = c("wrap", "truncate", "full"),
+        width = NA_integer_,
+        showAll = NA) {
     .warnInCaseOfUnknownArguments(functionName = "summary.TrialComparison", ...)
     .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
     setting <- function(value, parameter, default, type) {
-        if (!is.null(value)) {
+        if (!is.null(value) && !(length(value) == 1L && is.na(value))) {
             return(value)
         }
         suffix <- gsub("([a-z])([A-Z])", "\\1_\\2", parameter)
         return(.getEnvironmentVariable(paste0("RPACT_COMPARISON_SUMMARY_", toupper(suffix)),
             paste0("rpact.comparison.summary.", parameter), default = default, type = type))
     }
-    textMode <- setting(textMode, "textMode", "wrap", "character")
-    .assertIsSingleCharacter(textMode, "textMode")
-    if (!textMode %in% c("wrap", "truncate", "full")) {
-        stopIllegalArgument("'textMode' must be wrap, truncate or full",
-            functionName = "summary.TrialComparison", parameter = "textMode", value = textMode,
-            constraint = "one of wrap, truncate, full", diagnosticId = "comparison.summary_text_mode_invalid")
+    textModeChoices <- c("wrap", "truncate", "full")
+    if (missing(textMode)) {
+        textMode <- setting(NA_character_, "textMode", "wrap", "character")
     }
+    textMode <- tryCatch(match.arg(textMode, textModeChoices), error = function(e) {
+        stopIllegalArgument("'textMode' must be wrap, truncate or full: ", conditionMessage(e),
+            functionName = "summary.TrialComparison", parameter = "textMode", value = textMode,
+            constraint = "one of wrap, truncate, full", diagnosticId = "comparison.summary_text_mode_invalid",
+            context = list(allowedValues = textModeChoices))
+    })
     width <- setting(width, "width", getOption("width", 80L), "numeric")
     .assertComparisonLimit(width, "width", "summary.TrialComparison")
     if (width < 20L) {
@@ -1846,51 +1849,107 @@ summary.TrialComparison <- function(
         limits[[parameter]] <- setting(limits[[parameter]], parameter, defaults[[parameter]], "numeric")
         .assertComparisonLimit(limits[[parameter]], parameter, "summary.TrialComparison")
     }
-    if (showAll) {
-        limits[] <- .Machine$integer.max
-        if (textMode == "truncate") {
-            textMode <- "full"
-        }
-    }
-    limits$textMode <- textMode
-    limits$width <- width
-    limits$showAll <- showAll
     data <- .getTrialComparisonData(object$getObjects(), 
         harmonizeColumnNames = harmonizeColumnNames)
     info <- .getTrialComparisonInfo(object, data)
     attr(info, "harmonizeColumnNames") <- harmonizeColumnNames
     getComparisonParameterDescriptions(info[FALSE, ], digits = digits)
-    return(TrialComparisonSummary$new(object, info, limits, digits, match.arg(output)))
+    return(TrialComparisonSummary$new(object, info,
+        maxParameters = limits$maxParameters, maxProfiles = limits$maxProfiles,
+        maxObjects = limits$maxObjects, maxValues = limits$maxValues,
+        digits = digits, output = match.arg(output), harmonizeColumnNames = harmonizeColumnNames,
+        textMode = textMode, width = width, showAll = showAll))
 }
 
 .getComparisonSummaryHarmonization <- function(object) {
-    return(!isFALSE(attr(object$parameterInfo, "harmonizeColumnNames", exact = TRUE)))
+    return(object$harmonizeColumnNames)
 }
 
+#'
+#' @name TrialComparisonSummary
+#'
+#' @title
+#' Summary of a Trial Comparison
+#'
+#' @description
+#' A snapshot of comparison profiles and display settings, created by
+#' [summary.TrialComparison()] or [compare()].
+#'
+#' @template field_parameterInfo_comparisonSummary
+#' @template field_digits_comparisonSummary
+#' @template field_maxParameters_comparisonSummary
+#' @template field_maxProfiles_comparisonSummary
+#' @template field_maxObjects_comparisonSummary
+#' @template field_maxValues_comparisonSummary
+#' @template field_harmonizeColumnNames_comparisonSummary
+#' @template field_textMode_comparisonSummary
+#' @template field_width_comparisonSummary
+#' @template field_showAll_comparisonSummary
+#' @template field_object_comparisonSummary
+#' @template field_title_comparisonSummary
+#' @template field_header_comparisonSummary
+#' @template field_summaryItems_comparisonSummary
+#' @template field_intervalFormat_comparisonSummary
+#' @template field_justify_comparisonSummary
+#' @template field_output_comparisonSummary
+#' @template field_markdown_comparisonSummary
+#'
+#' @details
+#' Inherits from `SummaryFactory` and `ParameterSet`. Each resolved summary
+#' input is classified centrally as a default or user-defined parameter.
+#' [getObjectRCode()] includes only user-defined inputs unless
+#' `includeDefaultParameters = TRUE`. Settings resolved from R options or
+#' environment variables are retained when they differ from package defaults.
+#' `showAll` affects rendering without replacing the stored limits or text mode.
+#' The underlying comparison is retained by reference, whereas profiles and
+#' display labels are snapshots. Recompute the summary after changing objects.
+#'
+#' @seealso [getComparison()], [summary.TrialComparison()], [getObjectRCode()]
+#'
+#' @keywords internal
+#'
 TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     inherit = SummaryFactory,
+    private = list(
+        objectNames = NULL,
+        objectTypes = NULL,
+        overview = NULL
+    ),
     public = list(
         parameterInfo = NULL,
-        .limits = NULL,
-        .digits = NULL,
-        .objectNames = NULL,
-        .objectTypes = NULL,
-        .overview = NULL,
-        .numberOfObjects = NULL,
-        initialize = function(object, info, limits, digits, output) {
+        digits = NA_integer_,
+        maxParameters = NA_integer_,
+        maxProfiles = NA_integer_,
+        maxObjects = NA_integer_,
+        maxValues = NA_integer_,
+        harmonizeColumnNames = TRUE,
+        textMode = NA_character_,
+        width = NA_integer_,
+        showAll = NA,
+        initialize = function(object, info, maxParameters, maxProfiles, maxObjects, maxValues,
+                digits, output, harmonizeColumnNames, textMode, width, showAll) {
             super$initialize(object = object, output = output)
             self$title <- .getTrialComparisonTitle(object$getObjects(), summaryEnabled = TRUE)
             self$parameterInfo <- info
-            self$.limits <- limits
-            self$.digits <- digits
-            self$.objectNames <- names(object)
-            self$.objectTypes <- vapply(object$getObjects(), .comparisonObjectType, character(1))
-            self$.overview <- .comparisonOverview(object$getObjects())
-            self$.numberOfObjects <- length(object)
+            .setValueAndParameterType(self, "digits", digits, NA_integer_)
+            .setValueAndParameterType(self, "maxParameters", maxParameters, 12L)
+            .setValueAndParameterType(self, "maxProfiles", maxProfiles, 3L)
+            .setValueAndParameterType(self, "maxObjects", maxObjects, 6L)
+            .setValueAndParameterType(self, "maxValues", maxValues, 4L)
+            .setValueAndParameterType(self, "output", output, "all")
+            .setValueAndParameterType(self, "harmonizeColumnNames", harmonizeColumnNames, TRUE)
+            .setValueAndParameterType(self, "textMode", textMode, "wrap")
+            .setValueAndParameterType(self, "width", width, 80L)
+            .setValueAndParameterType(self, "showAll", showAll, FALSE)
+            self$.setParameterType("parameterInfo", C_PARAM_GENERATED)
+            self$.setParameterType("title", C_PARAM_GENERATED)
+            private$objectNames <- names(object)
+            private$objectTypes <- vapply(object$getObjects(), .comparisonObjectType, character(1))
+            private$overview <- .comparisonOverview(object$getObjects())
         },
         .show = function(..., consoleOutputEnabled = TRUE) {
-            .showTrialComparisonSummary(self, consoleOutputEnabled)
-            invisible(self)
+            .showTrialComparisonSummary(self, private, consoleOutputEnabled)
+            return(invisible(self))
         }
     )
 )
@@ -1957,9 +2016,18 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     return(values)
 }
 
-.showTrialComparisonSummary <- function(summary, consoleOutputEnabled) {
+.showTrialComparisonSummary <- function(summary, private, consoleOutputEnabled) {
     summary$.resetCat()
-    limits <- summary$.limits
+    limits <- list(maxParameters = summary$maxParameters, maxProfiles = summary$maxProfiles,
+        maxObjects = summary$maxObjects, maxValues = summary$maxValues,
+        textMode = summary$textMode, width = summary$width, showAll = summary$showAll)
+    if (limits$showAll) {
+        limits[c("maxParameters", "maxProfiles", "maxObjects", "maxValues")] <- .Machine$integer.max
+        if (limits$textMode == "truncate") {
+            limits$textMode <- "full"
+        }
+    }
+    
     shortened <- FALSE
     text <- function(value, width) {
         if (!consoleOutputEnabled || limits$textMode != "truncate") {
@@ -1996,7 +2064,6 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         "  "
     }
     info <- summary$parameterInfo
-    limits <- summary$.limits
     different <- which(info$nProfiles > 1L)
     common <- which(info$nProfiles == 1L & !info$isEmpty)
     empty <- which(info$nProfiles == 1L & info$isEmpty)
@@ -2004,7 +2071,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         summary$.cat(summary$title, "\n\n", heading = 1, consoleOutputEnabled = consoleOutputEnabled)
     }
     if (summary$output %in% c("all", "overview")) {
-        emit(summary$.overview, "\n")
+        emit(private$overview, "\n")
         overview <- .concatenateSummaryText(
             paste("The comparison identifies", length(different), if (length(different) == 1L) {
                 "differing parameter"
@@ -2085,7 +2152,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             labelInfo$isBinary <- labelInfo$isSingleValue <- FALSE
             labelInfo$values <- list(character())
             labelInfo$paramName <- row$paramCaption
-            description <- getComparisonParameterDescriptions(labelInfo, digits = summary$.digits)
+            description <- getComparisonParameterDescriptions(labelInfo, digits = summary$digits)
             if (!consoleOutputEnabled) {
                 description <- sub(": ", " - ", description, fixed = TRUE)
             }
@@ -2102,10 +2169,10 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             for (group in seq_len(min(row$nProfiles, limits$maxProfiles))) {
                 members <- which(groups == group)
                 ids <- utils::head(members, limits$maxObjects)
-                labels <- paste(text(summary$.objectTypes[ids], 40L), ids)
+                labels <- paste(text(private$objectTypes[ids], 40L), ids)
                 named <- rep(FALSE, length(ids))
-                if (!is.null(summary$.objectNames)) {
-                    objectNames <- summary$.objectNames[ids]
+                if (!is.null(private$objectNames)) {
+                    objectNames <- private$objectNames[ids]
                     named <- !is.na(objectNames) & nzchar(objectNames)
                     labels[named] <- text(objectNames[named], 18L)
                 }
@@ -2117,9 +2184,9 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                 }
                 membersText <- paste(labels, collapse = ", ")
                 if (!variedCaptions && !any(named) && length(members) > 1L) {
-                    if (length(unique(summary$.objectTypes[ids])) == 1L) {
+                    if (length(unique(private$objectTypes[ids])) == 1L) {
                         membersText <- paste(
-                            text(summary$.objectTypes[ids[1L]], 40L),
+                            text(private$objectTypes[ids[1L]], 40L),
                             paste(ids, collapse = ", ")
                         )
                     }
@@ -2147,7 +2214,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                     displayedProfiles[[length(displayedProfiles) + 1L]] <- profile
                     next
                 }
-                values <- preview(profile$value, limits$maxValues, summary$.digits, row$values[[1L]])
+                values <- preview(profile$value, limits$maxValues, summary$digits, row$values[[1L]])
                 if (length(keys)) {
                     positions <- vapply(keys, function(key) {
                         paste0(.comparisonCaption(key), " = ", preview(profile[[key]], limits$maxValues))
@@ -2161,10 +2228,10 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             }
             if (!consoleOutputEnabled) {
                 values <- .comparisonProfileMatrix(displayedProfiles, profileLabels,
-                    limits$maxValues, summary$.digits, row$values[[1L]],
+                    limits$maxValues, summary$digits, row$values[[1L]],
                     wrapColumnLabels = TRUE
                 )
-                .showMatrix(summary, values, summary$.digits,
+                .showMatrix(summary, values, summary$digits,
                     consoleOutputEnabled = FALSE,
                     rowLabel = "Parameter", escapeMarkdown = TRUE
                 )
@@ -2192,7 +2259,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         if (shownNA) {
             emit(legendIndent, "NA: missing/unavailable.\n")
         }
-        if (!is.na(summary$.digits)) {
+        if (!is.na(summary$digits)) {
             emit(legendIndent, "Display values are rounded.\n")
         }
         emit("\n")
