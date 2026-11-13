@@ -509,29 +509,28 @@ matter for discrete event counts.
 
 ## Means with a prior on the treatment effect
 
-We compare true mean differences from 0 to 6, with a known common SD of 6.
+We compare true mean differences from 0 to 6, with a known common standard deviation of 6.
 The prior `mixnorm(c(1, 0, 6))` has one normal component with weight 1, mean 0,
-and SD 6 on the treatment-minus-control effect. This prior SD describes
-uncertainty about the effect; `stDev` describes individual observations.
+and standard deviation 6 on the treatment-minus-control effect. Note that this prior standard deviation describes uncertainty about the effect; in contrast, `stDev` describes the variation of individual observations.
 
 ```{r}
 #| label: bayes-means-mappings
+commonArgs <- list(
+    targetValue = 4,
+    lowerReferenceValue = 0,
+    lowerPercentile = 0.2,
+    upperPercentile = 0.9,
+    bayesian = TRUE
+) 
+
 bayesMeanRules <- list(
-    quantile = getDesignQuantitative(
-        targetValue = 4,
-        lowerReferenceValue = 0,
-        lowerPercentile = 0.2,
-        upperPercentile = 0.9,
-        bayesian = TRUE,
-        percentileMapping = "quantile"
+    quantile = do.call(
+        getDesignQuantitative, 
+        c(commonArgs, list(percentileMapping = "quantile"))
     ),
-    posteriorProbability = getDesignQuantitative(
-        targetValue = 4,
-        lowerReferenceValue = 0,
-        lowerPercentile = 0.2,
-        upperPercentile = 0.9,
-        bayesian = TRUE,
-        percentileMapping = "posteriorProbability"
+    posteriorProbability = do.call(
+        getDesignQuantitative, 
+        c(commonArgs, list(percentileMapping = "posteriorProbability"))
     )
 )
 bayesMeanSizes <- matrix(c(25, 25, 50, 50), ncol = 2, byrow = TRUE)
@@ -549,21 +548,23 @@ summary(bayesMeanRules$quantile)
 summary(bayesMeanRules$posteriorProbability)
 ```
 
-Omit `normalApproximation` for Bayesian rules. The means model uses known
-standard deviations. With an effect prior, the sampling variance of the
-estimated difference is $\sigma_C^2/n_C + \sigma_T^2/n_T$.
+Note that here we don't have a `normalApproximation` argument: The means model uses known
+standard deviations, therefore we don't need to rely on a normal approximation for the sampling distribution of the mean difference estimator as we did in the frequentist case.
 
 The next table compares Go probabilities at three true effects, keeping the
 prior and sample sizes fixed.
 
 ```{r}
 #| label: bayes-means-comparison
-bayesMeanComparison <- do.call(rbind, lapply(names(bayesMeanOC), function(mapping) {
-    data <- subset(as.data.frame(bayesMeanOC[[mapping]]),
-        category == "Go" & alternative %in% c(0, 4, 6))
-    data$mapping <- mapping
-    return(data[c("mapping", "nControl", "nTreatment", "alternative", "probability")])
-}))
+bayesMeanComparison <- bayesMeanOC |>
+    purrr::imap(function(oc, mapping) {
+        oc |>
+            as.data.frame() |>
+            dplyr::filter(category == "Go", alternative %in% c(0, 4, 6)) |>
+            dplyr::mutate(mapping = mapping) |>
+            dplyr::select(mapping, nControl, nTreatment, alternative, probability)
+    }) |>
+    dplyr::bind_rows()
 knitr::kable(bayesMeanComparison, digits = 4, row.names = FALSE)
 ```
 
@@ -579,11 +580,11 @@ plot(bayesMeanOC$posteriorProbability, plotCat = 4,
 
 ## Means with separate group priors
 
+Above we considered a prior directly on the mean difference.
 Alternatively, `priorDist` can be a two-element list ordered **control,
 treatment**. The true control mean must then be supplied through `controlMean`;
 the true treatment mean is `controlMean + alternative`. A two-element `stDev`
-vector follows the same arm order. Priors on the group means define a different
-model from a prior directly on their difference.
+vector follows the same arm order:
 
 ```{r}
 #| label: bayes-means-group-priors
@@ -602,12 +603,11 @@ summary(bayesGroupOC, digits = 4)
 ```
 
 These single-component normal priors permit analytic conjugate calculations.
-Normal mixture priors with several components are also supported; those OCs
-use numerical RBesT boundary searches and integration.
+Normal mixture priors with several components are also supported; those operating characteristics use numerical `RBesT` boundary searches and integration.
 
 ## Rates with beta priors
 
-For rates, `priorDist1` is the treatment prior and `priorDist2` the control
+For a binary endpoint with rates, `priorDist1` is the treatment prior and `priorDist2` the control
 prior, consistent with `pi1` and `pi2`. This differs from the column order of
 `numberOfSubjects`, which remains **control, treatment**.
 
@@ -615,7 +615,7 @@ We use a harmful event with control probability 0.3, so the beneficial effect
 is $\theta = p_C - p_T$ and `directionUpper = FALSE`. Both reference values
 and custom criteria below use this beneficial-effect scale. A target value of
 0.15 means a reduction of 15 percentage points. The priors are Beta(2, 8) for
-treatment and Beta(3, 7) for control, with prior means 0.2 and 0.3, respectively.
+treatment and Beta(3, 7) for control, with prior means 0.2 and 0.3, respectively:
 
 ```{r}
 #| label: bayes-rates-mappings
@@ -646,20 +646,22 @@ bayesRateOC <- lapply(bayesRateRules, function(design) {
 })
 ```
 
-Omit `intervalMethod`: Bayesian rules evaluate posterior criteria rather than
-frequentist confidence intervals. The calculation evaluates the posterior
+The calculation evaluates the posterior
 decisions for all possible pairs of binomial event counts and sums their
 sampling probabilities. The deliberately small sample sizes keep the examples
-quick to execute; larger count grids can be expensive.
+fast to execute, because larger count grids can be expensive.
 
 ```{r}
 #| label: bayes-rates-comparison
-bayesRateComparison <- do.call(rbind, lapply(names(bayesRateOC), function(mapping) {
-    data <- subset(as.data.frame(bayesRateOC[[mapping]]),
-        category == "Go" & nControl == 12)
-    data$mapping <- mapping
-    return(data[c("mapping", "nControl", "nTreatment", "pi1", "pi2", "alternative", "probability")])
-}))
+bayesRateComparison <- bayesRateOC |>
+    purrr::imap(function(oc, mapping) {
+        oc |>
+            as.data.frame() |>
+            dplyr::filter(category == "Go", nControl == 12) |>
+            dplyr::mutate(mapping = mapping) |>
+            dplyr::select(mapping, nControl, nTreatment, pi1, pi2, alternative, probability)
+    }) |>
+    dplyr::bind_rows()
 knitr::kable(bayesRateComparison, digits = 4, row.names = FALSE)
 ```
 
@@ -674,10 +676,11 @@ plot(bayesRateOC$posteriorProbability, plotCat = 3,
 
 ## Custom posterior decision criteria
 
+It is also possible to specify more complex, custom posterior decision criteria.
 `getQuantitativeDecisionThresholds()` combines one or more posterior criteria
-with logical **AND**. `lowerTail = FALSE` specifies
-$P(\theta > q \mid y) > p$; `TRUE` specifies
-$P(\theta \leq q \mid y) > p$. A scalar direction is repeated for all criteria.
+with logical **`and`** operator. `lowerTail = FALSE` specifies
+$P(\theta > q \mid y) > p$; and `lowerTail = TRUE` specifies
+$P(\theta \leq q \mid y) > p$. If you only specify a scalar `lowerTail`, it is repeated for all criteria.
 
 The following means rule requires both a promising effect and evidence of
 clinical relevance for Go. Its Stop threshold is specified separately.
@@ -710,10 +713,7 @@ summary(customMeanRule)
 plot(customMeanOC, plotCat = 4, main = "Bayesian means: custom posterior criteria")
 ```
 
-Explicit criteria imply a Bayesian rule, so `bayesian = TRUE` is optional in
-this call. Supply all three criteria objects without reference-value or
-percentile arguments. The constructor requires a proof of pairwise exclusion
-using monotonicity of the posterior CDF. Rules that cannot be certified are
+Explicit criteria imply a Bayesian rule, so `bayesian = TRUE` does not need to be explicitly specified in this call. We can supply all three criteria objects without reference-value or percentile arguments. The constructor requires a proof of pairwise exclusion using monotonicity of the posterior CDF. Rules that cannot be certified are
 rejected, even if a particular prior might make them disjoint. The labels for
 custom intermediate criteria reflect the supplied definitions; they need not
 have the same interpretation as Indeterminate 1 in a reference-value rule.
@@ -753,20 +753,24 @@ plot(customRateOC, plotCat = 4, main = "Bayesian rates: custom posterior criteri
 
 For each custom rule, Indeterminate 2 is the complement of the three explicit
 categories, including exact probability-threshold ties. The stored probabilities
-therefore sum to one for each sample-size and effect scenario. We can inspect
-the range of these totals without rounding the category probabilities:
+therefore sum to one for each sample-size and effect scenario. We can confirm this by checking the totals:
 
 ```{r}
 #| label: bayes-probability-totals
-vapply(list(means = customMeanOC, rates = customRateOC), function(result) {
-    totals <- aggregate(probability ~ nControl + nTreatment + alternative,
-        data = as.data.frame(result), FUN = sum)
-    return(range(totals$probability))
-}, numeric(2))
+purrr::imap(list(means = customMeanOC, rates = customRateOC), function(result, endpoint) {
+    result |>
+        as.data.frame() |>
+        dplyr::group_by(nControl, nTreatment, alternative) |>
+        dplyr::summarise(total = sum(probability), .groups = "drop") |>
+        dplyr::summarise(minimum = min(total), maximum = max(total)) |>
+        dplyr::mutate(endpoint = endpoint, .before = 1)
+}) |>
+    dplyr::bind_rows()
 ```
 
 ## A significance-and-target shortcut
 
+Many times we have a more specified subset of decision criteria that we want to apply, such as requiring both statistical significance and a clinically relevant target effect.
 For the standard dual rule, `useSignificanceAndTarget = TRUE` constructs Go
 criteria with posterior probabilities `1 - alpha` at LRV and 0.5 at TV.
 This Bayesian shortcut uses `alpha` as a posterior tail probability. The
@@ -785,12 +789,11 @@ bayesDualRule <- getDesignQuantitative(
 summary(bayesDualRule)
 ```
 
-The following sections return to the frequentist `meansOC` and `ratesOC`
-objects. Their print, summary, and OC plot interfaces are also available for
-the Bayesian results above, with four detailed categories instead of six.
-
-
 # Printing, Summarizing, and Accessing Results
+
+
+The following sections return to the frequentist `meansOC` and `ratesOC`
+objects. Their print, summary, and operating characteristics plot interfaces are also available for the Bayesian results above, with four detailed categories instead of six.
 
 `print()` distinguishes user-defined, derived, and default parameters and
 displays the long-format probability table. The compact five-scenario object
@@ -816,7 +819,8 @@ meansScenarios <- getOperatingCharacteristicsMeans(
 summary(meansScenarios, digits = 4)
 ```
 
-`output` selects `"all"` (default), `"title"`, `"overview"`, or `"body"`. The OC
+We can further control the result, using the `output` and `digits` arguments of the `summary()` function.
+`output` selects `"all"` (default), `"title"`, `"overview"`, or `"body"`. The operating characteristics
 overview contains the rule and assumptions; its body contains the tables. For a
 decision rule, the body contains its four parameters. `digits` controls display
 precision, following the summary settings `rpact.summary.digits` and
@@ -927,6 +931,8 @@ plot(
 The Kestrel event-count map above illustrates type 3. Four interval methods are
 supported by both this plot and the Rates constructor:
 
+TODO: here qtd1 should be replaced by "wilson" to reflect the Wilson score method.
+
 | `intervalMethod` | Construction |
 |:--|:--|
 | `"qtd1"` | Original QTD1 approximation using Wilson score limits rounded to four decimal places in its variance construction |
@@ -934,7 +940,7 @@ supported by both this plot and the Rates constructor:
 | `"miettinenNurminen"` | Score inversion with variance correction $N/(N-1)$, where $N=n_C+n_T$ |
 | `"newcombe"` | Square-and-add combination of unrounded Wilson limits without continuity correction |
 
-QTD1 requires `lowerPercentile <= 0.5 <= upperPercentile`. The other methods
+The Wilson score method requires `lowerPercentile <= 0.5 <= upperPercentile`. The other methods
 allow ordered percentiles anywhere in $(0,1)$, including both on the same side
 of 0.5. They use the lower-tail construction below 0.5, the upper-tail
 construction above 0.5, and the observed difference at 0.5. See the
@@ -960,6 +966,8 @@ combinedMap$data$intervalMethod <- factor(combinedMap$data$intervalMethod, level
 combinedMap + facet_wrap(~intervalMethod, ncol = 2) +
     labs(subtitle = "LRV = -0.05; TV = 0; percentiles = 0.2 / 0.9; C/T = 25/25; lower treatment rates are beneficial")
 ```
+
+TODO: what happens with more than 1 Mio cells? error/warning?
 
 Maps contain at most one million cells, including zero-event rows and columns.
 Interval methods can classify boundary count pairs differently and change the OC
@@ -1306,16 +1314,3 @@ writeLines(as.character(print(summary(ratesScenarios), markdown = TRUE)), "kestr
   Approaches to Clinical Trials and Health-Care Evaluation*. Wiley, Section 6.3.
   Background reading on Bayesian decision making. The Bayesian examples above
   use posterior probability criteria implemented with RBesT.
-
-[^aeb071]: AEB071 is the publicly documented code for sotrastaurin. The
-[NCT01064791 study record](https://clinicaltrials.gov/study/NCT01064791) and [EU
-trial results record
-2009-015456-14](https://www.clinicaltrialsregister.eu/ctr-search/trial/2009-015456-14/results)
-identify the renal-transplant study, including protocol CAEB071A2214. Kestrel
-names this teaching example, not a new compound. The numerical QTD assumptions
-are illustrative planning assumptions, not reported trial results.
-
-[^afq056]: AFQ056 is the publicly documented code for mavoglurant, an mGluR5
-antagonist; see [the 2014 pharmacological characterization indexed in
-PubMed](https://pubmed.ncbi.nlm.nih.gov/25316499/). The numbers 2.9, 4, 0.5, and
-0.8 are illustrative decision-rule settings, not published efficacy results.
