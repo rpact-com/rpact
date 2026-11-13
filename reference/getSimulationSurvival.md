@@ -4,16 +4,16 @@ Returns the analysis times, power, stopping probabilities, conditional
 power, and expected sample size for testing the hazard ratio in a two
 treatment groups survival design.
 
-A finishing horizon is the last analysis at which the arm or population
-contributes. Discontinued arms and populations finish at their
-discontinuation analysis; continuing groups and shared control finish at
-their last applicable analysis. Overlapping enrichment populations
-retain their shared subjects. Multi-arm treatment summaries have
-active-arm rows and scenario columns, while shared control is a vector
-over scenarios. Enrichment summaries have population rows
-(subpopulations followed by the full population) and scenario columns. A
-single arm or population is stored as a vector; there is no stage
-dimension. The two-arm outputs are vectors over alternative scenarios.
+The outputs are matrices with stage rows and scenario columns for
+two-arm trials. Multi-arm treatment outputs are arrays with dimensions
+stage, scenario, and active arm; shared control is a stage-by-scenario
+matrix. Enrichment outputs have dimensions stage, scenario, and
+population (subpopulations followed by the full population). A single
+active arm or population uses a stage-by-scenario matrix. Stages and
+scenarios are never dropped, including for a fixed design. Discontinued
+groups contribute through their discontinuation analysis and stopped
+trials through their stopping analysis, with no later contributions.
+Overlapping enrichment populations include their shared subjects.
 
 ## Usage
 
@@ -383,14 +383,39 @@ function might depend on variables `stage`, `conditionalPower`,
 `allocationRatioPlanned`, `conditionalCriticalValue`, The function has
 to contain the three-dots argument '...' (see examples).
 
+The corresponding `dropoutObservationTime1` and
+`dropoutObservationTime2` fields retain the mean stage analysis time
+over exactly the same contributing replications, with the same
+dimensions as the proportions. They are omitted from print and summary
+output but can be accessed directly as `result$dropoutObservationTime1`
+and `result$dropoutObservationTime2`. In multi-arm trials, the first
+field refers to the active treatment arms and the second to shared
+control. In enrichment trials, both fields contain population-specific
+results for their respective treatment arms. See
+[SimulationResultsSurvival](https://docs.rpact.org/reference/SimulationResultsSurvival.md),
+[SimulationResultsMultiArmSurvival](https://docs.rpact.org/reference/SimulationResultsMultiArmSurvival.md),
+and
+[SimulationResultsEnrichmentSurvival](https://docs.rpact.org/reference/SimulationResultsEnrichmentSurvival.md)
+for the result fields and their dimensions.
+
+These averages can differ from the trial-level `analysisTime`, because
+arm or population selection and the requirement for a nonempty
+enrolled-subject denominator can change which replications contribute.
+Within a replication, all arms or populations contributing at a given
+stage share its analysis time; differences between the reported averages
+arise from the contributing sets of replications, rather than different
+analysis schedules within that replication. When both input dropout
+rates are zero, the proportions are also omitted from print and summary
+output while remaining in the result object.
+
 These outputs require patient histories and are unavailable for
 `simulationType = "testStatisticBased"`. Existing recruitment and
 allocation mechanisms are retained. The input dropout probability at
 `dropoutTime` describes the dropout distribution without competing
 events; it is not the simulated observed proportion. Analytic expected
-proportions condition on deterministic planned accrual at a fixed final
-planned horizon, whereas simulation includes random analysis times,
-early stopping and selection. Compare them only with matching horizon,
+proportions condition on deterministic planned accrual at each planned
+analysis time, whereas simulation includes random analysis times, early
+stopping and selection. Compare them only with matching stage, horizon,
 enrollment and allocation assumptions.
 
 ## Piecewise survival time

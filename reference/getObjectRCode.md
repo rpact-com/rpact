@@ -18,7 +18,8 @@ rcmd(
   tolerance = 1e-07,
   pipeOperator = c("auto", "none", "magrittr", "R"),
   output = c("vector", "cat", "test", "markdown", "internal"),
-  explicitPrint = FALSE
+  explicitPrint = FALSE,
+  showVersus = FALSE
 )
 
 getObjectRCode(
@@ -34,7 +35,8 @@ getObjectRCode(
   tolerance = 1e-07,
   pipeOperator = c("auto", "none", "magrittr", "R"),
   output = c("vector", "cat", "test", "markdown", "internal"),
-  explicitPrint = FALSE
+  explicitPrint = FALSE,
+  showVersus = FALSE
 )
 ```
 
@@ -103,6 +105,19 @@ getObjectRCode(
 - explicitPrint:
 
   Show an explicit `print` command, default is `FALSE`.
+
+- showVersus:
+
+  If `TRUE`, reconstruct a `TrialComparisonSummary` as a chain using
+  `%vs%`. Default is `FALSE`. A
+  [`summary()`](https://rdrr.io/r/base/summary.html) call is appended
+  only for non-default display settings or when
+  `includeDefaultParameters = TRUE`. If omitted, use option
+  `rpact.r.code.show.versus` or environment variable
+  `RPACT_R_CODE_SHOW_VERSUS` (the environment variable takes
+  precedence). Explicit arguments override both settings. Other object
+  classes are unaffected. `includeDefaultParameters` also controls the
+  contained objects.
 
 ## Value
 

@@ -87,11 +87,6 @@ run these functions.
 
 ## See also
 
-[Optimal Conditional Error Designs with
-rpact](https://www.rpact.org/vignettes/planning/rpact_optimal_conditional_error/)
-for a worked example with stopping rules, information constraints,
-interim estimates, and conditional power functions.
-
 Other design functions:
 [`getDesignConditionalDunnett()`](https://docs.rpact.org/reference/getDesignConditionalDunnett.md),
 [`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md),

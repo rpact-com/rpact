@@ -72,6 +72,7 @@
 <url><loc>https://docs.rpact.org/reference/StageResultsSurvival.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/SummaryFactory.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialComparison.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/TrialComparisonSummary.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesign.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignCharacteristics.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignConditionalDunnett.html</loc></url>
@@ -115,6 +116,9 @@
 <url><loc>https://docs.rpact.org/reference/dataSurvival.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/delete.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/disableStartupMessages.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/dot-addExpectedDropoutProportions.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/dot-getDropoutIncidence.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/dot-getDropoutProportionsGroupwise.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/enableStartupMessages.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/extract.TrialComparison.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/fetch.ParameterSet.html</loc></url>

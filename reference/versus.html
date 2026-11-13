@@ -79,7 +79,7 @@ summaries. Plot axes must still be specified when their selection is ambiguous.<
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="getComparison.html">getComparison()</a></code>, <code><a href="compare.html">compare()</a></code>, <code><a href="summary.TrialComparison.html">summary.TrialComparison()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="getComparison.html">getComparison()</a></code>, <code><a href="compare.html">compare()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -91,8 +91,11 @@ summaries. Plot axes must still be specified when their selection is ambiguous.<
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample size calculation comparison summary</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Comparison of 3 sample size means calculations.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The comparison identifies 6 differing parameters and 15 shared parameters or profiles.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Shared (examples): Object type, Endpoint, Calculation target, Normal approximation, Mean ratio, Treatment groups, ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The comparison identifies 6 differing parameters and</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 shared parameters or profiles.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Shared (examples): Object type, Endpoint, Calculation target, Normal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     approximation, Mean ratio, Treatment groups, ... (all shared captions:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     showAll = TRUE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Inputs and design settings:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -127,6 +130,7 @@ summaries. Plot axes must still be specified when their selection is ambiguous.<
 <span class="r-out co"><span class="r-pr">#&gt;</span> Legend:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Profiles compare exact values at each stage and situation.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Complete display: summary(x, showAll = TRUE).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Full data: as.data.frame(x). Exact profiles: summary(x)$parameterInfo.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">comp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="getSampleSizeMeans.html">getSampleSizeMeans</a></span><span class="op">(</span>alternative <span class="op">=</span> <span class="fl">0.22</span><span class="op">)</span> <span class="op">%vs%</span></span></span>
@@ -136,8 +140,11 @@ summaries. Plot axes must still be specified when their selection is ambiguous.<
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample size calculation comparison summary</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Comparison of 3 sample size means calculations.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The comparison identifies 5 differing parameters and 16 shared parameters or profiles.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Shared (examples): Object type, Endpoint, Calculation target, Standard deviation, Normal approximation, Mean ratio, ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The comparison identifies 5 differing parameters and</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 shared parameters or profiles.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Shared (examples): Object type, Endpoint, Calculation target, Standard</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     deviation, Normal approximation, Mean ratio, ... (all shared captions:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     showAll = TRUE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Inputs and design settings:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -171,6 +178,7 @@ summaries. Plot axes must still be specified when their selection is ambiguous.<
 <span class="r-out co"><span class="r-pr">#&gt;</span> Legend:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Profiles compare exact values at each stage and situation.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Complete display: summary(x, showAll = TRUE).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Full data: as.data.frame(x). Exact profiles: summary(x)$parameterInfo.</span>
 <span class="r-in"><span><span class="va">comp2</span> <span class="op">|&gt;</span> <span class="fu"><a href="getComparison.html">getComparison</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample size calculation comparison</span>

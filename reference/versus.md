@@ -47,8 +47,7 @@ still be specified when their selection is ambiguous.
 ## See also
 
 [`getComparison()`](https://docs.rpact.org/reference/getComparison.md),
-[`compare()`](https://docs.rpact.org/reference/compare.md),
-[`summary.TrialComparison()`](https://docs.rpact.org/reference/summary.TrialComparison.md)
+[`compare()`](https://docs.rpact.org/reference/compare.md)
 
 ## Examples
 
@@ -60,8 +59,11 @@ comparison
 #> Sample size calculation comparison summary
 #> 
 #> Comparison of 3 sample size means calculations.
-#> The comparison identifies 6 differing parameters and 15 shared parameters or profiles.
-#> Shared (examples): Object type, Endpoint, Calculation target, Normal approximation, Mean ratio, Treatment groups, ...
+#> The comparison identifies 6 differing parameters and
+#> 15 shared parameters or profiles.
+#> Shared (examples): Object type, Endpoint, Calculation target, Normal
+#>     approximation, Mean ratio, Treatment groups, ... (all shared captions:
+#>     showAll = TRUE)
 #> 
 #> Inputs and design settings:
 #> 
@@ -96,6 +98,7 @@ comparison
 #> Legend:
 #>     Profiles compare exact values at each stage and situation.
 #> 
+#> Complete display: summary(x, showAll = TRUE).
 #> Full data: as.data.frame(x). Exact profiles: summary(x)$parameterInfo.
 
 comp1 <- getSampleSizeMeans(alternative = 0.22) %vs%
@@ -105,8 +108,11 @@ comp2
 #> Sample size calculation comparison summary
 #> 
 #> Comparison of 3 sample size means calculations.
-#> The comparison identifies 5 differing parameters and 16 shared parameters or profiles.
-#> Shared (examples): Object type, Endpoint, Calculation target, Standard deviation, Normal approximation, Mean ratio, ...
+#> The comparison identifies 5 differing parameters and
+#> 16 shared parameters or profiles.
+#> Shared (examples): Object type, Endpoint, Calculation target, Standard
+#>     deviation, Normal approximation, Mean ratio, ... (all shared captions:
+#>     showAll = TRUE)
 #> 
 #> Inputs and design settings:
 #> 
@@ -140,6 +146,7 @@ comp2
 #> Legend:
 #>     Profiles compare exact values at each stage and situation.
 #> 
+#> Complete display: summary(x, showAll = TRUE).
 #> Full data: as.data.frame(x). Exact profiles: summary(x)$parameterInfo.
 comp2 |> getComparison()
 #> Sample size calculation comparison

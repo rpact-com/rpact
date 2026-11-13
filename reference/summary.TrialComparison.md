@@ -3,6 +3,11 @@
 Summarizes differences between the object profiles in a trial
 comparison.
 
+The `TrialComparisonSummary` method refreshes a summary from its
+underlying comparison, retaining stored display settings unless
+explicitly overridden. This also supports `%vs%` chains followed by
+`summary(...)`.
+
 ## Usage
 
 ``` r
@@ -11,20 +16,26 @@ summary(
   object,
   ...,
   digits = NA_integer_,
-  maxParameters = 12L,
-  maxProfiles = 3L,
-  maxObjects = 6L,
-  maxValues = 4L,
+  maxParameters = NA_integer_,
+  maxProfiles = NA_integer_,
+  maxObjects = NA_integer_,
+  maxValues = NA_integer_,
   output = c("all", "title", "overview", "body"),
-  harmonizeColumnNames = TRUE
+  harmonizeColumnNames = TRUE,
+  textMode = c("wrap", "truncate", "full"),
+  width = NA_integer_,
+  showAll = NA
 )
+
+# S3 method for class 'TrialComparisonSummary'
+summary(object, ...)
 ```
 
 ## Arguments
 
 - object:
 
-  A `TrialComparison`.
+  A `TrialComparison` or an existing `TrialComparisonSummary`.
 
 - ...:
 
@@ -61,6 +72,23 @@ summary(
   [`getComparison()`](https://docs.rpact.org/reference/getComparison.md).
   If `FALSE`, compare the original parameter names, as in
   `as.data.frame(object, harmonizeColumnNames = FALSE)`.
+
+- textMode:
+
+  Console text handling: `"wrap"` (default) wraps complete text,
+  `"truncate"` shows compact previews with an explicit shortening
+  notice, and `"full"` writes complete text without automatic wrapping.
+  Markdown always retains complete text in its profile tables.
+
+- width:
+
+  Console line width, at least 20 characters. Defaults to
+  `getOption("width", 80L)`. Long unbroken words can exceed this width.
+
+- showAll:
+
+  If `TRUE`, lift all four `max*` limits and disable text truncation.
+  Wrapping remains active when `textMode = "wrap"`. Defaults to `FALSE`.
 
 ## Value
 
@@ -103,3 +131,21 @@ situation. Scalar profiles use a Value column. Blank cells indicate
 coordinates absent from a profile; explicit missing values are shown as
 NA. The display limits also apply to these tables, with omitted values
 and profiles indicated explicitly.
+
+A `NULL` display argument reads its setting through
+`.getEnvironmentVariable()`. Explicit arguments take precedence over
+environment variables, which take precedence over R options and
+defaults. The four default limits are 12 parameters, 3 profiles, 6
+objects and 4 values. R options use the prefix
+`rpact.comparison.summary.` followed by the argument name:
+`maxParameters`, `maxProfiles`, `maxObjects`, `maxValues`, `textMode`,
+`width` or `showAll`. The corresponding environment variables are
+`RPACT_COMPARISON_SUMMARY_MAX_PARAMETERS`,
+`RPACT_COMPARISON_SUMMARY_MAX_PROFILES`,
+`RPACT_COMPARISON_SUMMARY_MAX_OBJECTS`,
+`RPACT_COMPARISON_SUMMARY_MAX_VALUES`,
+`RPACT_COMPARISON_SUMMARY_TEXT_MODE`, `RPACT_COMPARISON_SUMMARY_WIDTH`
+and `RPACT_COMPARISON_SUMMARY_SHOW_ALL`. Settings are captured when the
+summary is created. For a complete display use
+`summary(x, showAll = TRUE)`; for a compact display use
+`textMode = "truncate"`.

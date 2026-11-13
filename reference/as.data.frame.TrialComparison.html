@@ -104,8 +104,13 @@ with different object profiles, using the same rules as <code><a href="https://r
 
 
 <dt id="arg-transposed">transposed<a class="anchor" aria-label="anchor" href="#arg-transposed"></a></dt>
-<dd><p>If <code>TRUE</code>, return parameters as rows and comparison situations
-as columns. Mixed column types are converted to a common type by transposition.</p></dd>
+<dd><p>If <code>TRUE</code>, return parameters as rows and comparison records
+as columns, labelled by object and available stage/situation coordinates.
+Shared scalar profiles use <code>Value</code>; duplicate labels receive unique suffixes.
+If exactly one supplied or default input vector matches all situations across
+stages, its caption replaces <code>Situation</code> (for example, <code>Alternative 1</code>).
+Ambiguous axes retain <code>Situation</code>; shared profiles require agreement across objects.
+Mixed column types are converted to a common type by transposition.</p></dd>
 
 
 <dt id="arg-removevariableparameters">removeVariableParameters<a class="anchor" aria-label="anchor" href="#arg-removevariableparameters"></a></dt>
@@ -155,6 +160,15 @@ or LaTeX longtables split into column blocks with repeated identifier columns.
 LaTeX output requires the suggested rmarkdown package and registers the longtable
 dependency through knitr metadata. Other knitting targets use ordinary data-frame
 output. Reporting does not modify the comparison or its contained objects.</p>
+<p>Multi-arm survival simulations use <code>categoryType</code> and <code>category</code> coordinates.
+<code>comparison</code> rows (for example, <code>Treatment 1 vs. Control</code>) contain stage-wise
+and cumulative event counts for treatment plus control. <code>arm</code> rows contain
+individual-arm events, selections, rejections and drop-out summaries, including
+a separate <code>Control</code> category. Arm-independent simulation results occur on
+<code>overall</code> / <code>All arms</code> rows. Input and design settings remain available for
+grouping. Result cells outside their applicable category are <code>NA</code>.
+Categories and situations are retained in profile comparisons and transposed
+headings. Shared scalar-only output can omit these coordinates.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

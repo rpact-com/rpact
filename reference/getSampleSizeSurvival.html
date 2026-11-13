@@ -5,8 +5,8 @@ allocation, retaining fractional accrued counts without rounding. Within each
 accrual interval the individual competing-risk dropout incidence is averaged
 over enrollment dates and weighted by planned enrollment by the horizon.
 The denominator includes only subjects accrued by that time. The horizon is
-the final planned analysis, not an average over early stopping. An unavailable
-final horizon (including calculations without observation times) or no accrued
+the corresponding stage's planned analysis, without early-stopping weighting.
+An unavailable horizon (including calculations without observation times) or no accrued
 subjects gives NA; otherwise zero dropout gives zero. Exponential and piecewise
 exponential event times are supported. The existing restriction against
 Weibull event times with nonzero dropout remains in place."><meta property="og:description" content="Returns the sample size for testing the hazard ratio in a two treatment groups survival design.
@@ -15,8 +15,8 @@ allocation, retaining fractional accrued counts without rounding. Within each
 accrual interval the individual competing-risk dropout incidence is averaged
 over enrollment dates and weighted by planned enrollment by the horizon.
 The denominator includes only subjects accrued by that time. The horizon is
-the final planned analysis, not an average over early stopping. An unavailable
-final horizon (including calculations without observation times) or no accrued
+the corresponding stage's planned analysis, without early-stopping weighting.
+An unavailable horizon (including calculations without observation times) or no accrued
 subjects gives NA; otherwise zero dropout gives zero. Exponential and piecewise
 exponential event times are supported. The existing restriction against
 Weibull event times with nonzero dropout remains in place."><meta property="og:image" content="https://docs.rpact.org/logo.png"><meta name="keywords" content="rpact, adaptive designs, clinical trials, simulation, analysis, rstats, Shiny, r-project, R package"><link href="reference/figures/favicon.ico" rel="icon"><link href="reference/figures/favicon.ico" rel="apple-touch-icon"><link href="reference/figures/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"></head><body>
@@ -63,8 +63,8 @@ allocation, retaining fractional accrued counts without rounding. Within each
 accrual interval the individual competing-risk dropout incidence is averaged
 over enrollment dates and weighted by planned enrollment by the horizon.
 The denominator includes only subjects accrued by that time. The horizon is
-the final planned analysis, not an average over early stopping. An unavailable
-final horizon (including calculations without observation times) or no accrued
+the corresponding stage's planned analysis, without early-stopping weighting.
+An unavailable horizon (including calculations without observation times) or no accrued
 subjects gives NA; otherwise zero dropout gives zero. Exponential and piecewise
 exponential event times are supported. The existing restriction against
 Weibull event times with nonzero dropout remains in place.</p>
@@ -285,9 +285,9 @@ is used to calculate the expected number of events under the alternative
 to piecewise survival times and non-constant piecewise accrual over time.<br></p>
 <p>Optional argument <code>accountForObservationTimes</code>: if <code>accountForObservationTimes = FALSE</code>,
 only the event rates are used for the calculation of the maximum number of subjects.</p>
-<p>Accrual averages use one-dimensional numerical integration, split at event-hazard
-boundaries, with relative tolerance <code>1e-9</code> and absolute tolerance
-<code>1e-11</code>. Existing event-count and analysis-time calculations are unchanged.</p>
+<p>Accrual averages use analytic integration, split at event-hazard boundaries.
+When both input dropout rates are zero, the proportions are retained in the
+result object but omitted from print and summary output.</p>
     </div>
     <div class="section level2">
     <h2 id="piecewise-survival-time">Piecewise survival time<a class="anchor" aria-label="anchor" href="#piecewise-survival-time"></a></h2>

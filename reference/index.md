@@ -209,6 +209,7 @@
 - [`` `[`( ``*`<TrialComparisonTable>`*`)`](https://docs.rpact.org/reference/sub-.TrialComparisonTable.md)
   : Subset a Trial Comparison Table
 - [`summary(`*`<TrialComparison>`*`)`](https://docs.rpact.org/reference/summary.TrialComparison.md)
+  [`summary(`*`<TrialComparisonSummary>`*`)`](https://docs.rpact.org/reference/summary.TrialComparison.md)
   : Summarize Differences Between Trial Planning Objects
 - [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) :
   Test and Validate the rpact Package Installation

@@ -24,18 +24,21 @@
   event, censoring, dropout, and maximum-subject constraints while
   preserving the previous test-statistic-based workflow for existing use
   cases. Survival planning reports derived `expectedDropoutProportion1`
-  and `expectedDropoutProportion2` at each scenario’s final planned
+  and `expectedDropoutProportion2` at each interim and final planned
   analysis time, accounting for competing events and deterministic
   planned accrual. Patient-wise two-arm, multi-arm, and enrichment
-  survival simulations report `observedDropoutProportion1` and
-  `observedDropoutProportion2`, averaged from replication-specific
-  proportions at each arm or population’s finishing analysis, including
-  discontinued groups. The accompanying `dropoutObservationTime1` and
-  `dropoutObservationTime2` are mean finishing horizons over the same
-  eligible replications. These outputs differ from the input dropout
-  probabilities, have no stage dimension, and are unavailable for
-  test-statistic-based simulations. Existing event, power, sample-size
-  and analysis-time calculations are unchanged.
+  simulations report `observedDropoutProportion1` and
+  `observedDropoutProportion2` by stage, averaging replication-specific
+  proportions among replications contributing at that stage. Stopped
+  trials and discontinued groups do not contribute to later stages.
+  Outputs retain stage and scenario dimensions, with an additional
+  active-arm or population dimension where applicable. When both input
+  dropout rates are zero, the proportions remain in the result object
+  but are omitted from print and summary output. The accompanying
+  stage-wise `dropoutObservationTime1` and `dropoutObservationTime2`
+  remain available in result objects and are no longer displayed. These
+  outputs differ from input dropout probabilities and are unavailable
+  for test-statistic-based simulations.
 - The new functions
   [`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTimeMultiArm.md)
   and
@@ -107,14 +110,6 @@
   provided solely to validate that this derived direction is consistent
   with a `directionUpper` value that may already have been set in the
   design.
-- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
-  supports parallel test execution on Windows, Linux, and macOS while
-  retaining its HTML and PDF reports. The new `workers` argument
-  defaults to automatic selection (available CPUs minus two, between one
-  and 16); use `workers = 1` for serial execution. Local test scheduling
-  priorities are respected, and the result includes the worker count and
-  separate timings for unit tests, R basic package tests, and HTML/PDF
-  rendering.
 - Added
   [`getComparison()`](https://docs.rpact.org/reference/getComparison.md)
   and the R6 `TrialComparison` class for comparing designs, design
@@ -160,16 +155,40 @@
   their summaries through
   [`getComparison()`](https://docs.rpact.org/reference/getComparison.md)
   and returns a comparison summary. It supports chaining and plotting
-  with explicit axis selections. `compare(x)` can now create a
-  comparison from a single object.
+  with explicit axis selections.
+- Comparison summaries wrap complete Console text by default and offer
+  `textMode`, `width`, and `showAll` controls. All display limits and
+  these controls can also be set through `RPACT_COMPARISON_SUMMARY_*`
+  environment variables or `rpact.comparison.summary.*` options. Omitted
+  content has actionable display hints; Markdown tables retain full
+  text.
 
 ### Improvements, issues, and changes
 
-- Parameter listings now align their colon column using applicable
-  parameter captions without a fixed four-character padding allowance.
-  Technical summaries account separately for parameter type prefixes.
-  Caption padding remains capped at 40 characters, and longer captions
-  are retained in full.
+- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
+  supports parallel test execution on Windows, Linux, and macOS while
+  retaining its HTML and PDF reports. The new `workers` argument
+  defaults to automatic selection (available CPUs minus two, between one
+  and 16); use `workers = 1` for serial execution. Local test scheduling
+  priorities are respected, and the result includes the worker count and
+  separate timings for unit tests, R basic package tests, and HTML/PDF
+  rendering. On Windows,
+  [`testPackage()`](https://docs.rpact.org/reference/testPackage.md)
+  uses parallel R processes with file-backed standard streams and result
+  files to avoid the pipe-related access violation in R bug 19104.
+- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
+  runs R basic package tests in a separate R process before starting
+  parallel workers and isolates configuration writes per test process.
+  Worker crashes preserve partial results and are explicitly reported as
+  incomplete execution, with the expected test count from `META`, the
+  full diagnostic log path, and a hint to retry with `workers = 1`.
+  Partial reports cannot claim successful installation qualification.
+- [`print()`](https://rdrr.io/r/base/print.html) of rpact result objects
+  improved: Parameter listings now align their colon column using
+  applicable parameter captions without a fixed four-character padding
+  allowance. Technical summaries account separately for parameter type
+  prefixes. Caption padding remains capped at 40 characters, and longer
+  captions are retained in full.
 - Repeated p-values are now unavailable (`NA` with a warning) for
   sequential designs with user-defined beta spending
   (`typeBetaSpending = "bsUser"`), for both binding and nonbinding
@@ -180,17 +199,6 @@
   and package testing with the central error helpers, providing specific
   error categories and structured diagnostic context while preserving
   worker failure details.
-- On Windows,
-  [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
-  uses parallel R processes with file-backed standard streams and result
-  files to avoid the pipe-related access violation in R bug 19104.
-- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
-  runs R basic package tests in a separate R process before starting
-  parallel workers and isolates configuration writes per test process.
-  Worker crashes preserve partial results and are explicitly reported as
-  incomplete execution, with the expected test count from `META`, the
-  full diagnostic log path, and a hint to retry with `workers = 1`.
-  Partial reports cannot claim successful installation qualification.
 - Corrected Weibull hazard ratio conversions for `kappa != 1` in
   survival planning and simulation, including multi-arm and enrichment
   simulations. Lambda remains the inverse Weibull scale; the hazard
@@ -205,10 +213,6 @@
   now removes duplicate precondition blocks while preserving complete
   user-defined function bodies and pipe chains.
 - Issue [\#118](https://github.com/rpact-com/rpact/issues/118) fixed
-- Several improvements and refactorings, focusing on enhanced error
-  handling, improved naming conventions, and more consistent function
-  signatures
-- Updates to the documentation
 - In
   [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md),
   the early stopping probability (“Early stop”) is now displayed
@@ -244,6 +248,11 @@
   stable IDs and factual metadata. Authored explanations and corrective
   instructions are maintained separately by consuming applications;
   ordinary condition messages remain unchanged.
+- RPACT Cloud link changed to <https://demo.rpact.cloud>
+- Several improvements and refactorings, focusing on enhanced error
+  handling, improved naming conventions, and more consistent function
+  signatures
+- Several updates to the documentation
 
 ## rpact 4.4.0
 
@@ -459,7 +468,7 @@ CRAN release: 2025-03-24
   repository. Only members of the ‘RPACT User Group’ have access to the
   tests. For more information, please visit:
   [rpact.org/iq](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/)
-  and [RPACT Connect](https://rpact-connect.share.connect.posit.cloud)
+  and [RPACT Connect](https://connect.rpact.app)
 - Usage of `maxInformation` improved (see enhancement
   [\#65](https://github.com/rpact-com/rpact/issues/65))
 - Line breaks in the output of
@@ -682,8 +691,7 @@ CRAN release: 2024-01-25
 - Argument `theta` can be used for plotting of sample size and power
   results
 - Pipe operator usage improved
-- Shiny app link changed to
-  <https://rpact-cloud.share.connect.posit.cloud>
+- Shiny app link changed to <https://demo.rpact.cloud>
 - Several minor improvements
 
 ## rpact 3.4.0

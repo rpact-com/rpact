@@ -69,9 +69,14 @@ as.data.frame(
 
 - transposed:
 
-  If `TRUE`, return parameters as rows and comparison situations as
-  columns. Mixed column types are converted to a common type by
-  transposition.
+  If `TRUE`, return parameters as rows and comparison records as
+  columns, labelled by object and available stage/situation coordinates.
+  Shared scalar profiles use `Value`; duplicate labels receive unique
+  suffixes. If exactly one supplied or default input vector matches all
+  situations across stages, its caption replaces `Situation` (for
+  example, `Alternative 1`). Ambiguous axes retain `Situation`; shared
+  profiles require agreement across objects. Mixed column types are
+  converted to a common type by transposition.
 
 - removeVariableParameters:
 
@@ -130,3 +135,15 @@ requires the suggested rmarkdown package and registers the longtable
 dependency through knitr metadata. Other knitting targets use ordinary
 data-frame output. Reporting does not modify the comparison or its
 contained objects.
+
+Multi-arm survival simulations use `categoryType` and `category`
+coordinates. `comparison` rows (for example, `Treatment 1 vs. Control`)
+contain stage-wise and cumulative event counts for treatment plus
+control. `arm` rows contain individual-arm events, selections,
+rejections and drop-out summaries, including a separate `Control`
+category. Arm-independent simulation results occur on `overall` /
+`All arms` rows. Input and design settings remain available for
+grouping. Result cells outside their applicable category are `NA`.
+Categories and situations are retained in profile comparisons and
+transposed headings. Shared scalar-only output can omit these
+coordinates.

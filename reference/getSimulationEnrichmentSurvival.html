@@ -7,15 +7,15 @@ simulationType = &quot;auto&quot; chooses the simulation approach automatically 
 the explicitly specified arguments.
 The null hypothesis is defined by the hazard ratio thetaH0; values other
 than 1 can be used, for example, to simulate non-inferiority designs.
-A finishing horizon is the last analysis at which the arm or population
-contributes. Discontinued arms and populations finish at their discontinuation
-analysis; continuing groups and shared control finish at their last applicable
-analysis. Overlapping enrichment populations retain their shared subjects.
-Multi-arm treatment summaries have active-arm rows and scenario columns, while
-shared control is a vector over scenarios. Enrichment summaries have population
-rows (subpopulations followed by the full population) and scenario columns.
-A single arm or population is stored as a vector; there is no stage dimension.
-The two-arm outputs are vectors over alternative scenarios."><meta property="og:description" content="Returns the simulated power, stopping and selection probabilities, conditional power,
+The outputs are matrices with stage rows and scenario columns for two-arm
+trials. Multi-arm treatment outputs are arrays with dimensions stage, scenario,
+and active arm; shared control is a stage-by-scenario matrix. Enrichment outputs
+have dimensions stage, scenario, and population (subpopulations followed by the
+full population). A single active arm or population uses a stage-by-scenario
+matrix. Stages and scenarios are never dropped, including for a fixed design.
+Discontinued groups contribute through their discontinuation analysis and
+stopped trials through their stopping analysis, with no later contributions.
+Overlapping enrichment populations include their shared subjects."><meta property="og:description" content="Returns the simulated power, stopping and selection probabilities, conditional power,
 and expected sample size for testing hazard ratios in an enrichment design testing situation.
 Depending on simulationType, either a patient-wise survival simulation is performed
 or normally distributed log-rank test statistics are simulated. The default
@@ -23,15 +23,15 @@ simulationType = &quot;auto&quot; chooses the simulation approach automatically 
 the explicitly specified arguments.
 The null hypothesis is defined by the hazard ratio thetaH0; values other
 than 1 can be used, for example, to simulate non-inferiority designs.
-A finishing horizon is the last analysis at which the arm or population
-contributes. Discontinued arms and populations finish at their discontinuation
-analysis; continuing groups and shared control finish at their last applicable
-analysis. Overlapping enrichment populations retain their shared subjects.
-Multi-arm treatment summaries have active-arm rows and scenario columns, while
-shared control is a vector over scenarios. Enrichment summaries have population
-rows (subpopulations followed by the full population) and scenario columns.
-A single arm or population is stored as a vector; there is no stage dimension.
-The two-arm outputs are vectors over alternative scenarios."><meta property="og:image" content="https://docs.rpact.org/logo.png"><meta name="keywords" content="rpact, adaptive designs, clinical trials, simulation, analysis, rstats, Shiny, r-project, R package"><link href="reference/figures/favicon.ico" rel="icon"><link href="reference/figures/favicon.ico" rel="apple-touch-icon"><link href="reference/figures/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"></head><body>
+The outputs are matrices with stage rows and scenario columns for two-arm
+trials. Multi-arm treatment outputs are arrays with dimensions stage, scenario,
+and active arm; shared control is a stage-by-scenario matrix. Enrichment outputs
+have dimensions stage, scenario, and population (subpopulations followed by the
+full population). A single active arm or population uses a stage-by-scenario
+matrix. Stages and scenarios are never dropped, including for a fixed design.
+Discontinued groups contribute through their discontinuation analysis and
+stopped trials through their stopping analysis, with no later contributions.
+Overlapping enrichment populations include their shared subjects."><meta property="og:image" content="https://docs.rpact.org/logo.png"><meta name="keywords" content="rpact, adaptive designs, clinical trials, simulation, analysis, rstats, Shiny, r-project, R package"><link href="reference/figures/favicon.ico" rel="icon"><link href="reference/figures/favicon.ico" rel="apple-touch-icon"><link href="reference/figures/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -77,15 +77,15 @@ or normally distributed log-rank test statistics are simulated. The default
 the explicitly specified arguments.
 The null hypothesis is defined by the hazard ratio <code>thetaH0</code>; values other
 than 1 can be used, for example, to simulate non-inferiority designs.</p>
-<p>A finishing horizon is the last analysis at which the arm or population
-contributes. Discontinued arms and populations finish at their discontinuation
-analysis; continuing groups and shared control finish at their last applicable
-analysis. Overlapping enrichment populations retain their shared subjects.
-Multi-arm treatment summaries have active-arm rows and scenario columns, while
-shared control is a vector over scenarios. Enrichment summaries have population
-rows (subpopulations followed by the full population) and scenario columns.
-A single arm or population is stored as a vector; there is no stage dimension.
-The two-arm outputs are vectors over alternative scenarios.</p>
+<p>The outputs are matrices with stage rows and scenario columns for two-arm
+trials. Multi-arm treatment outputs are arrays with dimensions stage, scenario,
+and active arm; shared control is a stage-by-scenario matrix. Enrichment outputs
+have dimensions stage, scenario, and population (subpopulations followed by the
+full population). A single active arm or population uses a stage-by-scenario
+matrix. Stages and scenarios are never dropped, including for a fixed design.
+Discontinued groups contribute through their discontinuation analysis and
+stopped trials through their stopping analysis, with no later contributions.
+Overlapping enrichment populations include their shared subjects.</p>
     </div>
 
     <div class="section level2">
@@ -425,6 +425,12 @@ test-statistic-based approach is used for backward compatibility.
 After a population selection, each subsequent patient-wise analysis targets
 the planned increase in events among the selected subgroups. Events already
 observed in those subgroups at the preceding analysis count toward the target.</p>
+<p>For all simulation types, <code>populationEventsPerStage</code> reports stage-wise
+event increments for populations still selected for analysis. Dropped populations
+contribute zero to these means, which are averaged over iterations reaching the
+stage. In contrast, <code>singleEventsPerSubsetAndStage</code> includes events in a
+subset whenever it belongs to a selected population, even if its own population
+hypothesis has been dropped.</p>
 <p>Printed drop-out observation times are reported once per population because
 both treatment arms share the population's finishing analysis. The summary
 groups both arm-specific proportions and one observation time under each
@@ -455,14 +461,33 @@ The function might depend on the variables
 <code>conditionalCriticalValue</code>, and
 <code>overallEffects</code>.
 The function has to contain the three-dots argument '...' (see examples).</p>
+<p>The corresponding <code>dropoutObservationTime1</code> and
+<code>dropoutObservationTime2</code> fields retain the mean stage analysis time over
+exactly the same contributing replications, with the same dimensions as the
+proportions. They are omitted from print and summary output but can be accessed
+directly as <code>result$dropoutObservationTime1</code> and
+<code>result$dropoutObservationTime2</code>. In multi-arm trials, the first field
+refers to the active treatment arms and the second to shared control. In
+enrichment trials, both fields contain population-specific results for their
+respective treatment arms. See <a href="SimulationResultsSurvival.html">SimulationResultsSurvival</a>,
+<a href="SimulationResultsMultiArmSurvival.html">SimulationResultsMultiArmSurvival</a>, and <a href="SimulationResultsEnrichmentSurvival.html">SimulationResultsEnrichmentSurvival</a>
+for the result fields and their dimensions.</p>
+<p>These averages can differ from the trial-level <code>analysisTime</code>, because
+arm or population selection and the requirement for a nonempty enrolled-subject
+denominator can change which replications contribute. Within a replication,
+all arms or populations contributing at a given stage share its analysis time;
+differences between the reported averages arise from the contributing sets of
+replications, rather than different analysis schedules within that replication.
+When both input dropout rates are zero, the proportions are also omitted from
+print and summary output while remaining in the result object.</p>
 <p>These outputs require patient histories and are unavailable for
 <code>simulationType = "testStatisticBased"</code>. Existing recruitment and
 allocation mechanisms are retained. The input dropout probability at
 <code>dropoutTime</code> describes the dropout distribution without competing events;
 it is not the simulated observed proportion. Analytic expected proportions
-condition on deterministic planned accrual at a fixed final planned horizon,
+condition on deterministic planned accrual at each planned analysis time,
 whereas simulation includes random analysis times, early stopping and selection.
-Compare them only with matching horizon, enrollment and allocation assumptions.</p>
+Compare them only with matching stage, horizon, enrollment and allocation assumptions.</p>
     </div>
     <div class="section level2">
     <h2 id="treatment-arm-and-population-selection">Treatment arm and population selection<a class="anchor" aria-label="anchor" href="#treatment-arm-and-population-selection"></a></h2>

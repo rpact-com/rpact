@@ -8,8 +8,8 @@ planned allocation, retaining fractional accrued counts without
 rounding. Within each accrual interval the individual competing-risk
 dropout incidence is averaged over enrollment dates and weighted by
 planned enrollment by the horizon. The denominator includes only
-subjects accrued by that time. The horizon is the final planned
-analysis, not an average over early stopping. An unavailable final
+subjects accrued by that time. The horizon is the corresponding stage's
+planned analysis, without early-stopping weighting. An unavailable
 horizon (including calculations without observation times) or no accrued
 subjects gives NA; otherwise zero dropout gives zero. Exponential and
 piecewise exponential event times are supported. The existing
@@ -289,10 +289,9 @@ Optional argument `accountForObservationTimes`: if
 `accountForObservationTimes = FALSE`, only the event rates are used for
 the calculation of the maximum number of subjects.
 
-Accrual averages use one-dimensional numerical integration, split at
-event-hazard boundaries, with relative tolerance `1e-9` and absolute
-tolerance `1e-11`. Existing event-count and analysis-time calculations
-are unchanged.
+Accrual averages use analytic integration, split at event-hazard
+boundaries. When both input dropout rates are zero, the proportions are
+retained in the result object but omitted from print and summary output.
 
 ## Piecewise survival time
 

@@ -50,6 +50,46 @@ An R6 `TrialComparison` inheriting from `ParameterSet`. For a single
 `TrialComparisonSummary`, its underlying comparison is returned by
 reference; otherwise a new collection is created.
 
+Returns a
+[`TrialComparison`](https://docs.rpact.org/reference/TrialComparison.md)
+object. The following generics (R generic functions) are available for
+this result object:
+
+- [`add()`](https://docs.rpact.org/reference/add.md) to obtain the field
+  names,
+
+- [`delete()`](https://docs.rpact.org/reference/delete.md) to obtain the
+  field names,
+
+- [`fetch()`](https://docs.rpact.org/reference/fetch.TrialComparison.md)
+  to obtain the field names,
+
+- [`compare()`](https://docs.rpact.org/reference/compare.md) to obtain
+  the field names,
+
+- [`names()`](https://rdrr.io/r/base/names.html) to obtain the field
+  names,
+
+- [`length()`](https://rdrr.io/r/base/length.html) to obtain the field
+  names,
+
+- [`print()`](https://docs.rpact.org/reference/print.TrialComparison.md)
+  to print the object,
+
+- [`summary()`](https://docs.rpact.org/reference/summary.TrialComparison.md)
+  to display a summary of the object,
+
+- [`plot()`](https://docs.rpact.org/reference/plot.TrialComparison.md)
+  to plot the object,
+
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.TrialComparison.md)
+  to coerce the object to a
+  [`data.frame`](https://rdrr.io/r/base/data.frame.html),
+
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
+  to coerce the object to a
+  [`matrix`](https://rdrr.io/r/base/matrix.html).
+
 ## Details
 
 The comparison retains references to its objects. Changes to an original
@@ -157,13 +197,6 @@ its cumulative or stage-wise type; these scales are not harmonized.
 Profiles and plot groups respect time, arm, population and situation
 coordinates.
 
-Optimal conditional-error characteristics are supported internally,
-including their theta-by-stage results and atomic design settings. Their
-constructor and characteristic functions remain unexported.
-Function-valued settings are not compared as scalar parameters.
-Deprecated `TrialDesignSet` objects and standalone optimal
-conditional-error designs are not supported.
-
 Console and Markdown output are bounded. Limits and display rounding do
 not change the underlying data.
 [`as.data.frame.TrialComparison()`](https://docs.rpact.org/reference/as.data.frame.TrialComparison.md)
@@ -173,6 +206,26 @@ selects axes only when unambiguous.
 [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md)
 reconstructs the comparison and its contained objects; executing
 generated simulation code reruns the corresponding simulations.
+
+## How to get help for generic functions
+
+Click on the link of a generic in the list above to go directly to the
+help documentation of the `rpact` specific implementation of the
+generic. Note that you can use the R function
+[`methods`](https://rdrr.io/r/utils/methods.html) to get all the methods
+of a generic and to identify the object specific name of it, e.g., use
+`methods("plot")` to get all the methods for the `plot` generic. There
+you can find, e.g., `plot.AnalysisResults` and obtain the specific help
+documentation linked above by typing
+[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
+
+## See also
+
+[`compare()`](https://docs.rpact.org/reference/compare.md),
+[`add()`](https://docs.rpact.org/reference/add.md),
+[`delete()`](https://docs.rpact.org/reference/delete.md),
+[`fetch.TrialComparison()`](https://docs.rpact.org/reference/fetch.TrialComparison.md),
+[`getObjects()`](https://docs.rpact.org/reference/getObjects.md)
 
 ## Examples
 
@@ -228,22 +281,22 @@ comparisonSummary <- summary(comparison)
 identical(comparisonSummary |> getComparison(), comparison)
 #> [1] TRUE
 head(as.data.frame(comparison))
-#>   objectNumber                 objectType  endpoint calculationTarget
-#> 1            1           TrialDesignFixed Undefined            Design
-#> 2            2 TrialDesignGroupSequential Undefined            Design
-#> 3            2 TrialDesignGroupSequential Undefined            Design
-#>   objectName situation alpha beta sided criticalValues stageLevels kMax stages
-#> 1      fixed         1 0.025  0.2     1       1.959964 0.025000000    1      1
-#> 2 sequential         1 0.025  0.2     1       2.796510 0.002582893    2      1
-#> 3 sequential         1 0.025  0.2     1       1.977431 0.023996469    2      2
-#>   typeOfDesign informationRates futilityBounds bindingFutility tolerance
-#> 1         <NA>               NA             NA              NA        NA
-#> 2           OF              0.5           -Inf           FALSE     1e-08
-#> 3           OF              1.0           -Inf           FALSE     1e-08
-#>    alphaSpent
-#> 1          NA
-#> 2 0.002582893
-#> 3 0.024999990
+#>   objectNumber objectName stages situation                 objectType  endpoint
+#> 1            1      fixed      1         1           TrialDesignFixed Undefined
+#> 2            2 sequential      1         1 TrialDesignGroupSequential Undefined
+#> 3            2 sequential      2         1 TrialDesignGroupSequential Undefined
+#>   calculationTarget kMax typeOfDesign alpha beta bindingFutility sided
+#> 1            Design    1         <NA> 0.025  0.2              NA     1
+#> 2            Design    2           OF 0.025  0.2           FALSE     1
+#> 3            Design    2           OF 0.025  0.2           FALSE     1
+#>   tolerance  alphaSpent criticalValues stageLevels informationRates
+#> 1        NA          NA       1.959964 0.025000000               NA
+#> 2     1e-08 0.002582893       2.796510 0.002582893              0.5
+#> 3     1e-08 0.024999990       1.977431 0.023996469              1.0
+#>   futilityBounds
+#> 1             NA
+#> 2           -Inf
+#> 3           -Inf
 withCharacteristics <- getComparison(
     getDesignGroupSequential(kMax = 2),
     getDesignCharacteristics(getDesignGroupSequential(kMax = 3))

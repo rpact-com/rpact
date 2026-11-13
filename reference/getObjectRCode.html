@@ -55,7 +55,8 @@
 <span>  tolerance <span class="op">=</span> <span class="fl">1e-07</span>,</span>
 <span>  pipeOperator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"none"</span>, <span class="st">"magrittr"</span>, <span class="st">"R"</span><span class="op">)</span>,</span>
 <span>  output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"vector"</span>, <span class="st">"cat"</span>, <span class="st">"test"</span>, <span class="st">"markdown"</span>, <span class="st">"internal"</span><span class="op">)</span>,</span>
-<span>  explicitPrint <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  explicitPrint <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  showVersus <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">getObjectRCode</span><span class="op">(</span></span>
@@ -71,7 +72,8 @@
 <span>  tolerance <span class="op">=</span> <span class="fl">1e-07</span>,</span>
 <span>  pipeOperator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"none"</span>, <span class="st">"magrittr"</span>, <span class="st">"R"</span><span class="op">)</span>,</span>
 <span>  output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"vector"</span>, <span class="st">"cat"</span>, <span class="st">"test"</span>, <span class="st">"markdown"</span>, <span class="st">"internal"</span><span class="op">)</span>,</span>
-<span>  explicitPrint <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  explicitPrint <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  showVersus <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -137,6 +139,16 @@ set to <code>NULL</code> to insert no line breaks.</p></dd>
 
 <dt id="arg-explicitprint">explicitPrint<a class="anchor" aria-label="anchor" href="#arg-explicitprint"></a></dt>
 <dd><p>Show an explicit <code>print</code> command, default is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-showversus">showVersus<a class="anchor" aria-label="anchor" href="#arg-showversus"></a></dt>
+<dd><p>If <code>TRUE</code>, reconstruct a <code>TrialComparisonSummary</code> as a
+chain using <code>%vs%</code>. Default is <code>FALSE</code>. A <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> call is appended only
+for non-default display settings or when <code>includeDefaultParameters = TRUE</code>.
+If omitted, use option <code>rpact.r.code.show.versus</code> or environment variable
+<code>RPACT_R_CODE_SHOW_VERSUS</code> (the environment variable takes precedence).
+Explicit arguments override both settings. Other object classes are unaffected.
+<code>includeDefaultParameters</code> also controls the contained objects.</p></dd>
 
 </dl></div>
     <div class="section level2">
