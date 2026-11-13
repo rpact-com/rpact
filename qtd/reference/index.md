@@ -17,6 +17,8 @@
   : Algorithm AS 251: Normal Distribution
 - [`as251StudentT()`](https://docs.rpact.org/qtd/reference/as251StudentT.md)
   : Algorithm AS 251: Student T Distribution
+- [`compare()`](https://docs.rpact.org/qtd/reference/compare.md) : Start
+  or Extend a Trial Comparison
 - [`delete()`](https://docs.rpact.org/qtd/reference/delete.md) : Delete
   an Object from a Collection
 - [`` `[[`( ``*`<TrialComparison>`*`)`](https://docs.rpact.org/qtd/reference/extract.TrialComparison.md)
@@ -163,6 +165,8 @@
   : Get Test Actions
 - [`knit_print(`*`<SummaryFactory>`*`)`](https://docs.rpact.org/qtd/reference/knit_print.SummaryFactory.md)
   : Print Summary Factory in Markdown Code Chunks
+- [`knit_print(`*`<TrialComparisonTable>`*`)`](https://docs.rpact.org/qtd/reference/knit_print.TrialComparisonTable.md)
+  : Render a Trial Comparison Table in knitr
 - [`mvnprd()`](https://docs.rpact.org/qtd/reference/mvnprd.md) :
   Original Algorithm AS 251: Normal Distribution
 - [`mvstud()`](https://docs.rpact.org/qtd/reference/mvstud.md) :
@@ -218,7 +222,10 @@
   Confirmatory Adaptive Clinical Trial Design and Analysis
 - [`setOutputFormat()`](https://docs.rpact.org/qtd/reference/setOutputFormat.md)
   : Set Output Format
+- [`` `[`( ``*`<TrialComparisonTable>`*`)`](https://docs.rpact.org/qtd/reference/sub-.TrialComparisonTable.md)
+  : Subset a Trial Comparison Table
 - [`summary(`*`<TrialComparison>`*`)`](https://docs.rpact.org/qtd/reference/summary.TrialComparison.md)
+  [`summary(`*`<TrialComparisonSummary>`*`)`](https://docs.rpact.org/qtd/reference/summary.TrialComparison.md)
   : Summarize Differences Between Trial Planning Objects
 - [`summaryQuantitative`](https://docs.rpact.org/qtd/reference/summaryQuantitative.md)
   : Summaries of Quantitative Trial Designs and Operating
@@ -232,6 +239,8 @@
   [`getPiecewiseExponentialRandomNumbers()`](https://docs.rpact.org/qtd/reference/utilitiesForPiecewiseExponentialDistribution.md)
   [`rpwexp()`](https://docs.rpact.org/qtd/reference/utilitiesForPiecewiseExponentialDistribution.md)
   : The Piecewise Exponential Distribution
+- [`` `%vs%` ``](https://docs.rpact.org/qtd/reference/versus.md) :
+  Compare and Summarize Trial Planning Objects
 - [`writeDataset()`](https://docs.rpact.org/qtd/reference/writeDataset.md)
   : Write Dataset
 - [`writeDatasets()`](https://docs.rpact.org/qtd/reference/writeDatasets.md)

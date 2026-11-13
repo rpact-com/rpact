@@ -48,8 +48,10 @@ modify the collection.
 ## Examples
 
 ``` r
-comparison <- getComparison(fixed = getDesignFixed(),
-    sequential = getDesignGroupSequential(kMax = 2))
+comparison <- getComparison(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
 objects <- comparison |> getObjects()
 names(objects)
 #> [1] "fixed"      "sequential"

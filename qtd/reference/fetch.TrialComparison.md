@@ -60,8 +60,10 @@ and
 ## Examples
 
 ``` r
-comparison <- getComparison(fixed = getDesignFixed(),
-    sequential = getDesignGroupSequential(kMax = 2))
+comparison <- getComparison(
+    fixed = getDesignFixed(),
+    sequential = getDesignGroupSequential(kMax = 2)
+)
 identical(comparison |> fetch("fixed"), comparison[["fixed"]])
 #> [1] TRUE
 identical(comparison |> fetch(fixed), comparison$fixed)

@@ -11,7 +11,7 @@ for disjoint population subsets."><meta property="og:image" content="https://doc
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9326</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@ for disjoint population subsets.</p>
     <p>Create objects with <code><a href="getPiecewiseSurvivalTimeEnrichment.html">getPiecewiseSurvivalTimeEnrichment()</a></code>. The class inherits
 from <code>PiecewiseSurvivalTimeMultiGroup</code> and <code>TimeDefinition</code>.
 Rows of <code>lambdaControls</code> and <code>medianControls</code> correspond to disjoint
-population subsets. The dimensions of <code>hazardRatios</code> and
+population subsets. The dimensions of <code>hazardRatio</code> and
 <code>medianTreatments</code> are subset, interval, and situation, in that order.
 Interval starts begin at zero and the last interval is open-ended.
 Supplied interval medians parameterize exponential hazards through
@@ -73,8 +73,12 @@ alongside the supplied medians.</p>
 <dd><p>Positive, finite control hazards, with groups in rows and piecewise survival intervals in columns. Groups are active treatment arms sharing the same control hazards in multi-arm specifications, or disjoint population subsets in enrichment specifications. Is a numeric matrix.</p></dd>
 
 
-<dt><code>hazardRatios</code></dt>
-<dd><p>Positive, finite treatment-to-control hazard ratios in a group-by-interval-by-situation numeric array. Groups are active treatment arms or disjoint population subsets. Situations occupy the third, slowest-changing dimension.</p></dd>
+<dt><code>hazardRatio</code></dt>
+<dd><p>Positive, finite treatment-to-control hazard ratios in a
+group-by-interval-by-situation numeric array. Groups are active
+treatment arms or disjoint population subsets. Situations occupy the
+third, slowest-changing dimension. Values are supplied directly or
+derived from the supplied interval medians.</p></dd>
 
 
 <dt><code>medianControls</code></dt>
@@ -82,7 +86,7 @@ alongside the supplied medians.</p>
 
 
 <dt><code>medianTreatments</code></dt>
-<dd><p>The supplied positive, finite exponential treatment medians in a group-by-interval-by-situation numeric array, or NULL when hazard ratios were supplied directly. Dimensions and names match <code>hazardRatios</code>. These parameterize interval treatment hazards, rather than the medians of the complete piecewise survival distributions.</p></dd>
+<dd><p>The supplied positive, finite exponential treatment medians in a group-by-interval-by-situation numeric array, or NULL when hazard ratios were supplied directly. Dimensions and names match <code>hazardRatio</code>. These parameterize interval treatment hazards, rather than the medians of the complete piecewise survival distributions.</p></dd>
 
 
 <dt><code>groupType</code></dt>

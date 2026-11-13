@@ -159,8 +159,8 @@ documentation linked above by typing
 
 ## See also
 
-[`getDesignSet()`](https://docs.rpact.org/qtd/reference/getDesignSet.md)
-for creating a set of designs to compare.
+[`getComparison()`](https://docs.rpact.org/qtd/reference/getComparison.md)
+to compare different design situations.
 
 [`getFutilityBounds()`](https://docs.rpact.org/qtd/reference/getFutilityBounds.md)
 for the specification of futility bounds on scales other than the

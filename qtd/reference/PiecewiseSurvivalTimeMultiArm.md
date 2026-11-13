@@ -9,7 +9,7 @@ Create objects with
 [`getPiecewiseSurvivalTimeMultiArm()`](https://docs.rpact.org/qtd/reference/getPiecewiseSurvivalTimeMultiArm.md).
 The class inherits from `PiecewiseSurvivalTimeMultiGroup` and
 `TimeDefinition`. Rows of `lambdaControls` repeat the common control
-hazards for each active arm. The dimensions of `hazardRatios` and
+hazards for each active arm. The dimensions of `hazardRatio` and
 `medianTreatments` are active arm, interval, and situation, in that
 order. Interval starts begin at zero and the last interval is
 open-ended. Supplied interval medians parameterize exponential hazards
@@ -38,12 +38,13 @@ retained alongside the supplied medians.
   disjoint population subsets in enrichment specifications. Is a numeric
   matrix.
 
-- `hazardRatios`:
+- `hazardRatio`:
 
   Positive, finite treatment-to-control hazard ratios in a
   group-by-interval-by-situation numeric array. Groups are active
   treatment arms or disjoint population subsets. Situations occupy the
-  third, slowest-changing dimension.
+  third, slowest-changing dimension. Values are supplied directly or
+  derived from the supplied interval medians.
 
 - `medianControl`:
 
@@ -58,7 +59,7 @@ retained alongside the supplied medians.
   The supplied positive, finite exponential treatment medians in a
   group-by-interval-by-situation numeric array, or NULL when hazard
   ratios were supplied directly. Dimensions and names match
-  `hazardRatios`. These parameterize interval treatment hazards, rather
+  `hazardRatio`. These parameterize interval treatment hazards, rather
   than the medians of the complete piecewise survival distributions.
 
 - `groupType`:

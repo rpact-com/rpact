@@ -11,7 +11,7 @@ and other regulatory requirements."><meta property="og:image" content="https://d
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9326</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -148,6 +148,8 @@ For more information, see <code><a href="writeKeyValueFile.html">writeKeyValueFi
 
 <dt id="arg-metadatafile">metaDataFile<a class="anchor" aria-label="anchor" href="#arg-metadatafile"></a></dt>
 <dd><p>An optional path to a text file containing metadata: one entry per line in the form <code>KEY=VALUE</code>.
+Ignored with a warning when a non-empty <code>metaData</code> list is supplied.
+Supplied metadata is saved as <code>meta_data.txt</code> in the test target directory.
 For more information, see <code><a href="writeKeyValueFile.html">writeKeyValueFile</a></code> and <code><a href="readKeyValueFile.html">readKeyValueFile</a></code>.</p></dd>
 
 

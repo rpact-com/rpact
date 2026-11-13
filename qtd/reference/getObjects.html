@@ -11,7 +11,7 @@ The TrialComparison method returns the list of contained objects."><meta propert
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9326</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,8 +86,10 @@ use <code><a href="add.html">add()</a></code> and <code><a href="delete.html">de
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="getComparison.html">getComparison</a></span><span class="op">(</span>fixed <span class="op">=</span> <span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    sequential <span class="op">=</span> <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="getComparison.html">getComparison</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    sequential <span class="op">=</span> <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">objects</span> <span class="op">&lt;-</span> <span class="va">comparison</span> <span class="op">|&gt;</span> <span class="fu">getObjects</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">objects</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "fixed"      "sequential"</span>

@@ -11,7 +11,7 @@ The TrialComparison method deletes one contained object by position or name."><m
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9326</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,7 @@ unchanged. Removing the last object leaves an empty comparison.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The modified comparison invisibly for <code>TrialComparison</code>.</p>
+    <p>The modified comparison for <code>TrialComparison</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -81,11 +81,50 @@ unchanged. Removing the last object leaves an empty comparison.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="getComparison.html">getComparison</a></span><span class="op">(</span>fixed <span class="op">=</span> <span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    sequential <span class="op">=</span> <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="getComparison.html">getComparison</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    fixed <span class="op">=</span> <span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    sequential <span class="op">=</span> <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">comparison</span> <span class="op">|&gt;</span> <span class="fu">delete</span><span class="op">(</span><span class="st">"fixed"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Design comparison</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 objects; 2 comparison rows; 19 columns.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Object types:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Group sequential design : 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observed metrics (across objects, stages and situations):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Maximum number of stages : 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Significance level       : 0.025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Type II error rate       : 0.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Available operations:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     summary(x)                        : Compare differences</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     as.data.frame(x)                  : Access all data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     getObjects(x)                     : Access contained objects</span>
 <span class="r-in"><span><span class="va">comparison</span> <span class="op">|&gt;</span> <span class="fu">delete</span><span class="op">(</span>index <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">comparison</span> <span class="op">|&gt;</span> <span class="fu"><a href="add.html">add</a></span><span class="op">(</span><span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">delete</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Trial comparison</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0 objects; 0 comparison rows; 0 columns.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Available operations:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     summary(x)                        : Compare differences</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     as.data.frame(x)                  : Access all data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     getObjects(x)                     : Access contained objects</span>
+<span class="r-in"><span><span class="va">comparison</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="add.html">add</a></span><span class="op">(</span><span class="fu"><a href="getDesignFixed.html">getDesignFixed</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>    <span class="fu">delete</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Trial comparison</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0 objects; 0 comparison rows; 0 columns.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Available operations:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     summary(x)                        : Compare differences</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     as.data.frame(x)                  : Access all data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     plot(x, xAxis = ..., yAxis = ...) : Plot selected parameters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     getObjects(x)                     : Access contained objects</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

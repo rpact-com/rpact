@@ -53,6 +53,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/PowerAndAverageSampleNumberResult.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/QuantitativeDecisionThresholds.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/SimulationResults.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/SimulationResultsBaseSurvival.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/SimulationResultsCountData.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/SimulationResultsEnrichmentMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/SimulationResultsEnrichmentRates.html</loc></url>
@@ -76,6 +77,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/StageResultsSurvival.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/SummaryFactory.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/TrialComparison.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/TrialComparisonSummary.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesign.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesignCharacteristics.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesignConditionalDunnett.html</loc></url>
@@ -108,6 +110,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/as251Normal.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/as251StudentT.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/checkInstallationQualificationStatus.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/compare.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/dataEnrichmentMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/dataEnrichmentMeansStratified.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/dataEnrichmentRates.html</loc></url>
@@ -122,6 +125,9 @@
 <url><loc>https://docs.rpact.org/qtd/reference/dataSurvival.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/delete.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/disableStartupMessages.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/dot-addExpectedDropoutProportions.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/dot-getDropoutIncidence.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/dot-getDropoutProportionsGroupwise.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/enableStartupMessages.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/extract.TrialComparison.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/fetch.ParameterSet.html</loc></url>
@@ -205,6 +211,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/knit_print.FieldSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/knit_print.ParameterSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/knit_print.SummaryFactory.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/knit_print.TrialComparisonTable.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/length.TrialDesignSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/mvnprd.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/mvstud.html</loc></url>
@@ -403,6 +410,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/setLogLevel.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/setOutputFormat.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/setupPackageTests.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/sub-.TrialComparisonTable.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/summary.AnalysisResults.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/summary.Dataset.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/summary.FutilityBounds.html</loc></url>
@@ -414,6 +422,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/test_plan_section.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/utilitiesForPiecewiseExponentialDistribution.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/utilitiesForSurvivalTrials.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/versus.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/writeDataset.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/writeDatasets.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/writeKeyValueFile.html</loc></url>

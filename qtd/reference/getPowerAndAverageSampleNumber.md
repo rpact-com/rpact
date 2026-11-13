@@ -5,7 +5,12 @@ Returns the power and average sample number of the specified design.
 ## Usage
 
 ``` r
-getPowerAndAverageSampleNumber(design, theta = seq(-1, 1, 0.02), nMax = 100)
+getPowerAndAverageSampleNumber(
+  design = NULL,
+  ...,
+  theta = seq(-1, 1, 0.02),
+  nMax = 100
+)
 ```
 
 ## Arguments
@@ -13,6 +18,11 @@ getPowerAndAverageSampleNumber(design, theta = seq(-1, 1, 0.02), nMax = 100)
 - design:
 
   The trial design.
+
+- ...:
+
+  Ensures that all arguments (starting from the "...") are to be named
+  and that a warning will be displayed if unknown arguments are passed.
 
 - theta:
 

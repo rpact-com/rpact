@@ -222,8 +222,8 @@ H1: effect = 5, standard deviation = 12.
 | Efficacy boundary (t)                             | 7.169  | 3.520  |
 | Cumulative power                                  | 0.2096 | 0.8000 |
 | Number of subjects                                | 92.1   | 184.2  |
-| Expected number of subjects under H1              | 164.9  |        |
-| Stopping probability                              | 0.2096 |        |
+| Expected number of subjects                       |        | 164.9  |
+| Stopping probability                              |        | 0.2096 |
 | Efficacy stopping probability by stage (under H0) | 0.0026 |        |
 | Efficacy stopping probability by stage            | 0.2096 |        |
 
@@ -346,6 +346,8 @@ For more information, visit [www.rpact.com](https://www.rpact.com).
   : Algorithm AS 251: Normal Distribution
 - [`as251StudentT()`](https://docs.rpact.org/qtd/reference/as251StudentT.md)
   : Algorithm AS 251: Student T Distribution
+- [`compare()`](https://docs.rpact.org/qtd/reference/compare.md) : Start
+  or Extend a Trial Comparison
 - [`delete()`](https://docs.rpact.org/qtd/reference/delete.md) : Delete
   an Object from a Collection
 - [`` `[[`( ``*`<TrialComparison>`*`)`](https://docs.rpact.org/qtd/reference/extract.TrialComparison.md)
@@ -492,6 +494,8 @@ For more information, visit [www.rpact.com](https://www.rpact.com).
   : Get Test Actions
 - [`knit_print(`*`<SummaryFactory>`*`)`](https://docs.rpact.org/qtd/reference/knit_print.SummaryFactory.md)
   : Print Summary Factory in Markdown Code Chunks
+- [`knit_print(`*`<TrialComparisonTable>`*`)`](https://docs.rpact.org/qtd/reference/knit_print.TrialComparisonTable.md)
+  : Render a Trial Comparison Table in knitr
 - [`mvnprd()`](https://docs.rpact.org/qtd/reference/mvnprd.md) :
   Original Algorithm AS 251: Normal Distribution
 - [`mvstud()`](https://docs.rpact.org/qtd/reference/mvstud.md) :
@@ -547,7 +551,10 @@ For more information, visit [www.rpact.com](https://www.rpact.com).
   Confirmatory Adaptive Clinical Trial Design and Analysis
 - [`setOutputFormat()`](https://docs.rpact.org/qtd/reference/setOutputFormat.md)
   : Set Output Format
+- [`` `[`( ``*`<TrialComparisonTable>`*`)`](https://docs.rpact.org/qtd/reference/sub-.TrialComparisonTable.md)
+  : Subset a Trial Comparison Table
 - [`summary(`*`<TrialComparison>`*`)`](https://docs.rpact.org/qtd/reference/summary.TrialComparison.md)
+  [`summary(`*`<TrialComparisonSummary>`*`)`](https://docs.rpact.org/qtd/reference/summary.TrialComparison.md)
   : Summarize Differences Between Trial Planning Objects
 - [`summaryQuantitative`](https://docs.rpact.org/qtd/reference/summaryQuantitative.md)
   : Summaries of Quantitative Trial Designs and Operating
@@ -561,6 +568,8 @@ For more information, visit [www.rpact.com](https://www.rpact.com).
   [`getPiecewiseExponentialRandomNumbers()`](https://docs.rpact.org/qtd/reference/utilitiesForPiecewiseExponentialDistribution.md)
   [`rpwexp()`](https://docs.rpact.org/qtd/reference/utilitiesForPiecewiseExponentialDistribution.md)
   : The Piecewise Exponential Distribution
+- [`` `%vs%` ``](https://docs.rpact.org/qtd/reference/versus.md) :
+  Compare and Summarize Trial Planning Objects
 - [`writeDataset()`](https://docs.rpact.org/qtd/reference/writeDataset.md)
   : Write Dataset
 - [`writeDatasets()`](https://docs.rpact.org/qtd/reference/writeDatasets.md)
@@ -579,6 +588,5 @@ For more information, visit [www.rpact.com](https://www.rpact.com).
   This document illustrates frequentist and Bayesian quantitative Go,
   Indeterminate, and Stop decisions for continuous and binary endpoints
   with rpact. It covers priors, custom posterior criteria, both
-  percentile interpretations, operating characteristics, summaries, QTD
-  plots, interval methods, sensitivity analyses, and a complete
-  numerical demonstration.
+  percentile interpretations, operating characteristics, summaries,
+  plots, interval methods, and sensitivity analyses.

@@ -6,14 +6,32 @@ a patient-wise basic approximation is used, or normally distributed log-rank tes
 are simulated. The default simulationType = &quot;auto&quot; chooses the simulation approach
 automatically based on the explicitly specified arguments.
 The null hypothesis is defined by the hazard ratio thetaH0; values other
-than 1 can be used, for example, to simulate non-inferiority designs."><meta property="og:description" content="Returns the simulated power, stopping and selection probabilities, conditional power, and
+than 1 can be used, for example, to simulate non-inferiority designs.
+The outputs are matrices with stage rows and scenario columns for two-arm
+trials. Multi-arm treatment outputs are arrays with dimensions stage, scenario,
+and active arm; shared control is a stage-by-scenario matrix. Enrichment outputs
+have dimensions stage, scenario, and population (subpopulations followed by the
+full population). A single active arm or population uses a stage-by-scenario
+matrix. Stages and scenarios are never dropped, including for a fixed design.
+Discontinued groups contribute through their discontinuation analysis and
+stopped trials through their stopping analysis, with no later contributions.
+Overlapping enrichment populations include their shared subjects."><meta property="og:description" content="Returns the simulated power, stopping and selection probabilities, conditional power, and
 expected sample size for testing hazard ratios in a multi-arm treatment groups testing situation.
 Depending on simulationType, either a patient-wise survival simulation is performed,
 a patient-wise basic approximation is used, or normally distributed log-rank test statistics
 are simulated. The default simulationType = &quot;auto&quot; chooses the simulation approach
 automatically based on the explicitly specified arguments.
 The null hypothesis is defined by the hazard ratio thetaH0; values other
-than 1 can be used, for example, to simulate non-inferiority designs."><meta property="og:image" content="https://docs.rpact.org/qtd/logo.png"><meta name="keywords" content="rpact, adaptive designs, clinical trials, simulation, analysis, rstats, Shiny, r-project, R package"><link href="reference/figures/favicon.ico" rel="icon"><link href="reference/figures/favicon.ico" rel="apple-touch-icon"><link href="reference/figures/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"></head><body>
+than 1 can be used, for example, to simulate non-inferiority designs.
+The outputs are matrices with stage rows and scenario columns for two-arm
+trials. Multi-arm treatment outputs are arrays with dimensions stage, scenario,
+and active arm; shared control is a stage-by-scenario matrix. Enrichment outputs
+have dimensions stage, scenario, and population (subpopulations followed by the
+full population). A single active arm or population uses a stage-by-scenario
+matrix. Stages and scenarios are never dropped, including for a fixed design.
+Discontinued groups contribute through their discontinuation analysis and
+stopped trials through their stopping analysis, with no later contributions.
+Overlapping enrichment populations include their shared subjects."><meta property="og:image" content="https://docs.rpact.org/qtd/logo.png"><meta name="keywords" content="rpact, adaptive designs, clinical trials, simulation, analysis, rstats, Shiny, r-project, R package"><link href="reference/figures/favicon.ico" rel="icon"><link href="reference/figures/favicon.ico" rel="apple-touch-icon"><link href="reference/figures/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     <div class="alert alert-warning" role="status"><strong>QTD Preview – unreleased.</strong> Documentation built from <code>dev/qtd</code>. <a href="https://docs.rpact.org/" class="external-link">Stable documentation</a>.</div>
 
@@ -21,7 +39,7 @@ than 1 can be used, for example, to simulate non-inferiority designs."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9326</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +78,15 @@ are simulated. The default <code>simulationType = "auto"</code> chooses the simu
 automatically based on the explicitly specified arguments.
 The null hypothesis is defined by the hazard ratio <code>thetaH0</code>; values other
 than 1 can be used, for example, to simulate non-inferiority designs.</p>
+<p>The outputs are matrices with stage rows and scenario columns for two-arm
+trials. Multi-arm treatment outputs are arrays with dimensions stage, scenario,
+and active arm; shared control is a stage-by-scenario matrix. Enrichment outputs
+have dimensions stage, scenario, and population (subpopulations followed by the
+full population). A single active arm or population uses a stage-by-scenario
+matrix. Stages and scenarios are never dropped, including for a fixed design.
+Discontinued groups contribute through their discontinuation analysis and
+stopped trials through their stopping analysis, with no later contributions.
+Overlapping enrichment populations include their shared subjects.</p>
     </div>
 
     <div class="section level2">
@@ -457,6 +484,9 @@ statistics are simulated instead. The default <code>simulationType = "auto"</cod
 simulation approach automatically based on the explicitly specified arguments and uses the
 legacy test-statistic-based approach for backward compatibility if no patient-wise-specific
 arguments are provided.</p>
+<p>The summary groups observed drop-out proportions and observation times by
+active treatment arm, followed by the shared control arm. Each arm uses its
+own finishing analysis, including active arms discontinued at an interim.</p>
 <p>For piecewise exponential event times, create <code>piecewiseSurvivalTime</code>
 with <code><a href="getPiecewiseSurvivalTimeMultiArm.html">getPiecewiseSurvivalTimeMultiArm()</a></code>. Hazard ratios are represented
 as an active-arm-by-interval-by-situation array; equivalently, they can be
@@ -482,6 +512,33 @@ The function might depend on the variables
 <code>conditionalCriticalValue</code>, and
 <code>overallEffects</code>.
 The function has to contain the three-dots argument '...' (see examples).</p>
+<p>The corresponding <code>dropoutObservationTime1</code> and
+<code>dropoutObservationTime2</code> fields retain the mean stage analysis time over
+exactly the same contributing replications, with the same dimensions as the
+proportions. They are omitted from print and summary output but can be accessed
+directly as <code>result$dropoutObservationTime1</code> and
+<code>result$dropoutObservationTime2</code>. In multi-arm trials, the first field
+refers to the active treatment arms and the second to shared control. In
+enrichment trials, both fields contain population-specific results for their
+respective treatment arms. See <a href="SimulationResultsSurvival.html">SimulationResultsSurvival</a>,
+<a href="SimulationResultsMultiArmSurvival.html">SimulationResultsMultiArmSurvival</a>, and <a href="SimulationResultsEnrichmentSurvival.html">SimulationResultsEnrichmentSurvival</a>
+for the result fields and their dimensions.</p>
+<p>These averages can differ from the trial-level <code>analysisTime</code>, because
+arm or population selection and the requirement for a nonempty enrolled-subject
+denominator can change which replications contribute. Within a replication,
+all arms or populations contributing at a given stage share its analysis time;
+differences between the reported averages arise from the contributing sets of
+replications, rather than different analysis schedules within that replication.
+When both input dropout rates are zero, the proportions are also omitted from
+print and summary output while remaining in the result object.</p>
+<p>These outputs require patient histories and are unavailable for
+<code>simulationType = "testStatisticBased"</code>. Existing recruitment and
+allocation mechanisms are retained. The input dropout probability at
+<code>dropoutTime</code> describes the dropout distribution without competing events;
+it is not the simulated observed proportion. Analytic expected proportions
+condition on deterministic planned accrual at each planned analysis time,
+whereas simulation includes random analysis times, early stopping and selection.
+Compare them only with matching stage, horizon, enrollment and allocation assumptions.</p>
     </div>
     <div class="section level2">
     <h2 id="treatment-arm-and-population-selection">Treatment arm and population selection<a class="anchor" aria-label="anchor" href="#treatment-arm-and-population-selection"></a></h2>
@@ -649,7 +706,7 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 <span class="r-in"><span><span class="va">piecewiseTime</span> <span class="op">&lt;-</span> <span class="fu"><a href="getPiecewiseSurvivalTimeMultiArm.html">getPiecewiseSurvivalTimeMultiArm</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    piecewiseSurvivalTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    lambdaControl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.08</span>, <span class="fl">0.12</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    hazardRatios <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    hazardRatio <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>        favorable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>lowDose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.8</span><span class="op">)</span>, highDose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.6</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        conservative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>lowDose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.9</span><span class="op">)</span>, highDose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>

@@ -2,18 +2,22 @@
 
 Proposes axes and an object category without creating a plot. Selection
 problems are returned as text so applications can display them before
-plotting.
+plotting. The four column selectors accept technical names, dictionary
+captions, and object-specific captions, as in
+[`fetch()`](https://docs.rpact.org/qtd/reference/fetch.ParameterSet.md).
+Unbound names may be supplied without quotes; defined variables and
+expressions are evaluated normally.
 
 ## Usage
 
 ``` r
 getComparisonPlotParameters(
   data,
-  xParamName = NULL,
-  yParamName = NULL,
+  xAxis = NULL,
+  yAxis = NULL,
   ...,
-  categoryParamName = NULL,
-  groupParamName = NULL,
+  category = NULL,
+  group = NULL,
   objects = NULL,
   yAxisSide = "auto"
 )
@@ -25,9 +29,9 @@ getComparisonPlotParameters(
 
   A comparison data frame, a `TrialComparison`, or its summary.
 
-- xParamName, yParamName:
+- xAxis, yAxis:
 
-  Optional explicit axis column names. `yParamName` may be a vector of
+  Optional explicit axis names or captions. `yAxis` may be a vector of
   distinct numeric columns. Automatic axes must be varying numeric
   columns. Every y column must be numeric; an explicitly selected x-axis
   may also be categorical.
@@ -36,7 +40,7 @@ getComparisonPlotParameters(
 
   Further arguments. Currently unused.
 
-- categoryParamName:
+- category:
 
   Optional character vector of category column names. All selected
   columns jointly define the categories. NULL selects `objectName`,
@@ -45,7 +49,7 @@ getComparisonPlotParameters(
   NA_character\_ disables automatic categories, as does character(0). No
   category is needed for a single object.
 
-- groupParamName:
+- group:
 
   Optional explicit grouping column.
 
@@ -65,19 +69,33 @@ getComparisonPlotParameters(
 
 ## Value
 
-A list containing `xParamName`, `yParamName`, `categoryParamName`,
-`groupParamName`, `yAxisSide`, `yAxisTransformation`, `yAxisRanges`,
-`message`, `candidates`, and `issues`. `yAxisSide` is named by the
-selected parameters; the right-axis plotting transformation is
-`value * scale + offset` from `yAxisTransformation`. `yAxisRanges`
+A list containing `xAxis`, `yAxis`, `category`, `group`,
+`connectAcrossObjects`, `yAxisSide`, `yAxisTransformation`,
+`yAxisRanges`, `message`, `candidates`, and `issues`. `yAxisSide` is
+named by the selected parameters; the right-axis plotting transformation
+is `value * scale + offset` from `yAxisTransformation`. `yAxisRanges`
 contains the reference ranges used for scaling, not ggplot's expanded
 panel limits. Unresolved selections are NULL. `message` is NULL on
-success, otherwise contains all selection problems. `candidates` lists
+success, otherwise summarizes selection problems. `candidates` lists
 eligible columns for each selection; `issues` contains diagnostic
 metadata used by
 [`plot.TrialComparison()`](https://docs.rpact.org/qtd/reference/plot.TrialComparison.md).
 
 ## Details
+
+With original objects available, comparisons in which each object
+contributes one point at a distinct finite numeric x value are connected
+across objects when only that input varies and the object scope is
+shared. Automatic object categories are omitted in this case and
+`connectAcrossObjects` is TRUE. Explicit categories or groups retain
+their separate curves.
+
+Axis-selection messages use a short problem statement, separate
+candidate lists with names and captions, and one example using eligible
+axes. Text wraps to the console width (up to 100 characters). Candidate
+lists show at most five entries per axis and may be shortened further to
+keep the message compact. Full candidates and parameter descriptions
+remain available in `issues`.
 
 Explicit selections prevail. When original objects are available, inputs
 and design settings are preferred for x and results for y, as in the
@@ -109,16 +127,16 @@ comparison <- getComparison(
     first = getDesignFixed(alpha = 0.025),
     second = getDesignFixed(alpha = 0.05)
 )
-selection <- getComparisonPlotParameters(comparison, yParamName = "criticalValues")
-selection[c("xParamName", "yParamName", "categoryParamName", "message")]
-#> $xParamName
+selection <- getComparisonPlotParameters(comparison, yAxis = "criticalValues")
+selection[c("xAxis", "yAxis", "category", "message")]
+#> $xAxis
 #> [1] "alpha"
 #> 
-#> $yParamName
+#> $yAxis
 #> [1] "criticalValues"
 #> 
-#> $categoryParamName
-#> [1] "objectName"
+#> $category
+#> NULL
 #> 
 #> $message
 #> NULL

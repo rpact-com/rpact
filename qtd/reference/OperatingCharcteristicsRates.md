@@ -4,6 +4,61 @@ Stores exact binomial decision-category probabilities for two
 independent groups. Obtain instances with
 [`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md).
 
+Initializes a rates result. Use getOperatingCharacteristicsRates() to
+validate inputs and calculate probabilities.
+
+Prints the result to the console.
+
+Internal rendering method used by standard console and Markdown output.
+
+Returns the result description used in output headings.
+
+## Arguments
+
+- design:
+
+  The originating quantitative decision rule.
+
+- numberOfSubjects:
+
+  Matrix of control and treatment sample sizes.
+
+- pi1:
+
+  Vector of treatment event probabilities.
+
+- pi2:
+
+  Single control event probability.
+
+- directionUpper:
+
+  Whether larger treatment event rates are beneficial.
+
+- intervalMethod:
+
+  Risk-difference interval construction.
+
+- probabilities:
+
+  Computed probability data frame.
+
+- showType:
+
+  Output mode passed to ParameterSet.
+
+- digits:
+
+  Optional display precision.
+
+- consoleOutputEnabled:
+
+  Whether to print or collect the output.
+
+- startWithUpperCase:
+
+  Whether to capitalize the first character.
+
 ## Details
 
 Inherits the sample-size matrix and probability table from
@@ -17,55 +72,7 @@ assumptions and probability tables, and
 [`plot.OperatingCharcteristics()`](https://docs.rpact.org/qtd/reference/plot.OperatingCharcteristics.md)
 for the shared QTD plot families.
 
-## Inherited fields
-
-- `probabilities`:
-
-  Calculated data frame of decision-category probabilities. Frequentist
-  results store six categories; Bayesian results store Go, Indeterminate
-  1, Indeterminate 2 and Stop. Within each sample-size scenario,
-  categories form blocks retaining supplied effect order and repeats.
-  Probabilities are on the scale 0 to 1.
-
-- `priorDist`:
-
-  Supplied normal-mixture effect prior (RBesT normMix) or a two-element
-  list of control and treatment mean priors, in that order. NULL for
-  frequentist results and rates results. Default Bayesian effect prior
-  is mixnorm(c(1, 0, 100)).
-
-- `priorDist1`:
-
-  Supplied RBesT betaMix prior for the treatment event probability. NULL
-  for frequentist results and means results. Default Bayesian prior is
-  mixbeta(c(1, 1/3, 1/3)).
-
-- `priorDist2`:
-
-  Supplied RBesT betaMix prior for the control event probability. NULL
-  for frequentist results and means results. Default Bayesian prior is
-  mixbeta(c(1, 1/3, 1/3)).
-
-- `controlMean`:
-
-  Single supplied true control mean when separate Bayesian mean priors
-  are used. The true treatment mean is controlMean plus alternative.
-  NULL for an effect prior, frequentist results and rates results.
-
-## See also
-
-[`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md),
-[`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md)
-
-## Super classes
-
-[`FieldSet`](https://docs.rpact.org/qtd/reference/FieldSet.md) -\>
-[`ParameterSet`](https://docs.rpact.org/qtd/reference/ParameterSet.md)
--\>
-[`OperatingCharcteristics`](https://docs.rpact.org/qtd/reference/OperatingCharcteristics.md)
--\> `OperatingCharcteristicsRates`
-
-## Public fields
+## Fields
 
 - `groups`:
 
@@ -106,198 +113,42 @@ for the shared QTD plot families.
   the same order as pi1, and are not additional user-supplied
   assumptions. Is a numeric vector.
 
-## Methods
-
-### Public methods
-
-- [`OperatingCharcteristicsRates$new()`](#method-OperatingCharcteristicsRates-initialize)
-
-- [`OperatingCharcteristicsRates$show()`](#method-OperatingCharcteristicsRates-show)
-
-- [`OperatingCharcteristicsRates$.show()`](#method-OperatingCharcteristicsRates-.show)
-
-- [`OperatingCharcteristicsRates$.toString()`](#method-OperatingCharcteristicsRates-.toString)
-
-- [`OperatingCharcteristicsRates$clone()`](#method-OperatingCharcteristicsRates-clone)
-
-Inherited methods
-
-- [`FieldSet$.cat()`](https://docs.rpact.org/qtd/reference/FieldSet.html#method-.cat)
-- [`FieldSet$.catMarkdownText()`](https://docs.rpact.org/qtd/reference/FieldSet.html#method-.catMarkdownText)
-- [`FieldSet$.getFieldNames()`](https://docs.rpact.org/qtd/reference/FieldSet.html#method-.getFieldNames)
-- [`FieldSet$.getFields()`](https://docs.rpact.org/qtd/reference/FieldSet.html#method-.getFields)
-- [`FieldSet$.getVisibleFieldNames()`](https://docs.rpact.org/qtd/reference/FieldSet.html#method-.getVisibleFieldNames)
-- [`FieldSet$.resetCat()`](https://docs.rpact.org/qtd/reference/FieldSet.html#method-.resetCat)
-- [`ParameterSet$.containsMultidimensionalParameters()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.containsMultidimensionalParameters)
-- [`ParameterSet$.extractParameterNameAndValue()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.extractParameterNameAndValue)
-- [`ParameterSet$.formatDataFrameParametersAsCharacter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.formatDataFrameParametersAsCharacter)
-- [`ParameterSet$.getDataFrameColumnCaption()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getDataFrameColumnCaption)
-- [`ParameterSet$.getDefaultParameters()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getDefaultParameters)
-- [`ParameterSet$.getDerivedParameters()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getDerivedParameters)
-- [`ParameterSet$.getGeneratedParameters()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getGeneratedParameters)
-- [`ParameterSet$.getInputParameters()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getInputParameters)
-- [`ParameterSet$.getMultidimensionalNumberOfStages()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getMultidimensionalNumberOfStages)
-- [`ParameterSet$.getNChar()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getNChar)
-- [`ParameterSet$.getNumberOfRows()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getNumberOfRows)
-- [`ParameterSet$.getParameterType()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getParameterType)
-- [`ParameterSet$.getParameterValueIfUserDefinedOrDefault()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getParameterValueIfUserDefinedOrDefault)
-- [`ParameterSet$.getParametersOfOneGroup()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getParametersOfOneGroup)
-- [`ParameterSet$.getParametersToShow()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getParametersToShow)
-- [`ParameterSet$.getSubListByNames()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getSubListByNames)
-- [`ParameterSet$.getUndefinedParameters()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getUndefinedParameters)
-- [`ParameterSet$.getUnidimensionalNumberOfStages()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getUnidimensionalNumberOfStages)
-- [`ParameterSet$.getUserDefinedParameters()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getUserDefinedParameters)
-- [`ParameterSet$.getVariedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getVariedParameter)
-- [`ParameterSet$.getVisibleFieldNamesOrdered()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.getVisibleFieldNamesOrdered)
-- [`ParameterSet$.initParameterTypes()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.initParameterTypes)
-- [`ParameterSet$.printAsDataFrame()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.printAsDataFrame)
-- [`ParameterSet$.setParameterType()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.setParameterType)
-- [`ParameterSet$.showAllParameters()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.showAllParameters)
-- [`ParameterSet$.showParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.showParameter)
-- [`ParameterSet$.showParameterFormatted()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.showParameterFormatted)
-- [`ParameterSet$.showParameterSingle()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.showParameterSingle)
-- [`ParameterSet$.showParameterType()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.showParameterType)
-- [`ParameterSet$.showParameterTypeDescription()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.showParameterTypeDescription)
-- [`ParameterSet$.showParametersOfOneGroup()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.showParametersOfOneGroup)
-- [`ParameterSet$.showUnknownParameters()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-.showUnknownParameters)
-- [`ParameterSet$isApplicableParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isApplicableParameter)
-- [`ParameterSet$isDefaultParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isDefaultParameter)
-- [`ParameterSet$isDefinedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isDefinedParameter)
-- [`ParameterSet$isDerivedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isDerivedParameter)
-- [`ParameterSet$isGeneratedOrDerivedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isGeneratedOrDerivedParameter)
-- [`ParameterSet$isGeneratedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isGeneratedParameter)
-- [`ParameterSet$isNotApplicableParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isNotApplicableParameter)
-- [`ParameterSet$isNotGeneratedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isNotGeneratedParameter)
-- [`ParameterSet$isNotUserDefinedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isNotUserDefinedParameter)
-- [`ParameterSet$isUndefinedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isUndefinedParameter)
-- [`ParameterSet$isUserDefinedOrDerivedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isUserDefinedOrDerivedParameter)
-- [`ParameterSet$isUserDefinedParameter()`](https://docs.rpact.org/qtd/reference/ParameterSet.html#method-isUserDefinedParameter)
-
-------------------------------------------------------------------------
-
-### `OperatingCharcteristicsRates$new()`
-
-Initializes a rates result. Use getOperatingCharacteristicsRates() to
-validate inputs and calculate probabilities.
-
-#### Usage
-
-    OperatingCharcteristicsRates$new(
-      design,
-      numberOfSubjects,
-      pi1,
-      pi2,
-      directionUpper = TRUE,
-      intervalMethod = "qtd1",
-      probabilities = NA_real_
-    )
-
-#### Arguments
-
-- `design`:
-
-  The originating quantitative decision rule.
-
-- `numberOfSubjects`:
-
-  Matrix of control and treatment sample sizes.
-
-- `pi1`:
-
-  Vector of treatment event probabilities.
-
-- `pi2`:
-
-  Single control event probability.
-
-- `directionUpper`:
-
-  Whether larger treatment event rates are beneficial.
-
-- `intervalMethod`:
-
-  Risk-difference interval construction.
+## Inherited fields
 
 - `probabilities`:
 
-  Computed probability data frame.
+  Calculated data frame of decision-category probabilities. Frequentist
+  results store six categories; Bayesian results store Go, Indeterminate
+  1, Indeterminate 2 and Stop. Within each sample-size scenario,
+  categories form blocks retaining supplied effect order and repeats.
+  Probabilities are on the scale 0 to 1.
 
-------------------------------------------------------------------------
+- `priorDist`:
 
-### `OperatingCharcteristicsRates$show()`
+  Supplied normal-mixture effect prior (RBesT normMix) or a two-element
+  list of control and treatment mean priors, in that order. NULL for
+  frequentist results and rates results. Default Bayesian effect prior
+  is mixnorm(c(1, 0, 100)).
 
-Prints the result to the console.
+- `priorDist1`:
 
-#### Usage
+  Supplied RBesT betaMix prior for the treatment event probability. NULL
+  for frequentist results and means results. Default Bayesian prior is
+  mixbeta(c(1, 1/3, 1/3)).
 
-    OperatingCharcteristicsRates$show(showType = 1, digits = NA_integer_)
+- `priorDist2`:
 
-#### Arguments
+  Supplied RBesT betaMix prior for the control event probability. NULL
+  for frequentist results and means results. Default Bayesian prior is
+  mixbeta(c(1, 1/3, 1/3)).
 
-- `showType`:
+- `controlMean`:
 
-  Output mode passed to ParameterSet.
+  Single supplied true control mean when separate Bayesian mean priors
+  are used. The true treatment mean is controlMean plus alternative.
+  NULL for an effect prior, frequentist results and rates results.
 
-- `digits`:
+## See also
 
-  Optional display precision.
-
-------------------------------------------------------------------------
-
-### `OperatingCharcteristicsRates$.show()`
-
-Internal rendering method used by standard console and Markdown output.
-
-#### Usage
-
-    OperatingCharcteristicsRates$.show(
-      showType = 1,
-      digits = NA_integer_,
-      consoleOutputEnabled = TRUE
-    )
-
-#### Arguments
-
-- `showType`:
-
-  Output mode passed to ParameterSet.
-
-- `digits`:
-
-  Optional display precision.
-
-- `consoleOutputEnabled`:
-
-  Whether to print or collect the output.
-
-------------------------------------------------------------------------
-
-### `OperatingCharcteristicsRates$.toString()`
-
-Returns the result description used in output headings.
-
-#### Usage
-
-    OperatingCharcteristicsRates$.toString(startWithUpperCase = FALSE)
-
-#### Arguments
-
-- `startWithUpperCase`:
-
-  Whether to capitalize the first character.
-
-------------------------------------------------------------------------
-
-### `OperatingCharcteristicsRates$clone()`
-
-The objects of this class are cloneable with this method.
-
-#### Usage
-
-    OperatingCharcteristicsRates$clone(deep = FALSE)
-
-#### Arguments
-
-- `deep`:
-
-  Whether to make a deep clone.
+[`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md),
+[`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md)

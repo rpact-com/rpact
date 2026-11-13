@@ -85,6 +85,11 @@ To load your personal output formats read a formerly saved file at the
 beginning of your work with `rpact`, e.g. execute
 `setOutputFormat(file = "my_rpact_output_formats.txt")`.
 
+Drop-out observation times use a separate output format with the same
+default precision as study duration. For example, use
+`setOutputFormat("dropoutObservationTime1", digits = 4, nsmall = 4)` to
+change it for both arms without changing other time formats.
+
 Note that the `parameterName` must not match exactly, e.g., for p-values
 the following parameter names will be recognized amongst others:
 

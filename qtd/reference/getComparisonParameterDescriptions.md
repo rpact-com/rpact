@@ -50,28 +50,28 @@ getComparisonParameterDescriptions(info)
 #>                                "endpoint: character, factor, single value (Undefined)" 
 #>                                                                      calculationTarget 
 #>                          "calculationTarget: character, factor, single value (Design)" 
-#>                                                                                  alpha 
-#>                                     "alpha: numeric, continuous, single value (0.025)" 
-#>                                                                                   beta 
-#>                                        "beta: numeric, continuous, single value (0.2)" 
-#>                                                                                  sided 
-#>                                         "sided: integer, continuous, single value (1)" 
-#>                                                                         criticalValues 
-#>                                                  "criticalValues: numeric, continuous" 
-#>                                                                            stageLevels 
-#>                                                     "stageLevels: numeric, continuous" 
 #>                                                                                   kMax 
 #>                                                 "kMax: integer, factor, binary (1, 2)" 
 #>                                                                           typeOfDesign 
 #>                                   "typeOfDesign: character, factor, single value (OF)" 
-#>                                                                       informationRates 
-#>                             "informationRates: numeric, continuous, binary (0.5, 1.0)" 
-#>                                                                         futilityBounds 
-#>                             "futilityBounds: numeric, continuous, single value (-Inf)" 
+#>                                                                                  alpha 
+#>                                     "alpha: numeric, continuous, single value (0.025)" 
+#>                                                                                   beta 
+#>                                        "beta: numeric, continuous, single value (0.2)" 
 #>                                                                        bindingFutility 
 #>                               "bindingFutility: logical, factor, single value (FALSE)" 
+#>                                                                                  sided 
+#>                                         "sided: integer, continuous, single value (1)" 
 #>                                                                              tolerance 
 #>                                 "tolerance: numeric, continuous, single value (1e-08)" 
 #>                                                                             alphaSpent 
 #>                   "alphaSpent: numeric, continuous, binary (0.002582893, 0.024999990)" 
+#>                                                                         criticalValues 
+#>                                                  "criticalValues: numeric, continuous" 
+#>                                                                            stageLevels 
+#>                                                     "stageLevels: numeric, continuous" 
+#>                                                                       informationRates 
+#>                             "informationRates: numeric, continuous, binary (0.5, 1.0)" 
+#>                                                                         futilityBounds 
+#>                             "futilityBounds: numeric, continuous, single value (-Inf)" 
 ```
