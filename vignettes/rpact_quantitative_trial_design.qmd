@@ -31,12 +31,12 @@ vignette: >
 editor:
   markdown:
     wrap: none
-description: This document illustrates frequentist and Bayesian quantitative Go, Indeterminate, and Stop decisions for continuous and binary endpoints with rpact. It covers priors, custom posterior criteria, both percentile interpretations, operating characteristics, summaries, QTD plots, interval methods, sensitivity analyses, and a complete numerical demonstration.
+description: This document illustrates frequentist and Bayesian quantitative Go, Indeterminate, and Stop decisions for continuous and binary endpoints with rpact. It covers priors, custom posterior criteria, both percentile interpretations, operating characteristics, summaries, plots, interval methods, and sensitivity analyses.
 categories:
   - Planning
   - Means
   - Rates
-  - Quantitative Trial Design
+  - Quantitative Trial Decisions
 notes: Friedrich Pahlke and Daniel Sabanés Bové
 ---
 
@@ -55,29 +55,28 @@ options(width = 120)
 
 A development decision often depends on two questions: is the treatment effect
 sufficiently promising relative to a minimum acceptable difference, and could it
-reach a target difference? Quantitative trial design (QTD) makes these
+reach a target difference? Quantitative trial decisions (QTD) makes these
 requirements explicit and calculates the probabilities of the resulting
 decisions under specified trial assumptions.
 
 This vignette demonstrates the QTD functions in [rpact](https://www.rpact.org)
 for two independent groups with **continuous endpoints (Means)** and **binary
-endpoints (Rates)**. Rates here are event probabilities, rather than event
-counts per unit of exposure. We define a decision rule, inspect its output,
-calculate operating characteristics, and illustrate every QTD plot type,
+endpoints (Rates)**. We define a decision rule, inspect its output,
+calculate operating characteristics, and illustrate every available plot type,
 including sensitivity and weighted decision-performance displays. A dedicated
 Bayesian section adds normal and beta priors, custom posterior criteria, and
-both interpretations of the percentile inputs.
+interpretations of the percentile inputs.
 
 The examples in this vignette were inspired by a presentation by Björn Bornkamp
-and David Ohlssen on quantitative trial design. The worked example uses the
-fictional project name **Kestrel**. All decision rules, planning assumptions,
-and numerical results needed to follow the examples are provided below.
+and David Ohlssen. The example uses the
+fictional project name **Kestrel**. The corresponding decision rules, planning assumptions,
+and numerical results are provided below.
 
-The examples require the [QTD development version of
+Running the example code currently requires the [QTD development version of
 rpact](https://github.com/rpact-com/rpact/tree/dev/qtd) providing
 `getDesignQuantitative()`, `getOperatingCharacteristicsMeans()`,
 `getOperatingCharacteristicsRates()`, and `getQuantitativeDecisionThresholds()`,
-together with Bayesian class dispatch and their QTD print, summary, and plot
+together with Bayesian class dispatch and their print, summary, and plot
 methods.
 
 ## How to install the QTD development version
@@ -90,19 +89,23 @@ pak::pkg_install("rpact-com/rpact@dev/qtd", upgrade = TRUE)
 
 # Defining a Quantitative Decision Rule
 
+The typical QTD rule that we are using below is based on the a specific confidence interval for the effect estimate. Say the lower bound is $L$ and the upper bound is $U$.
+In addition two reference values are specified: the lower reference value (LRV) and the target value (TV). 
+
+Comparisons between the confidence limits $L$ and $U$ and the reference values LRV and TV determine the decisions. Note that this kind of Go/No-Go rules are particularly common for Phase 2 trials, where the sponsor needs to decide whether to continue development based on early evidence of efficacy.
+
 ## Reference values and percentiles
+
+Here is an overview of the `rpact` arguments for defining a quantitative decision rule:
 
 | Argument | Interpretation | Default |
 |:--|:--|:--|
-| `targetValue` | Target value (TV), also called target difference (TD) | Required |
+| `targetValue` | Target value (TV), also called target difference (TD) | none, custom value required |
 | `lowerReferenceValue` | Lower reference value (LRV), also called minimum acceptable difference (MAD) | `0` |
 | `lowerPercentile` | Percentile defining the lower interval limit | `0.2` |
 | `upperPercentile` | Percentile defining the upper interval limit | `0.9` |
 
-Use reference values on a scale on which larger effects are beneficial, with LRV
-no larger than TV. The percentiles satisfy $0 < p_L < p_U < 1$. For a normally
-approximated effect estimate $\widehat\theta$ with standard error $s$, the
-limits are
+We use the reference values on a scale on which larger effects are beneficial, therefore LRV must not be larger than TV. (For a harmful binary outcome we could use $\theta = p_C - p_T$.) The lower and upper percentiles $p_L$ and $p_U$ satisfy $0 < p_L < p_U < 1$. For a normally approximated effect estimate $\widehat\theta$ with standard error $s$, the corresponding confidence limits are
 
 $$
 L = \widehat\theta + \Phi^{-1}(p_L)s,
@@ -110,9 +113,10 @@ L = \widehat\theta + \Phi^{-1}(p_L)s,
 U = \widehat\theta + \Phi^{-1}(p_U)s.
 $$
 
-These are percentile-specific frequentist bounds. The 20th and 90th percentiles
-do not describe a symmetric 90% confidence interval and are not posterior
+These are percentile-specific frequentist bounds. Note that e.g. the 20th and 90th percentiles do not describe a symmetric 90% confidence interval and are not posterior
 quantiles.
+
+Let's look at a simple example:
 
 ```{r}
 #| label: binary-rule
@@ -126,16 +130,19 @@ print(binaryRule, markdown = FALSE)
 summary(binaryRule)
 ```
 
-For a harmful binary outcome we will use $\theta = p_C - p_T$. Thus, LRV =
-$-0.05$ allows an increase of up to five percentage points in the treatment
+Here LRV = $-0.05$ allows an increase of up to five percentage points in the treatment
 event probability, and TV = $0$ represents equal event probabilities.
 
-## Three and six decision categories
+## Decision mapping
 
-The main criteria are $L \geq \mathrm{LRV}$ and $U \geq \mathrm{TV}$. Meeting
-both gives **Go**, meeting one gives **Indeterminate**, and meeting neither
-gives **Stop**. The six-category view distinguishes particularly strong evidence
-and the two reasons for an indeterminate decision.
+The main criteria are:
+
+1. $L \geq \mathrm{LRV}$ and 
+2. $U \geq \mathrm{TV}$. 
+
+Meeting both criteria gives a **Go** decision, meeting one gives **Indeterminate**, and meeting neither gives a **Stop** decision. 
+
+The six-category view distinguishes further the particularly strong evidence and the two reasons for an indeterminate decision:
 
 | Six-category decision | Interval configuration | Three-category decision |
 |:--|:--|:--|
@@ -147,31 +154,26 @@ and the two reasons for an indeterminate decision.
 | Stop (Fixed) | $U < \mathrm{LRV}$ | Stop |
 
 The implementation includes equality at the corresponding reference boundary
-as shown above. This matters for discrete data. “Fixed” identifies the extreme
+as shown above. This matters for discrete data. "Fixed" identifies the extreme
 decision categories. How a team acts on the middle categories can also depend on
 the competitive situation and other evidence.
 
-Calculations retain six exclusive category probabilities. `plotCat = 3` adds the
-two Go, the two Indeterminate, and the two Stop probabilities for display;
-`plotCat = 6` shows them separately. Rule plots default to six categories and OC
-plots to three.
+Internal `rpact` calculations retain the six decision categories. For visualization,  `plotCat = 3` sums up the two Go, the two Indeterminate, and the two Stop probabilities each for display; `plotCat = 6` shows them separately. Rule plots default to six categories and operating characteristics plots default to three.
 
 # The Kestrel Binary-Endpoint Example
 
 ## Clinical setting and exact input assumptions
 
-Consider a phase II study in de novo renal transplant recipients involving
-sotrastaurin (AEB071).[^aeb071] Three experimental regimens
-and one active control regimen based on mycophenolic acid and tacrolimus are
-planned with **75 patients per group and 1:1:1:1 randomization**. The QTD
+Consider a phase II study in de novo renal transplant recipients.
+Three experimental regimens and one active control regimen are
+planned with 75 patients per group and 1:1:1:1 randomization. The QTD
 example compares either one experimental group or two pooled experimental
 groups against control. The comparisons therefore use **75 control versus 75
 treatment patients** and **75 control versus 150 treatment patients**.
 
 The endpoint is composite efficacy failure, so lower event probabilities are
 beneficial. The example addresses efficacy only; safety and the overall
-benefit-risk assessment are separate considerations. These are planning
-assumptions for this example, rather than reported outcomes of the public trial.
+benefit-risk assessment are separate considerations. 
 
 | Quantity | Value | rpact argument |
 |:--|:--|:--|
@@ -182,11 +184,13 @@ assumptions for this example, rather than reported outcomes of the public trial.
 | Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` |
 | Sample sizes, control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
 | Beneficial direction | Lower treatment rate | `directionUpper = FALSE` |
-| Interval construction | QTD1 | `intervalMethod = "qtd1"` |
+| Interval construction | Frequentist | `intervalMethod = "qtd1"` |
 
-We evaluate treatment event probabilities from 0.10 to 0.25 in steps of 0.001
+We evaluate treatment event probabilities from 0.10 to 0.25 in steps of 0.01
 for both sample-size scenarios. Rates and reference differences are entered as
 proportions, so five percentage points are entered as `0.05`.
+
+Let's try it out: 
 
 ```{r}
 #| label: kestrel-rates
@@ -199,26 +203,24 @@ demoSizes <- matrix(
 ratesOC <- getOperatingCharacteristicsRates(
     design = binaryRule,
     numberOfSubjects = demoSizes,
-    pi1 = seq(0.10, 0.25, by = 0.001),
+    pi1 = seq(0.10, 0.25, by = 0.01),
     pi2 = 0.15,
     directionUpper = FALSE,
     intervalMethod = "qtd1"
 )
 ```
 
-`numberOfSubjects` is a positive integer matrix with control in column 1 and
-treatment in column 2. Each row is a scenario. `pi1` is a vector of treatment
-event probabilities in $[0,1]$ and `pi2` is a single control event probability
-in $[0,1]$. The constructor requires `design`, `numberOfSubjects`, `pi1`, and
-`pi2`. Its optional arguments are `directionUpper = TRUE` and
-`intervalMethod = "qtd1"`; this example explicitly reverses the direction.
-Additional arguments in `...` are checked for unknown names.
+Here `numberOfSubjects` is a positive integer matrix with control in column 1 and
+treatment in column 2. Each row is a scenario. 
 
-With `directionUpper = TRUE`, the beneficial risk difference is `pi1 - pi2`;
+The constructor requires `design`, `numberOfSubjects`, `pi1`, and
+`pi2`. With `directionUpper = TRUE`, the beneficial risk difference is `pi1 - pi2`;
 with `FALSE`, it is `pi2 - pi1`. The returned `alternative` field uses that
-beneficial direction. Exact binomial summation over all possible event-count
-pairs produces the category probabilities. The interval construction itself
-remains approximate.
+beneficial direction. 
+
+Exact binomial summation over all possible event-count
+pairs produces the category probabilities which are in the result of `getOperatingCharacteristicsRates`. The confidence interval construction itself
+remains approximate, based on the normal assumption described above.
 
 ## The five named scenarios
 
