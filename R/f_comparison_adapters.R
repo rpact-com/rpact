@@ -303,6 +303,59 @@
         output = output, explicitPrint = explicitPrint))
 }
 
+.getComparisonSurvivalDropoutValues <- function(object, parameter, situations) {
+    arms <- object$activeArms
+    values <- object[[parameter]]
+    expectedRows <- if (endsWith(parameter, "2")) {
+        1L
+    } else {
+        arms
+    }
+    # Current simulations retain stages; older result objects stored only
+    # the finishing horizon per arm and situation.
+    stageWise <- length(dim(values)) == 3L ||
+        (expectedRows == 1L && is.matrix(values) && nrow(values) == object$.design$kMax)
+    if (stageWise) {
+        if (is.matrix(values)) {
+            values <- array(values, dim = c(dim(values), 1L))
+        }
+        expected <- c(object$.design$kMax, situations, expectedRows)
+        if (length(dim(values)) != 3L || !all(dim(values) == expected)) {
+            stopIllegalDataInput("Unexpected dimensions for comparison drop-out parameter '", parameter, "'",
+                functionName = ".getComparisonSurvivalDropoutValues", parameter = parameter, value = object[[parameter]],
+                constraint = "stage by situation by arm array", diagnosticId = "comparison.dropout_dimensions_invalid",
+                context = list(expectedDimensions = expected, actualDimensions = dim(values)))
+        }
+        return(values)
+    }
+    if (is.null(dim(values))) {
+        values <- matrix(values, nrow = 1L)
+    }
+    if (!is.matrix(values) || nrow(values) != expectedRows || ncol(values) != situations) {
+        stopIllegalDataInput("Unexpected dimensions for comparison drop-out parameter '", parameter, "'",
+            functionName = ".getComparisonSurvivalDropoutValues", parameter = parameter, value = object[[parameter]],
+            constraint = "arm by situation matrix, or a single-arm situation vector",
+            diagnosticId = "comparison.dropout_dimensions_invalid",
+            context = list(expectedDimensions = c(expectedRows, situations), actualDimensions = dim(values)))
+    }
+    return(values)
+}
+
+
+.validateComparisonSurvivalDropoutDimensions <- function(object, includeAllParameters = FALSE) {
+    if (!inherits(object, "SimulationResultsMultiArmSurvival")) {
+        return(invisible(NULL))
+    }
+    situations <- ncol(object$effectMatrix)
+    groupFields <- grep("^(observedDropoutProportion|dropoutObservationTime)[12]$", names(object), value = TRUE)
+    for (parameter in groupFields) {
+        if (is.null(object[[parameter]]) || (!includeAllParameters && object$isNotApplicableParameter(parameter))) {
+            next
+        }
+        .getComparisonSurvivalDropoutValues(object, parameter, situations)
+    }
+}
+
 .expandComparisonSurvivalCategories <- function(object, data, includeAllParameters = FALSE) {
     if (!inherits(object, "SimulationResultsMultiArmSurvival")) {
         return(data)
@@ -331,27 +384,9 @@
             next
         }
         result[[parameter]] <- NA_real_
-        expectedRows <- if (endsWith(parameter, "2")) {
-            1L
-        } else {
-            arms
-        }
-        # Current simulations retain stages; older result objects stored only
-        # the finishing horizon per arm and situation.
-        stageWise <- length(dim(values)) == 3L ||
-            (expectedRows == 1L && is.matrix(values) && nrow(values) == object$.design$kMax)
-        if (stageWise) {
-            if (is.matrix(values)) {
-                values <- array(values, dim = c(dim(values), 1L))
-            }
-            expected <- c(object$.design$kMax, max(data$situation), expectedRows)
-            if (!all(dim(values) == expected)) {
-                stopIllegalDataInput("Unexpected dimensions for comparison drop-out parameter '", parameter, "'",
-                    functionName = ".expandComparisonSurvivalCategories", parameter = parameter, value = object[[parameter]],
-                    constraint = "stage by situation by arm array", diagnosticId = "comparison.dropout_dimensions_invalid",
-                    context = list(expectedDimensions = expected, actualDimensions = dim(values)))
-            }
-            for (g in seq_len(expectedRows)) {
+        values <- .getComparisonSurvivalDropoutValues(object, parameter, max(data$situation))
+        if (length(dim(values)) == 3L) {
+            for (g in seq_len(dim(values)[3L])) {
                 category <- if (endsWith(parameter, "2")) {
                     "Control"
                 } else {
@@ -361,21 +396,6 @@
                 result[[parameter]][rows] <- values[cbind(result$stages[rows], result$situation[rows], g)]
             }
             next
-        }
-        if (is.null(dim(values))) {
-            values <- matrix(values, nrow = 1L)
-        }
-        expectedRows <- if (endsWith(parameter, "2")) {
-            1L
-        } else {
-            arms
-        }
-        if (!is.matrix(values) || nrow(values) != expectedRows || ncol(values) != max(data$situation)) {
-            stopIllegalDataInput("Unexpected dimensions for comparison drop-out parameter '", parameter, "'",
-                functionName = ".expandComparisonSurvivalCategories", parameter = parameter, value = object[[parameter]],
-                constraint = "arm by situation matrix, or a single-arm situation vector",
-                diagnosticId = "comparison.dropout_dimensions_invalid",
-                context = list(expectedDimensions = c(expectedRows, max(data$situation)), actualDimensions = dim(values)))
         }
         for (g in seq_len(nrow(values))) {
             category <- if (endsWith(parameter, "2")) {

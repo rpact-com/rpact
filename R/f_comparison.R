@@ -188,6 +188,7 @@
                 context = list(objectPosition = i, objectClass = class(obj))
             )
         }
+        .validateComparisonSurvivalDropoutDimensions(obj, includeAllParameters)
         df <- .getComparisonAdapterData(obj, includeAllParameters = includeAllParameters)
         if (is.null(df)) {
             df <- as.data.frame(obj, niceColumnNamesEnabled = FALSE,

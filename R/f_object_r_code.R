@@ -528,6 +528,7 @@ getObjectRCode <- function(
         showVersus <- .getEnvironmentVariable("RPACT_R_CODE_SHOW_VERSUS",
             "rpact.r.code.show.versus", default = FALSE, type = "logical")
     }
+    
     .assertIsSingleLogical(showVersus, "showVersus")
     .assertIsSingleLogical(includeDefaultParameters, "includeDefaultParameters")
     .assertIsSingleLogical(explicitPrint, "explicitPrint")
