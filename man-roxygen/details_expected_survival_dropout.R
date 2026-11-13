@@ -1,7 +1,9 @@
 #'
 #' The derived fields \code{expectedDropoutProportion1} and
 #' \code{expectedDropoutProportion2} give expected observed dropout proportions
-#' at each scenario's final planned analysis time. There is no stage dimension.
+#' at each stage's planned analysis time in each scenario. Both fields are numeric
+#' matrices with stage rows and alternative-scenario columns, including for a
+#' single stage or scenario.
 #' Enrollment, event time, and exponential dropout time are assumed independent
 #' within each arm. A dropout is observed only before the event and by the analysis
 #' horizon. These proportions differ from \code{dropoutRate1} and
@@ -13,13 +15,13 @@
 #' accrual interval the individual competing-risk dropout incidence is averaged
 #' over enrollment dates and weighted by planned enrollment by the horizon.
 #' The denominator includes only subjects accrued by that time. The horizon is
-#' the final planned analysis, not an average over early stopping. An unavailable
-#' final horizon (including calculations without observation times) or no accrued
+#' the corresponding stage's planned analysis, without early-stopping weighting.
+#' An unavailable horizon (including calculations without observation times) or no accrued
 #' subjects gives NA; otherwise zero dropout gives zero. Exponential and piecewise
 #' exponential event times are supported. The existing restriction against
 #' Weibull event times with nonzero dropout remains in place.
 #'
-#' Accrual averages use one-dimensional numerical integration, split at event-hazard
-#' boundaries, with relative tolerance \code{1e-9} and absolute tolerance
-#' \code{1e-11}. Existing event-count and analysis-time calculations are unchanged.
+#' Accrual averages use analytic integration, split at event-hazard boundaries.
+#' When both input dropout rates are zero, the proportions are retained in the
+#' result object but omitted from print and summary output.
 #'

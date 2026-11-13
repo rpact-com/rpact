@@ -156,7 +156,7 @@
         otherIssues <- issues[!axisIssues]
         if (length(otherIssues)) {
             lines <- c(lines, "", "Other selection problems:")
-            for (issue in head(otherIssues, 5L)) {
+            for (issue in utils::head(otherIssues, 5L)) {
                 lines <- c(lines, .wrapComparisonPlotMessage(issue$message, width, "  - ", "    "))
             }
         }
@@ -641,7 +641,7 @@ getComparisonPlotParameters <- function(
         addIssue(
             paste0(
                 "Cannot select '", parameter, "' unambiguously. Candidates: ",
-                paste(head(.comparisonText(descriptions, 85L), 8L), collapse = "; "),
+                paste(utils::head(.comparisonText(descriptions, 85L), 8L), collapse = "; "),
                 if (length(candidates) > 8L) {
                     "; ..."
                 } else {
@@ -663,12 +663,12 @@ getComparisonPlotParameters <- function(
     exampleX <- if (!is.null(result$xAxis)) {
         result$xAxis
     } else {
-        head(setdiff(result$candidates$xAxis, result$yAxis), 1L)
+        utils::head(setdiff(result$candidates$xAxis, result$yAxis), 1L)
     }
     exampleY <- if (!is.null(result$yAxis)) {
         result$yAxis
     } else {
-        head(setdiff(result$candidates$yAxis, exampleX), 1L)
+        utils::head(setdiff(result$candidates$yAxis, exampleX), 1L)
     }
     example <- if (length(exampleX) == 1L && length(exampleY) >= 1L) {
         yCode <- if (length(exampleY) == 1L) {

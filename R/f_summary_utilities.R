@@ -535,7 +535,8 @@ print.SummaryFactory <- function(
 }
 
 .addLegendEntry <- function(
-        type = c("effectMatrix", "treatmentArm", "treatmentArms", "treatmentEffectScale"), 
+        type = c("effectMatrix", "treatmentArm", "treatmentArmValues", "treatmentArms",
+            "treatmentEffectScale"),
         legendEntry = list()) {
         
     type <- match.arg(type)
@@ -543,6 +544,8 @@ print.SummaryFactory <- function(
         entry <- C_SUMMARY_LEGEND_ENTRY_EFFECT_MATRIX
     } else if (type == "treatmentArm") {
         entry <- C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARM
+    } else if (type == "treatmentArmValues") {
+        entry <- C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARM_VALUES
     } else if (type == "treatmentArms") {
         entry <- C_SUMMARY_LEGEND_ENTRY_TREATMENT_ARMS
     } else if (type == "treatmentEffectScale") {
@@ -828,6 +831,8 @@ print.SummaryFactory <- function(
                         "conditionalPowerAchieved",
                         "plannedCalendarTime",
                         "analysisTime",
+                        "observedDropoutProportion1",
+                        "observedDropoutProportion2",
                         "studyDuration"
                     )) {
                 transposed <- TRUE

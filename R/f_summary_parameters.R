@@ -343,6 +343,11 @@ NULL
     treatments <- ifelse(grepl("Survival", .getClassName(designPlan)), 1, 2)
     treatmentCaption <- ifelse(numberOfGroups > treatments, paste0("Treatment arm ", groupNumber), "Treatment arm")
 
+    if (inherits(designPlan, "SimulationResultsMultiArmSurvival") &&
+            parameterName == "observedDropoutProportion1") {
+        return(paste0(listItemPrefix, treatmentCaption))
+    }
+
     if (!grepl("Survival", .getClassName(designPlan)) ||
             (inherits(designPlan, "SimulationResultsMultiArmSurvival") &&
                 parameterName == "singleEventsPerArmAndStage")) {
@@ -361,7 +366,8 @@ NULL
         parameterCaption,
         summaryFactory,
         digitsSampleSize,
-        smoothedZeroFormat = FALSE) {
+        smoothedZeroFormat = FALSE,
+        legendEntry = list()) {
     arrayData <- designPlan[[parameterName]]
     if (is.null(arrayData)) {
         stopRuntimeIssue(.getClassName(designPlan), " does not contain the field ", sQuote(parameterName),
@@ -397,9 +403,9 @@ NULL
             designPlan
         )
         groupCaption <- summaryGroup$groupCaption
-        legendEntry <- summaryGroup$legendEntry
+        groupLegendEntry <- c(summaryGroup$legendEntry, legendEntry)
         if (numberOfGroups > 1) {
-            summaryFactory$addItem(groupCaption, "", legendEntry = legendEntry)
+            summaryFactory$addItem(groupCaption, "", legendEntry = groupLegendEntry)
         }
 
         for (groupNumber in 1:numberOfGroups) {
@@ -421,6 +427,7 @@ NULL
                 parameterCaption = groupCaption,
                 roundDigits = digitsSampleSize,
                 smoothedZeroFormat = smoothedZeroFormat,
+                legendEntry = groupLegendEntry,
                 enforceFirstCase = TRUE
             )
         }

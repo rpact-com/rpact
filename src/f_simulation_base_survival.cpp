@@ -675,7 +675,7 @@ List getSimulationSurvivalCpp(
 	NumericVector iterationsSum = NumericVector(sumVectorLength, 0.0);
 	NumericVector conditionalPowerAchievedSum = NumericVector(sumVectorLength, 0.0);
 
-    NumericMatrix dropoutRecords(n * maxNumberOfIterations * 2, 7);
+    NumericMatrix dropoutRecords(n * maxNumberOfIterations * 2 * kMax, 8);
     std::fill(dropoutRecords.begin(), dropoutRecords.end(), NA_REAL);
 
 	int simResultsVectorLength = sumVectorLength * maxNumberOfIterations;
@@ -787,27 +787,24 @@ List getSimulationSurvivalCpp(
 				calcEventsFunctionR,
 				calcEventsFunctionCppXPtr);
 
-            int lastDropoutStage = -1;
-            for (int k = 0; k < kMax; ++k) {
-                if (stepResults(k, 9) > 0 && R_finite(stepResults(k, 15))) {
-                    lastDropoutStage = k;
-                }
-            }
             for (int a = 0; a < 2; ++a) {
-                int row = (pi1Index * maxNumberOfIterations + iterationIndex) * 2 + a;
-                dropoutRecords(row, 0) = pi1Index + 1;
-                dropoutRecords(row, 1) = iterationIndex + 1;
-                dropoutRecords(row, 2) = 1;
-                dropoutRecords(row, 3) = a + 1;
-                if (lastDropoutStage >= 0) {
-                    double horizon = stepResults(lastDropoutStage, 15);
-                    NumericMatrix enrolled(1, 1), dropped(1, 1);
-                    LogicalVector member = treatmentGroup == a + 1;
-                    captureDropoutCounts(accrualTime, survivalTime, dropoutTime, member,
-                        horizon, enrolled, dropped, 0, 0);
-                    dropoutRecords(row, 4) = horizon;
-                    dropoutRecords(row, 5) = enrolled(0, 0);
-                    dropoutRecords(row, 6) = dropped(0, 0);
+                LogicalVector member = treatmentGroup == a + 1;
+                for (int k = 0; k < kMax; ++k) {
+                    int row = ((pi1Index * maxNumberOfIterations + iterationIndex) * 2 + a) * kMax + k;
+                    dropoutRecords(row, 0) = pi1Index + 1;
+                    dropoutRecords(row, 1) = iterationIndex + 1;
+                    dropoutRecords(row, 2) = 1;
+                    dropoutRecords(row, 3) = a + 1;
+                    dropoutRecords(row, 4) = k + 1;
+                    if (stepResults(k, 9) > 0 && R_finite(stepResults(k, 15))) {
+                        double horizon = stepResults(k, 15);
+                        NumericMatrix enrolled(1, 1), dropped(1, 1);
+                        captureDropoutCounts(accrualTime, survivalTime, dropoutTime, member,
+                            horizon, enrolled, dropped, 0, 0);
+                        dropoutRecords(row, 5) = horizon;
+                        dropoutRecords(row, 6) = enrolled(0, 0);
+                        dropoutRecords(row, 7) = dropped(0, 0);
+                    }
                 }
             }
 

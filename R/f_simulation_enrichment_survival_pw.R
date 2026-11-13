@@ -515,6 +515,13 @@ NULL
 #' the planned increase in events among the selected subgroups. Events already
 #' observed in those subgroups at the preceding analysis count toward the target.
 #'
+#' For all simulation types, \code{populationEventsPerStage} reports stage-wise
+#' event increments for populations still selected for analysis. Dropped populations
+#' contribute zero to these means, which are averaged over iterations reaching the
+#' stage. In contrast, \code{singleEventsPerSubsetAndStage} includes events in a
+#' subset whenever it belongs to a selected population, even if its own population
+#' hypothesis has been dropped.
+#'
 #' Printed drop-out observation times are reported once per population because
 #' both treatment arms share the population's finishing analysis. The summary
 #' groups both arm-specific proportions and one observation time under each

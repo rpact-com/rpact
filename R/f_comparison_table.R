@@ -2,7 +2,7 @@
 ## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
 ## |  This file is part of the rpact R package.
 ## |
-## |  RPACT — Statistical Tools for Drug Development
+## |  RPACT - Statistical Tools for Drug Development
 ## |
 ## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
 ## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>

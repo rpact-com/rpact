@@ -173,6 +173,7 @@ updateSubGroupVector <- function(
             survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
                 lambdaControl[subGroupIndex]
         }
+        survivalDataSet$dropoutTime[i] <- NA_real_
         if (any(phi > 0)) {
             if (phi[1] > 0) {
                 if (survivalDataSet$treatmentArm[i] == 1) {
@@ -278,6 +279,7 @@ updateSubGroupVector <- function(
                             survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
                                 lambdaControl[subGroupIndex]
                         }
+                        survivalDataSet$dropoutTime[i] <- NA_real_
                         if (any(phi > 0)) {
                             if (phi[1] > 0) {
                                 if (survivalDataSet$treatmentArm[i] == 1) {
@@ -745,7 +747,7 @@ updateSubGroupVector <- function(
     iterations <- matrix(0, nrow = kMax, ncol = cols)
     rawDataPerStage <- matrix(0L, nrow = cols, ncol = kMax)
     rawDataSets <- list()
-    dropoutRecords <- matrix(NA_real_, nrow = cols * maxNumberOfIterations * (gMax * 2), ncol = 7)
+    dropoutRecords <- matrix(NA_real_, nrow = cols * maxNumberOfIterations * (gMax * 2) * kMax, ncol = 8)
 
     len <- maxNumberOfIterations * kMax * gMax * cols
 
@@ -884,7 +886,7 @@ updateSubGroupVector <- function(
                 successCriterion = successCriterion
             )
 
-            recordRows <- ((i - 1L) * maxNumberOfIterations + j - 1L) * (gMax * 2) + seq_len(gMax * 2)
+            recordRows <- ((i - 1L) * maxNumberOfIterations + j - 1L) * (gMax * 2) * kMax + seq_len((gMax * 2) * kMax)
             dropoutRecords[recordRows, ] <- .finishDropoutRecords(stageResults, closedTest, i, j,
                 groups = gMax, arms = 2, sharedControl = FALSE)
 
@@ -1126,6 +1128,8 @@ updateSubGroupVector <- function(
             functionName = ".getSimulationEnrichmentSurvivalPatientWiseBasic"
         )
     }
+
+    .addStudyDurationToDesignPlan(simulationResults)
 
     data <- data.frame(
         iterationNumber = dataIterationNumber,

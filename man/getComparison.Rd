@@ -31,6 +31,22 @@ NULL is treated as an empty list.}
 An R6 \code{TrialComparison} inheriting from \code{ParameterSet}. For a single
 \code{TrialComparisonSummary}, its underlying comparison is returned by reference;
 otherwise a new collection is created.
+
+Returns a \code{\link{TrialComparison}} object.
+The following generics (R generic functions) are available for this result object:
+\itemize{
+\item \code{\link[=add.TrialComparison]{add()}} to obtain the field names,
+\item \code{\link[=delete.TrialComparison]{delete()}} to obtain the field names,
+\item \code{\link[=fetch.TrialComparison]{fetch()}} to obtain the field names,
+\item \code{\link[=compare]{compare()}} to obtain the field names,
+\item \code{\link[=names.TrialComparison]{names()}} to obtain the field names,
+\item \code{\link[=length.TrialComparison]{length()}} to obtain the field names,
+\item \code{\link[=print.TrialComparison]{print()}} to print the object,
+\item \code{\link[=summary.TrialComparison]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.TrialComparison]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.TrialComparison]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+}
 }
 \description{
 Creates a comparison of existing designs, design characteristics, sample size
@@ -130,18 +146,23 @@ plan when available, and its cumulative or stage-wise type; these scales are
 not harmonized. Profiles and plot groups respect time, arm, population and
 situation coordinates.
 
-Optimal conditional-error characteristics are supported internally, including
-their theta-by-stage results and atomic design settings. Their constructor and
-characteristic functions remain unexported. Function-valued settings are not
-compared as scalar parameters. Deprecated \code{TrialDesignSet} objects and standalone
-optimal conditional-error designs are not supported.
-
 Console and Markdown output are bounded. Limits and display rounding do not
 change the underlying data. \code{\link[=as.data.frame.TrialComparison]{as.data.frame.TrialComparison()}} returns the full
 comparison table. \code{\link[=plot.TrialComparison]{plot.TrialComparison()}} selects axes only when unambiguous.
 \code{\link[=getObjectRCode]{getObjectRCode()}} reconstructs the comparison and its contained objects;
 executing generated simulation code reruns the corresponding simulations.
 }
+\section{How to get help for generic functions}{
+
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
+obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
+}
+
 \examples{
 asn <- getPowerAndAverageSampleNumber(getDesignGroupSequential(kMax = 2),
     theta = c(0, 0.2), nMax = 100
@@ -173,4 +194,7 @@ plot(comparison,
 )
 }
 
+}
+\seealso{
+\code{\link[=compare]{compare()}}, \code{\link[=add]{add()}}, \code{\link[=delete]{delete()}}, \code{\link[=fetch.TrialComparison]{fetch.TrialComparison()}}, \code{\link[=getObjects]{getObjects()}}
 }

@@ -2073,8 +2073,8 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         if (nrow(group) < 2L) {
             next
         }
-        x <- head(group$x, -1L)
-        y <- head(group$y, -1L)
+        x <- utils::head(group$x, -1L)
+        y <- utils::head(group$y, -1L)
         dx <- diff(group$x)
         dy <- diff(group$y)
         valid <- is.finite(x) & is.finite(y) & is.finite(dx) & is.finite(dy)

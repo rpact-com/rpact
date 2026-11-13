@@ -367,7 +367,7 @@ List getSurvDropoutTimes(int numberOfSubjects,
 	Rcpp::RNGScope scope; 
 
 	NumericVector survivalTime(numberOfSubjects);
-	NumericVector dropoutTime(numberOfSubjects);
+	NumericVector dropoutTime(numberOfSubjects, NA_REAL);
 	
 	for (int i = 0; i < numberOfSubjects; i++) {
 		// Find which subgroup this subject belongs to
@@ -906,7 +906,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					expPvals[i] = pow(adjustedPValues[i], weights[i]);
 				}				
 				// prod(expPvals)
-				double denominator = std::accumulate(expPvals.begin(), expPvals.end(), 1, std::multiplies<double>());
+				double denominator = std::accumulate(expPvals.begin(), expPvals.end(), 1.0, std::multiplies<double>());
 				double term = pow(numerator / denominator, 1.0 / weights[k + 1]);
 				conditionalCriticalValue[k] = getOneMinusQNorm(std::min(term, 1.0 - 1e-07));
 			} else {
@@ -1197,7 +1197,7 @@ List performSimulationEnrichmentSurvivalLoop(
 	NumericMatrix iterations(kMax, cols);
 	IntegerMatrix rawDataPerStage(cols, kMax);
 	List rawDataSets;
-    NumericMatrix dropoutRecords(cols * maxNumberOfIterations * gMax * 2, 7);
+    NumericMatrix dropoutRecords(cols * maxNumberOfIterations * gMax * 2 * kMax, 8);
     std::fill(dropoutRecords.begin(), dropoutRecords.end(), NA_REAL);
 	
 	// Initialize all these with zeros
@@ -1346,7 +1346,7 @@ List performSimulationEnrichmentSurvivalLoop(
 			NumericMatrix separatePValuesTest = closedTest["separatePValues"];
 
             finishDropoutRecords(dropoutRecords,
-                (i * maxNumberOfIterations + j) * gMax * 2, i + 1, j + 1,
+                (i * maxNumberOfIterations + j) * gMax * 2 * kMax, i + 1, j + 1,
                 as<NumericMatrix>(stageResults["dropoutEnrolled"]),
                 as<NumericMatrix>(stageResults["dropoutDropped"]), analysisTime,
                 selectedPopulationsTest, eventsNotAchieved, successStop, futilityStop,
@@ -1498,7 +1498,7 @@ List performSimulationEnrichmentSurvivalLoop(
 			for (int k = 0; k < kMax; k++) {
 				if (iterations(k, i) > 0) {
 					simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] = 
-						round(simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] / iterations(k, i) * 10.0) / 10.0;
+                        R::fround(simulatedPopulationEventsPerStage[k + i * kMax + g * kMax * cols] / iterations(k, i), 1.0);
 				}
 			}
 		}

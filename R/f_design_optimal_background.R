@@ -493,7 +493,7 @@ NULL
 #' @noRd
 #'
 #' @template reference_optimal
-#' @references Hung, H. M. J., O<U+2019>Neill, R. T., Bauer, P. & Kohne, K. (1997). The behavior of the p-value when the theta hypothesis is true. Biometrics. http://www.jstor.org/stable/2533093
+#' @references Hung, H. M. J., O<U+2019>Neill, R. T., Bauer, P. & Kohne, K. (1997). The behavior of the p-value when the theta hypothesis is true. Biometrics. https://www.jstor.org/stable/2533093
 #' 
 .getOptimalDesignLikelihoodRatio <- function(pValue, design) {
     # Initialise likelihood ratio
