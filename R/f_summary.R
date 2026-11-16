@@ -1013,7 +1013,7 @@ NULL
         )
     }
 
-    if (simulationEnabled && survivalEnabled && (multiArmEnabled || enrichmentEnabled) && outputSize %in% c("medium", "large")) {
+    if (simulationEnabled && survivalEnabled && enrichmentEnabled && outputSize %in% c("medium", "large")) {
         .addSimulationArrayToSummary(
             designPlan,
             "eventsNotAchieved",

@@ -82,8 +82,8 @@ position explicitly. Manual positions are:
 \item \code{-1} or \code{"none"}: hide the legend
 \item \code{"left"}, \code{"right"}, \code{"bottom"}, \code{"top"}: outside the plot
 \item \code{0}: default outside position with a square aspect ratio
-\item \code{1}, \code{2}, \code{3}: inside left, at the top, centre, or bottom
-\item \code{4}, \code{5}, \code{6}: inside right, at the top, centre, or bottom
+\item \code{1}, \code{2}, \code{3}: inside left, at the top, center, or bottom
+\item \code{4}, \code{5}, \code{6}: inside right, at the top, center, or bottom
 \item \code{NA}: retain the legacy plot-specific positioning rules
 }}
 

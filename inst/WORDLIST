@@ -204,3 +204,10 @@ WToptimum
 www
 xlim
 ylim
+groupable
+Groupable
+dimensioned
+estimands
+finiteness
+getComparison
+getFutilityBounds

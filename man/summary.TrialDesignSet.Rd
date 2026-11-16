@@ -35,7 +35,7 @@ The following options can be set globally:
 \item \code{rpact.summary.output.size}: one of \code{c("small", "medium", "large")};
 defines how many details will be included into the summary;
 default is \code{"large"}, i.e., all available details are displayed.
-\item \code{rpact.summary.justify}: one of \code{c("right", "left", "centre")};
+\item \code{rpact.summary.justify}: one of \code{c("right", "left", "center")};
 shall the values be right-justified (the default), left-justified or centered.
 \item \code{rpact.summary.width}: defines the maximum number of characters to be used per line (default is \code{83}).
 \item \code{rpact.summary.intervalFormat}: defines how intervals will be displayed in the summary,
