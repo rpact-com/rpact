@@ -1013,7 +1013,9 @@ NULL
         )
     }
 
-    if (simulationEnabled && survivalEnabled && enrichmentEnabled && outputSize %in% c("medium", "large")) {
+    if (simulationEnabled && survivalEnabled && enrichmentEnabled && 
+            outputSize %in% c("medium", "large") && 
+            !is.null(designPlan$eventsNotAchieved)) {
         .addSimulationArrayToSummary(
             designPlan,
             "eventsNotAchieved",
