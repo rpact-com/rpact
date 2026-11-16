@@ -31,14 +31,6 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 
 ## Improvements, issues, and changes
 
-* Dropout parameter visibility now follows parameter types throughout. Observation times and proportions with both input dropout rates zero are classified as not applicable during calculation. Values remain accessible directly and through `as.data.frame(..., includeAllParameters = TRUE)`; default exports omit these fields.
-
-* Comparison summaries display mixed multi-arm and two-group event profiles in aligned tables. Inapplicable category coordinates are marked explicitly, without replicating stage-only values across treatment comparisons.
-
-* Markdown comparison summaries now align stages, categories and situations in rows, with comparison profiles side by side. `maxTableColumns` (default 4, also configurable through options and environment variables) splits larger tables into blocks, including with `showAll = TRUE`. Scalar values use one-row tables, and long profile labels have explicit short references.
-
-* Trial comparisons normalize profiles using parameter provenance and native dimensions. Repeated design settings no longer acquire arm or category dimensions, while stage- and group-specific results retain their coordinate domains even when values are equal. Shared-parameter exports combine normalized profiles rather than copying the first object's rows. Unfiltered comparison data frames retain their complete structure for plotting and grouping.
-
 * `testPackage()` now supports parallel test execution on Windows, Linux, and macOS while retaining its HTML and PDF reports. The new `workers` argument defaults to automatic selection (available CPUs minus two, between one and 16); use `workers = 1` for serial execution. Local test scheduling priorities are respected, and the result includes the worker count and separate timings for unit tests, R basic package tests, and HTML/PDF rendering. On Windows, `testPackage()` uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.
 * `testPackage()` now runs R basic package tests in a separate R process before starting parallel workers and isolates configuration writes per test process. Worker crashes preserve partial results and are explicitly reported as incomplete execution, with the expected test count from `META`, the full diagnostic log path, and a hint to retry with `workers = 1`. Partial reports cannot claim successful installation qualification.
 * `print()` of rpact result objects improved: Parameter listings now align their colon column using applicable parameter captions without a fixed four-character padding allowance. Technical summaries account separately for parameter type prefixes. Caption padding remains capped at 40 characters, and longer captions are retained in full.
@@ -48,6 +40,7 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 * Expanded the documentation of `typeOfSelection` for multi-arm and enrichment simulations, explaining all five selection rules, their interaction with adaptations and thresholds, and how to drop one worst arm at each interim using a custom selection function (issue [#159](https://github.com/rpact-com/rpact/issues/159)).
 * `getObjectRCode()` now removes duplicate precondition blocks while preserving complete user-defined function bodies and pipe chains.
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
+* Issue [#159](https://github.com/rpact-com/rpact/issues/159) fixed
 * In `getSimulationSurvival()`, the early stopping probability ("Early stop") is now displayed stage-wise instead of overall
 * In `getSimulationSurvival()`, `numberOfSubjects1` and `numberOfSubjects2` are no longer shown in the print output (though still available in the result object), and `singleEventsPerStage` is now displayed.
 * Improved naming of variables and class fields: in `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()`, the field `numberOfActiveArms` has been replaced by `numberOfSelectedArms`.
