@@ -94,6 +94,53 @@ spans multiple categories, apply all relevant files:
 - **Tasks involving GitHub:** Read
   [.github/agents/rpact_github.agent.md](.github/agents/rpact_github.agent.md).
 
+## Parameter applicability and visibility
+
+In rpact, parameter applicability and visibility must always be controlled
+exclusively through the existing parameter-type system. The parameter type is
+the single source of truth, not a separate output-specific visibility rule.
+
+Before changing which parameters are displayed, inspect the parameter-type
+methods in [R/class_core_parameter_set.R](R/class_core_parameter_set.R) and
+comparable initialization and calculation code in
+[R/class_design_plan.R](R/class_design_plan.R) and
+[R/class_simulation_results.R](R/class_simulation_results.R). For example,
+single-group design plans mark `meanRatio` and `allocationRatioPlanned` as
+`C_PARAM_NOT_APPLICABLE`, and survival simulation result initialization marks
+dropout fields as not applicable until their applicability is established.
+
+- Mark a parameter that is not applicable or should not be displayed with
+  `object$.setParameterType(parameterName, C_PARAM_NOT_APPLICABLE)`. For example:
+
+  ```r
+  result$.setParameterType("dropoutObservationTime1", C_PARAM_NOT_APPLICABLE)
+  ```
+
+- Set the type where the object's state is established: in initialization or
+  calculation/update code that knows whether the parameter is applicable.
+  When conditions change, set the appropriate type again. Do not blindly mark
+  every calculated field as `C_PARAM_GENERATED` if some fields remain inapplicable.
+- Retain a computed field's value when it is needed for direct access or further
+  calculations. Do not erase it, replace it with `NA`/`NULL`, or alter its format
+  merely to suppress its display; set its parameter type instead.
+- Print, summary, formatting, comparison and export code must consume the
+  established types using existing methods such as `isNotApplicableParameter()`,
+  `isGeneratedParameter()` and `.getGeneratedParameters()`. Do not change an
+  object's parameter types as a side effect of printing or formatting.
+- Do not introduce parallel visibility flags, parameter-name lists or regular
+  expressions that hide fields independently of their parameter types. Helpers
+  and formatter early returns that bypass
+  parameter types are violations, not patterns to copy. If such a rule is being
+  changed, move its applicability decision into the object's parameter-type
+  assignment and remove the redundant output filter.
+- Keep explicit display controls (such as preview limits) and existing export
+  options (such as `includeAllParameters`) separate from applicability. They
+  must not become a second mechanism for deciding whether a parameter applies.
+- When changing applicability, verify both the assigned types and the affected
+  output paths, including console and Markdown where supported. Check applicable
+  and inapplicable cases, type transitions where supported, and continued direct
+  access to retained values. Follow the repository's test instructions.
+
 ## Required error handling in R code
 
 All errors raised explicitly by rpact code under `R/` must use the appropriate

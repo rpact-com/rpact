@@ -755,6 +755,9 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
 #' Expected dropout proportions use each stage's planned analysis horizon for each
 #' alternative scenario, with stage rows and scenario columns. See the constructor help for
 #' the deterministic planned-accrual denominator and competing-event assumptions.
+#' When both input dropout rates are zero, these proportions are classified as
+#' not applicable. Their values remain accessible directly or with
+#' `as.data.frame(x, includeAllParameters = TRUE)`.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_design.R

@@ -2,7 +2,7 @@
 ## |  rpact: Confirmatory Adaptive Clinical Trial Design and Analysis
 ## |  This file is part of the rpact R package.
 ## |
-## |  RPACT — Statistical Tools for Drug Development
+## |  RPACT <U+2014> Statistical Tools for Drug Development
 ## |
 ## |  Authors: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
 ## |  SPDX-FileCopyrightText: RPACT GmbH, Germany <info@rpact.com>
@@ -362,12 +362,12 @@ plotTypes <- function(
     if (!inherits(obj, "ParameterSet")) {
         return(NA_character_)
     }
-    if (!inherits(obj, "TrialDesignPlan") && 
-            inherits(obj, "SimulationResults") && 
+    if (!inherits(obj, "TrialDesignPlan") &&
+            inherits(obj, "SimulationResults") &&
             inherits(obj, "Dataset")) {
         return(NA_character_)
     }
-    
+
     className <- .getClassName(obj)
     endpoint <- gsub("^TrialDesignPlan|^SimulationResults|^Dataset", "", className)
     if (grepl("Means|Rates|Survival|CountData|General", endpoint)) {
@@ -376,10 +376,10 @@ plotTypes <- function(
         endpoint <- tolower(endpoint)
         return(endpoint)
     }
-    
+
     stopRuntimeIssue("could not identify endpoint for ", .getClassName(obj),
         functionName = ".getEndpointName",
-        parameter = "obj", 
+        parameter = "obj",
         value = obj
     )
 }
@@ -418,10 +418,10 @@ plotTypes <- function(
         if (length(candidateNames) == 0) {
             return(NA_character_)
         }
-        
+
         return(candidateNames[1])
     }
-    
+
     if (inherits(designPlan, "SimulationResults")) {
         return(.getSimulationPlotXAxisParameterName(designPlan))
     }
@@ -546,16 +546,16 @@ getAvailablePlotTypes <- function(
         }
         types <- .removeInvalidPlotTypes(obj, types, c(5:14))
     } else if (inherits(obj, "SimulationResults")) {
-        if (grepl("Enrichment", .getClassName(obj)) && 
+        if (grepl("Enrichment", .getClassName(obj)) &&
                 !.getSimulationEnrichmentEffectData(obj, validatePlotCapability = FALSE)$valid) {
             if (output == "numeric") {
                 return(NA_real_)
             }
-            
+
             if (output == "caption") {
                 return(NA_character_)
             }
-            
+
             return(list())
         }
 
@@ -589,9 +589,14 @@ getAvailablePlotTypes <- function(
         }
         if (inherits(obj, "SimulationResultsSurvival")) {
             types <- c(types, 10:14)
-        }
-        else if (equals(obj[["simulationType"]], "patientWise")) {
-            types <- c(types, 10:12)
+        } else if (equals(obj[["simulationType"]], "patientWise")) {
+            types <- c(types, 10)
+            if (!is.null(obj[["expectedNumberOfSubjects"]]) && 
+                    length(obj[["expectedNumberOfSubjects"]]) > 1 &&
+                    obj$isGeneratedParameter("expectedNumberOfSubjects")) {
+                types <- c(types, 11)
+            }
+            types <- c(types, 12)
         }
         plotTypesToCheck <- c(4:14)
         if (grepl("MultiArm", .getClassName(obj))) {
@@ -976,28 +981,54 @@ getAvailablePlotTypes <- function(
 }
 
 .allGroupValuesEqual <- function(data, parameterName, groupName) {
-    groupedValues <- base::by(data[[parameterName]], data[[groupName]], paste, collapse = ",")
-    groupedValues <- groupedValues[!grepl("^NA(,NA)*$", groupedValues)]
-    if (length(groupedValues) <= 1) {
-        return(TRUE)
-    }
-
-    for (i in 1:(length(groupedValues) - 1)) {
-        for (j in (i + 1):length(groupedValues)) {
-            if (!is.na(groupedValues[i]) && !is.na(groupedValues[j]) &&
-                    groupedValues[i] != groupedValues[j]) {
-                return(FALSE)
+    tryCatch(
+        {
+            paramData <- data[[parameterName]]
+            if (is.null(paramData)) {
+                stopRuntimeIssue("parameter '", parameterName, "' not found in data",
+                    functionName = ".allGroupValuesEqual",
+                    parameter = "parameterName", value = parameterName
+                )
             }
+            
+            indices <- data[[groupName]]
+            if (is.null(indices)) {
+                stopRuntimeIssue("grouping parameter '", groupName, "' not found in data",
+                    functionName = ".allGroupValuesEqual",
+                    parameter = "groupName", value = groupName
+                )
+            }
+            
+            groupedValues <- base::by(data = paramData, INDICES = indices, FUN = paste, collapse = ",")
+            groupedValues <- groupedValues[!grepl("^NA(,NA)*$", groupedValues)]
+            if (length(groupedValues) <= 1) {
+                return(TRUE)
+            }
+
+            for (i in 1:(length(groupedValues) - 1)) {
+                for (j in (i + 1):length(groupedValues)) {
+                    if (!is.na(groupedValues[i]) && !is.na(groupedValues[j]) &&
+                            groupedValues[i] != groupedValues[j]) {
+                        return(FALSE)
+                    }
+                }
+            }
+            return(TRUE)
+        },
+        error = function(e) {
+            warnRuntimeIssue("Failed to check if all group values are equal: ", e$message,
+                diagnosticId = "plot.group_value_check_failed"
+            )
+            return(FALSE)
         }
-    }
-    return(TRUE)
+    )
 }
 
 .setXAxisScale <- function(p, data, ..., addZero = FALSE, digits = 0) {
     if (is.null(data$xValues) || !is.numeric(data$xValues) || length(na.omit(data$xValues)) == 0) {
         return(p)
     }
-    
+
     breaks <- sort(unique(round(na.omit(data$xValues), digits = digits)))
     if (addZero && !any(breaks == 0)) {
         breaks <- c(0, breaks)
@@ -1388,7 +1419,8 @@ getAvailablePlotTypes <- function(
     if (!is.null(piecewiseSpecification)) {
         p <- p + ggplot2::scale_x_continuous(
             breaks = seq_len(piecewiseSpecification$getNumberOfSituations()),
-            labels = dimnames(piecewiseSpecification$hazardRatio)[[3]])
+            labels = dimnames(piecewiseSpecification$hazardRatio)[[3]]
+        )
     } else if (xParameterName == "informationRates") {
         p <- .setXAxisScale(p, data, addZero = TRUE, digits = 3)
     }
@@ -1546,10 +1578,11 @@ getAvailablePlotTypes <- function(
     removedRows2 <- nRow - nrow(data)
 
     if (getLogLevel() == C_LOG_LEVEL_WARN && (removedRows1 > 0 || removedRows2 > 0)) {
-        warnDataIssue(sprintf(
-            "Removed %s rows containing (0, 0)-points and %s rows containing missing values",
-            removedRows1, removedRows2
-        ),
+        warnDataIssue(
+            sprintf(
+                "Removed %s rows containing (0, 0)-points and %s rows containing missing values",
+                removedRows1, removedRows2
+            ),
             diagnosticId = "plot.rows_omitted"
         )
     }
@@ -1588,16 +1621,16 @@ getAvailablePlotTypes <- function(
     } else {
         p <- ggplot2::ggplot(data, ggplot2::aes(x = .data[["xValues"]], y = .data[["yValues"]]))
     }
-    
-    if (isFALSE(discreteXAxis) && !is.null(xlab) && 
+
+    if (isFALSE(discreteXAxis) && !is.null(xlab) &&
             grepl("situation|stage", xlab, ignore.case = TRUE)) {
         discreteXAxis <- TRUE
     }
-    if (isFALSE(discreteXAxis) && !is.null(xAxisLabel) && 
+    if (isFALSE(discreteXAxis) && !is.null(xAxisLabel) &&
             grepl("situation|stage", xAxisLabel, ignore.case = TRUE)) {
         discreteXAxis <- TRUE
     }
-    
+
     p <- plotSettings$setTheme(p)
     p <- plotSettings$hideGridLines(p)
 
@@ -2041,9 +2074,9 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
 .showPlotTypeNotImplementedError <- function(type, functionName, x) {
     stopRuntimeIssue("'type' (", type, ") is not yet implemented",
         functionName = functionName,
-        parameter = "type", 
-        value = type, 
-        relatedParameter = "class", 
+        parameter = "type",
+        value = type,
+        relatedParameter = "class",
         relatedValue = .getClassName(x)
     )
 }
@@ -2139,13 +2172,17 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
             panelWidth <= 0 || panelHeight <= 0) {
         return(p + ggplot2::theme(legend.position = "right"))
     }
-    positions <- list(c(0.98, 0.98), c(0.02, 0.98), c(0.98, 0.02),
-        c(0.02, 0.02), c(0.98, 0.5), c(0.02, 0.5))
+    positions <- list(
+        c(0.98, 0.98), c(0.02, 0.98), c(0.98, 0.02),
+        c(0.02, 0.02), c(0.98, 0.5), c(0.02, 0.5)
+    )
     justifications <- list(c(1, 1), c(0, 1), c(1, 0), c(0, 0), c(1, 0.5), c(0, 0.5))
     scores <- vapply(seq_along(positions), function(i) {
         lower <- positions[[i]] - c(width, height) * justifications[[i]]
-        rectangle <- c(lower[1L] - 0.01, lower[1L] + width + 0.01,
-            lower[2L] - 0.01, lower[2L] + height + 0.01)
+        rectangle <- c(
+            lower[1L] - 0.01, lower[1L] + width + 0.01,
+            lower[2L] - 0.01, lower[2L] + height + 0.01
+        )
         score <- 0
         for (layer in seq_along(built$data)) {
             data <- built$data[[layer]]
@@ -2197,18 +2234,23 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         guides[[aesthetic]] <- guide
     }
     return(p + do.call(ggplot2::guides, guides) + ggplot2::theme(
-        legend.direction = "vertical", legend.box = "vertical", legend.title.position = "top"))
+        legend.direction = "vertical", legend.box = "vertical", legend.title.position = "top"
+    ))
 }
 
 .plotLegendLayerOverlap <- function(data, geom, rectangle) {
     if (inherits(geom, "GeomHline")) {
-        data <- data.frame(x = rep(c(0, 1), nrow(data)), y = rep(data$yintercept, each = 2),
-            PANEL = 1L, group = rep(seq_len(nrow(data)), each = 2))
+        data <- data.frame(
+            x = rep(c(0, 1), nrow(data)), y = rep(data$yintercept, each = 2),
+            PANEL = 1L, group = rep(seq_len(nrow(data)), each = 2)
+        )
         return(.plotLegendOverlap(data, rectangle, TRUE))
     }
     if (inherits(geom, "GeomVline")) {
-        data <- data.frame(x = rep(data$xintercept, each = 2), y = rep(c(0, 1), nrow(data)),
-            PANEL = 1L, group = rep(seq_len(nrow(data)), each = 2))
+        data <- data.frame(
+            x = rep(data$xintercept, each = 2), y = rep(c(0, 1), nrow(data)),
+            PANEL = 1L, group = rep(seq_len(nrow(data)), each = 2)
+        )
         return(.plotLegendOverlap(data, rectangle, TRUE))
     }
     if (all(c("xmin", "xmax", "ymin", "ymax") %in% names(data))) {
@@ -2217,16 +2259,20 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
         return(sum(width * height, na.rm = TRUE) * 100)
     }
     if (all(c("x", "ymin", "ymax") %in% names(data))) {
-        data <- data.frame(x = rep(data$x, each = 2),
+        data <- data.frame(
+            x = rep(data$x, each = 2),
             y = as.vector(rbind(data$ymin, data$ymax)), PANEL = 1L,
-            group = rep(seq_len(nrow(data)), each = 2))
+            group = rep(seq_len(nrow(data)), each = 2)
+        )
         return(.plotLegendOverlap(data, rectangle, TRUE))
     }
     if (!all(c("x", "y") %in% names(data)) || inherits(geom, "GeomBlank")) {
         return(0)
     }
-    return(.plotLegendOverlap(data, rectangle,
-        inherits(geom, "GeomLine") || inherits(geom, "GeomPath")))
+    return(.plotLegendOverlap(
+        data, rectangle,
+        inherits(geom, "GeomLine") || inherits(geom, "GeomPath")
+    ))
 }
 
 .finalizePlotLegend <- function(p, legendPosition, plotSettings) {

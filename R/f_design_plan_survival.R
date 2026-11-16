@@ -271,8 +271,14 @@ NULL
     }
     designPlan$expectedDropoutProportion1 <- matrix(result[, , 1], nrow = kMax)
     designPlan$expectedDropoutProportion2 <- matrix(result[, , 2], nrow = kMax)
-    designPlan$.setParameterType("expectedDropoutProportion1", C_PARAM_DERIVED)
-    designPlan$.setParameterType("expectedDropoutProportion2", C_PARAM_DERIVED)
+    rates <- c(designPlan$dropoutRate1, designPlan$dropoutRate2)
+    proportionType <- if (length(rates) > 0L && all(!is.na(rates) & rates == 0)) {
+        C_PARAM_NOT_APPLICABLE
+    } else {
+        C_PARAM_DERIVED
+    }
+    designPlan$.setParameterType("expectedDropoutProportion1", proportionType)
+    designPlan$.setParameterType("expectedDropoutProportion2", proportionType)
 }
 
 .getEventProbabilityFunction <- function(..., time, piecewiseLambda, piecewiseSurvivalTime, phi, kappa) {

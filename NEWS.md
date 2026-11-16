@@ -31,6 +31,8 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 
 ## Improvements, issues, and changes
 
+* Dropout parameter visibility now follows parameter types throughout. Observation times and proportions with both input dropout rates zero are classified as not applicable during calculation. Values remain accessible directly and through `as.data.frame(..., includeAllParameters = TRUE)`; default exports omit these fields.
+
 * Comparison summaries display mixed multi-arm and two-group event profiles in aligned tables. Inapplicable category coordinates are marked explicitly, without replicating stage-only values across treatment comparisons.
 
 * Markdown comparison summaries now align stages, categories and situations in rows, with comparison profiles side by side. `maxTableColumns` (default 4, also configurable through options and environment variables) splits larger tables into blocks, including with `showAll = TRUE`. Scalar values use one-row tables, and long profile labels have explicit short references.

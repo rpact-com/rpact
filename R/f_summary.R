@@ -1013,6 +1013,17 @@ NULL
         )
     }
 
+    if (simulationEnabled && survivalEnabled && (multiArmEnabled || enrichmentEnabled) && outputSize %in% c("medium", "large")) {
+        .addSimulationArrayToSummary(
+            designPlan,
+            "eventsNotAchieved",
+            "Events not achieved",
+            summaryFactory,
+            digitsSampleSize = digitSettings$digitsSampleSize,
+            smoothedZeroFormat = TRUE
+        )
+    } 
+    
     if (survivalEnabled && design$kMax > 1) {
         # sample size survival: expectedEventsH1
         # power survival: expectedNumberOfEvents

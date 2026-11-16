@@ -92,9 +92,6 @@ NULL
 }
 
 .getParameterValueFormatted <- function(obj, parameterName) {
-    if (.isDropoutOutputHidden(obj, parameterName)) {
-        return(NULL)
-    }
     tryCatch(
         {
             result <- obj$.extractParameterNameAndValue(parameterName)
