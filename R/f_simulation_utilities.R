@@ -1327,3 +1327,12 @@ getRawData <- function(x, aggregate = FALSE) {
     }
     return(invisible(eventsNotAchieved))
 }
+
+.setAccrualTimeToSimulationResults <- function(simulationResults, accrualTime) {
+    if (isTRUE(equals(accrualTime, C_ACCRUAL_TIME_DEFAULT)) || isTRUE(equals(c(0L, accrualTime), C_ACCRUAL_TIME_DEFAULT))) {
+        simulationResults$accrualTime <- C_ACCRUAL_TIME_DEFAULT
+        simulationResults$.setParameterType("accrualTime", C_PARAM_DEFAULT_VALUE)
+    } else {
+        .setValueAndParameterType(simulationResults, "accrualTime", accrualTime, C_ACCRUAL_TIME_DEFAULT)
+    }
+}

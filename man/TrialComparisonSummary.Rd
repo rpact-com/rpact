@@ -40,6 +40,8 @@ display labels are snapshots. Recompute the summary after changing objects.
 
 \item{\code{showAll}}{Whether all profiles, objects and values are displayed without the max limits or text truncation; defaults to FALSE. Stored limits remain unchanged. Is a single logical value.}
 
+\item{\code{showDataType}}{Whether parameter headings include data type descriptions in console and Markdown output; defaults to FALSE. Independent of showAll. Is a single logical value.}
+
 \item{\code{object}}{The underlying TrialComparison object, retained by reference.}
 
 \item{\code{title}}{Derived comparison summary title. Is a single character value.}

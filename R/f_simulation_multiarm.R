@@ -824,7 +824,7 @@ NULL
 
         .setValueAndParameterType(simulationResults, "kappa", kappa, 1)
 
-        .setValueAndParameterType(simulationResults, "accrualTime", accrualTime, 12)
+        .setAccrualTimeToSimulationResults(simulationResults, accrualTime)
         .setValueAndParameterType(simulationResults, "accrualIntensity", accrualIntensity, 0.1)
 
         .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)

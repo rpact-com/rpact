@@ -17,7 +17,8 @@
   harmonizeColumnNames = TRUE,
   textMode = c("wrap", "truncate", "full"),
   width = NA_integer_,
-  showAll = NA
+  showAll = NA,
+  showDataType = FALSE
 )
 
 \method{summary}{TrialComparisonSummary}(object, ...)
@@ -54,6 +55,9 @@ always retains complete text in its profile tables.}
 
 \item{showAll}{If \code{TRUE}, lift all four \verb{max*} limits and disable text truncation.
 Wrapping remains active when \code{textMode = "wrap"}. Defaults to \code{FALSE}.}
+
+\item{showDataType}{If \code{TRUE}, include data type descriptions such as
+\verb{integer, continuous} in parameter headings. Defaults to \code{FALSE}.}
 }
 \value{
 A \code{TrialComparisonSummary} inheriting from \code{SummaryFactory}. Its
@@ -86,8 +90,10 @@ and \code{paramCaptions} contains captions in object order (NA for absent parame
 These captions are captured with the summary. Distinct object-specific captions
 are shown together and identified alongside the corresponding object labels;
 they do not change exact value-profile grouping. Unnamed entries are labelled
-by their calculation or design type and collection position. The overview and
-these type labels are captured with the summary. The legend explains exact
+\code{Simulation} when all objects are simulation results, \code{Design} when all objects
+are trial designs, and \code{Result} otherwise, followed by their collection position.
+Explicit names take precedence. Full type descriptions remain in the overview.
+The overview and these labels are captured with the summary. The legend explains exact
 profile comparison and mentions NA only when displayed profiles contain
 missing values. Titles distinguish designs, sample size calculations, power
 calculations, and power simulations. Mixed comparisons use a design plan
@@ -98,16 +104,30 @@ use a Value column. Blank cells indicate coordinates absent from a profile;
 explicit missing values are shown as NA. The display limits also apply to
 these tables, with omitted values and profiles indicated explicitly.
 
+Console output uses a single comparison line for numeric scalar values when
+at most four objects are compared, all fit within the profile/object limits,
+captions agree and the complete line fits within \code{width}. Otherwise scalars
+retain the labelled profile display. Profiles with compatible coordinate
+columns are aligned by their exact coordinates and displayed side by side.
+Coordinates constant across the complete parameter are listed once; constant
+category types are expressed through the Arm or Comparison column caption.
+If the table exceeds \code{width}, values are listed vertically per coordinate.
+Incompatible coordinate structures retain the labelled profile display.
+\verb{<absent>} denotes a coordinate absent from a profile, whereas \verb{<omitted>}
+denotes a value outside that profile's \code{maxValues} preview. Neither marker
+represents a stored \code{NA}. Display choices do not change exact profile grouping.
+
 A \code{NULL} display argument reads its setting through \code{.getEnvironmentVariable()}.
 Explicit arguments take precedence over environment variables, which take
 precedence over R options and defaults. The four default limits are 12
 parameters, 3 profiles, 6 objects and 4 values. R options use the prefix
 \code{rpact.comparison.summary.} followed by the argument name: \code{maxParameters},
-\code{maxProfiles}, \code{maxObjects}, \code{maxValues}, \code{textMode}, \code{width} or \code{showAll}.
+\code{maxProfiles}, \code{maxObjects}, \code{maxValues}, \code{textMode}, \code{width}, \code{showAll} or \code{showDataType}.
 The corresponding environment variables are \code{RPACT_COMPARISON_SUMMARY_MAX_PARAMETERS},
 \code{RPACT_COMPARISON_SUMMARY_MAX_PROFILES}, \code{RPACT_COMPARISON_SUMMARY_MAX_OBJECTS},
 \code{RPACT_COMPARISON_SUMMARY_MAX_VALUES}, \code{RPACT_COMPARISON_SUMMARY_TEXT_MODE},
-\code{RPACT_COMPARISON_SUMMARY_WIDTH} and \code{RPACT_COMPARISON_SUMMARY_SHOW_ALL}.
+\code{RPACT_COMPARISON_SUMMARY_WIDTH}, \code{RPACT_COMPARISON_SUMMARY_SHOW_ALL} and
+\code{RPACT_COMPARISON_SUMMARY_SHOW_DATA_TYPE}.
 Settings are captured when the summary is created. For a complete display use
 \code{summary(x, showAll = TRUE)}; for a compact display use \code{textMode = "truncate"}.
 }

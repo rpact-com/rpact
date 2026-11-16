@@ -1793,6 +1793,8 @@ print.TrialComparison <- function(
 #'   `getOption("width", 80L)`. Long unbroken words can exceed this width.
 #' @param showAll If `TRUE`, lift all four `max*` limits and disable text truncation.
 #'   Wrapping remains active when `textMode = "wrap"`. Defaults to `FALSE`.
+#' @param showDataType If `TRUE`, include data type descriptions such as
+#'   `integer, continuous` in parameter headings. Defaults to `FALSE`.
 #' @param harmonizeColumnNames If `TRUE` (default), compare the harmonized
 #'   columns described in [getComparison()]. If `FALSE`, compare the original
 #'   parameter names, as in `as.data.frame(object, harmonizeColumnNames = FALSE)`.
@@ -1821,8 +1823,10 @@ print.TrialComparison <- function(
 #' These captions are captured with the summary. Distinct object-specific captions
 #' are shown together and identified alongside the corresponding object labels;
 #' they do not change exact value-profile grouping. Unnamed entries are labelled
-#' by their calculation or design type and collection position. The overview and
-#' these type labels are captured with the summary. The legend explains exact
+#' `Simulation` when all objects are simulation results, `Design` when all objects
+#' are trial designs, and `Result` otherwise, followed by their collection position.
+#' Explicit names take precedence. Full type descriptions remain in the overview.
+#' The overview and these labels are captured with the summary. The legend explains exact
 #' profile comparison and mentions NA only when displayed profiles contain
 #' missing values. Titles distinguish designs, sample size calculations, power
 #' calculations, and power simulations. Mixed comparisons use a design plan
@@ -1833,16 +1837,30 @@ print.TrialComparison <- function(
 #' explicit missing values are shown as NA. The display limits also apply to
 #' these tables, with omitted values and profiles indicated explicitly.
 #'
+#' Console output uses a single comparison line for numeric scalar values when
+#' at most four objects are compared, all fit within the profile/object limits,
+#' captions agree and the complete line fits within `width`. Otherwise scalars
+#' retain the labelled profile display. Profiles with compatible coordinate
+#' columns are aligned by their exact coordinates and displayed side by side.
+#' Coordinates constant across the complete parameter are listed once; constant
+#' category types are expressed through the Arm or Comparison column caption.
+#' If the table exceeds `width`, values are listed vertically per coordinate.
+#' Incompatible coordinate structures retain the labelled profile display.
+#' `<absent>` denotes a coordinate absent from a profile, whereas `<omitted>`
+#' denotes a value outside that profile's `maxValues` preview. Neither marker
+#' represents a stored `NA`. Display choices do not change exact profile grouping.
+#'
 #' A `NULL` display argument reads its setting through `.getEnvironmentVariable()`.
 #' Explicit arguments take precedence over environment variables, which take
 #' precedence over R options and defaults. The four default limits are 12
 #' parameters, 3 profiles, 6 objects and 4 values. R options use the prefix
 #' `rpact.comparison.summary.` followed by the argument name: `maxParameters`,
-#' `maxProfiles`, `maxObjects`, `maxValues`, `textMode`, `width` or `showAll`.
+#' `maxProfiles`, `maxObjects`, `maxValues`, `textMode`, `width`, `showAll` or `showDataType`.
 #' The corresponding environment variables are `RPACT_COMPARISON_SUMMARY_MAX_PARAMETERS`,
 #' `RPACT_COMPARISON_SUMMARY_MAX_PROFILES`, `RPACT_COMPARISON_SUMMARY_MAX_OBJECTS`,
 #' `RPACT_COMPARISON_SUMMARY_MAX_VALUES`, `RPACT_COMPARISON_SUMMARY_TEXT_MODE`,
-#' `RPACT_COMPARISON_SUMMARY_WIDTH` and `RPACT_COMPARISON_SUMMARY_SHOW_ALL`.
+#' `RPACT_COMPARISON_SUMMARY_WIDTH`, `RPACT_COMPARISON_SUMMARY_SHOW_ALL` and
+#' `RPACT_COMPARISON_SUMMARY_SHOW_DATA_TYPE`.
 #' Settings are captured when the summary is created. For a complete display use
 #' `summary(x, showAll = TRUE)`; for a compact display use `textMode = "truncate"`.
 #'
@@ -1860,7 +1878,8 @@ summary.TrialComparison <- function(
         harmonizeColumnNames = TRUE,
         textMode = c("wrap", "truncate", "full"),
         width = NA_integer_,
-        showAll = NA) {
+        showAll = NA,
+        showDataType = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = "summary.TrialComparison", ...)
     .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
     setting <- function(value, parameter, default, type) {
@@ -1890,6 +1909,12 @@ summary.TrialComparison <- function(
     }
     showAll <- setting(showAll, "showAll", FALSE, "logical")
     .assertIsSingleLogical(showAll, "showAll")
+    if (missing(showDataType)) {
+        showDataType <- setting(NA, "showDataType", FALSE, "logical")
+    } else {
+        showDataType <- setting(showDataType, "showDataType", FALSE, "logical")
+    }
+    .assertIsSingleLogical(showDataType, "showDataType")
     limits <- list(
         maxParameters = maxParameters, 
         maxProfiles = maxProfiles, 
@@ -1909,7 +1934,7 @@ summary.TrialComparison <- function(
         maxParameters = limits$maxParameters, maxProfiles = limits$maxProfiles,
         maxObjects = limits$maxObjects, maxValues = limits$maxValues,
         digits = digits, output = match.arg(output), harmonizeColumnNames = harmonizeColumnNames,
-        textMode = textMode, width = width, showAll = showAll))
+        textMode = textMode, width = width, showAll = showAll, showDataType = showDataType))
 }
 
 #'
@@ -1961,6 +1986,7 @@ summary.TrialComparisonSummary <- function(object, ...) {
 #' @template field_textMode_comparisonSummary
 #' @template field_width_comparisonSummary
 #' @template field_showAll_comparisonSummary
+#' @template field_showDataType_comparisonSummary
 #' @template field_object_comparisonSummary
 #' @template field_title_comparisonSummary
 #' @template field_header_comparisonSummary
@@ -1989,6 +2015,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     private = list(
         objectNames = NULL,
         objectTypes = NULL,
+        objectLabel = NULL,
         overview = NULL
     ),
     public = list(
@@ -2002,8 +2029,9 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         textMode = NA_character_,
         width = NA_integer_,
         showAll = NA,
+        showDataType = FALSE,
         initialize = function(object, info, maxParameters, maxProfiles, maxObjects, maxValues,
-                digits, output, harmonizeColumnNames, textMode, width, showAll) {
+                digits, output, harmonizeColumnNames, textMode, width, showAll, showDataType) {
             super$initialize(object = object, output = output)
             self$title <- .getTrialComparisonTitle(object$getObjects(), summaryEnabled = TRUE)
             self$parameterInfo <- info
@@ -2017,10 +2045,21 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             .setValueAndParameterType(self, "textMode", textMode, "wrap")
             .setValueAndParameterType(self, "width", width, 80L)
             .setValueAndParameterType(self, "showAll", showAll, FALSE)
+            .setValueAndParameterType(self, "showDataType", showDataType, FALSE)
             self$.setParameterType("parameterInfo", C_PARAM_GENERATED)
             self$.setParameterType("title", C_PARAM_GENERATED)
             private$objectNames <- names(object)
             private$objectTypes <- vapply(object$getObjects(), .comparisonObjectType, character(1))
+            objects <- object$getObjects()
+            private$objectLabel <- if (length(objects) > 0L &&
+                    all(vapply(objects, inherits, logical(1), "SimulationResults"))) {
+                "Simulation"
+            } else if (length(objects) > 0L &&
+                    all(vapply(objects, inherits, logical(1), "TrialDesign"))) {
+                "Design"
+            } else {
+                "Result"
+            }
             private$overview <- .comparisonOverview(object$getObjects())
         },
         .show = function(..., consoleOutputEnabled = TRUE) {
@@ -2092,6 +2131,204 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     return(values)
 }
 
+.comparisonScalarLine <- function(row, description, private, limits, digits) {
+    profiles <- row$profiles[[1L]]
+    groups <- row$profileGroups[[1L]]
+    captions <- unique(stats::na.omit(row$paramCaptions[[1L]]))
+    if (length(profiles) > 4L || row$nProfiles > limits$maxProfiles ||
+            any(tabulate(groups) > limits$maxObjects) || length(captions) > 1L ||
+            !all(vapply(profiles, function(profile) {
+                return(identical(names(profile), "value") && nrow(profile) == 1L &&
+                    is.numeric(profile$value))
+            }, logical(1)))) {
+        return(NULL)
+    }
+    ids <- seq_along(profiles)
+    labels <- paste(private$objectLabel, ids)
+    named <- rep(FALSE, length(ids))
+    if (!is.null(private$objectNames)) {
+        named <- !is.na(private$objectNames) & nzchar(private$objectNames)
+        labels[named] <- private$objectNames[named]
+    }
+    comparison <- if (any(named)) {
+        paste(labels, collapse = " vs. ")
+    } else {
+        paste(private$objectLabel, paste(ids, collapse = " vs. "))
+    }
+    values <- vapply(profiles, function(profile) {
+        return(.comparisonPreview(profile$value, digits = digits,
+            reference = row$values[[1L]], truncate = FALSE))
+    }, character(1))
+    line <- paste0("    ", description, " (", comparison, "): ", paste(values, collapse = " vs. "))
+    if (nchar(line, type = "width") > limits$width || grepl("[\r\n]", line)) {
+        return(NULL)
+    }
+    return(line)
+}
+
+# Match complete, unformatted coordinates; delimiters and display rounding must
+# never merge distinct positions. Integer and double coordinates are equivalent.
+.comparisonCoordinateIds <- function(profile, keys) {
+    return(vapply(seq_len(nrow(profile)), function(i) {
+        coordinates <- lapply(keys, function(key) {
+            value <- profile[[key]][i]
+            if (is.numeric(value)) {
+                value <- as.numeric(value)
+            } else if (is.factor(value)) {
+                value <- as.character(value)
+            }
+            return(value)
+        })
+        return(paste(as.character(serialize(coordinates, NULL, version = 2)), collapse = ""))
+    }, character(1)))
+}
+
+.comparisonCoordinateDisplay <- function(coordinates, allProfiles) {
+    keys <- names(coordinates)
+    constants <- character()
+    if (all(vapply(allProfiles, function(profile) {
+        return(nrow(profile) > 0L && setequal(setdiff(names(profile), "value"), keys))
+    }, logical(1)))) {
+        constants <- keys[vapply(keys, function(key) {
+            values <- unlist(lapply(allProfiles, function(profile) {
+                return(profile[[key]])
+            }), use.names = FALSE)
+            return(length(unique(values)) == 1L)
+        }, logical(1))]
+    }
+    captions <- vapply(keys, .comparisonCaption, character(1), tableOutputEnabled = TRUE)
+    names(captions) <- keys
+    captions[keys %in% c("stage", "stages")] <- "Stage"
+    redundant <- character()
+    if ("categoryType" %in% constants && "category" %in% keys) {
+        categoryType <- coordinates$categoryType[1L]
+        if (!is.na(categoryType) && categoryType %in% c("comparison", "arm")) {
+            captions["category"] <- if (categoryType == "comparison") {
+                "Comparison"
+            } else {
+                "Arm"
+            }
+            redundant <- "categoryType"
+        }
+    }
+    context <- vapply(setdiff(constants, redundant), function(key) {
+        return(paste0(captions[[key]], ": ",
+            .comparisonPreview(coordinates[[key]][1L], truncate = FALSE)))
+    }, character(1))
+    varying <- setdiff(keys, constants)
+    coordinateText <- lapply(varying, function(key) {
+        return(vapply(coordinates[[key]], .comparisonPreview, character(1), truncate = FALSE))
+    })
+    names(coordinateText) <- captions[varying]
+    return(list(columns = coordinateText, context = context))
+}
+
+.comparisonProfileTable <- function(profiles, labels, allProfiles, maxValues, digits, reference) {
+    keys <- setdiff(names(profiles[[1L]]), "value")
+    if (!length(keys) || !all(vapply(profiles, function(profile) {
+        return(nrow(profile) > 0L && setequal(setdiff(names(profile), "value"), keys))
+    }, logical(1)))) {
+        return(NULL)
+    }
+    ids <- lapply(profiles, .comparisonCoordinateIds, keys = keys)
+    if (any(vapply(ids, anyDuplicated, integer(1)) > 0L)) {
+        return(NULL)
+    }
+    shownIds <- lapply(ids, utils::head, n = maxValues)
+    positions <- unique(unlist(shownIds, use.names = FALSE))
+    coordinates <- do.call(rbind, lapply(profiles, function(profile) {
+        return(utils::head(profile[keys], maxValues))
+    }))
+    coordinates <- coordinates[match(positions, unlist(shownIds, use.names = FALSE)), , drop = FALSE]
+    display <- .comparisonCoordinateDisplay(coordinates, allProfiles)
+    values <- matrix("<absent>", nrow = length(positions), ncol = length(profiles),
+        dimnames = list(NULL, labels))
+    for (i in seq_along(profiles)) {
+        indices <- match(positions, ids[[i]])
+        present <- !is.na(indices)
+        displayed <- present & indices <= maxValues
+        values[present & !displayed, i] <- "<omitted>"
+        values[displayed, i] <- vapply(profiles[[i]]$value[indices[displayed]], function(value) {
+            return(.comparisonPreview(value, digits = digits, reference = reference, truncate = FALSE))
+        }, character(1))
+    }
+    cells <- cbind(as.data.frame(display$columns, check.names = FALSE,
+        row.names = seq_along(positions)), as.data.frame(values, check.names = FALSE))
+    return(list(cells = as.matrix(cells), context = display$context, nCoordinates = length(display$columns),
+        omitted = vapply(profiles, function(profile) {
+            return(max(0L, nrow(profile) - maxValues))
+        }, numeric(1)), absent = any(values == "<absent>"),
+        numeric = vapply(profiles, function(profile) {
+            return(is.numeric(profile$value))
+        }, logical(1))))
+}
+
+.comparisonTableLines <- function(table, width, indent = "        ") {
+    cells <- rbind(colnames(table$cells), table$cells)
+    widths <- apply(cells, 2L, function(column) {
+        return(max(nchar(column, type = "width")))
+    })
+    if (sum(widths) + 2L * (ncol(cells) - 1L) + nchar(indent) > width) {
+        return(NULL)
+    }
+    right <- c(rep(FALSE, table$nCoordinates), table$numeric)
+    for (j in seq_len(ncol(cells))) {
+        cells[, j] <- format(cells[, j], width = widths[j], justify = if (right[j]) {
+            "right"
+        } else {
+            "left"
+        })
+    }
+    return(paste0(indent, apply(cells, 1L, paste, collapse = "  ")))
+}
+
+.comparisonVerticalLines <- function(table, width, indent = "        ") {
+    keys <- seq_len(table$nCoordinates)
+    columns <- seq.int(table$nCoordinates + 1L, ncol(table$cells))
+    labels <- colnames(table$cells)[columns]
+    lines <- paste0(indent, "Values: ", paste(labels, collapse = " vs. "))
+    for (i in seq_len(nrow(table$cells))) {
+        coordinate <- if (length(keys)) {
+            paste(paste(colnames(table$cells)[keys], table$cells[i, keys]), collapse = ", ")
+        } else {
+            "Value"
+        }
+        values <- table$cells[i, columns]
+        line <- paste0(indent, coordinate, ": ", paste(values, collapse = " vs. "))
+        if (nchar(line, type = "width") <= width) {
+            lines <- c(lines, line)
+        } else {
+            lines <- c(lines, paste0(indent, coordinate, ":"),
+                paste0(indent, "    ", labels, ": ", values))
+        }
+    }
+    return(lines)
+}
+
+.showComparisonProfileTable <- function(table, labels, emit, emitTable, width) {
+    for (line in table$context) {
+        emit("        ", line, "\n")
+    }
+    lines <- .comparisonTableLines(table, width)
+    if (is.null(lines)) {
+        for (line in .comparisonVerticalLines(table, width)) {
+            emit(line, "\n")
+        }
+    } else {
+        # Bypass paragraph wrapping: its whitespace normalization destroys columns.
+        emitTable(paste0(paste(lines, collapse = "\n"), "\n"))
+    }
+    for (i in which(table$omitted > 0L)) {
+        emit("        ", labels[i], ": ... (+", table$omitted[i], " values)\n")
+    }
+    if (table$absent) {
+        emit("        <absent>: coordinate not present in this profile.\n")
+    }
+    if (any(table$cells == "<omitted>")) {
+        emit("        <omitted>: value outside this profile's maxValues preview.\n")
+    }
+}
+
 .showTrialComparisonSummary <- function(summary, private, consoleOutputEnabled) {
     summary$.resetCat()
     limits <- list(maxParameters = summary$maxParameters, maxProfiles = summary$maxProfiles,
@@ -2148,6 +2385,10 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     }
     if (summary$output %in% c("all", "overview")) {
         emit(private$overview, "\n")
+        if (length(private$objectTypes) > 0L && (is.null(private$objectNames) ||
+                any(is.na(private$objectNames) | !nzchar(private$objectNames)))) {
+            emit(private$objectLabel, " numbers follow the comparison input order.\n")
+        }
         overview <- .concatenateSummaryText(
             paste("The comparison identifies", length(different), if (length(different) == 1L) {
                 "differing parameter"
@@ -2210,6 +2451,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     }), use.names = FALSE)
     shown <- utils::head(interleaved, limits$maxParameters)
     shownNA <- FALSE
+    valuesOmitted <- FALSE
     sectionStarted <- summary$output == "all"
     for (role in roles) {
         indices <- shown[info$role[shown] == role]
@@ -2228,11 +2470,27 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             labelInfo$isBinary <- labelInfo$isSingleValue <- FALSE
             labelInfo$values <- list(character())
             labelInfo$paramName <- row$paramCaption
-            description <- getComparisonParameterDescriptions(labelInfo, digits = summary$digits)
+            description <- if (summary$showDataType) {
+                getComparisonParameterDescriptions(labelInfo, digits = summary$digits)
+            } else {
+                row$paramCaption
+            }
             if (!consoleOutputEnabled) {
                 description <- sub(": ", " - ", description, fixed = TRUE)
             }
             emit("\n")
+            scalarLine <- if (consoleOutputEnabled) {
+                .comparisonScalarLine(row, description, private, limits, summary$digits)
+            } else {
+                NULL
+            }
+            if (!is.null(scalarLine)) {
+                emit(scalarLine, "\n")
+                shownNA <- shownNA || any(vapply(row$profiles[[1L]], function(profile) {
+                    return(anyNA(profile$value))
+                }, logical(1)))
+                next
+            }
             if (consoleOutputEnabled) {
                 emit(parameterIndent, text(description, 75L), " [", row$nProfiles, " profiles]\n")
             } else {
@@ -2245,7 +2503,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             for (group in seq_len(min(row$nProfiles, limits$maxProfiles))) {
                 members <- which(groups == group)
                 ids <- utils::head(members, limits$maxObjects)
-                labels <- paste(text(private$objectTypes[ids], 40L), ids)
+                labels <- paste(private$objectLabel, ids)
                 named <- rep(FALSE, length(ids))
                 if (!is.null(private$objectNames)) {
                     objectNames <- private$objectNames[ids]
@@ -2260,12 +2518,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                 }
                 membersText <- paste(labels, collapse = ", ")
                 if (!variedCaptions && !any(named) && length(members) > 1L) {
-                    if (length(unique(private$objectTypes[ids])) == 1L) {
-                        membersText <- paste(
-                            text(private$objectTypes[ids[1L]], 40L),
-                            paste(ids, collapse = ", ")
-                        )
-                    }
+                    membersText <- paste(private$objectLabel, paste(ids, collapse = ", "))
                 }
                 if (length(members) > limits$maxObjects) {
                     omitted <- length(members) - limits$maxObjects
@@ -2280,29 +2533,40 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                     membersText <- text(membersText, 80L)
                 }
                 profile <- row$profiles[[1L]][[members[1L]]]
+                valuesOmitted <- valuesOmitted || nrow(profile) > limits$maxValues
                 keys <- setdiff(names(profile), "value")
                 shownNA <- shownNA || anyNA(utils::head(profile$value, limits$maxValues)) ||
                     any(vapply(keys, function(key) {
                         anyNA(utils::head(profile[[key]], limits$maxValues))
                     }, logical(1)))
-                if (!consoleOutputEnabled) {
-                    profileLabels <- c(profileLabels, membersText)
-                    displayedProfiles[[length(displayedProfiles) + 1L]] <- profile
-                    next
-                }
-                values <- preview(profile$value, limits$maxValues, summary$digits, row$values[[1L]])
-                if (length(keys)) {
-                    positions <- vapply(keys, function(key) {
-                        paste0(.comparisonCaption(key), " = ", preview(profile[[key]], limits$maxValues))
-                    }, "")
-                    values <- paste0("[", paste(positions, collapse = "; "), "] ", values)
-                }
-                emit(profileIndent, text(paste0(membersText, ": ", values), limits$width - nchar(profileIndent)), "\n")
-                if (nrow(profile) > limits$maxValues) {
-                    emit(profileIndent, "More values available; increase maxValues or use showAll = TRUE.\n")
-                }
+                profileLabels <- c(profileLabels, membersText)
+                displayedProfiles[[length(displayedProfiles) + 1L]] <- profile
             }
-            if (!consoleOutputEnabled) {
+            if (consoleOutputEnabled) {
+                table <- .comparisonProfileTable(displayedProfiles, profileLabels, row$profiles[[1L]],
+                    limits$maxValues, summary$digits, row$values[[1L]])
+                if (!is.null(table)) {
+                    .showComparisonProfileTable(table, profileLabels, emit,
+                        function(value) {
+                            summary$.cat(value, consoleOutputEnabled = TRUE)
+                        }, limits$width)
+                } else {
+                    for (j in seq_along(displayedProfiles)) {
+                        profile <- displayedProfiles[[j]]
+                        keys <- setdiff(names(profile), "value")
+                        values <- preview(profile$value, limits$maxValues, summary$digits, row$values[[1L]])
+                        if (length(keys)) {
+                            positions <- vapply(keys, function(key) {
+                                return(paste0(.comparisonCaption(key), " = ",
+                                    preview(profile[[key]], limits$maxValues)))
+                            }, character(1))
+                            values <- paste0("[", paste(positions, collapse = "; "), "] ", values)
+                        }
+                        emit(profileIndent, text(paste0(profileLabels[j], ": ", values),
+                            limits$width - nchar(profileIndent)), "\n")
+                    }
+                }
+            } else {
                 values <- .comparisonProfileMatrix(displayedProfiles, profileLabels,
                     limits$maxValues, summary$digits, row$values[[1L]],
                     wrapColumnLabels = TRUE
@@ -2318,11 +2582,25 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         }
     }
     emit("\n")
-    if (length(ordered) > length(shown)) {
-        emit(
-            "... ", length(ordered) - length(shown),
-            " more differing parameters; increase maxParameters.\n"
-        )
+    omittedParameters <- length(ordered) - length(shown)
+    if (omittedParameters > 0L || valuesOmitted) {
+        availability <- character()
+        controls <- character()
+        if (omittedParameters > 0L) {
+            availability <- paste0(omittedParameters, if (omittedParameters == 1L) {
+                " more differing parameter"
+            } else {
+                " more differing parameters"
+            })
+            controls <- "maxParameters"
+        }
+        if (valuesOmitted) {
+            availability <- c(availability, "More values available")
+            controls <- c(controls, "maxValues")
+        }
+        emit(paste(availability, collapse = ". "), "; increase ",
+            paste(controls, collapse = " and "), " or use showAll = TRUE.\n")
+        emit("\n")
     }
     if (length(shown)) {
         summary$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
