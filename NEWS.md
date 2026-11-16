@@ -1,4 +1,4 @@
-# rpact 4.5.0
+# rpact 5.0.0
 
 ## New features
 
@@ -31,11 +31,7 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 
 ## Improvements, issues, and changes
 
-* Console comparison summaries automatically use compact single-line comparisons for up to four numeric scalar results when the line fits. Compatible multidimensional profiles appear in aligned tables, with a vertical layout for narrow displays. Constant coordinates are shown once, and absent coordinates are distinguished from values omitted by display limits and stored `NA` values.
-
-* Comparison summaries use short labels for unnamed objects: `Simulation 1`, `Simulation 2`, etc. for simulation results, `Design 1`, `Design 2`, etc. for trial designs, and `Result 1`, `Result 2`, etc. otherwise. Numbers retain the comparison input order; explicit names take precedence and full type descriptions remain in the overview.
-
-* Comparison summaries omit data type labels by default. Use `showDataType = TRUE`, the `rpact.comparison.summary.showDataType` option, or the `RPACT_COMPARISON_SUMMARY_SHOW_DATA_TYPE` environment variable to include them in console and Markdown output.
+* Trial comparisons normalize profiles using parameter provenance and native dimensions. Repeated design settings no longer acquire arm or category dimensions, while stage- and group-specific results retain their coordinate domains even when values are equal. Shared-parameter exports combine normalized profiles rather than copying the first object's rows. Unfiltered comparison data frames retain their complete structure for plotting and grouping.
 
 * `testPackage()` now supports parallel test execution on Windows, Linux, and macOS while retaining its HTML and PDF reports. The new `workers` argument defaults to automatic selection (available CPUs minus two, between one and 16); use `workers = 1` for serial execution. Local test scheduling priorities are respected, and the result includes the worker count and separate timings for unit tests, R basic package tests, and HTML/PDF rendering. On Windows, `testPackage()` uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.
 * `testPackage()` now runs R basic package tests in a separate R process before starting parallel workers and isolates configuration writes per test process. Worker crashes preserve partial results and are explicitly reported as incomplete execution, with the expected test count from `META`, the full diagnostic log path, and a hint to retry with `workers = 1`. Partial reports cannot claim successful installation qualification.

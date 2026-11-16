@@ -104,10 +104,13 @@ Shallow cloning shares the contained objects. \code{clone(deep = TRUE)} is unsup
 
 \code{print()} describes the collection and selected observed ranges. \code{summary()}
 groups differences by object scope, inputs/design settings and results, with
-equal profiles grouped by object number. Constants are compared independently
-of the number of rows. Constant numeric vector cells, such as \verb{1, 1},
-compare equal to the corresponding scalar. Nonconstant profiles retain stage/situation positions;
-repeated values across the other dimension are collapsed. Missing values and
+equal profiles grouped by object number. Parameter provenance and native
+dimensions determine the applicable profile coordinates. Repeated design
+settings on arm/category rows are removed after exact consistency checks.
+Genuine scalar parameters are compared independently of the number of rows;
+dimensioned parameters retain their stage, group and scenario domains even
+when their values happen to be equal. Constant numeric vector cells, such as
+\verb{1, 1}, are normalized to the corresponding scalar value. Missing values and
 their positions participate in exact comparisons. No rounding or numerical
 tolerance is used to decide whether profiles differ.
 

@@ -94,10 +94,13 @@ NULL
 #'
 #' `print()` describes the collection and selected observed ranges. `summary()`
 #' groups differences by object scope, inputs/design settings and results, with
-#' equal profiles grouped by object number. Constants are compared independently
-#' of the number of rows. Constant numeric vector cells, such as `1, 1`,
-#' compare equal to the corresponding scalar. Nonconstant profiles retain stage/situation positions;
-#' repeated values across the other dimension are collapsed. Missing values and
+#' equal profiles grouped by object number. Parameter provenance and native
+#' dimensions determine the applicable profile coordinates. Repeated design
+#' settings on arm/category rows are removed after exact consistency checks.
+#' Genuine scalar parameters are compared independently of the number of rows;
+#' dimensioned parameters retain their stage, group and scenario domains even
+#' when their values happen to be equal. Constant numeric vector cells, such as
+#' `1, 1`, are normalized to the corresponding scalar value. Missing values and
 #' their positions participate in exact comparisons. No rounding or numerical
 #' tolerance is used to decide whether profiles differ.
 #'
@@ -988,8 +991,14 @@ fetch.TrialComparison <- function(x, ..., output = c("value", "named", "labeled"
 #' a separate `Control` category. Arm-independent simulation results occur on
 #' `overall` / `All arms` rows. Input and design settings remain available for
 #' grouping. Result cells outside their applicable category are `NA`.
-#' Categories and situations are retained in profile comparisons and transposed
-#' headings. Shared scalar-only output can omit these coordinates.
+#' The unfiltered data frame retains this expanded structure for plotting and
+#' grouping. Parameter filters use semantically normalized profiles: design
+#' settings do not acquire an arm dimension from repeated rows, whereas arm-level
+#' results retain their group domain even if all values are equal. Shared output
+#' combines the observed coordinate domains of the common profiles, without
+#' constructing new combinations or taking the first object's row layout.
+#' Scalars and lower-dimensional profiles are repeated only on compatible
+#' observed coordinates. Shared scalar-only output omits coordinate columns.
 #'
 #' @export
 #'
@@ -1066,19 +1075,7 @@ as.data.frame.TrialComparison <- function(
     }
     if (removeVariableParameters && nrow(data) > 0L) {
         info <- .getTrialComparisonInfo(x, data)
-        common <- info$paramName[info$nProfiles == 1L]
-        coordinates <- unique(c(.getComparisonCoordinateNames(data), intersect("situation", names(data))))
-        varyingProfiles <- vapply(data[common], function(values) {
-            return(length(unique(values)) > 1L)
-        }, logical(1))
-        if (!any(varyingProfiles)) {
-            coordinates <- character()
-        }
-        selected <- names(data)[names(data) %in% c(coordinates, common)]
-        data <- unique(data[data$objectNumber == objectNumbers[1L], selected, drop = FALSE])
-        if (!length(common)) {
-            data <- data.frame()
-        }
+        data <- .getComparisonSharedData(info, data)
         objectNumbers <- rep(1L, nrow(data))
         rownames(data) <- NULL
         columnNameData <- data
@@ -1491,25 +1488,118 @@ as.data.frame.TrialComparison <- function(
     return(value)
 }
 
-.comparisonProfile <- function(data, parameter, object = NULL) {
-    if (inherits(object, "SimulationResultsMultiArmSurvival") && "categoryType" %in% names(data)) {
-        inputs <- c(object$.getUserDefinedParameters(), object$.getDefaultParameters(),
-            names(.getComparisonDesign(object)), .comparisonIdentifiers, .comparisonScope)
-        if (parameter %in% names(object) && !parameter %in% inputs) {
-            categoryType <- if (parameter %in% c("singleEventsPerStage", "cumulativeEventsPerStage")) {
-                "comparison"
-            } else if (parameter %in% c("singleEventsPerArmAndStage", "selectedArms", "rejectedArmsPerStage",
-                    "lambdaTreatment", "medianTreatment", "effectMatrix") ||
-                    grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", parameter)) {
-                "arm"
+.getComparisonProfileSource <- function(object, parameter) {
+    if (is.null(object) || grepl("^(optimal_|design_|simulation_)", parameter)) {
+        return(NULL)
+    }
+    design <- .getComparisonDesign(object)
+    if (!is.null(design) && parameter %in% names(design)) {
+        return(list(object = design, parameter = parameter))
+    }
+    if (parameter %in% names(object)) {
+        return(list(object = object, parameter = parameter))
+    }
+    mapping <- .getComparisonColumnMapping(object, hasInterimAnalyses = TRUE)
+    sources <- names(mapping)[mapping == parameter & names(mapping) %in% names(object)]
+    if (length(sources) == 1L) {
+        return(list(object = object, parameter = sources[[1L]]))
+    }
+    for (source in .getComparisonMetadataSources(object)) {
+        if (parameter %in% names(source)) {
+            return(list(object = source, parameter = parameter))
+        }
+    }
+    return(NULL)
+}
+
+.getComparisonProfileDimensions <- function(data, source, categoryType) {
+    if (is.null(source)) {
+        return(NULL)
+    }
+    value <- source$object[[source$parameter]]
+    dimensions <- dim(value)
+    stages <- intersect(c("stages", "stage"), names(data))
+    situations <- intersect(c("situation", "situations"), names(data))
+    categories <- intersect(c("categoryType", "category"), names(data))
+    stageParameters <- c("informationRates", "criticalValues", "stageLevels", "alphaSpent",
+        "betaSpent", "futilityBounds", "weights", "plannedEvents", "plannedSubjects",
+        "minNumberOfEventsPerStage", "maxNumberOfEventsPerStage",
+        "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage")
+    if (inherits(source$object, "TrialDesign")) {
+        if (source$parameter %in% stageParameters || length(value) > 1L) {
+            return(stages)
+        }
+        return(character())
+    }
+    if (!is.null(categoryType) && categoryType %in% c("arm", "comparison")) {
+        keys <- categories
+        if (length(dimensions) == 3L) {
+            keys <- c(stages, keys)
+            if (dimensions[2L] > 1L) {
+                keys <- c(keys, situations)
+            }
+            return(keys)
+        }
+        if (is.matrix(value)) {
+            if (ncol(value) > 1L) {
+                keys <- c(keys, situations)
+            }
+            return(keys)
+        }
+        # A genuinely missing parameter has no coordinate domain to infer.
+        if (length(value) == 1L && is.na(value)) {
+            return(character())
+        }
+        return(NULL)
+    }
+    if (source$parameter %in% stageParameters) {
+        return(stages)
+    }
+    if (length(value) == 1L && is.null(dimensions)) {
+        return(character())
+    }
+    if (inherits(source$object, c("TrialDesignPlan", "SimulationResults")) &&
+            (!.isMultiHypothesesObject(source$object) || identical(categoryType, "overall"))) {
+        if (is.matrix(value)) {
+            keys <- if (nrow(value) > 1L) {
+                stages
             } else {
-                "overall"
+                character()
             }
-            data <- data[data$categoryType == categoryType, , drop = FALSE]
-            if (grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", parameter)) {
-                control <- endsWith(parameter, "2")
-                data <- data[(data$category == "Control") == control, , drop = FALSE]
+            if (ncol(value) > 1L) {
+                keys <- c(keys, situations)
             }
+            return(keys)
+        }
+        if (is.null(dimensions) && length(value) > 1L) {
+            return(situations)
+        }
+    }
+    return(NULL)
+}
+
+.reduceComparisonProfile <- function(profile, keys) {
+    reduced <- unique(profile[c(keys, "value")])
+    if (!length(keys)) {
+        if (nrow(reduced) == 1L) {
+            return(reduced)
+        }
+        return(NULL)
+    }
+    if (anyDuplicated(.comparisonCoordinateIds(reduced, keys))) {
+        return(NULL)
+    }
+    return(reduced)
+}
+
+.comparisonProfile <- function(data, parameter, object = NULL) {
+    source <- .getComparisonProfileSource(object, parameter)
+    categoryType <- .getComparisonSurvivalCategory(object, parameter)
+    if (!is.null(categoryType) && "categoryType" %in% names(data)) {
+        data <- data[!is.na(data$categoryType) & data$categoryType == categoryType, , drop = FALSE]
+        if (grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", parameter)) {
+            control <- endsWith(parameter, "2")
+            data <- data[!is.na(data$category) & (data$category == "Control") == control, , drop = FALSE]
         }
     }
     values <- data[[parameter]]
@@ -1517,7 +1607,9 @@ as.data.frame.TrialComparison <- function(
         values <- vapply(values, .comparisonConstantCell, character(1), USE.NAMES = FALSE)
         data[[parameter]] <- values
     }
-    if (length(unique(values)) <= 1L) {
+    contextParameter <- grepl("^(optimal_|design_|simulation_)", parameter)
+    if ((is.null(source) && all(is.na(values))) || parameter %in% .comparisonScope ||
+            (contextParameter && length(unique(values)) <= 1L)) {
         return(data.frame(value = values[1L]))
     }
     coordinates <- .getComparisonCoordinateNames(data)
@@ -1529,17 +1621,27 @@ as.data.frame.TrialComparison <- function(
     }
     profile <- data[keys]
     profile$value <- values
-    # Collapse a repeated dimension, retaining the positions of missing values.
-    collapseKeys <- if (length(semanticCoordinates)) {
-        character()
-    } else {
-        keys
+    if (!is.null(source) && (is.null(categoryType) || identical(categoryType, "overall"))) {
+        reduced <- .reduceComparisonProfile(profile, setdiff(keys, c("categoryType", "category")))
+        if (!is.null(reduced)) {
+            profile <- reduced
+        }
     }
-    for (key in collapseKeys) {
-        groups <- split(seq_len(nrow(profile)), profile[[key]])
-        if (length(groups) && all(vapply(groups, function(i) length(unique(values[i])) == 1L, logical(1)))) {
-            profile <- unique(profile[c(key, "value")])
-            break
+    dimensions <- .getComparisonProfileDimensions(data, source, categoryType)
+    if (!is.null(dimensions)) {
+        reduced <- .reduceComparisonProfile(profile, intersect(dimensions, names(profile)))
+        if (!is.null(reduced)) {
+            profile <- reduced
+        }
+    } else if (is.null(source) && length(unique(values)) <= 1L && !length(semanticCoordinates)) {
+        profile <- data.frame(value = values[1L])
+    } else if (is.null(source) && !length(semanticCoordinates)) {
+        for (key in keys) {
+            reduced <- .reduceComparisonProfile(profile, key)
+            if (!is.null(reduced)) {
+                profile <- reduced
+                break
+            }
         }
     }
     keys <- setdiff(names(profile), "value")
@@ -1548,6 +1650,82 @@ as.data.frame.TrialComparison <- function(
     }
     rownames(profile) <- NULL
     return(profile)
+}
+
+.getComparisonSharedCoordinates <- function(profiles, data) {
+    keys <- unique(unlist(lapply(profiles, function(profile) {
+        return(setdiff(names(profile), "value"))
+    }), use.names = FALSE))
+    coordinateOrder <- c("stages", "stage", "time", "situation", "situations",
+        "treatmentArm", "populations", "categoryType", "category")
+    keys <- c(intersect(coordinateOrder, keys), setdiff(keys, coordinateOrder))
+    if (!length(keys)) {
+        return(list(data = data.frame(row.names = 1L), present = matrix(FALSE, 1L, 0L)))
+    }
+    frames <- list()
+    present <- list()
+    for (profile in profiles) {
+        coordinates <- intersect(keys, names(profile))
+        if (!length(coordinates)) {
+            next
+        }
+        frame <- unique(profile[coordinates])
+        for (key in setdiff(keys, coordinates)) {
+            frame[[key]] <- data[[key]][rep(NA_integer_, nrow(frame))]
+        }
+        frames[[length(frames) + 1L]] <- frame[keys]
+        present[[length(present) + 1L]] <- matrix(rep(keys %in% coordinates, each = nrow(frame)),
+            nrow = nrow(frame), dimnames = list(NULL, keys))
+    }
+    grid <- do.call(rbind, frames)
+    present <- do.call(rbind, present)
+    # A less specific row is redundant only when an actually observed, more
+    # specific coordinate tuple covers it. Never form a Cartesian product.
+    keep <- rep(TRUE, nrow(grid))
+    signatures <- unique(present)
+    for (i in seq_len(nrow(signatures))) {
+        required <- which(signatures[i, ])
+        rows <- which(rowSums(present[, required, drop = FALSE]) == length(required) &
+            rowSums(present) == length(required))
+        covering <- which(rowSums(present[, required, drop = FALSE]) == length(required) &
+            rowSums(present) > length(required))
+        if (length(covering)) {
+            keep[rows] <- !.comparisonCoordinateIds(grid[rows, , drop = FALSE], keys[required]) %in%
+                .comparisonCoordinateIds(grid[covering, , drop = FALSE], keys[required])
+        }
+    }
+    grid <- grid[keep, , drop = FALSE]
+    present <- present[keep, , drop = FALSE]
+    uniqueRows <- !duplicated(cbind(grid, as.data.frame(present)))
+    grid <- grid[uniqueRows, , drop = FALSE]
+    present <- present[uniqueRows, , drop = FALSE]
+    rowOrder <- do.call(order, grid)
+    return(list(data = grid[rowOrder, , drop = FALSE], present = present[rowOrder, , drop = FALSE]))
+}
+
+.getComparisonSharedData <- function(info, data) {
+    common <- which(info$nProfiles == 1L)
+    if (!length(common)) {
+        return(data.frame())
+    }
+    profiles <- lapply(info$profiles[common], `[[`, 1L)
+    coordinates <- .getComparisonSharedCoordinates(profiles, data)
+    result <- coordinates$data
+    for (i in seq_along(profiles)) {
+        profile <- profiles[[i]]
+        keys <- setdiff(names(profile), "value")
+        if (!length(keys)) {
+            values <- rep(profile$value[1L], nrow(result))
+        } else {
+            indices <- match(.comparisonCoordinateIds(result, keys), .comparisonCoordinateIds(profile, keys))
+            applicable <- rowSums(coordinates$present[, keys, drop = FALSE]) == length(keys)
+            indices[!applicable] <- NA_integer_
+            values <- profile$value[indices]
+        }
+        result[[info$paramName[common[i]]]] <- values
+    }
+    rownames(result) <- NULL
+    return(result)
 }
 
 .getComparisonParameterOrder <- function(objects, candidates) {
@@ -1811,6 +1989,14 @@ print.TrialComparison <- function(
 #' Constant numeric vector cells compare equal to their scalar value regardless
 #' of vector length. Nonconstant vectors, missing values, and their positions
 #' remain part of the exact comparison. The stored comparison data are unchanged.
+#' Profile coordinates follow the parameter's source and native dimensions.
+#' Repeated design settings on simulation category rows are normalized only
+#' when the remaining coordinates uniquely determine the exact values. Stage
+#' and group domains of dimensioned parameters remain meaningful when their
+#' values are equal. Uncertain or conflicting dependencies retain additional
+#' coordinates rather than averaging or selecting an arbitrary value.
+#' Both parameter-filter options of [as.data.frame.TrialComparison()] use these
+#' profiles; unfiltered data-frame rows remain unchanged for plotting.
 #' This value normalization also applies when column-name harmonization is disabled.
 #' Plotting a summary retains its selected column-name mode unless custom data
 #' are supplied.
@@ -1837,13 +2023,16 @@ print.TrialComparison <- function(
 #' explicit missing values are shown as NA. The display limits also apply to
 #' these tables, with omitted values and profiles indicated explicitly.
 #'
-#' Console output uses a single comparison line for numeric scalar values when
+#' Console output uses a single comparison line for numeric, character or logical scalar values when
 #' at most four objects are compared, all fit within the profile/object limits,
 #' captions agree and the complete line fits within `width`. Otherwise scalars
 #' retain the labelled profile display. Profiles with compatible coordinate
 #' columns are aligned by their exact coordinates and displayed side by side.
-#' Coordinates constant across the complete parameter are listed once; constant
-#' category types are expressed through the Arm or Comparison column caption.
+#' Coordinates constant across the complete parameter are listed once, except
+#' redundant constant category types, categories and situation identifiers, which
+#' are omitted. Varying categories use an Arm or Comparison column caption where
+#' appropriate. A scalar missing profile is displayed as an `NA` column alongside
+#' the coordinates of the other profiles; non-missing scalars are not expanded.
 #' If the table exceeds `width`, values are listed vertically per coordinate.
 #' Incompatible coordinate structures retain the labelled profile display.
 #' `<absent>` denotes a coordinate absent from a profile, whereas `<omitted>`
@@ -2139,7 +2328,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             any(tabulate(groups) > limits$maxObjects) || length(captions) > 1L ||
             !all(vapply(profiles, function(profile) {
                 return(identical(names(profile), "value") && nrow(profile) == 1L &&
-                    is.numeric(profile$value))
+                    (is.numeric(profile$value) || is.character(profile$value) || is.logical(profile$value)))
             }, logical(1)))) {
         return(NULL)
     }
@@ -2183,7 +2372,25 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     }, character(1)))
 }
 
+.comparisonMissingProfile <- function(profile) {
+    return(identical(names(profile), "value") && nrow(profile) == 1L &&
+        is.na(profile$value) && !is.nan(profile$value))
+}
+
+.comparisonRedundantCoordinates <- function(profiles) {
+    keys <- c("categoryType", "category", "situation")
+    return(keys[vapply(keys, function(key) {
+        values <- unlist(lapply(profiles, function(profile) {
+            return(profile[[key]])
+        }), use.names = FALSE)
+        return(length(unique(values)) == 1L)
+    }, logical(1))])
+}
+
 .comparisonCoordinateDisplay <- function(coordinates, allProfiles) {
+    allProfiles <- Filter(function(profile) {
+        return(!.comparisonMissingProfile(profile))
+    }, allProfiles)
     keys <- names(coordinates)
     constants <- character()
     if (all(vapply(allProfiles, function(profile) {
@@ -2211,6 +2418,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             redundant <- "categoryType"
         }
     }
+    redundant <- union(redundant, .comparisonRedundantCoordinates(allProfiles))
     context <- vapply(setdiff(constants, redundant), function(key) {
         return(paste0(captions[[key]], ": ",
             .comparisonPreview(coordinates[[key]][1L], truncate = FALSE)))
@@ -2224,19 +2432,30 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
 }
 
 .comparisonProfileTable <- function(profiles, labels, allProfiles, maxValues, digits, reference) {
-    keys <- setdiff(names(profiles[[1L]]), "value")
+    missing <- vapply(profiles, .comparisonMissingProfile, logical(1))
+    coordinateProfiles <- profiles[!missing]
+    if (!length(coordinateProfiles)) {
+        return(NULL)
+    }
+    keys <- setdiff(names(coordinateProfiles[[1L]]), "value")
     if (!length(keys) || !all(vapply(profiles, function(profile) {
-        return(nrow(profile) > 0L && setequal(setdiff(names(profile), "value"), keys))
+        return(.comparisonMissingProfile(profile) ||
+            (nrow(profile) > 0L && setequal(setdiff(names(profile), "value"), keys)))
     }, logical(1)))) {
         return(NULL)
     }
-    ids <- lapply(profiles, .comparisonCoordinateIds, keys = keys)
+    ids <- lapply(profiles, function(profile) {
+        if (.comparisonMissingProfile(profile)) {
+            return(character())
+        }
+        return(.comparisonCoordinateIds(profile, keys))
+    })
     if (any(vapply(ids, anyDuplicated, integer(1)) > 0L)) {
         return(NULL)
     }
     shownIds <- lapply(ids, utils::head, n = maxValues)
     positions <- unique(unlist(shownIds, use.names = FALSE))
-    coordinates <- do.call(rbind, lapply(profiles, function(profile) {
+    coordinates <- do.call(rbind, lapply(coordinateProfiles, function(profile) {
         return(utils::head(profile[keys], maxValues))
     }))
     coordinates <- coordinates[match(positions, unlist(shownIds, use.names = FALSE)), , drop = FALSE]
@@ -2244,6 +2463,10 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     values <- matrix("<absent>", nrow = length(positions), ncol = length(profiles),
         dimnames = list(NULL, labels))
     for (i in seq_along(profiles)) {
+        if (missing[i]) {
+            values[, i] <- "NA"
+            next
+        }
         indices <- match(positions, ids[[i]])
         present <- !is.na(indices)
         displayed <- present & indices <= maxValues
@@ -2553,7 +2776,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                 } else {
                     for (j in seq_along(displayedProfiles)) {
                         profile <- displayedProfiles[[j]]
-                        keys <- setdiff(names(profile), "value")
+                        keys <- setdiff(names(profile), c("value",
+                            .comparisonRedundantCoordinates(row$profiles[[1L]])))
                         values <- preview(profile$value, limits$maxValues, summary$digits, row$values[[1L]])
                         if (length(keys)) {
                             positions <- vapply(keys, function(key) {
@@ -2609,7 +2833,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         } else {
             profileIndent
         }
-        emit(legendIndent, "Profiles compare exact values at each stage and situation.\n")
+        emit(legendIndent, "Profiles compare exact values on their applicable coordinates.\n")
         if (shownNA) {
             emit(legendIndent, "NA: missing/unavailable.\n")
         }

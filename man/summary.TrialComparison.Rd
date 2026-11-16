@@ -78,6 +78,14 @@ This also supports \verb{\%vs\%} chains followed by \code{summary(...)}.
 Constant numeric vector cells compare equal to their scalar value regardless
 of vector length. Nonconstant vectors, missing values, and their positions
 remain part of the exact comparison. The stored comparison data are unchanged.
+Profile coordinates follow the parameter's source and native dimensions.
+Repeated design settings on simulation category rows are normalized only
+when the remaining coordinates uniquely determine the exact values. Stage
+and group domains of dimensioned parameters remain meaningful when their
+values are equal. Uncertain or conflicting dependencies retain additional
+coordinates rather than averaging or selecting an arbitrary value.
+Both parameter-filter options of \code{\link[=as.data.frame.TrialComparison]{as.data.frame.TrialComparison()}} use these
+profiles; unfiltered data-frame rows remain unchanged for plotting.
 This value normalization also applies when column-name harmonization is disabled.
 Plotting a summary retains its selected column-name mode unless custom data
 are supplied.
@@ -104,13 +112,16 @@ use a Value column. Blank cells indicate coordinates absent from a profile;
 explicit missing values are shown as NA. The display limits also apply to
 these tables, with omitted values and profiles indicated explicitly.
 
-Console output uses a single comparison line for numeric scalar values when
+Console output uses a single comparison line for numeric, character or logical scalar values when
 at most four objects are compared, all fit within the profile/object limits,
 captions agree and the complete line fits within \code{width}. Otherwise scalars
 retain the labelled profile display. Profiles with compatible coordinate
 columns are aligned by their exact coordinates and displayed side by side.
-Coordinates constant across the complete parameter are listed once; constant
-category types are expressed through the Arm or Comparison column caption.
+Coordinates constant across the complete parameter are listed once, except
+redundant constant category types, categories and situation identifiers, which
+are omitted. Varying categories use an Arm or Comparison column caption where
+appropriate. A scalar missing profile is displayed as an \code{NA} column alongside
+the coordinates of the other profiles; non-missing scalars are not expanded.
 If the table exceeds \code{width}, values are listed vertically per coordinate.
 Incompatible coordinate structures retain the labelled profile display.
 \verb{<absent>} denotes a coordinate absent from a profile, whereas \verb{<omitted>}
