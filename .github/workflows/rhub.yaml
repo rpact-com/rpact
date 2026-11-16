@@ -76,15 +76,26 @@ jobs:
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
+      - name: Declare private test dependencies for this check
+        shell: Rscript {0}
+        run: |
+          description <- read.dcf("DESCRIPTION")
+          testDependencies <- c("RColorBrewer", "emmeans", "magrittr", "withr")
+          suggests <- trimws(strsplit(description[1, "Suggests"], ",")[[1]])
+          description[1, "Suggests"] <- paste(unique(c(suggests, testDependencies)), collapse = ",\n")
+          write.dcf(description, "DESCRIPTION")
       - name: Install dependencies for the current R environment
         uses: r-hub/actions/setup-deps@v1
         with:
+          dependencies: "'all'"
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
       - name: Add private tests
         run: |
           find ./private-tests/tests -maxdepth 1 -name \*.R -exec cp {} ./tests \;
           find ./private-tests/tests/testthat -maxdepth 1 -name \*.R -exec cp {} ./tests/testthat \;
+          cp -R ./private-tests/tests/testthat/testdata ./tests/testthat/
+          test -f ./tests/testthat/testdata/testdataOptimalConditionalError.RData
         shell: bash
       - name: Remove private tests folder
         run: rm -rf ./private-tests
@@ -129,15 +140,26 @@ jobs:
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
+      - name: Declare private test dependencies for this check
+        shell: Rscript {0}
+        run: |
+          description <- read.dcf("DESCRIPTION")
+          testDependencies <- c("RColorBrewer", "emmeans", "magrittr", "withr")
+          suggests <- trimws(strsplit(description[1, "Suggests"], ",")[[1]])
+          description[1, "Suggests"] <- paste(unique(c(suggests, testDependencies)), collapse = ",\n")
+          write.dcf(description, "DESCRIPTION")
       - name: Install dependencies for the current R environment
         uses: r-hub/actions/setup-deps@v1
         with:
+          dependencies: "'all'"
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
       - name: Add private tests
         run: |
           find ./private-tests/tests -maxdepth 1 -name \*.R -exec cp {} ./tests \;
           find ./private-tests/tests/testthat -maxdepth 1 -name \*.R -exec cp {} ./tests/testthat \;
+          cp -R ./private-tests/tests/testthat/testdata ./tests/testthat/
+          test -f ./tests/testthat/testdata/testdataOptimalConditionalError.RData
         shell: bash
       - name: Remove private tests folder
         run: rm -rf ./private-tests
