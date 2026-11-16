@@ -151,11 +151,13 @@
     if (!inherits(result, c("SimulationResultsSurvival", "SimulationResultsEnrichmentSurvival"))) {
         return(list())
     }
+    
     for (field in c("observedDropoutProportion1", "observedDropoutProportion2")) {
         if (!is.null(result[[field]]) && !result$isNotApplicableParameter(field)) {
             return(.addLegendEntry("treatmentArmValues"))
         }
     }
+    
     return(list())
 }
 

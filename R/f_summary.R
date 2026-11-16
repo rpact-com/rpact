@@ -1234,6 +1234,7 @@ NULL
     if (design$kMax > 1 &&
             outputSize %in% c("medium", "large") &&
             !is.null(designPlan[["earlyStop"]])) {
+              
         summaryFactory$addParameter(
             designPlan,
             parameterName = "earlyStop", 
@@ -1296,6 +1297,7 @@ NULL
                 if (is.null(x)) {
                     x <- design
                 }
+                
                 summaryFactory$addParameter(x,
                     parameterName = "earlyStop", 
                     values = probsH1$earlyStop,
