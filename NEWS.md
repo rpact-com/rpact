@@ -31,6 +31,10 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 
 ## Improvements, issues, and changes
 
+* Comparison summaries display mixed multi-arm and two-group event profiles in aligned tables. Inapplicable category coordinates are marked explicitly, without replicating stage-only values across treatment comparisons.
+
+* Markdown comparison summaries now align stages, categories and situations in rows, with comparison profiles side by side. `maxTableColumns` (default 4, also configurable through options and environment variables) splits larger tables into blocks, including with `showAll = TRUE`. Scalar values use one-row tables, and long profile labels have explicit short references.
+
 * Trial comparisons normalize profiles using parameter provenance and native dimensions. Repeated design settings no longer acquire arm or category dimensions, while stage- and group-specific results retain their coordinate domains even when values are equal. Shared-parameter exports combine normalized profiles rather than copying the first object's rows. Unfiltered comparison data frames retain their complete structure for plotting and grouping.
 
 * `testPackage()` now supports parallel test execution on Windows, Linux, and macOS while retaining its HTML and PDF reports. The new `workers` argument defaults to automatic selection (available CPUs minus two, between one and 16); use `workers = 1` for serial execution. Local test scheduling priorities are respected, and the result includes the worker count and separate timings for unit tests, R basic package tests, and HTML/PDF rendering. On Windows, `testPackage()` uses parallel R processes with file-backed standard streams and result files to avoid the pipe-related access violation in R bug 19104.

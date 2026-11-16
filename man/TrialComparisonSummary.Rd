@@ -14,6 +14,11 @@ input is classified centrally as a default or user-defined parameter.
 \code{includeDefaultParameters = TRUE}. Settings resolved from R options or
 environment variables are retained when they differ from package defaults.
 \code{showAll} affects rendering without replacing the stored limits or text mode.
+Markdown tables place coordinates in rows and profiles in columns, using at
+most \code{maxTableColumns} profile columns per block even with \code{showAll = TRUE}.
+Coordinate columns repeat in each block. Scalar profiles use one-row tables.
+Long profile labels are listed above the tables with short column references.
+Profiles with incompatible dimensions are displayed in separate tables.
 The underlying comparison is retained by reference, whereas profiles and
 display labels are snapshots. Recompute the summary after changing objects.
 }
@@ -31,6 +36,8 @@ display labels are snapshots. Recompute the summary after changing objects.
 \item{\code{maxObjects}}{Maximum number of object names or numbers displayed per profile; defaults to 6. Ignored for display when showAll is TRUE. Is a single numeric value representing a  whole number.}
 
 \item{\code{maxValues}}{Maximum number of values displayed per profile preview; defaults to 4. Ignored for display when showAll is TRUE. Is a single numeric value representing a  whole number.}
+
+\item{\code{maxTableColumns}}{Maximum result/profile columns per Markdown table block, excluding coordinate columns; defaults to 4. Applies also when showAll is TRUE; does not limit displayed data or affect console output. Is a single numeric value representing a  whole number.}
 
 \item{\code{harmonizeColumnNames}}{Whether the snapshot uses harmonized comparison column names; defaults to TRUE. Is a single logical value.}
 

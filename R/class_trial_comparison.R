@@ -1963,6 +1963,8 @@ print.TrialComparison <- function(
 #' @param maxProfiles Maximum number of distinct profiles shown per parameter.
 #' @param maxObjects Maximum object numbers/names listed per profile.
 #' @param maxValues Maximum profile values shown per preview.
+#' @param maxTableColumns Maximum result/profile columns per Markdown table block
+#'   (default 4). Coordinate columns are additional. Also applies with `showAll = TRUE`.
 #' @param textMode Console text handling: `"wrap"` (default) wraps complete text,
 #'   `"truncate"` shows compact previews with an explicit shortening notice,
 #'   and `"full"` writes complete text without automatic wrapping. Markdown
@@ -2017,11 +2019,13 @@ print.TrialComparison <- function(
 #' missing values. Titles distinguish designs, sample size calculations, power
 #' calculations, and power simulations. Mixed comparisons use a design plan
 #' comparison title; empty comparisons retain the general trial comparison title.
-#' Markdown output presents each differing parameter as a table with one row per
-#' displayed profile and columns labelled by stage and situation. Scalar profiles
-#' use a Value column. Blank cells indicate coordinates absent from a profile;
-#' explicit missing values are shown as NA. The display limits also apply to
-#' these tables, with omitted values and profiles indicated explicitly.
+#' Markdown output places coordinates in rows and displayed profiles in columns.
+#' Scalar profiles use one-row tables. At most `maxTableColumns` profile columns
+#' (default 4) appear per block, with coordinate columns repeated in each block.
+#' This layout limit also applies with `showAll = TRUE`. Long profile labels are
+#' listed above the tables with short references. Incompatible coordinate
+#' structures use separate tables. Missing and omitted coordinates use the same
+#' markers as console tables. Data limits apply independently of table layout.
 #'
 #' Console output uses a single comparison line for numeric, character or logical scalar values when
 #' at most four objects are compared, all fit within the profile/object limits,
@@ -2034,7 +2038,10 @@ print.TrialComparison <- function(
 #' appropriate. A scalar missing profile is displayed as an `NA` column alongside
 #' the coordinates of the other profiles; non-missing scalars are not expanded.
 #' If the table exceeds `width`, values are listed vertically per coordinate.
-#' Incompatible coordinate structures retain the labelled profile display.
+#' Profiles sharing at least one coordinate can use a joint table even if their
+#' remaining axes differ. A dash marks an inapplicable coordinate; values are
+#' not broadcast to categories absent from their source profile. Profiles without
+#' shared coordinates retain separate displays.
 #' `<absent>` denotes a coordinate absent from a profile, whereas `<omitted>`
 #' denotes a value outside that profile's `maxValues` preview. Neither marker
 #' represents a stored `NA`. Display choices do not change exact profile grouping.
@@ -2044,7 +2051,7 @@ print.TrialComparison <- function(
 #' precedence over R options and defaults. The four default limits are 12
 #' parameters, 3 profiles, 6 objects and 4 values. R options use the prefix
 #' `rpact.comparison.summary.` followed by the argument name: `maxParameters`,
-#' `maxProfiles`, `maxObjects`, `maxValues`, `textMode`, `width`, `showAll` or `showDataType`.
+#' `maxProfiles`, `maxObjects`, `maxValues`, `maxTableColumns`, `textMode`, `width`, `showAll` or `showDataType`.
 #' The corresponding environment variables are `RPACT_COMPARISON_SUMMARY_MAX_PARAMETERS`,
 #' `RPACT_COMPARISON_SUMMARY_MAX_PROFILES`, `RPACT_COMPARISON_SUMMARY_MAX_OBJECTS`,
 #' `RPACT_COMPARISON_SUMMARY_MAX_VALUES`, `RPACT_COMPARISON_SUMMARY_TEXT_MODE`,
@@ -2068,7 +2075,8 @@ summary.TrialComparison <- function(
         textMode = c("wrap", "truncate", "full"),
         width = NA_integer_,
         showAll = NA,
-        showDataType = FALSE) {
+        showDataType = FALSE,
+        maxTableColumns = NA_integer_) {
     .warnInCaseOfUnknownArguments(functionName = "summary.TrialComparison", ...)
     .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
     setting <- function(value, parameter, default, type) {
@@ -2108,8 +2116,9 @@ summary.TrialComparison <- function(
         maxParameters = maxParameters, 
         maxProfiles = maxProfiles, 
         maxObjects = maxObjects, 
-        maxValues = maxValues)
-    defaults <- c(maxParameters = 12L, maxProfiles = 3L, maxObjects = 6L, maxValues = 4L)
+        maxValues = maxValues,
+        maxTableColumns = maxTableColumns)
+    defaults <- c(maxParameters = 12L, maxProfiles = 3L, maxObjects = 6L, maxValues = 4L, maxTableColumns = 4L)
     for (parameter in names(limits)) {
         limits[[parameter]] <- setting(limits[[parameter]], parameter, defaults[[parameter]], "numeric")
         .assertComparisonLimit(limits[[parameter]], parameter, "summary.TrialComparison")
@@ -2122,6 +2131,7 @@ summary.TrialComparison <- function(
     return(TrialComparisonSummary$new(object, info,
         maxParameters = limits$maxParameters, maxProfiles = limits$maxProfiles,
         maxObjects = limits$maxObjects, maxValues = limits$maxValues,
+        maxTableColumns = limits$maxTableColumns,
         digits = digits, output = match.arg(output), harmonizeColumnNames = harmonizeColumnNames,
         textMode = textMode, width = width, showAll = showAll, showDataType = showDataType))
 }
@@ -2171,6 +2181,7 @@ summary.TrialComparisonSummary <- function(object, ...) {
 #' @template field_maxProfiles_comparisonSummary
 #' @template field_maxObjects_comparisonSummary
 #' @template field_maxValues_comparisonSummary
+#' @template field_maxTableColumns_comparisonSummary
 #' @template field_harmonizeColumnNames_comparisonSummary
 #' @template field_textMode_comparisonSummary
 #' @template field_width_comparisonSummary
@@ -2192,6 +2203,11 @@ summary.TrialComparisonSummary <- function(object, ...) {
 #' `includeDefaultParameters = TRUE`. Settings resolved from R options or
 #' environment variables are retained when they differ from package defaults.
 #' `showAll` affects rendering without replacing the stored limits or text mode.
+#' Markdown tables place coordinates in rows and profiles in columns, using at
+#' most `maxTableColumns` profile columns per block even with `showAll = TRUE`.
+#' Coordinate columns repeat in each block. Scalar profiles use one-row tables.
+#' Long profile labels are listed above the tables with short column references.
+#' Profiles with incompatible dimensions are displayed in separate tables.
 #' The underlying comparison is retained by reference, whereas profiles and
 #' display labels are snapshots. Recompute the summary after changing objects.
 #'
@@ -2214,13 +2230,14 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         maxProfiles = NA_integer_,
         maxObjects = NA_integer_,
         maxValues = NA_integer_,
+        maxTableColumns = NA_integer_,
         harmonizeColumnNames = TRUE,
         textMode = NA_character_,
         width = NA_integer_,
         showAll = NA,
         showDataType = FALSE,
         initialize = function(object, info, maxParameters, maxProfiles, maxObjects, maxValues,
-                digits, output, harmonizeColumnNames, textMode, width, showAll, showDataType) {
+                digits, output, harmonizeColumnNames, textMode, width, showAll, showDataType, maxTableColumns) {
             super$initialize(object = object, output = output)
             self$title <- .getTrialComparisonTitle(object$getObjects(), summaryEnabled = TRUE)
             self$parameterInfo <- info
@@ -2229,6 +2246,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             .setValueAndParameterType(self, "maxProfiles", maxProfiles, 3L)
             .setValueAndParameterType(self, "maxObjects", maxObjects, 6L)
             .setValueAndParameterType(self, "maxValues", maxValues, 4L)
+            .setValueAndParameterType(self, "maxTableColumns", maxTableColumns, 4L)
             .setValueAndParameterType(self, "output", output, "all")
             .setValueAndParameterType(self, "harmonizeColumnNames", harmonizeColumnNames, TRUE)
             .setValueAndParameterType(self, "textMode", textMode, "wrap")
@@ -2431,7 +2449,92 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     return(list(columns = coordinateText, context = context))
 }
 
+.comparisonAlignProfileCoordinates <- function(profiles) {
+    coordinateProfiles <- Filter(function(profile) {
+        return(!.comparisonMissingProfile(profile))
+    }, profiles)
+    schemas <- lapply(coordinateProfiles, function(profile) {
+        return(setdiff(names(profile), "value"))
+    })
+    if (!length(schemas) || !length(Reduce(intersect, schemas))) {
+        return(NULL)
+    }
+    keys <- Reduce(union, schemas)
+    sharedKeys <- Reduce(intersect, schemas)
+    if (all(vapply(schemas, setequal, logical(1), keys))) {
+        return(NULL)
+    }
+    # A display-only sentinel distinguishes an inapplicable coordinate from stored NA.
+    marker <- "<not applicable>"
+    values <- unlist(lapply(coordinateProfiles, function(profile) {
+        return(unlist(profile[setdiff(names(profile), "value")], use.names = FALSE))
+    }), use.names = FALSE)
+    while (marker %in% values) {
+        marker <- paste0(marker, ".")
+    }
+    aligned <- lapply(profiles, function(profile) {
+        if (.comparisonMissingProfile(profile)) {
+            return(profile)
+        }
+        for (key in keys) {
+            if (!key %in% names(profile)) {
+                profile[[key]] <- rep(marker, nrow(profile))
+            } else if (!key %in% sharedKeys && is.numeric(profile[[key]])) {
+                values <- profile[[key]]
+                profile[[key]] <- sprintf("%.17g", values)
+                profile[[key]][is.na(values)] <- NA_character_
+            } else if (!key %in% sharedKeys) {
+                profile[[key]] <- as.character(profile[[key]])
+            }
+        }
+        return(profile[c(keys, "value")])
+    })
+    return(list(profiles = aligned, marker = marker))
+}
+
 .comparisonProfileTable <- function(profiles, labels, allProfiles, maxValues, digits, reference) {
+    alignment <- .comparisonAlignProfileCoordinates(allProfiles)
+    if (!is.null(alignment)) {
+        # Include every profile when choosing the sentinel and deciding which axes vary.
+        indices <- vapply(profiles, function(profile) {
+            return(which(vapply(allProfiles, identical, logical(1), profile))[1L])
+        }, integer(1))
+        table <- .comparisonProfileTable(alignment$profiles[indices], labels,
+            alignment$profiles, maxValues, digits, reference)
+        if (!is.null(table)) {
+            table$notApplicable <- any(table$cells[, seq_len(table$nCoordinates), drop = FALSE] == alignment$marker)
+            table$cells[table$cells == alignment$marker] <- "-"
+            categoryTypes <- unique(unlist(lapply(allProfiles, function(profile) {
+                return(profile$categoryType)
+            }), use.names = FALSE))
+            typeColumn <- match(.comparisonCaption("categoryType", tableOutputEnabled = TRUE),
+                colnames(table$cells))
+            categoryColumn <- match(.comparisonCaption("category", tableOutputEnabled = TRUE),
+                colnames(table$cells))
+            if (length(categoryTypes) == 1L && categoryTypes %in% c("arm", "comparison") &&
+                    !is.na(typeColumn) && !is.na(categoryColumn)) {
+                colnames(table$cells)[categoryColumn] <- if (categoryTypes == "arm") {
+                    "Arm"
+                } else {
+                    "Comparison"
+                }
+                table$cells <- table$cells[, -typeColumn, drop = FALSE]
+                table$nCoordinates <- table$nCoordinates - 1L
+            }
+            sharedKeys <- Reduce(intersect, lapply(allProfiles[!vapply(allProfiles,
+                .comparisonMissingProfile, logical(1))], function(profile) {
+                return(setdiff(names(profile), "value"))
+            }))
+            captions <- vapply(sharedKeys, .comparisonCaption, character(1), tableOutputEnabled = TRUE)
+            captions[sharedKeys %in% c("stage", "stages")] <- "Stage"
+            captions <- intersect(captions, colnames(table$cells)[seq_len(table$nCoordinates)])
+            if (length(captions)) {
+                ids <- .comparisonCoordinateIds(as.data.frame(table$cells), captions)
+                table$cells <- table$cells[order(match(ids, unique(ids))), , drop = FALSE]
+            }
+        }
+        return(table)
+    }
     missing <- vapply(profiles, .comparisonMissingProfile, logical(1))
     coordinateProfiles <- profiles[!missing]
     if (!length(coordinateProfiles)) {
@@ -2544,12 +2647,121 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
     for (i in which(table$omitted > 0L)) {
         emit("        ", labels[i], ": ... (+", table$omitted[i], " values)\n")
     }
-    if (table$absent) {
-        emit("        <absent>: coordinate not present in this profile.\n")
-    }
     if (any(table$cells == "<omitted>")) {
         emit("        <omitted>: value outside this profile's maxValues preview.\n")
     }
+}
+
+.comparisonScalarTable <- function(profiles, labels, digits, reference) {
+    if (!all(vapply(profiles, function(profile) {
+        return(identical(names(profile), "value") && nrow(profile) == 1L)
+    }, logical(1)))) {
+        return(NULL)
+    }
+    values <- vapply(profiles, function(profile) {
+        return(.comparisonPreview(profile$value, digits = digits, reference = reference, truncate = FALSE))
+    }, character(1))
+    return(list(cells = matrix(values, nrow = 1L, dimnames = list(NULL, labels)),
+        context = character(), nCoordinates = 0L, omitted = rep(0L, length(profiles)),
+        absent = FALSE, numeric = vapply(profiles, function(profile) {
+            return(is.numeric(profile$value))
+        }, logical(1))))
+}
+
+.showComparisonMarkdownTable <- function(summary, table) {
+    emit <- function(...) {
+        summary$.cat(..., consoleOutputEnabled = FALSE)
+    }
+    labels <- colnames(table$cells)[seq.int(table$nCoordinates + 1L, ncol(table$cells))]
+    for (context in table$context) {
+        emit(.escapeMarkdownTableCell(context), "\n\n")
+    }
+    columns <- seq_along(labels)
+    blocks <- split(columns, ceiling(columns / summary$maxTableColumns))
+    for (b in seq_along(blocks)) {
+        selected <- blocks[[b]]
+        if (length(blocks) > 1L) {
+            emit("Table block ", b, " of ", length(blocks), ".\n\n")
+        }
+        cells <- table$cells[, c(seq_len(table$nCoordinates), table$nCoordinates + selected), drop = FALSE]
+        emit(.escapeMarkdownTableCell(colnames(cells)), tableColumns = ncol(cells))
+        right <- c(rep(FALSE, table$nCoordinates), table$numeric[selected])
+        emit(ifelse(right, "---:", ":---"), tableColumns = ncol(cells))
+        for (i in seq_len(nrow(cells))) {
+            emit(.escapeMarkdownTableCell(cells[i, ]), tableColumns = ncol(cells))
+        }
+        emit("\n")
+    }
+    for (i in which(table$omitted > 0L)) {
+        emit(.escapeMarkdownTableCell(labels[i]), ": ... (+", table$omitted[i], " values)\n\n")
+    }
+    if (any(table$cells == "<omitted>")) {
+        emit("&lt;omitted&gt;: value outside this profile's maxValues preview.\n\n")
+    }
+}
+
+.showComparisonMarkdownProfiles <- function(summary, profiles, labels, allProfiles, maxValues, reference,
+        registerTable = NULL) {
+    showTable <- function(table) {
+        if (!is.null(registerTable)) {
+            registerTable(table)
+        }
+        .showComparisonMarkdownTable(summary, table)
+    }
+    # Short references are local to this parameter and never replace the full labels silently.
+    long <- nchar(labels, type = "width") > 24L | grepl("[\r\n]", labels)
+    if (any(long)) {
+        short <- paste("Profile", seq_along(labels))
+        for (i in seq_along(labels)) {
+            summary$.cat(short[i], ": ", .escapeMarkdownTableCell(labels[i]), "\n\n",
+                consoleOutputEnabled = FALSE)
+        }
+        labels <- short
+    }
+    table <- .comparisonScalarTable(profiles, labels, summary$digits, reference)
+    if (is.null(table)) {
+        table <- .comparisonProfileTable(profiles, labels, allProfiles, maxValues, summary$digits, reference)
+    }
+    if (!is.null(table)) {
+        showTable(table)
+        return(invisible())
+    }
+    # Incompatible dimensions cannot safely share rows. Keep each exact profile intact.
+    for (i in seq_along(profiles)) {
+        table <- .comparisonScalarTable(profiles[i], labels[i], summary$digits, reference)
+        if (is.null(table)) {
+            table <- .comparisonProfileTable(profiles[i], labels[i], profiles[i],
+                maxValues, summary$digits, reference)
+        }
+        if (!is.null(table)) {
+            showTable(table)
+        } else {
+            profile <- profiles[[i]]
+            keys <- setdiff(names(profile), "value")
+            shown <- utils::head(profile, maxValues)
+            cells <- as.matrix(data.frame(lapply(shown, function(values) {
+                return(vapply(values, function(value) {
+                    return(.comparisonPreview(value, digits = summary$digits, truncate = FALSE))
+                }, character(1)))
+            }), check.names = FALSE))
+            colnames(cells) <- c(vapply(keys, .comparisonCaption, character(1)), labels[i])
+            showTable(list(cells = cells, context = character(),
+                nCoordinates = length(keys), numeric = is.numeric(profile$value),
+                omitted = max(0L, nrow(profile) - maxValues), absent = FALSE))
+        }
+    }
+}
+
+.comparisonProfileDescription <- function(labels, captions) {
+    captions[is.na(captions)] <- ""
+    descriptions <- vapply(unique(captions), function(caption) {
+        members <- paste(labels[captions == caption], collapse = ", ")
+        if (nzchar(caption)) {
+            return(paste0(members, " (", caption, ")"))
+        }
+        return(members)
+    }, character(1))
+    return(paste(descriptions, collapse = ", "))
 }
 
 .showTrialComparisonSummary <- function(summary, private, consoleOutputEnabled) {
@@ -2673,6 +2885,12 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
         }), use.names = FALSE)
     }), use.names = FALSE)
     shown <- utils::head(interleaved, limits$maxParameters)
+    shownAbsent <- FALSE
+    shownNotApplicable <- FALSE
+    registerTable <- function(table) {
+        shownAbsent <<- shownAbsent || isTRUE(table$absent)
+        shownNotApplicable <<- shownNotApplicable || isTRUE(table$notApplicable)
+    }
     shownNA <- FALSE
     valuesOmitted <- FALSE
     sectionStarted <- summary$output == "all"
@@ -2722,6 +2940,7 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             }
             groups <- row$profileGroups[[1L]]
             profileLabels <- character()
+            profileDescriptions <- character()
             displayedProfiles <- list()
             for (group in seq_len(min(row$nProfiles, limits$maxProfiles))) {
                 members <- which(groups == group)
@@ -2734,12 +2953,13 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                     labels[named] <- text(objectNames[named], 18L)
                 }
                 captions <- row$paramCaptions[[1L]]
+                plainLabels <- labels
                 variedCaptions <- length(unique(stats::na.omit(captions))) > 1L
-                if (variedCaptions) {
-                    hasCaption <- !is.na(captions[ids]) & nzchar(captions[ids])
-                    labels[hasCaption] <- paste0(labels[hasCaption], " (", captions[ids[hasCaption]], ")")
+                membersText <- if (variedCaptions) {
+                    .comparisonProfileDescription(labels, captions[ids])
+                } else {
+                    paste(labels, collapse = ", ")
                 }
-                membersText <- paste(labels, collapse = ", ")
                 if (!variedCaptions && !any(named) && length(members) > 1L) {
                     membersText <- paste(private$objectLabel, paste(ids, collapse = ", "))
                 }
@@ -2753,7 +2973,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                     membersText <- paste0(membersText, ", ... (+", omitted, " ", omittedLabel, "; increase maxObjects)")
                 }
                 if (variedCaptions) {
-                    membersText <- text(membersText, 80L)
+                    profileDescriptions <- c(profileDescriptions, membersText)
+                    membersText <- paste(plainLabels, collapse = ", ")
                 }
                 profile <- row$profiles[[1L]][[members[1L]]]
                 valuesOmitted <- valuesOmitted || nrow(profile) > limits$maxValues
@@ -2765,10 +2986,17 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                 profileLabels <- c(profileLabels, membersText)
                 displayedProfiles[[length(displayedProfiles) + 1L]] <- profile
             }
+            for (j in seq_along(profileDescriptions)) {
+                emit(profileIndent, profileDescriptions[j], "\n")
+            }
+            if (length(profileDescriptions)) {
+                emit("\n")
+            }
             if (consoleOutputEnabled) {
                 table <- .comparisonProfileTable(displayedProfiles, profileLabels, row$profiles[[1L]],
                     limits$maxValues, summary$digits, row$values[[1L]])
                 if (!is.null(table)) {
+                    registerTable(table)
                     .showComparisonProfileTable(table, profileLabels, emit,
                         function(value) {
                             summary$.cat(value, consoleOutputEnabled = TRUE)
@@ -2791,14 +3019,8 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
                     }
                 }
             } else {
-                values <- .comparisonProfileMatrix(displayedProfiles, profileLabels,
-                    limits$maxValues, summary$digits, row$values[[1L]],
-                    wrapColumnLabels = TRUE
-                )
-                .showMatrix(summary, values, summary$digits,
-                    consoleOutputEnabled = FALSE,
-                    rowLabel = "Parameter", escapeMarkdown = TRUE
-                )
+                .showComparisonMarkdownProfiles(summary, displayedProfiles, profileLabels,
+                    row$profiles[[1L]], limits$maxValues, row$values[[1L]], registerTable)
             }
             if (row$nProfiles > limits$maxProfiles) {
                 emit(profileIndent, "... ", row$nProfiles - limits$maxProfiles, " more profiles; increase maxProfiles or use showAll = TRUE.\n")
@@ -2834,6 +3056,17 @@ TrialComparisonSummary <- R6::R6Class("TrialComparisonSummary",
             profileIndent
         }
         emit(legendIndent, "Profiles compare exact values on their applicable coordinates.\n")
+        if (shownAbsent) {
+            marker <- if (consoleOutputEnabled) {
+                "<absent>"
+            } else {
+                "&lt;absent&gt;"
+            }
+            emit(legendIndent, marker, ": coordinate not present in this profile.\n")
+        }
+        if (shownNotApplicable) {
+            emit(legendIndent, "-: coordinate not applicable to this profile; values are not repeated across categories.\n")
+        }
         if (shownNA) {
             emit(legendIndent, "NA: missing/unavailable.\n")
         }

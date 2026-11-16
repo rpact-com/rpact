@@ -18,7 +18,8 @@
   textMode = c("wrap", "truncate", "full"),
   width = NA_integer_,
   showAll = NA,
-  showDataType = FALSE
+  showDataType = FALSE,
+  maxTableColumns = NA_integer_
 )
 
 \method{summary}{TrialComparisonSummary}(object, ...)
@@ -58,6 +59,9 @@ Wrapping remains active when \code{textMode = "wrap"}. Defaults to \code{FALSE}.
 
 \item{showDataType}{If \code{TRUE}, include data type descriptions such as
 \verb{integer, continuous} in parameter headings. Defaults to \code{FALSE}.}
+
+\item{maxTableColumns}{Maximum result/profile columns per Markdown table block
+(default 4). Coordinate columns are additional. Also applies with \code{showAll = TRUE}.}
 }
 \value{
 A \code{TrialComparisonSummary} inheriting from \code{SummaryFactory}. Its
@@ -106,11 +110,13 @@ profile comparison and mentions NA only when displayed profiles contain
 missing values. Titles distinguish designs, sample size calculations, power
 calculations, and power simulations. Mixed comparisons use a design plan
 comparison title; empty comparisons retain the general trial comparison title.
-Markdown output presents each differing parameter as a table with one row per
-displayed profile and columns labelled by stage and situation. Scalar profiles
-use a Value column. Blank cells indicate coordinates absent from a profile;
-explicit missing values are shown as NA. The display limits also apply to
-these tables, with omitted values and profiles indicated explicitly.
+Markdown output places coordinates in rows and displayed profiles in columns.
+Scalar profiles use one-row tables. At most \code{maxTableColumns} profile columns
+(default 4) appear per block, with coordinate columns repeated in each block.
+This layout limit also applies with \code{showAll = TRUE}. Long profile labels are
+listed above the tables with short references. Incompatible coordinate
+structures use separate tables. Missing and omitted coordinates use the same
+markers as console tables. Data limits apply independently of table layout.
 
 Console output uses a single comparison line for numeric, character or logical scalar values when
 at most four objects are compared, all fit within the profile/object limits,
@@ -123,7 +129,10 @@ are omitted. Varying categories use an Arm or Comparison column caption where
 appropriate. A scalar missing profile is displayed as an \code{NA} column alongside
 the coordinates of the other profiles; non-missing scalars are not expanded.
 If the table exceeds \code{width}, values are listed vertically per coordinate.
-Incompatible coordinate structures retain the labelled profile display.
+Profiles sharing at least one coordinate can use a joint table even if their
+remaining axes differ. A dash marks an inapplicable coordinate; values are
+not broadcast to categories absent from their source profile. Profiles without
+shared coordinates retain separate displays.
 \verb{<absent>} denotes a coordinate absent from a profile, whereas \verb{<omitted>}
 denotes a value outside that profile's \code{maxValues} preview. Neither marker
 represents a stored \code{NA}. Display choices do not change exact profile grouping.
@@ -133,7 +142,7 @@ Explicit arguments take precedence over environment variables, which take
 precedence over R options and defaults. The four default limits are 12
 parameters, 3 profiles, 6 objects and 4 values. R options use the prefix
 \code{rpact.comparison.summary.} followed by the argument name: \code{maxParameters},
-\code{maxProfiles}, \code{maxObjects}, \code{maxValues}, \code{textMode}, \code{width}, \code{showAll} or \code{showDataType}.
+\code{maxProfiles}, \code{maxObjects}, \code{maxValues}, \code{maxTableColumns}, \code{textMode}, \code{width}, \code{showAll} or \code{showDataType}.
 The corresponding environment variables are \code{RPACT_COMPARISON_SUMMARY_MAX_PARAMETERS},
 \code{RPACT_COMPARISON_SUMMARY_MAX_PROFILES}, \code{RPACT_COMPARISON_SUMMARY_MAX_OBJECTS},
 \code{RPACT_COMPARISON_SUMMARY_MAX_VALUES}, \code{RPACT_COMPARISON_SUMMARY_TEXT_MODE},
