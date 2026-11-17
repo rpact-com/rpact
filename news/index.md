@@ -1,6 +1,8 @@
 # Changelog
 
-## rpact 4.5.0
+## rpact 5.0.0
+
+CRAN release: 2026-11-16
 
 ### New features
 
@@ -139,7 +141,7 @@
   wrapping, independent positions, and font reductions limited to ten
   percent. Automatic legend placement (`legendPosition = "auto"`) is the
   default across all rpact plots with legends, while manual positions
-  and legacy `NA` behaviour remain available. Comparison operations and
+  and legacy `NA` behavior remain available. Comparison operations and
   package testing provide structured errors through the central error
   helpers, preserving worker failure details.
   [`compare()`](https://docs.rpact.org/reference/compare.md) starts a
@@ -213,6 +215,7 @@
   now removes duplicate precondition blocks while preserving complete
   user-defined function bodies and pipe chains.
 - Issue [\#118](https://github.com/rpact-com/rpact/issues/118) fixed
+- Issue [\#159](https://github.com/rpact-com/rpact/issues/159) fixed
 - In
   [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md),
   the early stopping probability (“Early stop”) is now displayed

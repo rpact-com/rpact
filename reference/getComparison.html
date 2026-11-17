@@ -17,7 +17,7 @@ names() returns the supplied names of the comparison objects."><meta property="o
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -151,10 +151,13 @@ pipelines such as <code>comparison |&gt; add(other) |&gt; delete(1)</code>.
 Shallow cloning shares the contained objects. <code>clone(deep = TRUE)</code> is unsupported.</p>
 <p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> describes the collection and selected observed ranges. <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>
 groups differences by object scope, inputs/design settings and results, with
-equal profiles grouped by object number. Constants are compared independently
-of the number of rows. Constant numeric vector cells, such as <code>1, 1</code>,
-compare equal to the corresponding scalar. Nonconstant profiles retain stage/situation positions;
-repeated values across the other dimension are collapsed. Missing values and
+equal profiles grouped by object number. Parameter provenance and native
+dimensions determine the applicable profile coordinates. Repeated design
+settings on arm/category rows are removed after exact consistency checks.
+Genuine scalar parameters are compared independently of the number of rows;
+dimensioned parameters retain their stage, group and scenario domains even
+when their values happen to be equal. Constant numeric vector cells, such as
+<code>1, 1</code>, are normalized to the corresponding scalar value. Missing values and
 their positions participate in exact comparisons. No rounding or numerical
 tolerance is used to decide whether profiles differ.</p>
 <p>For comparisons containing interim analyses, fixed plans' <code>nFixed</code>, <code>nFixed1</code>,

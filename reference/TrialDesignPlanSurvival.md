@@ -12,7 +12,10 @@ with suitable arguments to create a survival design plan. Expected
 dropout proportions use each stage's planned analysis horizon for each
 alternative scenario, with stage rows and scenario columns. See the
 constructor help for the deterministic planned-accrual denominator and
-competing-event assumptions.
+competing-event assumptions. When both input dropout rates are zero,
+these proportions are classified as not applicable. Their values remain
+accessible directly or with
+`as.data.frame(x, includeAllParameters = TRUE)`.
 
 ## Fields
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,10 @@ use <code><a href="getSampleSizeSurvival.html">getSampleSizeSurvival()</a></code
 or <code><a href="getPowerSurvival.html">getPowerSurvival()</a></code> with suitable arguments to create a survival design plan.
 Expected dropout proportions use each stage's planned analysis horizon for each
 alternative scenario, with stage rows and scenario columns. See the constructor help for
-the deterministic planned-accrual denominator and competing-event assumptions.</p>
+the deterministic planned-accrual denominator and competing-event assumptions.
+When both input dropout rates are zero, these proportions are classified as
+not applicable. Their values remain accessible directly or with
+<code>as.data.frame(x, includeAllParameters = TRUE)</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="fields">Fields<a class="anchor" aria-label="anchor" href="#fields"></a></h2>

@@ -101,9 +101,9 @@ plot(
 
   - `0`: default outside position with a square aspect ratio
 
-  - `1`, `2`, `3`: inside left, at the top, centre, or bottom
+  - `1`, `2`, `3`: inside left, at the top, center, or bottom
 
-  - `4`, `5`, `6`: inside right, at the top, centre, or bottom
+  - `4`, `5`, `6`: inside right, at the top, center, or bottom
 
   - `NA`: retain the legacy plot-specific positioning rules
 
