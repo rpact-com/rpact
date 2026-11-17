@@ -515,7 +515,9 @@ NULL
 
     .assertIsValidBeta(beta = design$beta, alpha = design$alpha)
 
-    if (design$kMax > 1 && (design$userBetaSpending[1] < 0 || design$userBetaSpending[design$kMax] > design$beta ||
+    # Allow subtraction roundoff when beta is supplied as 1 - power.
+    if (design$kMax > 1 && (design$userBetaSpending[1] < 0 ||
+            design$userBetaSpending[design$kMax] > design$beta + .Machine$double.eps ||
             any(design$userBetaSpending[2:design$kMax] - design$userBetaSpending[1:(design$kMax - 1)] < 0))) {
         stopIllegalArgument(
             sprintf(
@@ -1369,4 +1371,44 @@ getMedianByPi <- function(
         }
     }
     return(values)
+}
+
+.resolveDesignBeta <- function(beta, power, functionName) {
+    if (identical(power, NA)) {
+        return(beta)
+    }
+
+    .assertIsSingleNumber(power, "power", naAllowed = TRUE)
+    if (is.nan(power)) {
+        stopIllegalArgument("'power' must be a numeric probability or NA",
+            functionName = functionName,
+            parameter = "power",
+            value = power,
+            constraint = "a single numeric probability or NA, excluding NaN",
+            diagnosticId = "design.power_not_nan"
+        )
+    }
+    if (is.na(power)) {
+        return(beta)
+    }
+
+    .assertIsInOpenInterval(power, "power", lower = 0, upper = 1)
+    .assertIsSingleNumber(beta, "beta", naAllowed = TRUE)
+    if (is.na(beta)) {
+        return(1 - power)
+    }
+
+    .assertIsInOpenInterval(beta, "beta", lower = 0, upper = 1)
+    if (abs(beta + power - 1) > 1e-12) {
+        stopConflictingArguments("'beta' and 'power' must sum to 1 (within 1e-12)",
+            functionName = functionName, 
+            parameter = "power", 
+            value = power,
+            constraint = "abs(beta + power - 1) <= 1e-12",
+            relatedParameter = "beta", 
+            relatedValue = beta,
+            diagnosticId = "design.power_beta_complement"
+        )
+    }
+    return(beta)
 }

@@ -1170,7 +1170,9 @@ getDesignInverseNormal <- function(
         betaAdjustment = NA,
         constantBoundsHP = 3,
         twoSidedPower = NA,
-        tolerance = 1e-08) {
+        tolerance = 1e-08,
+        power = NA_real_) {
+    beta <- .resolveDesignBeta(beta, power, "getDesignInverseNormal")
     .warnInCaseOfUnknownArguments(functionName = "getDesignInverseNormal", ...)
 
     typeBetaSpending <- .matchArgument(typeBetaSpending, C_TYPE_OF_DESIGN_BS_NONE)
@@ -2246,6 +2248,7 @@ getDesignInverseNormal <- function(
 #' @inheritParams param_kMax
 #' @inheritParams param_alpha
 #' @inheritParams param_beta
+#' @inheritParams param_power
 #' @inheritParams param_sided
 #' @inheritParams param_typeOfDesign
 #' @inheritParams param_informationRates
@@ -2362,7 +2365,9 @@ getDesignGroupSequential <- function(
         constantBoundsHP = 3,
         twoSidedPower = NA,
         delayedInformation = NA_real_,
-        tolerance = 1e-08) {
+        tolerance = 1e-08,
+        power = NA_real_) {
+    beta <- .resolveDesignBeta(beta, power, "getDesignGroupSequential")
     .warnInCaseOfUnknownArguments(functionName = "getDesignGroupSequential", ...)
 
     typeBetaSpending <- .matchArgument(typeBetaSpending, C_TYPE_OF_DESIGN_BS_NONE)

@@ -1,3 +1,12 @@
+# rpact 5.1.0
+
+## New features
+
+* `getDesignFixed()`, `getDesignGroupSequential()`, and `getDesignInverseNormal()` now accept `power` as an alternative to `beta`, with `power = 1 - beta`. Consistent double specifications are accepted. The existing meaning of the returned `design$power` is unchanged.
+
+## Improvements, issues, and changes
+
+
 # rpact 5.0.0
 
 ## New features
@@ -40,7 +49,6 @@ Trial comparison data frames support `digits`, `ceilingEnabled`, and `removeVari
 * Expanded the documentation of `typeOfSelection` for multi-arm and enrichment simulations, explaining all five selection rules, their interaction with adaptations and thresholds, and how to drop one worst arm at each interim using a custom selection function (issue [#159](https://github.com/rpact-com/rpact/issues/159)).
 * `getObjectRCode()` now removes duplicate precondition blocks while preserving complete user-defined function bodies and pipe chains.
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
-* Issue [#159](https://github.com/rpact-com/rpact/issues/159) fixed
 * In `getSimulationSurvival()`, the early stopping probability ("Early stop") is now displayed stage-wise instead of overall
 * In `getSimulationSurvival()`, `numberOfSubjects1` and `numberOfSubjects2` are no longer shown in the print output (though still available in the result object), and `singleEventsPerStage` is now displayed.
 * Improved naming of variables and class fields: in `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()`, the field `numberOfActiveArms` has been replaced by `numberOfSelectedArms`.
