@@ -812,7 +812,7 @@ getComparisonPlotParameters <- function(
 #' @param mirrorModeEnabled Whether to use fill categories without a legend.
 #' @param legendPosition Shared legend position. "auto" (default) uses the
 #'   adaptive placement described below. Alternatively use rpact positions 1 (top left),
-#'   2 (centre left), 3 (bottom left), 4 (top right), 5 (centre right),
+#'   2 (center left), 3 (bottom left), 4 (top right), 5 (center right),
 #'   6 (bottom right), -1 (hidden), 0 (default position with square aspect),
 #'   or a ggplot position name (none, left, right, bottom, top).
 #' @param categoryLegendPosition,parameterLegendPosition Optional separate positions

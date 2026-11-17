@@ -14,6 +14,11 @@ input is classified centrally as a default or user-defined parameter.
 \code{includeDefaultParameters = TRUE}. Settings resolved from R options or
 environment variables are retained when they differ from package defaults.
 \code{showAll} affects rendering without replacing the stored limits or text mode.
+Markdown tables place coordinates in rows and profiles in columns, using at
+most \code{maxTableColumns} profile columns per block even with \code{showAll = TRUE}.
+Coordinate columns repeat in each block. Scalar profiles use one-row tables.
+Long profile labels are listed above the tables with short column references.
+Profiles with incompatible dimensions are displayed in separate tables.
 The underlying comparison is retained by reference, whereas profiles and
 display labels are snapshots. Recompute the summary after changing objects.
 }
@@ -32,6 +37,8 @@ display labels are snapshots. Recompute the summary after changing objects.
 
 \item{\code{maxValues}}{Maximum number of values displayed per profile preview; defaults to 4. Ignored for display when showAll is TRUE. Is a single numeric value representing a  whole number.}
 
+\item{\code{maxTableColumns}}{Maximum result/profile columns per Markdown table block, excluding coordinate columns; defaults to 4. Applies also when showAll is TRUE; does not limit displayed data or affect console output. Is a single numeric value representing a  whole number.}
+
 \item{\code{harmonizeColumnNames}}{Whether the snapshot uses harmonized comparison column names; defaults to TRUE. Is a single logical value.}
 
 \item{\code{textMode}}{Resolved console text handling: wrap, truncate or full. Defaults to wrap; showAll disables truncation without changing this stored input. Is a single character value.}
@@ -39,6 +46,8 @@ display labels are snapshots. Recompute the summary after changing objects.
 \item{\code{width}}{Resolved console line width in characters, at least 20. Taken from the supplied value, comparison setting or the R width option (fallback 80). Is a single numeric value representing a  whole number.}
 
 \item{\code{showAll}}{Whether all profiles, objects and values are displayed without the max limits or text truncation; defaults to FALSE. Stored limits remain unchanged. Is a single logical value.}
+
+\item{\code{showDataType}}{Whether parameter headings include data type descriptions in console and Markdown output; defaults to FALSE. Independent of showAll. Is a single logical value.}
 
 \item{\code{object}}{The underlying TrialComparison object, retained by reference.}
 

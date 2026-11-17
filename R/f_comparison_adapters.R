@@ -356,6 +356,26 @@
     }
 }
 
+.getComparisonSurvivalCategory <- function(object, parameter) {
+    if (!inherits(object, "SimulationResultsMultiArmSurvival")) {
+        return(NULL)
+    }
+    if (parameter %in% c("singleEventsPerStage", "cumulativeEventsPerStage")) {
+        return("comparison")
+    }
+    if (parameter %in% c("singleEventsPerArmAndStage", "selectedArms", "rejectedArmsPerStage",
+            "lambdaTreatment", "medianTreatment", "effectMatrix") ||
+            grepl("^(observedDropoutProportion|dropoutObservationTime)[12]$", parameter)) {
+        return("arm")
+    }
+    inputs <- c(object$.getUserDefinedParameters(), object$.getDefaultParameters(),
+        names(.getComparisonDesign(object)), .comparisonIdentifiers, .comparisonScope)
+    if (parameter %in% names(object) && !parameter %in% inputs) {
+        return("overall")
+    }
+    return(NULL)
+}
+
 .expandComparisonSurvivalCategories <- function(object, data, includeAllParameters = FALSE) {
     if (!inherits(object, "SimulationResultsMultiArmSurvival")) {
         return(data)
@@ -414,7 +434,7 @@
         if (is.null(values) || (!includeAllParameters && object$isNotApplicableParameter(parameter))) {
             next
         }
-        comparison <- parameter %in% c("singleEventsPerStage", "cumulativeEventsPerStage")
+        comparison <- identical(.getComparisonSurvivalCategory(object, parameter), "comparison")
         groups <- if (parameter == "singleEventsPerArmAndStage") {
             arms + 1L
         } else {
