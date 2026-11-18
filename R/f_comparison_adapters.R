@@ -66,7 +66,7 @@
     if (length(value) == 1L && is.atomic(value) && is.null(dim(value))) {
         return(value)
     }
-    return(paste(capture.output(dput(value)), collapse = " "))
+    return(list(value))
 }
 
 .addComparisonContext <- function(data, source, prefix = "", parameters = NULL) {
@@ -128,7 +128,7 @@
     return(list(target = target, endpoint = endpoint))
 }
 
-.getComparisonAdapterData <- function(object, includeAllParameters = FALSE) {
+.getComparisonAdapterData <- function(object, includeAllParameters = FALSE, strict = FALSE) {
     adapter <- .getComparisonAdapter(object)
     if (is.null(adapter)) {
         return(NULL)
@@ -165,7 +165,7 @@
         return(.getComparisonConditionalPowerData(object))
     }
     data <- as.data.frame(object, niceColumnNamesEnabled = FALSE,
-        includeAllParameters = includeAllParameters)
+        includeAllParameters = includeAllParameters, strict = strict)
     if (adapter == "PerformanceScore") {
         simulation <- object$.simulationResults
         alternative <- if (inherits(simulation, "SimulationResultsMeans")) {
@@ -239,7 +239,8 @@
 
 .getComparisonCoordinateNames <- function(data) {
     coordinates <- intersect(c("stages", "stage", "time", "treatmentArm", "populations", "situations",
-        "categoryType", "category"), names(data))
+        "categoryType", "category", "component", "componentIndex",
+        grep("^componentDimension[0-9]+$", names(data), value = TRUE)), names(data))
     if ("categoryType" %in% coordinates) {
         coordinates <- unique(c(coordinates, intersect("situation", names(data))))
     }
@@ -342,18 +343,46 @@
 }
 
 
-.validateComparisonSurvivalDropoutDimensions <- function(object, includeAllParameters = FALSE) {
+.validateComparisonSurvivalDropoutDimensions <- function(object, includeAllParameters = FALSE, strict = FALSE) {
     if (!inherits(object, "SimulationResultsMultiArmSurvival")) {
-        return(invisible(NULL))
+        return(character())
     }
     situations <- ncol(object$effectMatrix)
     groupFields <- grep("^(observedDropoutProportion|dropoutObservationTime)[12]$", names(object), value = TRUE)
+    invalidParameters <- character()
     for (parameter in groupFields) {
         if (is.null(object[[parameter]]) || (!includeAllParameters && object$isNotApplicableParameter(parameter))) {
             next
         }
-        .getComparisonSurvivalDropoutValues(object, parameter, situations)
+        error <- tryCatch({
+            .getComparisonSurvivalDropoutValues(object, parameter, situations)
+            NULL
+        }, error = identity)
+        if (inherits(error, "error")) {
+            values <- object[[parameter]]
+            arms <- if (endsWith(parameter, "2")) {
+                1L
+            } else {
+                object$activeArms
+            }
+            stageWise <- length(dim(values)) == 3L ||
+                (arms == 1L && is.matrix(values) && nrow(values) == object$.design$kMax)
+            expectedDimensions <- if (stageWise) {
+                c(object$.design$kMax, situations, arms)
+            } else {
+                c(arms, situations)
+            }
+            .comparisonConversionConflict(parameter, object[[parameter]], strict,
+                "drop-out dimensions must match the stages, situations and arms",
+                diagnosticId = "comparison.dropout_dimensions_invalid",
+                context = list(actualDimensions = dim(object[[parameter]]),
+                    expectedDimensions = expectedDimensions,
+                    stages = object$.design$kMax, situations = situations, arms = object$activeArms,
+                    cause = conditionMessage(error)))
+            invalidParameters <- c(invalidParameters, parameter)
+        }
     }
+    return(invalidParameters)
 }
 
 .getComparisonSurvivalCategory <- function(object, parameter) {
@@ -376,11 +405,21 @@
     return(NULL)
 }
 
-.expandComparisonSurvivalCategories <- function(object, data, includeAllParameters = FALSE) {
+.expandComparisonSurvivalCategories <- function(object, data, includeAllParameters = FALSE, strict = FALSE) {
     if (!inherits(object, "SimulationResultsMultiArmSurvival")) {
         return(data)
     }
+    if ("component" %in% names(data) && any(data$component == "doseLevels", na.rm = TRUE)) {
+        doseRows <- !is.na(data$component) & data$component == "doseLevels"
+        data$doseLevels <- NULL
+        if (all(doseRows)) {
+            data <- unique(data[setdiff(names(data), c("component", "componentIndex"))])
+        } else {
+            data <- data[!doseRows, , drop = FALSE]
+        }
+    }
     arms <- object$activeArms
+    invalidParameters <- .validateComparisonSurvivalDropoutDimensions(object, includeAllParameters, strict)
     types <- c("overall", rep("comparison", arms), rep("arm", arms + 1L))
     categories <- c("All arms", paste("Treatment", seq_len(arms), "vs. Control"),
         paste("Treatment", seq_len(arms)), "Control")
@@ -388,6 +427,21 @@
     result <- data[rowIndices, , drop = FALSE]
     result$categoryType <- rep(types, nrow(data))
     result$category <- rep(categories, nrow(data))
+    if (length(object$doseLevels) &&
+            (includeAllParameters || !object$isNotApplicableParameter("doseLevels"))) {
+        if (length(object$doseLevels) == arms) {
+            result$doseLevels <- NA_real_
+            for (g in seq_len(arms)) {
+                rows <- result$category %in% c(paste("Treatment", g), paste("Treatment", g, "vs. Control"))
+                result$doseLevels[rows] <- object$doseLevels[g]
+            }
+        } else {
+            .comparisonConversionConflict("doseLevels", object$doseLevels, strict,
+                "one dose level is required per treatment arm",
+                context = list(expectedLength = arms, actualLength = length(object$doseLevels)))
+            result$doseLevels <- rep(.comparisonCompleteText(object$doseLevels), nrow(result))
+        }
+    }
     overall <- result$categoryType == "overall"
     # Inputs and design settings remain available for grouping on every row.
     # Scalar and stage-wise simulation results belong only to the overall rows.
@@ -401,6 +455,10 @@
         result[grep(paste0("^", parameter, "\\."), names(result), value = TRUE)] <- NULL
         values <- object[[parameter]]
         if (is.null(values) || (!includeAllParameters && object$isNotApplicableParameter(parameter))) {
+            next
+        }
+        if (parameter %in% invalidParameters) {
+            result[[parameter]] <- rep(.comparisonCompleteText(values), nrow(result))
             next
         }
         result[[parameter]] <- NA_real_
@@ -442,10 +500,12 @@
         }
         expected <- c(object$.design$kMax, max(data$situation), groups)
         if (length(dim(values)) != 3L || !all(dim(values) == expected)) {
-            stopIllegalDataInput("Unexpected dimensions for comparison array '", parameter, "'",
-                functionName = ".expandComparisonSurvivalCategories", parameter = parameter, value = values,
-                constraint = "stage by situation by category array", diagnosticId = "comparison.array_dimensions_invalid",
+            .comparisonConversionConflict(parameter, values, strict,
+                "array dimensions must match stage by situation by category",
+                diagnosticId = "comparison.array_dimensions_invalid",
                 context = list(expectedDimensions = expected, actualDimensions = dim(values)))
+            result[[parameter]] <- rep(.comparisonCompleteText(values), nrow(result))
+            next
         }
         result[[parameter]] <- NA_real_
         for (g in seq_len(groups)) {

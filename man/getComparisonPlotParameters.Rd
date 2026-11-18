@@ -66,6 +66,10 @@ one point at a distinct finite numeric x value are connected across objects
 when only that input varies and the object scope is shared. Automatic object
 categories are omitted in this case and \code{connectAcrossObjects} is TRUE.
 Explicit categories or groups retain their separate curves.
+With an explicitly selected x axis, other inputs may also vary, provided
+each object contributes one distinct finite x value and the object scope
+(object type, endpoint and calculation target) is shared. These lines connect
+planning situations rather than representing variation of only one input.
 
 Axis-selection messages use a short problem statement, separate candidate
 lists with names and captions, and one example using eligible axes. Text wraps

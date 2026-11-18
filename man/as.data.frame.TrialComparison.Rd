@@ -2,6 +2,7 @@
 % Please edit documentation in R/class_trial_comparison.R
 \name{as.data.frame.TrialComparison}
 \alias{as.data.frame.TrialComparison}
+\alias{as.data.frame.TrialComparisonSummary}
 \title{Trial Comparison Data Frame}
 \usage{
 \method{as.data.frame}{TrialComparison}(
@@ -17,17 +18,21 @@
   removeVariableParameters = FALSE,
   digits = NA_integer_,
   ceilingEnabled = FALSE,
-  output = "data.frame"
+  output = "data.frame",
+  strict = FALSE
 )
+
+\method{as.data.frame}{TrialComparisonSummary}(x, row.names = NULL, optional = FALSE, ...)
 }
 \arguments{
-\item{x}{A \code{TrialComparison}.}
+\item{x}{A \code{TrialComparison} or \code{TrialComparisonSummary}.}
 
 \item{row.names}{Optional row names for the result.}
 
 \item{optional}{Unused; included for compatibility with \code{as.data.frame()}.}
 
-\item{...}{Further arguments. Currently unused.}
+\item{...}{For a \code{TrialComparisonSummary}, arguments passed to
+\code{as.data.frame.TrialComparison()}. Otherwise currently unused.}
 
 \item{niceColumnNamesEnabled}{Logical. If \code{TRUE}, nice looking column
 names will be used; syntactic names (variable names) otherwise
@@ -66,6 +71,10 @@ upwards to integers, using rpact parameter metadata. Variances are excluded.}
 Reporting modes add class \code{TrialComparisonTable} and rendering attributes;
 they still return a data frame. \code{"auto"} selects HTML or LaTeX during knitting.
 \code{"pdf"} produces LaTeX tables for a PDF document, not a PDF file.}
+
+\item{strict}{If \code{TRUE}, incompatible column types or unresolved component
+dimensions raise an error. The default \code{FALSE} warns and retains the complete
+conflicting values as character, without truncation.}
 }
 \value{
 A data.frame, unrounded and with all columns by default. Reporting modes
@@ -73,8 +82,23 @@ additionally inherit from \code{TrialComparisonTable} for automatic knitr output
 }
 \description{
 Converts a trial comparison to a data frame, optionally prepared for reporting.
+
+Converts a comparison summary to a data frame of its underlying comparison.
 }
 \details{
+Comparison summaries, including results of \verb{\%vs\%} chains, are converted through
+\code{getComparison(x)}. Summary display limits do not restrict the returned data.
+Numeric vectors retain their values and types. Additional component domains
+use \code{component} and \code{componentIndex} coordinates; arrays additionally use
+\code{componentDimension1}, \code{componentDimension2}, and further dimension indices.
+Independent components occupy separate rows rather than a Cartesian product.
+Related interval vectors share the \code{accrual} or \code{survival} component domain;
+a terminal interval boundary without an associated rate has an \code{NA} rate.
+Observed dataset columns share the \code{observedData} domain and retain row indices.
+Other row values are repeated across these components; select the appropriate
+component before aggregating or plotting to avoid counting repeated results.
+Transposed output remains a presentation format and may contain character data.
+
 With \code{harmonizeColumnNames = TRUE}, fixed-plan sample size columns are harmonized when the comparison includes
 interim analyses: \code{nFixed}, \code{nFixed1}, and \code{nFixed2} become \code{numberOfSubjects},
 \code{numberOfSubjects1}, and \code{numberOfSubjects2}. Fixed survival events use
