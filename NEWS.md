@@ -2,6 +2,7 @@
 
 ## New features
 
+* `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, `getSimulationMultiArmSurvival()`, and `getSimulationEnrichmentSurvival()` now support user-defined null hypothesis values through `thetaH0`, enabling non-inferiority simulations. Defaults are `0` for mean and rate differences and `1` for hazard ratios. Test statistics, conditional power, and sample size or event number recalculations account for the specified null value.
 * `getDesignFixed()`, `getDesignGroupSequential()`, and `getDesignInverseNormal()` now accept `power` as an alternative to `beta`, with `power = 1 - beta`. Consistent double specifications are accepted. The existing meaning of the returned `design$power` is unchanged.
 
 ## Improvements, issues, and changes
