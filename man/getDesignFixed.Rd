@@ -6,6 +6,7 @@
 \usage{
 getDesignFixed(
   alpha = NA_real_,
+  ...,
   beta = NA_real_,
   sided = 1L,
   directionUpper = NA,
@@ -15,6 +16,9 @@ getDesignFixed(
 }
 \arguments{
 \item{alpha}{The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.}
+
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
+that a warning will be displayed if unknown arguments are passed.}
 
 \item{beta}{Type II error rate, necessary for providing sample size calculations
 (e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs,

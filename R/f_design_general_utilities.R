@@ -48,6 +48,13 @@ NULL
         ignore <- c(ignore, "beta")
     }
 
+    power <- .getOptionalArgument("power", ...)
+    if (is.null(power)) {
+        power <- NA_real_
+    } else {
+        ignore <- c(ignore, "power")
+    }
+
     sided <- .getOptionalArgument("sided", ...)
     if (is.null(sided)) {
         sided <- 1L
@@ -76,6 +83,7 @@ NULL
     design <- getDesignFixed(
         alpha = alpha,
         beta = beta,
+        power = power,
         sided = sided,
         twoSidedPower = twoSidedPower,
         directionUpper = directionUpper

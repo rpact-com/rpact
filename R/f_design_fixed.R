@@ -31,6 +31,7 @@
 #' @inheritParams param_sided
 #' @inheritParams param_directionUpper
 #' @inheritParams param_twoSidedPower
+#' @inheritParams param_three_dots
 #'
 #' @details
 #' The fixed design represents a single-stage hypothesis test. The returned
@@ -59,6 +60,7 @@
 #'
 getDesignFixed <- function(
         alpha = NA_real_,
+        ..., 
         beta = NA_real_,
         sided = 1L, # C_SIDED_DEFAULT
         directionUpper = NA,
