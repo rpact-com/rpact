@@ -14,20 +14,20 @@ A `SummaryFactory` object supporting console and Markdown output.
 
 ## Details
 
-Use `summary(rule)` for the target value, lower reference value and
-decision percentiles. Use `summary(oc)` for the decision rule,
-assumptions and category probabilities. Each sample-size scenario has a
-separate table, with one row per alternative and one column per decision
-category. Categories are retained separately; probabilities are neither
-recomputed nor aggregated. Rates tables show the treatment event
-probability and the beneficial risk difference. Their assumptions
-include the control event probability, beneficial direction and selected
-interval method.
+Use `print(rule)` for compact decision criteria and `summary(rule)` for
+reference cutoffs, applicable percentile inputs and detailed decision
+tables. Use `summary(oc)` for the decision rule, assumptions and
+category probabilities. Each sample-size scenario has a separate table,
+with one row per alternative and one column per decision category.
+Categories are retained separately; probabilities are neither recomputed
+nor aggregated. Rates tables show the treatment event probability and
+the beneficial risk difference. Their assumptions include the control
+event probability, beneficial direction and selected interval method.
 
 The `digits` and `output` arguments follow
 [`summary.ParameterSet()`](https://docs.rpact.org/qtd/reference/summary.ParameterSet.md).
 The output parts are `"title"`, `"overview"`, `"body"` and `"all"`. For
-a decision rule, the body contains its parameters. For operating
+a decision rule, the body contains its tables. For operating
 characteristics, the overview contains the rule and assumptions, and the
 body contains the tables. Summary precision follows
 `rpact.summary.digits` and `rpact.summary.digits.probs`. The summary

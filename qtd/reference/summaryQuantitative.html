@@ -54,8 +54,9 @@ and <code><a href="getOperatingCharacteristicsRates.html">getOperatingCharacteri
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Use <code>summary(rule)</code> for the target value, lower reference value and decision
-percentiles. Use <code>summary(oc)</code> for the decision rule, assumptions and category
+    <p>Use <code>print(rule)</code> for compact decision criteria and <code>summary(rule)</code> for
+reference cutoffs, applicable percentile inputs and detailed decision tables.
+Use <code>summary(oc)</code> for the decision rule, assumptions and category
 probabilities. Each sample-size scenario has a separate table, with one row
 per alternative and one column per decision category. Categories are retained
 separately; probabilities are neither recomputed nor aggregated.
@@ -64,7 +65,7 @@ difference. Their assumptions include the control event probability,
 beneficial direction and selected interval method.</p>
 <p>The <code>digits</code> and <code>output</code> arguments follow <code><a href="summary.ParameterSet.html">summary.ParameterSet()</a></code>. The
 output parts are <code>"title"</code>, <code>"overview"</code>, <code>"body"</code> and <code>"all"</code>. For a decision
-rule, the body contains its parameters. For operating characteristics, the
+rule, the body contains its tables. For operating characteristics, the
 overview contains the rule and assumptions, and the body contains the tables.
 Summary precision follows <code>rpact.summary.digits</code> and
 <code>rpact.summary.digits.probs</code>. The summary keeps a copy of the supplied object,

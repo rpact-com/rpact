@@ -209,6 +209,7 @@
 <li>Always introduce a description with an explicit <code>@description</code> tag on its own line, followed by the description text on subsequent Roxygen lines. Do not rely on an untagged paragraph being interpreted as the description.</li>
 <li>Likewise, put section tags such as <code>@details</code> and <code>@examples</code> on their own lines above their content. Keep named tags and short entries such as <code>@param x ...</code>, <code>@rdname ...</code>, and <code>@return ...</code> inline as shown below; <code>@export</code> occupies its own line.</li>
 <li>Use actual Roxygen syntax in R source: do not add Markdown bold markers to tags or literal HTML entities such as <code>&amp;#x20;</code> to represent blank lines.</li>
+<li>Please also add Roxygen documentation to internal functions (even if existing internal functions might not be documented yet).</li>
 </ul><p>For example:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#'</span></span>

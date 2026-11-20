@@ -92,32 +92,40 @@ binaryRule <- getDesignQuantitative(
     lowerPercentile = 0.2,
     upperPercentile = 0.9
 )
-print(binaryRule, markdown = FALSE)
+binaryRule
 ```
 
-    Design parameters and output of quantitative trial design (decision rule):
+**Quantitative trial design (frequentist decision rule)**
 
-    User defined parameters:
-      Target value          : 0
-      Lower reference value : -0.05
+L = lower confidence bound (percentile level 0.2)  
+U = upper confidence bound (percentile level 0.9)
 
-    Default parameters:
-      Upper percentile      : 0.9000
-      Lower percentile      : 0.2000 
+- **Go** L \>= -0.05 and U \>= 0
+- **Stop** L \< -0.05 and U \< 0
+- **Indeterminate** Exactly one Go criterion is met
 
 ``` r
 
 summary(binaryRule)
 ```
 
-**Quantitative trial design (decision rule)**
+**Quantitative trial design (frequentist decision rule)**
 
-Fixed quantitative trial decision rule.
+Compares two confidence bounds with prespecified effect thresholds.
 
-- *Target value*: 0
-- *Lower reference value*: -0.050
-- *Upper percentile*: 0.9000
-- *Lower percentile*: 0.2000
+|                       | Effect cutoff | Confidence bound |
+|-----------------------|---------------|------------------|
+| Lower reference value | -0.050        | L (20%)          |
+| Target value          | 0.000         | U (90%)          |
+
+|                 | Interval configuration                |
+|-----------------|---------------------------------------|
+| Go (Fixed)      | L \>= 0.000                           |
+| Go              | -0.050 \<= L \< 0.000 and U \>= 0.000 |
+| Indeterminate 1 | L \< -0.050 and U \>= 0.000           |
+| Indeterminate 2 | L \>= -0.050 and U \< 0.000           |
+| Stop            | L \< -0.050 and -0.050 \<= U \< 0.000 |
+| Stop (Fixed)    | U \< -0.050                           |
 
 Here LRV = $`-0.05`$ allows an increase of up to five percentage points
 in the treatment event probability, and TV = $`0`$ represents equal
@@ -513,14 +521,23 @@ meansRule <- getDesignQuantitative(
 summary(meansRule)
 ```
 
-**Quantitative trial design (decision rule)**
+**Quantitative trial design (frequentist decision rule)**
 
-Fixed quantitative trial decision rule.
+Compares two confidence bounds with prespecified effect thresholds.
 
-- *Target value*: 4.000
-- *Lower reference value*: 2.900
-- *Upper percentile*: 0.8000
-- *Lower percentile*: 0.5000
+|                       | Effect cutoff | Confidence bound |
+|-----------------------|---------------|------------------|
+| Lower reference value | 2.900         | L (50%)          |
+| Target value          | 4.000         | U (80%)          |
+
+|                 | Interval configuration               |
+|-----------------|--------------------------------------|
+| Go (Fixed)      | L \>= 4.000                          |
+| Go              | 2.900 \<= L \< 4.000 and U \>= 4.000 |
+| Indeterminate 1 | L \< 2.900 and U \>= 4.000           |
+| Indeterminate 2 | L \>= 2.900 and U \< 4.000           |
+| Stop            | L \< 2.900 and 2.900 \<= U \< 4.000  |
+| Stop (Fixed)    | U \< 2.900                           |
 
 For the following calculations, we assume a common standard deviation of
 6, mean differences from 0 to 6, and sample-size pairs (25, 25), (50,
@@ -663,33 +680,65 @@ bayesMeanOC <- lapply(bayesMeanRules, function(design) {
         priorDist = effectPrior
     ))
 })
+bayesMeanRules$quantile
+```
+
+**Quantitative trial design (Bayesian decision rule)**
+
+Probabilities are posterior probabilities.
+
+- **Go** P(effect \> 0) \> 0.8 and P(effect \> 4) \> 0.1
+- **Stop** P(effect \<= 0) \> 0.2 and P(effect \<= 4) \> 0.9
+- **Indeterminate 1** P(effect \<= 0) \> 0.2 and P(effect \> 4) \> 0.1
+- **Indeterminate 2** All remaining outcomes
+
+``` r
+
 summary(bayesMeanRules$quantile)
 ```
 
-**Bayesian quantitative trial design (decision rule)**
+**Quantitative trial design (Bayesian decision rule)**
 
-Fixed quantitative trial decision rule.
+The quantile mapping converts percentile inputs to posterior probability
+cutoffs.
 
-- *Go criteria*: P(effect \> 0) \> 0.8, P(effect \> 4) \> 0.1
-- *Stop criteria*: P(effect \<= 0) \> 0.2, P(effect \<= 4) \> 0.9
-- *Indeterminate 1 criteria*: P(effect \<= 0) \> 0.2, P(effect \> 4) \>
-  0.1
-- *Percentile mapping*: quantile
+|                       | Effect cutoff | Input percentile | P(effect \> cutoff) |
+|-----------------------|---------------|------------------|---------------------|
+| Lower reference value | 0.000         | 0.2000           | 0.8000              |
+| Target value          | 4.000         | 0.9000           | 0.1000              |
+
+|                 | P(effect \> 0) | P(effect \> 4) |
+|-----------------|----------------|----------------|
+| Go              | \> 0.8000      | \> 0.1000      |
+| Stop            | \< 0.8000      | \< 0.1000      |
+| Indeterminate 1 | \< 0.8000      | \> 0.1000      |
+
+Indeterminate 2 includes all remaining outcomes, including exact cutoff
+ties.
 
 ``` r
 
 summary(bayesMeanRules$posteriorProbability)
 ```
 
-**Bayesian quantitative trial design (decision rule)**
+**Quantitative trial design (Bayesian decision rule)**
 
-Fixed quantitative trial decision rule.
+The posteriorProbability mapping uses the inputs as posterior
+probability cutoffs.
 
-- *Go criteria*: P(effect \> 0) \> 0.9, P(effect \> 4) \> 0.2
-- *Stop criteria*: P(effect \<= 0) \> 0.1, P(effect \<= 4) \> 0.8
-- *Indeterminate 1 criteria*: P(effect \<= 0) \> 0.1, P(effect \> 4) \>
-  0.2
-- *Percentile mapping*: posteriorProbability
+|                       | Effect cutoff | Input percentile | P(effect \> cutoff) |
+|-----------------------|---------------|------------------|---------------------|
+| Lower reference value | 0.000         | 0.9000           | 0.9000              |
+| Target value          | 4.000         | 0.2000           | 0.2000              |
+
+|                 | P(effect \> 0) | P(effect \> 4) |
+|-----------------|----------------|----------------|
+| Go              | \> 0.9000      | \> 0.2000      |
+| Stop            | \< 0.9000      | \< 0.2000      |
+| Indeterminate 1 | \< 0.9000      | \> 0.2000      |
+
+Indeterminate 2 includes all remaining outcomes, including exact cutoff
+ties.
 
 Note that here we don’t have a `normalApproximation` argument: The means
 model uses known standard deviations, therefore we don’t need to rely on
@@ -951,15 +1000,16 @@ customMeanOC <- getOperatingCharacteristicsMeans(
 summary(customMeanRule)
 ```
 
-**Bayesian quantitative trial design (decision rule)**
+**Quantitative trial design (Bayesian decision rule)**
 
-Fixed quantitative trial decision rule.
+Applies explicitly specified posterior probability criteria.
 
-- *Go criteria*: P(effect \> 0) \> 0.95, P(effect \> 4) \> 0.5
-- *Stop criteria*: P(effect \<= 3) \> 0.9
-- *Indeterminate 1 criteria*: P(effect \> 0) \> 0.95, P(effect \<= 4) \>
-  0.5, P(effect \> 3) \> 0.1
-- *Percentile mapping*: quantile
+|  | Posterior criteria |
+|----|----|
+| Go | P(effect \> 0.000) \> 0.9500 and P(effect \> 4.000) \> 0.5000 |
+| Stop | P(effect \<= 3.000) \> 0.9000 |
+| Indeterminate 1 | P(effect \> 0.000) \> 0.9500 and P(effect \<= 4.000) \> 0.5000 and P(effect \> 3.000) \> 0.1000 |
+| Indeterminate 2 | All remaining outcomes |
 
 ``` r
 
@@ -1010,15 +1060,16 @@ customRateOC <- getOperatingCharacteristicsRates(
 summary(customRateRule)
 ```
 
-**Bayesian quantitative trial design (decision rule)**
+**Quantitative trial design (Bayesian decision rule)**
 
-Fixed quantitative trial decision rule.
+Applies explicitly specified posterior probability criteria.
 
-- *Go criteria*: P(effect \> 0) \> 0.95, P(effect \> 0.15) \> 0.5
-- *Stop criteria*: P(effect \<= 0.1) \> 0.9
-- *Indeterminate 1 criteria*: P(effect \> 0) \> 0.95, P(effect \<= 0.15)
-  \> 0.5, P(effect \> 0.1) \> 0.1
-- *Percentile mapping*: quantile
+|  | Posterior criteria |
+|----|----|
+| Go | P(effect \> 0.000) \> 0.9500 and P(effect \> 0.150) \> 0.5000 |
+| Stop | P(effect \<= 0.100) \> 0.9000 |
+| Indeterminate 1 | P(effect \> 0.000) \> 0.9500 and P(effect \<= 0.150) \> 0.5000 and P(effect \> 0.100) \> 0.1000 |
+| Indeterminate 2 | All remaining outcomes |
 
 ``` r
 
@@ -1074,15 +1125,24 @@ bayesDualRule <- getDesignQuantitative(
 summary(bayesDualRule)
 ```
 
-**Bayesian quantitative trial design (decision rule)**
+**Quantitative trial design (Bayesian decision rule)**
 
-Fixed quantitative trial decision rule.
+The quantile mapping converts percentile inputs to posterior probability
+cutoffs.
 
-- *Go criteria*: P(effect \> 0) \> 0.95, P(effect \> 4) \> 0.5
-- *Stop criteria*: P(effect \<= 0) \> 0.05, P(effect \<= 4) \> 0.5
-- *Indeterminate 1 criteria*: P(effect \<= 0) \> 0.05, P(effect \> 4) \>
-  0.5
-- *Percentile mapping*: quantile
+|                       | Effect cutoff | Input percentile | P(effect \> cutoff) |
+|-----------------------|---------------|------------------|---------------------|
+| Lower reference value | 0.000         | 0.0500           | 0.9500              |
+| Target value          | 4.000         | 0.5000           | 0.5000              |
+
+|                 | P(effect \> 0) | P(effect \> 4) |
+|-----------------|----------------|----------------|
+| Go              | \> 0.9500      | \> 0.5000      |
+| Stop            | \< 0.9500      | \< 0.5000      |
+| Indeterminate 1 | \< 0.9500      | \> 0.5000      |
+
+Indeterminate 2 includes all remaining outcomes, including exact cutoff
+ties.
 
 ## Printing, Summarizing, and Accessing Results
 
@@ -1271,10 +1331,19 @@ summary(ratesScenarios, output = "overview")
 summary(binaryRule, output = "body", digits = 4)
 ```
 
-- *Target value*: 0
-- *Lower reference value*: -0.0500
-- *Upper percentile*: 0.90000
-- *Lower percentile*: 0.20000
+|                       | Effect cutoff | Confidence bound |
+|-----------------------|---------------|------------------|
+| Lower reference value | -0.0500       | L (20%)          |
+| Target value          | 0.0000        | U (90%)          |
+
+|                 | Interval configuration                   |
+|-----------------|------------------------------------------|
+| Go (Fixed)      | L \>= 0.0000                             |
+| Go              | -0.0500 \<= L \< 0.0000 and U \>= 0.0000 |
+| Indeterminate 1 | L \< -0.0500 and U \>= 0.0000            |
+| Indeterminate 2 | L \>= -0.0500 and U \< 0.0000            |
+| Stop            | L \< -0.0500 and -0.0500 \<= U \< 0.0000 |
+| Stop (Fixed)    | U \< -0.0500                             |
 
 Both the original object and its summary support Markdown for reports.
 The second expression embeds the summary tables directly into the
