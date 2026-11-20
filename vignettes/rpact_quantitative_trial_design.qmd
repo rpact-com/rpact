@@ -909,8 +909,6 @@ plot(
 The Kestrel event-count map above illustrates type 3. Four interval methods are
 supported by both this plot and the Rates constructor:
 
-TODO: here qtd1 should be replaced by "wilson" to reflect the Wilson score method.
-
 | `intervalMethod` | Construction |
 |:--|:--|
 | `"wilson"` | Original QTD1 approximation using Wilson score limits rounded to four decimal places in its variance construction |
