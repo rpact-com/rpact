@@ -31,7 +31,8 @@ The `digits` and `output` arguments follow
 The output parts are `"title"`, `"overview"`, `"body"` and `"all"`. For
 a decision rule, the body contains its tables. For operating
 characteristics, the overview contains the rule and assumptions, and the
-body contains the tables. Summary precision follows
+body contains the tables. An explicit `digits` sets the precision for
+both general values and probabilities. Otherwise, precision follows
 `rpact.summary.digits` and `rpact.summary.digits.probs`. The summary
 keeps a copy of the supplied object, so later changes to the original do
 not change an existing summary.
@@ -68,7 +69,7 @@ summary(rates)
 #>   Direction upper: FALSE
 #>   Interval method: wilson
 #> 
-#> Number of subjects (control = 75, treatment = 75)
+#> control: 75, treatment: 75
 #> 
 #>     Assumed Alternatives Go (Fixed)     Go Indeterminate Indeterminate   Stop
 #>   treatment                                            1             2       
@@ -86,7 +87,7 @@ summary(rates)
 #> 4       0.0982
 #> 5       0.2979
 #> 
-#> Number of subjects (control = 75, treatment = 150)
+#> control: 75, treatment: 150
 #> 
 #>     Assumed Alternatives Go (Fixed)     Go Indeterminate Indeterminate   Stop
 #>   treatment                                            1             2       
@@ -156,7 +157,7 @@ cat(print(summary(rates), markdown = TRUE)[1], "\n")
 #> * *Direction upper*: FALSE
 #> * *Interval method*: wilson
 #> 
-#> *Number of subjects (control = 75, treatment = 75)*
+#> *control: 75, treatment: 75*
 #> 
 #> | | Assumed treatment rate| Alternatives| Go (Fixed)| Go| Indeterminate 1| Indeterminate 2| Stop| Stop (Fixed)|
 #> | -----| -----| -----| -----| -----| -----| -----| -----| -----|
@@ -166,7 +167,7 @@ cat(print(summary(rates), markdown = TRUE)[1], "\n")
 #> | 4| 0.2000 | -0.050 | 0.0502 | 0.1469 | 0.4822 | 0      | 0.2224 | 0.0982 |
 #> | 5| 0.2500 | -0.100 | 0.0083 | 0.0438 | 0.3434 | 0      | 0.3066 | 0.2979 |
 #> 
-#> *Number of subjects (control = 75, treatment = 150)*
+#> *control: 75, treatment: 150*
 #> 
 #> | | Assumed treatment rate| Alternatives| Go (Fixed)| Go| Indeterminate 1| Indeterminate 2| Stop| Stop (Fixed)|
 #> | -----| -----| -----| -----| -----| -----| -----| -----| -----|

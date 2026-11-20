@@ -187,7 +187,7 @@ overall benefit-risk assessment are separate considerations.
 | Target difference | 0 percentage points | `targetValue = 0` |
 | Lower / upper percentiles | 20% / 90% | `lowerPercentile = 0.2`, `upperPercentile = 0.9` |
 | Control event probability | 15% | `pi2 = 0.15` |
-| Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` |
+| Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.01)` |
 | Sample sizes, control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
 | Beneficial direction | Lower treatment rate | `directionUpper = FALSE` |
 | Interval construction | Frequentist with Wilson score confidence interval | `intervalMethod = "wilson"` |
@@ -262,9 +262,7 @@ field uses that beneficial direction.
 
 Exact binomial summation over all possible event-count pairs produces
 the category probabilities which are in the result of
-`getOperatingCharacteristicsRates`. The confidence interval construction
-itself remains approximate, based on the normal assumption described
-above.
+`getOperatingCharacteristicsRates`.
 
 Printing `ratesOC` previews the first six rows of the probability table.
 Use `print(ratesOC, maxRows = 10)` to see e.g. 10 rows or
@@ -321,35 +319,35 @@ summary(ratesScenarios, digits = 4)
 
 - *Target value*: 0
 - *Lower reference value*: -0.0500
-- *Upper percentile*: 0.90000
-- *Lower percentile*: 0.20000
+- *Upper percentile*: 0.9000
+- *Lower percentile*: 0.2000
 
 **Assumptions**
 
 - *Treatment groups*: 2
-- *Assumed control rate*: 0.15000
+- *Assumed control rate*: 0.1500
 - *Direction upper*: FALSE
 - *Interval method*: wilson
 
-**Number of subjects (control = 75, treatment = 75)**
+**control: 75, treatment: 75**
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|
-| Very good | 0.10000 | 0.0500 | 0.53523 | 0.31322 | 0.13835 | \<0.00001 | 0.01232 | 0.00087 |
-| Good | 0.15000 | 0.0000 | 0.20378 | 0.30435 | 0.39130 | \<0.00001 | 0.08433 | 0.01624 |
-| Indifferent | 0.17500 | -0.0250 | 0.10671 | 0.22678 | 0.47114 | \<0.00001 | 0.15094 | 0.04444 |
-| Poor | 0.20000 | -0.0500 | 0.05023 | 0.14692 | 0.48221 | 0 | 0.22241 | 0.09822 |
-| Very poor | 0.25000 | -0.1000 | 0.00831 | 0.04384 | 0.34338 | 0 | 0.30655 | 0.29792 |
+| Very good | 0.1000 | 0.0500 | 0.5352 | 0.3132 | 0.1384 | \<0.0001 | 0.0123 | 0.0009 |
+| Good | 0.1500 | 0.0000 | 0.2038 | 0.3044 | 0.3913 | \<0.0001 | 0.0843 | 0.0162 |
+| Indifferent | 0.1750 | -0.0250 | 0.1067 | 0.2268 | 0.4711 | \<0.0001 | 0.1509 | 0.0444 |
+| Poor | 0.2000 | -0.0500 | 0.0502 | 0.1469 | 0.4822 | 0 | 0.2224 | 0.0982 |
+| Very poor | 0.2500 | -0.1000 | 0.0083 | 0.0438 | 0.3434 | 0 | 0.3066 | 0.2979 |
 
-**Number of subjects (control = 75, treatment = 150)**
+**control: 75, treatment: 150**
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|
-| Very good | 0.10000 | 0.0500 | 0.59475 | 0.32018 | 0.07488 | \<0.00001 | 0.00987 | 0.00032 |
-| Good | 0.15000 | 0.0000 | 0.19872 | 0.37202 | 0.33095 | 0 | 0.08686 | 0.01145 |
-| Indifferent | 0.17500 | -0.0250 | 0.09206 | 0.27165 | 0.43117 | 0 | 0.16723 | 0.03789 |
-| Poor | 0.20000 | -0.0500 | 0.03674 | 0.16258 | 0.44665 | 0 | 0.25795 | 0.09608 |
-| Very poor | 0.25000 | -0.1000 | 0.00387 | 0.03559 | 0.27701 | 0 | 0.34143 | 0.34210 |
+| Very good | 0.1000 | 0.0500 | 0.5948 | 0.3202 | 0.0749 | \<0.0001 | 0.0099 | 0.0003 |
+| Good | 0.1500 | 0.0000 | 0.1987 | 0.3720 | 0.3309 | 0 | 0.0869 | 0.0115 |
+| Indifferent | 0.1750 | -0.0250 | 0.0921 | 0.2716 | 0.4312 | 0 | 0.1672 | 0.0379 |
+| Poor | 0.2000 | -0.0500 | 0.0367 | 0.1626 | 0.4466 | 0 | 0.2580 | 0.0961 |
+| Very poor | 0.2500 | -0.1000 | 0.0039 | 0.0356 | 0.2770 | 0 | 0.3414 | 0.3421 |
 
 The summary uses the scenario names as row labels in each sample-size
 table. Names must be unique and non-empty. For means, use a named
@@ -502,47 +500,37 @@ Quantitative trial decisions for 75 patients per group. The vertical
 line marks 16 control events.
 
 Here `numberOfSubjects` is a vector of length two, unlike the matrix
-given to `getOperatingCharacteristicsBinary` previously.
+given to `getOperatingCharacteristicsRates` previously.
 `observedControl` adds the vertical line. Supplying `controlRate` and
 `treatmentRate` together adds joint binomial cell probabilities to the
 plot data without changing the decisions.
 
-For example, if we observe 16 control events, the following code
-extracts the corresponding treatment event ranges and aggregated cell
-probabilities:
+To calculate decision probabilities given 16 control events, keep only
+that row of counts and divide each joint cell probability by their sum,
+the probability of observing 16 control events. The table shows the
+treatment event ranges and conditional decision probabilities at the
+assumed treatment event rate of 0.10.
 
 ``` r
 
 observedRanges <- eventMap$data |>
     dplyr::filter(eventsControl == 16) |>
+    dplyr::mutate(conditionalProbability = cellProbability / sum(cellProbability)) |>
     dplyr::group_by(category) |>
     dplyr::summarise(
         Minimum = min(eventsTreatment),
         Maximum = max(eventsTreatment),
+        `Conditional probability` = sum(conditionalProbability),
         .groups = "drop"
     )
-knitr::kable(dplyr::rename(observedRanges, Decision = category))
+knitr::kable(dplyr::rename(observedRanges, Decision = category), digits = 6)
 ```
 
-| Decision      | Minimum | Maximum |
-|:--------------|--------:|--------:|
-| Go            |       0 |      15 |
-| Indeterminate |      16 |      22 |
-| Stop          |      23 |      75 |
-
-``` r
-
-eventMap$data |>
-    dplyr::group_by(category) |>
-    dplyr::summarise(cellProbability = sum(cellProbability), .groups = "drop")
-```
-
-    # A tibble: 3 × 2
-      category      cellProbability
-      <fct>                   <dbl>
-    1 Go                     0.848
-    2 Indeterminate          0.138
-    3 Stop                   0.0132
+| Decision      | Minimum | Maximum | Conditional probability |
+|:--------------|--------:|--------:|------------------------:|
+| Go            |       0 |      15 |                0.997286 |
+| Indeterminate |      16 |      22 |                0.002713 |
+| Stop          |      23 |      75 |                0.000001 |
 
 ## Continuous Endpoints: Means
 
@@ -677,11 +665,13 @@ beneficial-tail probability threshold at LRV and `lowerPercentile` as
 the threshold at TV. These are different decision rules, even with
 identical numerical inputs.
 
-For each mapping, Stop requires both complementary criteria in the
-opposite direction. Indeterminate 1 fails the LRV criterion and passes
-TV. Indeterminate 2 contains any other remaining outcomes. Probability
-comparisons are strict; an exact probability-threshold tie belongs to
-the residual category. This can matter for discrete event counts.
+For each mapping, Stop requires both opposite-tail probabilities to
+exceed their complementary thresholds. Indeterminate 1 meets the Stop
+criterion at LRV and the Go criterion at TV. Indeterminate 2 contains
+all remaining outcomes. For these reference-value rules, a tie at either
+threshold falls into Indeterminate 2 because neither strict comparison
+at that reference value passes. This can matter for discrete event
+counts.
 
 ### Means with a prior on the treatment effect
 
@@ -783,11 +773,6 @@ probability cutoffs.
 Indeterminate 2 includes all remaining outcomes, including exact cutoff
 ties.
 
-Note that here we don’t have a `normalApproximation` argument: The means
-model uses known standard deviations, therefore we don’t need to rely on
-a normal approximation for the sampling distribution of the mean
-difference estimator as we did in the frequentist case.
-
 The next table compares Go probabilities at three true effects, keeping
 the prior and sample sizes fixed.
 
@@ -883,14 +868,14 @@ summary(bayesGroupOC, digits = 4)
 - Prior distribution: normMix: 1, 40, 3 / normMix: 1, 43, 6
 - *Control mean*: 40.0000
 
-**Number of subjects (control = 25, treatment = 40)**
+**control: 25, treatment: 40**
 
-|     | Alternatives | Go      | Indeterminate 1 | Indeterminate 2 | Stop    |
-|-----|--------------|---------|-----------------|-----------------|---------|
-| 1   | 0            | 0.13757 | 0               | 0.07433         | 0.78809 |
-| 2   | 2.0000       | 0.54418 | 0               | 0.11214         | 0.34368 |
-| 3   | 4.0000       | 0.90545 | 0               | 0.04027         | 0.05428 |
-| 4   | 6.0000       | 0.99406 | 0               | 0.00344         | 0.00250 |
+|     | Alternatives | Go     | Indeterminate 1 | Indeterminate 2 | Stop   |
+|-----|--------------|--------|-----------------|-----------------|--------|
+| 1   | 0            | 0.1376 | 0               | 0.0743          | 0.7881 |
+| 2   | 2.0000       | 0.5442 | 0               | 0.1121          | 0.3437 |
+| 3   | 4.0000       | 0.9054 | 0               | 0.0403          | 0.0543 |
+| 4   | 6.0000       | 0.9941 | 0               | 0.0034          | 0.0025 |
 
 These single-component normal priors permit analytic conjugate
 calculations. Normal mixture priors with several components are also
@@ -1121,10 +1106,12 @@ plot(customRateOC, plotCat = 4, main = "Bayesian rates: custom posterior criteri
 
 ![](rpact_quantitative_trial_design_files/figure-html/bayes-custom-rates-1.png)
 
-For each custom rule, Indeterminate 2 is the complement of the three
-explicit categories, including exact probability-threshold ties. The
-stored probabilities therefore sum to one for each sample-size and
-effect scenario. We can confirm this by checking the totals:
+For each custom rule, Indeterminate 2 applies when none of the three
+explicit categories is satisfied. An exact probability-threshold tie
+fails the criterion where it occurs, and another explicit category can
+still be satisfied. The stored probabilities therefore sum to one for
+each sample-size and effect scenario. We can confirm this by checking
+the totals:
 
 ``` r
 
@@ -1255,8 +1242,8 @@ summary(meansScenarios, digits = 4)
 
 - *Target value*: 4.0000
 - *Lower reference value*: 2.9000
-- *Upper percentile*: 0.80000
-- *Lower percentile*: 0.50000
+- *Upper percentile*: 0.8000
+- *Lower percentile*: 0.5000
 
 **Assumptions**
 
@@ -1264,32 +1251,33 @@ summary(meansScenarios, digits = 4)
 - *Treatment groups*: 2
 - *Standard deviation*: 6.0000
 
-**Number of subjects (control = 75, treatment = 75)**
+**control: 75, treatment: 75**
 
 |  | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|
-| 1 | 0 | 0.00002 | 0.00057 | 0 | 0.00094 | 0.01554 | 0.98292 |
-| 2 | 2.9000 | 0.13079 | 0.25855 | 0 | 0.11067 | 0.30000 | 0.20000 |
-| 3 | 4.0000 | 0.50000 | 0.30000 | 0 | 0.06921 | 0.10604 | 0.02475 |
-| 4 | 6.0000 | 0.97939 | 0.01864 | 0 | 0.00119 | 0.00075 | 0.00003 |
+| 1 | 0 | \<0.0001 | 0.0006 | 0 | 0.0009 | 0.0155 | 0.9829 |
+| 2 | 2.9000 | 0.1308 | 0.2585 | 0 | 0.1107 | 0.3000 | 0.2000 |
+| 3 | 4.0000 | 0.5000 | 0.3000 | 0 | 0.0692 | 0.1060 | 0.0247 |
+| 4 | 6.0000 | 0.9794 | 0.0186 | 0 | 0.0012 | 0.0007 | \<0.0001 |
 
-**Number of subjects (control = 75, treatment = 150)**
+**control: 75, treatment: 150**
 
 |  | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|
-| 1 | 0 | \<0.00001 | 0.00005 | 0 | 0.00026 | 0.00468 | 0.99500 |
-| 2 | 2.9000 | 0.09743 | 0.22722 | 0 | 0.17535 | 0.30000 | 0.20000 |
-| 3 | 4.0000 | 0.50000 | 0.30000 | 0 | 0.10257 | 0.08117 | 0.01626 |
-| 4 | 6.0000 | 0.99079 | 0.00852 | 0 | 0.00056 | 0.00013 | \<0.00001 |
+| 1 | 0 | \<0.0001 | \<0.0001 | 0 | 0.0003 | 0.0047 | 0.9950 |
+| 2 | 2.9000 | 0.0974 | 0.2272 | 0 | 0.1754 | 0.3000 | 0.2000 |
+| 3 | 4.0000 | 0.5000 | 0.3000 | 0 | 0.1026 | 0.0812 | 0.0163 |
+| 4 | 6.0000 | 0.9908 | 0.0085 | 0 | 0.0006 | 0.0001 | \<0.0001 |
 
 We can further control the result, using the `output` and `digits`
 arguments of the [`summary()`](https://rdrr.io/r/base/summary.html)
 function. `output` selects `"all"` (default), `"title"`, `"overview"`,
 or `"body"`. The operating characteristics overview contains the rule
 and assumptions; its body contains the tables. For a decision rule, the
-body contains its four parameters. `digits` controls display precision,
-following the summary settings `rpact.summary.digits` and
-`rpact.summary.digits.probs`, without changing stored probabilities.
+body contains its detailed tables. For example, `digits = 4` sets four
+decimal places for both effects and probabilities in the summary tables.
+When `digits` is omitted, precision follows `rpact.summary.digits` and
+`rpact.summary.digits.probs`.
 
 ``` r
 
@@ -1393,35 +1381,35 @@ Preview limited to 6 of 60 rows.
 
 - *Target value*: 0
 - *Lower reference value*: -0.0500
-- *Upper percentile*: 0.90000
-- *Lower percentile*: 0.20000
+- *Upper percentile*: 0.9000
+- *Lower percentile*: 0.2000
 
 **Assumptions**
 
 - *Treatment groups*: 2
-- *Assumed control rate*: 0.15000
+- *Assumed control rate*: 0.1500
 - *Direction upper*: FALSE
 - *Interval method*: wilson
 
-**Number of subjects (control = 75, treatment = 75)**
+**control: 75, treatment: 75**
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|
-| Very good | 0.10000 | 0.0500 | 0.53523 | 0.31322 | 0.13835 | \<0.00001 | 0.01232 | 0.00087 |
-| Good | 0.15000 | 0.0000 | 0.20378 | 0.30435 | 0.39130 | \<0.00001 | 0.08433 | 0.01624 |
-| Indifferent | 0.17500 | -0.0250 | 0.10671 | 0.22678 | 0.47114 | \<0.00001 | 0.15094 | 0.04444 |
-| Poor | 0.20000 | -0.0500 | 0.05023 | 0.14692 | 0.48221 | 0 | 0.22241 | 0.09822 |
-| Very poor | 0.25000 | -0.1000 | 0.00831 | 0.04384 | 0.34338 | 0 | 0.30655 | 0.29792 |
+| Very good | 0.1000 | 0.0500 | 0.5352 | 0.3132 | 0.1384 | \<0.0001 | 0.0123 | 0.0009 |
+| Good | 0.1500 | 0.0000 | 0.2038 | 0.3044 | 0.3913 | \<0.0001 | 0.0843 | 0.0162 |
+| Indifferent | 0.1750 | -0.0250 | 0.1067 | 0.2268 | 0.4711 | \<0.0001 | 0.1509 | 0.0444 |
+| Poor | 0.2000 | -0.0500 | 0.0502 | 0.1469 | 0.4822 | 0 | 0.2224 | 0.0982 |
+| Very poor | 0.2500 | -0.1000 | 0.0083 | 0.0438 | 0.3434 | 0 | 0.3066 | 0.2979 |
 
-**Number of subjects (control = 75, treatment = 150)**
+**control: 75, treatment: 150**
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|
-| Very good | 0.10000 | 0.0500 | 0.59475 | 0.32018 | 0.07488 | \<0.00001 | 0.00987 | 0.00032 |
-| Good | 0.15000 | 0.0000 | 0.19872 | 0.37202 | 0.33095 | 0 | 0.08686 | 0.01145 |
-| Indifferent | 0.17500 | -0.0250 | 0.09206 | 0.27165 | 0.43117 | 0 | 0.16723 | 0.03789 |
-| Poor | 0.20000 | -0.0500 | 0.03674 | 0.16258 | 0.44665 | 0 | 0.25795 | 0.09608 |
-| Very poor | 0.25000 | -0.1000 | 0.00387 | 0.03559 | 0.27701 | 0 | 0.34143 | 0.34210 |
+| Very good | 0.1000 | 0.0500 | 0.5948 | 0.3202 | 0.0749 | \<0.0001 | 0.0099 | 0.0003 |
+| Good | 0.1500 | 0.0000 | 0.1987 | 0.3720 | 0.3309 | 0 | 0.0869 | 0.0115 |
+| Indifferent | 0.1750 | -0.0250 | 0.0921 | 0.2716 | 0.4312 | 0 | 0.1672 | 0.0379 |
+| Poor | 0.2000 | -0.0500 | 0.0367 | 0.1626 | 0.4466 | 0 | 0.2580 | 0.0961 |
+| Very poor | 0.2500 | -0.1000 | 0.0039 | 0.0356 | 0.2770 | 0 | 0.3414 | 0.3421 |
 
 The `probabilities` field is a data frame of unrounded values. Columns
 include `category`, `probability`, `nControl`, `nTreatment`, and
@@ -1510,7 +1498,7 @@ plot(
 
 ![](rpact_quantitative_trial_design_files/figure-html/supplied-intervals-1.png)
 
-Hypothetical continuous-endpoint results under the AFQ056 example’s
+Hypothetical continuous-endpoint results under the Kestrel example’s
 rule.
 
 ### Type 2: Normal decision regions
@@ -1622,7 +1610,7 @@ summary(scoreRates)
 - *Direction upper*: FALSE
 - *Interval method*: miettinenNurminen
 
-**Number of subjects (control = 25, treatment = 25)**
+**control: 25, treatment: 25**
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|
@@ -1659,7 +1647,7 @@ summary(higherIsBetter)
 - *Direction upper*: TRUE
 - *Interval method*: newcombe
 
-**Number of subjects (control = 25, treatment = 25)**
+**control: 25, treatment: 25**
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|

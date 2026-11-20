@@ -68,7 +68,8 @@ beneficial direction and selected interval method.</p>
 output parts are <code>"title"</code>, <code>"overview"</code>, <code>"body"</code> and <code>"all"</code>. For a decision
 rule, the body contains its tables. For operating characteristics, the
 overview contains the rule and assumptions, and the body contains the tables.
-Summary precision follows <code>rpact.summary.digits</code> and
+An explicit <code>digits</code> sets the precision for both general values and
+probabilities. Otherwise, precision follows <code>rpact.summary.digits</code> and
 <code>rpact.summary.digits.probs</code>. The summary keeps a copy of the supplied object,
 so later changes to the original do not change an existing summary.</p>
 <p>Print a summary with <code>print(summary(oc), markdown = TRUE)</code> to obtain Markdown
@@ -102,7 +103,7 @@ with probability tables. Console tables use wrapped, readable column names.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Direction upper: FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Interval method: wilson</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Number of subjects (control = 75, treatment = 75)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> control: 75, treatment: 75</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Assumed Alternatives Go (Fixed)     Go Indeterminate Indeterminate   Stop</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   treatment                                            1             2       </span>
@@ -120,7 +121,7 @@ with probability tables. Console tables use wrapped, readable column names.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4       0.0982</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5       0.2979</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Number of subjects (control = 75, treatment = 150)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> control: 75, treatment: 150</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Assumed Alternatives Go (Fixed)     Go Indeterminate Indeterminate   Stop</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   treatment                                            1             2       </span>
@@ -190,7 +191,7 @@ with probability tables. Console tables use wrapped, readable column names.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> * *Direction upper*: FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> * *Interval method*: wilson</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> *Number of subjects (control = 75, treatment = 75)*</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *control: 75, treatment: 75*</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | | Assumed treatment rate| Alternatives| Go (Fixed)| Go| Indeterminate 1| Indeterminate 2| Stop| Stop (Fixed)|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | -----| -----| -----| -----| -----| -----| -----| -----| -----|</span>
@@ -200,7 +201,7 @@ with probability tables. Console tables use wrapped, readable column names.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | 4| 0.2000 | -0.050 | 0.0502 | 0.1469 | 0.4822 | 0      | 0.2224 | 0.0982 |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | 5| 0.2500 | -0.100 | 0.0083 | 0.0438 | 0.3434 | 0      | 0.3066 | 0.2979 |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> *Number of subjects (control = 75, treatment = 150)*</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *control: 75, treatment: 150*</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | | Assumed treatment rate| Alternatives| Go (Fixed)| Go| Indeterminate 1| Indeterminate 2| Stop| Stop (Fixed)|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | -----| -----| -----| -----| -----| -----| -----| -----| -----|</span>
