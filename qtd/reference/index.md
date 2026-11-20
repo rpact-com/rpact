@@ -22,6 +22,8 @@
   or Extend a Trial Comparison
 - [`delete()`](https://docs.rpact.org/qtd/reference/delete.md) : Delete
   an Object from a Collection
+- [`.showQtdOperatingCharacteristics()`](https://docs.rpact.org/qtd/reference/dot-showQtdOperatingCharacteristics.md)
+  : Render Quantitative Operating Characteristics
 - [`` `[[`( ``*`<TrialComparison>`*`)`](https://docs.rpact.org/qtd/reference/extract.TrialComparison.md)
   [`` `$`( ``*`<TrialComparison>`*`)`](https://docs.rpact.org/qtd/reference/extract.TrialComparison.md)
   : Access Objects in a Trial Comparison

@@ -6,10 +6,6 @@ Obtain instances through
 
 Initializes means OC assumptions and probability output.
 
-Prints the result.
-
-Renders the result.
-
 Returns the result description.
 
 ## Arguments
@@ -45,18 +41,6 @@ Returns the result description.
 - probabilities:
 
   Category-block probability table.
-
-- showType:
-
-  Output mode.
-
-- digits:
-
-  Display precision.
-
-- consoleOutputEnabled:
-
-  Print or collect output.
 
 - startWithUpperCase:
 

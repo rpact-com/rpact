@@ -7,10 +7,6 @@ independent groups. Obtain instances with
 Initializes a rates result. Use getOperatingCharacteristicsRates() to
 validate inputs and calculate probabilities.
 
-Prints the result to the console.
-
-Internal rendering method used by standard console and Markdown output.
-
 Returns the result description used in output headings.
 
 ## Arguments
@@ -42,18 +38,6 @@ Returns the result description used in output headings.
 - probabilities:
 
   Computed probability data frame.
-
-- showType:
-
-  Output mode passed to ParameterSet.
-
-- digits:
-
-  Optional display precision.
-
-- consoleOutputEnabled:
-
-  Whether to print or collect the output.
 
 - startWithUpperCase:
 

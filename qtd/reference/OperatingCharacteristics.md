@@ -5,6 +5,10 @@ Obtain concrete instances through the endpoint-specific OC functions.
 
 Initializes the shared quantitative operating-characteristics fields.
 
+Prints the operating characteristics to the console.
+
+Renders the operating characteristics for console or Markdown output.
+
 ## Arguments
 
 - design:
@@ -18,6 +22,22 @@ Initializes the shared quantitative operating-characteristics fields.
 - probabilities:
 
   Computed probability data frame.
+
+- showType:
+
+  Output mode.
+
+- digits:
+
+  Display precision.
+
+- consoleOutputEnabled:
+
+  Whether to print or collect the output.
+
+- maxRows:
+
+  Maximum number of probability rows to show.
 
 ## Details
 
