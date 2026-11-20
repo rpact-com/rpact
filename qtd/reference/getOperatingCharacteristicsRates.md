@@ -105,9 +105,9 @@ requiring ggplot2 or Java.
 
 [`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md),
 [`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md),
-[OperatingCharacteristicsRates](https://docs.rpact.org/qtd/reference/OperatingCharcteristicsRates.md),
+[OperatingCharacteristicsRates](https://docs.rpact.org/qtd/reference/OperatingCharacteristicsRates.md),
 [summaryQuantitative](https://docs.rpact.org/qtd/reference/summaryQuantitative.md),
-[`plot.OperatingCharacteristics()`](https://docs.rpact.org/qtd/reference/plot.OperatingCharcteristics.md)
+[`plot.OperatingCharacteristics()`](https://docs.rpact.org/qtd/reference/plot.OperatingCharacteristics.md)
 
 ## Examples
 

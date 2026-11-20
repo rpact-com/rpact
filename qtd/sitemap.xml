@@ -40,9 +40,9 @@
 <url><loc>https://docs.rpact.org/qtd/reference/InstallationQualificationResult.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/MarkdownReporter.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/NumberOfSubjects.html</loc></url>
-<url><loc>https://docs.rpact.org/qtd/reference/OperatingCharcteristics.html</loc></url>
-<url><loc>https://docs.rpact.org/qtd/reference/OperatingCharcteristicsMeans.html</loc></url>
-<url><loc>https://docs.rpact.org/qtd/reference/OperatingCharcteristicsRates.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/OperatingCharacteristics.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/OperatingCharacteristicsMeans.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/OperatingCharacteristicsRates.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/ParameterSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/PerformanceScore.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/PiecewiseSurvivalTime.html</loc></url>
@@ -96,7 +96,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/TrialDesignSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/add.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.AnalysisResults.html</loc></url>
-<url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.OperatingCharcteristics.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.OperatingCharacteristics.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.ParameterSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.PiecewiseSurvivalTimeMultiGroup.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/as.data.frame.PowerAndAverageSampleNumberResult.html</loc></url>
@@ -378,7 +378,7 @@
 <url><loc>https://docs.rpact.org/qtd/reference/plot.Dataset.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/plot.EventProbabilities.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/plot.NumberOfSubjects.html</loc></url>
-<url><loc>https://docs.rpact.org/qtd/reference/plot.OperatingCharcteristics.html</loc></url>
+<url><loc>https://docs.rpact.org/qtd/reference/plot.OperatingCharacteristics.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/plot.ParameterSet.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/plot.SimulationResults.html</loc></url>
 <url><loc>https://docs.rpact.org/qtd/reference/plot.StageResults.html</loc></url>

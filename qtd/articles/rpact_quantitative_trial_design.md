@@ -10,7 +10,7 @@ probabilities of the resulting decisions under specified trial
 assumptions.
 
 This vignette demonstrates the QTD functions in
-[rpact](https://www.rpact.org) for two independent groups with
+[`rpact`](https://www.rpact.org/) for two independent groups with
 **continuous endpoints (Means)** and **binary endpoints (Rates)**. We
 define a decision rule, inspect its output, calculate operating
 characteristics, and illustrate every available plot type, including
@@ -55,8 +55,8 @@ evidence of efficacy.
 
 ### Reference values and percentiles
 
-Here is an overview of the `rpact` arguments for defining a quantitative
-decision rule:
+Here is an overview of the [`rpact`](https://www.rpact.org/) arguments
+for defining a quantitative decision rule:
 
 | Argument | Interpretation | Default |
 |:---|:---|:---|
@@ -151,11 +151,11 @@ identifies the extreme decision categories. How a team acts on the
 middle categories can also depend on the competitive situation and other
 evidence.
 
-Internal `rpact` calculations retain the six decision categories. For
-visualization, `plotCat = 3` sums up the two Go, the two Indeterminate,
-and the two Stop probabilities each for display; `plotCat = 6` shows
-them separately. Rule plots default to six categories and operating
-characteristics plots default to three.
+Internal [`rpact`](https://www.rpact.org/) calculations retain the six
+decision categories. For visualization, `plotCat = 3` sums up the two
+Go, the two Indeterminate, and the two Stop probabilities each for
+display; `plotCat = 6` shows them separately. Rule plots default to six
+categories and operating characteristics plots default to three.
 
 ## The Kestrel Binary-Endpoint Example
 
@@ -172,7 +172,7 @@ The endpoint is composite efficacy failure, so lower event probabilities
 are beneficial. The example addresses efficacy only; safety and the
 overall benefit-risk assessment are separate considerations.
 
-| Quantity | Value | rpact argument |
+| Quantity | Value | [`rpact`](https://www.rpact.org/) argument |
 |:---|:---|:---|
 | Minimum acceptable difference | −5 percentage points | `lowerReferenceValue = -0.05` |
 | Target difference | 0 percentage points | `targetValue = 0` |
@@ -304,24 +304,9 @@ summary(ratesScenarios, digits = 4)
 For both sample size configurations, we can thus see the probabilities
 for each decision under the assumed treatment rate.
 
-TODO: Either remove this table or use R code to produce it
-
-The next table gives a compact probability overview for the five
-scenarios. Triplets are ordered Go / Indeterminate / Stop.
-
-| Scenario | True improvement | 75 control / 75 treatment | 75 control / 150 treatment |
-|:---|---:|:---|:---|
-| Very good | 5% | 0.85 / 0.14 / 0.01 | 0.91 / 0.07 / 0.01 |
-| Good | 0% | 0.51 / 0.39 / 0.10 | 0.57 / 0.33 / 0.10 |
-| Indifferent | −2.5% | 0.33 / 0.47 / 0.20 | 0.36 / 0.43 / 0.21 |
-| Poor | −5% | 0.20 / 0.48 / 0.32 | 0.20 / 0.45 / 0.35 |
-| Very poor | −10% | 0.05 / 0.34 / 0.60 | 0.04 / 0.28 / 0.68 |
-
-The compact overview retains the displayed precision of the original
-demonstration and is not renormalized; some triplets sum to 0.99.
-Displayed values can differ from conventional rounding. Use the
-calculated table below for numerical comparisons: it reports the QTD1
-probabilities to six decimal places under the same assumptions.
+The following table gives the calculated three-category probabilities
+for the five scenarios to six decimal places under the Wilson interval
+construction.
 
 ``` r
 
@@ -372,26 +357,40 @@ characteristics.
 The following table summarizes the three-category probabilities for
 treatment event probabilities from 0.10 to 0.24 in steps of 0.02.
 
-TODO remove or use R code
+``` r
+
+detailedTable <- plot(ratesOC, type = 4, plotCat = 3,
+    pi1 = seq(0.10, 0.24, by = 0.02))$data |>
+    dplyr::select(nControl, nTreatment, pi2, pi1, category, probability) |>
+    tidyr::pivot_wider(names_from = category, values_from = probability) |>
+    dplyr::arrange(nControl, nTreatment, pi1) |>
+    dplyr::rename(
+        `Control N` = nControl,
+        `Treatment N` = nTreatment,
+        `Control rate` = pi2,
+        `Treatment rate` = pi1
+    )
+knitr::kable(detailedTable, digits = 4, row.names = FALSE)
+```
 
 | Control N | Treatment N | Control rate | Treatment rate |     Go | Indeterminate |   Stop |
 |----------:|------------:|-------------:|---------------:|-------:|--------------:|-------:|
 |        75 |          75 |         0.15 |           0.10 | 0.8485 |        0.1384 | 0.0132 |
 |        75 |          75 |         0.15 |           0.12 | 0.7278 |        0.2383 | 0.0339 |
 |        75 |          75 |         0.15 |           0.14 | 0.5831 |        0.3442 | 0.0728 |
-|        75 |          75 |         0.15 |           0.16 |  0.435 |        0.4307 | 0.1343 |
-|        75 |          75 |         0.15 |           0.18 | 0.3026 |         0.479 | 0.2183 |
+|        75 |          75 |         0.15 |           0.16 | 0.4350 |        0.4307 | 0.1343 |
+|        75 |          75 |         0.15 |           0.18 | 0.3026 |        0.4790 | 0.2183 |
 |        75 |          75 |         0.15 |           0.20 | 0.1971 |        0.4822 | 0.3206 |
 |        75 |          75 |         0.15 |           0.22 | 0.1208 |        0.4454 | 0.4337 |
 |        75 |          75 |         0.15 |           0.24 | 0.0699 |        0.3812 | 0.5489 |
 |        75 |         150 |         0.15 |           0.10 | 0.9149 |        0.0749 | 0.0102 |
-|        75 |         150 |         0.15 |           0.12 | 0.8065 |         0.164 | 0.0295 |
-|        75 |         150 |         0.15 |           0.14 | 0.6552 |         0.276 | 0.0688 |
+|        75 |         150 |         0.15 |           0.12 | 0.8065 |        0.1640 | 0.0295 |
+|        75 |         150 |         0.15 |           0.14 | 0.6552 |        0.2760 | 0.0688 |
 |        75 |         150 |         0.15 |           0.16 | 0.4854 |        0.3793 | 0.1353 |
-|        75 |         150 |         0.15 |           0.18 | 0.3263 |        0.4417 |  0.232 |
-|        75 |         150 |         0.15 |           0.20 | 0.1993 |        0.4466 |  0.354 |
+|        75 |         150 |         0.15 |           0.18 | 0.3263 |        0.4417 | 0.2320 |
+|        75 |         150 |         0.15 |           0.20 | 0.1993 |        0.4466 | 0.3540 |
 |        75 |         150 |         0.15 |           0.22 | 0.1112 |        0.3996 | 0.4892 |
-|        75 |         150 |         0.15 |           0.24 |  0.057 |        0.3209 | 0.6222 |
+|        75 |         150 |         0.15 |           0.24 | 0.0570 |        0.3209 | 0.6222 |
 
 The full probability grid begins at `pi1 = 0.100` with step `0.01`. The
 following calculation shows the first grid points and their
@@ -578,8 +577,9 @@ and
 [`getOperatingCharacteristicsRates()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsRates.md)
 select the Bayesian calculation from this class.
 
-These calculations additionally require the `RBesT` package. Install it
-once if you haven’t yet:
+These calculations additionally require the
+[`RBesT`](https://opensource.nibr.com/RBesT/) package. Install it once
+if you haven’t yet:
 
 ``` r
 
@@ -802,8 +802,9 @@ summary(bayesGroupOC, digits = 4)
 
 These single-component normal priors permit analytic conjugate
 calculations. Normal mixture priors with several components are also
-supported; those operating characteristics use numerical `RBesT`
-boundary searches and integration.
+supported; those operating characteristics use numerical
+[`RBesT`](https://opensource.nibr.com/RBesT/) boundary searches and
+integration.
 
 ### Rates with beta priors
 
@@ -1535,9 +1536,6 @@ Decision regions for observed mean differences and standard errors.
 The Kestrel event-count map above illustrates type 3. Four interval
 methods are supported by both this plot and the Rates constructor:
 
-TODO: here qtd1 should be replaced by “wilson” to reflect the Wilson
-score method.
-
 | `intervalMethod` | Construction |
 |:---|:---|
 | `"wilson"` | Original QTD1 approximation using Wilson score limits rounded to four decimal places in its variance construction |
@@ -1575,12 +1573,17 @@ combinedMap + facet_wrap(~intervalMethod, ncol = 2) +
 
 All four interval constructions for 25 patients per group.
 
-TODO: what happens with more than 1 Mio cells? error/warning?
-
 Maps contain at most one million cells, including zero-event rows and
-columns. Interval methods can classify boundary count pairs differently
-and change the OC probabilities. To use another method throughout an OC
-analysis, specify it in the constructor:
+columns: $`(n_C + 1)(n_T + 1) \leq 1{,}000{,}000`$. If the requested
+sample sizes exceed this limit,
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) raises an error
+(not a warning) before constructing the count grid, and no map is
+returned. For example, `numberOfSubjects = c(1000, 1000)` requires
+1,002,001 cells and is rejected, whereas `c(999, 999)` meets the limit
+exactly. Reduce the sample sizes used for the illustrative map to stay
+within the limit. Interval methods can classify boundary count pairs
+differently and change the OC probabilities. To use another method
+throughout an OC analysis, specify it in the constructor:
 
 ``` r
 
@@ -2038,10 +2041,10 @@ head(ratesPerformance$data[c("desiredDecision", "observedDecision", "probability
 All QTD plots accept `main`, `xlab`, `ylab`, `palette`,
 `legendPosition`, `plotSettings`, and `showSource`. With
 `palette = NULL`, decision categories use semantic colors and
-sample-size curves use the rpact hue palette. Sensitivity and
-performance use a continuous probability scale. The default legend
-position is `"auto"`; standard positions such as `"bottom"` and `"none"`
-are also supported.
+sample-size curves use the [`rpact`](https://www.rpact.org/) hue
+palette. Sensitivity and performance use a continuous probability scale.
+The default legend position is `"auto"`; standard positions such as
+`"bottom"` and `"none"` are also supported.
 
 ``` r
 
@@ -2068,12 +2071,13 @@ kestrelPlot
 
 ![](rpact_quantitative_trial_design_files/figure-html/plot-settings-1.png)
 
-Kestrel OC curves customized with the shared rpact plot settings.
+Kestrel OC curves customized with the shared
+[`rpact`](https://www.rpact.org/) plot settings.
 
-Results are ggplot objects supporting additional ggplot2 layers and
-themes. `data` contains the unrounded plot data. `showSource = TRUE`
-also prints them; a compact scenario object keeps this output
-manageable.
+Results are ggplot objects supporting additional
+[`ggplot2`](https://ggplot2.tidyverse.org/) layers and themes. `data`
+contains the unrounded plot data. `showSource = TRUE` also prints them;
+a compact scenario object keeps this output manageable.
 
 ``` r
 
@@ -2199,4 +2203,4 @@ writeLines(as.character(print(summary(ratesScenarios), markdown = TRUE)), "kestr
   *Bayesian Approaches to Clinical Trials and Health-Care Evaluation*.
   Wiley, Section 6.3. Background reading on Bayesian decision making.
   The Bayesian examples above use posterior probability criteria
-  implemented with RBesT.
+  implemented with [`RBesT`](https://opensource.nibr.com/RBesT/).
