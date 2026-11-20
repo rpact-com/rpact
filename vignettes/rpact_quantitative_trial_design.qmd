@@ -212,6 +212,7 @@ ratesOC <- getOperatingCharacteristicsRates(
     directionUpper = FALSE,
     intervalMethod = "wilson"
 )
+ratesOC
 ```
 
 Here `numberOfSubjects` is a positive integer matrix with control in column 1 and
@@ -225,6 +226,10 @@ beneficial direction.
 Exact binomial summation over all possible event-count
 pairs produces the category probabilities which are in the result of `getOperatingCharacteristicsRates`. The confidence interval construction itself
 remains approximate, based on the normal assumption described above.
+
+Printing `ratesOC` previews the first six rows of the probability table.
+Use `print(ratesOC, maxRows = 10)` to see e.g. 10 rows or
+`as.data.frame(ratesOC)` to extract the full table.
 
 ## Named scenarios
 

@@ -1766,6 +1766,10 @@ summary.ParameterSet <- function(
 #'
 #' @details
 #' Prints the parameters and results of a parameter set.
+#' For quantitative operating characteristics, the probability table is limited
+#' to six rows by default. Pass \code{maxRows} through \code{...} to change this limit
+#' in console or Markdown output. Supply a positive integer, or use \code{Inf} to
+#' request the full table, subject to the console's \code{max.print} option.
 #'
 #' @export
 #'
@@ -1778,23 +1782,22 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
         markdown <- .isMarkdownEnabled("print")
     }
 
-    showStatistics <- NULL
+    showArguments <- list()
     if (inherits(x, "SimulationResults")) {
         showStatistics <- .getOptionalArgument("showStatistics", ...)
         if (!is.null(showStatistics)) {
             .assertIsSingleLogical(showStatistics, "showStatistics")
+            showArguments$showStatistics <- showStatistics
         }
+    } else if (inherits(x, "OperatingCharacteristics")) {
+        showArguments$maxRows <- .getOptionalArgument("maxRows", ...)
     }
 
     if (isTRUE(markdown)) {
         if (.isPrintCall(sysCalls)) {
-            if (!is.null(showStatistics)) {
-                result <- paste0(utils::capture.output(
-                    x$.catMarkdownText(showStatistics = showStatistics)
-                ), collapse = "\n")
-            } else {
-                result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
-            }
+            result <- paste0(utils::capture.output(
+                do.call(x$.catMarkdownText, showArguments)
+            ), collapse = "\n")
             return(knitr::asis_output(result))
         }
 
@@ -1802,11 +1805,7 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
         return(invisible(x))
     }
 
-    if (!is.null(showStatistics)) {
-        x$show(showStatistics = showStatistics)
-    } else {
-        x$show()
-    }
+    do.call(x$show, showArguments)
     return(invisible(x))
 }
 

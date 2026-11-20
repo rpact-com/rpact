@@ -83,30 +83,6 @@ OperatingCharacteristicsRates <- R6::R6Class("OperatingCharacteristicsRates",
         },
         #'
         #' @description
-        #' Prints the result to the console.
-        #'
-        #' @param showType Output mode passed to ParameterSet.
-        #' @param digits Optional display precision.
-        #'
-        show = function(showType = 1, digits = NA_integer_) {
-            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
-        },
-        #'
-        #' @description
-        #' Internal rendering method used by standard console and Markdown output.
-        #'
-        #' @param showType Output mode passed to ParameterSet.
-        #' @param digits Optional display precision.
-        #' @param consoleOutputEnabled Whether to print or collect the output.
-        #'
-        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
-            if (!.showQtdOperatingCharacteristics(self, showType, digits, consoleOutputEnabled)) {
-                super$.show(showType = showType, digits = digits,
-                    consoleOutputEnabled = consoleOutputEnabled)
-            }
-        },
-        #'
-        #' @description
         #' Returns the result description used in output headings.
         #'
         #' @param startWithUpperCase Whether to capitalize the first character.

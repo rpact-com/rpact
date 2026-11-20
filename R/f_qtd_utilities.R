@@ -50,7 +50,22 @@
     return(settings)
 }
 
-.showQtdOperatingCharacteristics <- function(object, showType, digits, consoleOutputEnabled) {
+#'
+#' @title
+#' Render Quantitative Operating Characteristics
+#'
+#' @description
+#' Renders the parameters and a preview of the probability table.
+#'
+#' @param object An OperatingCharacteristics object.
+#' @param showType Output mode.
+#' @param digits Display precision.
+#' @param consoleOutputEnabled Whether to print or collect the output.
+#' @param maxRows Maximum number of probability rows to show.
+#'
+#' @return Invisibly, whether the output mode was handled.
+#'
+.showQtdOperatingCharacteristics <- function(object, showType, digits, consoleOutputEnabled, maxRows) {
     object$.resetCat()
     if (showType == 3) {
         .createSummary(object, digits = digits)$.show(showType = 1, digits = digits,
@@ -59,6 +74,13 @@
     }
     if (showType == 2) {
         return(invisible(FALSE))
+    }
+    if (!is.numeric(maxRows) || is.complex(maxRows) || length(maxRows) != 1L ||
+            is.na(maxRows) || maxRows < 1 || maxRows != trunc(maxRows)) {
+        stopIllegalArgument("'maxRows' must be a positive integer or Inf",
+            functionName = "OperatingCharacteristics$.show", parameter = "maxRows", value = maxRows,
+            constraint = "one positive integer or positive infinity", diagnosticId = "qtd.display.max_rows_invalid"
+        )
     }
     object$.cat("Parameters and output of ", object$.toString(), ":\n\n",
         heading = 1, consoleOutputEnabled = consoleOutputEnabled)
@@ -69,8 +91,17 @@
     object$.showParametersOfOneGroup(object$.getDefaultParameters(), "Default parameters",
         orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled)
     object$.cat("Output:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-    .showDataFrame(object$probabilities, object, niceColumnNamesEnabled = TRUE, digits = digits,
+    probabilities <- object$probabilities
+    totalRows <- nrow(probabilities)
+    if (totalRows > maxRows) {
+        probabilities <- utils::head(probabilities, maxRows)
+    }
+    .showDataFrame(probabilities, object, niceColumnNamesEnabled = TRUE, digits = digits,
         consoleOutputEnabled = consoleOutputEnabled)
+    if (totalRows > maxRows) {
+        object$.cat("Preview limited to ", maxRows, " of ", totalRows, " rows.\n\n",
+            consoleOutputEnabled = consoleOutputEnabled)
+    }
     object$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
     return(invisible(TRUE))
 }

@@ -70,6 +70,32 @@ OperatingCharacteristics <- R6::R6Class(
             self$probabilities <- probabilities
             self$.setParameterType("numberOfSubjects", C_PARAM_USER_DEFINED)
             self$.setParameterType("probabilities", C_PARAM_GENERATED)
+        },
+        #'
+        #' @description
+        #' Prints the operating characteristics to the console.
+        #'
+        #' @param showType Output mode.
+        #' @param digits Display precision.
+        #' @param maxRows Maximum number of probability rows to show.
+        #'   Use `Inf` to request the full table.
+        #'
+        show = function(showType = 1, digits = NA_integer_, maxRows = 6L) {
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE, maxRows = maxRows)
+        },
+        #'
+        #' @description
+        #' Renders the operating characteristics for console or Markdown output.
+        #'
+        #' @param showType Output mode.
+        #' @param digits Display precision.
+        #' @param consoleOutputEnabled Whether to print or collect the output.
+        #' @param maxRows Maximum number of probability rows to show.
+        #'
+        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE, maxRows = 6L) {
+            if (!.showQtdOperatingCharacteristics(self, showType, digits, consoleOutputEnabled, maxRows)) {
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+            }
         }
     )
 )
@@ -149,25 +175,6 @@ OperatingCharacteristicsMeans <- R6::R6Class(
             .setValueAndParameterType(self, "groups", groups, 2L)
             .setValueAndParameterType(self, "alternative", alternative, seq(0, 1, 0.2))
             .setValueAndParameterType(self, "stDev", stDev, 1)
-        },
-        #'
-        #' @description Prints the result.
-        #' @param showType Output mode.
-        #' @param digits Display precision.
-        #'
-        show = function(showType = 1, digits = NA_integer_) {
-            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
-        },
-        #'
-        #' @description Renders the result.
-        #' @param showType Output mode.
-        #' @param digits Display precision.
-        #' @param consoleOutputEnabled Print or collect output.
-        #'
-        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
-            if (!.showQtdOperatingCharacteristics(self, showType, digits, consoleOutputEnabled)) {
-                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
-            }
         },
         #'
         #' @description Returns the result description.

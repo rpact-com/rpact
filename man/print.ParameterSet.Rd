@@ -20,5 +20,9 @@ normal representation will be used otherwise (default is \code{FALSE})}
 }
 \details{
 Prints the parameters and results of a parameter set.
+For quantitative operating characteristics, the probability table is limited
+to six rows by default. Pass \code{maxRows} through \code{...} to change this limit
+in console or Markdown output. Supply a positive integer, or use \code{Inf} to
+request the full table, subject to the console's \code{max.print} option.
 }
 \keyword{internal}
