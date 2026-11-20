@@ -22,8 +22,10 @@
   operating characteristics, sample-size and scenario comparisons,
   sensitivity, and explicitly weighted decision performance. Rates plots
   support treatment-rate or beneficial-risk-difference axes and
-  control-rate sensitivity with a fixed treatment-rate grid. Bayesian
-  decision rules are supported through
+  control-rate sensitivity with a fixed treatment-rate grid. Unique
+  names supplied on `alternative` for means or `pi1` for rates label
+  summary rows and scenario plots, and are included in the probability
+  and plot data. Bayesian decision rules are supported through
   `getDesignQuantitative(bayesian = TRUE)` and custom criteria from
   [`getQuantitativeDecisionThresholds()`](https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.md).
   The common means and rates OC functions dispatch by design class and

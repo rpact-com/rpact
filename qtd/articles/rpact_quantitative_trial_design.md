@@ -279,12 +279,13 @@ efficacy:
 
 scenarioNames <- c("Very good", "Good", "Indifferent", "Poor", "Very poor")
 controlRate <- 0.15
-scenarioRates <- c(0.10, 0.15, 0.175, 0.20, 0.25)
+scenarioRates <- c(0.10, 0.15, 0.175, 0.20, 0.25) |> 
+    stats::setNames(scenarioNames)
 improvements <- controlRate - scenarioRates
 knitr::kable(data.frame(
     Scenario = scenarioNames,
-    `True improvement (percentage points)` = 100 * improvements,
-    `Treatment event probability` = scenarioRates,
+    `True improvement (percentage points)` = 100 * unname(improvements),
+    `Treatment event probability` = unname(scenarioRates),
     check.names = FALSE
 ))
 ```
@@ -333,24 +334,26 @@ summary(ratesScenarios, digits = 4)
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|
-| 1 | 0.10000 | 0.0500 | 0.53523 | 0.31322 | 0.13835 | \<0.00001 | 0.01232 | 0.00087 |
-| 2 | 0.15000 | 0.0000 | 0.20378 | 0.30435 | 0.39130 | \<0.00001 | 0.08433 | 0.01624 |
-| 3 | 0.17500 | -0.0250 | 0.10671 | 0.22678 | 0.47114 | \<0.00001 | 0.15094 | 0.04444 |
-| 4 | 0.20000 | -0.0500 | 0.05023 | 0.14692 | 0.48221 | 0 | 0.22241 | 0.09822 |
-| 5 | 0.25000 | -0.1000 | 0.00831 | 0.04384 | 0.34338 | 0 | 0.30655 | 0.29792 |
+| Very good | 0.10000 | 0.0500 | 0.53523 | 0.31322 | 0.13835 | \<0.00001 | 0.01232 | 0.00087 |
+| Good | 0.15000 | 0.0000 | 0.20378 | 0.30435 | 0.39130 | \<0.00001 | 0.08433 | 0.01624 |
+| Indifferent | 0.17500 | -0.0250 | 0.10671 | 0.22678 | 0.47114 | \<0.00001 | 0.15094 | 0.04444 |
+| Poor | 0.20000 | -0.0500 | 0.05023 | 0.14692 | 0.48221 | 0 | 0.22241 | 0.09822 |
+| Very poor | 0.25000 | -0.1000 | 0.00831 | 0.04384 | 0.34338 | 0 | 0.30655 | 0.29792 |
 
 **Number of subjects (control = 75, treatment = 150)**
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|
-| 1 | 0.10000 | 0.0500 | 0.59475 | 0.32018 | 0.07488 | \<0.00001 | 0.00987 | 0.00032 |
-| 2 | 0.15000 | 0.0000 | 0.19872 | 0.37202 | 0.33095 | 0 | 0.08686 | 0.01145 |
-| 3 | 0.17500 | -0.0250 | 0.09206 | 0.27165 | 0.43117 | 0 | 0.16723 | 0.03789 |
-| 4 | 0.20000 | -0.0500 | 0.03674 | 0.16258 | 0.44665 | 0 | 0.25795 | 0.09608 |
-| 5 | 0.25000 | -0.1000 | 0.00387 | 0.03559 | 0.27701 | 0 | 0.34143 | 0.34210 |
+| Very good | 0.10000 | 0.0500 | 0.59475 | 0.32018 | 0.07488 | \<0.00001 | 0.00987 | 0.00032 |
+| Good | 0.15000 | 0.0000 | 0.19872 | 0.37202 | 0.33095 | 0 | 0.08686 | 0.01145 |
+| Indifferent | 0.17500 | -0.0250 | 0.09206 | 0.27165 | 0.43117 | 0 | 0.16723 | 0.03789 |
+| Poor | 0.20000 | -0.0500 | 0.03674 | 0.16258 | 0.44665 | 0 | 0.25795 | 0.09608 |
+| Very poor | 0.25000 | -0.1000 | 0.00387 | 0.03559 | 0.27701 | 0 | 0.34143 | 0.34210 |
 
-For both sample size configurations, we can thus see the probabilities
-for each decision under the assumed treatment rate.
+The summary uses the scenario names as row labels in each sample-size
+table. Names must be unique and non-empty. For means, use a named
+`alternative` vector in the same way. (Note that if no names are
+provided, then the scenarios will just be identified by their index.)
 
 The following table gives the calculated three-category probabilities
 for the five scenarios to six decimal places under the Wilson interval
@@ -361,15 +364,14 @@ construction.
 scenarioPlot <- plot(ratesScenarios, type = 4, plotCat = 3)
 
 scenarioTable <- scenarioPlot$data |>
-    dplyr::select(scenario, nControl, nTreatment, pi1, alternative,
+    dplyr::select(scenario, effectIndex, Scenario = scenarioName, nControl, nTreatment, pi1, alternative,
         category, probability) |>
     tidyr::pivot_wider(
         names_from = category,
         values_from = probability,
         names_prefix = "probability."
     ) |>
-    dplyr::arrange(scenario, match(pi1, scenarioRates)) |>
-    dplyr::mutate(Scenario = scenarioNames[match(pi1, scenarioRates)])
+    dplyr::arrange(scenario, effectIndex)
 knitr::kable(
     scenarioTable[c("Scenario", "nControl", "nTreatment", "pi1", "alternative",
         "probability.Go", "probability.Indeterminate", "probability.Stop")],
@@ -1218,15 +1220,15 @@ print(ratesScenarios, markdown = FALSE)
       Interval method              : wilson
 
     Output:
-        Category Probability Number of   Number of Alternatives   Assumed      Assumed
+        Category Probability Number of   Number of Alternatives   Assumed      Assumed scenarioName
                               subjects    subjects              treatment control rate
                              (control) (treatment)                   rate
-    1 Go (Fixed)  0.53523266        75          75        0.050     0.100         0.15
-    2 Go (Fixed)  0.20377574        75          75        0.000     0.150         0.15
-    3 Go (Fixed)  0.10670767        75          75       -0.025     0.175         0.15
-    4 Go (Fixed)  0.05023338        75          75       -0.050     0.200         0.15
-    5 Go (Fixed)  0.00831052        75          75       -0.100     0.250         0.15
-    6         Go  0.31322328        75          75        0.050     0.100         0.15
+    1 Go (Fixed)  0.53523266        75          75        0.050     0.100         0.15    Very good
+    2 Go (Fixed)  0.20377574        75          75        0.000     0.150         0.15         Good
+    3 Go (Fixed)  0.10670767        75          75       -0.025     0.175         0.15  Indifferent
+    4 Go (Fixed)  0.05023338        75          75       -0.050     0.200         0.15         Poor
+    5 Go (Fixed)  0.00831052        75          75       -0.100     0.250         0.15    Very poor
+    6         Go  0.31322328        75          75        0.050     0.100         0.15    Very good
 
     Preview limited to 6 of 60 rows.
 
@@ -1371,14 +1373,14 @@ rates**
 
 **Output**
 
-|  | Category | Probability | Number of subjects (control) | Number of subjects (treatment) | Alternatives | Assumed treatment rate | Assumed control rate |
-|----|----|----|----|----|----|----|----|
-| 1 | Go (Fixed) | 0.53523266 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 2 | Go (Fixed) | 0.20377574 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 3 | Go (Fixed) | 0.10670767 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 4 | Go (Fixed) | 0.05023338 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 5 | Go (Fixed) | 0.00831052 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 6 | Go | 0.31322328 | 75 | 75 | 0.050 | 0.100 | 0.15 |
+|  | Category | Probability | Number of subjects (control) | Number of subjects (treatment) | Alternatives | Assumed treatment rate | Assumed control rate | scenarioName |
+|----|----|----|----|----|----|----|----|----|
+| 1 | Go (Fixed) | 0.53523266 | 75 | 75 | 0.050 | 0.100 | 0.15 | Very good |
+| 2 | Go (Fixed) | 0.20377574 | 75 | 75 | 0.000 | 0.150 | 0.15 | Good |
+| 3 | Go (Fixed) | 0.10670767 | 75 | 75 | -0.025 | 0.175 | 0.15 | Indifferent |
+| 4 | Go (Fixed) | 0.05023338 | 75 | 75 | -0.050 | 0.200 | 0.15 | Poor |
+| 5 | Go (Fixed) | 0.00831052 | 75 | 75 | -0.100 | 0.250 | 0.15 | Very poor |
+| 6 | Go | 0.31322328 | 75 | 75 | 0.050 | 0.100 | 0.15 | Very good |
 
 Preview limited to 6 of 60 rows.
 
@@ -1404,21 +1406,21 @@ Preview limited to 6 of 60 rows.
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|
-| 1 | 0.10000 | 0.0500 | 0.53523 | 0.31322 | 0.13835 | \<0.00001 | 0.01232 | 0.00087 |
-| 2 | 0.15000 | 0.0000 | 0.20378 | 0.30435 | 0.39130 | \<0.00001 | 0.08433 | 0.01624 |
-| 3 | 0.17500 | -0.0250 | 0.10671 | 0.22678 | 0.47114 | \<0.00001 | 0.15094 | 0.04444 |
-| 4 | 0.20000 | -0.0500 | 0.05023 | 0.14692 | 0.48221 | 0 | 0.22241 | 0.09822 |
-| 5 | 0.25000 | -0.1000 | 0.00831 | 0.04384 | 0.34338 | 0 | 0.30655 | 0.29792 |
+| Very good | 0.10000 | 0.0500 | 0.53523 | 0.31322 | 0.13835 | \<0.00001 | 0.01232 | 0.00087 |
+| Good | 0.15000 | 0.0000 | 0.20378 | 0.30435 | 0.39130 | \<0.00001 | 0.08433 | 0.01624 |
+| Indifferent | 0.17500 | -0.0250 | 0.10671 | 0.22678 | 0.47114 | \<0.00001 | 0.15094 | 0.04444 |
+| Poor | 0.20000 | -0.0500 | 0.05023 | 0.14692 | 0.48221 | 0 | 0.22241 | 0.09822 |
+| Very poor | 0.25000 | -0.1000 | 0.00831 | 0.04384 | 0.34338 | 0 | 0.30655 | 0.29792 |
 
 **Number of subjects (control = 75, treatment = 150)**
 
 |  | Assumed treatment rate | Alternatives | Go (Fixed) | Go | Indeterminate 1 | Indeterminate 2 | Stop | Stop (Fixed) |
 |----|----|----|----|----|----|----|----|----|
-| 1 | 0.10000 | 0.0500 | 0.59475 | 0.32018 | 0.07488 | \<0.00001 | 0.00987 | 0.00032 |
-| 2 | 0.15000 | 0.0000 | 0.19872 | 0.37202 | 0.33095 | 0 | 0.08686 | 0.01145 |
-| 3 | 0.17500 | -0.0250 | 0.09206 | 0.27165 | 0.43117 | 0 | 0.16723 | 0.03789 |
-| 4 | 0.20000 | -0.0500 | 0.03674 | 0.16258 | 0.44665 | 0 | 0.25795 | 0.09608 |
-| 5 | 0.25000 | -0.1000 | 0.00387 | 0.03559 | 0.27701 | 0 | 0.34143 | 0.34210 |
+| Very good | 0.10000 | 0.0500 | 0.59475 | 0.32018 | 0.07488 | \<0.00001 | 0.00987 | 0.00032 |
+| Good | 0.15000 | 0.0000 | 0.19872 | 0.37202 | 0.33095 | 0 | 0.08686 | 0.01145 |
+| Indifferent | 0.17500 | -0.0250 | 0.09206 | 0.27165 | 0.43117 | 0 | 0.16723 | 0.03789 |
+| Poor | 0.20000 | -0.0500 | 0.03674 | 0.16258 | 0.44665 | 0 | 0.25795 | 0.09608 |
+| Very poor | 0.25000 | -0.1000 | 0.00387 | 0.03559 | 0.27701 | 0 | 0.34143 | 0.34210 |
 
 The `probabilities` field is a data frame of unrounded values. Columns
 include `category`, `probability`, `nControl`, `nTreatment`, and
@@ -1434,13 +1436,13 @@ existing summary.
 head(ratesScenarios$probabilities)
 ```
 
-        category probability nControl nTreatment alternative   pi1  pi2
-    1 Go (Fixed)  0.53523266       75         75       0.050 0.100 0.15
-    2 Go (Fixed)  0.20377574       75         75       0.000 0.150 0.15
-    3 Go (Fixed)  0.10670767       75         75      -0.025 0.175 0.15
-    4 Go (Fixed)  0.05023338       75         75      -0.050 0.200 0.15
-    5 Go (Fixed)  0.00831052       75         75      -0.100 0.250 0.15
-    6         Go  0.31322328       75         75       0.050 0.100 0.15
+        category probability nControl nTreatment alternative   pi1  pi2 scenarioName
+    1 Go (Fixed)  0.53523266       75         75       0.050 0.100 0.15    Very good
+    2 Go (Fixed)  0.20377574       75         75       0.000 0.150 0.15         Good
+    3 Go (Fixed)  0.10670767       75         75      -0.025 0.175 0.15  Indifferent
+    4 Go (Fixed)  0.05023338       75         75      -0.050 0.200 0.15         Poor
+    5 Go (Fixed)  0.00831052       75         75      -0.100 0.250 0.15    Very poor
+    6         Go  0.31322328       75         75       0.050 0.100 0.15    Very good
 
 ``` r
 
@@ -2011,22 +2013,22 @@ distributions.
 
 The data include `desiredDecision`, `observedDecision`, and `correct`.
 The `qtdEffectDistribution` attribute records the exact effect
-distribution and desired decisions. For Rates it identifies scenarios by
-`pi1`. If several `pi2` values are supplied, the same distribution over
-treatment rates and desired decisions applies separately to each
-control-rate panel.
+distribution and desired decisions. For Rates it includes the treatment
+event rate (`pi1`) and, when supplied, the scenario name
+(`scenarioName`). If several `pi2` values are supplied, the same
+distribution applies separately to each control-rate panel.
 
 ``` r
 
 attr(ratesPerformance, "qtdEffectDistribution")
 ```
 
-        pi1 weight desiredDecision
-    1 0.100    0.2              Go
-    2 0.150    0.2              Go
-    3 0.175    0.2   Indeterminate
-    4 0.200    0.2            Stop
-    5 0.250    0.2            Stop
+        pi1 weight desiredDecision scenarioName
+    1 0.100    0.2              Go    Very good
+    2 0.150    0.2              Go         Good
+    3 0.175    0.2   Indeterminate  Indifferent
+    4 0.200    0.2            Stop         Poor
+    5 0.250    0.2            Stop    Very poor
 
 ``` r
 
@@ -2090,88 +2092,88 @@ sourcePlot <- plot(ratesScenarios, type = 4, showSource = TRUE)
 ```
 
     Source data of the QTD plot:
-            category scenario effectIndex nControl nTreatment alternative  pi2   pi1 probability     sampleSize
-    1             Go        1           1       75         75       0.050 0.15 0.100  0.84845594  C: 75 / T: 75
-    2  Indeterminate        1           1       75         75       0.050 0.15 0.100  0.13835067  C: 75 / T: 75
-    3           Stop        1           1       75         75       0.050 0.15 0.100  0.01319339  C: 75 / T: 75
-    4             Go        2           1       75        150       0.050 0.15 0.100  0.91493290 C: 75 / T: 150
-    5  Indeterminate        2           1       75        150       0.050 0.15 0.100  0.07488037 C: 75 / T: 150
-    6           Stop        2           1       75        150       0.050 0.15 0.100  0.01018674 C: 75 / T: 150
-    7             Go        1           2       75         75       0.000 0.15 0.150  0.50812904  C: 75 / T: 75
-    8  Indeterminate        1           2       75         75       0.000 0.15 0.150  0.39130040  C: 75 / T: 75
-    9           Stop        1           2       75         75       0.000 0.15 0.150  0.10057056  C: 75 / T: 75
-    10            Go        2           2       75        150       0.000 0.15 0.150  0.57074458 C: 75 / T: 150
-    11 Indeterminate        2           2       75        150       0.000 0.15 0.150  0.33094646 C: 75 / T: 150
-    12          Stop        2           2       75        150       0.000 0.15 0.150  0.09830897 C: 75 / T: 150
-    13            Go        1           3       75         75      -0.025 0.15 0.175  0.33348862  C: 75 / T: 75
-    14 Indeterminate        1           3       75         75      -0.025 0.15 0.175  0.47113675  C: 75 / T: 75
-    15          Stop        1           3       75         75      -0.025 0.15 0.175  0.19537463  C: 75 / T: 75
-    16            Go        2           3       75        150      -0.025 0.15 0.175  0.36370879 C: 75 / T: 150
-    17 Indeterminate        2           3       75        150      -0.025 0.15 0.175  0.43117184 C: 75 / T: 150
-    18          Stop        2           3       75        150      -0.025 0.15 0.175  0.20511938 C: 75 / T: 150
-    19            Go        1           4       75         75      -0.050 0.15 0.200  0.19714998  C: 75 / T: 75
-    20 Indeterminate        1           4       75         75      -0.050 0.15 0.200  0.48221454  C: 75 / T: 75
-    21          Stop        1           4       75         75      -0.050 0.15 0.200  0.32063548  C: 75 / T: 75
-    22            Go        2           4       75        150      -0.050 0.15 0.200  0.19931900 C: 75 / T: 150
-    23 Indeterminate        2           4       75        150      -0.050 0.15 0.200  0.44664640 C: 75 / T: 150
-    24          Stop        2           4       75        150      -0.050 0.15 0.200  0.35403460 C: 75 / T: 150
-    25            Go        1           5       75         75      -0.100 0.15 0.250  0.05214613  C: 75 / T: 75
-    26 Indeterminate        1           5       75         75      -0.100 0.15 0.250  0.34337718  C: 75 / T: 75
-    27          Stop        1           5       75         75      -0.100 0.15 0.250  0.60447670  C: 75 / T: 75
-    28            Go        2           5       75        150      -0.100 0.15 0.250  0.03945968 C: 75 / T: 150
-    29 Indeterminate        2           5       75        150      -0.100 0.15 0.250  0.27700912 C: 75 / T: 150
-    30          Stop        2           5       75        150      -0.100 0.15 0.250  0.68353120 C: 75 / T: 150
-           scenarioLabel totalSubjects allocationRatio effectLabel
-    1   1: C: 75 / T: 75           150               1         0.1
-    2   1: C: 75 / T: 75           150               1         0.1
-    3   1: C: 75 / T: 75           150               1         0.1
-    4  2: C: 75 / T: 150           225               2         0.1
-    5  2: C: 75 / T: 150           225               2         0.1
-    6  2: C: 75 / T: 150           225               2         0.1
-    7   1: C: 75 / T: 75           150               1        0.15
-    8   1: C: 75 / T: 75           150               1        0.15
-    9   1: C: 75 / T: 75           150               1        0.15
-    10 2: C: 75 / T: 150           225               2        0.15
-    11 2: C: 75 / T: 150           225               2        0.15
-    12 2: C: 75 / T: 150           225               2        0.15
-    13  1: C: 75 / T: 75           150               1       0.175
-    14  1: C: 75 / T: 75           150               1       0.175
-    15  1: C: 75 / T: 75           150               1       0.175
-    16 2: C: 75 / T: 150           225               2       0.175
-    17 2: C: 75 / T: 150           225               2       0.175
-    18 2: C: 75 / T: 150           225               2       0.175
-    19  1: C: 75 / T: 75           150               1         0.2
-    20  1: C: 75 / T: 75           150               1         0.2
-    21  1: C: 75 / T: 75           150               1         0.2
-    22 2: C: 75 / T: 150           225               2         0.2
-    23 2: C: 75 / T: 150           225               2         0.2
-    24 2: C: 75 / T: 150           225               2         0.2
-    25  1: C: 75 / T: 75           150               1        0.25
-    26  1: C: 75 / T: 75           150               1        0.25
-    27  1: C: 75 / T: 75           150               1        0.25
-    28 2: C: 75 / T: 150           225               2        0.25
-    29 2: C: 75 / T: 150           225               2        0.25
-    30 2: C: 75 / T: 150           225               2        0.25
+            category scenario effectIndex nControl nTreatment alternative  pi2   pi1 probability scenarioName
+    1             Go        1           1       75         75       0.050 0.15 0.100  0.84845594    Very good
+    2  Indeterminate        1           1       75         75       0.050 0.15 0.100  0.13835067    Very good
+    3           Stop        1           1       75         75       0.050 0.15 0.100  0.01319339    Very good
+    4             Go        2           1       75        150       0.050 0.15 0.100  0.91493290    Very good
+    5  Indeterminate        2           1       75        150       0.050 0.15 0.100  0.07488037    Very good
+    6           Stop        2           1       75        150       0.050 0.15 0.100  0.01018674    Very good
+    7             Go        1           2       75         75       0.000 0.15 0.150  0.50812904         Good
+    8  Indeterminate        1           2       75         75       0.000 0.15 0.150  0.39130040         Good
+    9           Stop        1           2       75         75       0.000 0.15 0.150  0.10057056         Good
+    10            Go        2           2       75        150       0.000 0.15 0.150  0.57074458         Good
+    11 Indeterminate        2           2       75        150       0.000 0.15 0.150  0.33094646         Good
+    12          Stop        2           2       75        150       0.000 0.15 0.150  0.09830897         Good
+    13            Go        1           3       75         75      -0.025 0.15 0.175  0.33348862  Indifferent
+    14 Indeterminate        1           3       75         75      -0.025 0.15 0.175  0.47113675  Indifferent
+    15          Stop        1           3       75         75      -0.025 0.15 0.175  0.19537463  Indifferent
+    16            Go        2           3       75        150      -0.025 0.15 0.175  0.36370879  Indifferent
+    17 Indeterminate        2           3       75        150      -0.025 0.15 0.175  0.43117184  Indifferent
+    18          Stop        2           3       75        150      -0.025 0.15 0.175  0.20511938  Indifferent
+    19            Go        1           4       75         75      -0.050 0.15 0.200  0.19714998         Poor
+    20 Indeterminate        1           4       75         75      -0.050 0.15 0.200  0.48221454         Poor
+    21          Stop        1           4       75         75      -0.050 0.15 0.200  0.32063548         Poor
+    22            Go        2           4       75        150      -0.050 0.15 0.200  0.19931900         Poor
+    23 Indeterminate        2           4       75        150      -0.050 0.15 0.200  0.44664640         Poor
+    24          Stop        2           4       75        150      -0.050 0.15 0.200  0.35403460         Poor
+    25            Go        1           5       75         75      -0.100 0.15 0.250  0.05214613    Very poor
+    26 Indeterminate        1           5       75         75      -0.100 0.15 0.250  0.34337718    Very poor
+    27          Stop        1           5       75         75      -0.100 0.15 0.250  0.60447670    Very poor
+    28            Go        2           5       75        150      -0.100 0.15 0.250  0.03945968    Very poor
+    29 Indeterminate        2           5       75        150      -0.100 0.15 0.250  0.27700912    Very poor
+    30          Stop        2           5       75        150      -0.100 0.15 0.250  0.68353120    Very poor
+           sampleSize     scenarioLabel totalSubjects allocationRatio effectLabel
+    1   C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very good
+    2   C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very good
+    3   C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very good
+    4  C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very good
+    5  C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very good
+    6  C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very good
+    7   C: 75 / T: 75  1: C: 75 / T: 75           150               1        Good
+    8   C: 75 / T: 75  1: C: 75 / T: 75           150               1        Good
+    9   C: 75 / T: 75  1: C: 75 / T: 75           150               1        Good
+    10 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Good
+    11 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Good
+    12 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Good
+    13  C: 75 / T: 75  1: C: 75 / T: 75           150               1 Indifferent
+    14  C: 75 / T: 75  1: C: 75 / T: 75           150               1 Indifferent
+    15  C: 75 / T: 75  1: C: 75 / T: 75           150               1 Indifferent
+    16 C: 75 / T: 150 2: C: 75 / T: 150           225               2 Indifferent
+    17 C: 75 / T: 150 2: C: 75 / T: 150           225               2 Indifferent
+    18 C: 75 / T: 150 2: C: 75 / T: 150           225               2 Indifferent
+    19  C: 75 / T: 75  1: C: 75 / T: 75           150               1        Poor
+    20  C: 75 / T: 75  1: C: 75 / T: 75           150               1        Poor
+    21  C: 75 / T: 75  1: C: 75 / T: 75           150               1        Poor
+    22 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Poor
+    23 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Poor
+    24 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Poor
+    25  C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very poor
+    26  C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very poor
+    27  C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very poor
+    28 C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very poor
+    29 C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very poor
+    30 C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very poor
 
 ``` r
 
 head(sourcePlot$data)
 ```
 
-           category scenario effectIndex nControl nTreatment alternative  pi2 pi1 probability     sampleSize
-    1            Go        1           1       75         75        0.05 0.15 0.1  0.84845594  C: 75 / T: 75
-    2 Indeterminate        1           1       75         75        0.05 0.15 0.1  0.13835067  C: 75 / T: 75
-    3          Stop        1           1       75         75        0.05 0.15 0.1  0.01319339  C: 75 / T: 75
-    4            Go        2           1       75        150        0.05 0.15 0.1  0.91493290 C: 75 / T: 150
-    5 Indeterminate        2           1       75        150        0.05 0.15 0.1  0.07488037 C: 75 / T: 150
-    6          Stop        2           1       75        150        0.05 0.15 0.1  0.01018674 C: 75 / T: 150
+           category scenario effectIndex nControl nTreatment alternative  pi2 pi1 probability scenarioName     sampleSize
+    1            Go        1           1       75         75        0.05 0.15 0.1  0.84845594    Very good  C: 75 / T: 75
+    2 Indeterminate        1           1       75         75        0.05 0.15 0.1  0.13835067    Very good  C: 75 / T: 75
+    3          Stop        1           1       75         75        0.05 0.15 0.1  0.01319339    Very good  C: 75 / T: 75
+    4            Go        2           1       75        150        0.05 0.15 0.1  0.91493290    Very good C: 75 / T: 150
+    5 Indeterminate        2           1       75        150        0.05 0.15 0.1  0.07488037    Very good C: 75 / T: 150
+    6          Stop        2           1       75        150        0.05 0.15 0.1  0.01018674    Very good C: 75 / T: 150
           scenarioLabel totalSubjects allocationRatio effectLabel
-    1  1: C: 75 / T: 75           150               1         0.1
-    2  1: C: 75 / T: 75           150               1         0.1
-    3  1: C: 75 / T: 75           150               1         0.1
-    4 2: C: 75 / T: 150           225               2         0.1
-    5 2: C: 75 / T: 150           225               2         0.1
-    6 2: C: 75 / T: 150           225               2         0.1
+    1  1: C: 75 / T: 75           150               1   Very good
+    2  1: C: 75 / T: 75           150               1   Very good
+    3  1: C: 75 / T: 75           150               1   Very good
+    4 2: C: 75 / T: 150           225               2   Very good
+    5 2: C: 75 / T: 150           225               2   Very good
+    6 2: C: 75 / T: 150           225               2   Very good
 
 The original QTD interface offered PNG plots, a full-data CSV, and a
 compact summary CSV. In R, plots can be saved as PNG files, and full

@@ -149,7 +149,8 @@ decisions are "Go", "Indeterminate", or "Stop". All three observed decisions
 remain visible; no implicit treatment of Indeterminate as Stop is applied.
 For rates, provide one entry per distinct selected treatment rate, in <code>pi1</code>
 selection order (or original input order). The same distribution is applied
-separately to each control-rate panel.</p></dd>
+separately to each control-rate panel. For named inputs, supply one entry per
+scenario in selection order (or original input order), even when values repeat.</p></dd>
 
 
 <dt id="arg-contourlevels">contourLevels<a class="anchor" aria-label="anchor" href="#arg-contourlevels"></a></dt>
@@ -184,7 +185,10 @@ decisions are the color/fill categories, and the rpact hue palette for curves.</
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A ggplot object with its data in the <code>data</code> component.</p>
+    <p>A ggplot object with its data in the <code>data</code> component.
+Named effects label scenarios in types 3 and 4 and appear in the data
+for plots that display individual effects. Type 6 records the names in the
+<code>qtdEffectDistribution</code> attribute.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

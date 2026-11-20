@@ -45,7 +45,9 @@ getOperatingCharacteristicsMeans(
 
 - alternative:
 
-  Finite vector of true treatment-minus-control effects.
+  Finite vector of true treatment-minus-control effects. Optional names
+  must be unique and non-empty. They label summary rows and appear in
+  the `scenarioName` column of the probability table and plot data.
 
 - stDev:
 
