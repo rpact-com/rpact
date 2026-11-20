@@ -189,7 +189,7 @@ benefit-risk assessment are separate considerations.
 | Target difference | 0 percentage points | `targetValue = 0` |
 | Lower / upper percentiles | 20% / 90% | `lowerPercentile = 0.2`, `upperPercentile = 0.9` |
 | Control event probability | 15% | `pi2 = 0.15` |
-| Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` |
+| Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.01)` |
 | Sample sizes, control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
 | Beneficial direction | Lower treatment rate | `directionUpper = FALSE` |
 | Interval construction | Frequentist with Wilson score confidence interval | `intervalMethod = "wilson"` |
@@ -370,22 +370,25 @@ eventMap
 
 Here `numberOfSubjects` is a vector of length two, unlike the matrix given to `getOperatingCharacteristicsRates` previously. `observedControl` adds the vertical line. Supplying `controlRate` and `treatmentRate` together adds joint binomial cell probabilities to the plot data without changing the decisions.
 
-For example, if we observe 16 control events, the following code extracts the corresponding treatment event ranges and aggregated cell probabilities:
+To calculate decision probabilities given 16 control events, keep only that
+row of counts and divide each joint cell probability by their sum, the
+probability of observing 16 control events. The table shows the treatment
+event ranges and conditional decision probabilities at the assumed treatment
+event rate of 0.10.
 
 ```{r}
 #| label: observed-event-ranges
 observedRanges <- eventMap$data |>
     dplyr::filter(eventsControl == 16) |>
+    dplyr::mutate(conditionalProbability = cellProbability / sum(cellProbability)) |>
     dplyr::group_by(category) |>
     dplyr::summarise(
         Minimum = min(eventsTreatment),
         Maximum = max(eventsTreatment),
+        `Conditional probability` = sum(conditionalProbability),
         .groups = "drop"
     )
-knitr::kable(dplyr::rename(observedRanges, Decision = category))
-eventMap$data |>
-    dplyr::group_by(category) |>
-    dplyr::summarise(cellProbability = sum(cellProbability), .groups = "drop")
+knitr::kable(dplyr::rename(observedRanges, Decision = category), digits = 6)
 ```
 
 
@@ -492,11 +495,12 @@ the beneficial-tail probability threshold at LRV and `lowerPercentile` as the
 threshold at TV. These are different decision rules, even with identical
 numerical inputs.
 
-For each mapping, Stop requires both complementary criteria in the opposite
-direction. Indeterminate 1 fails the LRV criterion and passes TV. Indeterminate
-2 contains any other remaining outcomes. Probability comparisons are strict;
-an exact probability-threshold tie belongs to the residual category. This can
-matter for discrete event counts.
+For each mapping, Stop requires both opposite-tail probabilities to exceed
+their complementary thresholds. Indeterminate 1 meets the Stop criterion at
+LRV and the Go criterion at TV. Indeterminate 2 contains all remaining outcomes.
+For these reference-value rules, a tie at either threshold falls into
+Indeterminate 2 because neither strict comparison at that reference value
+passes. This can matter for discrete event counts.
 
 ## Means with a prior on the treatment effect
 
@@ -741,9 +745,11 @@ summary(customRateRule)
 plot(customRateOC, plotCat = 4, main = "Bayesian rates: custom posterior criteria")
 ```
 
-For each custom rule, Indeterminate 2 is the complement of the three explicit
-categories, including exact probability-threshold ties. The stored probabilities
-therefore sum to one for each sample-size and effect scenario. We can confirm this by checking the totals:
+For each custom rule, Indeterminate 2 applies when none of the three explicit
+categories is satisfied. An exact probability-threshold tie fails the criterion
+where it occurs, and another explicit category can still be satisfied. The
+stored probabilities therefore sum to one for each sample-size and effect
+scenario. We can confirm this by checking the totals:
 
 ```{r}
 #| label: bayes-probability-totals
