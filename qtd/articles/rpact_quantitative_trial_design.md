@@ -33,7 +33,8 @@ and
 together with Bayesian class dispatch and their print, summary, and plot
 methods.
 
-### How to install the QTD development version
+Please use this command to install the QTD development version from the
+respective GitHub branch:
 
 ``` r
 
@@ -189,7 +190,7 @@ overall benefit-risk assessment are separate considerations.
 | Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` |
 | Sample sizes, control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
 | Beneficial direction | Lower treatment rate | `directionUpper = FALSE` |
-| Interval construction | Frequentist | `intervalMethod = "wilson"` |
+| Interval construction | Frequentist with Wilson score confidence interval | `intervalMethod = "wilson"` |
 
 We evaluate treatment event probabilities from 0.10 to 0.25 in steps of
 0.01 for both sample-size scenarios. Rates and reference differences are
@@ -2088,75 +2089,7 @@ a compact scenario object keeps this output manageable.
 
 ``` r
 
-sourcePlot <- plot(ratesScenarios, type = 4, showSource = TRUE)
-```
-
-    Source data of the QTD plot:
-            category scenario effectIndex nControl nTreatment alternative  pi2   pi1 probability scenarioName
-    1             Go        1           1       75         75       0.050 0.15 0.100  0.84845594    Very good
-    2  Indeterminate        1           1       75         75       0.050 0.15 0.100  0.13835067    Very good
-    3           Stop        1           1       75         75       0.050 0.15 0.100  0.01319339    Very good
-    4             Go        2           1       75        150       0.050 0.15 0.100  0.91493290    Very good
-    5  Indeterminate        2           1       75        150       0.050 0.15 0.100  0.07488037    Very good
-    6           Stop        2           1       75        150       0.050 0.15 0.100  0.01018674    Very good
-    7             Go        1           2       75         75       0.000 0.15 0.150  0.50812904         Good
-    8  Indeterminate        1           2       75         75       0.000 0.15 0.150  0.39130040         Good
-    9           Stop        1           2       75         75       0.000 0.15 0.150  0.10057056         Good
-    10            Go        2           2       75        150       0.000 0.15 0.150  0.57074458         Good
-    11 Indeterminate        2           2       75        150       0.000 0.15 0.150  0.33094646         Good
-    12          Stop        2           2       75        150       0.000 0.15 0.150  0.09830897         Good
-    13            Go        1           3       75         75      -0.025 0.15 0.175  0.33348862  Indifferent
-    14 Indeterminate        1           3       75         75      -0.025 0.15 0.175  0.47113675  Indifferent
-    15          Stop        1           3       75         75      -0.025 0.15 0.175  0.19537463  Indifferent
-    16            Go        2           3       75        150      -0.025 0.15 0.175  0.36370879  Indifferent
-    17 Indeterminate        2           3       75        150      -0.025 0.15 0.175  0.43117184  Indifferent
-    18          Stop        2           3       75        150      -0.025 0.15 0.175  0.20511938  Indifferent
-    19            Go        1           4       75         75      -0.050 0.15 0.200  0.19714998         Poor
-    20 Indeterminate        1           4       75         75      -0.050 0.15 0.200  0.48221454         Poor
-    21          Stop        1           4       75         75      -0.050 0.15 0.200  0.32063548         Poor
-    22            Go        2           4       75        150      -0.050 0.15 0.200  0.19931900         Poor
-    23 Indeterminate        2           4       75        150      -0.050 0.15 0.200  0.44664640         Poor
-    24          Stop        2           4       75        150      -0.050 0.15 0.200  0.35403460         Poor
-    25            Go        1           5       75         75      -0.100 0.15 0.250  0.05214613    Very poor
-    26 Indeterminate        1           5       75         75      -0.100 0.15 0.250  0.34337718    Very poor
-    27          Stop        1           5       75         75      -0.100 0.15 0.250  0.60447670    Very poor
-    28            Go        2           5       75        150      -0.100 0.15 0.250  0.03945968    Very poor
-    29 Indeterminate        2           5       75        150      -0.100 0.15 0.250  0.27700912    Very poor
-    30          Stop        2           5       75        150      -0.100 0.15 0.250  0.68353120    Very poor
-           sampleSize     scenarioLabel totalSubjects allocationRatio effectLabel
-    1   C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very good
-    2   C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very good
-    3   C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very good
-    4  C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very good
-    5  C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very good
-    6  C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very good
-    7   C: 75 / T: 75  1: C: 75 / T: 75           150               1        Good
-    8   C: 75 / T: 75  1: C: 75 / T: 75           150               1        Good
-    9   C: 75 / T: 75  1: C: 75 / T: 75           150               1        Good
-    10 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Good
-    11 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Good
-    12 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Good
-    13  C: 75 / T: 75  1: C: 75 / T: 75           150               1 Indifferent
-    14  C: 75 / T: 75  1: C: 75 / T: 75           150               1 Indifferent
-    15  C: 75 / T: 75  1: C: 75 / T: 75           150               1 Indifferent
-    16 C: 75 / T: 150 2: C: 75 / T: 150           225               2 Indifferent
-    17 C: 75 / T: 150 2: C: 75 / T: 150           225               2 Indifferent
-    18 C: 75 / T: 150 2: C: 75 / T: 150           225               2 Indifferent
-    19  C: 75 / T: 75  1: C: 75 / T: 75           150               1        Poor
-    20  C: 75 / T: 75  1: C: 75 / T: 75           150               1        Poor
-    21  C: 75 / T: 75  1: C: 75 / T: 75           150               1        Poor
-    22 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Poor
-    23 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Poor
-    24 C: 75 / T: 150 2: C: 75 / T: 150           225               2        Poor
-    25  C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very poor
-    26  C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very poor
-    27  C: 75 / T: 75  1: C: 75 / T: 75           150               1   Very poor
-    28 C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very poor
-    29 C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very poor
-    30 C: 75 / T: 150 2: C: 75 / T: 150           225               2   Very poor
-
-``` r
-
+sourcePlot <- plot(ratesScenarios, type = 4)
 head(sourcePlot$data)
 ```
 
