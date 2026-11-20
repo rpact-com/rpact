@@ -228,8 +228,7 @@ with `FALSE`, it is `pi2 - pi1`. The returned `alternative` field uses that
 beneficial direction. 
 
 Exact binomial summation over all possible event-count
-pairs produces the category probabilities which are in the result of `getOperatingCharacteristicsRates`. The confidence interval construction itself
-remains approximate, based on the normal assumption described above.
+pairs produces the category probabilities which are in the result of `getOperatingCharacteristicsRates`. 
 
 Printing `ratesOC` previews the first six rows of the probability table.
 Use `print(ratesOC, maxRows = 10)` to see e.g. 10 rows or
@@ -369,7 +368,7 @@ eventMap <- plot(
 eventMap
 ```
 
-Here `numberOfSubjects` is a vector of length two, unlike the matrix given to `getOperatingCharacteristicsBinary` previously. `observedControl` adds the vertical line. Supplying `controlRate` and `treatmentRate` together adds joint binomial cell probabilities to the plot data without changing the decisions.
+Here `numberOfSubjects` is a vector of length two, unlike the matrix given to `getOperatingCharacteristicsRates` previously. `observedControl` adds the vertical line. Supplying `controlRate` and `treatmentRate` together adds joint binomial cell probabilities to the plot data without changing the decisions.
 
 For example, if we observe 16 control events, the following code extracts the corresponding treatment event ranges and aggregated cell probabilities:
 
@@ -541,8 +540,6 @@ summary(bayesMeanRules$quantile)
 summary(bayesMeanRules$posteriorProbability)
 ```
 
-Note that here we don't have a `normalApproximation` argument: The means model uses known
-standard deviations, therefore we don't need to rely on a normal approximation for the sampling distribution of the mean difference estimator as we did in the frequentist case.
 
 The next table compares Go probabilities at three true effects, keeping the
 prior and sample sizes fixed.
@@ -885,7 +882,7 @@ example uses the continuous-endpoint rule's reference values and percentiles.
 
 ```{r}
 #| label: supplied-intervals
-#| fig-cap: "Hypothetical continuous-endpoint results under the AFQ056 example's rule."
+#| fig-cap: "Hypothetical continuous-endpoint results under the Kestrel example's rule."
 plot(
     meansRule,
     type = "Decision rule intervals",
