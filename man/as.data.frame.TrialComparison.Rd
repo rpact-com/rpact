@@ -101,6 +101,12 @@ individual-arm events, selections, rejections and drop-out summaries, including
 a separate \code{Control} category. Arm-independent simulation results occur on
 \code{overall} / \verb{All arms} rows. Input and design settings remain available for
 grouping. Result cells outside their applicable category are \code{NA}.
-Categories and situations are retained in profile comparisons and transposed
-headings. Shared scalar-only output can omit these coordinates.
+The unfiltered data frame retains this expanded structure for plotting and
+grouping. Parameter filters use semantically normalized profiles: design
+settings do not acquire an arm dimension from repeated rows, whereas arm-level
+results retain their group domain even if all values are equal. Shared output
+combines the observed coordinate domains of the common profiles, without
+constructing new combinations or taking the first object's row layout.
+Scalars and lower-dimensional profiles are repeated only on compatible
+observed coordinates. Shared scalar-only output omits coordinate columns.
 }

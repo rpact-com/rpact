@@ -611,16 +611,20 @@ NULL
 
         .setValueAndParameterType(simulationResults, "kappa", kappa, 1)
 
-        .setValueAndParameterType(simulationResults, "accrualTime", accrualTime, 12)
+        .setAccrualTimeToSimulationResults(simulationResults, accrualTime)
         .setValueAndParameterType(simulationResults, "accrualIntensity", accrualIntensity, 0.1)
 
-        .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, 0)
-        .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, 0)
-        .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, 12)
-
-        .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
+        .assertIsSingleNumber(dropoutRate1, "dropoutRate1", naAllowed = TRUE)
+        .assertIsSingleNumber(dropoutRate2, "dropoutRate2", naAllowed = TRUE)
         .assertIsInInterval(dropoutRate1, "dropoutRate1", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
         .assertIsInInterval(dropoutRate2, "dropoutRate2", lower = 0, upper = 1, lowerIncluded = TRUE, upperIncluded = FALSE)
+        
+        .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, 0)
+        .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, 0)
+
+        .assertIsInOpenInterval(dropoutTime, "dropoutTime", lower = 0, upper = NA, naAllowed = TRUE)
+        .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, 12)
+
 
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {

@@ -66,6 +66,12 @@
     names(records) <- c("scenario", "iteration", "group", "arm", "stage", "horizon", "enrolled", "dropouts")
     result$.dropoutRecords <- records
     kMax <- result$.design$kMax
+    rates <- c(result$dropoutRate1, result$dropoutRate2)
+    proportionType <- if (length(rates) > 0L && all(!is.na(rates) & rates == 0)) {
+        C_PARAM_NOT_APPLICABLE
+    } else {
+        C_PARAM_GENERATED
+    }
     for (groupNumber in 1:2) {
         numberOfGroups <- groups
         if (multiArm && groupNumber == 2) {
@@ -105,8 +111,8 @@
         result[[paste0("observedDropoutProportion", groupNumber)]] <- proportions
         result[[paste0("dropoutObservationTime", groupNumber)]] <- horizons
         result[[paste0(".dropoutContributors", groupNumber)]] <- contributors
-        result$.setParameterType(paste0("observedDropoutProportion", groupNumber), C_PARAM_GENERATED)
-        result$.setParameterType(paste0("dropoutObservationTime", groupNumber), C_PARAM_GENERATED)
+        result$.setParameterType(paste0("observedDropoutProportion", groupNumber), proportionType)
+        result$.setParameterType(paste0("dropoutObservationTime", groupNumber), C_PARAM_NOT_APPLICABLE)
     }
 }
 
@@ -156,12 +162,13 @@
     if (!inherits(result, c("SimulationResultsSurvival", "SimulationResultsEnrichmentSurvival"))) {
         return(list())
     }
+    
     for (field in c("observedDropoutProportion1", "observedDropoutProportion2")) {
-        if (!is.null(result[[field]]) && !result$isNotApplicableParameter(field) &&
-                !.isDropoutOutputHidden(result, field)) {
+        if (!is.null(result[[field]]) && !result$isNotApplicableParameter(field)) {
             return(.addLegendEntry("treatmentArmValues"))
         }
     }
+    
     return(list())
 }
 
@@ -170,8 +177,7 @@
     control <- result$observedDropoutProportion2
     if (is.null(treatment) || is.null(control) ||
             result$isNotApplicableParameter("observedDropoutProportion1") ||
-            result$isNotApplicableParameter("observedDropoutProportion2") ||
-            .isDropoutOutputHidden(result, "observedDropoutProportion1")) {
+            result$isNotApplicableParameter("observedDropoutProportion2")) {
         return(invisible(NULL))
     }
     

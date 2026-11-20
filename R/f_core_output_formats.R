@@ -1380,6 +1380,20 @@ getOutputFormat <- function(
     message(length(C_OUTPUT_FORMAT_DEFAULT_VALUES), " output formats were successfully reset")
 }
 
+.escapeMarkdownTableCell <- function(value) {
+    value <- gsub("&", "&amp;", value, fixed = TRUE)
+    value <- gsub("\u00a0", "&#160;", value, fixed = TRUE)
+    value <- gsub("<", "&lt;", value, fixed = TRUE)
+    value <- gsub("\\", "&#92;", value, fixed = TRUE)
+    value <- gsub("|", "&#124;", value, fixed = TRUE)
+    value <- gsub("*", "&#42;", value, fixed = TRUE)
+    value <- gsub("_", "&#95;", value, fixed = TRUE)
+    value <- gsub("`", "&#96;", value, fixed = TRUE)
+    value <- gsub("[", "&#91;", value, fixed = TRUE)
+    value <- gsub("]", "&#93;", value, fixed = TRUE)
+    return(gsub("[\r\n]+", " ", value))
+}
+
 .showMatrix <- function(object, values, digits, consoleOutputEnabled, rowLabel = "Group",
         escapeMarkdown = FALSE) {
     if (is.na(digits)) {
@@ -1390,17 +1404,7 @@ getOutputFormat <- function(
             if (!escapeMarkdown) {
                 return(value)
             }
-            value <- gsub("&", "&amp;", value, fixed = TRUE)
-            value <- gsub("\u00a0", "&#160;", value, fixed = TRUE)
-            value <- gsub("<", "&lt;", value, fixed = TRUE)
-            value <- gsub("\\", "&#92;", value, fixed = TRUE)
-            value <- gsub("|", "&#124;", value, fixed = TRUE)
-            value <- gsub("*", "&#42;", value, fixed = TRUE)
-            value <- gsub("_", "&#95;", value, fixed = TRUE)
-            value <- gsub("`", "&#96;", value, fixed = TRUE)
-            value <- gsub("[", "&#91;", value, fixed = TRUE)
-            value <- gsub("]", "&#93;", value, fixed = TRUE)
-            return(gsub("[\r\n]+", " ", value))
+            return(.escapeMarkdownTableCell(value))
         }
         tableColumns <- ncol(values) + 1L
         object$.cat(escapeCell(c(rowLabel, colnames(values))), tableColumns = tableColumns,

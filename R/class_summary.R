@@ -355,6 +355,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 parameterName,
                 values,
                 variantIndex,
+                numberOfVariants,
                 transposed = FALSE) {
             tryCatch(
                 {
@@ -370,7 +371,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                         if (nrow(values) == 1 && ncol(values) == 1) {
                             colValues <- values[1, 1]
                         } else if (nrow(values) == 1) {
-                            colValues <- values[1, variantIndex]
+                            if (ncol(values) > 1 && numberOfVariants == 1 && 
+                                    parameterName %in% c("earlyStop", "successPerStage")) {
+                                colValues <- values[1, ]
+                            } else {
+                                colValues <- values[1, variantIndex]
+                            }
                         } else if (ncol(values) == 1) {
                             colValues <- values[variantIndex, 1]
                         } else {

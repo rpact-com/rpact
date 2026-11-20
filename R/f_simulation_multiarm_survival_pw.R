@@ -661,7 +661,8 @@ getSimulationMultiArmSurvival <- function(
     dropoutRate2 <- simulationResults$dropoutRate2
     dropoutTime <- simulationResults$dropoutTime
     directionUpper <- simulationResults$directionUpper
-
+    simulationResults$.setParameterType("correlationComputation", C_PARAM_NOT_APPLICABLE)
+    
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
     if (.isTrialDesignConditionalDunnett(design)) {

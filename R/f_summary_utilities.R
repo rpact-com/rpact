@@ -979,7 +979,7 @@ print.SummaryFactory <- function(
 
         for (variantIndex in 1:numberOfVariants) {
             colValues <- summaryFactory$.getColumnValues(
-                parameterName, values, variantIndex, transposed)
+                parameterName, values, variantIndex, numberOfVariants, transposed)
             colValues <- .getSummaryValuesFormatted(
                 parameterSet,
                 parameterName1,
@@ -994,7 +994,7 @@ print.SummaryFactory <- function(
             colValues2 <- NA_real_
             if (!all(is.na(values2))) {
                 colValues2 <- summaryFactory$.getColumnValues(
-                    parameterName, values2, variantIndex, transposed)
+                    parameterName, values2, variantIndex, numberOfVariants, transposed)
                 colValues2 <- .getSummaryValuesFormatted(
                     parameterSet,
                     parameterName2,

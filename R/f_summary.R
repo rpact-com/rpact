@@ -1017,6 +1017,19 @@ NULL
         )
     }
 
+    if (simulationEnabled && survivalEnabled && enrichmentEnabled && 
+            outputSize %in% c("medium", "large") && 
+            !is.null(designPlan$eventsNotAchieved)) {
+        .addSimulationArrayToSummary(
+            designPlan,
+            "eventsNotAchieved",
+            "Events not achieved",
+            summaryFactory,
+            digitsSampleSize = digitSettings$digitsSampleSize,
+            smoothedZeroFormat = TRUE
+        )
+    } 
+    
     if (survivalEnabled && design$kMax > 1) {
         # sample size survival: expectedEventsH1
         # power survival: expectedNumberOfEvents
@@ -1227,6 +1240,7 @@ NULL
     if (design$kMax > 1 &&
             outputSize %in% c("medium", "large") &&
             !is.null(designPlan[["earlyStop"]])) {
+              
         summaryFactory$addParameter(
             designPlan,
             parameterName = "earlyStop", 
@@ -1289,6 +1303,7 @@ NULL
                 if (is.null(x)) {
                     x <- design
                 }
+                
                 summaryFactory$addParameter(x,
                     parameterName = "earlyStop", 
                     values = probsH1$earlyStop,

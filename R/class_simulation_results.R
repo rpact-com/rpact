@@ -1134,8 +1134,12 @@ SimulationResultsMultiArmRates <- R6::R6Class(
 #' proportions are averaged over nonempty enrolled-subject denominators at that
 #' stage. Stopped trials and discontinued groups do not contribute to later stages.
 #' The fields \code{dropoutObservationTime1} and \code{dropoutObservationTime2}
-#' remain available for direct access but are omitted from print and summary
-#' output. They average analysis times over exactly the replications contributing
+#' are classified as not applicable and remain available for direct access, but
+#' are omitted from print, summary and default data-frame output. Use
+#' `as.data.frame(x, includeAllParameters = TRUE)` to include retained fields.
+#' Observed dropout proportions are also classified as not applicable when both
+#' input dropout rates are zero.
+#' The observation-time fields average analysis times over exactly the replications contributing
 #' to the corresponding dropout proportion. They can therefore differ from the
 #' trial-level \code{analysisTime} after arm or population selection, or when an
 #' enrolled-subject denominator is empty. Contributing arms and populations share

@@ -41,5 +41,5 @@ identical(objects$fixed, comparison$fixed)
 
 }
 \seealso{
-\code{\link[=getComparison]{getComparison()}}, \code{\link[=fetch.TrialComparison]{fetch.TrialComparison()}}
+\code{\link[=getComparison]{getComparison()}}, \code{\link[=compare]{compare()}}
 }

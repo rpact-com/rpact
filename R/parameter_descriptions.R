@@ -509,8 +509,8 @@ NULL
 #'     \item `-1` or `"none"`: hide the legend
 #'     \item `"left"`, `"right"`, `"bottom"`, `"top"`: outside the plot
 #'     \item `0`: default outside position with a square aspect ratio
-#'     \item `1`, `2`, `3`: inside left, at the top, centre, or bottom
-#'     \item `4`, `5`, `6`: inside right, at the top, centre, or bottom
+#'     \item `1`, `2`, `3`: inside left, at the top, center, or bottom
+#'     \item `4`, `5`, `6`: inside right, at the top, center, or bottom
 #'     \item `NA`: retain the legacy plot-specific positioning rules
 #'   }
 #'
