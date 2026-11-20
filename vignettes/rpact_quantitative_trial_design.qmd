@@ -257,25 +257,8 @@ summary(ratesScenarios, digits = 4)
 
 For both sample size configurations, we can thus see the probabilities for each decision under the assumed treatment rate.
 
-TODO: Either remove this table or use R code to produce it
-
-The next table gives a compact probability overview for the five scenarios.
-Triplets are ordered Go / Indeterminate / Stop.
-
-| Scenario | True improvement | 75 control / 75 treatment | 75 control / 150 treatment |
-|:--|--:|:--|:--|
-| Very good | 5% | 0.85 / 0.14 / 0.01 | 0.91 / 0.07 / 0.01 |
-| Good | 0% | 0.51 / 0.39 / 0.10 | 0.57 / 0.33 / 0.10 |
-| Indifferent | −2.5% | 0.33 / 0.47 / 0.20 | 0.36 / 0.43 / 0.21 |
-| Poor | −5% | 0.20 / 0.48 / 0.32 | 0.20 / 0.45 / 0.35 |
-| Very poor | −10% | 0.05 / 0.34 / 0.60 | 0.04 / 0.28 / 0.68 |
-
-The compact overview retains the displayed precision of the original
-demonstration and is not renormalized; some triplets sum to 0.99. Displayed
-values can differ from conventional rounding. Use the calculated table below
-for numerical comparisons:
-it reports the QTD1 probabilities to six decimal places under the same
-assumptions.
+The following table gives the calculated three-category probabilities for the
+five scenarios to six decimal places under the Wilson interval construction.
 
 ```{r}
 #| label: kestrel-calculated-table
