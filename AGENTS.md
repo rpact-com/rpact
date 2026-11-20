@@ -415,6 +415,7 @@ format consistently, even when Roxygen could infer sections from their order:
   `@export` occupies its own line.
 - Use actual Roxygen syntax in R source: do not add Markdown bold markers to
   tags or literal HTML entities such as `&#x20;` to represent blank lines.
+- Please also add Roxygen documentation to internal functions (even if existing internal functions might not be documented yet).
 
 For example:
 

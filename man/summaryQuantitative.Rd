@@ -12,8 +12,9 @@ The standard \code{\link[=summary]{summary()}} method supports quantitative deci
 and \code{\link[=getOperatingCharacteristicsRates]{getOperatingCharacteristicsRates()}}.
 }
 \details{
-Use \code{summary(rule)} for the target value, lower reference value and decision
-percentiles. Use \code{summary(oc)} for the decision rule, assumptions and category
+Use \code{print(rule)} for compact decision criteria and \code{summary(rule)} for
+reference cutoffs, applicable percentile inputs and detailed decision tables.
+Use \code{summary(oc)} for the decision rule, assumptions and category
 probabilities. Each sample-size scenario has a separate table, with one row
 per alternative and one column per decision category. Categories are retained
 separately; probabilities are neither recomputed nor aggregated.
@@ -23,7 +24,7 @@ beneficial direction and selected interval method.
 
 The \code{digits} and \code{output} arguments follow \code{\link[=summary.ParameterSet]{summary.ParameterSet()}}. The
 output parts are \code{"title"}, \code{"overview"}, \code{"body"} and \code{"all"}. For a decision
-rule, the body contains its parameters. For operating characteristics, the
+rule, the body contains its tables. For operating characteristics, the
 overview contains the rule and assumptions, and the body contains the tables.
 Summary precision follows \code{rpact.summary.digits} and
 \code{rpact.summary.digits.probs}. The summary keeps a copy of the supplied object,

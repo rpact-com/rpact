@@ -130,7 +130,7 @@ binaryRule <- getDesignQuantitative(
     lowerPercentile = 0.2,
     upperPercentile = 0.9
 )
-print(binaryRule, markdown = FALSE)
+binaryRule
 summary(binaryRule)
 ```
 
@@ -526,6 +526,7 @@ bayesMeanOC <- lapply(bayesMeanRules, function(design) {
         priorDist = effectPrior
     ))
 })
+bayesMeanRules$quantile
 summary(bayesMeanRules$quantile)
 summary(bayesMeanRules$posteriorProbability)
 ```

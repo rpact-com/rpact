@@ -60,10 +60,18 @@ TrialDesignPlanQuantitativeBase <- R6::R6Class(
                 upperPercentile = 0.9, 
                 lowerPercentile = 0.2) {
                 
-            .setValueAndParameterType(self, "targetValue", targetValue, NA_real_)
-            .setValueAndParameterType(self, "lowerReferenceValue", lowerReferenceValue, NA_real_)
-            .setValueAndParameterType(self, "upperPercentile", upperPercentile, 0.9)
-            .setValueAndParameterType(self, "lowerPercentile", lowerPercentile, 0.2)
+            .setValueAndParameterType(self, "targetValue", targetValue, NA_real_,
+                notApplicableIfNA = TRUE
+            )
+            .setValueAndParameterType(self, "lowerReferenceValue", lowerReferenceValue, NA_real_,
+                notApplicableIfNA = TRUE
+            )
+            .setValueAndParameterType(self, "upperPercentile", upperPercentile, 0.9,
+                notApplicableIfNA = TRUE
+            )
+            .setValueAndParameterType(self, "lowerPercentile", lowerPercentile, 0.2,
+                notApplicableIfNA = TRUE
+            )
         },
         #'
         #' @description Prints the quantitative rule.
@@ -80,33 +88,15 @@ TrialDesignPlanQuantitativeBase <- R6::R6Class(
         #' @param consoleOutputEnabled Print or collect output.
         #'
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
-            "Method for automatically printing trial design objects"
             self$.resetCat()
-            if (inherits(self, "TrialDesignPlanQuantitativeBayes") && showType != 2) {
-                result <- .createSummaryQuantitative(self, digits = digits, output = "all")
-                .showSummaryQuantitative(result, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
-                self$.catLines <- result$.catLines
-                return(invisible())
-            }
             if (showType == 3) {
-                .createSummary(self, digits = digits)$.show(
-                    showType = 1,
-                    digits = digits, consoleOutputEnabled = consoleOutputEnabled
-                )
+                result <- .createSummaryQuantitative(self, digits = digits, output = "all")
+                .showSummaryQuantitative(result, consoleOutputEnabled = consoleOutputEnabled)
+                self$.catLines <- result$.catLines
             } else if (showType == 2) {
                 super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                self$.cat("Design parameters and output of ", self$.toString(), ":\n\n",
-                    heading = 1,
-                    consoleOutputEnabled = consoleOutputEnabled
-                )
-                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                )
-                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                )
-                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+                .showQuantitativeRule(self, digits, consoleOutputEnabled)
             }
         },
         #'
@@ -114,7 +104,7 @@ TrialDesignPlanQuantitativeBase <- R6::R6Class(
         #' @param startWithUpperCase Capitalize the description.
         #'
         .toString = function(startWithUpperCase = FALSE) {
-            s <- "quantitative trial design (decision rule)"
+            s <- "quantitative trial design (frequentist decision rule)"
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         }
     )
@@ -277,13 +267,16 @@ TrialDesignPlanQuantitativeBayes <- R6::R6Class(
             for (parameter in c("go", "stop", "indeterminate1", "percentileMapping")) {
                 self$.setParameterType(parameter, C_PARAM_USER_DEFINED)
             }
+            if (self$isNotApplicableParameter("lowerPercentile")) {
+                self$.setParameterType("percentileMapping", C_PARAM_NOT_APPLICABLE)
+            }
         },
         #'
         #' @description Returns the object description.
         #' @param startWithUpperCase Capitalize the description.
         #'
         .toString = function(startWithUpperCase = FALSE) {
-            text <- "Bayesian quantitative trial design (decision rule)"
+            text <- "quantitative trial design (Bayesian decision rule)"
             if (startWithUpperCase) {
                 text <- .firstCharacterToUpperCase(text)
             }
