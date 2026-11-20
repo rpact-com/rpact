@@ -18,12 +18,6 @@
 
 \item{probabilities}{Computed probability data frame.}
 
-\item{showType}{Output mode passed to ParameterSet.}
-
-\item{digits}{Optional display precision.}
-
-\item{consoleOutputEnabled}{Whether to print or collect the output.}
-
 \item{startWithUpperCase}{Whether to capitalize the first character.}
 }
 \description{
@@ -32,10 +26,6 @@ groups. Obtain instances with \code{\link[=getOperatingCharacteristicsRates]{get
 
 Initializes a rates result. Use getOperatingCharacteristicsRates() to
 validate inputs and calculate probabilities.
-
-Prints the result to the console.
-
-Internal rendering method used by standard console and Markdown output.
 
 Returns the result description used in output headings.
 }

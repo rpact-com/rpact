@@ -141,7 +141,7 @@ Collate:
     'class_design_quantitative.R'
     'class_event_probabilities.R'
     'class_fisher_information.R'
-    'class_operating_charcteristics.R'
+    'class_operating_characteristics.R'
     'f_simulation_base_counts.R'
     'f_simulation_utilities.R'
     'f_simulation_base_survival.R'
