@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.1.0.9329</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,6 +73,31 @@
 <strong>Tasks involving GitHub:</strong> Read <a href="agents/rpact_github.agent.html">.github/agents/rpact_github.agent.md</a>.</li>
 </ul></div>
 <div class="section level2">
+<h2 id="news-entries">NEWS entries<a class="anchor" aria-label="anchor" href="#news-entries"></a></h2>
+<p>Before adding or updating an entry in <code>NEWS.md</code>, review the existing entries in both the latest version (the topmost version section) and earlier versions. Classify the change relative to previously released functionality, not merely relative to the last commit.</p>
+<ul><li>Append new list entries at the bottom of the relevant subsection’s list, never at the top. Keep existing entries in their current order; revise an existing entry in place when it covers the change.</li>
+<li>First determine whether the change introduces a genuinely new feature by checking whether that feature already appears in earlier NEWS entries. Function or class names alone do not establish that it is the same feature; compare the functionality described.</li>
+<li>Then check whether the latest version already contains an entry for the same topic or feature, especially under <code>## New features</code>. If a new feature is already described there, further development since the last commit is a refinement of that unreleased feature. Revise and, where needed, extend its existing entry to describe the resulting functionality. Do not add another standalone feature bullet for that refinement.</li>
+<li>Add a standalone entry under <code>## New features</code> only for a genuinely new feature that is not already covered by an entry in the latest version.</li>
+<li>For a bug fix or optimization, add an entry under <code>## Improvements, issues, and changes</code> only if it does not concern an unreleased new feature already listed under <code>## New features</code> in the latest version. Fixes and optimizations of such features belong in the existing feature entry, not in a separate improvements bullet. For changes to previously released functionality, use the improvements subsection and revise an existing entry there if it already covers the same change.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="parameter-applicability-and-visibility">Parameter applicability and visibility<a class="anchor" aria-label="anchor" href="#parameter-applicability-and-visibility"></a></h2>
+<p>In rpact, parameter applicability and visibility must always be controlled exclusively through the existing parameter-type system. The parameter type is the single source of truth, not a separate output-specific visibility rule.</p>
+<p>Before changing which parameters are displayed, inspect the parameter-type methods in <a href="R/class_core_parameter_set.R">R/class_core_parameter_set.R</a> and comparable initialization and calculation code in <a href="R/class_design_plan.R">R/class_design_plan.R</a> and <a href="R/class_simulation_results.R">R/class_simulation_results.R</a>. For example, single-group design plans mark <code>meanRatio</code> and <code>allocationRatioPlanned</code> as <code>C_PARAM_NOT_APPLICABLE</code>, and survival simulation result initialization marks dropout fields as not applicable until their applicability is established.</p>
+<ul><li>
+<p>Mark a parameter that is not applicable or should not be displayed with <code>object$.setParameterType(parameterName, C_PARAM_NOT_APPLICABLE)</code>. For example:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span><span class="op">$</span><span class="fu">.setParameterType</span><span class="op">(</span><span class="st">"dropoutObservationTime1"</span>, <span class="va">C_PARAM_NOT_APPLICABLE</span><span class="op">)</span></span></code></pre></div>
+</li>
+<li><p>Set the type where the object’s state is established: in initialization or calculation/update code that knows whether the parameter is applicable. When conditions change, set the appropriate type again. Do not blindly mark every calculated field as <code>C_PARAM_GENERATED</code> if some fields remain inapplicable.</p></li>
+<li><p>Retain a computed field’s value when it is needed for direct access or further calculations. Do not erase it, replace it with <code>NA</code>/<code>NULL</code>, or alter its format merely to suppress its display; set its parameter type instead.</p></li>
+<li><p>Print, summary, formatting, comparison and export code must consume the established types using existing methods such as <code>isNotApplicableParameter()</code>, <code>isGeneratedParameter()</code> and <code>.getGeneratedParameters()</code>. Do not change an object’s parameter types as a side effect of printing or formatting.</p></li>
+<li><p>Do not introduce parallel visibility flags, parameter-name lists or regular expressions that hide fields independently of their parameter types. Helpers and formatter early returns that bypass parameter types are violations, not patterns to copy. If such a rule is being changed, move its applicability decision into the object’s parameter-type assignment and remove the redundant output filter.</p></li>
+<li><p>Keep explicit display controls (such as preview limits) and existing export options (such as <code>includeAllParameters</code>) separate from applicability. They must not become a second mechanism for deciding whether a parameter applies.</p></li>
+<li><p>When changing applicability, verify both the assigned types and the affected output paths, including console and Markdown where supported. Check applicable and inapplicable cases, type transitions where supported, and continued direct access to retained values. Follow the repository’s test instructions.</p></li>
+</ul></div>
+<div class="section level2">
 <h2 id="required-error-handling-in-r-code">Required error handling in R code<a class="anchor" aria-label="anchor" href="#required-error-handling-in-r-code"></a></h2>
 <p>All errors raised explicitly by rpact code under <code>R/</code> must use the appropriate error helper from <a href="R/f_error_handling.R">R/f_error_handling.R</a>. Direct calls to <code><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop()</a></code> (including <code><a href="https://rdrr.io/r/base/stop.html" class="external-link">base::stop()</a></code>, rethrowing caught conditions, and calls hidden behind aliases or new wrappers) are prohibited. The only permitted direct call is the existing <code>stop(condition)</code> in <code>.stopWithError()</code> in <code>R/f_error_handling.R</code>; keep this as the single central error-signalling point. Existing violations elsewhere are not examples to follow.</p>
 <p>Before adding or changing an error path, read <code>R/f_error_handling.R</code> and inspect comparable calls in the package, especially in <code>R/f_core_assertions.R</code> and <code>R/class_design_optimal.R</code>. Reuse a suitable existing assertion when it already performs the required validation and supplies the appropriate error metadata. Otherwise, call the most specific helper below rather than calling <code>.stopWithError()</code> or <code>.createCondition()</code> directly.</p>
@@ -110,7 +135,7 @@
 <li>Use only formal metadata arguments supported by the chosen helper. Its <code>...</code> arguments are concatenated into the message by <code>.getErrorMessage()</code>; arbitrary named entries in <code>...</code> do <strong>not</strong> become structured metadata. Put additional diagnostic fields in the named <code>context</code> list.</li>
 </ul><p>Keep the message clear and actionable, using the existing English message style. The helpers add the exception prefix themselves. When replacing an existing error, preserve its substantive explanation and validation behavior unless the task requires a change. When handling a caught error, include its useful explanation and context in the appropriate helper call rather than rethrowing it with <code>stop(e)</code>.</p>
 <p>For example, a length check following the pattern in <code>R/class_design_optimal.R</code> should include both the actual inputs and their lengths (the call belongs inside the failing validation branch):</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stopArgumentLengthOutOfBounds</span><span class="op">(</span></span>
 <span>    <span class="st">"Must provide exactly one weight in weightsLR per entry of thetaLR."</span>,</span>
 <span>    functionName <span class="op">=</span> <span class="st">"getDesignOptimalConditionalError"</span>,</span>
@@ -136,10 +161,10 @@
 <h2 id="braces-in-r-conditionals">Braces in R conditionals<a class="anchor" aria-label="anchor" href="#braces-in-r-conditionals"></a></h2>
 <p>Always use curly braces for every <code>if</code>, <code>else if</code>, and <code>else</code> branch in rpact R code, even when a branch contains only one statement or R would allow the braces to be omitted. This also applies to early returns and conditional expressions used in assignments. Put the branch body on separate lines and indent it with four spaces; write <code>} else {</code> and <code>} else if (...) {</code> on the same line.</p>
 <p>For example, do not write:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/call.html" class="external-link">is.call</a></span><span class="op">(</span><span class="va">call</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Write:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/call.html" class="external-link">is.call</a></span><span class="op">(</span><span class="va">call</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -149,7 +174,7 @@
 <h2 id="braces-in-r-loops">Braces in R loops<a class="anchor" aria-label="anchor" href="#braces-in-r-loops"></a></h2>
 <p>Always use curly braces for every <code>for</code>, <code>while</code>, and <code>repeat</code> loop, even when its body contains only one statement. Put the opening brace on the same line as the loop header, the body on separate lines indented with four spaces, and the closing brace on its own line. Do not use inline loop bodies.</p>
 <p>For example:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">parameter</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">limits</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu">.assertComparisonLimit</span><span class="op">(</span><span class="va">limits</span><span class="op">[[</span><span class="va">parameter</span><span class="op">]</span><span class="op">]</span>, <span class="va">parameter</span>, <span class="st">"summary.TrialComparison"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -185,7 +210,7 @@
 <li>Likewise, put section tags such as <code>@details</code> and <code>@examples</code> on their own lines above their content. Keep named tags and short entries such as <code>@param x ...</code>, <code>@rdname ...</code>, and <code>@return ...</code> inline as shown below; <code>@export</code> occupies its own line.</li>
 <li>Use actual Roxygen syntax in R source: do not add Markdown bold markers to tags or literal HTML entities such as <code>&amp;#x20;</code> to represent blank lines.</li>
 </ul><p>For example:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#'</span></span>
 <span><span class="co">#' @title</span></span>
 <span><span class="co">#' Access Objects in a Trial Comparison</span></span>
@@ -231,7 +256,7 @@
 <li><p>Reuse a template only if its meaning and type fit the field in the affected class. When the same field name has different semantics or dimensions in different classes, add a separate workbook row with the same <code>field_id</code> and a distinct <code>field_name_unique</code>, following existing suffix conventions. For example, <code>lambdaControl_piecewise</code> documents the interval-specific vector without changing the existing scalar <code>lambdaControl</code> description.</p></li>
 <li>
 <p>Read <code>man-raw/create_class_field_descriptions.R</code> and run its template generation and diagnostic commands from the rpact repository root, with <code>rpact.dev</code> available. The current commands are:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">rpact.dev</span><span class="fu">::</span><span class="fu">createFieldDescriptionRoxygenTemplates</span><span class="op">(</span></span>
 <span>    overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    analyzeIssues <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -241,7 +266,7 @@
 </li>
 <li>
 <p>Reference the generated templates in each affected class’s Roxygen block, using actual Roxygen syntax, for example:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' @template field_piecewiseSurvivalTime</span></span>
 <span><span class="co">#' @template field_lambdaControl_piecewise</span></span>
 <span><span class="co">#' @template field_hazardRatio</span></span></code></pre></div>

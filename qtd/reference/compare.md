@@ -51,7 +51,10 @@ recalculating them.
 ## See also
 
 [`getComparison()`](https://docs.rpact.org/qtd/reference/getComparison.md),
-[`add()`](https://docs.rpact.org/qtd/reference/add.md)
+[`add()`](https://docs.rpact.org/qtd/reference/add.md),
+[`delete()`](https://docs.rpact.org/qtd/reference/delete.md),
+[`fetch.TrialComparison()`](https://docs.rpact.org/qtd/reference/fetch.TrialComparison.md),
+[`getObjects()`](https://docs.rpact.org/qtd/reference/getObjects.md)
 
 ## Examples
 

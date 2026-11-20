@@ -17,7 +17,7 @@ names() returns the supplied names of the comparison objects."><meta property="o
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.1.0.9329</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,7 +96,19 @@ NULL is treated as an empty list.</p></dd>
     <p>An R6 <code>TrialComparison</code> inheriting from <code>ParameterSet</code>. For a single
 <code>TrialComparisonSummary</code>, its underlying comparison is returned by reference;
 otherwise a new collection is created.</p>
-    </div>
+<p>Returns a <code><a href="TrialComparison.html">TrialComparison</a></code> object.
+The following generics (R generic functions) are available for this result object:</p><ul><li><p><code><a href="add.html">add()</a></code> to obtain the field names,</p></li>
+<li><p><code><a href="delete.html">delete()</a></code> to obtain the field names,</p></li>
+<li><p><code><a href="fetch.TrialComparison.html">fetch()</a></code> to obtain the field names,</p></li>
+<li><p><code><a href="compare.html">compare()</a></code> to obtain the field names,</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code> to obtain the field names,</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/length.html" class="external-link">length()</a></code> to obtain the field names,</p></li>
+<li><p><code><a href="print.TrialComparison.html">print()</a></code> to print the object,</p></li>
+<li><p><code><a href="summary.TrialComparison.html">summary()</a></code> to display a summary of the object,</p></li>
+<li><p><code><a href="plot.TrialComparison.html">plot()</a></code> to plot the object,</p></li>
+<li><p><code><a href="as.data.frame.TrialComparison.html">as.data.frame()</a></code> to coerce the object to a <code><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></code>,</p></li>
+<li><p><code><a href="as.matrix.FieldSet.html">as.matrix()</a></code> to coerce the object to a <code><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></code>.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The comparison retains references to its objects. Changes to an original
@@ -140,10 +152,13 @@ pipelines such as <code>comparison |&gt; add(other) |&gt; delete(1)</code>.
 Shallow cloning shares the contained objects. <code>clone(deep = TRUE)</code> is unsupported.</p>
 <p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> describes the collection and selected observed ranges. <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>
 groups differences by object scope, inputs/design settings and results, with
-equal profiles grouped by object number. Constants are compared independently
-of the number of rows. Constant numeric vector cells, such as <code>1, 1</code>,
-compare equal to the corresponding scalar. Nonconstant profiles retain stage/situation positions;
-repeated values across the other dimension are collapsed. Missing values and
+equal profiles grouped by object number. Parameter provenance and native
+dimensions determine the applicable profile coordinates. Repeated design
+settings on arm/category rows are removed after exact consistency checks.
+Genuine scalar parameters are compared independently of the number of rows;
+dimensioned parameters retain their stage, group and scenario domains even
+when their values happen to be equal. Constant numeric vector cells, such as
+<code>1, 1</code>, are normalized to the corresponding scalar value. Missing values and
 their positions participate in exact comparisons. No rounding or numerical
 tolerance is used to decide whether profiles differ.</p>
 <p>For comparisons containing interim analyses, fixed plans' <code>nFixed</code>, <code>nFixed1</code>,
@@ -178,16 +193,27 @@ settings. Fisher information retains selected stages, situations, the source
 plan when available, and its cumulative or stage-wise type; these scales are
 not harmonized. Profiles and plot groups respect time, arm, population and
 situation coordinates.</p>
-<p>Optimal conditional-error characteristics are supported internally, including
-their theta-by-stage results and atomic design settings. Their constructor and
-characteristic functions remain unexported. Function-valued settings are not
-compared as scalar parameters. Deprecated <code>TrialDesignSet</code> objects and standalone
-optimal conditional-error designs are not supported.</p>
 <p>Console and Markdown output are bounded. Limits and display rounding do not
 change the underlying data. <code><a href="as.data.frame.TrialComparison.html">as.data.frame.TrialComparison()</a></code> returns the full
 comparison table. <code><a href="plot.TrialComparison.html">plot.TrialComparison()</a></code> selects axes only when unambiguous.
 <code><a href="getObjectRCode.html">getObjectRCode()</a></code> reconstructs the comparison and its contained objects;
 executing generated simulation code reruns the corresponding simulations.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="how-to-get-help-for-generic-functions">How to get help for generic functions<a class="anchor" aria-label="anchor" href="#how-to-get-help-for-generic-functions"></a></h2>
+
+
+<p>Click on the link of a generic in the list above to go directly to the help documentation of
+the <code>rpact</code> specific implementation of the generic.
+Note that you can use the R function <code><a href="https://rdrr.io/r/utils/methods.html" class="external-link">methods</a></code> to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use <code>methods("plot")</code> to get all the methods for the <code>plot</code> generic.
+There you can find, e.g., <code>plot.AnalysisResults</code> and
+obtain the specific help documentation linked above by typing <code><a href="plot.AnalysisResults.html">?plot.AnalysisResults</a></code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="compare.html">compare()</a></code>, <code><a href="add.html">add()</a></code>, <code><a href="delete.html">delete()</a></code>, <code><a href="fetch.TrialComparison.html">fetch.TrialComparison()</a></code>, <code><a href="getObjects.html">getObjects()</a></code></p></div>
     </div>
 
     <div class="section level2">

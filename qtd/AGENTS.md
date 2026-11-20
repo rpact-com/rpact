@@ -108,6 +108,103 @@ If a task spans multiple categories, apply all relevant files:
 - **Tasks involving GitHub:** Read
   [.github/agents/rpact_github.agent.md](https://docs.rpact.org/qtd/agents/rpact_github.agent.md).
 
+## NEWS entries
+
+Before adding or updating an entry in `NEWS.md`, review the existing
+entries in both the latest version (the topmost version section) and
+earlier versions. Classify the change relative to previously released
+functionality, not merely relative to the last commit.
+
+- Append new list entries at the bottom of the relevant subsection’s
+  list, never at the top. Keep existing entries in their current order;
+  revise an existing entry in place when it covers the change.
+- First determine whether the change introduces a genuinely new feature
+  by checking whether that feature already appears in earlier NEWS
+  entries. Function or class names alone do not establish that it is the
+  same feature; compare the functionality described.
+- Then check whether the latest version already contains an entry for
+  the same topic or feature, especially under `## New features`. If a
+  new feature is already described there, further development since the
+  last commit is a refinement of that unreleased feature. Revise and,
+  where needed, extend its existing entry to describe the resulting
+  functionality. Do not add another standalone feature bullet for that
+  refinement.
+- Add a standalone entry under `## New features` only for a genuinely
+  new feature that is not already covered by an entry in the latest
+  version.
+- For a bug fix or optimization, add an entry under
+  `## Improvements, issues, and changes` only if it does not concern an
+  unreleased new feature already listed under `## New features` in the
+  latest version. Fixes and optimizations of such features belong in the
+  existing feature entry, not in a separate improvements bullet. For
+  changes to previously released functionality, use the improvements
+  subsection and revise an existing entry there if it already covers the
+  same change.
+
+## Parameter applicability and visibility
+
+In rpact, parameter applicability and visibility must always be
+controlled exclusively through the existing parameter-type system. The
+parameter type is the single source of truth, not a separate
+output-specific visibility rule.
+
+Before changing which parameters are displayed, inspect the
+parameter-type methods in
+[R/class_core_parameter_set.R](https://docs.rpact.org/qtd/R/class_core_parameter_set.R)
+and comparable initialization and calculation code in
+[R/class_design_plan.R](https://docs.rpact.org/qtd/R/class_design_plan.R)
+and
+[R/class_simulation_results.R](https://docs.rpact.org/qtd/R/class_simulation_results.R).
+For example, single-group design plans mark `meanRatio` and
+`allocationRatioPlanned` as `C_PARAM_NOT_APPLICABLE`, and survival
+simulation result initialization marks dropout fields as not applicable
+until their applicability is established.
+
+- Mark a parameter that is not applicable or should not be displayed
+  with
+  `object$.setParameterType(parameterName, C_PARAM_NOT_APPLICABLE)`. For
+  example:
+
+  ``` r
+
+  result$.setParameterType("dropoutObservationTime1", C_PARAM_NOT_APPLICABLE)
+  ```
+
+- Set the type where the object’s state is established: in
+  initialization or calculation/update code that knows whether the
+  parameter is applicable. When conditions change, set the appropriate
+  type again. Do not blindly mark every calculated field as
+  `C_PARAM_GENERATED` if some fields remain inapplicable.
+
+- Retain a computed field’s value when it is needed for direct access or
+  further calculations. Do not erase it, replace it with `NA`/`NULL`, or
+  alter its format merely to suppress its display; set its parameter
+  type instead.
+
+- Print, summary, formatting, comparison and export code must consume
+  the established types using existing methods such as
+  `isNotApplicableParameter()`, `isGeneratedParameter()` and
+  `.getGeneratedParameters()`. Do not change an object’s parameter types
+  as a side effect of printing or formatting.
+
+- Do not introduce parallel visibility flags, parameter-name lists or
+  regular expressions that hide fields independently of their parameter
+  types. Helpers and formatter early returns that bypass parameter types
+  are violations, not patterns to copy. If such a rule is being changed,
+  move its applicability decision into the object’s parameter-type
+  assignment and remove the redundant output filter.
+
+- Keep explicit display controls (such as preview limits) and existing
+  export options (such as `includeAllParameters`) separate from
+  applicability. They must not become a second mechanism for deciding
+  whether a parameter applies.
+
+- When changing applicability, verify both the assigned types and the
+  affected output paths, including console and Markdown where supported.
+  Check applicable and inapplicable cases, type transitions where
+  supported, and continued direct access to retained values. Follow the
+  repository’s test instructions.
+
 ## Required error handling in R code
 
 All errors raised explicitly by rpact code under `R/` must use the

@@ -3,6 +3,9 @@
 Converts a trial comparison to a data frame, optionally prepared for
 reporting.
 
+Converts a comparison summary to a data frame of its underlying
+comparison.
+
 ## Usage
 
 ``` r
@@ -20,15 +23,19 @@ as.data.frame(
   removeVariableParameters = FALSE,
   digits = NA_integer_,
   ceilingEnabled = FALSE,
-  output = "data.frame"
+  output = "data.frame",
+  strict = FALSE
 )
+
+# S3 method for class 'TrialComparisonSummary'
+as.data.frame(x, row.names = NULL, optional = FALSE, ...)
 ```
 
 ## Arguments
 
 - x:
 
-  A `TrialComparison`.
+  A `TrialComparison` or `TrialComparisonSummary`.
 
 - row.names:
 
@@ -41,7 +48,8 @@ as.data.frame(
 
 - ...:
 
-  Further arguments. Currently unused.
+  For a `TrialComparisonSummary`, arguments passed to
+  `as.data.frame.TrialComparison()`. Otherwise currently unused.
 
 - niceColumnNamesEnabled:
 
@@ -103,6 +111,12 @@ as.data.frame(
   LaTeX during knitting. `"pdf"` produces LaTeX tables for a PDF
   document, not a PDF file.
 
+- strict:
+
+  If `TRUE`, incompatible column types or unresolved component
+  dimensions raise an error. The default `FALSE` warns and retains the
+  complete conflicting values as character, without truncation.
+
 ## Value
 
 A data.frame, unrounded and with all columns by default. Reporting modes
@@ -110,6 +124,21 @@ additionally inherit from `TrialComparisonTable` for automatic knitr
 output.
 
 ## Details
+
+Comparison summaries, including results of `%vs%` chains, are converted
+through `getComparison(x)`. Summary display limits do not restrict the
+returned data. Numeric vectors retain their values and types. Additional
+component domains use `component` and `componentIndex` coordinates;
+arrays additionally use `componentDimension1`, `componentDimension2`,
+and further dimension indices. Independent components occupy separate
+rows rather than a Cartesian product. Related interval vectors share the
+`accrual` or `survival` component domain; a terminal interval boundary
+without an associated rate has an `NA` rate. Observed dataset columns
+share the `observedData` domain and retain row indices. Other row values
+are repeated across these components; select the appropriate component
+before aggregating or plotting to avoid counting repeated results.
+Transposed output remains a presentation format and may contain
+character data.
 
 With `harmonizeColumnNames = TRUE`, fixed-plan sample size columns are
 harmonized when the comparison includes interim analyses: `nFixed`,
@@ -143,7 +172,13 @@ control. `arm` rows contain individual-arm events, selections,
 rejections and drop-out summaries, including a separate `Control`
 category. Arm-independent simulation results occur on `overall` /
 `All arms` rows. Input and design settings remain available for
-grouping. Result cells outside their applicable category are `NA`.
-Categories and situations are retained in profile comparisons and
-transposed headings. Shared scalar-only output can omit these
-coordinates.
+grouping. Result cells outside their applicable category are `NA`. The
+unfiltered data frame retains this expanded structure for plotting and
+grouping. Parameter filters use semantically normalized profiles: design
+settings do not acquire an arm dimension from repeated rows, whereas
+arm-level results retain their group domain even if all values are
+equal. Shared output combines the observed coordinate domains of the
+common profiles, without constructing new combinations or taking the
+first object's row layout. Scalars and lower-dimensional profiles are
+repeated only on compatible observed coordinates. Shared scalar-only
+output omits coordinate columns.

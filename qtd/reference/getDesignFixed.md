@@ -8,10 +8,12 @@ constructs an object of class `TrialDesignFixed` with `kMax = 1`.
 ``` r
 getDesignFixed(
   alpha = NA_real_,
+  ...,
   beta = NA_real_,
   sided = 1L,
   directionUpper = NA,
-  twoSidedPower = NA
+  twoSidedPower = NA,
+  power = NA_real_
 )
 ```
 
@@ -21,6 +23,11 @@ getDesignFixed(
 
   The significance level alpha, default is `0.025`. Must be a positive
   numeric of length 1.
+
+- ...:
+
+  Ensures that all arguments (starting from the "...") are to be named
+  and that a warning will be displayed if unknown arguments are passed.
 
 - beta:
 
@@ -52,6 +59,20 @@ getDesignFixed(
   distribution. Default is `FALSE`, i.e., it is assumed that one tail
   probability is equal to 0 or the power should be directed to one
   part.#'
+
+- power:
+
+  Nominal target power, an alternative to `beta`, defined as `1 - beta`.
+  Must be a single numeric value strictly between 0 and 1. If both are
+  supplied, `abs(beta + power - 1) <= 1e-12` is required and the
+  supplied `beta` is retained. The usual restrictions on `beta` and its
+  relationship to `alpha` still apply. The default `NA_real_` leaves the
+  existing `beta` default or derivation from user-defined beta spending
+  unchanged. This scalar input does not replace the returned
+  `design$power`: that field can contain cumulative rejection
+  probabilities by stage, whose final value need not equal the nominal
+  target, particularly for two-sided designs when only one rejection
+  tail is counted.
 
 ## Value
 
@@ -133,5 +154,35 @@ design2
 #> Output:
 #>   Critical values          : 1.645 
 #>   Stage levels (one-sided) : 0.0500 
+#> 
+
+# Equivalent specifications of nominal target power
+getDesignFixed(power = 0.9)
+#> Design parameters and output of fixed sample size design:
+#> 
+#> User defined parameters:
+#>   Type II error rate       : 0.1000 
+#> 
+#> Default parameters:
+#>   Significance level       : 0.0250 
+#>   Test                     : one-sided 
+#> 
+#> Output:
+#>   Critical values          : 1.960 
+#>   Stage levels (one-sided) : 0.0250 
+#> 
+getDesignFixed(beta = 0.1, power = 0.9)
+#> Design parameters and output of fixed sample size design:
+#> 
+#> User defined parameters:
+#>   Type II error rate       : 0.1000 
+#> 
+#> Default parameters:
+#>   Significance level       : 0.0250 
+#>   Test                     : one-sided 
+#> 
+#> Output:
+#>   Critical values          : 1.960 
+#>   Stage levels (one-sided) : 0.0250 
 #> 
 ```

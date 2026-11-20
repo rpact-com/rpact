@@ -47,8 +47,7 @@ still be specified when their selection is ambiguous.
 ## See also
 
 [`getComparison()`](https://docs.rpact.org/qtd/reference/getComparison.md),
-[`compare()`](https://docs.rpact.org/qtd/reference/compare.md),
-[`summary.TrialComparison()`](https://docs.rpact.org/qtd/reference/summary.TrialComparison.md)
+[`compare()`](https://docs.rpact.org/qtd/reference/compare.md)
 
 ## Examples
 
@@ -60,6 +59,7 @@ comparison
 #> Sample size calculation comparison summary
 #> 
 #> Comparison of 3 sample size means calculations.
+#> Result numbers follow the comparison input order.
 #> The comparison identifies 6 differing parameters and
 #> 15 shared parameters or profiles.
 #> Shared (examples): Object type, Endpoint, Calculation target, Normal
@@ -68,36 +68,31 @@ comparison
 #> 
 #> Inputs and design settings:
 #> 
-#>     Alternatives: numeric, continuous [3 profiles]
-#>         Sample size means 1: 0.22
-#>         Sample size means 2: 0.44
-#>         Sample size means 3: 0.59
+#>     Alternatives (Result 1 vs. 2 vs. 3): 0.22 vs. 0.44 vs. 0.59
 #> 
-#>     Standard deviation: numeric, continuous [2 profiles]
-#>         Sample size means 1: 0.5
-#>         Sample size means 2, 3: 1.0
+#>     Standard deviation (Result 1 vs. 2 vs. 3): 0.5 vs. 1.0 vs. 1.0
 #> 
 #> Results and derived parameters:
 #> 
-#>     Critical values (treatment effect scale): numeric, continuous [3 profiles]
-#>         Sample size means 1: 0.1541470
-#>         Sample size means 2: 0.3082939
-#>         Sample size means 3: 0.4138996
+#>     Critical values (treatment effect scale) [3 profiles]
+#>         Result 1: 0.1541470
+#>         Result 2: 0.3082939
+#>         Result 3: 0.4138996
 #> 
-#>     Number of subjects fixed: numeric, continuous [2 profiles]
-#>         Sample size means 1, 2: 164.10993
-#>         Sample size means 3: 92.15175
+#>     Number of subjects fixed [2 profiles]
+#>         Result 1, 2: 164.10993
+#>         Result 3: 92.15175
 #> 
-#>     Number of subjects fixed (1): numeric, continuous [2 profiles]
-#>         Sample size means 1, 2: 82.05496
-#>         Sample size means 3: 46.07588
+#>     Number of subjects fixed (1) [2 profiles]
+#>         Result 1, 2: 82.05496
+#>         Result 3: 46.07588
 #> 
-#>     Number of subjects fixed (2): numeric, continuous [2 profiles]
-#>         Sample size means 1, 2: 82.05496
-#>         Sample size means 3: 46.07588
+#>     Number of subjects fixed (2) [2 profiles]
+#>         Result 1, 2: 82.05496
+#>         Result 3: 46.07588
 #> 
 #> Legend:
-#>     Profiles compare exact values at each stage and situation.
+#>     Profiles compare exact values on their applicable coordinates.
 #> 
 #> Complete display: summary(x, showAll = TRUE).
 #> Full data: as.data.frame(x). Exact profiles: summary(x)$parameterInfo.
@@ -109,6 +104,7 @@ comp2
 #> Sample size calculation comparison summary
 #> 
 #> Comparison of 3 sample size means calculations.
+#> Result numbers follow the comparison input order.
 #> The comparison identifies 5 differing parameters and
 #> 16 shared parameters or profiles.
 #> Shared (examples): Object type, Endpoint, Calculation target, Standard
@@ -117,35 +113,32 @@ comp2
 #> 
 #> Inputs and design settings:
 #> 
-#>     Alternatives: numeric, continuous [3 profiles]
-#>         Sample size means 1: 0.22
-#>         Sample size means 2: 0.44
-#>         Sample size means 3: 0.59
+#>     Alternatives (Result 1 vs. 2 vs. 3): 0.22 vs. 0.44 vs. 0.59
 #> 
 #> Results and derived parameters:
 #> 
-#>     Critical values (treatment effect scale): numeric, continuous [3 profiles]
-#>         Sample size means 1: 0.1539693
-#>         Sample size means 2: 0.3082939
-#>         Sample size means 3: 0.4138996
+#>     Critical values (treatment effect scale) [3 profiles]
+#>         Result 1: 0.1539693
+#>         Result 2: 0.3082939
+#>         Result 3: 0.4138996
 #> 
-#>     Number of subjects fixed: numeric, continuous [3 profiles]
-#>         Sample size means 1: 650.59405
-#>         Sample size means 2: 164.10993
-#>         Sample size means 3: 92.15175
+#>     Number of subjects fixed [3 profiles]
+#>         Result 1: 650.59405
+#>         Result 2: 164.10993
+#>         Result 3: 92.15175
 #> 
-#>     Number of subjects fixed (1): numeric, continuous [3 profiles]
-#>         Sample size means 1: 325.29703
-#>         Sample size means 2: 82.05496
-#>         Sample size means 3: 46.07588
+#>     Number of subjects fixed (1) [3 profiles]
+#>         Result 1: 325.29703
+#>         Result 2: 82.05496
+#>         Result 3: 46.07588
 #> 
-#>     Number of subjects fixed (2): numeric, continuous [3 profiles]
-#>         Sample size means 1: 325.29703
-#>         Sample size means 2: 82.05496
-#>         Sample size means 3: 46.07588
+#>     Number of subjects fixed (2) [3 profiles]
+#>         Result 1: 325.29703
+#>         Result 2: 82.05496
+#>         Result 3: 46.07588
 #> 
 #> Legend:
-#>     Profiles compare exact values at each stage and situation.
+#>     Profiles compare exact values on their applicable coordinates.
 #> 
 #> Complete display: summary(x, showAll = TRUE).
 #> Full data: as.data.frame(x). Exact profiles: summary(x)$parameterInfo.

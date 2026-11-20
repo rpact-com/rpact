@@ -43,7 +43,7 @@ modify the collection.
 ## See also
 
 [`getComparison()`](https://docs.rpact.org/qtd/reference/getComparison.md),
-[`fetch.TrialComparison()`](https://docs.rpact.org/qtd/reference/fetch.TrialComparison.md)
+[`compare()`](https://docs.rpact.org/qtd/reference/compare.md)
 
 ## Examples
 

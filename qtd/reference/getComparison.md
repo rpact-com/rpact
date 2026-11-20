@@ -50,6 +50,46 @@ An R6 `TrialComparison` inheriting from `ParameterSet`. For a single
 `TrialComparisonSummary`, its underlying comparison is returned by
 reference; otherwise a new collection is created.
 
+Returns a
+[`TrialComparison`](https://docs.rpact.org/qtd/reference/TrialComparison.md)
+object. The following generics (R generic functions) are available for
+this result object:
+
+- [`add()`](https://docs.rpact.org/qtd/reference/add.md) to obtain the
+  field names,
+
+- [`delete()`](https://docs.rpact.org/qtd/reference/delete.md) to obtain
+  the field names,
+
+- [`fetch()`](https://docs.rpact.org/qtd/reference/fetch.TrialComparison.md)
+  to obtain the field names,
+
+- [`compare()`](https://docs.rpact.org/qtd/reference/compare.md) to
+  obtain the field names,
+
+- [`names()`](https://rdrr.io/r/base/names.html) to obtain the field
+  names,
+
+- [`length()`](https://rdrr.io/r/base/length.html) to obtain the field
+  names,
+
+- [`print()`](https://docs.rpact.org/qtd/reference/print.TrialComparison.md)
+  to print the object,
+
+- [`summary()`](https://docs.rpact.org/qtd/reference/summary.TrialComparison.md)
+  to display a summary of the object,
+
+- [`plot()`](https://docs.rpact.org/qtd/reference/plot.TrialComparison.md)
+  to plot the object,
+
+- [`as.data.frame()`](https://docs.rpact.org/qtd/reference/as.data.frame.TrialComparison.md)
+  to coerce the object to a
+  [`data.frame`](https://rdrr.io/r/base/data.frame.html),
+
+- [`as.matrix()`](https://docs.rpact.org/qtd/reference/as.matrix.FieldSet.md)
+  to coerce the object to a
+  [`matrix`](https://rdrr.io/r/base/matrix.html).
+
 ## Details
 
 The comparison retains references to its objects. Changes to an original
@@ -109,13 +149,16 @@ contained objects. `clone(deep = TRUE)` is unsupported.
 and selected observed ranges.
 [`summary()`](https://rdrr.io/r/base/summary.html) groups differences by
 object scope, inputs/design settings and results, with equal profiles
-grouped by object number. Constants are compared independently of the
-number of rows. Constant numeric vector cells, such as `1, 1`, compare
-equal to the corresponding scalar. Nonconstant profiles retain
-stage/situation positions; repeated values across the other dimension
-are collapsed. Missing values and their positions participate in exact
-comparisons. No rounding or numerical tolerance is used to decide
-whether profiles differ.
+grouped by object number. Parameter provenance and native dimensions
+determine the applicable profile coordinates. Repeated design settings
+on arm/category rows are removed after exact consistency checks. Genuine
+scalar parameters are compared independently of the number of rows;
+dimensioned parameters retain their stage, group and scenario domains
+even when their values happen to be equal. Constant numeric vector
+cells, such as `1, 1`, are normalized to the corresponding scalar value.
+Missing values and their positions participate in exact comparisons. No
+rounding or numerical tolerance is used to decide whether profiles
+differ.
 
 For comparisons containing interim analyses, fixed plans' `nFixed`,
 `nFixed1`, and `nFixed2` are harmonized to `numberOfSubjects`,
@@ -157,13 +200,6 @@ its cumulative or stage-wise type; these scales are not harmonized.
 Profiles and plot groups respect time, arm, population and situation
 coordinates.
 
-Optimal conditional-error characteristics are supported internally,
-including their theta-by-stage results and atomic design settings. Their
-constructor and characteristic functions remain unexported.
-Function-valued settings are not compared as scalar parameters.
-Deprecated `TrialDesignSet` objects and standalone optimal
-conditional-error designs are not supported.
-
 Console and Markdown output are bounded. Limits and display rounding do
 not change the underlying data.
 [`as.data.frame.TrialComparison()`](https://docs.rpact.org/qtd/reference/as.data.frame.TrialComparison.md)
@@ -173,6 +209,26 @@ selects axes only when unambiguous.
 [`getObjectRCode()`](https://docs.rpact.org/qtd/reference/getObjectRCode.md)
 reconstructs the comparison and its contained objects; executing
 generated simulation code reruns the corresponding simulations.
+
+## How to get help for generic functions
+
+Click on the link of a generic in the list above to go directly to the
+help documentation of the `rpact` specific implementation of the
+generic. Note that you can use the R function
+[`methods`](https://rdrr.io/r/utils/methods.html) to get all the methods
+of a generic and to identify the object specific name of it, e.g., use
+`methods("plot")` to get all the methods for the `plot` generic. There
+you can find, e.g., `plot.AnalysisResults` and obtain the specific help
+documentation linked above by typing
+[`?plot.AnalysisResults`](https://docs.rpact.org/qtd/reference/plot.AnalysisResults.md).
+
+## See also
+
+[`compare()`](https://docs.rpact.org/qtd/reference/compare.md),
+[`add()`](https://docs.rpact.org/qtd/reference/add.md),
+[`delete()`](https://docs.rpact.org/qtd/reference/delete.md),
+[`fetch.TrialComparison()`](https://docs.rpact.org/qtd/reference/fetch.TrialComparison.md),
+[`getObjects()`](https://docs.rpact.org/qtd/reference/getObjects.md)
 
 ## Examples
 

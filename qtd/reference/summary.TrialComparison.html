@@ -13,7 +13,7 @@ This also supports %vs% chains followed by summary(...)."><meta property="og:ima
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.1.0.9329</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,9 @@ This also supports <code>%vs%</code> chains followed by <code>summary(...)</code
 <span>  harmonizeColumnNames <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  textMode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wrap"</span>, <span class="st">"truncate"</span>, <span class="st">"full"</span><span class="op">)</span>,</span>
 <span>  width <span class="op">=</span> <span class="cn">NA_integer_</span>,</span>
-<span>  showAll <span class="op">=</span> <span class="cn">NA</span></span>
+<span>  showAll <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  showDataType <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  maxTableColumns <span class="op">=</span> <span class="cn">NA_integer_</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'TrialComparisonSummary'</span></span>
@@ -131,6 +133,16 @@ always retains complete text in its profile tables.</p></dd>
 <dd><p>If <code>TRUE</code>, lift all four <code>max*</code> limits and disable text truncation.
 Wrapping remains active when <code>textMode = "wrap"</code>. Defaults to <code>FALSE</code>.</p></dd>
 
+
+<dt id="arg-showdatatype">showDataType<a class="anchor" aria-label="anchor" href="#arg-showdatatype"></a></dt>
+<dd><p>If <code>TRUE</code>, include data type descriptions such as
+<code>integer, continuous</code> in parameter headings. Defaults to <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-maxtablecolumns">maxTableColumns<a class="anchor" aria-label="anchor" href="#arg-maxtablecolumns"></a></dt>
+<dd><p>Maximum result/profile columns per Markdown table block
+(default 4). Coordinate columns are additional. Also applies with <code>showAll = TRUE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -146,6 +158,14 @@ Input roles take precedence when roles differ across the compared object types.<
     <p>Constant numeric vector cells compare equal to their scalar value regardless
 of vector length. Nonconstant vectors, missing values, and their positions
 remain part of the exact comparison. The stored comparison data are unchanged.
+Profile coordinates follow the parameter's source and native dimensions.
+Repeated design settings on simulation category rows are normalized only
+when the remaining coordinates uniquely determine the exact values. Stage
+and group domains of dimensioned parameters remain meaningful when their
+values are equal. Uncertain or conflicting dependencies retain additional
+coordinates rather than averaging or selecting an arbitrary value.
+Both parameter-filter options of <code><a href="as.data.frame.TrialComparison.html">as.data.frame.TrialComparison()</a></code> use these
+profiles; unfiltered data-frame rows remain unchanged for plotting.
 This value normalization also applies when column-name harmonization is disabled.
 Plotting a summary retains its selected column-name mode unless custom data
 are supplied.</p>
@@ -157,27 +177,50 @@ and <code>paramCaptions</code> contains captions in object order (NA for absent 
 These captions are captured with the summary. Distinct object-specific captions
 are shown together and identified alongside the corresponding object labels;
 they do not change exact value-profile grouping. Unnamed entries are labelled
-by their calculation or design type and collection position. The overview and
-these type labels are captured with the summary. The legend explains exact
+<code>Simulation</code> when all objects are simulation results, <code>Design</code> when all objects
+are trial designs, and <code>Result</code> otherwise, followed by their collection position.
+Explicit names take precedence. Full type descriptions remain in the overview.
+The overview and these labels are captured with the summary. The legend explains exact
 profile comparison and mentions NA only when displayed profiles contain
 missing values. Titles distinguish designs, sample size calculations, power
 calculations, and power simulations. Mixed comparisons use a design plan
 comparison title; empty comparisons retain the general trial comparison title.
-Markdown output presents each differing parameter as a table with one row per
-displayed profile and columns labelled by stage and situation. Scalar profiles
-use a Value column. Blank cells indicate coordinates absent from a profile;
-explicit missing values are shown as NA. The display limits also apply to
-these tables, with omitted values and profiles indicated explicitly.</p>
+Markdown output places coordinates in rows and displayed profiles in columns.
+Scalar profiles use one-row tables. At most <code>maxTableColumns</code> profile columns
+(default 4) appear per block, with coordinate columns repeated in each block.
+This layout limit also applies with <code>showAll = TRUE</code>. Long profile labels are
+listed above the tables with short references. Incompatible coordinate
+structures use separate tables. Missing and omitted coordinates use the same
+markers as console tables. Data limits apply independently of table layout.</p>
+<p>Console output uses a single comparison line for numeric, character or logical scalar values when
+at most four objects are compared, all fit within the profile/object limits,
+captions agree and the complete line fits within <code>width</code>. Otherwise scalars
+retain the labelled profile display. Profiles with compatible coordinate
+columns are aligned by their exact coordinates and displayed side by side.
+Coordinates constant across the complete parameter are listed once, except
+redundant constant category types, categories and situation identifiers, which
+are omitted. Varying categories use an Arm or Comparison column caption where
+appropriate. A scalar missing profile is displayed as an <code>NA</code> column alongside
+the coordinates of the other profiles; non-missing scalars are not expanded.
+If the table exceeds <code>width</code>, values are listed vertically per coordinate.
+Profiles sharing at least one coordinate can use a joint table even if their
+remaining axes differ. A dash marks an inapplicable coordinate; values are
+not broadcast to categories absent from their source profile. Profiles without
+shared coordinates retain separate displays.
+<code>&lt;absent&gt;</code> denotes a coordinate absent from a profile, whereas <code>&lt;omitted&gt;</code>
+denotes a value outside that profile's <code>maxValues</code> preview. Neither marker
+represents a stored <code>NA</code>. Display choices do not change exact profile grouping.</p>
 <p>A <code>NULL</code> display argument reads its setting through <code>.getEnvironmentVariable()</code>.
 Explicit arguments take precedence over environment variables, which take
 precedence over R options and defaults. The four default limits are 12
 parameters, 3 profiles, 6 objects and 4 values. R options use the prefix
 <code>rpact.comparison.summary.</code> followed by the argument name: <code>maxParameters</code>,
-<code>maxProfiles</code>, <code>maxObjects</code>, <code>maxValues</code>, <code>textMode</code>, <code>width</code> or <code>showAll</code>.
+<code>maxProfiles</code>, <code>maxObjects</code>, <code>maxValues</code>, <code>maxTableColumns</code>, <code>textMode</code>, <code>width</code>, <code>showAll</code> or <code>showDataType</code>.
 The corresponding environment variables are <code>RPACT_COMPARISON_SUMMARY_MAX_PARAMETERS</code>,
 <code>RPACT_COMPARISON_SUMMARY_MAX_PROFILES</code>, <code>RPACT_COMPARISON_SUMMARY_MAX_OBJECTS</code>,
 <code>RPACT_COMPARISON_SUMMARY_MAX_VALUES</code>, <code>RPACT_COMPARISON_SUMMARY_TEXT_MODE</code>,
-<code>RPACT_COMPARISON_SUMMARY_WIDTH</code> and <code>RPACT_COMPARISON_SUMMARY_SHOW_ALL</code>.
+<code>RPACT_COMPARISON_SUMMARY_WIDTH</code>, <code>RPACT_COMPARISON_SUMMARY_SHOW_ALL</code> and
+<code>RPACT_COMPARISON_SUMMARY_SHOW_DATA_TYPE</code>.
 Settings are captured when the summary is created. For a complete display use
 <code>summary(x, showAll = TRUE)</code>; for a compact display use <code>textMode = "truncate"</code>.</p>
     </div>

@@ -12,6 +12,7 @@
   : Coerce a Multi-Group Piecewise Survival Specification to a Data
   Frame
 - [`as.data.frame(`*`<TrialComparison>`*`)`](https://docs.rpact.org/qtd/reference/as.data.frame.TrialComparison.md)
+  [`as.data.frame(`*`<TrialComparisonSummary>`*`)`](https://docs.rpact.org/qtd/reference/as.data.frame.TrialComparison.md)
   : Trial Comparison Data Frame
 - [`as251Normal()`](https://docs.rpact.org/qtd/reference/as251Normal.md)
   : Algorithm AS 251: Normal Distribution

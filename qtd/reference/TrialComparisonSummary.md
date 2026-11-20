@@ -13,9 +13,14 @@ includes only user-defined inputs unless
 `includeDefaultParameters = TRUE`. Settings resolved from R options or
 environment variables are retained when they differ from package
 defaults. `showAll` affects rendering without replacing the stored
-limits or text mode. The underlying comparison is retained by reference,
-whereas profiles and display labels are snapshots. Recompute the summary
-after changing objects.
+limits or text mode. Markdown tables place coordinates in rows and
+profiles in columns, using at most `maxTableColumns` profile columns per
+block even with `showAll = TRUE`. Coordinate columns repeat in each
+block. Scalar profiles use one-row tables. Long profile labels are
+listed above the tables with short column references. Profiles with
+incompatible dimensions are displayed in separate tables. The underlying
+comparison is retained by reference, whereas profiles and display labels
+are snapshots. Recompute the summary after changing objects.
 
 ## Fields
 
@@ -54,6 +59,13 @@ after changing objects.
   Ignored for display when showAll is TRUE. Is a single numeric value
   representing a whole number.
 
+- `maxTableColumns`:
+
+  Maximum result/profile columns per Markdown table block, excluding
+  coordinate columns; defaults to 4. Applies also when showAll is TRUE;
+  does not limit displayed data or affect console output. Is a single
+  numeric value representing a whole number.
+
 - `harmonizeColumnNames`:
 
   Whether the snapshot uses harmonized comparison column names; defaults
@@ -76,6 +88,12 @@ after changing objects.
   Whether all profiles, objects and values are displayed without the max
   limits or text truncation; defaults to FALSE. Stored limits remain
   unchanged. Is a single logical value.
+
+- `showDataType`:
+
+  Whether parameter headings include data type descriptions in console
+  and Markdown output; defaults to FALSE. Independent of showAll. Is a
+  single logical value.
 
 - `object`:
 
@@ -118,5 +136,4 @@ after changing objects.
 ## See also
 
 [`getComparison()`](https://docs.rpact.org/qtd/reference/getComparison.md),
-[`summary.TrialComparison()`](https://docs.rpact.org/qtd/reference/summary.TrialComparison.md),
-[`getObjectRCode()`](https://docs.rpact.org/qtd/reference/getObjectRCode.md)
+[`compare()`](https://docs.rpact.org/qtd/reference/compare.md)

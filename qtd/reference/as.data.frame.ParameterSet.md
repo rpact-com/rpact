@@ -12,7 +12,8 @@ as.data.frame(
   optional = FALSE,
   ...,
   niceColumnNamesEnabled = FALSE,
-  includeAllParameters = FALSE
+  includeAllParameters = FALSE,
+  strict = FALSE
 )
 ```
 
@@ -39,6 +40,11 @@ as.data.frame(
   Logical. If `TRUE`, all available parameters will be included in the
   data frame; a meaningful parameter selection otherwise, default is
   `FALSE`.
+
+- strict:
+
+  If `TRUE`, unresolved component conflicts raise an error. Otherwise
+  warn and retain the complete conflicting values as character.
 
 ## Value
 

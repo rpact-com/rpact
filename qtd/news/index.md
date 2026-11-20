@@ -1,19 +1,8 @@
 # Changelog
 
-## rpact 4.6.0
+## rpact 5.1.0
 
 ### New features
-
-- Quantitative trial design now supports Bayesian decision rules through
-  `getDesignQuantitative(bayesian = TRUE)` and custom criteria from
-  [`getQuantitativeDecisionThresholds()`](https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.md).
-  The common means and rates OC functions dispatch by design class and
-  support RBesT normal or beta mixture priors. Bayesian results include
-  four exclusive decision categories, posterior decision maps,
-  summaries, sensitivity plots and reproducible R code. Percentile
-  interpretation is explicit through `percentileMapping`; the default
-  preserves the quantile interpretation. RBesT is an optional suggested
-  dependency.
 
 - Introduced quantitative trial design (QTD) for fixed two-group trials
   with continuous or binary endpoints. The new function
@@ -34,9 +23,42 @@
   comparisons, sensitivity, and explicitly weighted decision
   performance. Rates plots support treatment-rate or
   beneficial-risk-difference axes and control-rate sensitivity with a
-  fixed treatment-rate grid.
+  fixed treatment-rate grid. Bayesian decision rules are supported
+  through `getDesignQuantitative(bayesian = TRUE)` and custom criteria
+  from
+  [`getQuantitativeDecisionThresholds()`](https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.md).
+  The common means and rates OC functions dispatch by design class and
+  support `RBesT` normal or beta mixture priors. Bayesian results
+  include four exclusive decision categories, posterior decision maps,
+  summaries, sensitivity plots and reproducible R code. Percentile
+  interpretation is explicit through `percentileMapping`; the default
+  preserves the quantile interpretation. RBesT is an optional suggested
+  dependency.
 
-## rpact 4.5.0
+- [`getSimulationMultiArmMeans()`](https://docs.rpact.org/qtd/reference/getSimulationMultiArmMeans.md),
+  [`getSimulationMultiArmRates()`](https://docs.rpact.org/qtd/reference/getSimulationMultiArmRates.md),
+  [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/qtd/reference/getSimulationMultiArmSurvival.md),
+  and
+  [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/qtd/reference/getSimulationEnrichmentSurvival.md)
+  now support user-defined null hypothesis values through `thetaH0`,
+  enabling non-inferiority simulations. Defaults are `0` for mean and
+  rate differences and `1` for hazard ratios. Test statistics,
+  conditional power, and sample size or event number recalculations
+  account for the specified null value.
+
+- [`getDesignFixed()`](https://docs.rpact.org/qtd/reference/getDesignFixed.md),
+  [`getDesignGroupSequential()`](https://docs.rpact.org/qtd/reference/getDesignGroupSequential.md),
+  and
+  [`getDesignInverseNormal()`](https://docs.rpact.org/qtd/reference/getDesignInverseNormal.md)
+  now accept `power` as an alternative to `beta`, with
+  `power = 1 - beta`. Consistent double specifications are accepted. The
+  existing meaning of the returned `design$power` is unchanged.
+
+### Improvements, issues, and changes
+
+## rpact 5.0.0
+
+CRAN release: 2026-11-16
 
 ### New features
 
@@ -173,25 +195,42 @@
   single and multiple y parameters. Comparison legends use object-aware
   titles and adaptive category/parameter layouts, with measured
   wrapping, independent positions, and font reductions limited to ten
-  percent. Automatic legend placement (`legendPosition = "auto"`) is the
-  default across all rpact plots with legends, while manual positions
-  and legacy `NA` behaviour remain available. Comparison operations and
-  package testing provide structured errors through the central error
-  helpers, preserving worker failure details.
+  percent. With an explicit x axis, single-point objects of the same
+  type, endpoint, and calculation target connect at distinct finite x
+  values even when other inputs vary. Category and group legends with
+  only one observed level are hidden without changing line grouping;
+  constant categories and groups leave colours available for the y
+  parameters, with matching legend colours. Automatic legend placement
+  (`legendPosition = "auto"`) is the default across all rpact plots with
+  legends, while manual positions and legacy `NA` behavior remain
+  available. Comparison operations and package testing provide
+  structured errors through the central error helpers, preserving worker
+  failure details.
   [`compare()`](https://docs.rpact.org/qtd/reference/compare.md) starts
   a trial comparison from supported planning objects and extends an
   existing `TrialComparison` by reference, supporting pipelines such as
   `design |> compare(plan1) |> compare(plan2)`. Trial comparison data
   frames support `digits`, `ceilingEnabled`, and
   `removeVariableParameters` for numeric formatting and shared profiles.
-  The `output` modes `"auto"`, `"html"`, and `"pdf"` retain data frames
-  and render scrollable HTML or split LaTeX longtables automatically
-  through knitr, without embedded report helpers.
+  Numeric values remain numeric and complete, including scalar standard
+  deviations across stages and scenario vectors with
+  `includeAllParameters = TRUE`. Additional vector and array components
+  are exported on indexed rows, without truncation or artificial
+  Cartesian products. Unresolvable type or dimension conflicts warn and
+  retain complete character representations by default; `strict = TRUE`
+  raises a structured error instead. Transposed tables remain a
+  presentation format. The `output` modes `"auto"`, `"html"`, and
+  `"pdf"` retain data frames and render scrollable HTML or split LaTeX
+  longtables automatically through knitr, without embedded report
+  helpers.
 - The `%vs%` operator combines trial planning objects, comparisons, and
   their summaries through
   [`getComparison()`](https://docs.rpact.org/qtd/reference/getComparison.md)
   and returns a comparison summary. It supports chaining and plotting
-  with explicit axis selections.
+  with explicit axis selections. Comparison summaries can be converted
+  directly with
+  [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html), using
+  the underlying comparison and supporting the same conversion options.
 - Comparison summaries wrap complete Console text by default and offer
   `textMode`, `width`, and `showAll` controls. All display limits and
   these controls can also be set through `RPACT_COMPARISON_SUMMARY_*`
@@ -504,7 +543,7 @@ CRAN release: 2025-03-24
   repository. Only members of the ‘RPACT User Group’ have access to the
   tests. For more information, please visit:
   [rpact.org/iq](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/)
-  and [RPACT Connect](https://rpact-connect.share.connect.posit.cloud)
+  and [RPACT Connect](https://connect.rpact.app)
 - Usage of `maxInformation` improved (see enhancement
   [\#65](https://github.com/rpact-com/rpact/issues/65))
 - Line breaks in the output of

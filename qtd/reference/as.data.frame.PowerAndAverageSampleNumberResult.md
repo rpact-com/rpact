@@ -14,7 +14,8 @@ as.data.frame(
   optional = FALSE,
   niceColumnNamesEnabled = FALSE,
   includeAllParameters = FALSE,
-  ...
+  ...,
+  strict = FALSE
 )
 ```
 
@@ -42,6 +43,11 @@ as.data.frame(
 
   Ensures that all arguments (starting from the "...") are to be named
   and that a warning will be displayed if unknown arguments are passed.
+
+- strict:
+
+  If `TRUE`, unresolved component conflicts raise an error. Otherwise
+  warn and retain the complete conflicting values as character.
 
 ## Value
 

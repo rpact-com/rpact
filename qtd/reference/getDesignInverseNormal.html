@@ -9,7 +9,7 @@ the inverse normal combination test."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.1.0.9329</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,7 +74,8 @@ the inverse normal combination test.</p>
 <span>  betaAdjustment <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  constantBoundsHP <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  twoSidedPower <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  tolerance <span class="op">=</span> <span class="fl">1e-08</span></span>
+<span>  tolerance <span class="op">=</span> <span class="fl">1e-08</span>,</span>
+<span>  power <span class="op">=</span> <span class="cn">NA_real_</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -232,6 +233,20 @@ should be directed to one part.#'</p></dd>
 
 <dt id="arg-tolerance">tolerance<a class="anchor" aria-label="anchor" href="#arg-tolerance"></a></dt>
 <dd><p>The numerical tolerance, default is <code>1e-08</code>.</p></dd>
+
+
+<dt id="arg-power">power<a class="anchor" aria-label="anchor" href="#arg-power"></a></dt>
+<dd><p>Nominal target power, an alternative to <code>beta</code>, defined as
+<code>1 - beta</code>. Must be a single numeric value strictly between 0 and 1.
+If both are supplied, <code>abs(beta + power - 1) &lt;= 1e-12</code> is required
+and the supplied <code>beta</code> is retained. The usual restrictions on
+<code>beta</code> and its relationship to <code>alpha</code> still apply.
+The default <code>NA_real_</code> leaves the existing <code>beta</code> default or
+derivation from user-defined beta spending unchanged.
+This scalar input does not replace the returned <code>design$power</code>:
+that field can contain cumulative rejection probabilities by stage,
+whose final value need not equal the nominal target, particularly for
+two-sided designs when only one rejection tail is counted.</p></dd>
 
 </dl></div>
     <div class="section level2">

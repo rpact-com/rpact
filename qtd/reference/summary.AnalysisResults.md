@@ -54,7 +54,7 @@ The following options can be set globally:
     defines how many details will be included into the summary; default
     is `"large"`, i.e., all available details are displayed.
 
-2.  `rpact.summary.justify`: one of `c("right", "left", "centre")`;
+2.  `rpact.summary.justify`: one of `c("right", "left", "center")`;
     shall the values be right-justified (the default), left-justified or
     centered.
 
