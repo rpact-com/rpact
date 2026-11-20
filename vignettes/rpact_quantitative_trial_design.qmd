@@ -945,9 +945,13 @@ combinedMap + facet_wrap(~intervalMethod, ncol = 2) +
     labs(subtitle = "LRV = -0.05; TV = 0; percentiles = 0.2 / 0.9; C/T = 25/25; lower treatment rates are beneficial")
 ```
 
-TODO: what happens with more than 1 Mio cells? error/warning?
-
-Maps contain at most one million cells, including zero-event rows and columns.
+Maps contain at most one million cells, including zero-event rows and columns:
+$(n_C + 1)(n_T + 1) \leq 1{,}000{,}000$. If the requested sample sizes exceed
+this limit, `plot()` raises an error (not a warning) before constructing the
+count grid, and no map is returned. For example, `numberOfSubjects = c(1000, 1000)`
+requires 1,002,001 cells and is rejected, whereas `c(999, 999)` meets the limit
+exactly. Reduce the sample sizes used for the illustrative map to stay within
+the limit.
 Interval methods can classify boundary count pairs differently and change the OC
 probabilities. To use another method throughout an OC analysis, specify it in
 the constructor:
