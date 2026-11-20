@@ -575,3 +575,6 @@ the generated output.
   and inspect existing vignettes, especially those in the selected topic
   directory. Follow their layout, overall structure, and writing style,
   including established conventions for metadata, headings, and code examples.
+- Always prefer dplyr/ tidyr/ purrr from the tidyverse over base R syntax for data wrangling
+  in vignettes. Try to keep the code as human readable as possible. The objective
+  is not few lines of code but excellent readability.
