@@ -41,9 +41,6 @@ getOperatingCharacteristicsRates(
 - pi1:
 
   Numeric vector of true treatment event probabilities in `[0, 1]`.
-  Optional names must be unique and non-empty. They label summary rows
-  and appear in the `scenarioName` column of the probability table and
-  plot data.
 
 - pi2:
 
