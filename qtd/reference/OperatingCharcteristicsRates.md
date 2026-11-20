@@ -62,14 +62,14 @@ Returns the result description used in output headings.
 ## Details
 
 Inherits the sample-size matrix and probability table from
-`OperatingCharcteristics`. The originating quantitative decision rule is
-stored internally. Each sample-size scenario contains six frequentist or
-four Bayesian categories and the supplied treatment rates in their
+`OperatingCharacteristics`. The originating quantitative decision rule
+is stored internally. Each sample-size scenario contains six frequentist
+or four Bayesian categories and the supplied treatment rates in their
 original order, including repeats. Console and Markdown printing use the
 standard ParameterSet mechanism. Use
 [`summary()`](https://rdrr.io/r/base/summary.html) for decision-rule
 assumptions and probability tables, and
-[`plot.OperatingCharcteristics()`](https://docs.rpact.org/qtd/reference/plot.OperatingCharcteristics.md)
+[`plot.OperatingCharacteristics()`](https://docs.rpact.org/qtd/reference/plot.OperatingCharcteristics.md)
 for the shared QTD plot families.
 
 ## Fields

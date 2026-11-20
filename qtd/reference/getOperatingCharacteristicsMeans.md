@@ -65,7 +65,7 @@ getOperatingCharacteristicsMeans(
 
 ## Value
 
-An OperatingCharcteristicsMeans object with the rule, assumptions and
+An OperatingCharacteristicsMeans object with the rule, assumptions and
 category-block probability data frame. Bayesian data additionally retain
 stDevControl and stDevTreatment; the scalar stDev facet is their root
 mean square.

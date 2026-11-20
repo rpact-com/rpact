@@ -7,7 +7,7 @@ quantitative trials.
 ## Usage
 
 ``` r
-# S3 method for class 'OperatingCharcteristics'
+# S3 method for class 'OperatingCharacteristics'
 plot(
   x,
   plotCat = c(3, 6),

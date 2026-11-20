@@ -13,7 +13,7 @@ getOperatingCharacteristicsRates(
   pi1,
   pi2,
   directionUpper = TRUE,
-  intervalMethod = "qtd1",
+  intervalMethod = "wilson",
   priorDist1 = NULL,
   priorDist2 = NULL
 )
@@ -53,7 +53,7 @@ getOperatingCharacteristicsRates(
 
 - intervalMethod:
 
-  One of `"qtd1"` (default), `"farringtonManning"`,
+  One of `"wilson"` (default), `"farringtonManning"`,
   `"miettinenNurminen"`, or `"newcombe"`, as described in
   [`plot.TrialDesignPlanQuantitative()`](https://docs.rpact.org/qtd/reference/plot.TrialDesignPlanQuantitative.md).
 
@@ -64,11 +64,11 @@ getOperatingCharacteristicsRates(
 
 ## Value
 
-An `OperatingCharcteristicsRates` object supporting console and Markdown
-printing, summaries and the QTD plot families. Its `probabilities` data
-frame contains `category`, `probability`, `nControl`, `nTreatment`,
-`alternative`, `pi1`, and `pi2`. `alternative` is the true risk
-difference in the beneficial direction.
+An `OperatingCharacteristicsRates` object supporting console and
+Markdown printing, summaries and the QTD plot families. Its
+`probabilities` data frame contains `category`, `probability`,
+`nControl`, `nTreatment`, `alternative`, `pi1`, and `pi2`. `alternative`
+is the true risk difference in the beneficial direction.
 
 ## Details
 
@@ -105,9 +105,9 @@ requiring ggplot2 or Java.
 
 [`getDesignQuantitative()`](https://docs.rpact.org/qtd/reference/getDesignQuantitative.md),
 [`getOperatingCharacteristicsMeans()`](https://docs.rpact.org/qtd/reference/getOperatingCharacteristicsMeans.md),
-[OperatingCharcteristicsRates](https://docs.rpact.org/qtd/reference/OperatingCharcteristicsRates.md),
+[OperatingCharacteristicsRates](https://docs.rpact.org/qtd/reference/OperatingCharcteristicsRates.md),
 [summaryQuantitative](https://docs.rpact.org/qtd/reference/summaryQuantitative.md),
-[`plot.OperatingCharcteristics()`](https://docs.rpact.org/qtd/reference/plot.OperatingCharcteristics.md)
+[`plot.OperatingCharacteristics()`](https://docs.rpact.org/qtd/reference/plot.OperatingCharcteristics.md)
 
 ## Examples
 
@@ -133,7 +133,7 @@ print(oc)
 #> 
 #> Default parameters:
 #>   Treatment groups             : 2 
-#>   Interval method              : qtd1 
+#>   Interval method              : wilson 
 #> 
 #> Output:
 #>           Category  Probability Number of   Number of Alternatives   Assumed
@@ -281,7 +281,7 @@ cat(print(oc, markdown = TRUE)[1], "\n")
 #> *Default parameters*
 #> 
 #> * *Treatment groups*: 2 
-#> * *Interval method*: qtd1 
+#> * *Interval method*: wilson 
 #> 
 #> *Output*
 #> 

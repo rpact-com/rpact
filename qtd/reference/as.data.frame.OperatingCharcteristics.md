@@ -6,7 +6,7 @@ quantitative OCs.
 ## Usage
 
 ``` r
-# S3 method for class 'OperatingCharcteristics'
+# S3 method for class 'OperatingCharacteristics'
 as.data.frame(
   x,
   row.names = NULL,
@@ -20,7 +20,7 @@ as.data.frame(
 
 - x:
 
-  An OperatingCharcteristicsMeans or OperatingCharcteristicsRates
+  An OperatingCharacteristicsMeans or OperatingCharacteristicsRates
   object.
 
 - row.names:

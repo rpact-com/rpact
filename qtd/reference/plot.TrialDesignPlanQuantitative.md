@@ -18,7 +18,7 @@ plot(
   standardErrorRange = NULL,
   gridSize = 200L,
   numberOfSubjects = NULL,
-  intervalMethod = "qtd1",
+  intervalMethod = "wilson",
   directionUpper = TRUE,
   controlRate = NULL,
   treatmentRate = NULL,
@@ -76,7 +76,7 @@ plot(
 
 - intervalMethod:
 
-  For type 3, "qtd1" (default), "farringtonManning",
+  For type 3, "wilson" (default), "farringtonManning",
   "miettinenNurminen", or "newcombe". See Details for the method
   definitions.
 
@@ -131,11 +131,11 @@ displayed percentiles do not imply a symmetric two-sided confidence
 interval. Type 2 plots observed estimates against standard errors, not
 true effects.
 
-With `intervalMethod = "qtd1"`, type 3 reproduces the QTD1 construction
-with limits rounded to four decimal places. Score limits supply the
-variance terms of the lower and upper risk-difference limits. Boundary
-equality follows QTD1: lower limits equal to LRV or TV satisfy the
-corresponding lower criterion; upper limits equal to TV satisfy the
+With `intervalMethod = "wilson"`, type 3 reproduces the QTD1
+construction with limits rounded to four decimal places. Score limits
+supply the variance terms of the lower and upper risk-difference limits.
+Boundary equality follows QTD1: lower limits equal to LRV or TV satisfy
+the corresponding lower criterion; upper limits equal to TV satisfy the
 target criterion. The event map contains at most one million cells. With
 supplied rates, category probabilities can be obtained by summing
 `cellProbability` by `category` in the returned plot data. The QTD1

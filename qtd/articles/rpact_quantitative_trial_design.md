@@ -181,7 +181,7 @@ overall benefit-risk assessment are separate considerations.
 | Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` |
 | Sample sizes, control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
 | Beneficial direction | Lower treatment rate | `directionUpper = FALSE` |
-| Interval construction | Frequentist | `intervalMethod = "qtd1"` |
+| Interval construction | Frequentist | `intervalMethod = "wilson"` |
 
 We evaluate treatment event probabilities from 0.10 to 0.25 in steps of
 0.01 for both sample-size scenarios. Rates and reference differences are
@@ -203,7 +203,7 @@ ratesOC <- getOperatingCharacteristicsRates(
     pi1 = seq(0.10, 0.25, by = 0.01),
     pi2 = 0.15,
     directionUpper = FALSE,
-    intervalMethod = "qtd1"
+    intervalMethod = "wilson"
 )
 ```
 
@@ -260,7 +260,7 @@ ratesScenarios <- getOperatingCharacteristicsRates(
     pi1 = scenarioRates,
     pi2 = 0.15,
     directionUpper = FALSE,
-    intervalMethod = "qtd1"
+    intervalMethod = "wilson"
 )
 summary(ratesScenarios, digits = 4)
 ```
@@ -279,7 +279,7 @@ summary(ratesScenarios, digits = 4)
 - *Treatment groups*: 2
 - *Assumed control rate*: 0.15000
 - *Direction upper*: FALSE
-- *Interval method*: qtd1
+- *Interval method*: wilson
 
 **Number of subjects (control = 75, treatment = 75)**
 
@@ -437,7 +437,7 @@ eventMap <- plot(
     type = 3,
     numberOfSubjects = c(75, 75),
     directionUpper = FALSE,
-    intervalMethod = "qtd1",
+    intervalMethod = "wilson",
     observedControl = 16,
     controlRate = 0.15,
     treatmentRate = 0.10,
@@ -1114,7 +1114,7 @@ print(ratesScenarios, markdown = FALSE)
 
     Default parameters:
       Treatment groups             : 2
-      Interval method              : qtd1
+      Interval method              : wilson
 
     Output:
               Category  Probability Number of   Number of Alternatives   Assumed      Assumed
@@ -1263,7 +1263,7 @@ summary(ratesScenarios, output = "overview")
 - *Treatment groups*: 2
 - *Assumed control rate*: 0.1500
 - *Direction upper*: FALSE
-- *Interval method*: qtd1
+- *Interval method*: wilson
 
 ``` r
 
@@ -1309,7 +1309,7 @@ rates**
 **Default parameters**
 
 - *Treatment groups*: 2
-- *Interval method*: qtd1
+- *Interval method*: wilson
 
 **Output**
 
@@ -1392,7 +1392,7 @@ rates**
 - *Treatment groups*: 2
 - *Assumed control rate*: 0.15000
 - *Direction upper*: FALSE
-- *Interval method*: qtd1
+- *Interval method*: wilson
 
 **Number of subjects (control = 75, treatment = 75)**
 
@@ -1540,7 +1540,7 @@ score method.
 
 | `intervalMethod` | Construction |
 |:---|:---|
-| `"qtd1"` | Original QTD1 approximation using Wilson score limits rounded to four decimal places in its variance construction |
+| `"wilson"` | Original QTD1 approximation using Wilson score limits rounded to four decimal places in its variance construction |
 | `"farringtonManning"` | Risk-difference score-test inversion using constrained maximum-likelihood variance |
 | `"miettinenNurminen"` | Score inversion with variance correction $`N/(N-1)`$, where $`N=n_C+n_T`$ |
 | `"newcombe"` | Square-and-add combination of unrounded Wilson limits without continuity correction |
@@ -1557,7 +1557,7 @@ group to keep calculation of all four maps economical.
 
 ``` r
 
-intervalMethods <- c("qtd1", "farringtonManning", "miettinenNurminen", "newcombe")
+intervalMethods <- c("wilson", "farringtonManning", "miettinenNurminen", "newcombe")
 methodPlots <- lapply(intervalMethods, function(method) {
     return(plot(binaryRule, type = 3, numberOfSubjects = c(25, 25),
         directionUpper = FALSE, intervalMethod = method, plotCat = 6))

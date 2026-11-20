@@ -296,7 +296,7 @@ Default parameters:
 <tr class="even">
 <td style="text-align: left;">Interval construction</td>
 <td style="text-align: left;">Frequentist</td>
-<td style="text-align: left;"><code>intervalMethod = "qtd1"</code></td>
+<td style="text-align: left;"><code>intervalMethod = "wilson"</code></td>
 </tr>
 </tbody>
 </table>
@@ -316,7 +316,7 @@ Default parameters:
 <span>    pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.10</span>, <span class="fl">0.25</span>, by <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span>,</span>
 <span>    pi2 <span class="op">=</span> <span class="fl">0.15</span>,</span>
 <span>    directionUpper <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    intervalMethod <span class="op">=</span> <span class="st">"qtd1"</span></span>
+<span>    intervalMethod <span class="op">=</span> <span class="st">"wilson"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>Here <code>numberOfSubjects</code> is a positive integer matrix with control in column 1 and treatment in column 2. Each row is a scenario.</p>
@@ -388,7 +388,7 @@ Default parameters:
 <span>    pi1 <span class="op">=</span> <span class="va">scenarioRates</span>,</span>
 <span>    pi2 <span class="op">=</span> <span class="fl">0.15</span>,</span>
 <span>    directionUpper <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    intervalMethod <span class="op">=</span> <span class="st">"qtd1"</span></span>
+<span>    intervalMethod <span class="op">=</span> <span class="st">"wilson"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ratesScenarios</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -413,7 +413,7 @@ Default parameters:
 <li>
 <em>Direction upper</em>: FALSE</li>
 <li>
-<em>Interval method</em>: qtd1</li>
+<em>Interval method</em>: wilson</li>
 </ul>
 <p><strong>Number of subjects (control = 75, treatment = 75)</strong></p>
 <table class="table caption-top" style="width:100%;">
@@ -1046,7 +1046,7 @@ Default parameters:
 <span>    type <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>    numberOfSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">75</span>, <span class="fl">75</span><span class="op">)</span>,</span>
 <span>    directionUpper <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    intervalMethod <span class="op">=</span> <span class="st">"qtd1"</span>,</span>
+<span>    intervalMethod <span class="op">=</span> <span class="st">"wilson"</span>,</span>
 <span>    observedControl <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>    controlRate <span class="op">=</span> <span class="fl">0.15</span>,</span>
 <span>    treatmentRate <span class="op">=</span> <span class="fl">0.10</span>,</span>
@@ -1947,7 +1947,7 @@ Derived from user defined parameters:
 
 Default parameters:
   Treatment groups             : 2
-  Interval method              : qtd1
+  Interval method              : wilson
 
 Output:
           Category  Probability Number of   Number of Alternatives   Assumed      Assumed
@@ -2209,7 +2209,7 @@ Output:
 <li>
 <em>Direction upper</em>: FALSE</li>
 <li>
-<em>Interval method</em>: qtd1</li>
+<em>Interval method</em>: wilson</li>
 </ul>
 </div>
 <div class="sourceCode cell-code" id="cb39"><pre class="downlit sourceCode r">
@@ -2260,7 +2260,7 @@ Output:
 <li>
 <em>Treatment groups</em>: 2</li>
 <li>
-<em>Interval method</em>: qtd1</li>
+<em>Interval method</em>: wilson</li>
 </ul>
 <p><strong>Output</strong></p>
 <table class="table caption-top">
@@ -2909,7 +2909,7 @@ Output:
 <li>
 <em>Direction upper</em>: FALSE</li>
 <li>
-<em>Interval method</em>: qtd1</li>
+<em>Interval method</em>: wilson</li>
 </ul>
 <p><strong>Number of subjects (control = 75, treatment = 75)</strong></p>
 <table class="table caption-top" style="width:100%;">
@@ -3181,7 +3181,7 @@ $`3`
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><code>"qtd1"</code></td>
+<td style="text-align: left;"><code>"wilson"</code></td>
 <td style="text-align: left;">Original QTD1 approximation using Wilson score limits rounded to four decimal places in its variance construction</td>
 </tr>
 <tr class="even">
@@ -3203,7 +3203,7 @@ $`3`
 <p>This comparison uses additional illustrative sample sizes of 25 per group to keep calculation of all four maps economical.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb51"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">intervalMethods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"qtd1"</span>, <span class="st">"farringtonManning"</span>, <span class="st">"miettinenNurminen"</span>, <span class="st">"newcombe"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">intervalMethods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wilson"</span>, <span class="st">"farringtonManning"</span>, <span class="st">"miettinenNurminen"</span>, <span class="st">"newcombe"</span><span class="op">)</span></span>
 <span><span class="va">methodPlots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">intervalMethods</span>, <span class="kw">function</span><span class="op">(</span><span class="va">method</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">binaryRule</span>, type <span class="op">=</span> <span class="fl">3</span>, numberOfSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>,</span>
 <span>        directionUpper <span class="op">=</span> <span class="cn">FALSE</span>, intervalMethod <span class="op">=</span> <span class="va">method</span>, plotCat <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span>

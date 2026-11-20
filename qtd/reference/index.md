@@ -6,7 +6,7 @@
   : Trial Comparison
 - [`add()`](https://docs.rpact.org/qtd/reference/add.md) : Add Objects
   to a Collection
-- [`as.data.frame(`*`<OperatingCharcteristics>`*`)`](https://docs.rpact.org/qtd/reference/as.data.frame.OperatingCharcteristics.md)
+- [`as.data.frame(`*`<OperatingCharacteristics>`*`)`](https://docs.rpact.org/qtd/reference/as.data.frame.OperatingCharcteristics.md)
   : Extract Quantitative Decision Probability Tables
 - [`as.data.frame(`*`<PiecewiseSurvivalTimeMultiGroup>`*`)`](https://docs.rpact.org/qtd/reference/as.data.frame.PiecewiseSurvivalTimeMultiGroup.md)
   : Coerce a Multi-Group Piecewise Survival Specification to a Data
@@ -180,7 +180,7 @@
   : Event Probabilities Plotting
 - [`plot(`*`<NumberOfSubjects>`*`)`](https://docs.rpact.org/qtd/reference/plot.NumberOfSubjects.md)
   : Number Of Subjects Plotting
-- [`plot(`*`<OperatingCharcteristics>`*`)`](https://docs.rpact.org/qtd/reference/plot.OperatingCharcteristics.md)
+- [`plot(`*`<OperatingCharacteristics>`*`)`](https://docs.rpact.org/qtd/reference/plot.OperatingCharcteristics.md)
   : Plot Quantitative Operating Characteristics
 - [`plot(`*`<ParameterSet>`*`)`](https://docs.rpact.org/qtd/reference/plot.ParameterSet.md)
   : Parameter Set Plotting

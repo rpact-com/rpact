@@ -64,7 +64,7 @@ summary(rates)
 #>   Treatment groups: 2
 #>   Assumed control rate: 0.1500
 #>   Direction upper: FALSE
-#>   Interval method: qtd1
+#>   Interval method: wilson
 #> 
 #> Number of subjects (control = 75, treatment = 75)
 #> 
@@ -120,7 +120,7 @@ cat(print(summary(rates), markdown = TRUE)[1], "\n")
 #> *Default parameters*
 #> 
 #> * *Treatment groups*: 2 
-#> * *Interval method*: qtd1 
+#> * *Interval method*: wilson 
 #> 
 #> *Output*
 #> 
@@ -204,7 +204,7 @@ cat(print(summary(rates), markdown = TRUE)[1], "\n")
 #> * *Treatment groups*: 2
 #> * *Assumed control rate*: 0.1500
 #> * *Direction upper*: FALSE
-#> * *Interval method*: qtd1
+#> * *Interval method*: wilson
 #> 
 #> *Number of subjects (control = 75, treatment = 75)*
 #> 

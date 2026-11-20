@@ -65,7 +65,7 @@ Returns the result description.
 ## Details
 
 Inherits sample sizes, probabilities, priors and controlMean from
-OperatingCharcteristics. The rates priors priorDist1 and priorDist2
+OperatingCharacteristics. The rates priors priorDist1 and priorDist2
 remain NULL.
 
 ## Fields

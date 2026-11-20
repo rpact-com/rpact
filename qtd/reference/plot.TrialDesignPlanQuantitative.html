@@ -58,7 +58,7 @@ event-count decision map for a quantitative decision rule.</p>
 <span>  standardErrorRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gridSize <span class="op">=</span> <span class="fl">200L</span>,</span>
 <span>  numberOfSubjects <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  intervalMethod <span class="op">=</span> <span class="st">"qtd1"</span>,</span>
+<span>  intervalMethod <span class="op">=</span> <span class="st">"wilson"</span>,</span>
 <span>  directionUpper <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  controlRate <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  treatmentRate <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -115,7 +115,7 @@ displayed ranges for type 2. Defaults are derived from the reference values.</p>
 
 
 <dt id="arg-intervalmethod">intervalMethod<a class="anchor" aria-label="anchor" href="#arg-intervalmethod"></a></dt>
-<dd><p>For type 3, "qtd1" (default), "farringtonManning",
+<dd><p>For type 3, "wilson" (default), "farringtonManning",
 "miettinenNurminen", or "newcombe". See Details for the method definitions.</p></dd>
 
 
@@ -167,7 +167,7 @@ a vertical reference line in type 3.</p></dd>
     <p>Intervals use <code>estimate + qnorm(percentile) * standardError</code>; the displayed
 percentiles do not imply a symmetric two-sided confidence interval. Type 2
 plots observed estimates against standard errors, not true effects.</p>
-<p>With <code>intervalMethod = "qtd1"</code>, type 3 reproduces the QTD1 construction with limits
+<p>With <code>intervalMethod = "wilson"</code>, type 3 reproduces the QTD1 construction with limits
 rounded to four decimal places. Score limits supply the variance terms of
 the lower and upper risk-difference limits. Boundary equality follows QTD1:
 lower limits equal to LRV or TV satisfy the corresponding lower criterion;
