@@ -142,20 +142,21 @@ FieldSet <- R6::R6Class("FieldSet",
                     }
 
                     if (heading > 0) {
+                        headingText <- sub(":$", "", trimws(line))
                         if (headingBaseNumber %in% c(-1, -2)) {
                             lineBreak <- ""
                             if (grepl("\n *$", line)) {
                                 lineBreak <- "\n\n"
                             }
                             fontStyle <- ifelse(headingBaseNumber == -1, "**", "*")
-                            line <- paste0(fontStyle, sub(": *", "", trimws(line)), fontStyle, lineBreak)
+                            line <- paste0(fontStyle, headingText, fontStyle, lineBreak)
                         } else {
                             headingCmd <- paste0(rep("#", heading + headingBaseNumber + 1), collapse = "")
                             lineBreak <- ""
                             if (grepl("\n *$", line)) {
                                 lineBreak <- "\n\n"
                             }
-                            line <- paste0(headingCmd, " ", sub(": *", "", trimws(line)), lineBreak)
+                            line <- paste0(headingCmd, " ", headingText, lineBreak)
                         }
                     } else {
                         parts <- strsplit(line, " *: ")[[1]]

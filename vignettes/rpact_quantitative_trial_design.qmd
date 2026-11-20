@@ -818,9 +818,10 @@ summary(meansScenarios, digits = 4)
 We can further control the result, using the `output` and `digits` arguments of the `summary()` function.
 `output` selects `"all"` (default), `"title"`, `"overview"`, or `"body"`. The operating characteristics
 overview contains the rule and assumptions; its body contains the tables. For a
-decision rule, the body contains its four parameters. `digits` controls display
-precision, following the summary settings `rpact.summary.digits` and
-`rpact.summary.digits.probs`, without changing stored probabilities.
+decision rule, the body contains its detailed tables. For example, `digits = 4`
+sets four decimal places for both effects and probabilities in the summary
+tables. When `digits` is omitted, precision follows `rpact.summary.digits` and
+`rpact.summary.digits.probs`.
 
 ```{r}
 #| label: summary-parts

@@ -47,7 +47,8 @@ NULL
 #' output parts are `"title"`, `"overview"`, `"body"` and `"all"`. For a decision
 #' rule, the body contains its tables. For operating characteristics, the
 #' overview contains the rule and assumptions, and the body contains the tables.
-#' Summary precision follows `rpact.summary.digits` and
+#' An explicit `digits` sets the precision for both general values and
+#' probabilities. Otherwise, precision follows `rpact.summary.digits` and
 #' `rpact.summary.digits.probs`. The summary keeps a copy of the supplied object,
 #' so later changes to the original do not change an existing summary.
 #'
@@ -103,7 +104,7 @@ NULL
 #' @noRd
 #'
 .createSummaryQuantitative <- function(object, digits, output, markdown = FALSE) {
-    digitSettings <- .getSummaryDigits(digits)
+    digitSettings <- .getSummaryDigits(digits, useExplicitDigitsForProbabilities = TRUE)
     result <- SummaryFactory$new(
         object = object$clone(deep = TRUE), output = output, markdown = markdown
     )
@@ -457,7 +458,7 @@ NULL
     object <- summaryFactory$object
     digitSettings <- attr(summaryFactory, "qtdSummaryDigits")
     if (!is.na(digits)) {
-        digitSettings <- .getSummaryDigits(digits)
+        digitSettings <- .getSummaryDigits(digits, useExplicitDigitsForProbabilities = TRUE)
     }
     operatingCharacteristics <- .isQtdOperatingCharacteristics(object)
     ruleParameters <- c("targetValue", "lowerReferenceValue", "upperPercentile", "lowerPercentile")
@@ -506,9 +507,9 @@ NULL
     }
 
     for (scenario in seq_len(nrow(object$numberOfSubjects))) {
-        sampleSizes <- .formatSampleSizes(object$numberOfSubjects[scenario, ])
-        summaryFactory$.cat("Number of subjects (control = ", sampleSizes[1L],
-            ", treatment = ", sampleSizes[2L], ")\n\n",
+        sampleSizes <- .formatSampleSizes(unname(object$numberOfSubjects[scenario, ]))
+        summaryFactory$.cat("control: ", sampleSizes[1L],
+            ", treatment: ", sampleSizes[2L], "\n\n",
             heading = 2, consoleOutputEnabled = consoleOutputEnabled
         )
         table <- .getQuantitativeSummaryTable(object, scenario, digitSettings)

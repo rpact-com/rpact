@@ -455,7 +455,23 @@ print.SummaryFactory <- function(
     return(paste0(a, b))
 }
 
-.getSummaryDigits <- function(digits = NA_integer_) {
+#'
+#' @title
+#' Resolve Summary Precision
+#'
+#' @description
+#' Resolves decimal precision for numerical values in summaries.
+#'
+#' @param digits Requested precision, or `NA_integer_` to use the summary settings.
+#' @param useExplicitDigitsForProbabilities Whether a supplied precision also
+#'   takes precedence over the probability settings.
+#'
+#' @return A list of precision settings for general values, probabilities, sample sizes, and times.
+#'
+#' @noRd
+#'
+.getSummaryDigits <- function(digits = NA_integer_, useExplicitDigitsForProbabilities = FALSE) {
+    explicitProbabilityDigits <- useExplicitDigitsForProbabilities && !is.na(digits)
     if (is.na(digits)) {
         digits <- .getEnvironmentVariable(
             "RPACT_SUMMARY_DIGITS",
@@ -469,8 +485,8 @@ print.SummaryFactory <- function(
 
     digitsSampleSize <- 1
     digitsTime <- 2
-    if (digits > 0) {
-        digitsGeneral <- digits
+    digitsGeneral <- digits
+    if (digits > 0 && !explicitProbabilityDigits) {
         digitsProbabilities <- NA_integer_
         tryCatch(
             {
@@ -492,9 +508,10 @@ print.SummaryFactory <- function(
         .assertIsInClosedInterval(digitsProbabilities, "digitsProbabilities",
             lower = -1, upper = 12, naAllowed = FALSE
         )
+    } else if (digits > 0) {
+        digitsProbabilities <- digits
     } else {
         digitsSampleSize <- digits
-        digitsGeneral <- digits
         digitsProbabilities <- digits
         digitsTime <- digits
     }

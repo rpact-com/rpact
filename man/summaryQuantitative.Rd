@@ -27,7 +27,8 @@ The \code{digits} and \code{output} arguments follow \code{\link[=summary.Parame
 output parts are \code{"title"}, \code{"overview"}, \code{"body"} and \code{"all"}. For a decision
 rule, the body contains its tables. For operating characteristics, the
 overview contains the rule and assumptions, and the body contains the tables.
-Summary precision follows \code{rpact.summary.digits} and
+An explicit \code{digits} sets the precision for both general values and
+probabilities. Otherwise, precision follows \code{rpact.summary.digits} and
 \code{rpact.summary.digits.probs}. The summary keeps a copy of the supplied object,
 so later changes to the original do not change an existing summary.
 
