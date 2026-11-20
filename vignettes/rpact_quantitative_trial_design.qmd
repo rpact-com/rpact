@@ -40,6 +40,10 @@ categories:
 notes: Friedrich Pahlke and Daniel Sabanés Bové
 ---
 
+[`rpact`]: https://www.rpact.org/
+[`ggplot2`]: https://ggplot2.tidyverse.org/
+[`RBesT`]: https://opensource.nibr.com/RBesT/
+
 ```{r}
 #| label: setup
 #| include: false
@@ -59,7 +63,7 @@ reach a target difference? Quantitative trial decisions (QTD) makes these
 requirements explicit and calculates the probabilities of the resulting
 decisions under specified trial assumptions.
 
-This vignette demonstrates the QTD functions in [rpact](https://www.rpact.org)
+This vignette demonstrates the QTD functions in [`rpact`]
 for two independent groups with **continuous endpoints (Means)** and **binary
 endpoints (Rates)**. We define a decision rule, inspect its output,
 calculate operating characteristics, and illustrate every available plot type,
@@ -96,7 +100,7 @@ Comparisons between the confidence limits $L$ and $U$ and the reference values L
 
 ## Reference values and percentiles
 
-Here is an overview of the `rpact` arguments for defining a quantitative decision rule:
+Here is an overview of the [`rpact`] arguments for defining a quantitative decision rule:
 
 | Argument | Interpretation | Default |
 |:--|:--|:--|
@@ -158,7 +162,7 @@ as shown above. This matters for discrete data. "Fixed" identifies the extreme
 decision categories. How a team acts on the middle categories can also depend on
 the competitive situation and other evidence.
 
-Internal `rpact` calculations retain the six decision categories. For visualization,  `plotCat = 3` sums up the two Go, the two Indeterminate, and the two Stop probabilities each for display; `plotCat = 6` shows them separately. Rule plots default to six categories and operating characteristics plots default to three.
+Internal [`rpact`] calculations retain the six decision categories. For visualization,  `plotCat = 3` sums up the two Go, the two Indeterminate, and the two Stop probabilities each for display; `plotCat = 6` shows them separately. Rule plots default to six categories and operating characteristics plots default to three.
 
 # The Kestrel Binary-Endpoint Example
 
@@ -175,7 +179,7 @@ The endpoint is composite efficacy failure, so lower event probabilities are
 beneficial. The example addresses efficacy only; safety and the overall
 benefit-risk assessment are separate considerations. 
 
-| Quantity | Value | rpact argument |
+| Quantity | Value | [`rpact`] argument |
 |:--|:--|:--|
 | Minimum acceptable difference | −5 percentage points | `lowerReferenceValue = -0.05` |
 | Target difference | 0 percentage points | `targetValue = 0` |
@@ -443,7 +447,7 @@ The result has class `TrialDesignPlanQuantitativeBayes`.
 `getOperatingCharacteristicsMeans()` and `getOperatingCharacteristicsRates()`
 select the Bayesian calculation from this class.
 
-These calculations additionally require the `RBesT` package. Install it once if you haven't yet:
+These calculations additionally require the [`RBesT`] package. Install it once if you haven't yet:
 
 ```{r}
 #| label: install-rbest
@@ -581,7 +585,7 @@ summary(bayesGroupOC, digits = 4)
 ```
 
 These single-component normal priors permit analytic conjugate calculations.
-Normal mixture priors with several components are also supported; those operating characteristics use numerical `RBesT` boundary searches and integration.
+Normal mixture priors with several components are also supported; those operating characteristics use numerical [`RBesT`] boundary searches and integration.
 
 ## Rates with beta priors
 
@@ -1221,14 +1225,14 @@ head(ratesPerformance$data[c("desiredDecision", "observedDecision", "probability
 
 All QTD plots accept `main`, `xlab`, `ylab`, `palette`, `legendPosition`,
 `plotSettings`, and `showSource`. With `palette = NULL`, decision categories use
-semantic colors and sample-size curves use the rpact hue palette. Sensitivity
+semantic colors and sample-size curves use the [`rpact`] hue palette. Sensitivity
 and performance use a continuous probability scale. The default legend position
 is `"auto"`; standard positions such as `"bottom"` and `"none"` are also
 supported.
 
 ```{r}
 #| label: plot-settings
-#| fig-cap: "Kestrel OC curves customized with the shared rpact plot settings."
+#| fig-cap: "Kestrel OC curves customized with the shared [`rpact`] plot settings."
 kestrelPlot <- plot(
     ratesOC,
     type = 1,
@@ -1250,7 +1254,7 @@ kestrelPlot <- plot(
 kestrelPlot
 ```
 
-Results are ggplot objects supporting additional ggplot2 layers and themes.
+Results are ggplot objects supporting additional [`ggplot2`] layers and themes.
 `data` contains the unrounded plot data. `showSource = TRUE` also prints them; a
 compact scenario object keeps this output manageable.
 
@@ -1293,4 +1297,4 @@ writeLines(as.character(print(summary(ratesScenarios), markdown = TRUE)), "kestr
 - Spiegelhalter, D. J., Abrams, K. R., and Myles, J. P. (2004). *Bayesian
   Approaches to Clinical Trials and Health-Care Evaluation*. Wiley, Section 6.3.
   Background reading on Bayesian decision making. The Bayesian examples above
-  use posterior probability criteria implemented with RBesT.
+  use posterior probability criteria implemented with [`RBesT`].
