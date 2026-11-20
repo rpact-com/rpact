@@ -22,7 +22,11 @@ project:
   execute-dir: project
 license: CC BY-SA
 affiliation: RPACT
-format: html
+format:
+    html:
+        toc: true
+        toc-depth: 3
+        embed-resources: true
 image: /photos/by_friedrich_pahlke_25.jpg
 vignette: >
   %\VignetteIndexEntry{Quantitative Trial Decisions for Means and Rates with rpact}
@@ -83,7 +87,7 @@ rpact](https://github.com/rpact-com/rpact/tree/dev/qtd) providing
 together with Bayesian class dispatch and their print, summary, and plot
 methods.
 
-## How to install the QTD development version
+Please use this command to install the QTD development version from the respective GitHub branch:
 
 ```{r}
 #| label: install-dev
@@ -188,7 +192,7 @@ benefit-risk assessment are separate considerations.
 | Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` |
 | Sample sizes, control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
 | Beneficial direction | Lower treatment rate | `directionUpper = FALSE` |
-| Interval construction | Frequentist | `intervalMethod = "wilson"` |
+| Interval construction | Frequentist with Wilson score confidence interval | `intervalMethod = "wilson"` |
 
 We evaluate treatment event probabilities from 0.10 to 0.25 in steps of 0.01
 for both sample-size scenarios. Rates and reference differences are entered as
@@ -1267,7 +1271,7 @@ compact scenario object keeps this output manageable.
 
 ```{r}
 #| label: show-plot-source
-sourcePlot <- plot(ratesScenarios, type = 4, showSource = TRUE)
+sourcePlot <- plot(ratesScenarios, type = 4)
 head(sourcePlot$data)
 ```
 
