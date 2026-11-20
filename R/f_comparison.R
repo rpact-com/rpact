@@ -17,6 +17,200 @@
 ## |  Contact: info@rpact.com
 ## |
 
+.comparisonConversionConflict <- function(parameter, value, strict, constraint, context = list(),
+        diagnosticId = "comparison.conversion_conflict", functionName = "as.data.frame.TrialComparison",
+        relatedParameter = NULL, relatedValue = NULL) {
+    arguments <- list(
+        paste0("Cannot align comparison parameter '", parameter, "': ", constraint,
+            ". Use strict = FALSE to retain the complete values as character."),
+        functionName = functionName, parameter = parameter, value = value,
+        relatedParameter = relatedParameter, relatedValue = relatedValue,
+        constraint = constraint, diagnosticId = diagnosticId, context = context
+    )
+    if (strict) {
+        do.call(stopIllegalDataInput, arguments)
+    } else {
+        arguments[[1L]] <- paste0("Cannot align comparison parameter '", parameter, "': ", constraint,
+            ". Retaining the complete values as character (use strict = TRUE to fail).")
+        do.call(warnDataIssue, arguments)
+    }
+}
+
+.comparisonCompleteText <- function(value) {
+    return(paste(capture.output(dput(value, control = "all")), collapse = " "))
+}
+
+.comparisonRowCoordinates <- function(data) {
+    stage <- intersect(c("stages", "stage"), names(data))
+    stages <- if (length(stage)) {
+        data[[stage[1L]]]
+    } else {
+        rep(1L, nrow(data))
+    }
+    situations <- if ("situation" %in% names(data)) {
+        data$situation
+    } else {
+        as.integer(ave(seq_len(nrow(data)), stages, FUN = seq_along))
+    }
+    return(paste(stages, situations, sep = ":"))
+}
+
+.getComparisonSourceData <- function(object, includeAllParameters, strict) {
+    arguments <- list(object, niceColumnNamesEnabled = FALSE, includeAllParameters = includeAllParameters)
+    if (inherits(object, c("TrialDesign", "TrialDesignCharacteristics", "TrialDesignPlan",
+            "SimulationResults", "PowerAndAverageSampleNumberResult"))) {
+        arguments$strict <- strict
+    }
+    return(do.call(as.data.frame, arguments))
+}
+
+# Expand independent component domains separately, never as a Cartesian product.
+# The original scenario coordinate is retained when a row has several components.
+.comparisonComponentDomain <- function(parameter, columns) {
+    if (parameter %in% c("accrualTime", "accrualIntensity", "accrualIntensityRelative") &&
+            any(c("accrualTime", "accrual") %in% columns)) {
+        return("accrual")
+    }
+    if (parameter %in% c("piecewiseSurvivalTime", "lambda1", "lambda2", "median1", "median2", "hazardRatio") &&
+            any(c("piecewiseSurvivalTime", "survival") %in% columns)) {
+        return("survival")
+    }
+    if (startsWith(parameter, "observedData_") || parameter == "observedData") {
+        return("observedData")
+    }
+    return(parameter)
+}
+
+.expandDataFrameComponents <- function(data, strict = FALSE) {
+    columns <- names(data)[vapply(data, is.list, logical(1))]
+    if (!length(columns) || !nrow(data)) {
+        return(data)
+    }
+    for (parameter in columns) {
+        cells <- data[[parameter]]
+        atomicCells <- vapply(cells, function(value) {
+            return(is.atomic(value) && !is.object(value))
+        }, logical(1))
+        numericCells <- vapply(cells, function(value) {
+            return(is.numeric(value) || is.logical(value) || !length(value))
+        }, logical(1))
+        definedCells <- cells[!vapply(cells, function(value) {
+            return(!length(value) || (is.logical(value) && all(is.na(value))))
+        }, logical(1))]
+        types <- unique(vapply(definedCells, typeof, character(1)))
+        if (!all(atomicCells) || (!all(numericCells) && length(types) > 1L)) {
+            .comparisonConversionConflict(parameter, cells, strict,
+                "component cells must have compatible atomic types", functionName = ".expandDataFrameComponents")
+            data[[parameter]] <- vapply(cells, .comparisonCompleteText, character(1))
+        }
+    }
+    columns <- names(data)[vapply(data, is.list, logical(1))]
+    if (!length(columns)) {
+        return(data)
+    }
+    reserved <- c("component", "componentIndex",
+        grep("^componentDimension[0-9]+$", names(data), value = TRUE))
+    if (any(reserved %in% names(data))) {
+        for (parameter in columns) {
+            .comparisonConversionConflict(parameter, data[[parameter]], strict,
+                "component coordinates must not collide with existing columns", functionName = ".expandDataFrameComponents")
+            data[[parameter]] <- vapply(data[[parameter]], .comparisonCompleteText, character(1))
+        }
+        return(data)
+    }
+    if (!"situation" %in% names(data)) {
+        stage <- intersect(c("stages", "stage"), names(data))
+        data$situation <- if (length(stage)) {
+            as.integer(ave(seq_len(nrow(data)), data[[stage[1L]]], FUN = seq_along))
+        } else {
+            seq_len(nrow(data))
+        }
+    }
+    dimensionCount <- max(0L, unlist(lapply(data[columns], function(cells) {
+        return(vapply(cells, function(value) {
+            return(length(dim(value)))
+        }, integer(1)))
+    })))
+    dimensionNames <- if (dimensionCount > 0L) {
+        paste0("componentDimension", seq_len(dimensionCount))
+    } else {
+        character()
+    }
+    domains <- vapply(columns, .comparisonComponentDomain, character(1), columns = columns)
+    for (domain in unique(domains)) {
+        members <- columns[domains == domain]
+        sizes <- lapply(data[members], lengths)
+        maximum <- Reduce(pmax, sizes)
+        for (parameter in members) {
+            allowed <- sizes[[parameter]] == maximum | sizes[[parameter]] == 0L
+            if (domain %in% c("accrual", "survival")) {
+                timeParameter <- if (domain == "accrual") {
+                    "accrualTime"
+                } else {
+                    "piecewiseSurvivalTime"
+                }
+                if (timeParameter %in% members && parameter != timeParameter) {
+                    allowed <- allowed | (sizes[[timeParameter]] == maximum & sizes[[parameter]] == maximum - 1L)
+                }
+            }
+            if (!all(allowed)) {
+                .comparisonConversionConflict(parameter, data[[parameter]], strict,
+                    "values in one component domain must have matching indices",
+                    functionName = ".expandDataFrameComponents",
+                    context = list(domain = domain, componentLengths = sizes))
+                data[[parameter]] <- vapply(data[[parameter]], .comparisonCompleteText, character(1))
+            }
+        }
+    }
+    columns <- names(data)[vapply(data, is.list, logical(1))]
+    if (!length(columns)) {
+        return(data)
+    }
+    domains <- vapply(columns, .comparisonComponentDomain, character(1), columns = columns)
+    blocks <- list()
+    for (domain in unique(domains)) {
+        members <- columns[domains == domain]
+        sizes <- pmax(1L, Reduce(pmax, lapply(data[members], lengths)))
+        indices <- rep(seq_len(nrow(data)), sizes)
+        block <- data[indices, setdiff(names(data), columns), drop = FALSE]
+        block$component <- domain
+        block$componentIndex <- sequence(sizes)
+        for (name in columns) {
+            prototype <- unlist(data[[name]], use.names = FALSE)
+            if (is.null(prototype)) {
+                prototype <- logical()
+            }
+            block[[name]] <- prototype[rep(NA_integer_, length(indices))]
+        }
+        for (name in dimensionNames) {
+            block[[name]] <- NA_integer_
+        }
+        for (parameter in members) {
+            cells <- data[[parameter]]
+            block[[parameter]] <- unlist(lapply(seq_along(cells), function(i) {
+                value <- as.vector(cells[[i]])
+                if (!length(value)) {
+                    return(rep(NA, sizes[i]))
+                }
+                return(value[seq_len(sizes[i])])
+            }), use.names = FALSE)
+            offset <- 0L
+            for (i in seq_along(cells)) {
+                dimensions <- dim(cells[[i]])
+                if (length(dimensions) && length(cells[[i]])) {
+                    coordinates <- arrayInd(seq_along(cells[[i]]), dimensions)
+                    block[offset + seq_along(cells[[i]]), dimensionNames[seq_along(dimensions)]] <- coordinates
+                }
+                offset <- offset + sizes[i]
+            }
+        }
+        blocks[[domain]] <- block
+    }
+    result <- do.call(rbind, blocks)
+    rownames(result) <- NULL
+    return(result)
+}
+
 .getComparisonColumnMapping <- function(object, hasInterimAnalyses = FALSE) {
     mapping <- c(sampleSizes = "numberOfSubjects")
     design <- if (.isComparisonObject(object)) {
@@ -149,11 +343,13 @@
         ...,
         niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE,
-        harmonizeColumnNames = TRUE) {
+        harmonizeColumnNames = TRUE,
+        strict = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".getComparisonData", ...)
     .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
     .assertIsSingleLogical(includeAllParameters, "includeAllParameters")
     .assertIsSingleLogical(harmonizeColumnNames, "harmonizeColumnNames")
+    .assertIsSingleLogical(strict, "strict")
     if (!is.list(objects) || is.data.frame(objects) || length(objects) == 0) {
         stopIllegalArgument("'objects' must be a non-empty list of supported rpact comparison objects",
             functionName = ".getComparisonData", parameter = "objects", value = objects,
@@ -188,11 +384,9 @@
                 context = list(objectPosition = i, objectClass = class(obj))
             )
         }
-        .validateComparisonSurvivalDropoutDimensions(obj, includeAllParameters)
-        df <- .getComparisonAdapterData(obj, includeAllParameters = includeAllParameters)
+        df <- .getComparisonAdapterData(obj, includeAllParameters = includeAllParameters, strict = strict)
         if (is.null(df)) {
-            df <- as.data.frame(obj, niceColumnNamesEnabled = FALSE,
-                includeAllParameters = includeAllParameters)
+            df <- .getComparisonSourceData(obj, includeAllParameters, strict)
         }
         if (inherits(obj, "PowerAndAverageSampleNumberResult")) {
             # nMax is an essential input even when the compact source export omits it.
@@ -204,9 +398,21 @@
         mappedColumns <- unique(c(requiredColumns, names(mappings[[i]])))
         missingColumns <- setdiff(intersect(mappedColumns, names(obj)), names(df))
         if (length(missingColumns) && is.null(.getComparisonAdapter(obj))) {
-            fullData <- as.data.frame(obj, niceColumnNamesEnabled = FALSE, includeAllParameters = TRUE)
+            fullData <- .getComparisonSourceData(obj, TRUE, strict)
             missingColumns <- intersect(missingColumns, names(fullData))
-            df[missingColumns] <- fullData[missingColumns]
+            indices <- match(.comparisonRowCoordinates(df), .comparisonRowCoordinates(fullData))
+            if (anyNA(indices)) {
+                .comparisonConversionConflict("objects", obj, strict,
+                    "compact and full exports must share stage and situation coordinates",
+                    diagnosticId = "comparison.source_rows_unmatched",
+                    context = list(objectPosition = i, columns = missingColumns,
+                        unmatchedRows = which(is.na(indices))))
+                for (parameter in missingColumns) {
+                    df[[parameter]] <- rep(.comparisonCompleteText(fullData[[parameter]]), nrow(df))
+                }
+            } else {
+                df[missingColumns] <- fullData[indices, missingColumns, drop = FALSE]
+            }
         }
         df <- .harmonizeComparisonColumns(df, mappings[[i]])
         design <- .getComparisonDesign(obj)
@@ -220,10 +426,7 @@
             }
         }
         if (!inherits(obj, c("TrialDesign", "PerformanceScore")) && inherits(design, "TrialDesign")) {
-            designData <- as.data.frame(design,
-                niceColumnNamesEnabled = FALSE,
-                includeAllParameters = includeAllParameters
-            )
+            designData <- .getComparisonSourceData(design, includeAllParameters, strict)
             missing <- setdiff(names(designData), names(df))
             stageColumn <- intersect(c("stages", "stage"), names(df))
             if ("stage" %in% stageColumn) {
@@ -234,24 +437,29 @@
             } else if (length(stageColumn) && "stages" %in% names(designData)) {
                 indices <- match(df[[stageColumn[1L]]], designData$stages)
                 if (anyNA(indices)) {
-                    stopIllegalDataInput("Cannot match analysis stages of object ", i,
-                        functionName = ".getComparisonData", parameter = stageColumn[1L], value = df[[stageColumn[1L]]],
+                    .comparisonConversionConflict(stageColumn[1L], df[[stageColumn[1L]]], strict,
+                        "each result stage must match an associated design stage",
                         relatedParameter = "design$stages", relatedValue = designData$stages,
-                        constraint = "each result stage must match an associated design stage",
                         diagnosticId = "comparison.stages_unmatched",
-                        context = list(objectPosition = i, unmatchedStages = df[[stageColumn[1L]]][is.na(indices)])
-                    )
+                        context = list(objectPosition = i, designStages = designData$stages,
+                            unmatchedStages = df[[stageColumn[1L]]][is.na(indices)]))
+                    indices <- NULL
                 }
             } else {
-                stopIllegalDataInput("Cannot match the associated design to the rows of object ", i,
-                    functionName = ".getComparisonData", parameter = "objects", value = obj,
-                    constraint = "a multi-row associated design requires stages in both data frames",
+                .comparisonConversionConflict("objects", obj, strict,
+                    "a multi-row associated design requires stages in both data frames",
                     diagnosticId = "comparison.design_rows_unmatched",
                     context = list(objectPosition = i, resultColumns = names(df),
-                        designColumns = names(designData), designRows = nrow(designData))
-                )
+                        designColumns = names(designData), designRows = nrow(designData)))
+                indices <- NULL
             }
-            df[missing] <- designData[indices, missing, drop = FALSE]
+            if (is.null(indices)) {
+                for (parameter in missing) {
+                    df[[parameter]] <- rep(.comparisonCompleteText(designData[[parameter]]), nrow(df))
+                }
+            } else {
+                df[missing] <- designData[indices, missing, drop = FALSE]
+            }
         }
         className <- class(obj)[1L]
         isDesign <- inherits(obj, c("TrialDesign", "TrialDesignCharacteristics"))
@@ -304,12 +512,18 @@
             info$objectName <- rep(label, nrow(df))
         }
         stageColumn <- intersect(c("stages", "stage"), names(df))
-        info$situation <- if (length(stageColumn)) {
+        info$situation <- if ("situation" %in% names(df)) {
+            df$situation
+        } else if (length(stageColumn)) {
             as.integer(ave(seq_len(nrow(df)), df[[stageColumn[1L]]], FUN = seq_along))
         } else {
             seq_len(nrow(df))
         }
-        return(.expandComparisonSurvivalCategories(obj, cbind(info, df, row.names = NULL), includeAllParameters))
+        df$situation <- NULL
+        return(.expandDataFrameComponents(
+            .expandComparisonSurvivalCategories(obj, cbind(info, df, row.names = NULL),
+                includeAllParameters, strict = strict),
+            strict = strict))
     })
     columnNames <- unique(unlist(lapply(frames, names), use.names = FALSE))
     frames <- lapply(frames, function(df) {
@@ -320,14 +534,31 @@
     })
     for (name in columnNames) {
         columns <- lapply(frames, `[[`, name)
-        numericCompatible <- all(vapply(columns, 
-            function(x) is.numeric(x) || is.logical(x), logical(1)))
-        sameType <- length(unique(vapply(columns, 
-            function(x) paste(class(x), collapse = "/"), character(1)))) == 1L
+        defined <- columns[!vapply(columns, function(column) {
+            return(is.logical(column) && all(is.na(column)))
+        }, logical(1))]
+        numericCompatible <- all(vapply(columns, function(x) {
+            return(is.numeric(x) || is.logical(x))
+        }, logical(1)))
+        sameType <- length(unique(vapply(defined, function(x) {
+            return(paste(class(x), collapse = "/"))
+        }, character(1)))) <= 1L
         if (!numericCompatible && !sameType) {
+            .comparisonConversionConflict(name, columns, strict,
+                "columns from different objects must have compatible types",
+                context = list(objectPositions = seq_along(frames)))
             frames <- lapply(frames, function(df) {
-                df[[name]] <- as.character(df[[name]])
-                df
+                values <- df[[name]]
+                df[[name]] <- vapply(seq_along(values), function(i) {
+                    if (is.na(values[i]) && !is.nan(values[i])) {
+                        return(NA_character_)
+                    }
+                    if (is.character(values)) {
+                        return(values[i])
+                    }
+                    return(.comparisonCompleteText(values[i]))
+                }, character(1))
+                return(df)
             })
         }
     }

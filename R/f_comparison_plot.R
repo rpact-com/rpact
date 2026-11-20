@@ -81,10 +81,10 @@
     return(unique(present))
 }
 
-.canConnectComparisonObjects <- function(data, objects, xAxis) {
+.canConnectComparisonObjects <- function(data, objects, xAxis, xAxisExplicit = FALSE) {
     if (length(objects) < 2L || is.null(xAxis) ||
             !"objectNumber" %in% names(data) || !is.numeric(data[[xAxis]]) ||
-            .comparisonRole(objects, xAxis) != "Inputs and design settings") {
+            (!xAxisExplicit && .comparisonRole(objects, xAxis) != "Inputs and design settings")) {
         return(FALSE)
     }
     
@@ -92,6 +92,15 @@
     if (anyNA(data$objectNumber) || anyDuplicated(data$objectNumber) ||
             any(!is.finite(data[[xAxis]])) || anyDuplicated(data[[xAxis]])) {
         return(FALSE)
+    }
+    scope <- intersect(.comparisonScope, names(data))
+    if (any(vapply(data[scope], function(values) {
+        return(anyNA(values) || length(unique(values)) != 1L)
+    }, logical(1)))) {
+        return(FALSE)
+    }
+    if (xAxisExplicit) {
+        return(TRUE)
     }
     
     varying <- getComparisonParameterNames(data,
@@ -396,6 +405,10 @@
 #' when only that input varies and the object scope is shared. Automatic object
 #' categories are omitted in this case and `connectAcrossObjects` is TRUE.
 #' Explicit categories or groups retain their separate curves.
+#' With an explicitly selected x axis, other inputs may also vary, provided
+#' each object contributes one distinct finite x value and the object scope
+#' (object type, endpoint and calculation target) is shared. These lines connect
+#' planning situations rather than representing variation of only one input.
 #'
 #' Axis-selection messages use a short problem statement, separate candidate
 #' lists with names and captions, and one example using eligible axes. Text wraps
@@ -444,6 +457,7 @@ getComparisonPlotParameters <- function(
         objects = NULL,
         yAxisSide = "auto") {
     xAxis <- .comparisonPlotColumnArgument(substitute(xAxis), parent.frame())
+    xAxisExplicit <- !is.null(xAxis)
     yAxis <- .comparisonPlotColumnArgument(substitute(yAxis), parent.frame())
     category <- .comparisonPlotColumnArgument(substitute(category), parent.frame())
     group <- .comparisonPlotColumnArgument(substitute(group), parent.frame())
@@ -603,7 +617,8 @@ getComparisonPlotParameters <- function(
     }
     available <- getComparisonParameterNames(data,
         type = "continuous",
-        exclude = c("objectNumber", "designNumber", "situation")
+        exclude = c("objectNumber", "designNumber", "situation", "componentIndex",
+            grep("^componentDimension[0-9]+$", names(data), value = TRUE))
     )
     available <- available[vapply(data[available], is.numeric, logical(1))]
     roles <- stats::setNames(rep("", length(available)), available)
@@ -627,6 +642,16 @@ getComparisonPlotParameters <- function(
         preferred <- candidates[roles[candidates] == preferredRole]
         if (length(preferred)) {
             candidates <- preferred
+        }
+        if (parameter == "xAxis" && length(candidates) > 1L && "objectNumber" %in% names(data)) {
+            withinObject <- vapply(candidates, function(name) {
+                return(any(vapply(split(data[[name]], data$objectNumber), function(values) {
+                    return(length(unique(values[!is.na(values)])) > 1L)
+                }, logical(1))))
+            }, logical(1))
+            if (any(withinObject)) {
+                candidates <- candidates[withinObject]
+            }
         }
         result$candidates[[parameter]] <- candidates
         if (!is.null(result[[parameter]]) || invalid[parameter]) {
@@ -713,7 +738,7 @@ getComparisonPlotParameters <- function(
     result$candidates$group <- setdiff(names(data), c(result$xAxis, result$yAxis))
     if (is.null(category) && !categoryDisabled && !invalid["category"] && length(categories)) {
         if (is.null(group) && !invalid["xAxis"] &&
-                .canConnectComparisonObjects(data, objects, result$xAxis)) {
+                .canConnectComparisonObjects(data, objects, result$xAxis, xAxisExplicit)) {
             result$connectAcrossObjects <- TRUE
         } else {
             result["category"] <- list(categories[[1L]])
@@ -842,7 +867,9 @@ getComparisonPlotParameters <- function(
 #' Categories and groups jointly identify lines. Without either,
 #'   objectNumber (or designNumber) identifies separate objects, except for the
 #'   single-point parameter series detected by [getComparisonPlotParameters()].
-#'   Those series connect objects that differ only in the x input. Stages are
+#'   With automatic x selection, those series connect objects that differ only
+#'   in the x input. An explicit x axis also permits other varying inputs within
+#'   the same object scope. Stages are
 #'   separated unless used as an axis. Select categories explicitly to compare
 #'   results across objects along a parameter axis.
 #'
@@ -859,7 +886,14 @@ getComparisonPlotParameters <- function(
 #' right uses one primary axis on the right. Parameters assigned to the same
 #' side always share that scale.
 #'
-#' For multiple y parameters with category/group legends, `legendPosition = "auto"`
+#' Category/group guides with only one observed level are hidden without changing
+#' the grouping of the lines. This applies to automatic and manual legend positions;
+#' unused factor levels do not count, while a displayed missing-value level does.
+#' Legends identifying multiple y parameters remain available independently.
+#' Constant categories and groups do not occupy colour or fill aesthetics, so
+#' multiple y parameters retain the colours used without a category or group.
+#'
+#' For multiple y parameters with informative category/group legends, `legendPosition = "auto"`
 #' prefers horizontal category entries below the x-axis and a separate vertical
 #' parameter legend automatically placed inside. Category entries wrap into rows
 #' according to measured guide and panel dimensions. If the parameter legend
@@ -968,6 +1002,21 @@ getComparisonPlotParameters <- function(
     yAxis <- selection$yAxis
     category <- selection$category
     group <- selection$group
+    if ("component" %in% names(data)) {
+        components <- unique(stats::na.omit(data$component))
+        selectedComponents <- intersect(components, vapply(c(xAxis, yAxis, category, group),
+            .comparisonComponentDomain, character(1), columns = components))
+        componentCoordinates <- c("component", "componentIndex",
+            grep("^componentDimension[0-9]+$", names(data), value = TRUE))
+        if (length(selectedComponents)) {
+            data <- data[is.na(data$component) | data$component %in% selectedComponents, , drop = FALSE]
+        } else {
+            componentColumns <- names(data)[vapply(names(data), function(parameter) {
+                return(.comparisonComponentDomain(parameter, components) %in% components)
+            }, logical(1))]
+            data <- unique(data[setdiff(names(data), c(componentColumns, componentCoordinates))])
+        }
+    }
     captions <- .comparisonYCaptions(yAxis, input$objects)
     sides <- selection$yAxisSide
     transformation <- selection$yAxisTransformation
@@ -983,20 +1032,25 @@ getComparisonPlotParameters <- function(
 
     categoryEnabled <- length(category) > 0L
     groupEnabled <- !is.null(group) && length(group) == 1 && !is.na(group)
-    colourParameters <- if (groupEnabled) {
-        group
-    } else {
-        category
-    }
-    if (missing(legendTitle)) {
-        legendTitle <- .comparisonLegendTitle(data, input$objects, colourParameters)
-    }
-    fillLegendTitle <- .comparisonLegendTitle(data, input$objects, category)
     categoryColumn <- category
     if (length(category) > 1L) {
         categoryColumn <- tail(make.unique(c(names(data), ".comparisonCategory")), 1L)
         data[[categoryColumn]] <- .comparisonInteraction(data, category, labelsEnabled = TRUE)
     }
+    # Constant categories still identify curves, but do not occupy colour or fill.
+    categoryEnabled <- categoryEnabled && length(unique(data[[categoryColumn]])) > 1L
+    groupEnabled <- groupEnabled && length(unique(data[[group]])) > 1L
+    colourParameters <- if (groupEnabled) {
+        group
+    } else if (categoryEnabled) {
+        category
+    } else {
+        NULL
+    }
+    if (missing(legendTitle)) {
+        legendTitle <- .comparisonLegendTitle(data, input$objects, colourParameters)
+    }
+    fillLegendTitle <- .comparisonLegendTitle(data, input$objects, category)
 
     prepared <- .comparisonPlotYData(data, yAxis, captions, sides, transformation)
     data <- prepared$data
@@ -1204,13 +1258,27 @@ getComparisonPlotParameters <- function(
         p <- p + ggplot2::scale_y_continuous(name = yLabel, position = "right")
     }
     p <- .preparePlotLegend(p)
-    categoryAesthetics <- if (groupEnabled && categoryEnabled) {
-        c("colour", "fill")
+    categoryColumns <- if (groupEnabled && categoryEnabled) {
+        c(colour = group, fill = categoryColumn)
     } else if (groupEnabled || categoryEnabled) {
-        "colour"
+        if (groupEnabled) {
+            c(colour = group)
+        } else if (mirrorModeEnabled) {
+            c(fill = categoryColumn)
+        } else {
+            c(colour = categoryColumn)
+        }
     } else {
         character()
     }
+    informative <- vapply(categoryColumns, function(column) {
+        return(length(unique(data[[column]])) > 1L)
+    }, logical(1))
+    hidden <- names(categoryColumns)[!informative]
+    if (length(hidden)) {
+        p <- p + do.call(ggplot2::guides, stats::setNames(rep(list("none"), length(hidden)), hidden))
+    }
+    categoryAesthetics <- names(categoryColumns)[informative]
     parameterAesthetics <- if (multipleY) {
         c(if (plotLineEnabled) {
             "linetype"

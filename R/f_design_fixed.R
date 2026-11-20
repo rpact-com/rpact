@@ -27,9 +27,11 @@
 #'
 #' @inheritParams param_alpha
 #' @inheritParams param_beta
+#' @inheritParams param_power
 #' @inheritParams param_sided
 #' @inheritParams param_directionUpper
 #' @inheritParams param_twoSidedPower
+#' @inheritParams param_three_dots
 #'
 #' @details
 #' The fixed design represents a single-stage hypothesis test. The returned
@@ -50,14 +52,21 @@
 #' design2 <- getDesignFixed(alpha = 0.05, beta = 0.1)
 #' design2
 #'
+#' # Equivalent specifications of nominal target power
+#' getDesignFixed(power = 0.9)
+#' getDesignFixed(beta = 0.1, power = 0.9)
+#'
 #' @export
 #'
 getDesignFixed <- function(
         alpha = NA_real_,
+        ..., 
         beta = NA_real_,
         sided = 1L, # C_SIDED_DEFAULT
         directionUpper = NA,
-        twoSidedPower = NA) {
+        twoSidedPower = NA,
+        power = NA_real_) {
+    beta <- .resolveDesignBeta(beta, power, "getDesignFixed")
     .assertIsValidAlphaAndBeta(alpha = alpha, beta = beta, naAllowed = TRUE)
     .assertIsValidSidedParameter(sided)
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)

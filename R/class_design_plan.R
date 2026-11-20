@@ -295,6 +295,8 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
 #' Returns the \code{\link{TrialDesignPlan}} as data frame.
 #'
 #' @param x A \code{\link{TrialDesignPlan}} object.
+#' @param strict If `TRUE`, unresolved component conflicts raise an error.
+#'   Otherwise warn and retain the complete conflicting values as character.
 #' @inheritParams param_niceColumnNamesEnabled
 #' @inheritParams param_includeAllParameters
 #' @inheritParams param_three_dots
@@ -319,12 +321,14 @@ as.data.frame.TrialDesignPlan <- function(
         optional = FALSE,
         niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE,
-        ...) {
+        ...,
+        strict = FALSE) {
     return(.getAsDataFrame(
         parameterSet = x,
         parameterNames = NULL,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
-        includeAllParameters = includeAllParameters
+        includeAllParameters = includeAllParameters,
+        strict = strict
     ))
 }
 

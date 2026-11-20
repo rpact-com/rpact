@@ -338,6 +338,8 @@ print.TrialDesignCharacteristics <- function(x, ..., markdown = NA, showDesign =
 #' Returns the \code{TrialDesignCharacteristics} as data frame.
 #'
 #' @param x A \code{\link{TrialDesignCharacteristics}} object.
+#' @param strict If `TRUE`, unresolved component conflicts raise an error.
+#'   Otherwise warn and retain the complete conflicting values as character.
 #' @inheritParams param_niceColumnNamesEnabled
 #' @inheritParams param_includeAllParameters
 #' @inheritParams param_three_dots
@@ -362,7 +364,8 @@ as.data.frame.TrialDesignCharacteristics <- function(
         optional = FALSE,
         niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE,
-        ...) {
+        ...,
+        strict = FALSE) {
     if (x$.design$kMax > 1) {
         parameterNamesToBeExcluded <- c("nFixed", "shift")
     } else {
@@ -373,7 +376,8 @@ as.data.frame.TrialDesignCharacteristics <- function(
         parameterNames = parameterNamesToBeExcluded,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters,
-        handleParameterNamesAsToBeExcluded = TRUE
+        handleParameterNamesAsToBeExcluded = TRUE,
+        strict = strict
     ))
 }
 
@@ -1459,6 +1463,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
 #' Returns the \code{TrialDesign} as data frame.
 #'
 #' @param x A \code{\link{TrialDesign}} object.
+#' @param strict If `TRUE`, unresolved component conflicts raise an error.
+#'   Otherwise warn and retain the complete conflicting values as character.
 #' @inheritParams param_niceColumnNamesEnabled
 #' @inheritParams param_includeAllParameters
 #' @inheritParams param_three_dots
@@ -1484,7 +1490,8 @@ as.data.frame.TrialDesign <- function(
         optional = FALSE,
         niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE,
-        ...) {
+        ...,
+        strict = FALSE) {
     .assertIsTrialDesign(x)
 
     if (includeAllParameters) {
@@ -1496,6 +1503,7 @@ as.data.frame.TrialDesign <- function(
         parameterSet = x,
         parameterNames = parameterNames,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
-        includeAllParameters = includeAllParameters
+        includeAllParameters = includeAllParameters,
+        strict = strict
     ))
 }

@@ -10,7 +10,8 @@
   optional = FALSE,
   niceColumnNamesEnabled = FALSE,
   includeAllParameters = FALSE,
-  ...
+  ...,
+  strict = FALSE
 )
 }
 \arguments{
@@ -26,6 +27,9 @@ a meaningful parameter selection otherwise, default is \code{FALSE}.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
+
+\item{strict}{If \code{TRUE}, unresolved component conflicts raise an error.
+Otherwise warn and retain the complete conflicting values as character.}
 }
 \value{
 Returns a \code{\link[base]{data.frame}}.

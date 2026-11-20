@@ -306,6 +306,8 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
 #' Returns the \code{\link{PowerAndAverageSampleNumberResult}} as data frame.
 #'
 #' @param x A \code{\link{PowerAndAverageSampleNumberResult}} object.
+#' @param strict If `TRUE`, unresolved component conflicts raise an error.
+#'   Otherwise warn and retain the complete conflicting values as character.
 #' @inheritParams param_niceColumnNamesEnabled
 #' @inheritParams param_includeAllParameters
 #' @inheritParams param_three_dots
@@ -332,14 +334,16 @@ as.data.frame.PowerAndAverageSampleNumberResult <- function(
         optional = FALSE,
         niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE,
-        ...) {
+        ...,
+        strict = FALSE) {
     parameterNames <- x$.getVisibleFieldNames()
     parameterNames <- parameterNames[parameterNames != "nMax"]
     dataFrame <- .getAsDataFrame(
         parameterSet = x,
         parameterNames = parameterNames,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
-        includeAllParameters = includeAllParameters
+        includeAllParameters = includeAllParameters,
+        strict = strict
     )
     return(dataFrame)
 }

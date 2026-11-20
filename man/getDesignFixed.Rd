@@ -6,14 +6,19 @@
 \usage{
 getDesignFixed(
   alpha = NA_real_,
+  ...,
   beta = NA_real_,
   sided = 1L,
   directionUpper = NA,
-  twoSidedPower = NA
+  twoSidedPower = NA,
+  power = NA_real_
 )
 }
 \arguments{
 \item{alpha}{The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.}
+
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
+that a warning will be displayed if unknown arguments are passed.}
 
 \item{beta}{Type II error rate, necessary for providing sample size calculations
 (e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs,
@@ -34,6 +39,18 @@ a specified \code{directionUpper} must agree with it.}
 the sample size calculation is performed by considering both tails of the distribution.
 Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
 should be directed to one part.#'}
+
+\item{power}{Nominal target power, an alternative to \code{beta}, defined as
+\code{1 - beta}. Must be a single numeric value strictly between 0 and 1.
+If both are supplied, \code{abs(beta + power - 1) <= 1e-12} is required
+and the supplied \code{beta} is retained. The usual restrictions on
+\code{beta} and its relationship to \code{alpha} still apply.
+The default \code{NA_real_} leaves the existing \code{beta} default or
+derivation from user-defined beta spending unchanged.
+This scalar input does not replace the returned \code{design$power}:
+that field can contain cumulative rejection probabilities by stage,
+whose final value need not equal the nominal target, particularly for
+two-sided designs when only one rejection tail is counted.}
 }
 \value{
 Returns a \code{\link{TrialDesign}} object.
@@ -65,6 +82,10 @@ design
 # Custom significance and power
 design2 <- getDesignFixed(alpha = 0.05, beta = 0.1)
 design2
+
+# Equivalent specifications of nominal target power
+getDesignFixed(power = 0.9)
+getDesignFixed(beta = 0.1, power = 0.9)
 
 }
 \seealso{

@@ -979,7 +979,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         numberOfStages,
         includeAllParameters,
         mandatoryParameterNames) {
-    if (parameterSet$isUndefinedParameter(parameterName) &&
+    if (!includeAllParameters && parameterSet$isUndefinedParameter(parameterName) &&
             parameterName != "futilityStop") {
         return(NULL)
     }
@@ -1000,7 +1000,21 @@ ParameterSet <- R6::R6Class("ParameterSet",
     }
 
     if (is.array(parameterValues) && !is.matrix(parameterValues)) {
-        return(NULL)
+        if (inherits(parameterSet, "SimulationResultsMultiArmSurvival") &&
+                !is.null(.getComparisonSurvivalCategory(parameterSet, parameterName))) {
+            return(NULL)
+        }
+        dimensions <- dim(parameterValues)
+        if (length(dimensions) == 3L && all(dimensions[1:2] == c(numberOfStages, numberOfVariants))) {
+            cells <- list()
+            for (stage in seq_len(numberOfStages)) {
+                for (situation in seq_len(numberOfVariants)) {
+                    cells[[length(cells) + 1L]] <- parameterValues[stage, situation, ]
+                }
+            }
+            return(cells)
+        }
+        return(rep(list(parameterValues), numberOfVariants * numberOfStages))
     }
 
     if (parameterName %in% c("adjustedStageWisePValues", "overallAdjustedTestStatistics")) {
@@ -1012,14 +1026,17 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(rep(parameterValues, numberOfVariants * numberOfStages))
         }
 
-        if (.isMultiHypothesesObject(parameterSet)) {
-            if (length(parameterValues) == numberOfStages) {
-                return(as.vector(sapply(FUN = rep, X = parameterValues, times = numberOfVariants)))
+        if (parameterName == "stDev") {
+            if (length(unique(parameterValues)) == 1L) {
+                return(rep(parameterValues[1L], numberOfVariants * numberOfStages))
             }
+            return(rep(list(parameterValues), numberOfVariants * numberOfStages))
         }
 
-        if (length(parameterValues) == numberOfVariants) {
-            return(rep(parameterValues, numberOfStages))
+        if (parameterName %in% c("accrualTime", "piecewiseSurvivalTime", "accrualIntensityRelative", "doseLevels") ||
+                (parameterName == "accrualIntensity" && !is.null(parameterSet[[".accrualTime"]]) &&
+                    length(parameterSet$.accrualTime$accrualIntensity) > 1L)) {
+            return(rep(list(parameterValues), numberOfVariants * numberOfStages))
         }
 
         if (length(parameterValues) == numberOfStages &&
@@ -1030,7 +1047,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                     "maxNumberOfEventsPerStage",
                     "minNumberOfSubjectsPerStage",
                     "maxNumberOfSubjectsPerStage",
-                    "allocationRatioPlanned"
+                    "allocationRatioPlanned",
+                    "eventsPerStage"
                 )) {
             values <- c()
             for (stage in 1:numberOfStages) {
@@ -1039,32 +1057,11 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(values)
         }
 
-        if (parameterName %in% c(
-                "accrualTime",
-                "accrualIntensity",
-                "plannedEvents",
-                "plannedSubjects",
-                "minNumberOfEventsPerStage",
-                "maxNumberOfEventsPerStage",
-                "minNumberOfSubjectsPerStage",
-                "maxNumberOfSubjectsPerStage",
-                "piecewiseSurvivalTime",
-                "lambda2",
-                "stDev"
-            )) {
-            if (parameterName == "stDev" && length(unique(parameterValues)) == 1) {
-                return(parameterValues[1])
-            }
-
-            return(paste(parameterValues, collapse = ", "))
+        if (length(parameterValues) == numberOfVariants) {
+            return(rep(parameterValues, numberOfStages))
         }
 
-        stopRuntimeIssue("parameter ", .pQuote(parameterName), " has an invalid ",
-            "dimension (length is ", length(parameterValues), ")",
-            functionName = ".getDataFrameColumnValues",
-            parameter = parameterName,
-            value = length(parameterValues)
-        )
+        return(rep(list(parameterValues), numberOfVariants * numberOfStages))
     } else if (parameterName == "effectMatrix") {
         # return effect matrix row if 'effectMatrix' is user defined
         if (parameterSet$isUserDefinedParameter("effectMatrix")) {
@@ -1129,15 +1126,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         return(rep(parameterValues[, 1], numberOfVariants))
     }
 
-    stopRuntimeIssue("parameter ", .pQuote(parameterName), " has an invalid ",
-        "dimension (", nrow(parameterValues),
-        " x ", ncol(parameterValues), "); ",
-        "expected was (", numberOfStages, " x ", numberOfVariants, ")",
-        functionName = ".getDataFrameColumnValues",
-        parameter = parameterName,
-        relatedParameter = "numberOfStages",
-        relatedValue = numberOfStages
-    )
+    return(rep(list(parameterValues), numberOfVariants * numberOfStages))
 }
 
 .getAsDataFrameMultidimensional <- function(
@@ -1146,7 +1135,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
         niceColumnNamesEnabled,
         includeAllParameters,
         returnParametersAsCharacter,
-        mandatoryParameterNames) {
+        mandatoryParameterNames,
+        strict = FALSE) {
     numberOfVariants <- .getMultidimensionalNumberOfVariants(parameterSet, parameterNames)
     numberOfStages <- parameterSet$.getMultidimensionalNumberOfStages(parameterNames)
 
@@ -1229,10 +1219,6 @@ ParameterSet <- R6::R6Class("ParameterSet",
                             parameterName, niceColumnNamesEnabled
                         )
 
-                        if (parameterName == "stDev" && length(columnValues) == 2) {
-                            columnValues <- paste(columnValues, collapse = ", ")
-                        }
-
                         dataFrame[[columnCaption]] <- columnValues
                         if (returnParametersAsCharacter) {
                             parameterSet$.formatDataFrameParametersAsCharacter(
@@ -1274,22 +1260,28 @@ ParameterSet <- R6::R6Class("ParameterSet",
         extraParameterNames <- extraParameterNames[!grepl("^\\.", extraParameterNames)]
         extraParameterNames <- extraParameterNames[!(extraParameterNames %in% parameterNames)]
         extraParameterNames <- unique(c(parameterNames[!(parameterNames %in% usedParameterNames)], extraParameterNames))
+        extraParameterNames <- setdiff(extraParameterNames, variedParameter)
         for (extraParameter in extraParameterNames) {
             tryCatch(
                 {
                     if (parameterSet$.getParameterType(extraParameter) != C_PARAM_TYPE_UNKNOWN) {
                         value <- parameterSet[[extraParameter]]
                         if (!is.null(value) && length(value) > 0 &&
-                                !is.matrix(value) && !is.array(value) && !is.data.frame(value) &&
+                                !is.data.frame(value) &&
                                 (is.numeric(value) || is.character(value) || is.logical(value))) {
                             columnCaption <- parameterSet$.getDataFrameColumnCaption(
                                 extraParameter, niceColumnNamesEnabled
                             )
 
+                            if (columnCaption %in% names(dataFrame)) {
+                                next
+                            }
                             if (length(value) == 1) {
                                 dataFrame[[columnCaption]] <- rep(value, nrow(dataFrame))
                             } else {
-                                dataFrame[[columnCaption]] <- rep(.arrayToString(value, maxLength = 10), nrow(dataFrame))
+                                dataFrame[[columnCaption]] <- .getDataFrameColumnValues(
+                                    parameterSet, extraParameter, numberOfVariants, numberOfStages,
+                                    includeAllParameters, mandatoryParameterNames)
                             }
                         }
                     }
@@ -1305,7 +1297,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         }
     }
 
-    return(dataFrame)
+    return(.expandDataFrameComponents(dataFrame, strict = strict))
 }
 
 .getAsDataFrameUnidimensional <- function(
@@ -1372,7 +1364,9 @@ ParameterSet <- R6::R6Class("ParameterSet",
         includeAllParameters = FALSE,
         handleParameterNamesAsToBeExcluded = FALSE,
         returnParametersAsCharacter = FALSE,
-        mandatoryParameterNames = character()) {
+        mandatoryParameterNames = character(),
+        strict = FALSE) {
+    .assertIsSingleLogical(strict, "strict")
     parameterNamesToBeExcluded <- c()
     if (handleParameterNamesAsToBeExcluded) {
         parameterNamesToBeExcluded <- parameterNames
@@ -1421,7 +1415,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         return(.addDelayedInformationRates(.getAsDataFrameMultidimensional(
             parameterSet, parameterNames, niceColumnNamesEnabled,
             includeAllParameters, returnParametersAsCharacter,
-            mandatoryParameterNames
+            mandatoryParameterNames, strict = strict
         )))
     }
 
@@ -1531,6 +1525,8 @@ print.FieldSet <- function(x, ..., markdown = NA) {
 #' Returns the \code{ParameterSet} as data frame.
 #'
 #' @param x A \code{\link{FieldSet}} object.
+#' @param strict If `TRUE`, unresolved component conflicts raise an error.
+#'   Otherwise warn and retain the complete conflicting values as character.
 #' @inheritParams param_niceColumnNamesEnabled
 #' @inheritParams param_includeAllParameters
 #' @inheritParams param_three_dots
@@ -1550,14 +1546,16 @@ as.data.frame.ParameterSet <- function(
         optional = FALSE,
         ...,
         niceColumnNamesEnabled = FALSE,
-        includeAllParameters = FALSE) {
+        includeAllParameters = FALSE,
+        strict = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame", ...)
 
     return(.getAsDataFrame(
         parameterSet = x,
         parameterNames = NULL,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
-        includeAllParameters = includeAllParameters
+        includeAllParameters = includeAllParameters,
+        strict = strict
     ))
 }
 

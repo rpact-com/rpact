@@ -32,7 +32,8 @@ getDesignInverseNormal(
   betaAdjustment = NA,
   constantBoundsHP = 3,
   twoSidedPower = NA,
-  tolerance = 1e-08
+  tolerance = 1e-08,
+  power = NA_real_
 )
 }
 \arguments{
@@ -135,6 +136,18 @@ Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal 
 should be directed to one part.#'}
 
 \item{tolerance}{The numerical tolerance, default is \code{1e-08}.}
+
+\item{power}{Nominal target power, an alternative to \code{beta}, defined as
+\code{1 - beta}. Must be a single numeric value strictly between 0 and 1.
+If both are supplied, \code{abs(beta + power - 1) <= 1e-12} is required
+and the supplied \code{beta} is retained. The usual restrictions on
+\code{beta} and its relationship to \code{alpha} still apply.
+The default \code{NA_real_} leaves the existing \code{beta} default or
+derivation from user-defined beta spending unchanged.
+This scalar input does not replace the returned \code{design$power}:
+that field can contain cumulative rejection probabilities by stage,
+whose final value need not equal the nominal target, particularly for
+two-sided designs when only one rejection tail is counted.}
 }
 \value{
 Returns a \code{\link{TrialDesign}} object.
