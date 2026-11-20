@@ -165,7 +165,7 @@
     if (inherits(object$.design, "TrialDesignPlanQuantitativeBayes")) {
         return(.getQtdBayesPlotData(object, plotCat, stDev, pi2))
     }
-    functionName <- "plot.OperatingCharcteristics"
+    functionName <- "plot.OperatingCharacteristics"
     settings <- .getQtdEndpointSettings(object, functionName = functionName)
     .assertQtdPlotRule(object$.design, functionName)
     supplied <- list(stDev = stDev, pi2 = pi2)

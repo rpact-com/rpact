@@ -135,7 +135,7 @@
 #' retained. Bayesian priors and controlMean are stored for summaries, sensitivity
 #' recalculation and [getObjectRCode()].
 #'
-#' @return An OperatingCharcteristicsMeans object with the rule, assumptions and
+#' @return An OperatingCharacteristicsMeans object with the rule, assumptions and
 #'   category-block probability data frame. Bayesian data additionally retain
 #'   stDevControl and stDevTreatment; the scalar stDev facet is their root mean square.
 #'
@@ -200,7 +200,7 @@ getOperatingCharacteristicsMeans <- function(
         alternative = alternative,
         stDev = stDev
     )
-    return(OperatingCharcteristicsMeans$new(
+    return(OperatingCharacteristicsMeans$new(
         design = design,
         numberOfSubjects = numberOfSubjects,
         normalApproximation = normalApproximation,

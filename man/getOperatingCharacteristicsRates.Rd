@@ -41,7 +41,7 @@ If TRUE (default), the effect is \code{pi1 - pi2}; if FALSE, it is \code{pi2 - p
 control, respectively. NULL selects mixbeta(c(1, 1/3, 1/3)) for each arm.}
 }
 \value{
-An \code{OperatingCharcteristicsRates} object supporting console and
+An \code{OperatingCharacteristicsRates} object supporting console and
 Markdown printing, summaries and the QTD plot families. Its \code{probabilities} data frame contains \code{category},
 \code{probability}, \code{nControl}, \code{nTreatment}, \code{alternative}, \code{pi1}, and \code{pi2}.
 \code{alternative} is the true risk difference in the beneficial direction.
@@ -90,5 +90,5 @@ cat(print(oc, markdown = TRUE)[1], "\n")
 }
 \seealso{
 \code{\link[=getDesignQuantitative]{getDesignQuantitative()}}, \code{\link[=getOperatingCharacteristicsMeans]{getOperatingCharacteristicsMeans()}},
-\link{OperatingCharcteristicsRates}, \link{summaryQuantitative}, \code{\link[=plot.OperatingCharcteristics]{plot.OperatingCharcteristics()}}
+\link{OperatingCharacteristicsRates}, \link{summaryQuantitative}, \code{\link[=plot.OperatingCharacteristics]{plot.OperatingCharacteristics()}}
 }

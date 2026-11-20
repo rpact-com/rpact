@@ -337,13 +337,13 @@ plot.TrialDesignPlanQuantitative <- function(x, ..., type = 1L, estimates = NULL
 #'
 #' @export
 #'
-plot.OperatingCharcteristics <- function(x, plotCat = c(3, 6), main = NA_character_, ...,
+plot.OperatingCharacteristics <- function(x, plotCat = c(3, 6), main = NA_character_, ...,
         type = 1L, alternatives = NULL, stDev = NULL, pi1 = NULL, pi2 = NULL, xAxis = NULL,
         sensitivity = "sampleSize", category = "Go",
         weights = NULL, desiredDecisions = NULL, contourLevels = NULL, plotPointsEnabled = NA,
         xlab = NA_character_, ylab = NA_character_,
         palette = NULL, legendPosition = "auto", plotSettings = NULL, showSource = FALSE) {
-    functionName <- "plot.OperatingCharcteristics"
+    functionName <- "plot.OperatingCharacteristics"
     .warnInCaseOfUnknownArguments(functionName = functionName, ...)
     .assertGgplotIsInstalled()
     .assertIsSingleCharacter(main, "main", naAllowed = TRUE)

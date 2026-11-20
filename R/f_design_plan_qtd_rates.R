@@ -1,7 +1,7 @@
 ## Operating characteristics for quantitative trial decisions with binary endpoints.
 
 #'
-#' @name OperatingCharcteristicsRates
+#' @name OperatingCharacteristicsRates
 #'
 #' @title
 #' Operating Characteristics for Quantitative Decisions Comparing Rates
@@ -31,19 +31,19 @@
 #'
 #' @details
 #' Inherits the sample-size matrix and probability table from
-#' `OperatingCharcteristics`. The originating quantitative decision rule is
+#' `OperatingCharacteristics`. The originating quantitative decision rule is
 #' stored internally. Each sample-size scenario contains six frequentist or four Bayesian categories
 #' and the supplied treatment rates in their original order, including repeats.
 #' Console and Markdown printing use the standard ParameterSet mechanism.
 #' Use [summary()] for decision-rule assumptions and probability tables, and
-#' [plot.OperatingCharcteristics()] for the shared QTD plot families.
+#' [plot.OperatingCharacteristics()] for the shared QTD plot families.
 #'
 #' @seealso [getOperatingCharacteristicsRates()], [getDesignQuantitative()]
 #'
 #' @keywords internal
 #'
-OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
-    inherit = OperatingCharcteristics,
+OperatingCharacteristicsRates <- R6::R6Class("OperatingCharacteristicsRates",
+    inherit = OperatingCharacteristics,
     public = list(
         groups = NULL,
         pi1 = NULL,
@@ -210,7 +210,7 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
 #' A count grid may contain at most one million cells per sample-size scenario.
 #' Counts and probabilities are computed without requiring ggplot2 or Java.
 #'
-#' @return An `OperatingCharcteristicsRates` object supporting console and
+#' @return An `OperatingCharacteristicsRates` object supporting console and
 #'   Markdown printing, summaries and the QTD plot families. Its `probabilities` data frame contains `category`,
 #'   `probability`, `nControl`, `nTreatment`, `alternative`, `pi1`, and `pi2`.
 #'   `alternative` is the true risk difference in the beneficial direction.
@@ -226,7 +226,7 @@ OperatingCharcteristicsRates <- R6::R6Class("OperatingCharcteristicsRates",
 #' cat(print(oc, markdown = TRUE)[1], "\n")
 #'
 #' @seealso [getDesignQuantitative()], [getOperatingCharacteristicsMeans()],
-#'   [OperatingCharcteristicsRates], [summaryQuantitative], [plot.OperatingCharcteristics()]
+#'   [OperatingCharacteristicsRates], [summaryQuantitative], [plot.OperatingCharacteristics()]
 #'
 #' @export
 #'
@@ -287,7 +287,7 @@ getOperatingCharacteristicsRates <- function(design, ..., numberOfSubjects, pi1,
         c("qtd1", "farringtonManning", "miettinenNurminen", "newcombe"), functionName)
     probabilities <- .calcOperatingCharacteristicsRates(design, numberOfSubjects, pi1, pi2,
         directionUpper, intervalMethod)
-    return(OperatingCharcteristicsRates$new(design = design, numberOfSubjects = numberOfSubjects,
+    return(OperatingCharacteristicsRates$new(design = design, numberOfSubjects = numberOfSubjects,
         pi1 = pi1, pi2 = pi2, directionUpper = directionUpper, intervalMethod = intervalMethod,
         probabilities = probabilities))
 }

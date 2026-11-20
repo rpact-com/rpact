@@ -15,7 +15,7 @@
 ## |
 
 #'
-#' @name OperatingCharcteristics
+#' @name OperatingCharacteristics
 #'
 #' @title
 #' Operating Characteristics for Quantitative Decisions
@@ -41,8 +41,8 @@
 #'
 #' @keywords internal
 #'
-OperatingCharcteristics <- R6::R6Class(
-    "OperatingCharcteristics",
+OperatingCharacteristics <- R6::R6Class(
+    "OperatingCharacteristics",
     inherit = ParameterSet,
     public = list(
         .design = NULL,
@@ -75,7 +75,7 @@ OperatingCharcteristics <- R6::R6Class(
 )
 
 #'
-#' @name OperatingCharcteristicsMeans
+#' @name OperatingCharacteristicsMeans
 #'
 #' @title
 #' Operating Characteristics for Comparing Means
@@ -103,7 +103,7 @@ OperatingCharcteristics <- R6::R6Class(
 #'
 #' @details
 #' Inherits sample sizes, probabilities, priors and controlMean from
-#' OperatingCharcteristics. The rates priors priorDist1 and priorDist2 remain NULL.
+#' OperatingCharacteristics. The rates priors priorDist1 and priorDist2 remain NULL.
 #'
 #' @seealso [getDesignQuantitative()], [getOperatingCharacteristicsMeans()]
 #'
@@ -111,9 +111,9 @@ OperatingCharcteristics <- R6::R6Class(
 #'
 #' @export
 #'
-OperatingCharcteristicsMeans <- R6::R6Class(
-    "OperatingCharcteristicsMeans",
-    inherit = OperatingCharcteristics,
+OperatingCharacteristicsMeans <- R6::R6Class(
+    "OperatingCharacteristicsMeans",
+    inherit = OperatingCharacteristics,
     public = list(
         normalApproximation = NULL,
         groups = NULL,

@@ -172,7 +172,7 @@
     }
     probabilities <- .calcQtdBayes(design, numberOfSubjects, alternative, "Means",
         priorDist = priorDist, stDev = stDev, controlMean = controlMean)
-    result <- OperatingCharcteristicsMeans$new(design = design, numberOfSubjects = numberOfSubjects,
+    result <- OperatingCharacteristicsMeans$new(design = design, numberOfSubjects = numberOfSubjects,
         alternative = alternative, stDev = stDev, probabilities = probabilities)
     result$priorDist <- priorDist
     result$controlMean <- controlMean
@@ -208,7 +208,7 @@
     .assertQtdPrior(priorDist2, "priorDist2", "betaMix", functionName)
     probabilities <- .calcQtdBayes(design, numberOfSubjects, pi1, "Rates",
         priorDist1 = priorDist1, priorDist2 = priorDist2, pi2 = pi2, directionUpper = directionUpper)
-    result <- OperatingCharcteristicsRates$new(design, numberOfSubjects, pi1, pi2,
+    result <- OperatingCharacteristicsRates$new(design, numberOfSubjects, pi1, pi2,
         directionUpper = directionUpper, intervalMethod = NA_character_, probabilities = probabilities)
     result$priorDist1 <- priorDist1
     result$priorDist2 <- priorDist2
@@ -218,7 +218,7 @@
 }
 
 .getQtdBayesPlotData <- function(object, plotCat, stDev, pi2) {
-    functionName <- "plot.OperatingCharcteristics"
+    functionName <- "plot.OperatingCharacteristics"
     .validateQtdBayesRule(object$.design, functionName)
     settings <- .getQtdEndpointSettings(object)
     supplied <- list(stDev = stDev, pi2 = pi2)
@@ -307,7 +307,7 @@
         constructor <- "getDesignQuantitative"
     } else {
         arguments <- list(design = object$.design, numberOfSubjects = object$numberOfSubjects)
-        if (inherits(object, "OperatingCharcteristicsMeans")) {
+        if (inherits(object, "OperatingCharacteristicsMeans")) {
             constructor <- "getOperatingCharacteristicsMeans"
             arguments <- c(arguments, list(alternative = object$alternative, stDev = object$stDev))
             if (inherits(object$.design, "TrialDesignPlanQuantitativeBayes")) {

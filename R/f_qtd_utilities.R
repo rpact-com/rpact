@@ -1,16 +1,16 @@
 ## Endpoint-specific settings and shared output for quantitative trial results.
 
 .isQtdOperatingCharacteristics <- function(object) {
-    return(inherits(object, "OperatingCharcteristicsMeans") || inherits(object, "OperatingCharcteristicsRates"))
+    return(inherits(object, "OperatingCharacteristicsMeans") || inherits(object, "OperatingCharacteristicsRates"))
 }
 
 .getQtdEndpointSettings <- function(object, xAxis = NULL, functionName = ".getQtdEndpointSettings") {
-    if (inherits(object, "OperatingCharcteristicsMeans")) {
+    if (inherits(object, "OperatingCharacteristicsMeans")) {
         settings <- list(endpoint = "means", assumptionColumn = "stDev", assumptionCaption = "SD",
             assumptions = c("normalApproximation", "groups", "stDev"), summaryColumns = "alternative",
             effectColumn = "alternative", effectCaption = "True effect", defaultAxis = "effect",
             sensitivity = c("sampleSize", "stDev", "allocation"))
-    } else if (inherits(object, "OperatingCharcteristicsRates")) {
+    } else if (inherits(object, "OperatingCharacteristicsRates")) {
         settings <- list(endpoint = "rates", assumptionColumn = "pi2", assumptionCaption = "Control rate",
             assumptions = c("groups", "pi2", "directionUpper", "intervalMethod"),
             summaryColumns = c("pi1", "alternative"), effectColumn = "pi1",
@@ -19,7 +19,7 @@
     } else {
         stopIllegalArgument("This operation requires QTD operating characteristics for means or rates",
             functionName = functionName, parameter = "x", value = object,
-            constraint = "OperatingCharcteristicsMeans or OperatingCharcteristicsRates",
+            constraint = "OperatingCharacteristicsMeans or OperatingCharacteristicsRates",
             diagnosticId = "qtd.plot.unsupported_endpoint")
     }
     if (inherits(object$.design, "TrialDesignPlanQuantitativeBayes")) {
@@ -82,7 +82,7 @@
 #' @description
 #' Returns the stored probability table of frequentist or Bayesian quantitative OCs.
 #'
-#' @param x An OperatingCharcteristicsMeans or OperatingCharcteristicsRates object.
+#' @param x An OperatingCharacteristicsMeans or OperatingCharacteristicsRates object.
 #' @param row.names Optional row names for the resulting data frame.
 #' @param optional Reserved for compatibility with as.data.frame.
 #' @param ... Additional arguments are checked for unknown names.
@@ -93,9 +93,9 @@
 #'
 #' @export
 #'
-as.data.frame.OperatingCharcteristics <- function(x, row.names = NULL, optional = FALSE,
+as.data.frame.OperatingCharacteristics <- function(x, row.names = NULL, optional = FALSE,
         ..., niceColumnNamesEnabled = FALSE) {
-    .warnInCaseOfUnknownArguments(functionName = "as.data.frame.OperatingCharcteristics", ...)
+    .warnInCaseOfUnknownArguments(functionName = "as.data.frame.OperatingCharacteristics", ...)
     .assertIsSingleLogical(niceColumnNamesEnabled, "niceColumnNamesEnabled")
     result <- x$probabilities
     if (!is.null(row.names)) {
