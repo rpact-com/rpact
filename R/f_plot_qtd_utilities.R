@@ -234,11 +234,11 @@
 }
 
 .getQtdBinaryDecisionData <- function(rule, numberOfSubjects, directionUpper, controlRate = NULL,
-        treatmentRate = NULL, plotCat = 6L, intervalMethod = "qtd1",
+        treatmentRate = NULL, plotCat = 6L, intervalMethod = "wilson",
         functionName = "plot.TrialDesignPlanQuantitative") {
     .assertQtdPlotChoice(intervalMethod, "intervalMethod",
-        c("qtd1", "farringtonManning", "miettinenNurminen", "newcombe"), functionName)
-    if (intervalMethod == "qtd1" && (rule$lowerPercentile > 0.5 || rule$upperPercentile < 0.5)) {
+        c("wilson", "farringtonManning", "miettinenNurminen", "newcombe"), functionName)
+    if (intervalMethod == "wilson" && (rule$lowerPercentile > 0.5 || rule$upperPercentile < 0.5)) {
         stopIllegalArgument("The QTD1 approximation requires percentiles on either side of 0.5",
             functionName = functionName, parameter = c("lowerPercentile", "upperPercentile"),
             value = c(rule$lowerPercentile, rule$upperPercentile),
@@ -266,7 +266,7 @@
     if (!directionUpper) {
         data$estimate <- -data$estimate
     }
-    if (intervalMethod != "qtd1") {
+    if (intervalMethod != "wilson") {
         if (directionUpper) {
             bounds <- .getQtdRiskDifferenceBounds(data$eventsTreatment, nTreatment, data$eventsControl, nControl,
                 rule$lowerPercentile, rule$upperPercentile, intervalMethod)

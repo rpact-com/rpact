@@ -184,7 +184,7 @@ benefit-risk assessment are separate considerations.
 | Treatment event-probability range | 10% to 25% | `pi1 = seq(0.10, 0.25, by = 0.001)` |
 | Sample sizes, control then treatment | (75, 75), (75, 150) | Two rows of `numberOfSubjects` |
 | Beneficial direction | Lower treatment rate | `directionUpper = FALSE` |
-| Interval construction | Frequentist | `intervalMethod = "qtd1"` |
+| Interval construction | Frequentist | `intervalMethod = "wilson"` |
 
 We evaluate treatment event probabilities from 0.10 to 0.25 in steps of 0.01
 for both sample-size scenarios. Rates and reference differences are entered as
@@ -206,7 +206,7 @@ ratesOC <- getOperatingCharacteristicsRates(
     pi1 = seq(0.10, 0.25, by = 0.01),
     pi2 = 0.15,
     directionUpper = FALSE,
-    intervalMethod = "qtd1"
+    intervalMethod = "wilson"
 )
 ```
 
@@ -250,7 +250,7 @@ ratesScenarios <- getOperatingCharacteristicsRates(
     pi1 = scenarioRates,
     pi2 = 0.15,
     directionUpper = FALSE,
-    intervalMethod = "qtd1"
+    intervalMethod = "wilson"
 )
 summary(ratesScenarios, digits = 4)
 ```
@@ -368,7 +368,7 @@ eventMap <- plot(
     type = 3,
     numberOfSubjects = c(75, 75),
     directionUpper = FALSE,
-    intervalMethod = "qtd1",
+    intervalMethod = "wilson",
     observedControl = 16,
     controlRate = 0.15,
     treatmentRate = 0.10,
@@ -935,7 +935,7 @@ TODO: here qtd1 should be replaced by "wilson" to reflect the Wilson score metho
 
 | `intervalMethod` | Construction |
 |:--|:--|
-| `"qtd1"` | Original QTD1 approximation using Wilson score limits rounded to four decimal places in its variance construction |
+| `"wilson"` | Original QTD1 approximation using Wilson score limits rounded to four decimal places in its variance construction |
 | `"farringtonManning"` | Risk-difference score-test inversion using constrained maximum-likelihood variance |
 | `"miettinenNurminen"` | Score inversion with variance correction $N/(N-1)$, where $N=n_C+n_T$ |
 | `"newcombe"` | Square-and-add combination of unrounded Wilson limits without continuity correction |
@@ -953,7 +953,7 @@ keep calculation of all four maps economical.
 #| label: interval-method-maps
 #| fig-height: 8
 #| fig-cap: "All four interval constructions for 25 patients per group."
-intervalMethods <- c("qtd1", "farringtonManning", "miettinenNurminen", "newcombe")
+intervalMethods <- c("wilson", "farringtonManning", "miettinenNurminen", "newcombe")
 methodPlots <- lapply(intervalMethods, function(method) {
     return(plot(binaryRule, type = 3, numberOfSubjects = c(25, 25),
         directionUpper = FALSE, intervalMethod = method, plotCat = 6))

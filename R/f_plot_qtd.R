@@ -34,7 +34,7 @@
 #'   displayed ranges for type 2. Defaults are derived from the reference values.
 #' @param gridSize Number of grid values per axis for type 2 (between 2 and 1000).
 #' @param numberOfSubjects For type 3, two positive integers: control and treatment.
-#' @param intervalMethod For type 3, "qtd1" (default), "farringtonManning",
+#' @param intervalMethod For type 3, "wilson" (default), "farringtonManning",
 #'   "miettinenNurminen", or "newcombe". See Details for the method definitions.
 #' @param directionUpper Whether a higher treatment event rate is beneficial.
 #'   If FALSE, the effect is control rate minus treatment rate.
@@ -54,7 +54,7 @@
 #' percentiles do not imply a symmetric two-sided confidence interval. Type 2
 #' plots observed estimates against standard errors, not true effects.
 #'
-#' With `intervalMethod = "qtd1"`, type 3 reproduces the QTD1 construction with limits
+#' With `intervalMethod = "wilson"`, type 3 reproduces the QTD1 construction with limits
 #' rounded to four decimal places. Score limits supply the variance terms of
 #' the lower and upper risk-difference limits. Boundary equality follows QTD1:
 #' lower limits equal to LRV or TV satisfy the corresponding lower criterion;
@@ -97,7 +97,7 @@
 #'
 plot.TrialDesignPlanQuantitative <- function(x, ..., type = 1L, estimates = NULL,
         standardErrors = NULL, labels = NULL, effectRange = NULL, standardErrorRange = NULL,
-        gridSize = 200L, numberOfSubjects = NULL, intervalMethod = "qtd1", directionUpper = TRUE,
+        gridSize = 200L, numberOfSubjects = NULL, intervalMethod = "wilson", directionUpper = TRUE,
         controlRate = NULL, treatmentRate = NULL, observedControl = NULL, plotCat = 6L,
         main = NA_character_, xlab = NA_character_, ylab = NA_character_, palette = NULL,
         legendPosition = "auto", plotSettings = NULL, showSource = FALSE) {

@@ -15,7 +15,7 @@
   standardErrorRange = NULL,
   gridSize = 200L,
   numberOfSubjects = NULL,
-  intervalMethod = "qtd1",
+  intervalMethod = "wilson",
   directionUpper = TRUE,
   controlRate = NULL,
   treatmentRate = NULL,
@@ -51,7 +51,7 @@ displayed ranges for type 2. Defaults are derived from the reference values.}
 
 \item{numberOfSubjects}{For type 3, two positive integers: control and treatment.}
 
-\item{intervalMethod}{For type 3, "qtd1" (default), "farringtonManning",
+\item{intervalMethod}{For type 3, "wilson" (default), "farringtonManning",
 "miettinenNurminen", or "newcombe". See Details for the method definitions.}
 
 \item{directionUpper}{Whether a higher treatment event rate is beneficial.
@@ -87,7 +87,7 @@ Intervals use \code{estimate + qnorm(percentile) * standardError}; the displayed
 percentiles do not imply a symmetric two-sided confidence interval. Type 2
 plots observed estimates against standard errors, not true effects.
 
-With \code{intervalMethod = "qtd1"}, type 3 reproduces the QTD1 construction with limits
+With \code{intervalMethod = "wilson"}, type 3 reproduces the QTD1 construction with limits
 rounded to four decimal places. Score limits supply the variance terms of
 the lower and upper risk-difference limits. Boundary equality follows QTD1:
 lower limits equal to LRV or TV satisfy the corresponding lower criterion;

@@ -65,7 +65,7 @@ OperatingCharacteristicsRates <- R6::R6Class("OperatingCharacteristicsRates",
         #' @param probabilities Computed probability data frame.
         #'
         initialize = function(design, numberOfSubjects, pi1, pi2, directionUpper = TRUE,
-                intervalMethod = "qtd1", probabilities = NA_real_) {
+                intervalMethod = "wilson", probabilities = NA_real_) {
             super$initialize(design = design, numberOfSubjects = numberOfSubjects,
                 probabilities = probabilities)
             .setValueAndParameterType(self, "groups", 2L, 2L)
@@ -74,7 +74,7 @@ OperatingCharacteristicsRates <- R6::R6Class("OperatingCharacteristicsRates",
             self$.setParameterType("pi1", C_PARAM_USER_DEFINED)
             self$.setParameterType("pi2", C_PARAM_USER_DEFINED)
             .setValueAndParameterType(self, "directionUpper", directionUpper, TRUE)
-            .setValueAndParameterType(self, "intervalMethod", intervalMethod, "qtd1")
+            .setValueAndParameterType(self, "intervalMethod", intervalMethod, "wilson")
             self$alternative <- pi1 - pi2
             if (!directionUpper) {
                 self$alternative <- -self$alternative
@@ -176,7 +176,7 @@ OperatingCharacteristicsRates <- R6::R6Class("OperatingCharacteristicsRates",
 #' @param pi2 Single true control event probability in `[0, 1]`.
 #' @param directionUpper Whether increasing treatment event rates are beneficial.
 #'   If TRUE (default), the effect is `pi1 - pi2`; if FALSE, it is `pi2 - pi1`.
-#' @param intervalMethod One of `"qtd1"` (default), `"farringtonManning"`,
+#' @param intervalMethod One of `"wilson"` (default), `"farringtonManning"`,
 #'   `"miettinenNurminen"`, or `"newcombe"`, as described in
 #'   [plot.TrialDesignPlanQuantitative()].
 #' @param priorDist1,priorDist2 Bayesian RBesT betaMix priors for treatment and
@@ -231,7 +231,7 @@ OperatingCharacteristicsRates <- R6::R6Class("OperatingCharacteristicsRates",
 #' @export
 #'
 getOperatingCharacteristicsRates <- function(design, ..., numberOfSubjects, pi1, pi2,
-        directionUpper = TRUE, intervalMethod = "qtd1", priorDist1 = NULL, priorDist2 = NULL) {
+        directionUpper = TRUE, intervalMethod = "wilson", priorDist1 = NULL, priorDist2 = NULL) {
     functionName <- "getOperatingCharacteristicsRates"
     .warnInCaseOfUnknownArguments(functionName = functionName, ...)
     missingInputs <- c(design = missing(design), numberOfSubjects = missing(numberOfSubjects),
@@ -284,7 +284,7 @@ getOperatingCharacteristicsRates <- function(design, ..., numberOfSubjects, pi1,
     .assertQtdPlotNumeric(pi2, "pi2", functionName, lower = 0, upper = 1, expectedLength = 1L)
     .assertIsSingleLogical(directionUpper, "directionUpper")
     .assertQtdPlotChoice(intervalMethod, "intervalMethod",
-        c("qtd1", "farringtonManning", "miettinenNurminen", "newcombe"), functionName)
+        c("wilson", "farringtonManning", "miettinenNurminen", "newcombe"), functionName)
     probabilities <- .calcOperatingCharacteristicsRates(design, numberOfSubjects, pi1, pi2,
         directionUpper, intervalMethod)
     return(OperatingCharacteristicsRates$new(design = design, numberOfSubjects = numberOfSubjects,

@@ -11,7 +11,7 @@ getOperatingCharacteristicsRates(
   pi1,
   pi2,
   directionUpper = TRUE,
-  intervalMethod = "qtd1",
+  intervalMethod = "wilson",
   priorDist1 = NULL,
   priorDist2 = NULL
 )
@@ -33,7 +33,7 @@ entries must be positive integers.}
 \item{directionUpper}{Whether increasing treatment event rates are beneficial.
 If TRUE (default), the effect is \code{pi1 - pi2}; if FALSE, it is \code{pi2 - pi1}.}
 
-\item{intervalMethod}{One of \code{"qtd1"} (default), \code{"farringtonManning"},
+\item{intervalMethod}{One of \code{"wilson"} (default), \code{"farringtonManning"},
 \code{"miettinenNurminen"}, or \code{"newcombe"}, as described in
 \code{\link[=plot.TrialDesignPlanQuantitative]{plot.TrialDesignPlanQuantitative()}}.}
 
