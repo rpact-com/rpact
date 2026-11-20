@@ -213,7 +213,43 @@ ratesOC <- getOperatingCharacteristicsRates(
     directionUpper = FALSE,
     intervalMethod = "wilson"
 )
+ratesOC
 ```
+
+**Parameters and output of operating-characteristics for comparing
+rates**
+
+**User defined parameters**
+
+- *Number of subjects \[1\]*: 75, 75
+- *Number of subjects \[2\]*: 75, 150
+- *Assumed treatment rate*: 0.100, 0.110, 0.120, 0.130, 0.140, 0.150,
+  0.160, 0.170, 0.180, 0.190, 0.200, 0.210, 0.220, 0.230, 0.240, 0.250
+- *Assumed control rate*: 0.150
+- *Direction upper*: FALSE
+
+**Derived from user defined parameters**
+
+- *Alternatives*: 0.05, 0.04, 0.03, 0.02, 0.01, -2.776e-17, -0.01,
+  -0.02, -0.03, -0.04, -0.05, -0.06, -0.07, -0.08, -0.09, -0.1
+
+**Default parameters**
+
+- *Treatment groups*: 2
+- *Interval method*: wilson
+
+**Output**
+
+|  | Category | Probability | Number of subjects (control) | Number of subjects (treatment) | Alternatives | Assumed treatment rate | Assumed control rate |
+|----|----|----|----|----|----|----|----|
+| 1 | Go (Fixed) | 0.5352327 | 75 | 75 | 5.000000e-02 | 0.10 | 0.15 |
+| 2 | Go (Fixed) | 0.4569387 | 75 | 75 | 4.000000e-02 | 0.11 | 0.15 |
+| 3 | Go (Fixed) | 0.3833406 | 75 | 75 | 3.000000e-02 | 0.12 | 0.15 |
+| 4 | Go (Fixed) | 0.3160265 | 75 | 75 | 2.000000e-02 | 0.13 | 0.15 |
+| 5 | Go (Fixed) | 0.2560068 | 75 | 75 | 1.000000e-02 | 0.14 | 0.15 |
+| 6 | Go (Fixed) | 0.2037757 | 75 | 75 | -2.775558e-17 | 0.15 | 0.15 |
+
+Preview limited to 6 of 192 rows.
 
 Here `numberOfSubjects` is a positive integer matrix with control in
 column 1 and treatment in column 2. Each row is a scenario.
@@ -228,6 +264,10 @@ the category probabilities which are in the result of
 `getOperatingCharacteristicsRates`. The confidence interval construction
 itself remains approximate, based on the normal assumption described
 above.
+
+Printing `ratesOC` previews the first six rows of the probability table.
+Use `print(ratesOC, maxRows = 10)` to see e.g. 10 rows or
+`as.data.frame(ratesOC)` to extract the full table.
 
 ### Named scenarios
 
@@ -1178,69 +1218,17 @@ print(ratesScenarios, markdown = FALSE)
       Interval method              : wilson
 
     Output:
-              Category  Probability Number of   Number of Alternatives   Assumed      Assumed
-                                     subjects    subjects              treatment control rate
-                                    (control) (treatment)                   rate
-     1      Go (Fixed) 5.352327e-01        75          75        0.050     0.100         0.15
-     2      Go (Fixed) 2.037757e-01        75          75        0.000     0.150         0.15
-     3      Go (Fixed) 1.067077e-01        75          75       -0.025     0.175         0.15
-     4      Go (Fixed) 5.023338e-02        75          75       -0.050     0.200         0.15
-     5      Go (Fixed) 8.310520e-03        75          75       -0.100     0.250         0.15
-     6              Go 3.132233e-01        75          75        0.050     0.100         0.15
-     7              Go 3.043533e-01        75          75        0.000     0.150         0.15
-     8              Go 2.267809e-01        75          75       -0.025     0.175         0.15
-     9              Go 1.469166e-01        75          75       -0.050     0.200         0.15
-    10              Go 4.383561e-02        75          75       -0.100     0.250         0.15
-    11 Indeterminate 1 1.383506e-01        75          75        0.050     0.100         0.15
-    12 Indeterminate 1 3.913004e-01        75          75        0.000     0.150         0.15
-    13 Indeterminate 1 4.711368e-01        75          75       -0.025     0.175         0.15
-    14 Indeterminate 1 4.822145e-01        75          75       -0.050     0.200         0.15
-    15 Indeterminate 1 3.433772e-01        75          75       -0.100     0.250         0.15
-    16 Indeterminate 2 6.447415e-08        75          75        0.050     0.100         0.15
-    17 Indeterminate 2 2.235870e-09        75          75        0.000     0.150         0.15
-    18 Indeterminate 2 3.442681e-10        75          75       -0.025     0.175         0.15
-    19 Indeterminate 2 4.756762e-11        75          75       -0.050     0.200         0.15
-    20 Indeterminate 2 6.683973e-13        75          75       -0.100     0.250         0.15
-    21            Stop 1.232006e-02        75          75        0.050     0.100         0.15
-    22            Stop 8.432942e-02        75          75        0.000     0.150         0.15
-    23            Stop 1.509382e-01        75          75       -0.025     0.175         0.15
-    24            Stop 2.224109e-01        75          75       -0.050     0.200         0.15
-    25            Stop 3.065523e-01        75          75       -0.100     0.250         0.15
-    26    Stop (Fixed) 8.733303e-04        75          75        0.050     0.100         0.15
-    27    Stop (Fixed) 1.624114e-02        75          75        0.000     0.150         0.15
-    28    Stop (Fixed) 4.443645e-02        75          75       -0.025     0.175         0.15
-    29    Stop (Fixed) 9.822453e-02        75          75       -0.050     0.200         0.15
-    30    Stop (Fixed) 2.979244e-01        75          75       -0.100     0.250         0.15
-    31      Go (Fixed) 5.947519e-01        75         150        0.050     0.100         0.15
-    32      Go (Fixed) 1.987206e-01        75         150        0.000     0.150         0.15
-    33      Go (Fixed) 9.205907e-02        75         150       -0.025     0.175         0.15
-    34      Go (Fixed) 3.674273e-02        75         150       -0.050     0.200         0.15
-    35      Go (Fixed) 3.869971e-03        75         150       -0.100     0.250         0.15
-    36              Go 3.201810e-01        75         150        0.050     0.100         0.15
-    37              Go 3.720240e-01        75         150        0.000     0.150         0.15
-    38              Go 2.716497e-01        75         150       -0.025     0.175         0.15
-    39              Go 1.625763e-01        75         150       -0.050     0.200         0.15
-    40              Go 3.558971e-02        75         150       -0.100     0.250         0.15
-    41 Indeterminate 1 7.488036e-02        75         150        0.050     0.100         0.15
-    42 Indeterminate 1 3.309465e-01        75         150        0.000     0.150         0.15
-    43 Indeterminate 1 4.311718e-01        75         150       -0.025     0.175         0.15
-    44 Indeterminate 1 4.466464e-01        75         150       -0.050     0.200         0.15
-    45 Indeterminate 1 2.770091e-01        75         150       -0.100     0.250         0.15
-    46 Indeterminate 2 9.126242e-09        75         150        0.050     0.100         0.15
-    47 Indeterminate 2 1.591020e-11        75         150        0.000     0.150         0.15
-    48 Indeterminate 2 4.410220e-13        75         150       -0.025     0.175         0.15
-    49 Indeterminate 2 9.714064e-15        75         150       -0.050     0.200         0.15
-    50 Indeterminate 2 2.480298e-18        75         150       -0.100     0.250         0.15
-    51            Stop 9.867110e-03        75         150        0.050     0.100         0.15
-    52            Stop 8.685674e-02        75         150        0.000     0.150         0.15
-    53            Stop 1.672263e-01        75         150       -0.025     0.175         0.15
-    54            Stop 2.579502e-01        75         150       -0.050     0.200         0.15
-    55            Stop 3.414298e-01        75         150       -0.100     0.250         0.15
-    56    Stop (Fixed) 3.196266e-04        75         150        0.050     0.100         0.15
-    57    Stop (Fixed) 1.145223e-02        75         150        0.000     0.150         0.15
-    58    Stop (Fixed) 3.789310e-02        75         150       -0.025     0.175         0.15
-    59    Stop (Fixed) 9.608442e-02        75         150       -0.050     0.200         0.15
-    60    Stop (Fixed) 3.421014e-01        75         150       -0.100     0.250         0.15
+        Category Probability Number of   Number of Alternatives   Assumed      Assumed
+                              subjects    subjects              treatment control rate
+                             (control) (treatment)                   rate
+    1 Go (Fixed)  0.53523266        75          75        0.050     0.100         0.15
+    2 Go (Fixed)  0.20377574        75          75        0.000     0.150         0.15
+    3 Go (Fixed)  0.10670767        75          75       -0.025     0.175         0.15
+    4 Go (Fixed)  0.05023338        75          75       -0.050     0.200         0.15
+    5 Go (Fixed)  0.00831052        75          75       -0.100     0.250         0.15
+    6         Go  0.31322328        75          75        0.050     0.100         0.15
+
+    Preview limited to 6 of 60 rows.
 
 [`summary()`](https://rdrr.io/r/base/summary.html) gives the rule and
 assumptions, followed by one table per sample-size scenario, with one
@@ -1385,66 +1373,14 @@ rates**
 
 |  | Category | Probability | Number of subjects (control) | Number of subjects (treatment) | Alternatives | Assumed treatment rate | Assumed control rate |
 |----|----|----|----|----|----|----|----|
-| 1 | Go (Fixed) | 5.352327e-01 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 2 | Go (Fixed) | 2.037757e-01 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 3 | Go (Fixed) | 1.067077e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 4 | Go (Fixed) | 5.023338e-02 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 5 | Go (Fixed) | 8.310520e-03 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 6 | Go | 3.132233e-01 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 7 | Go | 3.043533e-01 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 8 | Go | 2.267809e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 9 | Go | 1.469166e-01 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 10 | Go | 4.383561e-02 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 11 | Indeterminate 1 | 1.383506e-01 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 12 | Indeterminate 1 | 3.913004e-01 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 13 | Indeterminate 1 | 4.711368e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 14 | Indeterminate 1 | 4.822145e-01 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 15 | Indeterminate 1 | 3.433772e-01 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 16 | Indeterminate 2 | 6.447415e-08 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 17 | Indeterminate 2 | 2.235870e-09 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 18 | Indeterminate 2 | 3.442681e-10 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 19 | Indeterminate 2 | 4.756762e-11 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 20 | Indeterminate 2 | 6.683973e-13 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 21 | Stop | 1.232006e-02 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 22 | Stop | 8.432942e-02 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 23 | Stop | 1.509382e-01 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 24 | Stop | 2.224109e-01 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 25 | Stop | 3.065523e-01 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 26 | Stop (Fixed) | 8.733303e-04 | 75 | 75 | 0.050 | 0.100 | 0.15 |
-| 27 | Stop (Fixed) | 1.624114e-02 | 75 | 75 | 0.000 | 0.150 | 0.15 |
-| 28 | Stop (Fixed) | 4.443645e-02 | 75 | 75 | -0.025 | 0.175 | 0.15 |
-| 29 | Stop (Fixed) | 9.822453e-02 | 75 | 75 | -0.050 | 0.200 | 0.15 |
-| 30 | Stop (Fixed) | 2.979244e-01 | 75 | 75 | -0.100 | 0.250 | 0.15 |
-| 31 | Go (Fixed) | 5.947519e-01 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 32 | Go (Fixed) | 1.987206e-01 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 33 | Go (Fixed) | 9.205907e-02 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 34 | Go (Fixed) | 3.674273e-02 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 35 | Go (Fixed) | 3.869971e-03 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 36 | Go | 3.201810e-01 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 37 | Go | 3.720240e-01 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 38 | Go | 2.716497e-01 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 39 | Go | 1.625763e-01 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 40 | Go | 3.558971e-02 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 41 | Indeterminate 1 | 7.488036e-02 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 42 | Indeterminate 1 | 3.309465e-01 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 43 | Indeterminate 1 | 4.311718e-01 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 44 | Indeterminate 1 | 4.466464e-01 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 45 | Indeterminate 1 | 2.770091e-01 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 46 | Indeterminate 2 | 9.126242e-09 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 47 | Indeterminate 2 | 1.591020e-11 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 48 | Indeterminate 2 | 4.410220e-13 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 49 | Indeterminate 2 | 9.714064e-15 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 50 | Indeterminate 2 | 2.480298e-18 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 51 | Stop | 9.867110e-03 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 52 | Stop | 8.685674e-02 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 53 | Stop | 1.672263e-01 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 54 | Stop | 2.579502e-01 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 55 | Stop | 3.414298e-01 | 75 | 150 | -0.100 | 0.250 | 0.15 |
-| 56 | Stop (Fixed) | 3.196266e-04 | 75 | 150 | 0.050 | 0.100 | 0.15 |
-| 57 | Stop (Fixed) | 1.145223e-02 | 75 | 150 | 0.000 | 0.150 | 0.15 |
-| 58 | Stop (Fixed) | 3.789310e-02 | 75 | 150 | -0.025 | 0.175 | 0.15 |
-| 59 | Stop (Fixed) | 9.608442e-02 | 75 | 150 | -0.050 | 0.200 | 0.15 |
-| 60 | Stop (Fixed) | 3.421014e-01 | 75 | 150 | -0.100 | 0.250 | 0.15 |
+| 1 | Go (Fixed) | 0.53523266 | 75 | 75 | 0.050 | 0.100 | 0.15 |
+| 2 | Go (Fixed) | 0.20377574 | 75 | 75 | 0.000 | 0.150 | 0.15 |
+| 3 | Go (Fixed) | 0.10670767 | 75 | 75 | -0.025 | 0.175 | 0.15 |
+| 4 | Go (Fixed) | 0.05023338 | 75 | 75 | -0.050 | 0.200 | 0.15 |
+| 5 | Go (Fixed) | 0.00831052 | 75 | 75 | -0.100 | 0.250 | 0.15 |
+| 6 | Go | 0.31322328 | 75 | 75 | 0.050 | 0.100 | 0.15 |
+
+Preview limited to 6 of 60 rows.
 
 ------------------------------------------------------------------------
 

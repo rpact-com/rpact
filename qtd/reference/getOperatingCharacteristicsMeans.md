@@ -118,45 +118,17 @@ getOperatingCharacteristicsMeans(rule, numberOfSubjects = matrix(c(20, 30), ncol
 #>   Standard deviation           : 1 
 #> 
 #> Output:
-#>           Category  Probability Number of   Number of Alternatives  Standard
-#>                                  subjects    subjects              deviation
-#>                                 (control) (treatment)                       
-#>  1      Go (Fixed) 8.322067e-06        20          30          0.0         1
-#>  2      Go (Fixed) 1.513943e-04        20          30          0.2         1
-#>  3      Go (Fixed) 1.749695e-03        20          30          0.4         1
-#>  4      Go (Fixed) 1.296489e-02        20          30          0.6         1
-#>  5      Go (Fixed) 6.246053e-02        20          30          0.8         1
-#>  6      Go (Fixed) 2.000000e-01        20          30          1.0         1
-#>  7              Go 1.452616e-02        20          30          0.0         1
-#>  8              Go 6.799626e-02        20          30          0.2         1
-#>  9              Go 2.110021e-01        20          30          0.4         1
-#> 10              Go 4.455844e-01        20          30          0.6         1
-#> 11              Go 6.595187e-01        20          30          0.8         1
-#> 12              Go 7.000000e-01        20          30          1.0         1
-#> 13 Indeterminate 1 0.000000e+00        20          30          0.0         1
-#> 14 Indeterminate 1 0.000000e+00        20          30          0.2         1
-#> 15 Indeterminate 1 0.000000e+00        20          30          0.4         1
-#> 16 Indeterminate 1 0.000000e+00        20          30          0.6         1
-#> 17 Indeterminate 1 0.000000e+00        20          30          0.8         1
-#> 18 Indeterminate 1 0.000000e+00        20          30          1.0         1
-#> 19 Indeterminate 2 1.854655e-01        20          30          0.0         1
-#> 20 Indeterminate 2 3.727077e-01        20          30          0.2         1
-#> 21 Indeterminate 2 4.940341e-01        20          30          0.4         1
-#> 22 Indeterminate 2 4.333774e-01        20          30          0.6         1
-#> 23 Indeterminate 2 2.511963e-01        20          30          0.8         1
-#> 24 Indeterminate 2 9.563539e-02        20          30          1.0         1
-#> 25            Stop 7.000000e-01        20          30          0.0         1
-#> 26            Stop 5.349749e-01        20          30          0.2         1
-#> 27            Stop 2.893897e-01        20          30          0.4         1
-#> 28            Stop 1.076836e-01        20          30          0.6         1
-#> 29            Stop 2.679919e-02        20          30          0.8         1
-#> 30            Stop 4.363575e-03        20          30          1.0         1
-#> 31    Stop (Fixed) 1.000000e-01        20          30          0.0         1
-#> 32    Stop (Fixed) 2.416974e-02        20          30          0.2         1
-#> 33    Stop (Fixed) 3.824396e-03        20          30          0.4         1
-#> 34    Stop (Fixed) 3.896947e-04        20          30          0.6         1
-#> 35    Stop (Fixed) 2.530058e-05        20          30          0.8         1
-#> 36    Stop (Fixed) 1.039173e-06        20          30          1.0         1
+#>     Category  Probability Number of   Number of Alternatives  Standard
+#>                            subjects    subjects              deviation
+#>                           (control) (treatment)                       
+#> 1 Go (Fixed) 8.322067e-06        20          30          0.0         1
+#> 2 Go (Fixed) 1.513943e-04        20          30          0.2         1
+#> 3 Go (Fixed) 1.749695e-03        20          30          0.4         1
+#> 4 Go (Fixed) 1.296489e-02        20          30          0.6         1
+#> 5 Go (Fixed) 6.246053e-02        20          30          0.8         1
+#> 6 Go (Fixed) 2.000000e-01        20          30          1.0         1
+#> 
+#> Preview limited to 6 of 36 rows.
 #> 
 if (requireNamespace("RBesT", quietly = TRUE)) {
     bayes <- getDesignQuantitative(1, bayesian = TRUE)
@@ -180,36 +152,26 @@ if (requireNamespace("RBesT", quietly = TRUE)) {
 #>   Standard deviation           : 1 
 #> 
 #> Output:
-#>           Category  Probability Number of   Number of Alternatives  Standard
-#>                                  subjects    subjects              deviation
-#>                                 (control) (treatment)                       
-#>  1              Go 1.453361e-02        20          30            0         1
-#>  2              Go 8.999959e-01        20          30            1         1
-#>  3              Go 9.999990e-01        20          30            2         1
-#>  4 Indeterminate 1 0.000000e+00        20          30            0         1
-#>  5 Indeterminate 1 0.000000e+00        20          30            1         1
-#>  6 Indeterminate 1 0.000000e+00        20          30            2         1
-#>  7 Indeterminate 2 1.854654e-01        20          30            0         1
-#>  8 Indeterminate 2 9.563947e-02        20          30            1         1
-#>  9 Indeterminate 2 1.038717e-06        20          30            2         1
-#> 10            Stop 8.000010e-01        20          30            0         1
-#> 11            Stop 4.364660e-03        20          30            1         1
-#> 12            Stop 5.767456e-10        20          30            2         1
+#>          Category Probability Number of   Number of Alternatives  Standard
+#>                                subjects    subjects              deviation
+#>                               (control) (treatment)                       
+#> 1              Go  0.01453361        20          30            0         1
+#> 2              Go  0.89999587        20          30            1         1
+#> 3              Go  0.99999896        20          30            2         1
+#> 4 Indeterminate 1  0.00000000        20          30            0         1
+#> 5 Indeterminate 1  0.00000000        20          30            1         1
+#> 6 Indeterminate 1  0.00000000        20          30            2         1
 #> 
-#>     Standard    Standard
-#>    deviation   deviation
-#>    (control) (treatment)
-#>  1         1           1
-#>  2         1           1
-#>  3         1           1
-#>  4         1           1
-#>  5         1           1
-#>  6         1           1
-#>  7         1           1
-#>  8         1           1
-#>  9         1           1
-#> 10         1           1
-#> 11         1           1
-#> 12         1           1
+#>    Standard    Standard
+#>   deviation   deviation
+#>   (control) (treatment)
+#> 1         1           1
+#> 2         1           1
+#> 3         1           1
+#> 4         1           1
+#> 5         1           1
+#> 6         1           1
+#> 
+#> Preview limited to 6 of 12 rows.
 #> 
 ```

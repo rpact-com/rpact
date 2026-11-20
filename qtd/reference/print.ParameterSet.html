@@ -67,7 +67,11 @@ normal representation will be used otherwise (default is <code>FALSE</code>)</p>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Prints the parameters and results of a parameter set.</p>
+    <p>Prints the parameters and results of a parameter set.
+For quantitative operating characteristics, the probability table is limited
+to six rows by default. Pass <code>maxRows</code> through <code>...</code> to change this limit
+in console or Markdown output. Supply a positive integer, or use <code>Inf</code> to
+request the full table, subject to the console's <code>max.print</code> option.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

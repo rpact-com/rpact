@@ -30,4 +30,8 @@ print(x, ..., markdown = NA)
 
 ## Details
 
-Prints the parameters and results of a parameter set.
+Prints the parameters and results of a parameter set. For quantitative
+operating characteristics, the probability table is limited to six rows
+by default. Pass `maxRows` through `...` to change this limit in console
+or Markdown output. Supply a positive integer, or use `Inf` to request
+the full table, subject to the console's `max.print` option.

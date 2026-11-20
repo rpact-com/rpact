@@ -167,132 +167,26 @@ Counts and probabilities are computed without requiring ggplot2 or Java.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Interval method              : wilson </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Output:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Category  Probability Number of   Number of Alternatives   Assumed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                  subjects    subjects              treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                 (control) (treatment)                   rate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1      Go (Fixed) 5.352327e-01        75          75        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2      Go (Fixed) 2.037757e-01        75          75        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3      Go (Fixed) 1.067077e-01        75          75       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4      Go (Fixed) 5.023338e-02        75          75       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5      Go (Fixed) 8.310520e-03        75          75       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6              Go 3.132233e-01        75          75        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7              Go 3.043533e-01        75          75        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8              Go 2.267809e-01        75          75       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9              Go 1.469166e-01        75          75       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10              Go 4.383561e-02        75          75       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 Indeterminate 1 1.383506e-01        75          75        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12 Indeterminate 1 3.913004e-01        75          75        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 Indeterminate 1 4.711368e-01        75          75       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 Indeterminate 1 4.822145e-01        75          75       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15 Indeterminate 1 3.433772e-01        75          75       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16 Indeterminate 2 6.447415e-08        75          75        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 Indeterminate 2 2.235870e-09        75          75        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18 Indeterminate 2 3.442681e-10        75          75       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19 Indeterminate 2 4.756762e-11        75          75       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20 Indeterminate 2 6.683973e-13        75          75       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21            Stop 1.232006e-02        75          75        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22            Stop 8.432942e-02        75          75        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23            Stop 1.509382e-01        75          75       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24            Stop 2.224109e-01        75          75       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25            Stop 3.065523e-01        75          75       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26    Stop (Fixed) 8.733303e-04        75          75        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27    Stop (Fixed) 1.624114e-02        75          75        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28    Stop (Fixed) 4.443645e-02        75          75       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29    Stop (Fixed) 9.822453e-02        75          75       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30    Stop (Fixed) 2.979244e-01        75          75       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31      Go (Fixed) 5.947519e-01        75         150        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32      Go (Fixed) 1.987206e-01        75         150        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33      Go (Fixed) 9.205907e-02        75         150       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34      Go (Fixed) 3.674273e-02        75         150       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35      Go (Fixed) 3.869971e-03        75         150       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36              Go 3.201810e-01        75         150        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37              Go 3.720240e-01        75         150        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38              Go 2.716497e-01        75         150       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39              Go 1.625763e-01        75         150       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40              Go 3.558971e-02        75         150       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41 Indeterminate 1 7.488036e-02        75         150        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42 Indeterminate 1 3.309465e-01        75         150        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43 Indeterminate 1 4.311718e-01        75         150       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44 Indeterminate 1 4.466464e-01        75         150       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45 Indeterminate 1 2.770091e-01        75         150       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46 Indeterminate 2 9.126242e-09        75         150        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47 Indeterminate 2 1.591020e-11        75         150        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48 Indeterminate 2 4.410220e-13        75         150       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49 Indeterminate 2 9.714064e-15        75         150       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50 Indeterminate 2 2.480298e-18        75         150       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51            Stop 9.867110e-03        75         150        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52            Stop 8.685674e-02        75         150        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53            Stop 1.672263e-01        75         150       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54            Stop 2.579502e-01        75         150       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55            Stop 3.414298e-01        75         150       -0.100     0.250</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56    Stop (Fixed) 3.196266e-04        75         150        0.050     0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57    Stop (Fixed) 1.145223e-02        75         150        0.000     0.150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58    Stop (Fixed) 3.789310e-02        75         150       -0.025     0.175</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59    Stop (Fixed) 9.608442e-02        75         150       -0.050     0.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60    Stop (Fixed) 3.421014e-01        75         150       -0.100     0.250</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Category Probability Number of   Number of Alternatives   Assumed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                           subjects    subjects              treatment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          (control) (treatment)                   rate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Go (Fixed)  0.53523266        75          75        0.050     0.100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Go (Fixed)  0.20377574        75          75        0.000     0.150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Go (Fixed)  0.10670767        75          75       -0.025     0.175</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Go (Fixed)  0.05023338        75          75       -0.050     0.200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 Go (Fixed)  0.00831052        75          75       -0.100     0.250</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6         Go  0.31322328        75          75        0.050     0.100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Assumed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    control rate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59         0.15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60         0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        Assumed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   control rate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1         0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3         0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5         0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6         0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Preview limited to 6 of 60 rows.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">oc</span>, markdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="st">"\n"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> *Parameters and output of operating-characteristics for comparing rates*</span>
@@ -318,66 +212,14 @@ Counts and probabilities are computed without requiring ggplot2 or Java.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | | Category| Probability| Number of subjects (control)| Number of subjects (treatment)| Alternatives| Assumed treatment rate| Assumed control rate|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | -----| -----| -----| -----| -----| -----| -----| -----|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 1| Go (Fixed)     | 5.352327e-01   | 75             | 75             | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 2| Go (Fixed)     | 2.037757e-01   | 75             | 75             | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 3| Go (Fixed)     | 1.067077e-01   | 75             | 75             | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 4| Go (Fixed)     | 5.023338e-02   | 75             | 75             | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 5| Go (Fixed)     | 8.310520e-03   | 75             | 75             | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 6| Go             | 3.132233e-01   | 75             | 75             | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 7| Go             | 3.043533e-01   | 75             | 75             | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 8| Go             | 2.267809e-01   | 75             | 75             | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 9| Go             | 1.469166e-01   | 75             | 75             | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 10| Go             | 4.383561e-02   | 75             | 75             | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 11| Indeterminate 1| 1.383506e-01   | 75             | 75             | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 12| Indeterminate 1| 3.913004e-01   | 75             | 75             | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 13| Indeterminate 1| 4.711368e-01   | 75             | 75             | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 14| Indeterminate 1| 4.822145e-01   | 75             | 75             | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 15| Indeterminate 1| 3.433772e-01   | 75             | 75             | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 16| Indeterminate 2| 6.447415e-08   | 75             | 75             | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 17| Indeterminate 2| 2.235870e-09   | 75             | 75             | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 18| Indeterminate 2| 3.442681e-10   | 75             | 75             | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 19| Indeterminate 2| 4.756762e-11   | 75             | 75             | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 20| Indeterminate 2| 6.683973e-13   | 75             | 75             | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 21| Stop           | 1.232006e-02   | 75             | 75             | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 22| Stop           | 8.432942e-02   | 75             | 75             | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 23| Stop           | 1.509382e-01   | 75             | 75             | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 24| Stop           | 2.224109e-01   | 75             | 75             | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 25| Stop           | 3.065523e-01   | 75             | 75             | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 26| Stop (Fixed)   | 8.733303e-04   | 75             | 75             | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 27| Stop (Fixed)   | 1.624114e-02   | 75             | 75             | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 28| Stop (Fixed)   | 4.443645e-02   | 75             | 75             | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 29| Stop (Fixed)   | 9.822453e-02   | 75             | 75             | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 30| Stop (Fixed)   | 2.979244e-01   | 75             | 75             | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 31| Go (Fixed)     | 5.947519e-01   | 75             | 150            | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 32| Go (Fixed)     | 1.987206e-01   | 75             | 150            | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 33| Go (Fixed)     | 9.205907e-02   | 75             | 150            | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 34| Go (Fixed)     | 3.674273e-02   | 75             | 150            | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 35| Go (Fixed)     | 3.869971e-03   | 75             | 150            | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 36| Go             | 3.201810e-01   | 75             | 150            | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 37| Go             | 3.720240e-01   | 75             | 150            | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 38| Go             | 2.716497e-01   | 75             | 150            | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 39| Go             | 1.625763e-01   | 75             | 150            | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 40| Go             | 3.558971e-02   | 75             | 150            | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 41| Indeterminate 1| 7.488036e-02   | 75             | 150            | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 42| Indeterminate 1| 3.309465e-01   | 75             | 150            | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 43| Indeterminate 1| 4.311718e-01   | 75             | 150            | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 44| Indeterminate 1| 4.466464e-01   | 75             | 150            | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 45| Indeterminate 1| 2.770091e-01   | 75             | 150            | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 46| Indeterminate 2| 9.126242e-09   | 75             | 150            | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 47| Indeterminate 2| 1.591020e-11   | 75             | 150            | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 48| Indeterminate 2| 4.410220e-13   | 75             | 150            | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 49| Indeterminate 2| 9.714064e-15   | 75             | 150            | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 50| Indeterminate 2| 2.480298e-18   | 75             | 150            | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 51| Stop           | 9.867110e-03   | 75             | 150            | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 52| Stop           | 8.685674e-02   | 75             | 150            | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 53| Stop           | 1.672263e-01   | 75             | 150            | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 54| Stop           | 2.579502e-01   | 75             | 150            | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 55| Stop           | 3.414298e-01   | 75             | 150            | -0.100         | 0.250          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 56| Stop (Fixed)   | 3.196266e-04   | 75             | 150            | 0.050          | 0.100          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 57| Stop (Fixed)   | 1.145223e-02   | 75             | 150            | 0.000          | 0.150          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 58| Stop (Fixed)   | 3.789310e-02   | 75             | 150            | -0.025         | 0.175          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 59| Stop (Fixed)   | 9.608442e-02   | 75             | 150            | -0.050         | 0.200          | 0.15           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> | 60| Stop (Fixed)   | 3.421014e-01   | 75             | 150            | -0.100         | 0.250          | 0.15           |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | 1| Go (Fixed)| 0.53523266| 75        | 75        | 0.050     | 0.100     | 0.15      |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | 2| Go (Fixed)| 0.20377574| 75        | 75        | 0.000     | 0.150     | 0.15      |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | 3| Go (Fixed)| 0.10670767| 75        | 75        | -0.025    | 0.175     | 0.15      |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | 4| Go (Fixed)| 0.05023338| 75        | 75        | -0.050    | 0.200     | 0.15      |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | 5| Go (Fixed)| 0.00831052| 75        | 75        | -0.100    | 0.250     | 0.15      |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> | 6| Go        | 0.31322328| 75        | 75        | 0.050     | 0.100     | 0.15      |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Preview limited to 6 of 60 rows.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

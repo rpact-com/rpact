@@ -17,15 +17,14 @@
   for means and exact binomial summation for rates. Binary calculations
   offer QTD1 (default), Farrington–Manning, Miettinen–Nurminen, and
   Newcombe interval methods through `intervalMethod`. The new QTD result
-  objects include console and Markdown tables, summaries with a
-  probability table per sample-size scenario, and ggplot2 plots of
-  decision rules, operating characteristics, sample-size and scenario
-  comparisons, sensitivity, and explicitly weighted decision
-  performance. Rates plots support treatment-rate or
-  beneficial-risk-difference axes and control-rate sensitivity with a
-  fixed treatment-rate grid. Bayesian decision rules are supported
-  through `getDesignQuantitative(bayesian = TRUE)` and custom criteria
-  from
+  objects include console and Markdown summaries with a probability
+  table per sample-size scenario, and ggplot2 plots of decision rules,
+  operating characteristics, sample-size and scenario comparisons,
+  sensitivity, and explicitly weighted decision performance. Rates plots
+  support treatment-rate or beneficial-risk-difference axes and
+  control-rate sensitivity with a fixed treatment-rate grid. Bayesian
+  decision rules are supported through
+  `getDesignQuantitative(bayesian = TRUE)` and custom criteria from
   [`getQuantitativeDecisionThresholds()`](https://docs.rpact.org/qtd/reference/getQuantitativeDecisionThresholds.md).
   The common means and rates OC functions dispatch by design class and
   support `RBesT` normal or beta mixture priors. Bayesian results

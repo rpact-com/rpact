@@ -356,11 +356,127 @@ U = upper confidence bound (percentile level 0.9)</p>
 <span>    pi2 <span class="op">=</span> <span class="fl">0.15</span>,</span>
 <span>    directionUpper <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    intervalMethod <span class="op">=</span> <span class="st">"wilson"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="va">ratesOC</span></span></code></pre></div>
+<div class="cell-output-display">
+<p><strong>Parameters and output of operating-characteristics for comparing rates</strong></p>
+<p><strong>User defined parameters</strong></p>
+<ul>
+<li>
+<em>Number of subjects [1]</em>: 75, 75</li>
+<li>
+<em>Number of subjects [2]</em>: 75, 150</li>
+<li>
+<em>Assumed treatment rate</em>: 0.100, 0.110, 0.120, 0.130, 0.140, 0.150, 0.160, 0.170, 0.180, 0.190, 0.200, 0.210, 0.220, 0.230, 0.240, 0.250</li>
+<li>
+<em>Assumed control rate</em>: 0.150</li>
+<li>
+<em>Direction upper</em>: FALSE</li>
+</ul>
+<p><strong>Derived from user defined parameters</strong></p>
+<ul>
+<li>
+<em>Alternatives</em>: 0.05, 0.04, 0.03, 0.02, 0.01, -2.776e-17, -0.01, -0.02, -0.03, -0.04, -0.05, -0.06, -0.07, -0.08, -0.09, -0.1</li>
+</ul>
+<p><strong>Default parameters</strong></p>
+<ul>
+<li>
+<em>Treatment groups</em>: 2</li>
+<li>
+<em>Interval method</em>: wilson</li>
+</ul>
+<p><strong>Output</strong></p>
+<table class="table caption-top">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead><tr class="header">
+<th></th>
+<th>Category</th>
+<th>Probability</th>
+<th>Number of subjects (control)</th>
+<th>Number of subjects (treatment)</th>
+<th>Alternatives</th>
+<th>Assumed treatment rate</th>
+<th>Assumed control rate</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Go (Fixed)</td>
+<td>0.5352327</td>
+<td>75</td>
+<td>75</td>
+<td>5.000000e-02</td>
+<td>0.10</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Go (Fixed)</td>
+<td>0.4569387</td>
+<td>75</td>
+<td>75</td>
+<td>4.000000e-02</td>
+<td>0.11</td>
+<td>0.15</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Go (Fixed)</td>
+<td>0.3833406</td>
+<td>75</td>
+<td>75</td>
+<td>3.000000e-02</td>
+<td>0.12</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Go (Fixed)</td>
+<td>0.3160265</td>
+<td>75</td>
+<td>75</td>
+<td>2.000000e-02</td>
+<td>0.13</td>
+<td>0.15</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Go (Fixed)</td>
+<td>0.2560068</td>
+<td>75</td>
+<td>75</td>
+<td>1.000000e-02</td>
+<td>0.14</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Go (Fixed)</td>
+<td>0.2037757</td>
+<td>75</td>
+<td>75</td>
+<td>-2.775558e-17</td>
+<td>0.15</td>
+<td>0.15</td>
+</tr>
+</tbody>
+</table>
+<p>Preview limited to 6 of 192 rows.</p>
+</div>
 </div>
 <p>Here <code>numberOfSubjects</code> is a positive integer matrix with control in column 1 and treatment in column 2. Each row is a scenario.</p>
 <p>The constructor requires <code>design</code>, <code>numberOfSubjects</code>, <code>pi1</code>, and <code>pi2</code>. With <code>directionUpper = TRUE</code>, the beneficial risk difference is <code>pi1 - pi2</code>; with <code>FALSE</code>, it is <code>pi2 - pi1</code>. The returned <code>alternative</code> field uses that beneficial direction.</p>
 <p>Exact binomial summation over all possible event-count pairs produces the category probabilities which are in the result of <code>getOperatingCharacteristicsRates</code>. The confidence interval construction itself remains approximate, based on the normal assumption described above.</p>
+<p>Printing <code>ratesOC</code> previews the first six rows of the probability table. Use <code>print(ratesOC, maxRows = 10)</code> to see e.g. 10 rows or <code>as.data.frame(ratesOC)</code> to extract the full table.</p>
 </section><section class="level2"><h3 id="named-scenarios">Named scenarios<a class="anchor" aria-label="anchor" href="#named-scenarios"></a>
 </h3>
 <p>We can also assign names to scenarios for easier reference. For example, let’s define five scenarios ranging from “very good” to “very poor” efficacy:</p>
@@ -2161,69 +2277,17 @@ Default parameters:
   Interval method              : wilson
 
 Output:
-          Category  Probability Number of   Number of Alternatives   Assumed      Assumed
-                                 subjects    subjects              treatment control rate
-                                (control) (treatment)                   rate
- 1      Go (Fixed) 5.352327e-01        75          75        0.050     0.100         0.15
- 2      Go (Fixed) 2.037757e-01        75          75        0.000     0.150         0.15
- 3      Go (Fixed) 1.067077e-01        75          75       -0.025     0.175         0.15
- 4      Go (Fixed) 5.023338e-02        75          75       -0.050     0.200         0.15
- 5      Go (Fixed) 8.310520e-03        75          75       -0.100     0.250         0.15
- 6              Go 3.132233e-01        75          75        0.050     0.100         0.15
- 7              Go 3.043533e-01        75          75        0.000     0.150         0.15
- 8              Go 2.267809e-01        75          75       -0.025     0.175         0.15
- 9              Go 1.469166e-01        75          75       -0.050     0.200         0.15
-10              Go 4.383561e-02        75          75       -0.100     0.250         0.15
-11 Indeterminate 1 1.383506e-01        75          75        0.050     0.100         0.15
-12 Indeterminate 1 3.913004e-01        75          75        0.000     0.150         0.15
-13 Indeterminate 1 4.711368e-01        75          75       -0.025     0.175         0.15
-14 Indeterminate 1 4.822145e-01        75          75       -0.050     0.200         0.15
-15 Indeterminate 1 3.433772e-01        75          75       -0.100     0.250         0.15
-16 Indeterminate 2 6.447415e-08        75          75        0.050     0.100         0.15
-17 Indeterminate 2 2.235870e-09        75          75        0.000     0.150         0.15
-18 Indeterminate 2 3.442681e-10        75          75       -0.025     0.175         0.15
-19 Indeterminate 2 4.756762e-11        75          75       -0.050     0.200         0.15
-20 Indeterminate 2 6.683973e-13        75          75       -0.100     0.250         0.15
-21            Stop 1.232006e-02        75          75        0.050     0.100         0.15
-22            Stop 8.432942e-02        75          75        0.000     0.150         0.15
-23            Stop 1.509382e-01        75          75       -0.025     0.175         0.15
-24            Stop 2.224109e-01        75          75       -0.050     0.200         0.15
-25            Stop 3.065523e-01        75          75       -0.100     0.250         0.15
-26    Stop (Fixed) 8.733303e-04        75          75        0.050     0.100         0.15
-27    Stop (Fixed) 1.624114e-02        75          75        0.000     0.150         0.15
-28    Stop (Fixed) 4.443645e-02        75          75       -0.025     0.175         0.15
-29    Stop (Fixed) 9.822453e-02        75          75       -0.050     0.200         0.15
-30    Stop (Fixed) 2.979244e-01        75          75       -0.100     0.250         0.15
-31      Go (Fixed) 5.947519e-01        75         150        0.050     0.100         0.15
-32      Go (Fixed) 1.987206e-01        75         150        0.000     0.150         0.15
-33      Go (Fixed) 9.205907e-02        75         150       -0.025     0.175         0.15
-34      Go (Fixed) 3.674273e-02        75         150       -0.050     0.200         0.15
-35      Go (Fixed) 3.869971e-03        75         150       -0.100     0.250         0.15
-36              Go 3.201810e-01        75         150        0.050     0.100         0.15
-37              Go 3.720240e-01        75         150        0.000     0.150         0.15
-38              Go 2.716497e-01        75         150       -0.025     0.175         0.15
-39              Go 1.625763e-01        75         150       -0.050     0.200         0.15
-40              Go 3.558971e-02        75         150       -0.100     0.250         0.15
-41 Indeterminate 1 7.488036e-02        75         150        0.050     0.100         0.15
-42 Indeterminate 1 3.309465e-01        75         150        0.000     0.150         0.15
-43 Indeterminate 1 4.311718e-01        75         150       -0.025     0.175         0.15
-44 Indeterminate 1 4.466464e-01        75         150       -0.050     0.200         0.15
-45 Indeterminate 1 2.770091e-01        75         150       -0.100     0.250         0.15
-46 Indeterminate 2 9.126242e-09        75         150        0.050     0.100         0.15
-47 Indeterminate 2 1.591020e-11        75         150        0.000     0.150         0.15
-48 Indeterminate 2 4.410220e-13        75         150       -0.025     0.175         0.15
-49 Indeterminate 2 9.714064e-15        75         150       -0.050     0.200         0.15
-50 Indeterminate 2 2.480298e-18        75         150       -0.100     0.250         0.15
-51            Stop 9.867110e-03        75         150        0.050     0.100         0.15
-52            Stop 8.685674e-02        75         150        0.000     0.150         0.15
-53            Stop 1.672263e-01        75         150       -0.025     0.175         0.15
-54            Stop 2.579502e-01        75         150       -0.050     0.200         0.15
-55            Stop 3.414298e-01        75         150       -0.100     0.250         0.15
-56    Stop (Fixed) 3.196266e-04        75         150        0.050     0.100         0.15
-57    Stop (Fixed) 1.145223e-02        75         150        0.000     0.150         0.15
-58    Stop (Fixed) 3.789310e-02        75         150       -0.025     0.175         0.15
-59    Stop (Fixed) 9.608442e-02        75         150       -0.050     0.200         0.15
-60    Stop (Fixed) 3.421014e-01        75         150       -0.100     0.250         0.15</code></pre>
+    Category Probability Number of   Number of Alternatives   Assumed      Assumed
+                          subjects    subjects              treatment control rate
+                         (control) (treatment)                   rate
+1 Go (Fixed)  0.53523266        75          75        0.050     0.100         0.15
+2 Go (Fixed)  0.20377574        75          75        0.000     0.150         0.15
+3 Go (Fixed)  0.10670767        75          75       -0.025     0.175         0.15
+4 Go (Fixed)  0.05023338        75          75       -0.050     0.200         0.15
+5 Go (Fixed)  0.00831052        75          75       -0.100     0.250         0.15
+6         Go  0.31322328        75          75        0.050     0.100         0.15
+
+Preview limited to 6 of 60 rows.</code></pre>
 </div>
 </div>
 <p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> gives the rule and assumptions, followed by one table per sample-size scenario, with one row per input effect and six probability columns. Rates tables include treatment probability and beneficial risk difference.</p>
@@ -2540,7 +2604,7 @@ Output:
 <tr class="odd">
 <td>1</td>
 <td>Go (Fixed)</td>
-<td>5.352327e-01</td>
+<td>0.53523266</td>
 <td>75</td>
 <td>75</td>
 <td>0.050</td>
@@ -2550,7 +2614,7 @@ Output:
 <tr class="even">
 <td>2</td>
 <td>Go (Fixed)</td>
-<td>2.037757e-01</td>
+<td>0.20377574</td>
 <td>75</td>
 <td>75</td>
 <td>0.000</td>
@@ -2560,7 +2624,7 @@ Output:
 <tr class="odd">
 <td>3</td>
 <td>Go (Fixed)</td>
-<td>1.067077e-01</td>
+<td>0.10670767</td>
 <td>75</td>
 <td>75</td>
 <td>-0.025</td>
@@ -2570,7 +2634,7 @@ Output:
 <tr class="even">
 <td>4</td>
 <td>Go (Fixed)</td>
-<td>5.023338e-02</td>
+<td>0.05023338</td>
 <td>75</td>
 <td>75</td>
 <td>-0.050</td>
@@ -2580,7 +2644,7 @@ Output:
 <tr class="odd">
 <td>5</td>
 <td>Go (Fixed)</td>
-<td>8.310520e-03</td>
+<td>0.00831052</td>
 <td>75</td>
 <td>75</td>
 <td>-0.100</td>
@@ -2590,555 +2654,16 @@ Output:
 <tr class="even">
 <td>6</td>
 <td>Go</td>
-<td>3.132233e-01</td>
+<td>0.31322328</td>
 <td>75</td>
 <td>75</td>
 <td>0.050</td>
 <td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>7</td>
-<td>Go</td>
-<td>3.043533e-01</td>
-<td>75</td>
-<td>75</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>8</td>
-<td>Go</td>
-<td>2.267809e-01</td>
-<td>75</td>
-<td>75</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>9</td>
-<td>Go</td>
-<td>1.469166e-01</td>
-<td>75</td>
-<td>75</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>10</td>
-<td>Go</td>
-<td>4.383561e-02</td>
-<td>75</td>
-<td>75</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>11</td>
-<td>Indeterminate 1</td>
-<td>1.383506e-01</td>
-<td>75</td>
-<td>75</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>12</td>
-<td>Indeterminate 1</td>
-<td>3.913004e-01</td>
-<td>75</td>
-<td>75</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>13</td>
-<td>Indeterminate 1</td>
-<td>4.711368e-01</td>
-<td>75</td>
-<td>75</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>14</td>
-<td>Indeterminate 1</td>
-<td>4.822145e-01</td>
-<td>75</td>
-<td>75</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>15</td>
-<td>Indeterminate 1</td>
-<td>3.433772e-01</td>
-<td>75</td>
-<td>75</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>16</td>
-<td>Indeterminate 2</td>
-<td>6.447415e-08</td>
-<td>75</td>
-<td>75</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>17</td>
-<td>Indeterminate 2</td>
-<td>2.235870e-09</td>
-<td>75</td>
-<td>75</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>18</td>
-<td>Indeterminate 2</td>
-<td>3.442681e-10</td>
-<td>75</td>
-<td>75</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>19</td>
-<td>Indeterminate 2</td>
-<td>4.756762e-11</td>
-<td>75</td>
-<td>75</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>20</td>
-<td>Indeterminate 2</td>
-<td>6.683973e-13</td>
-<td>75</td>
-<td>75</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>21</td>
-<td>Stop</td>
-<td>1.232006e-02</td>
-<td>75</td>
-<td>75</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>22</td>
-<td>Stop</td>
-<td>8.432942e-02</td>
-<td>75</td>
-<td>75</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>23</td>
-<td>Stop</td>
-<td>1.509382e-01</td>
-<td>75</td>
-<td>75</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>24</td>
-<td>Stop</td>
-<td>2.224109e-01</td>
-<td>75</td>
-<td>75</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>25</td>
-<td>Stop</td>
-<td>3.065523e-01</td>
-<td>75</td>
-<td>75</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>26</td>
-<td>Stop (Fixed)</td>
-<td>8.733303e-04</td>
-<td>75</td>
-<td>75</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>27</td>
-<td>Stop (Fixed)</td>
-<td>1.624114e-02</td>
-<td>75</td>
-<td>75</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>28</td>
-<td>Stop (Fixed)</td>
-<td>4.443645e-02</td>
-<td>75</td>
-<td>75</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>29</td>
-<td>Stop (Fixed)</td>
-<td>9.822453e-02</td>
-<td>75</td>
-<td>75</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>30</td>
-<td>Stop (Fixed)</td>
-<td>2.979244e-01</td>
-<td>75</td>
-<td>75</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>31</td>
-<td>Go (Fixed)</td>
-<td>5.947519e-01</td>
-<td>75</td>
-<td>150</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>32</td>
-<td>Go (Fixed)</td>
-<td>1.987206e-01</td>
-<td>75</td>
-<td>150</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>33</td>
-<td>Go (Fixed)</td>
-<td>9.205907e-02</td>
-<td>75</td>
-<td>150</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>34</td>
-<td>Go (Fixed)</td>
-<td>3.674273e-02</td>
-<td>75</td>
-<td>150</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>35</td>
-<td>Go (Fixed)</td>
-<td>3.869971e-03</td>
-<td>75</td>
-<td>150</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>36</td>
-<td>Go</td>
-<td>3.201810e-01</td>
-<td>75</td>
-<td>150</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>37</td>
-<td>Go</td>
-<td>3.720240e-01</td>
-<td>75</td>
-<td>150</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>38</td>
-<td>Go</td>
-<td>2.716497e-01</td>
-<td>75</td>
-<td>150</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>39</td>
-<td>Go</td>
-<td>1.625763e-01</td>
-<td>75</td>
-<td>150</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>40</td>
-<td>Go</td>
-<td>3.558971e-02</td>
-<td>75</td>
-<td>150</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>41</td>
-<td>Indeterminate 1</td>
-<td>7.488036e-02</td>
-<td>75</td>
-<td>150</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>42</td>
-<td>Indeterminate 1</td>
-<td>3.309465e-01</td>
-<td>75</td>
-<td>150</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>43</td>
-<td>Indeterminate 1</td>
-<td>4.311718e-01</td>
-<td>75</td>
-<td>150</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>44</td>
-<td>Indeterminate 1</td>
-<td>4.466464e-01</td>
-<td>75</td>
-<td>150</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>45</td>
-<td>Indeterminate 1</td>
-<td>2.770091e-01</td>
-<td>75</td>
-<td>150</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>46</td>
-<td>Indeterminate 2</td>
-<td>9.126242e-09</td>
-<td>75</td>
-<td>150</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>47</td>
-<td>Indeterminate 2</td>
-<td>1.591020e-11</td>
-<td>75</td>
-<td>150</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>48</td>
-<td>Indeterminate 2</td>
-<td>4.410220e-13</td>
-<td>75</td>
-<td>150</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>49</td>
-<td>Indeterminate 2</td>
-<td>9.714064e-15</td>
-<td>75</td>
-<td>150</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>50</td>
-<td>Indeterminate 2</td>
-<td>2.480298e-18</td>
-<td>75</td>
-<td>150</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>51</td>
-<td>Stop</td>
-<td>9.867110e-03</td>
-<td>75</td>
-<td>150</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>52</td>
-<td>Stop</td>
-<td>8.685674e-02</td>
-<td>75</td>
-<td>150</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>53</td>
-<td>Stop</td>
-<td>1.672263e-01</td>
-<td>75</td>
-<td>150</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>54</td>
-<td>Stop</td>
-<td>2.579502e-01</td>
-<td>75</td>
-<td>150</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>55</td>
-<td>Stop</td>
-<td>3.414298e-01</td>
-<td>75</td>
-<td>150</td>
-<td>-0.100</td>
-<td>0.250</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>56</td>
-<td>Stop (Fixed)</td>
-<td>3.196266e-04</td>
-<td>75</td>
-<td>150</td>
-<td>0.050</td>
-<td>0.100</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>57</td>
-<td>Stop (Fixed)</td>
-<td>1.145223e-02</td>
-<td>75</td>
-<td>150</td>
-<td>0.000</td>
-<td>0.150</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>58</td>
-<td>Stop (Fixed)</td>
-<td>3.789310e-02</td>
-<td>75</td>
-<td>150</td>
-<td>-0.025</td>
-<td>0.175</td>
-<td>0.15</td>
-</tr>
-<tr class="odd">
-<td>59</td>
-<td>Stop (Fixed)</td>
-<td>9.608442e-02</td>
-<td>75</td>
-<td>150</td>
-<td>-0.050</td>
-<td>0.200</td>
-<td>0.15</td>
-</tr>
-<tr class="even">
-<td>60</td>
-<td>Stop (Fixed)</td>
-<td>3.421014e-01</td>
-<td>75</td>
-<td>150</td>
-<td>-0.100</td>
-<td>0.250</td>
 <td>0.15</td>
 </tr>
 </tbody>
 </table>
+<p>Preview limited to 6 of 60 rows.</p>
 <hr>
 <p><strong>Operating-characteristics for comparing rates</strong></p>
 <p><strong>Decision rule</strong></p>
