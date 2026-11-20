@@ -38,6 +38,7 @@ NULL
 #' probabilities. Each sample-size scenario has a separate table, with one row
 #' per alternative and one column per decision category. Categories are retained
 #' separately; probabilities are neither recomputed nor aggregated.
+#' Names supplied with `pi1` or `alternative` label the rows in each table.
 #' Rates tables show the treatment event probability and the beneficial risk
 #' difference. Their assumptions include the control event probability,
 #' beneficial direction and selected interval method.
@@ -412,7 +413,14 @@ NULL
     probabilities <- probabilities[rows, , drop = FALSE]
     firstCategory <- probabilities$category == categories[1L]
     settings <- .getQtdEndpointSettings(object)
-    result <- data.frame(row.names = seq_len(sum(firstCategory)))
+    rowNames <- names(object$alternative)
+    if (inherits(object, "OperatingCharacteristicsRates")) {
+        rowNames <- names(object$pi1)
+    }
+    if (is.null(rowNames)) {
+        rowNames <- seq_len(sum(firstCategory))
+    }
+    result <- data.frame(row.names = rowNames)
     for (column in settings$summaryColumns) {
         digits <- digitSettings$digitsGeneral
         if (column == "pi1") {

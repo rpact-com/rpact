@@ -27,6 +27,8 @@
 
     # Matrix column names identify arms, not result-table row names.
     numberOfSubjects <- unname(numberOfSubjects)
+    scenarioNames <- names(alternative)
+    alternative <- unname(alternative)
 
     s <- stDev * sqrt((1 / numberOfSubjects[2]) + (1 / numberOfSubjects[1]))
 
@@ -56,22 +58,17 @@
 
     p6 <- pnorm(lrvMinusQUs, mean = alternative, sd = s)
 
-    categories <- c(
-        "Go (Fixed)",
-        "Go",
-        "Indeterminate 1",
-        "Indeterminate 2",
-        "Stop",
-        "Stop (Fixed)"
-    )
-    return(data.frame(
+    categories <- .getQtdCategories()
+    data <- data.frame(
         category = rep(categories, each = length(alternative)),
         probability = c(p1, p2, p3, p4, p5, p6),
         nControl = numberOfSubjects[1],
         nTreatment = numberOfSubjects[2],
         alternative = alternative,
         stDev = stDev
-    ))
+    )
+    data$scenarioName <- rep(scenarioNames, times = length(categories))
+    return(data)
 }
 
 # This is just going through all numberOfSubjects scenarios
@@ -106,6 +103,8 @@
 #' @param normalApproximation Frequentist option, currently TRUE. Omit for Bayes.
 #' @param groups Number of groups; currently two.
 #' @param alternative Finite vector of true treatment-minus-control effects.
+#'   Optional names must be unique and non-empty. They label summary rows
+#'   and appear in the `scenarioName` column of the probability table and plot data.
 #' @param stDev Positive common SD or, for Bayes, two known SDs ordered control,
 #'   treatment. Defaults to one. Sampling uncertainty of SDs is not modeled.
 #' @param priorDist Bayesian RBesT normMix prior on the effect or a list of two
@@ -194,6 +193,7 @@ getOperatingCharacteristicsMeans <- function(
     .assertQtdPlotNumeric(alternative, "alternative", functionName)
     .assertQtdPlotNumeric(stDev, "stDev", functionName, lower = 0, openLower = TRUE, expectedLength = 1L)
 
+    .assertQtdEffectNames(alternative, "alternative", functionName)
     meanOCresults <- .calcOperatingCharacteristicsMeans(
         design = design,
         numberOfSubjects = numberOfSubjects,

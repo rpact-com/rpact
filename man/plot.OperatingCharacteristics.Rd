@@ -77,7 +77,8 @@ decisions are "Go", "Indeterminate", or "Stop". All three observed decisions
 remain visible; no implicit treatment of Indeterminate as Stop is applied.
 For rates, provide one entry per distinct selected treatment rate, in \code{pi1}
 selection order (or original input order). The same distribution is applied
-separately to each control-rate panel.}
+separately to each control-rate panel. For named inputs, supply one entry per
+scenario in selection order (or original input order), even when values repeat.}
 
 \item{contourLevels}{Optional probability levels for sensitivity-map contours.}
 
@@ -97,6 +98,9 @@ decisions are the color/fill categories, and the rpact hue palette for curves.}
 }
 \value{
 A ggplot object with its data in the \code{data} component.
+Named effects label scenarios in types 3 and 4 and appear in the data
+for plots that display individual effects. Type 6 records the names in the
+\code{qtdEffectDistribution} attribute.
 }
 \description{
 Plots decision probabilities, sample-size comparisons, sensitivity surfaces

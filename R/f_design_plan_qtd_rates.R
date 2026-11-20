@@ -108,6 +108,9 @@ OperatingCharacteristicsRates <- R6::R6Class("OperatingCharacteristicsRates",
     if (is.null(decisionMaps)) {
         decisionMaps <- new.env(parent = emptyenv())
     }
+    scenarioNames <- names(pi1)
+    pi1 <- unname(pi1)
+    alternative <- unname(alternative)
     for (scenario in seq_len(nrow(numberOfSubjects))) {
         sizes <- unname(numberOfSubjects[scenario, ])
         key <- paste(sizes, collapse = "/")
@@ -132,7 +135,9 @@ OperatingCharacteristicsRates <- R6::R6Class("OperatingCharacteristicsRates",
             pi1 = rep(pi1, times = length(categories)), pi2 = pi2
         )
     }
-    return(do.call(rbind, result))
+    data <- do.call(rbind, result)
+    data$scenarioName <- rep(scenarioNames, times = length(categories) * nrow(numberOfSubjects))
+    return(data)
 }
 
 #'
@@ -261,6 +266,7 @@ getOperatingCharacteristicsRates <- function(design, ..., numberOfSubjects, pi1,
     .assertIsSingleLogical(directionUpper, "directionUpper")
     .assertQtdPlotChoice(intervalMethod, "intervalMethod",
         c("wilson", "farringtonManning", "miettinenNurminen", "newcombe"), functionName)
+    .assertQtdEffectNames(pi1, "pi1", functionName)
     probabilities <- .calcOperatingCharacteristicsRates(design, numberOfSubjects, pi1, pi2,
         directionUpper, intervalMethod)
     return(OperatingCharacteristicsRates$new(design = design, numberOfSubjects = numberOfSubjects,

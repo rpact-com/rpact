@@ -239,12 +239,13 @@ We can also assign names to scenarios for easier reference. For example, let's d
 #| label: kestrel-scenarios
 scenarioNames <- c("Very good", "Good", "Indifferent", "Poor", "Very poor")
 controlRate <- 0.15
-scenarioRates <- c(0.10, 0.15, 0.175, 0.20, 0.25)
+scenarioRates <- c(0.10, 0.15, 0.175, 0.20, 0.25) |> 
+    stats::setNames(scenarioNames)
 improvements <- controlRate - scenarioRates
 knitr::kable(data.frame(
     Scenario = scenarioNames,
-    `True improvement (percentage points)` = 100 * improvements,
-    `Treatment event probability` = scenarioRates,
+    `True improvement (percentage points)` = 100 * unname(improvements),
+    `Treatment event probability` = unname(scenarioRates),
     check.names = FALSE
 ))
 ```
@@ -264,7 +265,8 @@ ratesScenarios <- getOperatingCharacteristicsRates(
 summary(ratesScenarios, digits = 4)
 ```
 
-For both sample size configurations, we can thus see the probabilities for each decision under the assumed treatment rate.
+The summary uses the scenario names as row labels in each sample-size table. Names must be unique and non-empty. For means, use a named `alternative` vector in the same way.
+(Note that if no names are provided, then the scenarios will just be identified by their index.)
 
 The following table gives the calculated three-category probabilities for the
 five scenarios to six decimal places under the Wilson interval construction.
@@ -274,15 +276,14 @@ five scenarios to six decimal places under the Wilson interval construction.
 scenarioPlot <- plot(ratesScenarios, type = 4, plotCat = 3)
 
 scenarioTable <- scenarioPlot$data |>
-    dplyr::select(scenario, nControl, nTreatment, pi1, alternative,
+    dplyr::select(scenario, effectIndex, Scenario = scenarioName, nControl, nTreatment, pi1, alternative,
         category, probability) |>
     tidyr::pivot_wider(
         names_from = category,
         values_from = probability,
         names_prefix = "probability."
     ) |>
-    dplyr::arrange(scenario, match(pi1, scenarioRates)) |>
-    dplyr::mutate(Scenario = scenarioNames[match(pi1, scenarioRates)])
+    dplyr::arrange(scenario, effectIndex)
 knitr::kable(
     scenarioTable[c("Scenario", "nControl", "nTreatment", "pi1", "alternative",
         "probability.Go", "probability.Indeterminate", "probability.Stop")],
@@ -1217,9 +1218,9 @@ ratesPerformance
 
 The data include `desiredDecision`, `observedDecision`, and `correct`. The
 `qtdEffectDistribution` attribute records the exact effect distribution and
-desired decisions. For Rates it identifies scenarios by `pi1`. If several `pi2`
-values are supplied, the same distribution over treatment rates and desired
-decisions applies separately to each control-rate panel.
+desired decisions. For Rates it includes the treatment event rate (`pi1`) and,
+when supplied, the scenario name (`scenarioName`). If several `pi2` values are
+supplied, the same distribution applies separately to each control-rate panel.
 
 ```{r}
 #| label: performance-data

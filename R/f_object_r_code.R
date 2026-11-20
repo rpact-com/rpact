@@ -615,6 +615,17 @@ getObjectRCode <- function(
     .assertIsParameterSetClass(obj, "ParameterSet")
     if (inherits(obj, "TrialDesignPlanQuantitativeBase") ||
             inherits(obj, "QuantitativeDecisionThresholds") || .isQtdOperatingCharacteristics(obj)) {
+        if (.isQtdOperatingCharacteristics(obj)) {
+            effectParameter <- .getQtdEndpointSettings(obj)$effectColumn
+            effects <- obj[[effectParameter]]
+            if (effectParameter %in% names(newArgumentValues)) {
+                effects <- newArgumentValues[[effectParameter]]
+            }
+            if (!is.null(names(effects))) {
+                # The word wrapper can insert line breaks inside scenario names.
+                stringWrapParagraphWidth <- NULL
+            }
+        }
         code <- .getQtdRCodeExpression(obj, newArgumentValues)
         return(.formatRCode(paste0(prefix, code), precondition = character(),
             stringWrapParagraphWidth = stringWrapParagraphWidth, postfix = postfix,

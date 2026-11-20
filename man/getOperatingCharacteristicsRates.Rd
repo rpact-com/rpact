@@ -26,7 +26,9 @@ values refer to the risk difference in the beneficial direction.}
 treatment, and at least one row. Each row is a sample-size scenario; all
 entries must be positive integers.}
 
-\item{pi1}{Numeric vector of true treatment event probabilities in \verb{[0, 1]}.}
+\item{pi1}{Numeric vector of true treatment event probabilities in \verb{[0, 1]}.
+Optional names must be unique and non-empty. They label summary rows
+and appear in the \code{scenarioName} column of the probability table and plot data.}
 
 \item{pi2}{Single true control event probability in \verb{[0, 1]}.}
 

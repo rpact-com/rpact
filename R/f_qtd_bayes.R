@@ -81,6 +81,8 @@
         return(.getQtdBayesDecision(design[[rule]], twoSamples, directionUpper))
     })
     result <- vector("list", nrow(numberOfSubjects))
+    scenarioNames <- names(alternatives)
+    alternatives <- unname(alternatives)
     for (scenario in seq_len(nrow(numberOfSubjects))) {
         sizes <- unname(numberOfSubjects[scenario, ])
         probabilities <- tryCatch({
@@ -130,7 +132,9 @@
         }
         result[[scenario]] <- data
     }
-    return(do.call(rbind, result))
+    data <- do.call(rbind, result)
+    data$scenarioName <- rep(scenarioNames, times = length(categories) * nrow(numberOfSubjects))
+    return(data)
 }
 
 .getQtdBayesMeans <- function(design, numberOfSubjects, alternative, stDev, controlMean, priorDist, groups) {
@@ -140,6 +144,7 @@
     .assertQtdPlotChoice(groups, "groups", 2L, functionName)
     .assertIsNumericVector(alternative, "alternative")
     .assertQtdPlotNumeric(alternative, "alternative", functionName)
+    .assertQtdEffectNames(alternative, "alternative", functionName)
     .assertQtdPlotNumeric(stDev, "stDev", functionName, lower = 0, openLower = TRUE)
     if (!(length(stDev) %in% c(1L, 2L))) {
         stopArgumentLengthOutOfBounds("'stDev' must have length one or two",
@@ -189,6 +194,7 @@
     .assertQtdSampleSizes(numberOfSubjects, functionName)
     .assertIsNumericVector(pi1, "pi1")
     .assertQtdPlotNumeric(pi1, "pi1", functionName, lower = 0, upper = 1)
+    .assertQtdEffectNames(pi1, "pi1", functionName)
     .assertIsNumericVector(pi2, "pi2")
     .assertQtdPlotNumeric(pi2, "pi2", functionName, lower = 0, upper = 1, expectedLength = 1L)
     .assertIsSingleLogical(directionUpper, "directionUpper")
@@ -263,6 +269,7 @@
             }
             data <- stats::aggregate(stats::reformulate(columns, response = "probability"), data, sum)
         }
+        data$scenarioName <- names(object[[settings$effectColumn]])[data$effectIndex]
         data$category <- factor(data$category, levels = .getQtdCategories(plotCat))
         data$sampleSize <- paste0("C: ", data$nControl, " / T: ", data$nTreatment)
         data$scenarioLabel <- paste0(data$scenario, ": ", data$sampleSize)

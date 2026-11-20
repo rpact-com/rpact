@@ -1,5 +1,30 @@
 ## Endpoint-specific settings and shared output for quantitative trial results.
 
+#'
+#' @title
+#' Validate Quantitative Effect Scenario Names
+#'
+#' @description
+#' Checks that a named effect vector supplies a distinct, nonblank label for every entry.
+#'
+#' @param values The numeric treatment rates or mean effects.
+#' @param parameter The argument name.
+#' @param functionName The public function validating the argument.
+#'
+#' @noRd
+#'
+.assertQtdEffectNames <- function(values, parameter, functionName) {
+    labels <- names(values)
+    if (anyNA(labels) || any(!nzchar(trimws(labels))) || anyDuplicated(labels)) {
+        stopIllegalArgument("Names of '", parameter, "' must be unique and non-empty",
+            functionName = functionName, parameter = parameter, value = values,
+            constraint = "unique, non-empty, non-missing scenario names when supplied",
+            diagnosticId = "qtd.invalid_effect_names",
+            context = list(scenarioNames = labels)
+        )
+    }
+}
+
 .isQtdOperatingCharacteristics <- function(object) {
     return(inherits(object, "OperatingCharacteristicsMeans") || inherits(object, "OperatingCharacteristicsRates"))
 }

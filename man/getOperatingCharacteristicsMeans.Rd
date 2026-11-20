@@ -28,7 +28,9 @@ each row is a sample-size scenario.}
 
 \item{groups}{Number of groups; currently two.}
 
-\item{alternative}{Finite vector of true treatment-minus-control effects.}
+\item{alternative}{Finite vector of true treatment-minus-control effects.
+Optional names must be unique and non-empty. They label summary rows
+and appear in the \code{scenarioName} column of the probability table and plot data.}
 
 \item{stDev}{Positive common SD or, for Bayes, two known SDs ordered control,
 treatment. Defaults to one. Sampling uncertainty of SDs is not modeled.}

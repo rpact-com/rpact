@@ -272,7 +272,8 @@ plot.TrialDesignPlanQuantitative <- function(x, ..., type = 1L, estimates = NULL
 #'   remain visible; no implicit treatment of Indeterminate as Stop is applied.
 #'   For rates, provide one entry per distinct selected treatment rate, in `pi1`
 #'   selection order (or original input order). The same distribution is applied
-#'   separately to each control-rate panel.
+#'   separately to each control-rate panel. For named inputs, supply one entry per
+#'   scenario in selection order (or original input order), even when values repeat.
 #' @param xlab,ylab Optional axis labels.
 #' @param palette Optional rpact color palette; NULL uses semantic colors when
 #'   decisions are the color/fill categories, and the rpact hue palette for curves.
@@ -311,6 +312,9 @@ plot.TrialDesignPlanQuantitative <- function(x, ..., type = 1L, estimates = NULL
 #' column; for means it retains the `effect` column.
 #'
 #' @return A ggplot object with its data in the `data` component.
+#' Named effects label scenarios in types 3 and 4 and appear in the data
+#' for plots that display individual effects. Type 6 records the names in the
+#' `qtdEffectDistribution` attribute.
 #'
 #' @examples
 #' rule <- getDesignQuantitative(targetValue = 1, lowerReferenceValue = 0)
@@ -366,6 +370,13 @@ plot.OperatingCharacteristics <- function(x, plotCat = c(3, 6), main = NA_charac
     if (is.na(plotPointsEnabled)) {
         plotPointsEnabled <- length(unique(data[[settings$effectColumn]])) <= 10L
     }
+    if (type %in% c(3L, 4L)) {
+        labels <- data[[settings$xColumn]]
+        if (!is.null(data$scenarioName)) {
+            labels <- data$scenarioName
+        }
+        data$effectLabel <- factor(labels, levels = unique(labels))
+    }
     rule <- x$.design
     size <- 0.8
     if (inherits(plotSettings, "PlotSettings")) {
@@ -403,12 +414,15 @@ plot.OperatingCharacteristics <- function(x, plotCat = c(3, 6), main = NA_charac
         outcomeColors <- TRUE
     } else if (type == 3L) {
         .assertQtdSampleSizeVariation(data, functionName)
+        effectGroup <- settings$effectColumn
+        if (!is.null(data$scenarioName)) {
+            effectGroup <- "effectLabel"
+        }
         data <- .uniqueQtdEffectRows(data, includeSampleSize = TRUE,
-            effectColumnName = settings$effectColumn, assumptionColumn = settings$assumptionColumn)
-        data$effectLabel <- factor(data[[settings$xColumn]], levels = unique(data[[settings$xColumn]]))
+            effectColumnName = effectGroup, assumptionColumn = settings$assumptionColumn)
         data$allocationLabel <- paste0("T/C = ", signif(data$allocationRatio, 5))
         p <- ggplot2::ggplot(data, ggplot2::aes(.data[["totalSubjects"]], .data[["probability"]], color = .data[["effectLabel"]],
-            group = interaction(.data[[settings$effectColumn]], .data[["allocationRatio"]]))) +
+            group = interaction(.data[[effectGroup]], .data[["allocationRatio"]]))) +
             ggplot2::geom_line(linewidth = size) + ggplot2::geom_point(size = pointSize) +
             ggplot2::facet_grid(stats::as.formula(paste(settings$assumptionColumn, "+ allocationLabel ~ category")),
                 labeller = .getQtdFacetLabeller()) +
@@ -416,7 +430,6 @@ plot.OperatingCharacteristics <- function(x, plotCat = c(3, 6), main = NA_charac
                 color = ifelse(settings$xAxis == "treatmentRate", "Treatment rate", "True effect"))
         defaultTitle <- "Decision probabilities by sample size"
     } else if (type == 4L) {
-        data$effectLabel <- factor(data[[settings$xColumn]], levels = unique(data[[settings$xColumn]]))
         p <- ggplot2::ggplot(data, ggplot2::aes(.data[["effectLabel"]], .data[["probability"]], color = .data[["scenarioLabel"]])) +
             ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5), size = pointSize) +
             ggplot2::facet_wrap(categoryFacets, ncol = 3, labeller = .getQtdFacetLabeller()) +

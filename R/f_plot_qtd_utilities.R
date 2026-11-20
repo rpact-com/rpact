@@ -215,6 +215,7 @@
             }
             data <- stats::aggregate(stats::reformulate(columns, response = "probability"), data = data, FUN = sum)
         }
+        data$scenarioName <- names(object[[settings$effectColumn]])[data$effectIndex]
         data$category <- factor(data$category, levels = .getQtdCategories(plotCat))
         data$sampleSize <- paste0("C: ", data$nControl, " / T: ", data$nTreatment)
         data$scenarioLabel <- paste0(data$scenario, ": ", data$sampleSize)
@@ -459,6 +460,9 @@
                 constraint = "pi1 is a rates endpoint argument", relatedParameter = "endpoint", relatedValue = "means",
                 diagnosticId = "qtd.plot.endpoint_argument_not_applicable")
         }
+        if (is.null(alternatives) && !is.null(data$scenarioName)) {
+            return(data[order(data$effectIndex), , drop = FALSE])
+        }
         return(.selectQtdAlternatives(data, alternatives, functionName))
     }
     if (!is.null(alternatives) && !is.null(pi1)) {
@@ -474,6 +478,9 @@
         pi1 <- unique(selected$pi1)
     }
     if (is.null(pi1)) {
+        if (!is.null(data$scenarioName)) {
+            return(data[order(data$effectIndex), , drop = FALSE])
+        }
         pi1 <- unique(object$pi1)
     }
     return(.selectQtdAlternatives(data, pi1, functionName, effectColumnName = "pi1", parameterName = "pi1"))
@@ -598,6 +605,9 @@
             effectLabel <- "pi1"
         }
         data$panel <- paste0(assumption, "; ", effectLabel, " = ", data[[settings$effectColumn]])
+        if (length(unique(data$scenarioName)) == 1L) {
+            data$panel <- paste0(data$panel, " (", data$scenarioName, ")")
+        }
         xlab <- "Number of control subjects"
         ylab <- "Number of treatment subjects"
     }
@@ -627,7 +637,12 @@
 
 .getQtdDecisionPerformance <- function(data, weights, desiredDecisions, functionName,
         effectColumnName = "alternative", assumptionColumn = "stDev") {
-    effects <- unique(data[[effectColumnName]])
+    scenarioColumn <- effectColumnName
+    if (!is.null(data$scenarioName)) {
+        scenarioColumn <- "scenarioName"
+    }
+    scenarios <- unique(data[c(scenarioColumn, effectColumnName)])
+    effects <- scenarios[[effectColumnName]]
     
     .assertQtdPlotNumeric(weights, "weights", functionName, lower = 0, expectedLength = length(effects))
     if (abs(sum(weights) - 1) > 1e-10) {
@@ -667,8 +682,8 @@
             context = list(allowedValues = decisions)
         )
     }
-    data <- .uniqueQtdEffectRows(data, effectColumnName = effectColumnName, assumptionColumn = assumptionColumn)
-    indices <- match(data[[effectColumnName]], effects)
+    data <- .uniqueQtdEffectRows(data, effectColumnName = scenarioColumn, assumptionColumn = assumptionColumn)
+    indices <- match(data[[scenarioColumn]], scenarios[[scenarioColumn]])
     data$desiredDecision <- desiredDecisions[indices]
     data$observedDecision <- .getQtdCoarseCategory(data$category)
     data$probability <- data$probability * weights[indices]
@@ -685,6 +700,7 @@
     if (effectColumnName != "alternative") {
         names(distribution)[1L] <- effectColumnName
     }
+    distribution$scenarioName <- scenarios$scenarioName
     distribution <- distribution[order(distribution[[1L]]), , drop = FALSE]
     rownames(distribution) <- NULL
     attr(result, "effectDistribution") <- distribution

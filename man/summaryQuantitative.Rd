@@ -18,6 +18,7 @@ Use \code{summary(oc)} for the decision rule, assumptions and category
 probabilities. Each sample-size scenario has a separate table, with one row
 per alternative and one column per decision category. Categories are retained
 separately; probabilities are neither recomputed nor aggregated.
+Names supplied with \code{pi1} or \code{alternative} label the rows in each table.
 Rates tables show the treatment event probability and the beneficial risk
 difference. Their assumptions include the control event probability,
 beneficial direction and selected interval method.
