@@ -96,12 +96,29 @@ spans multiple categories, apply all relevant files:
 
 ## NEWS entries
 
+**Only the latest version (the topmost version section) of `NEWS.md` may be
+edited. All older version sections are immutable historical release notes.**
+Never add, change, delete, move, reformat, or duplicate entries in an older
+version, even if an entry appears incorrect or concerns the same feature.
+Read older versions only to establish release history; finding a matching
+entry there never authorizes editing it. Document changes to previously
+released functionality exclusively in the latest version.
+
+Before editing, identify the exact boundaries of the topmost version section:
+from the first version heading up to, but not including, the next version
+heading. Restrict every insertion and replacement to that range. Repeated
+subsection headings such as `## New features` are not sufficient edit anchors;
+never use a file-wide replacement that could affect older version sections.
+All instructions below to append, revise, or extend entries apply only within
+this topmost version section.
+
 Before adding or updating an entry in `NEWS.md`, review the existing entries
-in both the latest version (the topmost version section) and earlier versions.
+in the latest version and read earlier versions as historical reference only.
 Classify the change relative to previously released functionality, not merely
 relative to the last commit.
 
-- Append new list entries at the bottom of the relevant subsection's list,
+- Append new list entries at the bottom of the relevant subsection's list
+  within the latest version,
   never at the top. Keep existing entries in their current order; revise an
   existing entry in place when it covers the change.
 - First determine whether the change introduces a genuinely new feature by
@@ -121,8 +138,16 @@ relative to the last commit.
   unreleased new feature already listed under `## New features` in the latest
   version. Fixes and optimizations of such features belong in the existing
   feature entry, not in a separate improvements bullet. For changes to
-  previously released functionality, use the improvements subsection and
-  revise an existing entry there if it already covers the same change.
+  previously released functionality, use the latest version's improvements
+  subsection and revise an existing entry there if it already covers the
+  same change. Never revise the entry in the version that originally
+  introduced the functionality.
+
+After editing `NEWS.md`, inspect the diff and verify that all older version
+sections, starting with the second version heading, are byte-for-byte
+unchanged from their pre-edit state. If the edit touched that historical
+content, undo only those unintended changes before completing the task,
+preserving any changes that were already present before the task.
 
 ## Parameter applicability and visibility
 
