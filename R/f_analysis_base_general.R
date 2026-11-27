@@ -30,10 +30,12 @@ NULL
         userFunctionCallEnabled = FALSE) {
     .assertIsDatasetGeneral(dataInput)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, design,
-        objectType = "analysis", userFunctionCallEnabled = userFunctionCallEnabled,
-        default = C_DIRECTION_UPPER_DEFAULT
-    )
+    if (isTRUE(userFunctionCallEnabled)) {
+        directionUpper <- .assertIsValidDirectionUpper(directionUpper, design,
+            objectType = "analysis", userFunctionCallEnabled = userFunctionCallEnabled,
+            default = C_DIRECTION_UPPER_DEFAULT
+        )
+    }
     thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
 
     estimates <- dataInput$getEstimatesUpTo(stage)
